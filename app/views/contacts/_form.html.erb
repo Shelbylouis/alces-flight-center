@@ -1,0 +1,39 @@
+<%= form_with scope: :contact, local: true do |form| %>
+  <% if @contact.errors.any? %>
+    <div id="error_explanation">
+      <h2>
+        <%= pluralize(@contact.errors.count, "error") %> prohibited
+        this contact from being saved:
+      </h2>
+      <ul>
+        <% @contact.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <p>
+    <%= form.label :name %><br>
+    <%= form.text_field :name %>
+  </p>
+ 
+  <p>
+    <%= form.label :email %><br>
+    <%= form.text_area :email %>
+  </p>
+
+  <p>
+    <%= form.label :username %><br>
+    <%= form.text_area :username %>
+  </p>
+
+  <p>
+    <%= form.label :password %><br>
+    <%= form.text_area :password %>
+  </p>
+ 
+  <p>
+    <%= form.submit %>
+  </p>
+<% end %>

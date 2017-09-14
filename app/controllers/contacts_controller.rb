@@ -11,6 +11,10 @@ class ContactsController < ApplicationController
     @contact = Contact.new
   end
 
+  def edit
+    @contact = Contact.find(params[:id])
+  end
+
   def create
     @contact = Contact.new(contact_params)
     if @contact.save

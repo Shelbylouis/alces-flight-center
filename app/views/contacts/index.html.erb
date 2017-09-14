@@ -14,6 +14,7 @@
       <td><%= contact.name %></td>
       <td><%= contact.email %></td>
       <td><%= link_to 'Show', contact_path(contact) %></td>
+      <td><%= link_to 'Edit', edit_contact_path(contact) %></td>
     </tr>
   <% end %>
 </table>
