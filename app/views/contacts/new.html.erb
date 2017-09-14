@@ -2,12 +2,22 @@
 
 <%= form_with scope: :contact, url: contacts_path, local: true do |form| %>
   <p>
-    <%= form.label :title %><br>
+    <%= form.label :name %><br>
     <%= form.text_field :title %>
   </p>
  
   <p>
-    <%= form.label :text %><br>
+    <%= form.label :email %><br>
+    <%= form.text_area :text %>
+  </p>
+
+  <p>
+    <%= form.label :username %><br>
+    <%= form.text_area :text %>
+  </p>
+
+  <p>
+    <%= form.label :password %><br>
     <%= form.text_area :text %>
   </p>
  
