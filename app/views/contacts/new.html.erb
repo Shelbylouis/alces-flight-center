@@ -3,22 +3,22 @@
 <%= form_with scope: :contact, url: contacts_path, local: true do |form| %>
   <p>
     <%= form.label :name %><br>
-    <%= form.text_field :title %>
+    <%= form.text_field :name %>
   </p>
  
   <p>
     <%= form.label :email %><br>
-    <%= form.text_area :text %>
+    <%= form.text_area :email %>
   </p>
 
   <p>
     <%= form.label :username %><br>
-    <%= form.text_area :text %>
+    <%= form.text_area :username %>
   </p>
 
   <p>
     <%= form.label :password %><br>
-    <%= form.text_area :text %>
+    <%= form.text_area :password %>
   </p>
  
   <p>
