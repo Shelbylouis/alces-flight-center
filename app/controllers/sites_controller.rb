@@ -33,6 +33,12 @@ class SitesController < ApplicationController
     end
   end
 
+  def destroy
+    @site = Site.find(params[:id])
+    @site.destroy
+    redirect_to sites_path
+  end
+
   private
 
   def site_params
