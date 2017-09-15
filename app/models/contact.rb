@@ -1,3 +1,5 @@
+require 'validates_email_format_of'
+
 class Contact < ApplicationRecord
   belongs_to :site
   validates :name, presence: true

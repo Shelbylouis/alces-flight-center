@@ -1,6 +1,7 @@
 class ContactsController < ApplicationController
   def index
-    @contacts = Contact.all
+    @site = Site.find(params[:site_id])
+    @contacts = @site.contacts.all
   end
 
   def show
@@ -8,7 +9,8 @@ class ContactsController < ApplicationController
   end
 
   def new
-    @contact = Contact.new
+    @site = Site.find(params[:site_id])
+    @contact = @site.contacts.build
   end
 
   def edit
@@ -16,9 +18,10 @@ class ContactsController < ApplicationController
   end
 
   def create
-    @contact = Contact.new(contact_params)
+    @site = Site.find(params[:site_id])
+    @contact = @site.contacts.new(contact_params)
     if @contact.save
-      redirect_to @contact
+      redirect_to site_contact(@site, @contact)
     else
       render 'new'
     end
