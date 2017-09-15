@@ -13,5 +13,5 @@
   <strong>Email:</strong>
   <%= @contact.email %>
 </p>
-<%= link_to 'Back', contacts_path %>
-<%= link_to 'Edit', edit_contact_path %>
+<%= link_to 'Back', site_path(@site) %>
+<%= link_to 'Edit', edit_site_contact_path(@site, @contact) %>

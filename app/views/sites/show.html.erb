@@ -9,6 +9,26 @@
   <%= @site.description %>
 </p>
 <p>
+  <strong>Contacts:</strong>
+  <table>
+    <tr>
+      <th>Username</th>
+      <th>Name</th>
+      <th>Email</th>
+    </tr>
+    <% @site.contacts.each do |contact| %>
+      <tr>
+        <td><%= contact.username %></td>
+        <td><%= contact.name %></td>
+        <td><%= contact.email %></td>
+        <td><%= link_to 'show', site_contact_path(@site, contact) %></td>
+        <td><%= link_to 'edit', edit_site_contact_path(@site, contact) %></td>
+        <td><%= link_to 'delete', site_contact_path(@site, contact),
+                method: :delete,
+                data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </table>
   <%= link_to 'new contact', new_site_contact_path(@site) %>
 </p>
 <%= link_to 'Back', sites_path %>
