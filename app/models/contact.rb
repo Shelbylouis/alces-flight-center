@@ -1,4 +1,5 @@
 class Contact < ApplicationRecord
+  belongs_to :site
   validates :name, presence: true
   validates :email, email_format: { message: 'is not looking good' }
   validates :username, presence: true

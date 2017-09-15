@@ -10,13 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170914111619) do
+ActiveRecord::Schema.define(version: 20170915110306) do
 
   create_table "contacts", force: :cascade do |t|
     t.string "name"
     t.string "email"
     t.string "username"
     t.string "password"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "site_id"
+    t.index ["site_id"], name: "index_contacts_on_site_id"
+  end
+
+  create_table "sites", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
