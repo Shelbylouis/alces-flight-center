@@ -11,12 +11,25 @@ class SitesController < ApplicationController
     @site = Site.new
   end
 
+  def edit
+    @site = Site.find(params[:id])
+  end
+
   def create
     @site = Site.new(site_params)
     if @site.save
       redirect_to @site
     else
       render 'new'
+    end
+  end
+
+  def update
+    @site = Site.find(params[:id])
+    if @site.update(site_params)
+      redirect_to @site
+    else
+      render 'edit'
     end
   end
 
