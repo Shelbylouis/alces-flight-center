@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170918104016) do
+ActiveRecord::Schema.define(version: 20170918134612) do
 
   create_table "clusters", force: :cascade do |t|
     t.string "name"
@@ -20,6 +20,16 @@ ActiveRecord::Schema.define(version: 20170918104016) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["site_id"], name: "index_clusters_on_site_id"
+  end
+
+  create_table "components", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.string "component_type"
+    t.integer "cluster_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cluster_id"], name: "index_components_on_cluster_id"
   end
 
   create_table "contacts", force: :cascade do |t|
