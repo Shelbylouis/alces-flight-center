@@ -31,5 +31,26 @@
   </table>
   <%= link_to 'new contact', new_site_contact_path(@site) %>
 </p>
+<p>
+  <strong>Cluster:</strong>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Support</th>
+    </tr>
+    <% @site.clusters.each do |cluster| %>
+      <tr>
+        <td><%= cluster.name %></td>
+        <td><%= cluster.support_type %></td>
+        <td><%= link_to 'show', site_cluster_path(@site, cluster) %></td>
+        <td><%= link_to 'edit', edit_cluster_contact_path(@site, cluster) %></td>
+        <td><%= link_to 'delete', site_cluster_path(@site, cluster),
+                method: :delete,
+                data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </table>
+  <%= link_to 'new cluster', new_site_cluster_path(@site) %>
+</p>
 <%= link_to 'Back', sites_path %>
 <%= link_to 'Edit', edit_site_path %>
