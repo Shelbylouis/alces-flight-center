@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170915110306) do
+ActiveRecord::Schema.define(version: 20170918104016) do
+
+  create_table "clusters", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.string "support_type"
+    t.integer "site_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["site_id"], name: "index_clusters_on_site_id"
+  end
 
   create_table "contacts", force: :cascade do |t|
     t.string "name"

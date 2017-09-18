@@ -3,6 +3,7 @@ Rails.application.routes.draw do
 
   resources :sites do
     resources :contacts
+    resources :cluster
   end
 
   root 'welcome#index'
