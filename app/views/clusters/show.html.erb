@@ -14,11 +14,21 @@
   <%= @cluster.support_type %>
 </p>
 <p>
-    <strong>Components</strong><br>
+  <strong>Components</strong>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+    </tr>
     <% @cluster.components.each do |component| %>
-      <%= link_to 'show', cluster_component_path(@cluster, component)  %>
+      <tr>
+        <td><%= component.name %></td>
+        <td><%= component.component_type %></td>
+        <td><%= link_to 'show', cluster_component_path(@cluster, component)  %></td>
+      </tr>
     <% end %>
-    <%= link_to 'New Component', new_cluster_component_path(@cluster) %>
+  </table>
+  <%= link_to 'New Component', new_cluster_component_path(@cluster) %>
 </p>
 <%= link_to 'Back', site_path(@site) %>
 <%= link_to 'Edit', edit_site_cluster_path(@site, @cluster) %>

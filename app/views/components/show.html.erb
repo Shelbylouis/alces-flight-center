@@ -1,0 +1,18 @@
+
+<p>
+  <strong>Name:</strong>
+  <%= @component.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @component.description %>
+</p>
+ 
+<p>
+  <strong>Component Type:</strong>
+  <%= @component.component_type %>
+</p>
+
+<%= link_to 'Back', cluster_path(@cluster) %>
+<%= link_to 'Edit', edit_cluster_component_path(@cluster, @component) %>
