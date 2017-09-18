@@ -10,6 +10,11 @@ class ComponentsController < ApplicationController
     @component = @cluster.components.build
   end
 
+  def edit
+    @component = Component.find(params[:id])
+    @cluster = find_cluster(@component)
+  end
+
   def create
     @cluster = find_cluster
     @component = @cluster.components.new(component_params)
@@ -17,6 +22,16 @@ class ComponentsController < ApplicationController
       redirect_to [@cluster, @component]
     else
       render 'new'
+    end
+  end
+
+  def update
+    @component = Component.find(params[:id])
+    @cluster = find_cluster(@component)
+    if @component.update(component_params)
+      redirect_to [@cluster, @component]
+    else
+      render 'edit'
     end
   end
 
