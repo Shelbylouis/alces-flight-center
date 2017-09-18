@@ -13,5 +13,12 @@
   <strong>Support Type:</strong>
   <%= @cluster.support_type %>
 </p>
+<p>
+    <strong>Components</strong><br>
+    <% @cluster.components.each do |component| %>
+      <%= link_to 'show', cluster_component_path(@cluster, component)  %>
+    <% end %>
+    <%= link_to 'New Component', new_cluster_component_path(@cluster) %>
+</p>
 <%= link_to 'Back', site_path(@site) %>
 <%= link_to 'Edit', edit_site_cluster_path(@site, @cluster) %>
