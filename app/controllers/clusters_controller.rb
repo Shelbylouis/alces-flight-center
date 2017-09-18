@@ -5,8 +5,8 @@ class ClustersController < ApplicationController
   end
 
   def show
-    @site = find_site
     @cluster = Cluster.find(params[:id])
+    @site = find_site(@cluster)
   end
 
   def new
@@ -15,8 +15,8 @@ class ClustersController < ApplicationController
   end
 
   def edit
-    @site = find_site
     @cluster = Cluster.find(params[:id])
+    @site = find_site(@cluster)
   end
 
   def create
@@ -30,8 +30,8 @@ class ClustersController < ApplicationController
   end
 
   def update
-    @site = find_site
     @cluster = Cluster.find(params[:id])
+    @site = find_site(@cluster)
     if @cluster.update(cluster_params)
       redirect_to [@site, @cluster]
     else
@@ -40,16 +40,17 @@ class ClustersController < ApplicationController
   end
 
   def destroy
-    @site = find_site
     @cluster = Cluster.find(params[:id])
+    @site = find_site(@cluster)
     @cluster.destroy
     redirect_to @site
   end
 
   private
 
-  def find_site
-    Site.find(params[:site_id])
+  def find_site(cluster = nil)
+    site_id = (cluster ? cluster.site.id : params[:site_id])
+    Site.find(site_id)
   end
 
   def cluster_params
