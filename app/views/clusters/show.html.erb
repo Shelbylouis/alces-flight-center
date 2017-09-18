@@ -26,6 +26,9 @@
         <td><%= component.component_type %></td>
         <td><%= link_to 'show', cluster_component_path(@cluster, component)  %></td>
         <td><%= link_to 'edit', edit_cluster_component_path(@cluster, component)  %></td>
+        <td><%= link_to 'delete', cluster_component_path(@cluster, component),
+                method: :delete,
+                data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </table>

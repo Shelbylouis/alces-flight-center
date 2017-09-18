@@ -35,6 +35,13 @@ class ComponentsController < ApplicationController
     end
   end
 
+  def destroy
+    @component = Component.find(params[:id])
+    @cluster = find_cluster(@component)
+    @component.destroy
+    redirect_to @cluster
+  end
+
   private
 
   def find_cluster(component = nil)
