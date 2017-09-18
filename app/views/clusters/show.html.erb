@@ -1,0 +1,17 @@
+
+<p>
+  <strong>Name:</strong>
+  <%= @cluster.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @cluster.description %>
+</p>
+ 
+<p>
+  <strong>Support Type:</strong>
+  <%= @cluster.support_type %>
+</p>
+<%= link_to 'Back', site_path(@site) %>
+<%= link_to 'Edit', edit_site_cluster_path(@site, @cluster) %>
