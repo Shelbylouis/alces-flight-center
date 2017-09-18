@@ -14,6 +14,11 @@ class ClustersController < ApplicationController
     @cluster = @site.clusters.build
   end
 
+  def edit
+    @site = find_site
+    @cluster = Cluster.find(params[:id])
+  end
+
   def create
     @site = find_site
     @cluster = @site.clusters.new(cluster_params)
@@ -22,6 +27,23 @@ class ClustersController < ApplicationController
     else
       render 'new'
     end
+  end
+
+  def update
+    @site = find_site
+    @cluster = Cluster.find(params[:id])
+    if @cluster.update(cluster_params)
+      redirect_to [@site, @cluster]
+    else
+      render 'edit'
+    end
+  end
+
+  def destroy
+    @site = find_site
+    @cluster = Cluster.find(params[:id])
+    @cluster.destroy
+    redirect_to @site
   end
 
   private

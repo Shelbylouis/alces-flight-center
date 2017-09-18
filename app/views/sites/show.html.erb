@@ -43,7 +43,7 @@
         <td><%= cluster.name %></td>
         <td><%= cluster.support_type %></td>
         <td><%= link_to 'show', site_cluster_path(@site, cluster) %></td>
-        <td><%= link_to 'edit', edit_cluster_contact_path(@site, cluster) %></td>
+        <td><%= link_to 'edit', edit_site_cluster_path(@site, cluster) %></td>
         <td><%= link_to 'delete', site_cluster_path(@site, cluster),
                 method: :delete,
                 data: { confirm: 'Are you sure?' } %></td>
