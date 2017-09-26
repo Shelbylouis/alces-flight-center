@@ -38,4 +38,13 @@ RailsAdmin.config do |config|
     # history_index
     # history_show
   end
+
+  config.model "Contact" do
+    edit do
+      field :name
+      field :email
+      field :password
+      field :site
+    end
+  end
 end

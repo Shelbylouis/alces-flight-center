@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170918134612) do
+ActiveRecord::Schema.define(version: 20170926091548) do
 
   create_table "clusters", force: :cascade do |t|
     t.string "name"
@@ -33,13 +33,15 @@ ActiveRecord::Schema.define(version: 20170918134612) do
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.string "name"
-    t.string "email"
-    t.string "username"
-    t.string "password"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name", null: false
+    t.string "email", null: false
+    t.string "encrypted_password", limit: 128, null: false
+    t.string "remember_token", limit: 128, null: false
     t.integer "site_id"
+    t.index ["email"], name: "index_contacts_on_email"
+    t.index ["remember_token"], name: "index_contacts_on_remember_token"
     t.index ["site_id"], name: "index_contacts_on_site_id"
   end
 
