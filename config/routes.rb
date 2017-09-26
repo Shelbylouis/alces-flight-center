@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
   constraints Clearance::Constraints::SignedIn.new do
-    root 'home#show'
+    root 'cases#index'
     resources :cases, except: [:destroy]
   end
 
