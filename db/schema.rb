@@ -10,7 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170926100529) do
+ActiveRecord::Schema.define(version: 20170926110331) do
+
+  create_table "case_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description"
+    t.boolean "requires_component", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "component_type_id"
+    t.index ["component_type_id"], name: "index_case_categories_on_component_type_id"
+  end
 
   create_table "clusters", force: :cascade do |t|
     t.string "name"
