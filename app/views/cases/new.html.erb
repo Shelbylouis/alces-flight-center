@@ -1,0 +1,34 @@
+
+<%= form_for @case do |f| %>
+  <div>
+    <%# XXX Update applicable components, or hide entirely, when this changes.
+  %>
+    <label>Case category
+      <%= f.collection_select :case_category_id, @case_categories, :id, :name %>
+    </label>
+  </div>
+
+  <%# XXX Update applicable components when this changes. %>
+  <div>
+    <label>Cluster
+      <%= f.collection_select :cluster_id, @site_clusters, :id, :name %>
+    </label>
+  </div>
+
+  <div>
+    <label>Component
+      <%= f.collection_select :component_id,
+        @site_components,
+        :id,
+        :name,
+        include_blank: true
+      %>
+    </label>
+  </div>
+
+  <div>
+    <label>Details <%= f.text_area :details, required: true %></label>
+  </div>
+
+  <%= f.submit %>
+<% end %>
