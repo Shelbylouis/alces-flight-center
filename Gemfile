@@ -22,6 +22,8 @@ gem 'uglifier', '>= 1.3.0'
 gem 'rails_admin', '~> 1.2'
 gem 'clearance'
 
+gem 'bootstrap', '~> 4.0.0.beta'
+gem 'jquery-rails' # Required for Bootstrap.
 
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
