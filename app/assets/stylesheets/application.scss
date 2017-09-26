@@ -16,3 +16,18 @@
 
 // Custom bootstrap variables must be set or imported *before* bootstrap.
 @import "bootstrap";
+
+.page-container {
+  padding-bottom: 3rem;
+}
+
+.card {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+  .card-header {
+    li {
+      margin-right: 0.5rem;
+    }
+  }
+}

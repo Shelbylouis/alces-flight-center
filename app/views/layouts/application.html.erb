@@ -11,17 +11,60 @@
   </head>
 
   <body>
-    <div id="flash">
-      <% flash.each do |key, value| %>
-        <div class="flash <%= key %>"><%= value %></div>
-      <% end %>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" href="/">Alces Support</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <%# Add links like this here: %>
+          <%# <li class="nav-item"> %>
+          <%#   <%= link_to 'Hunter', :hunter, class: 'nav-link' %1> %>
+          <%# </li> %>
+        </ul>
+      </div>
+
+    <%# XXX Make this look better %>
     <% if signed_in? %>
       Signed in as: <%= current_user.name %>
       <%= button_to 'Sign out', sign_out_path, method: :delete %>
     <% end %>
+    </nav>
 
-    <%= yield %>
+    <% if @title %>
+      <div class="jumbotron">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col"></div>
+            <div class="col-6">
+              <h1 class="display-4"><%= @title %></h1>
+            </div>
+            <div class="col"></div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="container-fluid page-container">
+      <%= render 'partials/flash_alert', flash_key: :error, alert_class: 'alert-danger' %>
+      <%= render 'partials/flash_alert', flash_key: :success, alert_class: 'alert-success' %>
+      <%= render 'partials/flash_alert', flash_key: :notice, alert_class: 'alert-info' %>
+
+      <div class="row">
+        <div class="col"></div>
+        <div class="col-6">
+          <%= yield %>
+        </div>
+        <div class="col"></div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <span class="text-muted">© Alces Software Ltd 2017</span>
+      </div>
+    </footer>
   </body>
 </html>
