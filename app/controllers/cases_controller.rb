@@ -3,9 +3,11 @@ class CasesController < ApplicationController
 
   def index
     @site = current_site
+    @title = "Support for site #{@site.name}"
   end
 
   def new
+    @title = "Create new support case"
     @case = Case.new
     assign_form_variables
   end
