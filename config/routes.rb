@@ -7,6 +7,10 @@ Rails.application.routes.draw do
   # them out; this declaration defines this.
   delete :logout, to: 'clearance/sessions#destroy'
 
+  constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
+    root 'home#admin_landing'
+  end
+
   constraints Clearance::Constraints::SignedIn.new do
     root 'cases#index'
     resources :cases, except: [:destroy]
