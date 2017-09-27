@@ -36,11 +36,9 @@ RailsAdmin.config do |config|
 
   config.model "User" do
     edit do
-      field :name
-      field :email
-      field :password
-      field :admin
-      field :site
+      configure :password_confirmation do
+        hide
+      end
     end
   end
 end
