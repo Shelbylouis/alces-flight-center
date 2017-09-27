@@ -13,7 +13,7 @@ class CasesController < ApplicationController
   end
 
   def create
-    @case = Case.new(case_params.merge(contact: current_user))
+    @case = Case.new(case_params.merge(user: current_user))
 
     if @case.save
       flash[:success] = 'Support case successfully created.'

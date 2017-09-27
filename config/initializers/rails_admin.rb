@@ -39,11 +39,12 @@ RailsAdmin.config do |config|
     # history_show
   end
 
-  config.model "Contact" do
+  config.model "User" do
     edit do
       field :name
       field :email
       field :password
+      field :admin
       field :site
     end
   end

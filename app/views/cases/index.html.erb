@@ -31,7 +31,7 @@
     <% @site.cases.each do |c| %>
       <tr>
         <td><%= c.created_at %></td>
-        <td><%= c.contact.name %></td>
+        <td><%= c.user.name %></td>
         <td><%= c.case_category.name %></td>
         <td><%= c.cluster.name %></td>
         <td><%= c.component&.name %></td>
