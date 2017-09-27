@@ -24,13 +24,15 @@
           <%#   <%= link_to 'Hunter', :hunter, class: 'nav-link' %1> %>
           <%# </li> %>
         </ul>
+        <% if signed_in? %>
+          <span class="navbar-text text-light"><%= current_user.name %></span>
+          <%= button_to 'Sign out',
+            sign_out_path,
+            method: :delete,
+            class: ['btn', 'btn-light']
+          %>
+        <% end %>
       </div>
-
-    <%# XXX Make this look better %>
-    <% if signed_in? %>
-      Signed in as: <%= current_user.name %>
-      <%= button_to 'Sign out', sign_out_path, method: :delete %>
-    <% end %>
     </nav>
 
     <% if @title %>
