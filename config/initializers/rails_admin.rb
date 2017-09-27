@@ -1,27 +1,22 @@
+
 RailsAdmin.config do |config|
+  # Required so ApplicationController methods, such as `current_user`,
+  # available within `authorize_with` block.
+  config.parent_controller = ApplicationController.to_s
 
-  ### Popular gems integration
+  # Prevent access to admin interface unless current user is an admin.
+  config.authorize_with do
+    unless current_user&.admin?
+      redirect_to(
+        main_app.root_path,
+        alert: "You are not permitted to view this page"
+      )
+    end
+  end
 
-  ## == Devise ==
-  # config.authenticate_with do
-  #   warden.authenticate! scope: :user
-  # end
-  # config.current_user_method(&:current_user)
-
-  ## == Cancan ==
-  # config.authorize_with :cancan
-
-  ## == Pundit ==
-  # config.authorize_with :pundit
-
-  ## == PaperTrail ==
-  # config.audit_with :paper_trail, 'User', 'PaperTrail::Version' # PaperTrail >= 3.0.0
-
-  ### More at https://github.com/sferik/rails_admin/wiki/Base-configuration
-
-  ## == Gravatar integration ==
-  ## To disable Gravatar integration in Navigation Bar set to false
-  # config.show_gravatar = true
+  # Allows current user name and Gravatar avatar to be displayed within admin
+  # dashboard.
+  config.current_user_method { current_user }
 
   config.actions do
     dashboard                     # mandatory
