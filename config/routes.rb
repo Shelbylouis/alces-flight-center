@@ -17,6 +17,6 @@ Rails.application.routes.draw do
   end
 
   constraints Clearance::Constraints::SignedOut.new do
-    root 'home#signed_out'
+    root 'clearance/sessions#new'
   end
 end
