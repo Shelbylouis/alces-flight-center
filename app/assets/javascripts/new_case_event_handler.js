@@ -35,7 +35,7 @@ $(function() {
 
     // Hides components that do not match the select component type
     if(selected_component_type_id) {
-      filter_on_miss_match(options(), selected_component_type_id, function(component) {
+      filter_on_miss_match(options(), selected_component_type_id, function(component) { 
         return data_attr_id(component, 'component-type')
       })
     }
@@ -44,7 +44,13 @@ $(function() {
   function hide_components_on_selected_cluster() {
     selected_cluster_id = data_attr_id(selected_cluster(), 'cluster')
     filter_on_miss_match(options(), selected_cluster_id, function(component) {
-      return data_attr_id(component, 'cluster')
+      // Regular components are filtered on cluster id
+      if ($(component).val()) {
+        return data_attr_id(component, 'cluster')
+      // The blank component needs to skip filtering, this is done by making it the expected value
+      } else {
+        return selected_cluster_id
+      }
     })
   }
 
