@@ -3,6 +3,8 @@ class RequestTrackerInterface
   RT_API_ENDPOINT = 'http://helpdesk.alces-software.com/rt/REST/1.0/'
   NEW_TICKET_PATH = 'ticket/new'
 
+  Ticket = Struct.new(:id)
+
   attr_reader :username, :password
 
   def initialize
@@ -18,11 +20,16 @@ class RequestTrackerInterface
       text: text
     )
 
-    HTTP.post(
+    response = HTTP.post(
       url,
       params: {user: username, pass: password},
       body: "content=#{content}"
     )
+
+    ticket_id_regex = /Ticket (\d{5,}) created./
+    id = response.to_s.match(ticket_id_regex)[1].to_i
+
+    Ticket.new(id)
   end
 
   private
