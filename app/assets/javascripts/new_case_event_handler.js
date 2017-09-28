@@ -12,16 +12,17 @@ $(function() {
     categories = $('#CaseForm_case_case_category_id')
     selected_category_index = parseInt(categories.val()) -1
     selected_category = categories.children()[selected_category_index]
+    selected_component_type_id = strip_id_from_class(selected_category)
 
     // Unhides all the options fields
     options.each(function(_index, opt) { $(opt).show() })
 
-    // Hide options that do not match the new case category
-    options.filter(function(_index, opt) {
-      selected_category_id = strip_id_from_class(selected_category)
-      console.log(selected_category_id)
-      return selected_category_id != strip_id_from_class(opt)
-    }).each(function(_index, opt){ $(opt).hide() })
+    // Hides components that do not match the select component type
+    if(selected_component_type_id) {
+      options.filter(function(_index, opt) {
+        return selected_component_type_id != strip_id_from_class(opt)
+      }).each(function(_index, opt){ $(opt).hide() })
+    }
   }
 
   // Applies the event handler and runs it on load
