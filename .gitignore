@@ -42,3 +42,9 @@ bower.json
 
 # Ignore Byebug command history file.
 .byebug_history
+
+# Ignore VCR cassettes to:
+# a. not expose request details in repo;
+# b. ensure requests are actually made when tests first run and when cassettes
+# expire, so tests do not become obsolete.
+fixtures/vcr_cassettes/

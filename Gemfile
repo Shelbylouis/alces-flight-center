@@ -45,6 +45,8 @@ group :development, :test do
   gem 'selenium-webdriver'
 
   gem 'rspec-rails'
+  gem 'vcr'
+  gem 'webmock'
 
   gem 'dotenv-rails'
 end
