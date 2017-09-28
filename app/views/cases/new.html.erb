@@ -1,7 +1,7 @@
 
 <%# XXX Add required labels to required fields as in Metalware? %>
 
-<%= form_for @case do |f| %>
+<%= form_for @case, namespace: 'CaseForm' do |f| %>
   <%# XXX Update applicable components when this changes. %>
   <div class="form-group">
     <%= f.label :cluster_id %>
