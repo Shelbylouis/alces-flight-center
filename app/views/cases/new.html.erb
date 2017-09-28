@@ -29,10 +29,9 @@
 
   <div class="form-group">
     <%= f.label :component_id %>
-    <%= f.collection_select :component_id,
-      @site_components,
-      :id,
-      :name,
+    <%= f.select :component_id,
+      options_for_site_components,
+      # TODO: Change to: {include_blank: requires_component?}
       {include_blank: true},
       {class: ['form-control']}
     %>
