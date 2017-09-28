@@ -1,33 +1,38 @@
 // Filters the components options by case category
 $(function() {
-  function strip_id_from_class(obj) {
-    class_string = obj.className
-    if(!class_string) { return null; } // Handles missing class name
-    tag_without_id = class_string.match(/.*-id-/)[0]
-    return parseInt(class_string.replace(tag_without_id, ''))
+
+  function data_attr_id(obj, data_tag) {
+    return $(obj).attr('data-' + data_tag + '-id')
   }
 
-  function new_case_update_component_field() {
-    options = $('#CaseForm_case_component_id').children()
-    categories = $('#CaseForm_case_case_category_id')
-    selected_category_index = parseInt(categories.val()) -1
-    selected_category = categories.children()[selected_category_index]
-    selected_component_type_id = strip_id_from_class(selected_category)
+  function options() { return $('#CaseForm_case_component_id').children() }
+  function categories() { return $('#CaseForm_case_case_category_id') }
+  function selected_category() {
+    index = parseInt(categories().val()) -1
+    return categories().children()[index]
+  }
 
-    // Unhides all the options fields
-    options.each(function(_index, opt) { $(opt).show() })
+  function show_all_components() {
+    options().each(function(_index, opt) { $(opt).show() })
+  }
+
+  function filter_components_on_selected_case_category() {
+    selected_component_type_id = data_attr_id(selected_category(), 'component-type')
 
     // Hides components that do not match the select component type
     if(selected_component_type_id) {
-      options.filter(function(_index, opt) {
-        return selected_component_type_id != strip_id_from_class(opt)
+      options().filter(function(_index, opt) {
+        return selected_component_type_id != data_attr_id(opt, 'component-type')
       }).each(function(_index, opt){ $(opt).hide() })
     }
   }
 
+  function event_handler() {
+    show_all_components()
+    filter_components_on_selected_case_category()
+  }
+
   // Applies the event handler and runs it on load
-  $('#CaseForm_case_case_category_id').change(function(){
-    new_case_update_component_field()
-  })
-  new_case_update_component_field()
+  $('#CaseForm_case_case_category_id').change(function(){ event_handler() })
+  event_handler()
 })

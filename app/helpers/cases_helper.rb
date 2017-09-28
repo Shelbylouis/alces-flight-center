@@ -1,7 +1,7 @@
 module CasesHelper
   def options_for_site_components
     arr = build_options_array(@site_components) do |site_component|
-      { class: "data-component-type-id-#{site_component.component_type.id}" }
+      { "data-component-type-id": site_component.component_type.id }
     end
     options_for_select(arr)
   end
@@ -9,7 +9,7 @@ module CasesHelper
   def options_for_case_categories
     arr = build_options_array(@case_categories) do |case_category|
       component_id = case_category.component_type&.id
-      component_id ? { class: "data-component-type-id-#{component_id}" } : {}
+      component_id ? { 'data-component-type-id': component_id } : {}
     end
     options_for_select(arr)
   end
