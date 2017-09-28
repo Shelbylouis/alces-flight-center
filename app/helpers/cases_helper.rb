@@ -8,7 +8,8 @@ module CasesHelper
 
   def options_for_case_categories
     arr = build_options_array(@case_categories) do |case_category|
-      { class: "data-case-category-id-#{case_category.id}" }
+      component_id = case_category.component_type&.id
+      component_id ? { class: "data-component-type-id-#{component_id}" } : {}
     end
     options_for_select(arr)
   end
