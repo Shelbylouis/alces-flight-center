@@ -1,14 +1,14 @@
 module CasesHelper
   def options_for_site_components
     build_options_with_data_attributes(@site_components) do |site_component|
-      { "data-component-type-id": site_component.component_type.id }
+      { 'component-type': site_component.component_type.id }
     end
   end
 
   def options_for_case_categories
     build_options_with_data_attributes(@case_categories) do |case_category|
       component_id = case_category.component_type&.id
-      component_id ? { 'data-component-type-id': component_id } : {}
+      component_id ? { 'component-type': component_id } : {}
     end
   end
 
@@ -21,9 +21,16 @@ module CasesHelper
       [
         obj.name,
         obj.id,
-        yield(obj)
+        convert_keys_to_data_id_tag(yield(obj))
       ]
     end
     options_for_select(arr)
+  end
+
+  def convert_keys_to_data_id_tag(data_hash = {})
+    data_hash.inject({}) do |memo, (key, value)|
+      memo["data-#{key}-id"] = value
+      memo
+    end
   end
 end
