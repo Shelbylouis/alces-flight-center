@@ -2,12 +2,11 @@
 <%# XXX Add required labels to required fields as in Metalware? %>
 
 <%= form_for @case do |f| %>
+  <%# XXX Update applicable components when this changes. %>
   <div class="form-group">
-    <%# XXX Update applicable components, or hide entirely, when this changes.
-  %>
-    <%= f.label :case_category_id %>
-    <%= f.collection_select :case_category_id,
-      @case_categories,
+    <%= f.label :cluster_id %>
+    <%= f.collection_select :cluster_id,
+      @site_clusters,
       :id,
       :name,
       {},
@@ -15,11 +14,12 @@
     %>
   </div>
 
-  <%# XXX Update applicable components when this changes. %>
   <div class="form-group">
-    <%= f.label :cluster_id %>
-    <%= f.collection_select :cluster_id,
-      @site_clusters,
+    <%# XXX Update applicable components, or hide entirely, when this changes.
+  %>
+    <%= f.label :case_category_id %>
+    <%= f.collection_select :case_category_id,
+      @case_categories,
       :id,
       :name,
       {},
