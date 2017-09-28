@@ -33,6 +33,6 @@ $(function() {
   }
 
   // Applies the event handler and runs it on load
-  $('#CaseForm_case_case_category_id').change(function(){ event_handler() })
+  $('#CaseForm_new_case').change(function(){ event_handler() })
   event_handler()
 })
