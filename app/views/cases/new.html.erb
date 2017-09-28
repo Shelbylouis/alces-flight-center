@@ -18,10 +18,8 @@
     <%# XXX Update applicable components, or hide entirely, when this changes.
   %>
     <%= f.label :case_category_id %>
-    <%= f.collection_select :case_category_id,
-      @case_categories,
-      :id,
-      :name,
+    <%= f.select :case_category_id,
+      options_for_case_categories,
       {},
       {class: ['form-control']}
     %>
