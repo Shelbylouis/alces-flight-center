@@ -5,10 +5,8 @@
   <%# XXX Update applicable components when this changes. %>
   <div class="form-group">
     <%= f.label :cluster_id %>
-    <%= f.collection_select :cluster_id,
-      @site_clusters,
-      :id,
-      :name,
+    <%= f.select :cluster_id,
+      options_for_site_clusters,
       {},
       {class: ['form-control']}
     %>

@@ -1,7 +1,10 @@
 module CasesHelper
   def options_for_site_components
     build_options_with_data_attributes(@site_components) do |site_component|
-      { 'component-type': site_component.component_type.id }
+      {
+        'component-type': site_component.component_type.id,
+        'cluster': site_component.cluster.id
+      }
     end
   end
 
@@ -9,6 +12,12 @@ module CasesHelper
     build_options_with_data_attributes(@case_categories) do |case_category|
       component_id = case_category.component_type&.id
       component_id ? { 'component-type': component_id } : {}
+    end
+  end
+
+  def options_for_site_clusters
+    build_options_with_data_attributes(@site_clusters) do |cluster|
+      { 'cluster': cluster.id }
     end
   end
 
