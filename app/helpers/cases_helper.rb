@@ -1,6 +1,9 @@
 module CasesHelper
   def options_for_site_components
-    options_for_select(site_components_array)
+    arr = build_options_array(@site_components) do |site_component|
+      { class: "data-component-type-id-#{site_component.component_type.id}" }
+    end
+    options_for_select(arr)
   end
 
   def options_for_case_categories
@@ -11,16 +14,6 @@ module CasesHelper
   end
 
   private
-
-  def site_components_array
-    @site_components.map do |site_component|
-      [
-        site_component.name,
-        site_component.id,
-        { class: "data-component-type-id-#{site_component.component_type.id}" }
-      ]
-    end
-  end
 
   ##
   # The hash returned from the block becomes the html attributes hash
