@@ -24,6 +24,7 @@
         <th>Cluster</th>
         <th>Associated component</th>
         <th>Details</th>
+        <th>Contact support</th>
       </tr>
     </thead>
 
@@ -36,6 +37,14 @@
         <td><%= c.cluster.name %></td>
         <td><%= c.component&.name %></td>
         <td><%= c.details %></td>
+        <td>
+          <a
+            href='<%= c.mailto_url %>'
+            target='_blank'
+          >
+            <%= octicon 'mail', height: 28, class: 'email-icon' %>
+          </a>
+        </td>
       </tr>
     <% end %>
     </tbody>
