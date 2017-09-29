@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe RequestTrackerInterface, type: :model do
-  subject { RequestTrackerInterface.new }
+RSpec.shared_examples 'Request Tracker interface' do
+  subject { described_class.new }
 
   describe 'create_ticket' do
     it 'creates a ticket and returns object with id' do
@@ -22,4 +22,8 @@ RSpec.describe RequestTrackerInterface, type: :model do
       end
     end
   end
+end
+
+RSpec.describe RequestTrackerInterface do
+  it_behaves_like 'Request Tracker interface'
 end
