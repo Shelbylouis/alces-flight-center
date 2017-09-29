@@ -38,13 +38,11 @@ class RequestTrackerInterface
   end
 
   def new_ticket_request_content(requestor_email:, subject:, text:)
-    parameters = {
-        Queue: 'Support',
-        Requestor: requestor_email,
-        Subject: subject,
-        # Multiline text must have each new line prefixed with a space.
-        Text: text.gsub("\n", "\n "),
-    }
-    parameters.map { |pair| pair.join(': ') }.join("\n")
+    Utils.rt_format({
+      Queue: 'Support',
+      Requestor: requestor_email,
+      Subject: subject,
+      Text: text
+    })
   end
 end
