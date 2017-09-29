@@ -5,11 +5,11 @@ $(function() {
     return $(obj).attr('data-' + data_tag + '-id')
   }
 
+  // NOTE: options() is the components list
   function options() { return $('#CaseForm_case_component_id').children() }
 
   function selected(object) {
-    index = parseInt(object.val()) - 1
-    return object.children()[index]
+    return object.find(":selected")[0]
   }
 
   function selected_category() {
@@ -18,6 +18,11 @@ $(function() {
 
   function selected_cluster() {
     return selected($('#CaseForm_case_cluster_id'))
+  }
+
+  select_component_field = $('#CaseForm_case_component_id')
+  function selected_component() {
+    return selected(select_component_field)
   }
 
   function show_all_components() {
@@ -35,7 +40,7 @@ $(function() {
 
     // Hides components that do not match the select component type
     if(selected_component_type_id) {
-      filter_on_miss_match(options(), selected_component_type_id, function(component) { 
+      filter_on_miss_match(options(), selected_component_type_id, function(component) {
         return data_attr_id(component, 'component-type')
       })
     }
@@ -54,10 +59,20 @@ $(function() {
     })
   }
 
+  function unset_selected_component_if_invalid() {
+    // Do nothing if selected_component() is already undefined
+    if (selected_component()) {
+      if ($(selected_component()).css('display') === 'none' ) {
+        select_component_field.val(undefined)
+      }
+    }
+  }
+
   function event_handler() {
     show_all_components()
     hide_components_on_selected_case_category()
     hide_components_on_selected_cluster()
+    unset_selected_component_if_invalid()
   }
 
   // Applies the event handler and runs it on load
