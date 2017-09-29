@@ -1,6 +1,6 @@
 
 class RequestTrackerInterface
-  RT_API_ENDPOINT = 'http://helpdesk.alces-software.com/rt/REST/1.0/'
+  RT_API_ENDPOINT = 'http://gateway.alces-software.com:5556/rt/REST/1.0/'
   NEW_TICKET_PATH = 'ticket/new'
 
   Ticket = Struct.new(:id)
