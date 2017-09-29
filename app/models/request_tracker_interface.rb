@@ -13,19 +13,13 @@ class RequestTrackerInterface
   end
 
   def create_ticket(requestor_email:, subject:, text:)
-    url = URI.join(RT_API_ENDPOINT, NEW_TICKET_PATH)
     content = new_ticket_request_content(
       requestor_email: requestor_email,
       subject: subject,
       text: text
     )
 
-    response = HTTP.post(
-      url,
-      params: {user: username, pass: password},
-      body: "content=#{content}"
-    )
-
+    response = api_request(NEW_TICKET_PATH, content: content)
     ticket_id_regex = /Ticket (\d{5,}) created./
     id = response.to_s.match(ticket_id_regex)[1].to_i
 
@@ -33,6 +27,15 @@ class RequestTrackerInterface
   end
 
   private
+
+  def api_request(path, content:)
+    url = URI.join(RT_API_ENDPOINT, path)
+    HTTP.post(
+      url,
+      params: {user: username, pass: password},
+      body: "content=#{content}"
+    )
+  end
 
   def new_ticket_request_content(requestor_email:, subject:, text:)
     parameters = {
