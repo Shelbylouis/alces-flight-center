@@ -16,7 +16,7 @@ RSpec.shared_examples 'Request Tracker interface' do
     }
   end
 
-  describe 'create_ticket' do
+  describe '#create_ticket' do
     it 'creates a ticket and returns object with id' do
       VCR.use_cassette('rt_create_ticket', re_record_interval: 7.days) do
         ticket = subject.create_ticket(new_ticket_params)
@@ -35,7 +35,7 @@ end
 RSpec.describe FakeRequestTrackerInterface do
   include_context 'Request Tracker interface'
 
-  describe 'create_ticket' do
+  describe '#create_ticket' do
     it 'produces tickets with incrementing IDs' do
       # Mock that we have a Case with the current maximum rt ticket id.
       max_rt_ticket_id = 10001
