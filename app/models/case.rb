@@ -10,16 +10,10 @@ class Case < ApplicationRecord
   before_validation :create_rt_ticket, on: :create
 
   def create_rt_ticket
-    # XXX Adjust info included in ticket.
     ticket = request_tracker.create_ticket(
       requestor_email: user.email,
       subject: rt_ticket_subject,
-      text: <<-EOF.strip_heredoc
-        Cluster: #{cluster.name}
-        Case category: #{case_category.name}
-        Associated component: #{component&.name || 'None'}
-        Details: #{details}
-      EOF
+      text: rt_ticket_text
     )
 
     self.rt_ticket_id = ticket.id
@@ -49,5 +43,18 @@ class Case < ApplicationRecord
 
   def rt_ticket_subject
     "Supportware ticket: #{cluster.name} - #{case_category.name}"
+  end
+
+  def rt_ticket_text
+    properties = {
+      Cluster: cluster.name,
+      'Case category': case_category.name,
+      'Associated component': component&.name,
+      Details: details
+    }.reject { |k,v| v.nil? }
+
+    # Ticket text does not need to be in this format, it is just text, but this
+    # is readable and an adequate format for now.
+    Utils.rt_format(properties)
   end
 end
