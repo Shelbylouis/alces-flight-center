@@ -27,3 +27,7 @@ end
 RSpec.describe RequestTrackerInterface do
   it_behaves_like 'Request Tracker interface'
 end
+
+RSpec.describe FakeRequestTrackerInterface do
+  it_behaves_like 'Request Tracker interface'
+end
