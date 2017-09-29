@@ -13,7 +13,7 @@ class Case < ApplicationRecord
     # XXX Adjust info included in ticket.
     ticket = request_tracker.create_ticket(
       requestor_email: user.email,
-      subject: "Supportware ticket: #{cluster.name} - #{case_category.name}",
+      subject: rt_ticket_subject,
       text: <<-EOF.strip_heredoc
         Cluster: #{cluster.name}
         Case category: #{case_category.name}
@@ -25,6 +25,12 @@ class Case < ApplicationRecord
     self.rt_ticket_id = ticket.id
   end
 
+  def mailto_url
+    support_email = 'support@alces-software.com'
+    subject = URI.escape(rt_email_subject)
+    "mailto:#{support_email}?subject=#{subject}"
+  end
+
   private
 
   def request_tracker
@@ -34,5 +40,14 @@ class Case < ApplicationRecord
     # which would then cause things to blow up (e.g. see
     # https://stackoverflow.com/a/23008837).
     @rt ||= Rails.configuration.rt_interface_class.constantize.new
+  end
+
+  def rt_email_subject
+    rt_email_identifier = "[helpdesk.alces-software.com ##{rt_ticket_id}]"
+    "RE: #{rt_email_identifier} #{rt_ticket_subject}"
+  end
+
+  def rt_ticket_subject
+    "Supportware ticket: #{cluster.name} - #{case_category.name}"
   end
 end
