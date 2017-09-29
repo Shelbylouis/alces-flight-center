@@ -1,4 +1,6 @@
 
+require 'exceptions'
+
 class RequestTrackerInterface
   RT_API_ENDPOINT = 'http://gateway.alces-software.com:5556/rt/REST/1.0/'
   NEW_TICKET_PATH = 'ticket/new'
@@ -20,9 +22,12 @@ class RequestTrackerInterface
     )
 
     response = api_request(NEW_TICKET_PATH, content: content)
-    ticket_id_regex = /Ticket (\d{5,}) created./
-    id = response.to_s.match(ticket_id_regex)[1].to_i
 
+    ticket_id_regex = /Ticket (\d{5,}) created./
+    response_match = response.to_s.match(ticket_id_regex)
+    raise UnexpectedRtApiResponseException, response.body unless response_match
+
+    id = response_match[1].to_i
     Ticket.new(id)
   end
 
@@ -34,7 +39,11 @@ class RequestTrackerInterface
       url,
       params: {user: username, pass: password},
       body: "content=#{content}"
-    )
+    ).tap do |r|
+      unless r.status.success?
+        raise UnexpectedRtApiResponseException, r.body
+      end
+    end
   end
 
   def new_ticket_request_content(requestor_email:, subject:, text:)

@@ -29,7 +29,44 @@ RSpec.shared_examples 'Request Tracker interface' do
 end
 
 RSpec.describe RequestTrackerInterface do
-  it_behaves_like 'Request Tracker interface'
+  include_context 'Request Tracker interface'
+
+  describe '#create_ticket' do
+    let :bad_response_body { 'Oh no, things went wrong' }
+
+    it 'raises when API responds with an unexpected status' do
+      stub_request(
+        :any, /#{described_class::RT_API_ENDPOINT}/
+      ).to_return(
+        status: 418,
+        body: bad_response_body
+      )
+
+      VCR.turned_off do
+        expect do
+          subject.create_ticket(new_ticket_params)
+        end.to raise_error(
+          UnexpectedRtApiResponseException, bad_response_body
+        )
+      end
+    end
+
+    it 'raises when API responds with an unexpected body format' do
+      stub_request(
+        :any, /#{described_class::RT_API_ENDPOINT}/
+      ).to_return(
+        body: bad_response_body
+      )
+
+      VCR.turned_off do
+        expect do
+          subject.create_ticket(new_ticket_params)
+        end.to raise_error(
+          UnexpectedRtApiResponseException, bad_response_body
+        )
+      end
+    end
+  end
 end
 
 RSpec.describe FakeRequestTrackerInterface do
