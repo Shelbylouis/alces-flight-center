@@ -5,6 +5,10 @@ $(function() {
     return $(obj).attr('data-' + data_tag + '-id')
   }
 
+  function hidden(html) {
+    return $(html).css('display') === 'none'
+  }
+
   // NOTE: options() is the components list
   function options() { return $('#CaseForm_case_component_id').children() }
 
@@ -21,11 +25,13 @@ $(function() {
   }
 
   select_component_field = $('#CaseForm_case_component_id')
+  form_group_for_select_component = select_component_field.parent()
   function selected_component() {
     return selected(select_component_field)
   }
 
   function show_all_components() {
+    form_group_for_select_component.show()
     options().each(function(_index, opt) { $(opt).show() })
   }
 
@@ -62,9 +68,21 @@ $(function() {
   function unset_selected_component_if_invalid() {
     // Do nothing if selected_component() is already undefined
     if (selected_component()) {
-      if ($(selected_component()).css('display') === 'none' ) {
+      if (hidden(selected_component())) {
         select_component_field.val(undefined)
       }
+    }
+  }
+
+  function hide_component_field_if_empty() {
+    loop_count = 0
+    num_visible_components = options().toArray().reduce(function(memo, cur) {
+      if (loop_count == 0) { memo = hidden(memo) ? 0 : 1 }
+      loop_count++
+      return memo + (hidden(cur) ? 0 : 1)
+    })
+    if (num_visible_components === 0) {
+      form_group_for_select_component.hide()
     }
   }
 
@@ -73,6 +91,7 @@ $(function() {
     hide_components_on_selected_case_category()
     hide_components_on_selected_cluster()
     unset_selected_component_if_invalid()
+    hide_component_field_if_empty()
   }
 
   // Applies the event handler and runs it on load
