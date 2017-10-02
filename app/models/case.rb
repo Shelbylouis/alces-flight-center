@@ -1,4 +1,11 @@
 class Case < ApplicationRecord
+  # We don't (yet at least) introspect rt for the status of a ticket, so there
+  # is not necessarily any correspondence between a Case status and its
+  # corresponding rt ticket status. Loosely however:
+  # - `open` corresponds to `new`/`open`/`stalled`;
+  # - `closed` corresponds to `resolved`/`rejected`/`deleted`.
+  STATUSES = ['open', 'closed'].freeze
+
   belongs_to :case_category
   belongs_to :cluster
   belongs_to :component, required: false
@@ -6,6 +13,7 @@ class Case < ApplicationRecord
 
   validates :details, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
+  validates :status, inclusion: { in: STATUSES }, presence: true
 
   before_validation :create_rt_ticket, on: :create
 
