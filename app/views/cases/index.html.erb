@@ -30,7 +30,7 @@
     </thead>
 
     <tbody>
-    <% @site.cases.each do |c| %>
+    <% @open_cases.each do |c| %>
       <tr>
         <td><%= c.created_at %></td>
         <td><%= c.user.name %></td>
