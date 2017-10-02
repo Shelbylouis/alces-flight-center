@@ -25,11 +25,11 @@ class CasesController < ApplicationController
     end
   end
 
-  def close
+  def archive
     @case = Case.find(params[:id])
-    @case.status = :closed
+    @case.status = :archived
     if @case.save
-      flash[:success] = 'Support case closed.'
+      flash[:success] = 'Support case archived.'
     else
       flash_object_errors(@case)
     end

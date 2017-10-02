@@ -1,10 +1,9 @@
 class Case < ApplicationRecord
-  # We don't (yet at least) introspect rt for the status of a ticket, so there
-  # is not necessarily any correspondence between a Case status and its
-  # corresponding rt ticket status. Loosely however:
-  # - `open` corresponds to `new`/`open`/`stalled`;
-  # - `closed` corresponds to `resolved`/`rejected`/`deleted`.
-  STATUSES = ['open', 'closed'].freeze
+  # The status of a Case is purely for user's benefits, so they can archive
+  # (hide) cases they no longer wish to be prominent within the UI; this is
+  # unrelated to what the status of the corresponding ticket is within the
+  # Alces rt system.
+  STATUSES = ['open', 'archived'].freeze
 
   belongs_to :case_category
   belongs_to :cluster

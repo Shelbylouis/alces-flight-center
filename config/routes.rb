@@ -15,7 +15,7 @@ Rails.application.routes.draw do
     root 'cases#index'
     resources :cases, only: [:new, :index, :create] do
       member do
-        post :close
+        post :archive
       end
     end
   end
