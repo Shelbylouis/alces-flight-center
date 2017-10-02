@@ -13,7 +13,11 @@ Rails.application.routes.draw do
 
   constraints Clearance::Constraints::SignedIn.new do
     root 'cases#index'
-    resources :cases, only: [:new, :index, :create]
+    resources :cases, only: [:new, :index, :create] do
+      member do
+        post :close
+      end
+    end
   end
 
   constraints Clearance::Constraints::SignedOut.new do

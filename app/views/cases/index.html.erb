@@ -25,6 +25,7 @@
         <th>Associated component</th>
         <th>Details</th>
         <th>Contact support</th>
+        <th>Close</th>
       </tr>
     </thead>
 
@@ -44,6 +45,15 @@
           >
             <%= octicon 'mail', height: 28, class: 'interactive-icon' %>
           </a>
+        </td>
+        <td>
+          <%= link_to raw(octicon 'x', height: 28, class: 'interactive-icon'),
+            close_case_path(c.id),
+            method: :post,
+            data: {
+              confirm: 'Are you sure you want to close this support case?'
+            }
+          %>
         </td>
       </tr>
     <% end %>

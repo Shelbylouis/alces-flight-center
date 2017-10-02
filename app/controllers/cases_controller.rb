@@ -25,6 +25,17 @@ class CasesController < ApplicationController
     end
   end
 
+  def close
+    @case = Case.find(params[:id])
+    @case.status = :closed
+    if @case.save
+      flash[:success] = 'Support case closed.'
+    else
+      flash_object_errors(@case)
+    end
+    redirect_to cases_path
+  end
+
   private
 
   def case_params
