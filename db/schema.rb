@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171002095025) do
+ActiveRecord::Schema.define(version: 20171002172522) do
 
   create_table "case_categories", force: :cascade do |t|
     t.string "name", null: false
@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(version: 20171002095025) do
     t.integer "component_id"
     t.integer "user_id"
     t.integer "rt_ticket_id", limit: 8
-    t.string "status", default: "open", null: false
+    t.boolean "archived", default: false, null: false
     t.index ["case_category_id"], name: "index_cases_on_case_category_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"

@@ -2,7 +2,7 @@ class CasesController < ApplicationController
   before_action :require_login
 
   def index
-    @open_cases = current_site.cases.where(status: :open)
+    @open_cases = current_site.cases.where(archived: false)
     @title = "Support for site #{current_site.name}"
   end
 
@@ -27,7 +27,7 @@ class CasesController < ApplicationController
 
   def archive
     @case = Case.find(params[:id])
-    @case.status = :archived
+    @case.archived = true
     if @case.save
       flash[:success] = 'Support case archived.'
     else

@@ -1,10 +1,4 @@
 class Case < ApplicationRecord
-  # The status of a Case is purely for user's benefits, so they can archive
-  # (hide) cases they no longer wish to be prominent within the UI; this is
-  # unrelated to what the status of the corresponding ticket is within the
-  # Alces rt system.
-  STATUSES = ['open', 'archived'].freeze
-
   belongs_to :case_category
   belongs_to :cluster
   belongs_to :component, required: false
@@ -12,7 +6,6 @@ class Case < ApplicationRecord
 
   validates :details, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
-  validates :status, inclusion: { in: STATUSES }, presence: true
 
   before_validation :create_rt_ticket, on: :create
 
