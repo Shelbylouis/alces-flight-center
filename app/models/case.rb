@@ -25,6 +25,10 @@ class Case < ApplicationRecord
     "mailto:#{support_email}?subject=#{subject}"
   end
 
+  def open
+    !archived
+  end
+
   private
 
   def request_tracker

@@ -43,23 +43,25 @@
 
     <tbody>
     <% cases.reverse.each do |c| %>
-      <% if c.archived %>
-        <tr
-          class="archived-case-row"
-          title="This support case has been archived; you must open a new support case if you wish to contact Alces Flight Support"
-        >
-      <% else %>
-        <tr>
+      <% if archive || c.open %>
+        <% if c.archived %>
+          <tr
+            class="archived-case-row"
+            title="This support case has been archived; you must open a new support case if you wish to contact Alces Flight Support"
+          >
+        <% else %>
+          <tr>
+        <% end %>
+          <td><%= c.created_at %></td>
+          <td><%= c.user.name %></td>
+          <td><%= c.case_category.name %></td>
+          <td><%= c.cluster.name %></td>
+          <td><%= c.component&.name %></td>
+          <td><%= c.details %></td>
+          <td><%= render 'email_support_icon', support_case: c %></td>
+          <td><%= render 'archive_icon', support_case: c %></td>
+        </tr>
       <% end %>
-        <td><%= c.created_at %></td>
-        <td><%= c.user.name %></td>
-        <td><%= c.case_category.name %></td>
-        <td><%= c.cluster.name %></td>
-        <td><%= c.component&.name %></td>
-        <td><%= c.details %></td>
-        <td><%= render 'email_support_icon', support_case: c %></td>
-        <td><%= render 'archive_icon', support_case: c %></td>
-      </tr>
     <% end %>
     </tbody>
   </table>

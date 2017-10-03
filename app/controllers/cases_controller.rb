@@ -2,7 +2,7 @@ class CasesController < ApplicationController
   before_action :require_login
 
   def index
-    @open_cases = current_site.cases.where(archived: false)
+    @cases = current_site.cases
     @title = "Support for site #{current_site.name}"
   end
 
