@@ -58,8 +58,8 @@
           <td><%= c.cluster.name %></td>
           <td><%= c.component&.name %></td>
           <td><%= c.details %></td>
-          <td><%= render 'email_support_icon', support_case: c %></td>
-          <td><%= render 'archive_icon', support_case: c %></td>
+          <td><%= render 'cases/email_support_icon', support_case: c %></td>
+          <td><%= render 'cases/archive_icon', support_case: c %></td>
         </tr>
       <% end %>
     <% end %>
