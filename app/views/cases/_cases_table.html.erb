@@ -17,13 +17,7 @@
           %>
         </li>
       <% end %>
-      <li class="nav-item">
-        <%= link_to 'Create new support case',
-          :new_case,
-          class: ['nav-link', 'btn', 'btn-dark'],
-          role: 'button'
-        %>
-      </li>
+      <%= render 'cases/new_support_case_button' %>
     </ul>
   </div>
 
