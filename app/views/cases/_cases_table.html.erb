@@ -42,7 +42,7 @@
     </thead>
 
     <tbody>
-    <% cases.each do |c| %>
+    <% cases.reverse.each do |c| %>
       <% if c.archived %>
         <tr
           class="archived-case-row"
