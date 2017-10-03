@@ -6,6 +6,11 @@ class CasesController < ApplicationController
     @title = "Support for site #{current_site.name}"
   end
 
+  def archive_index
+    @cases = current_site.cases
+    @title = 'Support case archive'
+  end
+
   def new
     @title = "Create new support case"
     @case = Case.new

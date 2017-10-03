@@ -14,6 +14,10 @@ Rails.application.routes.draw do
   constraints Clearance::Constraints::SignedIn.new do
     root 'cases#index'
     resources :cases, only: [:new, :index, :create] do
+      collection do
+        get :archive, to: 'cases#archive_index'
+      end
+
       member do
         post :archive
       end

@@ -3,8 +3,20 @@
   <div class='card-header'>
     <ul class="nav">
       <li class="nav-item">
-        <span class="navbar-brand">Open support cases</span>
+        <span class="navbar-brand">
+          <%= archive ? 'All' : 'Open' %>
+          support cases
+        </span>
       </li>
+      <% unless archive %>
+        <li class="nav-item">
+          <%= link_to 'View all',
+            archive_cases_path,
+            class: ['nav-link', 'btn', 'btn-dark'],
+            role: 'button'
+          %>
+        </li>
+      <% end %>
       <li class="nav-item">
       <%= link_to 'Create new support case',
         :new_case,
@@ -31,7 +43,14 @@
 
     <tbody>
     <% cases.each do |c| %>
-      <tr>
+      <% if c.archived %>
+        <tr
+          class="archived-case-row"
+          title="This support case has been archived; you must open a new support case if you wish to contact Alces Flight Support"
+        >
+      <% else %>
+        <tr>
+      <% end %>
         <td><%= c.created_at %></td>
         <td><%= c.user.name %></td>
         <td><%= c.case_category.name %></td>

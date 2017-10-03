@@ -1,9 +1,13 @@
 
-<%= link_to raw(octicon 'x', height: 28, class: 'interactive-icon'),
-  archive_case_path(support_case.id),
-  method: :post,
-  title: 'Archive this support case if it has been resolved or is no longer relevant',
-  data: {
-    confirm: 'Are you sure you want to archive this support case?'
-  }
-%>
+<% if support_case.archived %>
+  <%= octicon 'x', height: 28, class: 'icon' %>
+<% else %>
+  <%= link_to raw(octicon 'x', height: 28, class: 'interactive-icon'),
+    archive_case_path(support_case.id),
+    method: :post,
+    title: 'Archive this support case if it has been resolved or is no longer relevant',
+    data: {
+      confirm: 'Are you sure you want to archive this support case?'
+    }
+  %>
+<% end %>

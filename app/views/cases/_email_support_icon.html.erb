@@ -1,6 +1,10 @@
 
-<%= link_to raw(octicon 'mail', height: 28, class: 'interactive-icon'),
-  support_case.mailto_url,
-  target: '_blank',
-  title: 'Send an email to Alces Flight Support regarding this support case'
-%>
+<% if support_case.archived %>
+  <%= octicon 'mail', height: 28, class: 'icon' %>
+<% else %>
+  <%= link_to raw(octicon 'mail', height: 28, class: 'interactive-icon'),
+    support_case.mailto_url,
+    target: '_blank',
+    title: 'Send an email to Alces Flight Support regarding this support case'
+  %>
+<% end %>
