@@ -2,16 +2,18 @@
 require 'exceptions'
 
 class RequestTrackerInterface
-  RT_API_ENDPOINT = 'http://gateway.alces-software.com:5556/rt/REST/1.0/'
   NEW_TICKET_PATH = 'ticket/new'
 
   Ticket = Struct.new(:id)
 
-  attr_reader :username, :password
+  attr_reader :username, :password, :api_endpoint
 
   def initialize
     @username = ENV.fetch('RT_USERNAME')
     @password = ENV.fetch('RT_PASSWORD')
+
+    api_host = ENV.fetch('RT_API_HOST')
+    @api_endpoint = "http://#{api_host}/rt/REST/1.0/"
   end
 
   def create_ticket(requestor_email:, subject:, text:)
@@ -34,7 +36,7 @@ class RequestTrackerInterface
   private
 
   def api_request(path, content:)
-    url = URI.join(RT_API_ENDPOINT, path)
+    url = URI.join(api_endpoint, path)
     HTTP.timeout(write: 2, connect: 5, read: 10).post(
       url,
       params: {user: username, pass: password},

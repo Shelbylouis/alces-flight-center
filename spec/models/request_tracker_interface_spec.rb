@@ -36,7 +36,7 @@ RSpec.describe RequestTrackerInterface do
 
     it 'raises when API responds with an unexpected status' do
       stub_request(
-        :any, /#{described_class::RT_API_ENDPOINT}/
+        :any, /#{subject.api_endpoint}/
       ).to_return(
         status: 418,
         body: bad_response_body
@@ -53,7 +53,7 @@ RSpec.describe RequestTrackerInterface do
 
     it 'raises when API responds with an unexpected body format' do
       stub_request(
-        :any, /#{described_class::RT_API_ENDPOINT}/
+        :any, /#{subject.api_endpoint}/
       ).to_return(
         body: bad_response_body
       )
