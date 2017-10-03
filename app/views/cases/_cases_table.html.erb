@@ -38,23 +38,8 @@
         <td><%= c.cluster.name %></td>
         <td><%= c.component&.name %></td>
         <td><%= c.details %></td>
-        <td>
-          <%= link_to raw(octicon 'mail', height: 28, class: 'interactive-icon'),
-            c.mailto_url,
-            target: '_blank',
-            title: 'Send an email to Alces Flight Support regarding this support case'
-          %>
-        </td>
-        <td>
-          <%= link_to raw(octicon 'x', height: 28, class: 'interactive-icon'),
-            archive_case_path(c.id),
-            method: :post,
-            title: 'Archive this support case if it has been resolved or is no longer relevant',
-            data: {
-              confirm: 'Are you sure you want to archive this support case?'
-            }
-          %>
-        </td>
+        <td><%= render 'email_support_icon', support_case: c %></td>
+        <td><%= render 'archive_icon', support_case: c %></td>
       </tr>
     <% end %>
     </tbody>
