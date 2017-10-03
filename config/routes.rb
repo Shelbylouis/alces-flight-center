@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: :show
+    resources :components, only: :show
   end
 
   constraints Clearance::Constraints::SignedOut.new do

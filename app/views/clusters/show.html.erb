@@ -40,7 +40,7 @@
       <tbody>
       <% group.components.each do |c| %>
         <tr>
-          <td><%= c.name %></td>
+          <td><%= link_to c.name, component_path(c) %></td>
         </tr>
       <% end %>
       </tbody>
