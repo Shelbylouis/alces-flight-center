@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171002172522) do
+ActiveRecord::Schema.define(version: 20171003125109) do
 
   create_table "case_categories", force: :cascade do |t|
     t.string "name", null: false
@@ -49,6 +49,16 @@ ActiveRecord::Schema.define(version: 20171002172522) do
     t.index ["site_id"], name: "index_clusters_on_site_id"
   end
 
+  create_table "component_groups", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "cluster_id", null: false
+    t.integer "component_type_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cluster_id"], name: "index_component_groups_on_cluster_id"
+    t.index ["component_type_id"], name: "index_component_groups_on_component_type_id"
+  end
+
   create_table "component_types", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
@@ -58,12 +68,10 @@ ActiveRecord::Schema.define(version: 20171002172522) do
 
   create_table "components", force: :cascade do |t|
     t.string "name"
-    t.integer "cluster_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "component_type_id"
-    t.index ["cluster_id"], name: "index_components_on_cluster_id"
-    t.index ["component_type_id"], name: "index_components_on_component_type_id"
+    t.integer "component_group_id"
+    t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end
 
   create_table "sites", force: :cascade do |t|

@@ -2,7 +2,8 @@ class Cluster < ApplicationRecord
   SUPPORT_TYPES = ['managed', 'advice'].freeze
 
   belongs_to :site
-  has_many :components, dependent: :destroy
+  has_many :component_groups
+  has_many :components, through: :component_groups, dependent: :destroy
   has_many :cases
 
   validates_associated :site
