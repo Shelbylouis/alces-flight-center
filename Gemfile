@@ -50,7 +50,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'vcr'
   gem 'webmock'
-
+  gem 'factory_girl_rails'
   gem 'dotenv-rails'
 end
 
