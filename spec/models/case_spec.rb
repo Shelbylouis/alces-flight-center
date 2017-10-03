@@ -31,7 +31,7 @@ RSpec.describe Case, type: :model do
     it 'creates rt ticket with correct properties' do
       expected_create_ticket_args = {
         requestor_email: requestor_email,
-        subject: "Supportware ticket: somecluster - Crashed node",
+        subject: "Alces Flight Center ticket: somecluster - Crashed node",
         text: <<-EOF.strip_heredoc
           Cluster: somecluster
           Case category: Crashed node
@@ -81,7 +81,7 @@ RSpec.describe Case, type: :model do
       )
 
       expected_subject = URI.escape(
-        'RE: [helpdesk.alces-software.com #12345] Supportware ticket: somecluster - New user request'
+        'RE: [helpdesk.alces-software.com #12345] Alces Flight Center ticket: somecluster - New user request'
       )
       expected_mailto_url = "mailto:support@alces-software.com?subject=#{expected_subject}"
       expect(support_case.mailto_url).to eq expected_mailto_url

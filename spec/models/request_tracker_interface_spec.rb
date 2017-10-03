@@ -6,7 +6,7 @@ RSpec.shared_examples 'Request Tracker interface' do
   let :new_ticket_params do
     {
       requestor_email: 'test@example.com',
-      subject: 'Supportware test ticket - please delete',
+      subject: 'Alces Flight Center test ticket - please delete',
       text: <<-EOF.strip_heredoc
             Testing
             multiline

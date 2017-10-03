@@ -42,7 +42,7 @@ class Case < ApplicationRecord
   end
 
   def rt_ticket_subject
-    "Supportware ticket: #{cluster.name} - #{case_category.name}"
+    "Alces Flight Center ticket: #{cluster.name} - #{case_category.name}"
   end
 
   def rt_ticket_text
