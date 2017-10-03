@@ -35,7 +35,7 @@ class RequestTrackerInterface
 
   def api_request(path, content:)
     url = URI.join(RT_API_ENDPOINT, path)
-    HTTP.post(
+    HTTP.timeout(write: 2, connect: 5, read: 10).post(
       url,
       params: {user: username, pass: password},
       body: "content=#{content}"
