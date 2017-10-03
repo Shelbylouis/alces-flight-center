@@ -39,13 +39,11 @@
         <td><%= c.component&.name %></td>
         <td><%= c.details %></td>
         <td>
-          <a
-            href='<%= c.mailto_url %>'
-            target='_blank'
-            title='Send an email to Alces Flight Support regarding this support case'
-          >
-            <%= octicon 'mail', height: 28, class: 'interactive-icon' %>
-          </a>
+          <%= link_to raw(octicon 'mail', height: 28, class: 'interactive-icon'),
+            c.mailto_url,
+            target: '_blank',
+            title: 'Send an email to Alces Flight Support regarding this support case'
+          %>
         </td>
         <td>
           <%= link_to raw(octicon 'x', height: 28, class: 'interactive-icon'),
