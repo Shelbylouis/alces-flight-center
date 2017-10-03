@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   delete :logout, to: 'clearance/sessions#destroy'
 
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
-    root 'home#admin_landing'
+    root 'rails_admin/main#dashboard'
   end
 
   constraints Clearance::Constraints::SignedIn.new do
