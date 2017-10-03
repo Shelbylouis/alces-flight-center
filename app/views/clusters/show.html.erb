@@ -1,0 +1,49 @@
+
+
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Overview
+        </span>
+      </li>
+      <%= render 'cases/new_support_case_button' %>
+    </ul>
+  </div>
+
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item"><%= @cluster.description %></li>
+  </ul>
+</div>
+
+<% @cluster.component_groups.each do |group| %>
+  <div class='card'>
+    <div class='card-header'>
+      <ul class="nav">
+        <li class="nav-item">
+          <span class="navbar-brand">
+            <% group_size = group.components.length %>
+            <%= group.name %> &mdash; <%= pluralize(group_size, group.component_type.name) %>
+          </span>
+        </li>
+      </ul>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <% group.components.each do |c| %>
+        <tr>
+          <td><%= c.name %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

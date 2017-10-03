@@ -8,6 +8,13 @@
             <%= cluster.name %> overview
           </span>
         </li>
+        <li class="nav-item">
+          <%= link_to 'Details',
+            cluster_path(cluster),
+            class: ['nav-link', 'btn', 'btn-dark'],
+            role: 'button'
+          %>
+        </li>
       </ul>
     </div>
 
