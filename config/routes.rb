@@ -15,10 +15,6 @@ Rails.application.routes.draw do
     root 'home#index'
 
     resources :cases, only: [:new, :index, :create] do
-      collection do
-        get :archive, to: 'cases#archive_index'
-      end
-
       member do
         post :archive
       end
