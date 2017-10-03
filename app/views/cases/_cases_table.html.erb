@@ -42,6 +42,7 @@
           <a
             href='<%= c.mailto_url %>'
             target='_blank'
+            title='Send an email to Alces Flight Support regarding this support case'
           >
             <%= octicon 'mail', height: 28, class: 'interactive-icon' %>
           </a>
@@ -50,6 +51,7 @@
           <%= link_to raw(octicon 'x', height: 28, class: 'interactive-icon'),
             archive_case_path(c.id),
             method: :post,
+            title: 'Archive this support case if it has been resolved or is no longer relevant',
             data: {
               confirm: 'Are you sure you want to archive this support case?'
             }
