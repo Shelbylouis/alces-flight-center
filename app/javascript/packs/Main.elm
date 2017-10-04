@@ -108,6 +108,16 @@ selectedCaseCategory model =
         |> List.head
 
 
+componentsForCluster : ClusterId -> List Component -> List Component
+componentsForCluster clusterId components =
+    let
+        partOfCluster =
+            \component ->
+                component.clusterId == clusterId
+    in
+    List.filter partOfCluster components
+
+
 
 -- INIT
 
@@ -179,6 +189,14 @@ view model =
 
         componentsField =
             let
+                currentClusterComponents =
+                    case model.formState.selectedClusterId of
+                        Just id ->
+                            componentsForCluster id model.components
+
+                        Nothing ->
+                            []
+
                 caseCategoryRequiresComponent =
                     selectedCaseCategory model
                         |> Maybe.map .requiresComponent
@@ -189,7 +207,7 @@ view model =
                     (selectField "Component"
                         "component_id"
                         (model.formState.selectedComponentId |> Maybe.map componentIdToInt)
-                        model.components
+                        currentClusterComponents
                         componentId
                         .name
                         ChangeSelectedComponent
