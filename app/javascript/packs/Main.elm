@@ -3,6 +3,7 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
+import Maybe.Extra
 
 
 -- MODEL
@@ -92,6 +93,21 @@ componentIdToInt (ComponentId id) =
     id
 
 
+selectedCaseCategory : Model -> Maybe CaseCategory
+selectedCaseCategory model =
+    let
+        id =
+            model.formState.selectedCaseCategoryId
+
+        matchesId =
+            \caseCategory ->
+                Maybe.map ((==) caseCategory.id) id
+                    |> Maybe.withDefault False
+    in
+    List.filter matchesId model.caseCategories
+        |> List.head
+
+
 
 -- INIT
 
@@ -140,45 +156,63 @@ view : Model -> Html Msg
 view model =
     let
         clustersField =
-            selectField "Cluster"
-                "cluster_id"
-                (model.formState.selectedClusterId |> Maybe.map clusterIdToInt)
-                model.clusters
-                clusterId
-                .name
-                ChangeSelectedCluster
+            Just
+                (selectField "Cluster"
+                    "cluster_id"
+                    (model.formState.selectedClusterId |> Maybe.map clusterIdToInt)
+                    model.clusters
+                    clusterId
+                    .name
+                    ChangeSelectedCluster
+                )
 
         caseCategoriesField =
-            selectField "Case category"
-                "case_category_id"
-                (model.formState.selectedCaseCategoryId |> Maybe.map caseCategoryIdToInt)
-                model.caseCategories
-                caseCategoryId
-                .name
-                ChangeSelectedCaseCategory
+            Just
+                (selectField "Case category"
+                    "case_category_id"
+                    (model.formState.selectedCaseCategoryId |> Maybe.map caseCategoryIdToInt)
+                    model.caseCategories
+                    caseCategoryId
+                    .name
+                    ChangeSelectedCaseCategory
+                )
 
         componentsField =
-            selectField "Component"
-                "component_id"
-                (model.formState.selectedComponentId |> Maybe.map componentIdToInt)
-                model.components
-                componentId
-                .name
-                ChangeSelectedComponent
+            let
+                caseCategoryRequiresComponent =
+                    selectedCaseCategory model
+                        |> Maybe.map .requiresComponent
+                        |> Maybe.withDefault False
+            in
+            if caseCategoryRequiresComponent then
+                Just
+                    (selectField "Component"
+                        "component_id"
+                        (model.formState.selectedComponentId |> Maybe.map componentIdToInt)
+                        model.components
+                        componentId
+                        .name
+                        ChangeSelectedComponent
+                    )
+            else
+                Nothing
 
         detailsField =
-            textareaField "Details"
-                "details"
-                model.formState.details
-                ChangeDetails
+            Just
+                (textareaField "Details"
+                    "details"
+                    model.formState.details
+                    ChangeDetails
+                )
 
         formElements =
-            [ clustersField
-            , caseCategoriesField
-            , componentsField
-            , detailsField
-            , submitButton
-            ]
+            Maybe.Extra.values
+                [ clustersField
+                , caseCategoriesField
+                , componentsField
+                , detailsField
+                , Just submitButton
+                ]
     in
     Html.form [] formElements
 
