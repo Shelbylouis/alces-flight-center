@@ -12,7 +12,12 @@ import Maybe.Extra
 -- MODEL
 
 
-type alias Model =
+type Model
+    = Initialized State
+    | Error String
+
+
+type alias State =
     { clusters : List Cluster
     , caseCategories : List CaseCategory
     , components : List Component
@@ -64,18 +69,18 @@ componentIdToInt (Component.Id id) =
     id
 
 
-selectedCaseCategory : Model -> Maybe CaseCategory
-selectedCaseCategory model =
+selectedCaseCategory : State -> Maybe CaseCategory
+selectedCaseCategory state =
     let
         id =
-            model.formState.selectedCaseCategoryId
+            state.formState.selectedCaseCategoryId
 
         matchesId =
             \caseCategory ->
                 Maybe.map ((==) caseCategory.id) id
                     |> Maybe.withDefault False
     in
-    List.filter matchesId model.caseCategories
+    List.filter matchesId state.caseCategories
         |> List.head
 
 
@@ -105,16 +110,17 @@ init =
             \items -> List.head items |> Maybe.map .id
 
         initialModel =
-            { clusters = clusters
-            , caseCategories = caseCategories
-            , components = components
-            , formState =
-                { selectedClusterId = firstId clusters
-                , selectedCaseCategoryId = firstId caseCategories
-                , selectedComponentId = firstId components
-                , details = ""
+            Initialized
+                { clusters = clusters
+                , caseCategories = caseCategories
+                , components = components
+                , formState =
+                    { selectedClusterId = firstId clusters
+                    , selectedCaseCategoryId = firstId caseCategories
+                    , selectedComponentId = firstId components
+                    , details = ""
+                    }
                 }
-            }
     in
     ( initialModel, Cmd.none )
 
@@ -125,13 +131,29 @@ init =
 
 view : Model -> Html Msg
 view model =
+    case model of
+        Initialized state ->
+            caseForm state
+
+        Error message ->
+            span []
+                [ text
+                    ("Error initializing form: "
+                        ++ message
+                        ++ ". Please contact support@alces-software.com"
+                    )
+                ]
+
+
+caseForm : State -> Html Msg
+caseForm state =
     let
         clustersField =
             Just
                 (selectField "Cluster"
                     "cluster_id"
-                    (model.formState.selectedClusterId |> Maybe.map clusterIdToInt)
-                    model.clusters
+                    (state.formState.selectedClusterId |> Maybe.map clusterIdToInt)
+                    state.clusters
                     clusterId
                     .name
                     ChangeSelectedCluster
@@ -141,8 +163,8 @@ view model =
             Just
                 (selectField "Case category"
                     "case_category_id"
-                    (model.formState.selectedCaseCategoryId |> Maybe.map caseCategoryIdToInt)
-                    model.caseCategories
+                    (state.formState.selectedCaseCategoryId |> Maybe.map caseCategoryIdToInt)
+                    state.caseCategories
                     caseCategoryId
                     .name
                     ChangeSelectedCaseCategory
@@ -151,15 +173,15 @@ view model =
         componentsField =
             let
                 currentClusterComponents =
-                    case model.formState.selectedClusterId of
+                    case state.formState.selectedClusterId of
                         Just id ->
-                            Component.forCluster id model.components
+                            Component.forCluster id state.components
 
                         Nothing ->
                             []
 
                 caseCategoryRequiresComponent =
-                    selectedCaseCategory model
+                    selectedCaseCategory state
                         |> Maybe.map .requiresComponent
                         |> Maybe.withDefault False
             in
@@ -167,7 +189,7 @@ view model =
                 Just
                     (selectField "Component"
                         "component_id"
-                        (model.formState.selectedComponentId |> Maybe.map componentIdToInt)
+                        (state.formState.selectedComponentId |> Maybe.map componentIdToInt)
                         currentClusterComponents
                         componentId
                         .name
@@ -180,7 +202,7 @@ view model =
             Just
                 (textareaField "Details"
                     "details"
-                    model.formState.details
+                    state.formState.details
                     ChangeDetails
                 )
 
@@ -300,9 +322,23 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    case model of
+        Initialized state ->
+            let
+                ( newState, cmd ) =
+                    updateState msg state
+            in
+            ( Initialized newState, cmd )
+
+        Error message ->
+            model ! []
+
+
+updateState : Msg -> State -> ( State, Cmd Msg )
+updateState msg state =
     let
         formState =
-            model.formState
+            state.formState
     in
     case msg of
         ChangeSelectedCluster id ->
@@ -313,7 +349,7 @@ update msg model =
                 newFormState =
                     { formState | selectedClusterId = selectedClusterId }
             in
-            ( { model | formState = newFormState }, Cmd.none )
+            ( { state | formState = newFormState }, Cmd.none )
 
         ChangeSelectedCaseCategory id ->
             let
@@ -323,7 +359,7 @@ update msg model =
                 newFormState =
                     { formState | selectedCaseCategoryId = selectedCaseCategoryId }
             in
-            ( { model | formState = newFormState }, Cmd.none )
+            ( { state | formState = newFormState }, Cmd.none )
 
         ChangeSelectedComponent id ->
             let
@@ -333,14 +369,14 @@ update msg model =
                 newFormState =
                     { formState | selectedComponentId = selectedComponentId }
             in
-            ( { model | formState = newFormState }, Cmd.none )
+            ( { state | formState = newFormState }, Cmd.none )
 
         ChangeDetails details ->
             let
                 newFormState =
                     { formState | details = details }
             in
-            ( { model | formState = newFormState }, Cmd.none )
+            ( { state | formState = newFormState }, Cmd.none )
 
 
 stringToId : (Int -> id) -> String -> Maybe id
