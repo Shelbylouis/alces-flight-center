@@ -1,5 +1,8 @@
 module Main exposing (..)
 
+import CaseCategory exposing (CaseCategory)
+import Cluster exposing (Cluster)
+import Component exposing (Component)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
@@ -17,42 +20,10 @@ type alias Model =
     }
 
 
-type alias Cluster =
-    { id : ClusterId
-    , name : String
-    }
-
-
-type ClusterId
-    = ClusterId Int
-
-
-type alias CaseCategory =
-    { id : CaseCategoryId
-    , name : String
-    , requiresComponent : Bool
-    }
-
-
-type CaseCategoryId
-    = CaseCategoryId Int
-
-
-type alias Component =
-    { id : ComponentId
-    , name : String
-    , clusterId : ClusterId
-    }
-
-
-type ComponentId
-    = ComponentId Int
-
-
 type alias FormState =
-    { selectedClusterId : Maybe ClusterId
-    , selectedCaseCategoryId : Maybe CaseCategoryId
-    , selectedComponentId : Maybe ComponentId
+    { selectedClusterId : Maybe Cluster.Id
+    , selectedCaseCategoryId : Maybe CaseCategory.Id
+    , selectedComponentId : Maybe Component.Id
     , details : String
     }
 
@@ -60,36 +31,36 @@ type alias FormState =
 clusterId : Cluster -> Int
 clusterId cluster =
     case cluster.id of
-        ClusterId id ->
+        Cluster.Id id ->
             id
 
 
 caseCategoryId : CaseCategory -> Int
 caseCategoryId caseCategory =
     case caseCategory.id of
-        CaseCategoryId id ->
+        CaseCategory.Id id ->
             id
 
 
 componentId : Component -> Int
 componentId component =
     case component.id of
-        ComponentId id ->
+        Component.Id id ->
             id
 
 
-clusterIdToInt : ClusterId -> Int
-clusterIdToInt (ClusterId id) =
+clusterIdToInt : Cluster.Id -> Int
+clusterIdToInt (Cluster.Id id) =
     id
 
 
-caseCategoryIdToInt : CaseCategoryId -> Int
-caseCategoryIdToInt (CaseCategoryId id) =
+caseCategoryIdToInt : CaseCategory.Id -> Int
+caseCategoryIdToInt (CaseCategory.Id id) =
     id
 
 
-componentIdToInt : ComponentId -> Int
-componentIdToInt (ComponentId id) =
+componentIdToInt : Component.Id -> Int
+componentIdToInt (Component.Id id) =
     id
 
 
@@ -108,16 +79,6 @@ selectedCaseCategory model =
         |> List.head
 
 
-componentsForCluster : ClusterId -> List Component -> List Component
-componentsForCluster clusterId components =
-    let
-        partOfCluster =
-            \component ->
-                component.clusterId == clusterId
-    in
-    List.filter partOfCluster components
-
-
 
 -- INIT
 
@@ -126,18 +87,18 @@ init : ( Model, Cmd Msg )
 init =
     let
         clusters =
-            [ Cluster (ClusterId 1) "Foo cluster"
-            , Cluster (ClusterId 2) "Bar cluster"
+            [ Cluster (Cluster.Id 1) "Foo cluster"
+            , Cluster (Cluster.Id 2) "Bar cluster"
             ]
 
         caseCategories =
-            [ CaseCategory (CaseCategoryId 1) "Suspected hardware issue" True
-            , CaseCategory (CaseCategoryId 2) "Request for gridware package" False
+            [ CaseCategory (CaseCategory.Id 1) "Suspected hardware issue" True
+            , CaseCategory (CaseCategory.Id 2) "Request for gridware package" False
             ]
 
         components =
-            [ Component (ComponentId 1) "foonode01" (ClusterId 1)
-            , Component (ComponentId 2) "foonode02" (ClusterId 1)
+            [ Component (Component.Id 1) "foonode01" (Cluster.Id 1)
+            , Component (Component.Id 2) "foonode02" (Cluster.Id 1)
             ]
 
         firstId =
@@ -192,7 +153,7 @@ view model =
                 currentClusterComponents =
                     case model.formState.selectedClusterId of
                         Just id ->
-                            componentsForCluster id model.components
+                            Component.forCluster id model.components
 
                         Nothing ->
                             []
@@ -347,7 +308,7 @@ update msg model =
         ChangeSelectedCluster id ->
             let
                 selectedClusterId =
-                    stringToId ClusterId id
+                    stringToId Cluster.Id id
 
                 newFormState =
                     { formState | selectedClusterId = selectedClusterId }
@@ -357,7 +318,7 @@ update msg model =
         ChangeSelectedCaseCategory id ->
             let
                 selectedCaseCategoryId =
-                    stringToId CaseCategoryId id
+                    stringToId CaseCategory.Id id
 
                 newFormState =
                     { formState | selectedCaseCategoryId = selectedCaseCategoryId }
@@ -367,7 +328,7 @@ update msg model =
         ChangeSelectedComponent id ->
             let
                 selectedComponentId =
-                    stringToId ComponentId id
+                    stringToId Component.Id id
 
                 newFormState =
                     { formState | selectedComponentId = selectedComponentId }
