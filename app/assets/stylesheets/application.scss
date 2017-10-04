@@ -36,3 +36,9 @@
 .navbar-text {
   margin-right: 0.5rem;
 }
+
+footer {
+  // So Elm debugger appears in front of rather than behind footer in
+  // development.
+  z-index: -1;
+}
