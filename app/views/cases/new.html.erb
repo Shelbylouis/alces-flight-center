@@ -1,4 +1,9 @@
 
 <%# XXX Add required labels to required fields as in Metalware? %>
 
-<div id='new-case-form'></div>
+<div
+  id='new-case-form'
+  data-clusters='<%= @site_clusters.to_json %>'
+  data-case-categories='<%= @case_categories.to_json %>'
+  data-components='<%= @site_components.to_json %>'
+></div>

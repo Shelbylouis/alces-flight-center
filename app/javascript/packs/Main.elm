@@ -6,6 +6,7 @@ import Component exposing (Component)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
+import Json.Decode as D
 import Maybe.Extra
 
 
@@ -31,6 +32,56 @@ type alias FormState =
     , selectedComponentId : Maybe Component.Id
     , details : String
     }
+
+
+decodeInitialModel : D.Value -> Model
+decodeInitialModel value =
+    let
+        result =
+            D.decodeValue initialStateDecoder value
+    in
+    case result of
+        Ok state ->
+            Initialized state
+
+        Err message ->
+            Error message
+
+
+initialStateDecoder : D.Decoder State
+initialStateDecoder =
+    let
+        clusters =
+            [ Cluster (Cluster.Id 1) "Foo cluster"
+            , Cluster (Cluster.Id 2) "Bar cluster"
+            ]
+
+        caseCategories =
+            [ CaseCategory (CaseCategory.Id 1) "Suspected hardware issue" True
+            , CaseCategory (CaseCategory.Id 2) "Request for gridware package" False
+            ]
+
+        components =
+            [ Component (Component.Id 1) "foonode01" (Cluster.Id 1)
+            , Component (Component.Id 2) "foonode02" (Cluster.Id 1)
+            ]
+
+        firstId =
+            \items -> List.head items |> Maybe.map .id
+
+        initialState =
+            { clusters = clusters
+            , caseCategories = caseCategories
+            , components = components
+            , formState =
+                { selectedClusterId = firstId clusters
+                , selectedCaseCategoryId = firstId caseCategories
+                , selectedComponentId = firstId components
+                , details = ""
+                }
+            }
+    in
+    D.succeed initialState
 
 
 clusterId : Cluster -> Int
@@ -88,41 +139,9 @@ selectedCaseCategory state =
 -- INIT
 
 
-init : ( Model, Cmd Msg )
-init =
-    let
-        clusters =
-            [ Cluster (Cluster.Id 1) "Foo cluster"
-            , Cluster (Cluster.Id 2) "Bar cluster"
-            ]
-
-        caseCategories =
-            [ CaseCategory (CaseCategory.Id 1) "Suspected hardware issue" True
-            , CaseCategory (CaseCategory.Id 2) "Request for gridware package" False
-            ]
-
-        components =
-            [ Component (Component.Id 1) "foonode01" (Cluster.Id 1)
-            , Component (Component.Id 2) "foonode02" (Cluster.Id 1)
-            ]
-
-        firstId =
-            \items -> List.head items |> Maybe.map .id
-
-        initialModel =
-            Initialized
-                { clusters = clusters
-                , caseCategories = caseCategories
-                , components = components
-                , formState =
-                    { selectedClusterId = firstId clusters
-                    , selectedCaseCategoryId = firstId caseCategories
-                    , selectedComponentId = firstId components
-                    , details = ""
-                    }
-                }
-    in
-    ( initialModel, Cmd.none )
+init : D.Value -> ( Model, Cmd Msg )
+init flags =
+    ( decodeInitialModel flags, Cmd.none )
 
 
 
@@ -399,9 +418,9 @@ subscriptions model =
 -- MAIN
 
 
-main : Program Never Model Msg
+main : Program D.Value Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { init = init
         , view = view
         , update = update
