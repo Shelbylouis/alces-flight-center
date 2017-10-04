@@ -47,11 +47,11 @@ group :development, :test do
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
 
+  gem 'dotenv-rails'
+  gem 'factory_girl_rails'
   gem 'rspec-rails'
   gem 'vcr'
   gem 'webmock'
-  gem 'factory_girl_rails'
-  gem 'dotenv-rails'
 end
 
 group :development do

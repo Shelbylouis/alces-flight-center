@@ -2,7 +2,7 @@
 require 'exceptions'
 
 class RequestTrackerInterface
-  NEW_TICKET_PATH = 'ticket/new'
+  NEW_TICKET_PATH = 'ticket/new'.freeze
 
   Ticket = Struct.new(:id)
 
@@ -39,21 +39,17 @@ class RequestTrackerInterface
     url = URI.join(api_endpoint, path)
     HTTP.timeout(write: 2, connect: 5, read: 10).post(
       url,
-      params: {user: username, pass: password},
+      params: { user: username, pass: password },
       body: "content=#{content}"
     ).tap do |r|
-      unless r.status.success?
-        raise UnexpectedRtApiResponseException, r.body
-      end
+      raise UnexpectedRtApiResponseException, r.body unless r.status.success?
     end
   end
 
   def new_ticket_request_content(requestor_email:, subject:, text:)
-    Utils.rt_format({
-      Queue: 'Support',
-      Requestor: requestor_email,
-      Subject: subject,
-      Text: text
-    })
+    Utils.rt_format(Queue: 'Support',
+                    Requestor: requestor_email,
+                    Subject: subject,
+                    Text: text)
   end
 end
