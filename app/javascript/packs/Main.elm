@@ -138,34 +138,49 @@ init =
 
 view : Model -> Html Msg
 view model =
-    Html.form []
-        [ selectField "Cluster"
-            "cluster_id"
-            (model.formState.selectedClusterId |> Maybe.map clusterIdToInt)
-            model.clusters
-            clusterId
-            .name
-            ChangeSelectedCluster
-        , selectField "Case category"
-            "case_category_id"
-            (model.formState.selectedCaseCategoryId |> Maybe.map caseCategoryIdToInt)
-            model.caseCategories
-            caseCategoryId
-            .name
-            ChangeSelectedCaseCategory
-        , selectField "Component"
-            "component_id"
-            (model.formState.selectedComponentId |> Maybe.map componentIdToInt)
-            model.components
-            componentId
-            .name
-            ChangeSelectedComponent
-        , textareaField "Details"
-            "details"
-            model.formState.details
-            ChangeDetails
-        , submitButton
-        ]
+    let
+        clustersField =
+            selectField "Cluster"
+                "cluster_id"
+                (model.formState.selectedClusterId |> Maybe.map clusterIdToInt)
+                model.clusters
+                clusterId
+                .name
+                ChangeSelectedCluster
+
+        caseCategoriesField =
+            selectField "Case category"
+                "case_category_id"
+                (model.formState.selectedCaseCategoryId |> Maybe.map caseCategoryIdToInt)
+                model.caseCategories
+                caseCategoryId
+                .name
+                ChangeSelectedCaseCategory
+
+        componentsField =
+            selectField "Component"
+                "component_id"
+                (model.formState.selectedComponentId |> Maybe.map componentIdToInt)
+                model.components
+                componentId
+                .name
+                ChangeSelectedComponent
+
+        detailsField =
+            textareaField "Details"
+                "details"
+                model.formState.details
+                ChangeDetails
+
+        formElements =
+            [ clustersField
+            , caseCategoriesField
+            , componentsField
+            , detailsField
+            , submitButton
+            ]
+    in
+    Html.form [] formElements
 
 
 selectField :
