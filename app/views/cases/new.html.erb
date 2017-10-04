@@ -1,42 +1,4 @@
 
 <%# XXX Add required labels to required fields as in Metalware? %>
 
-<%= form_for @case, namespace: 'CaseForm' do |f| %>
-  <%# XXX Update applicable components when this changes. %>
-  <div class="form-group">
-    <%= f.label :cluster_id %>
-    <%= f.select :cluster_id,
-      options_for_site_clusters,
-      {},
-      {class: ['form-control']}
-    %>
-  </div>
-
-  <div class="form-group">
-    <%# XXX Update applicable components, or hide entirely, when this changes.
-  %>
-    <%= f.label :case_category_id %>
-    <%= f.select :case_category_id,
-      options_for_case_categories,
-      {},
-      {class: ['form-control']}
-    %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :component_id %>
-    <%= f.select :component_id,
-      options_for_site_components,
-      # TODO: Change to: {include_blank: requires_component?}
-      {include_blank: true},
-      {class: ['form-control']}
-    %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label :details %>
-    <%= f.text_area :details, required: true, class: ['form-control'], rows: 10 %>
-  </div>
-
-  <%= f.submit(class: ['btn', 'btn-dark', 'btn-block']) %>
-<% end %>
+<div id='new-case-form'></div>
