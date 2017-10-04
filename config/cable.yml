@@ -7,4 +7,4 @@ test:
 production:
   adapter: redis
   url: redis://localhost:6379/1
-  channel_prefix: supportware_production
+  channel_prefix: alces_flight_center_production
