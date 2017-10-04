@@ -77,6 +77,21 @@ componentId component =
             id
 
 
+clusterIdToInt : ClusterId -> Int
+clusterIdToInt (ClusterId id) =
+    id
+
+
+caseCategoryIdToInt : CaseCategoryId -> Int
+caseCategoryIdToInt (CaseCategoryId id) =
+    id
+
+
+componentIdToInt : ComponentId -> Int
+componentIdToInt (ComponentId id) =
+    id
+
+
 
 -- INIT
 
@@ -84,23 +99,32 @@ componentId component =
 init : ( Model, Cmd Msg )
 init =
     let
+        clusters =
+            [ Cluster (ClusterId 1) "Foo cluster"
+            , Cluster (ClusterId 2) "Bar cluster"
+            ]
+
+        caseCategories =
+            [ CaseCategory (CaseCategoryId 1) "Suspected hardware issue" True
+            , CaseCategory (CaseCategoryId 2) "Request for gridware package" False
+            ]
+
+        components =
+            [ Component (ComponentId 1) "foonode01" (ClusterId 1)
+            , Component (ComponentId 2) "foonode02" (ClusterId 1)
+            ]
+
+        firstId =
+            \items -> List.head items |> Maybe.map .id
+
         initialModel =
-            { clusters =
-                [ Cluster (ClusterId 1) "Foo cluster"
-                , Cluster (ClusterId 2) "Bar cluster"
-                ]
-            , caseCategories =
-                [ CaseCategory (CaseCategoryId 1) "Suspected hardware issue" True
-                , CaseCategory (CaseCategoryId 2) "Request for gridware package" False
-                ]
-            , components =
-                [ Component (ComponentId 1) "foonode01" (ClusterId 1)
-                , Component (ComponentId 2) "foonode02" (ClusterId 1)
-                ]
+            { clusters = clusters
+            , caseCategories = caseCategories
+            , components = components
             , formState =
-                { selectedClusterId = Nothing
-                , selectedCaseCategoryId = Nothing
-                , selectedComponentId = Nothing
+                { selectedClusterId = firstId clusters
+                , selectedCaseCategoryId = firstId caseCategories
+                , selectedComponentId = firstId components
                 , details = ""
                 }
             }
@@ -117,18 +141,21 @@ view model =
     Html.form []
         [ selectField "Cluster"
             "cluster_id"
+            (model.formState.selectedClusterId |> Maybe.map clusterIdToInt)
             model.clusters
             clusterId
             .name
             ChangeSelectedCluster
         , selectField "Case category"
             "case_category_id"
+            (model.formState.selectedCaseCategoryId |> Maybe.map caseCategoryIdToInt)
             model.caseCategories
             caseCategoryId
             .name
             ChangeSelectedCaseCategory
         , selectField "Component"
             "component_id"
+            (model.formState.selectedComponentId |> Maybe.map componentIdToInt)
             model.components
             componentId
             .name
@@ -144,20 +171,32 @@ view model =
 selectField :
     String
     -> String
+    -> Maybe Int
     -> List a
     -> (a -> Int)
     -> (a -> String)
     -> (String -> Msg)
     -> Html Msg
-selectField fieldName fieldIdentifier items toId toOptionLabel changeMsg =
+selectField fieldName fieldIdentifier selectedItemId items toId toOptionLabel changeMsg =
     let
         namespacedId =
             namespacedFieldId fieldIdentifier
 
         fieldOption =
             \item ->
+                let
+                    isSelected =
+                        case selectedItemId of
+                            Just id ->
+                                id == toId item
+
+                            Nothing ->
+                                False
+                in
                 option
-                    [ toId item |> toString |> value ]
+                    [ toId item |> toString |> value
+                    , selected isSelected
+                    ]
                     [ toOptionLabel item |> text ]
     in
     div [ class "form-group" ]
