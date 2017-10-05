@@ -324,8 +324,7 @@ selectField fieldName fieldIdentifier selectedItemId items toId toOptionLabel ch
             [ for namespacedId ]
             [ text fieldName ]
         , select
-            [ name (formFieldIdentifier fieldIdentifier)
-            , id namespacedId
+            [ id namespacedId
             , class "form-control"
             , onInput changeMsg
             ]
@@ -345,8 +344,7 @@ textareaField fieldName fieldIdentifier content inputMsg =
             [ for namespacedId ]
             [ text fieldName ]
         , textarea
-            [ name (formFieldIdentifier fieldIdentifier)
-            , id namespacedId
+            [ id namespacedId
             , class "form-control"
             , rows 10
             , onInput inputMsg
@@ -358,11 +356,6 @@ textareaField fieldName fieldIdentifier content inputMsg =
 namespacedFieldId : String -> String
 namespacedFieldId fieldIdentifier =
     "new-case-form-" ++ fieldIdentifier
-
-
-formFieldIdentifier : String -> String
-formFieldIdentifier fieldIdentifier =
-    "case[" ++ fieldIdentifier ++ "]"
 
 
 submitButton : Html Msg
