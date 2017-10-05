@@ -15,4 +15,11 @@ class Cluster < ApplicationRecord
   def support_type_enum
     SUPPORT_TYPES
   end
+
+  def case_form_json
+    {
+      id: id,
+      name: name
+    }
+  end
 end

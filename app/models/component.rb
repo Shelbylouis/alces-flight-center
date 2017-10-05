@@ -5,4 +5,12 @@ class Component < ApplicationRecord
 
   validates_associated :component_group
   validates :name, presence: true
+
+  def case_form_json
+    {
+      id: id,
+      name: name,
+      clusterId: cluster.id
+    }
+  end
 end

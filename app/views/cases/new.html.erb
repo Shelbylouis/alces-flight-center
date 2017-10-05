@@ -3,7 +3,7 @@
 
 <div
   id='new-case-form'
-  data-clusters='<%= @site_clusters.to_json %>'
-  data-case-categories='<%= @case_categories.to_json %>'
-  data-components='<%= @site_components.to_json %>'
+  data-clusters='<%= json_map(@site_clusters, :case_form_json) %>'
+  data-case-categories='<%= json_map(@case_categories, :case_form_json) %>'
+  data-components='<%= json_map(@site_components, :case_form_json) %>'
 ></div>

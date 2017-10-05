@@ -24,4 +24,8 @@ FactoryGirl.define do
     component_group
     name 'node01'
   end
+
+  factory :case_category do
+    name 'Broken cluster'
+  end
 end
