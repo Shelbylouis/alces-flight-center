@@ -5,9 +5,13 @@ import Cluster exposing (Cluster)
 import Component exposing (Component)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onSubmit)
+import Http
 import Json.Decode as D
+import Json.Encode as E
 import Maybe.Extra
+import Navigation
+import Rails
 
 
 -- MODEL
@@ -71,6 +75,33 @@ initialStateDecoder =
         (D.field "clusters" (D.list Cluster.decoder))
         (D.field "caseCategories" (D.list CaseCategory.decoder))
         (D.field "components" (D.list Component.decoder))
+
+
+formStateEncoder : FormState -> Maybe E.Value
+formStateEncoder formState =
+    let
+        -- Encode value only if all select fields have value selected.
+        formCompleteEncoder =
+            Maybe.map3
+                (\clusterId ->
+                    \caseCategoryId ->
+                        \componentId ->
+                            E.object
+                                [ ( "case"
+                                  , E.object
+                                        [ ( "cluster_id", clusterIdToInt clusterId |> E.int )
+                                        , ( "case_category_id", caseCategoryIdToInt caseCategoryId |> E.int )
+                                        , ( "component_id", componentIdToInt componentId |> E.int )
+                                        , ( "details", E.string formState.details )
+                                        ]
+                                  )
+                                ]
+                )
+    in
+    formCompleteEncoder
+        formState.selectedClusterId
+        formState.selectedCaseCategoryId
+        formState.selectedComponentId
 
 
 clusterId : Cluster -> Int
@@ -223,7 +254,7 @@ caseForm state =
                 , Just submitButton
                 ]
     in
-    Html.form [] formElements
+    Html.form [ onSubmit StartSubmit ] formElements
 
 
 selectField :
@@ -322,6 +353,8 @@ type Msg
     | ChangeSelectedCaseCategory String
     | ChangeSelectedComponent String
     | ChangeDetails String
+    | StartSubmit
+    | SubmitResponse (Result (Rails.Error String) ())
 
 
 
@@ -386,12 +419,48 @@ updateState msg state =
             in
             ( { state | formState = newFormState }, Cmd.none )
 
+        StartSubmit ->
+            ( state, submitForm state.formState )
+
+        SubmitResponse result ->
+            case result of
+                Ok () ->
+                    -- Success response indicates case was successfully
+                    -- created, so redirect to root page.
+                    ( state, Navigation.load "/" )
+
+                Err errors ->
+                    -- XXX Handle errors
+                    ( state, Cmd.none )
+
 
 stringToId : (Int -> id) -> String -> Maybe id
 stringToId constructor idString =
     String.toInt idString
         |> Result.toMaybe
         |> Maybe.map constructor
+
+
+submitForm : FormState -> Cmd Msg
+submitForm formState =
+    let
+        maybeBody =
+            formStateEncoder formState
+                |> Maybe.map Http.jsonBody
+
+        getErrors =
+            D.field "errors" D.string
+                |> Rails.decodeErrors
+    in
+    case maybeBody of
+        Just body ->
+            Rails.post "/cases" body (D.succeed ())
+                |> Http.send (getErrors >> SubmitResponse)
+
+        Nothing ->
+            -- Do not do anything if form is not in a state to be submitted -
+            -- XXX maybe should do something however?
+            Cmd.none
 
 
 
