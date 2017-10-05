@@ -64,12 +64,21 @@ initialStateDecoder =
             \clusters ->
                 \caseCategories ->
                     \components ->
+                        let
+                            selectedClusterId =
+                                firstId clusters
+
+                            selectedComponentId =
+                                Maybe.andThen
+                                    (Component.forCluster components >> firstId)
+                                    selectedClusterId
+                        in
                         State clusters
                             caseCategories
                             components
-                            { selectedClusterId = firstId clusters
+                            { selectedClusterId = selectedClusterId
                             , selectedCaseCategoryId = firstId caseCategories
-                            , selectedComponentId = firstId components
+                            , selectedComponentId = selectedComponentId
                             , details = ""
                             , error = Nothing
                             , isSubmitting = False
