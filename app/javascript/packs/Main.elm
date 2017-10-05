@@ -36,6 +36,7 @@ type alias FormState =
     , selectedComponentId : Maybe Component.Id
     , details : String
     , error : Maybe String
+    , isSubmitting : Bool
     }
 
 
@@ -71,6 +72,7 @@ initialStateDecoder =
                             , selectedComponentId = firstId components
                             , details = ""
                             , error = Nothing
+                            , isSubmitting = False
                             }
     in
     D.map3 createInitialState
@@ -282,7 +284,7 @@ caseForm state =
                 , caseCategoriesField
                 , componentsField
                 , detailsField
-                , Just submitButton
+                , submitButton state.formState |> Just
                 ]
     in
     Html.form [ onSubmit StartSubmit ] formElements
@@ -358,12 +360,13 @@ namespacedFieldId fieldIdentifier =
     "new-case-form-" ++ fieldIdentifier
 
 
-submitButton : Html Msg
-submitButton =
+submitButton : FormState -> Html Msg
+submitButton formState =
     input
         [ type_ "submit"
         , value "Create Case"
         , class "btn btn-dark btn-block"
+        , disabled formState.isSubmitting
         ]
         []
 
@@ -445,7 +448,13 @@ updateState msg state =
             ( { state | formState = newFormState }, Cmd.none )
 
         StartSubmit ->
-            ( state, submitForm state.formState )
+            let
+                newFormState =
+                    { formState | isSubmitting = True }
+            in
+            ( { state | formState = newFormState }
+            , submitForm state.formState
+            )
 
         SubmitResponse result ->
             case result of
@@ -459,6 +468,7 @@ updateState msg state =
                         newFormState =
                             { formState
                                 | error = Just (formatSubmitError error)
+                                , isSubmitting = False
                             }
                     in
                     ( { state | formState = newFormState }, Cmd.none )
