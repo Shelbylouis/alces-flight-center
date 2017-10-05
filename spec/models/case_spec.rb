@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Case, type: :model do
   describe '#create_rt_ticket' do
     subject do
-      # XXX Consider best way to DRY up creating test data.
+      # XXX Use FactoryGirl here.
       cluster = Cluster.new(name: 'somecluster')
       case_category = CaseCategory.new(name: 'Crashed node')
       user = User.new(
