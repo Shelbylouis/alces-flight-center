@@ -5,7 +5,7 @@ import Cluster exposing (Cluster)
 import Component exposing (Component)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onSubmit)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Json.Decode as D
 import Json.Encode as E
@@ -35,6 +35,7 @@ type alias FormState =
     , selectedCaseCategoryId : Maybe CaseCategory.Id
     , selectedComponentId : Maybe Component.Id
     , details : String
+    , error : Maybe String
     }
 
 
@@ -69,6 +70,7 @@ initialStateDecoder =
                             , selectedCaseCategoryId = firstId caseCategories
                             , selectedComponentId = firstId components
                             , details = ""
+                            , error = Nothing
                             }
     in
     D.map3 createInitialState
@@ -172,7 +174,12 @@ view : Model -> Html Msg
 view model =
     case model of
         Initialized state ->
-            caseForm state
+            div []
+                (Maybe.Extra.values
+                    [ errorAlert state.formState
+                    , caseForm state |> Just
+                    ]
+                )
 
         Error message ->
             span []
@@ -182,6 +189,30 @@ view model =
                         ++ ". Please contact support@alces-software.com"
                     )
                 ]
+
+
+errorAlert : FormState -> Maybe (Html Msg)
+errorAlert formState =
+    -- This closely matches the error alert we show from Rails, but is managed
+    -- by Elm rather than Bootstrap JS.
+    let
+        displayError =
+            \error ->
+                div
+                    [ class "alert alert-danger alert-dismissable fade show"
+                    , attribute "role" "alert"
+                    ]
+                    [ button
+                        [ type_ "button"
+                        , class "close"
+                        , attribute "aria-label" "Dismiss"
+                        , onClick ClearError
+                        ]
+                        [ span [ attribute "aria-hidden" "true" ] [ text "×" ] ]
+                    , text ("Error creating support case: " ++ error ++ ".")
+                    ]
+    in
+    Maybe.map displayError formState.error
 
 
 caseForm : State -> Html Msg
@@ -355,6 +386,7 @@ type Msg
     | ChangeDetails String
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
+    | ClearError
 
 
 
@@ -429,9 +461,21 @@ updateState msg state =
                     -- created, so redirect to root page.
                     ( state, Navigation.load "/" )
 
-                Err errors ->
-                    -- XXX Handle errors
-                    ( state, Cmd.none )
+                Err error ->
+                    let
+                        newFormState =
+                            { formState
+                                | error = Just (formatSubmitError error)
+                            }
+                    in
+                    ( { state | formState = newFormState }, Cmd.none )
+
+        ClearError ->
+            let
+                newFormState =
+                    { formState | error = Nothing }
+            in
+            ( { state | formState = newFormState }, Cmd.none )
 
 
 stringToId : (Int -> id) -> String -> Maybe id
@@ -461,6 +505,35 @@ submitForm formState =
             -- Do not do anything if form is not in a state to be submitted -
             -- XXX maybe should do something however?
             Cmd.none
+
+
+formatSubmitError : Rails.Error String -> String
+formatSubmitError error =
+    case error.rails of
+        Just errors ->
+            errors
+
+        Nothing ->
+            formatHttpError error.http
+
+
+formatHttpError : Http.Error -> String
+formatHttpError error =
+    case error of
+        Http.BadUrl url ->
+            "invalid URL: " ++ url
+
+        Http.Timeout ->
+            "request timed out"
+
+        Http.NetworkError ->
+            "unable to access network"
+
+        Http.BadStatus { status } ->
+            "unexpected response status: " ++ toString status.code
+
+        Http.BadPayload message { status } ->
+            "bad payload: " ++ message ++ "; status: " ++ toString status.code
 
 
 
