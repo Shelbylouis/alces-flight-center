@@ -1,8 +1,7 @@
 
 import Elm from './Main'
 
-
-document.addEventListener('DOMContentLoaded', () => {
+const initializeFormApp = () => {
   const target = document.getElementById('new-case-form')
 
   const loadAttributeJson =
@@ -15,4 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   Elm.Main.embed(target, flags)
-})
+}
+
+document.addEventListener('turbolinks:load', initializeFormApp)
