@@ -261,7 +261,7 @@ caseForm state =
                 currentClusterComponents =
                     case state.formState.selectedClusterId of
                         Just id ->
-                            Component.forCluster id state.components
+                            Component.forCluster state.components id
 
                         Nothing ->
                             []

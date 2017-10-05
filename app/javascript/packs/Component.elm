@@ -15,8 +15,8 @@ type Id
     = Id Int
 
 
-forCluster : Cluster.Id -> List Component -> List Component
-forCluster clusterId components =
+forCluster : List Component -> Cluster.Id -> List Component
+forCluster components clusterId =
     let
         partOfCluster =
             \component ->
