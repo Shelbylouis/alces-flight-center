@@ -9,7 +9,7 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Json.Decode as D
 import Json.Encode as E
-import Maybe.Extra
+import Maybe.Extra exposing (isNothing)
 import Navigation
 import Rails
 
@@ -106,6 +106,20 @@ formStateEncoder formState =
         formState.selectedClusterId
         formState.selectedCaseCategoryId
         formState.selectedComponentId
+
+
+formIsInvalid : FormState -> Bool
+formIsInvalid formState =
+    let
+        anyMaybeIsNothing =
+            List.any identity
+                [ isNothing formState.selectedClusterId
+                , isNothing formState.selectedCaseCategoryId
+                , isNothing formState.selectedComponentId
+                ]
+    in
+    anyMaybeIsNothing
+        || String.isEmpty formState.details
 
 
 clusterId : Cluster -> Int
@@ -366,7 +380,7 @@ submitButton formState =
         [ type_ "submit"
         , value "Create Case"
         , class "btn btn-dark btn-block"
-        , disabled formState.isSubmitting
+        , disabled (formState.isSubmitting || formIsInvalid formState)
         ]
         []
 
