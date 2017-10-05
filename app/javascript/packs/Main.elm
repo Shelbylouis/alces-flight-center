@@ -51,37 +51,26 @@ decodeInitialModel value =
 initialStateDecoder : D.Decoder State
 initialStateDecoder =
     let
-        clusters =
-            [ Cluster (Cluster.Id 1) "Foo cluster"
-            , Cluster (Cluster.Id 2) "Bar cluster"
-            ]
-
-        caseCategories =
-            [ CaseCategory (CaseCategory.Id 1) "Suspected hardware issue" True
-            , CaseCategory (CaseCategory.Id 2) "Request for gridware package" False
-            ]
-
-        components =
-            [ Component (Component.Id 1) "foonode01" (Cluster.Id 1)
-            , Component (Component.Id 2) "foonode02" (Cluster.Id 1)
-            ]
-
         firstId =
             \items -> List.head items |> Maybe.map .id
 
-        initialState =
-            { clusters = clusters
-            , caseCategories = caseCategories
-            , components = components
-            , formState =
-                { selectedClusterId = firstId clusters
-                , selectedCaseCategoryId = firstId caseCategories
-                , selectedComponentId = firstId components
-                , details = ""
-                }
-            }
+        createInitialState =
+            \clusters ->
+                \caseCategories ->
+                    \components ->
+                        State clusters
+                            caseCategories
+                            components
+                            { selectedClusterId = firstId clusters
+                            , selectedCaseCategoryId = firstId caseCategories
+                            , selectedComponentId = firstId components
+                            , details = ""
+                            }
     in
-    D.succeed initialState
+    D.map3 createInitialState
+        (D.field "clusters" (D.list Cluster.decoder))
+        (D.field "caseCategories" (D.list CaseCategory.decoder))
+        (D.field "components" (D.list Component.decoder))
 
 
 clusterId : Cluster -> Int
