@@ -14,8 +14,7 @@ RSpec.describe Component, type: :model do
     it 'gives correct JSON' do
       expect(subject.case_form_json).to eq({
         id: 1,
-        name: 'Some Component',
-        clusterId: 2
+        name: 'Some Component'
       })
     end
   end

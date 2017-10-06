@@ -9,9 +9,11 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Json.Decode as D
 import Json.Encode as E
-import Maybe.Extra exposing (isNothing)
+import Maybe.Extra exposing (isNothing, unwrap)
 import Navigation
 import Rails
+import SelectList exposing (Position(..), SelectList)
+import Utils
 
 
 -- MODEL
@@ -23,17 +25,8 @@ type Model
 
 
 type alias State =
-    { clusters : List Cluster
-    , caseCategories : List CaseCategory
-    , components : List Component
-    , formState : FormState
-    }
-
-
-type alias FormState =
-    { selectedClusterId : Maybe Cluster.Id
-    , selectedCaseCategoryId : Maybe CaseCategory.Id
-    , selectedComponentId : Maybe Component.Id
+    { clusters : SelectList Cluster
+    , caseCategories : SelectList CaseCategory
     , details : String
     , error : Maybe String
     , isSubmitting : Bool
@@ -57,78 +50,54 @@ decodeInitialModel value =
 initialStateDecoder : D.Decoder State
 initialStateDecoder =
     let
-        firstId =
-            \items -> List.head items |> Maybe.map .id
-
         createInitialState =
             \clusters ->
                 \caseCategories ->
-                    \components ->
-                        let
-                            selectedClusterId =
-                                firstId clusters
-
-                            selectedComponentId =
-                                Maybe.andThen
-                                    (Component.forCluster components >> firstId)
-                                    selectedClusterId
-                        in
-                        State clusters
-                            caseCategories
-                            components
-                            { selectedClusterId = selectedClusterId
-                            , selectedCaseCategoryId = firstId caseCategories
-                            , selectedComponentId = selectedComponentId
-                            , details = ""
-                            , error = Nothing
-                            , isSubmitting = False
-                            }
+                    { clusters = clusters
+                    , caseCategories = caseCategories
+                    , details = ""
+                    , error = Nothing
+                    , isSubmitting = False
+                    }
     in
-    D.map3 createInitialState
-        (D.field "clusters" (D.list Cluster.decoder))
-        (D.field "caseCategories" (D.list CaseCategory.decoder))
-        (D.field "components" (D.list Component.decoder))
+    D.map2 createInitialState
+        (D.field "clusters" <| Utils.selectListDecoder Cluster.decoder)
+        (D.field "caseCategories" <| Utils.selectListDecoder CaseCategory.decoder)
 
 
-formStateEncoder : FormState -> Maybe E.Value
-formStateEncoder formState =
+formStateEncoder : State -> E.Value
+formStateEncoder state =
     let
-        -- Encode value only if all select fields have value selected.
-        formCompleteEncoder =
-            Maybe.map3
-                (\clusterId ->
-                    \caseCategoryId ->
-                        \componentId ->
-                            E.object
-                                [ ( "case"
-                                  , E.object
-                                        [ ( "cluster_id", clusterIdToInt clusterId |> E.int )
-                                        , ( "case_category_id", caseCategoryIdToInt caseCategoryId |> E.int )
-                                        , ( "component_id", componentIdToInt componentId |> E.int )
-                                        , ( "details", E.string formState.details )
-                                        ]
-                                  )
-                                ]
-                )
+        selectedCaseCategory =
+            SelectList.selected state.caseCategories
+
+        selectedCluster =
+            SelectList.selected state.clusters
+
+        selectedComponent =
+            SelectList.selected selectedCluster.components
+
+        componentIdValue =
+            if selectedCaseCategory.requiresComponent then
+                componentIdToInt selectedComponent.id |> E.int
+            else
+                E.null
     in
-    formCompleteEncoder
-        formState.selectedClusterId
-        formState.selectedCaseCategoryId
-        formState.selectedComponentId
-
-
-formIsInvalid : FormState -> Bool
-formIsInvalid formState =
-    let
-        anyMaybeIsNothing =
-            List.any identity
-                [ isNothing formState.selectedClusterId
-                , isNothing formState.selectedCaseCategoryId
-                , isNothing formState.selectedComponentId
+    E.object
+        [ ( "case"
+          , E.object
+                [ ( "cluster_id", clusterIdToInt selectedCluster.id |> E.int )
+                , ( "case_category_id", caseCategoryIdToInt selectedCaseCategory.id |> E.int )
+                , ( "component_id", componentIdValue )
+                , ( "details", E.string state.details )
                 ]
-    in
-    anyMaybeIsNothing
-        || String.isEmpty formState.details
+          )
+        ]
+
+
+formIsInvalid : State -> Bool
+formIsInvalid state =
+    String.isEmpty state.details
 
 
 clusterId : Cluster -> Int
@@ -167,21 +136,6 @@ componentIdToInt (Component.Id id) =
     id
 
 
-selectedCaseCategory : State -> Maybe CaseCategory
-selectedCaseCategory state =
-    let
-        id =
-            state.formState.selectedCaseCategoryId
-
-        matchesId =
-            \caseCategory ->
-                Maybe.map ((==) caseCategory.id) id
-                    |> Maybe.withDefault False
-    in
-    List.filter matchesId state.caseCategories
-        |> List.head
-
-
 
 -- INIT
 
@@ -201,7 +155,7 @@ view model =
         Initialized state ->
             div []
                 (Maybe.Extra.values
-                    [ errorAlert state.formState
+                    [ errorAlert state
                     , caseForm state |> Just
                     ]
                 )
@@ -216,8 +170,8 @@ view model =
                 ]
 
 
-errorAlert : FormState -> Maybe (Html Msg)
-errorAlert formState =
+errorAlert : State -> Maybe (Html Msg)
+errorAlert state =
     -- This closely matches the error alert we show from Rails, but is managed
     -- by Elm rather than Bootstrap JS.
     let
@@ -237,17 +191,25 @@ errorAlert formState =
                     , text ("Error creating support case: " ++ error ++ ".")
                     ]
     in
-    Maybe.map displayError formState.error
+    Maybe.map displayError state.error
 
 
 caseForm : State -> Html Msg
 caseForm state =
     let
+        selectedCluster =
+            SelectList.selected state.clusters
+
+        selectedClusterComponents =
+            selectedCluster.components
+
+        selectedCaseCategory =
+            SelectList.selected state.caseCategories
+
         clustersField =
             Just
                 (selectField "Cluster"
                     "cluster_id"
-                    (state.formState.selectedClusterId |> Maybe.map clusterIdToInt)
                     state.clusters
                     clusterId
                     .name
@@ -258,7 +220,6 @@ caseForm state =
             Just
                 (selectField "Case category"
                     "case_category_id"
-                    (state.formState.selectedCaseCategoryId |> Maybe.map caseCategoryIdToInt)
                     state.caseCategories
                     caseCategoryId
                     .name
@@ -266,26 +227,11 @@ caseForm state =
                 )
 
         componentsField =
-            let
-                currentClusterComponents =
-                    case state.formState.selectedClusterId of
-                        Just id ->
-                            Component.forCluster state.components id
-
-                        Nothing ->
-                            []
-
-                caseCategoryRequiresComponent =
-                    selectedCaseCategory state
-                        |> Maybe.map .requiresComponent
-                        |> Maybe.withDefault False
-            in
-            if caseCategoryRequiresComponent then
+            if selectedCaseCategory.requiresComponent then
                 Just
                     (selectField "Component"
                         "component_id"
-                        (state.formState.selectedComponentId |> Maybe.map componentIdToInt)
-                        currentClusterComponents
+                        selectedClusterComponents
                         componentId
                         .name
                         ChangeSelectedComponent
@@ -297,7 +243,7 @@ caseForm state =
             Just
                 (textareaField "Details"
                     "details"
-                    state.formState.details
+                    state.details
                     ChangeDetails
                 )
 
@@ -307,7 +253,7 @@ caseForm state =
                 , caseCategoriesField
                 , componentsField
                 , detailsField
-                , submitButton state.formState |> Just
+                , submitButton state |> Just
                 ]
     in
     Html.form [ onSubmit StartSubmit ] formElements
@@ -316,33 +262,28 @@ caseForm state =
 selectField :
     String
     -> String
-    -> Maybe Int
-    -> List a
+    -> SelectList a
     -> (a -> Int)
     -> (a -> String)
     -> (String -> Msg)
     -> Html Msg
-selectField fieldName fieldIdentifier selectedItemId items toId toOptionLabel changeMsg =
+selectField fieldName fieldIdentifier items toId toOptionLabel changeMsg =
     let
         namespacedId =
             namespacedFieldId fieldIdentifier
 
         fieldOption =
-            \item ->
-                let
-                    isSelected =
-                        case selectedItemId of
-                            Just id ->
-                                id == toId item
+            \position ->
+                \item ->
+                    option
+                        [ toId item |> toString |> value
+                        , position == Selected |> selected
+                        ]
+                        [ toOptionLabel item |> text ]
 
-                            Nothing ->
-                                False
-                in
-                option
-                    [ toId item |> toString |> value
-                    , selected isSelected
-                    ]
-                    [ toOptionLabel item |> text ]
+        options =
+            SelectList.mapBy fieldOption items
+                |> SelectList.toList
     in
     div [ class "form-group" ]
         [ label
@@ -353,7 +294,7 @@ selectField fieldName fieldIdentifier selectedItemId items toId toOptionLabel ch
             , class "form-control"
             , onInput changeMsg
             ]
-            (List.map fieldOption items)
+            options
         ]
 
 
@@ -383,13 +324,13 @@ namespacedFieldId fieldIdentifier =
     "new-case-form-" ++ fieldIdentifier
 
 
-submitButton : FormState -> Html Msg
-submitButton formState =
+submitButton : State -> Html Msg
+submitButton state =
     input
         [ type_ "submit"
         , value "Create Case"
         , class "btn btn-dark btn-block"
-        , disabled (formState.isSubmitting || formIsInvalid formState)
+        , disabled (state.isSubmitting || formIsInvalid state)
         ]
         []
 
@@ -419,6 +360,7 @@ update msg model =
             let
                 ( newState, cmd ) =
                     updateState msg state
+                        |> Maybe.withDefault ( state, Cmd.none )
             in
             ( Initialized newState, cmd )
 
@@ -426,82 +368,48 @@ update msg model =
             model ! []
 
 
-updateState : Msg -> State -> ( State, Cmd Msg )
+updateState : Msg -> State -> Maybe ( State, Cmd Msg )
 updateState msg state =
-    let
-        formState =
-            state.formState
-    in
     case msg of
         ChangeSelectedCluster id ->
-            let
-                selectedClusterId =
-                    stringToId Cluster.Id id
-
-                newFormState =
-                    { formState | selectedClusterId = selectedClusterId }
-            in
-            ( { state | formState = newFormState }, Cmd.none )
+            stringToId Cluster.Id id
+                |> Maybe.map (handleChangeSelectedCluster state)
 
         ChangeSelectedCaseCategory id ->
-            let
-                selectedCaseCategoryId =
-                    stringToId CaseCategory.Id id
-
-                newFormState =
-                    { formState | selectedCaseCategoryId = selectedCaseCategoryId }
-            in
-            ( { state | formState = newFormState }, Cmd.none )
+            stringToId CaseCategory.Id id
+                |> Maybe.map (handleChangeSelectedCaseCategory state)
 
         ChangeSelectedComponent id ->
-            let
-                selectedComponentId =
-                    stringToId Component.Id id
-
-                newFormState =
-                    { formState | selectedComponentId = selectedComponentId }
-            in
-            ( { state | formState = newFormState }, Cmd.none )
+            stringToId Component.Id id
+                |> Maybe.map (handleChangeSelectedComponent state)
 
         ChangeDetails details ->
-            let
-                newFormState =
-                    { formState | details = details }
-            in
-            ( { state | formState = newFormState }, Cmd.none )
+            Just ( { state | details = details }, Cmd.none )
 
         StartSubmit ->
-            let
-                newFormState =
-                    { formState | isSubmitting = True }
-            in
-            ( { state | formState = newFormState }
-            , submitForm state.formState
-            )
+            Just
+                ( { state | isSubmitting = True }
+                , submitForm state
+                )
 
         SubmitResponse result ->
             case result of
                 Ok () ->
                     -- Success response indicates case was successfully
                     -- created, so redirect to root page.
-                    ( state, Navigation.load "/" )
+                    Just ( state, Navigation.load "/" )
 
                 Err error ->
-                    let
-                        newFormState =
-                            { formState
-                                | error = Just (formatSubmitError error)
-                                , isSubmitting = False
-                            }
-                    in
-                    ( { state | formState = newFormState }, Cmd.none )
+                    Just
+                        ( { state
+                            | error = Just (formatSubmitError error)
+                            , isSubmitting = False
+                          }
+                        , Cmd.none
+                        )
 
         ClearError ->
-            let
-                newFormState =
-                    { formState | error = Nothing }
-            in
-            ( { state | formState = newFormState }, Cmd.none )
+            Just ( { state | error = Nothing }, Cmd.none )
 
 
 stringToId : (Int -> id) -> String -> Maybe id
@@ -511,26 +419,67 @@ stringToId constructor idString =
         |> Maybe.map constructor
 
 
-submitForm : FormState -> Cmd Msg
-submitForm formState =
+handleChangeSelectedCluster : State -> Cluster.Id -> ( State, Cmd Msg )
+handleChangeSelectedCluster state clusterId =
     let
-        maybeBody =
-            formStateEncoder formState
-                |> Maybe.map Http.jsonBody
+        newClusters =
+            SelectList.select (sameId clusterId) state.clusters
+    in
+    ( { state | clusters = newClusters }
+    , Cmd.none
+    )
+
+
+handleChangeSelectedCaseCategory : State -> CaseCategory.Id -> ( State, Cmd Msg )
+handleChangeSelectedCaseCategory state caseCategoryId =
+    let
+        newCaseCategories =
+            SelectList.select (sameId caseCategoryId) state.caseCategories
+    in
+    ( { state | caseCategories = newCaseCategories }
+    , Cmd.none
+    )
+
+
+handleChangeSelectedComponent : State -> Component.Id -> ( State, Cmd Msg )
+handleChangeSelectedComponent state componentId =
+    let
+        newClusters =
+            SelectList.mapBy updateSelectedClusterSelectedComponent state.clusters
+
+        updateSelectedClusterSelectedComponent =
+            \position ->
+                \cluster ->
+                    if position == Selected then
+                        { cluster
+                            | components =
+                                SelectList.select (sameId componentId) cluster.components
+                        }
+                    else
+                        cluster
+    in
+    ( { state | clusters = newClusters }
+    , Cmd.none
+    )
+
+
+sameId : b -> { a | id : b } -> Bool
+sameId id item =
+    item.id == id
+
+
+submitForm : State -> Cmd Msg
+submitForm state =
+    let
+        body =
+            formStateEncoder state |> Http.jsonBody
 
         getErrors =
             D.field "errors" D.string
                 |> Rails.decodeErrors
     in
-    case maybeBody of
-        Just body ->
-            Rails.post "/cases" body (D.succeed ())
-                |> Http.send (getErrors >> SubmitResponse)
-
-        Nothing ->
-            -- Do not do anything if form is not in a state to be submitted -
-            -- XXX maybe should do something however?
-            Cmd.none
+    Rails.post "/cases" body (D.succeed ())
+        |> Http.send (getErrors >> SubmitResponse)
 
 
 formatSubmitError : Rails.Error String -> String

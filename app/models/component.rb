@@ -10,7 +10,6 @@ class Component < ApplicationRecord
     {
       id: id,
       name: name,
-      clusterId: cluster.id
     }
   end
 end

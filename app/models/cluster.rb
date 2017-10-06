@@ -19,7 +19,8 @@ class Cluster < ApplicationRecord
   def case_form_json
     {
       id: id,
-      name: name
+      name: name,
+      components: components.map(&:case_form_json),
     }
   end
 end
