@@ -35,7 +35,7 @@ class CasesController < ApplicationController
     else
       flash_object_errors(@case)
     end
-    redirect_to cases_path
+    redirect_to root_path
   end
 
   private
@@ -53,6 +53,10 @@ class CasesController < ApplicationController
     support_case.errors.messages.map do |field, messages|
       "#{field} #{messages.join(', ')}"
     end.join('; ')
+  end
+
+  def flash_object_errors(support_case)
+    flash[:error] = "Error creating support case: #{format_errors(support_case)}"
   end
 
   def assign_form_variables
