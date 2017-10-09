@@ -40,6 +40,7 @@ FactoryGirl.define do
     case_category
     name 'New user/group'
     requires_component false
+    details_template 'Enter the usernames to create'
   end
 
   factory :case do
