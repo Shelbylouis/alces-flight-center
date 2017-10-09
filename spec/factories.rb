@@ -30,6 +30,7 @@ FactoryGirl.define do
   factory :component do
     component_group
     name 'node01'
+    support_type :inherit
   end
 
   factory :case_category do
@@ -41,6 +42,7 @@ FactoryGirl.define do
     name 'New user/group'
     requires_component false
     details_template 'Enter the usernames to create'
+    support_type :managed
   end
 
   factory :case do

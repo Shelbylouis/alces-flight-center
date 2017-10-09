@@ -1,5 +1,5 @@
 class Cluster < ApplicationRecord
-  SUPPORT_TYPES = ['managed', 'advice'].freeze
+  SUPPORT_TYPES = Issue::SUPPORT_TYPES
 
   belongs_to :site
   has_many :component_groups, dependent: :destroy
