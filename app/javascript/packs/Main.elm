@@ -14,6 +14,7 @@ import Maybe.Extra exposing (isNothing, unwrap)
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
+import String.Extra
 import Utils
 
 
@@ -231,7 +232,6 @@ caseForm state =
         clustersField =
             Just
                 (selectField "Cluster"
-                    "cluster_id"
                     state.clusters
                     clusterId
                     .name
@@ -241,7 +241,6 @@ caseForm state =
         caseCategoriesField =
             Just
                 (selectField "Case category"
-                    "case_category_id"
                     state.caseCategories
                     caseCategoryId
                     .name
@@ -251,7 +250,6 @@ caseForm state =
         issuesField =
             Just
                 (selectField "Issue"
-                    "issue_id"
                     selectedCaseCategoryIssues
                     issueId
                     .name
@@ -262,7 +260,6 @@ caseForm state =
             if selectedIssue.requiresComponent then
                 Just
                     (selectField "Component"
-                        "component_id"
                         selectedClusterComponents
                         componentId
                         .name
@@ -272,12 +269,7 @@ caseForm state =
                 Nothing
 
         detailsField =
-            Just
-                (textareaField "Details"
-                    "details"
-                    state.details
-                    ChangeDetails
-                )
+            Just (textareaField "Details" state.details ChangeDetails)
 
         formElements =
             Maybe.Extra.values
@@ -292,18 +284,11 @@ caseForm state =
     Html.form [ onSubmit StartSubmit ] formElements
 
 
-selectField :
-    String
-    -> String
-    -> SelectList a
-    -> (a -> Int)
-    -> (a -> String)
-    -> (String -> Msg)
-    -> Html Msg
-selectField fieldName fieldIdentifier items toId toOptionLabel changeMsg =
+selectField : String -> SelectList a -> (a -> Int) -> (a -> String) -> (String -> Msg) -> Html Msg
+selectField fieldName items toId toOptionLabel changeMsg =
     let
-        namespacedId =
-            namespacedFieldId fieldIdentifier
+        identifier =
+            fieldIdentifier fieldName
 
         fieldOption =
             \position ->
@@ -320,10 +305,10 @@ selectField fieldName fieldIdentifier items toId toOptionLabel changeMsg =
     in
     div [ class "form-group" ]
         [ label
-            [ for namespacedId ]
+            [ for identifier ]
             [ text fieldName ]
         , select
-            [ id namespacedId
+            [ id identifier
             , class "form-control"
             , onInput changeMsg
             ]
@@ -331,19 +316,19 @@ selectField fieldName fieldIdentifier items toId toOptionLabel changeMsg =
         ]
 
 
-textareaField : String -> String -> String -> (String -> Msg) -> Html Msg
-textareaField fieldName fieldIdentifier content inputMsg =
+textareaField : String -> String -> (String -> Msg) -> Html Msg
+textareaField fieldName content inputMsg =
     -- XXX De-duplicate this and `selectField`.
     let
-        namespacedId =
-            namespacedFieldId fieldIdentifier
+        identifier =
+            fieldIdentifier fieldName
     in
     div [ class "form-group" ]
         [ label
-            [ for namespacedId ]
+            [ for identifier ]
             [ text fieldName ]
         , textarea
-            [ id namespacedId
+            [ id identifier
             , class "form-control"
             , rows 10
             , onInput inputMsg
@@ -352,9 +337,10 @@ textareaField fieldName fieldIdentifier content inputMsg =
         ]
 
 
-namespacedFieldId : String -> String
-namespacedFieldId fieldIdentifier =
-    "new-case-form-" ++ fieldIdentifier
+fieldIdentifier : String -> String
+fieldIdentifier fieldName =
+    String.toLower fieldName
+        |> String.Extra.dasherize
 
 
 submitButton : State -> Html Msg
