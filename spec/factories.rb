@@ -33,11 +33,17 @@ FactoryGirl.define do
   end
 
   factory :case_category do
-    name 'Broken cluster'
+    name 'User management'
+  end
+
+  factory :issue do
+    case_category
+    name 'New user/group'
+    requires_component false
   end
 
   factory :case do
-    case_category
+    issue
     cluster
     user
     details "Oh no, my science isn't working"

@@ -42,7 +42,7 @@ class CasesController < ApplicationController
 
   def case_params
     params.require(:case).permit(
-      :case_category_id, :cluster_id, :component_id, :details
+      :issue_id, :cluster_id, :component_id, :details
     )
   end
 

@@ -1,13 +1,12 @@
-class CaseCategory < ApplicationRecord
-  has_many :issues
-
+class Issue < ApplicationRecord
+  belongs_to :case_category
   validates :name, presence: true
 
   def case_form_json
     {
       id: id,
       name: name,
-      issues: issues.map(&:case_form_json),
+      requiresComponent: requires_component,
     }
   end
 end
