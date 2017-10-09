@@ -18,3 +18,10 @@ decoder =
     D.map2 Component
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
+
+
+extractId : Component -> Int
+extractId component =
+    case component.id of
+        Id id ->
+            id

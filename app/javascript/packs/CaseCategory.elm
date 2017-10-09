@@ -23,3 +23,10 @@ decoder =
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "issues" (Utils.selectListDecoder Issue.decoder))
+
+
+extractId : CaseCategory -> Int
+extractId caseCategory =
+    case caseCategory.id of
+        Id id ->
+            id

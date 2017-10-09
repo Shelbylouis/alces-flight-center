@@ -22,3 +22,10 @@ decoder =
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
         (D.field "detailsTemplate" D.string)
+
+
+extractId : Issue -> Int
+extractId issue =
+    case issue.id of
+        Id id ->
+            id
