@@ -62,6 +62,5 @@ class CasesController < ApplicationController
   def assign_form_variables
     @case_categories = CaseCategory.all
     @site_clusters = current_site.clusters
-    @site_components = current_site.components
   end
 end
