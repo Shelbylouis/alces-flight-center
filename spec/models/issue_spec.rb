@@ -7,6 +7,7 @@ RSpec.describe Issue, type: :model do
         :issue,
         id: 1,
         name: 'New user request',
+        details_template: 'Give a username',
         requires_component: true
       )
     end
@@ -15,6 +16,7 @@ RSpec.describe Issue, type: :model do
       expect(subject.case_form_json).to eq({
         id: 1,
         name: 'New user request',
+        detailsTemplate: 'Give a username',
         requiresComponent: true
       })
     end

@@ -7,6 +7,7 @@ class Issue < ApplicationRecord
     {
       id: id,
       name: name,
+      detailsTemplate: details_template,
       requiresComponent: requires_component,
     }
   end

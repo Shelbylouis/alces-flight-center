@@ -29,7 +29,6 @@ type Model
 type alias State =
     { clusters : SelectList Cluster
     , caseCategories : SelectList CaseCategory
-    , details : String
     , error : Maybe String
     , isSubmitting : Bool
     }
@@ -57,7 +56,6 @@ initialStateDecoder =
                 \caseCategories ->
                     { clusters = clusters
                     , caseCategories = caseCategories
-                    , details = ""
                     , error = Nothing
                     , isSubmitting = False
                     }
@@ -94,7 +92,7 @@ formStateEncoder state =
                 [ ( "cluster_id", clusterIdToInt selectedCluster.id |> E.int )
                 , ( "issue_id", issueIdToInt selectedIssue.id |> E.int )
                 , ( "component_id", componentIdValue )
-                , ( "details", E.string state.details )
+                , ( "details", E.string selectedIssue.details )
                 ]
           )
         ]
@@ -102,7 +100,14 @@ formStateEncoder state =
 
 formIsInvalid : State -> Bool
 formIsInvalid state =
-    String.isEmpty state.details
+    let
+        selectedCaseCategory =
+            SelectList.selected state.caseCategories
+
+        selectedIssue =
+            SelectList.selected selectedCaseCategory.issues
+    in
+    String.isEmpty selectedIssue.details
 
 
 clusterId : Cluster -> Int
@@ -269,7 +274,7 @@ caseForm state =
                 Nothing
 
         detailsField =
-            Just (textareaField "Details" state.details ChangeDetails)
+            Just (textareaField "Details" selectedIssue.details ChangeDetails)
 
         formElements =
             Maybe.Extra.values
@@ -332,8 +337,9 @@ textareaField fieldName content inputMsg =
             , class "form-control"
             , rows 10
             , onInput inputMsg
+            , value content
             ]
-            [ text content ]
+            []
         ]
 
 
@@ -408,7 +414,8 @@ updateState msg state =
                 |> Maybe.map (handleChangeSelectedComponent state)
 
         ChangeDetails details ->
-            Just ( { state | details = details }, Cmd.none )
+            Just
+                ( handleChangeDetails state details, Cmd.none )
 
         StartSubmit ->
             Just
@@ -506,6 +513,34 @@ handleChangeSelectedComponent state componentId =
     ( { state | clusters = newClusters }
     , Cmd.none
     )
+
+
+handleChangeDetails : State -> String -> State
+handleChangeDetails state details =
+    let
+        newCaseCategories =
+            SelectList.mapBy updateSelectedCaseCategorySelectedIssue state.caseCategories
+
+        updateSelectedCaseCategorySelectedIssue =
+            \position ->
+                \caseCategory ->
+                    if position == Selected then
+                        { caseCategory
+                            | issues =
+                                SelectList.mapBy updateSelectedIssueDetails caseCategory.issues
+                        }
+                    else
+                        caseCategory
+
+        updateSelectedIssueDetails =
+            \position ->
+                \issue ->
+                    if position == Selected then
+                        { issue | details = details }
+                    else
+                        issue
+    in
+    { state | caseCategories = newCaseCategories }
 
 
 sameId : b -> { a | id : b } -> Bool
