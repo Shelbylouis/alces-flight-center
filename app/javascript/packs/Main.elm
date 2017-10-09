@@ -10,7 +10,7 @@ import Http
 import Issue exposing (Issue)
 import Json.Decode as D
 import Json.Encode as E
-import Maybe.Extra exposing (isNothing, unwrap)
+import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
