@@ -42,22 +42,21 @@ encoder state =
         issue =
             selectedIssue state
 
-        selectedCluster =
+        cluster =
             SelectList.selected state.clusters
-
-        selectedComponent =
-            SelectList.selected selectedCluster.components
 
         componentIdValue =
             if issue.requiresComponent then
-                Component.extractId selectedComponent |> E.int
+                selectedComponent state
+                    |> Component.extractId
+                    |> E.int
             else
                 E.null
     in
     E.object
         [ ( "case"
           , E.object
-                [ ( "cluster_id", Cluster.extractId selectedCluster |> E.int )
+                [ ( "cluster_id", Cluster.extractId cluster |> E.int )
                 , ( "issue_id", Issue.extractId issue |> E.int )
                 , ( "component_id", componentIdValue )
                 , ( "details", E.string issue.details )
@@ -70,6 +69,13 @@ selectedIssue : State -> Issue
 selectedIssue state =
     SelectList.selected state.caseCategories
         |> .issues
+        |> SelectList.selected
+
+
+selectedComponent : State -> Component
+selectedComponent state =
+    SelectList.selected state.clusters
+        |> .components
         |> SelectList.selected
 
 
