@@ -107,92 +107,101 @@ errorAlert children =
 caseForm : State -> Html Msg
 caseForm state =
     let
-        selectedClusterComponents =
-            SelectList.selected state.clusters |> .components
+        formElements =
+            Maybe.Extra.values
+                [ clustersField state.clusters |> Just
+                , caseCategoriesField state |> Just
+                , issuesField state |> Just
+                , maybeComponentsField state
+                , detailsField state |> Just
+                , submitButton state |> Just
+                ]
+    in
+    Html.form [ onSubmit StartSubmit ] formElements
 
-        selectedCaseCategoryIssues =
-            SelectList.selected state.caseCategories |> .issues
 
-        selectedIssue =
-            State.selectedIssue state
+clustersField : SelectList Cluster -> Html Msg
+clustersField clusters =
+    selectField "Cluster"
+        clusters
+        Cluster.extractId
+        .name
+        (always Valid)
+        ChangeSelectedCluster
 
-        clustersField =
-            Just
-                (selectField "Cluster"
-                    state.clusters
-                    Cluster.extractId
-                    .name
-                    (always Valid)
-                    ChangeSelectedCluster
-                )
 
+caseCategoriesField : State -> Html Msg
+caseCategoriesField state =
+    let
         validateCaseCategory =
             FieldValidation.validateWithEmptyError
                 (CaseCategory.availableForSelectedCluster state.clusters)
+    in
+    selectField "Case category"
+        state.caseCategories
+        CaseCategory.extractId
+        .name
+        validateCaseCategory
+        ChangeSelectedCaseCategory
 
-        caseCategoriesField =
-            Just
-                (selectField "Case category"
-                    state.caseCategories
-                    CaseCategory.extractId
-                    .name
-                    validateCaseCategory
-                    ChangeSelectedCaseCategory
-                )
+
+issuesField : State -> Html Msg
+issuesField state =
+    let
+        selectedCaseCategoryIssues =
+            SelectList.selected state.caseCategories |> .issues
 
         validateIssue =
             FieldValidation.validateWithError
                 """This cluster is self-managed; you may only request
                 consultancy support from Alces Software."""
                 (Issue.availableForSelectedCluster state.clusters)
+    in
+    selectField "Issue"
+        selectedCaseCategoryIssues
+        Issue.extractId
+        .name
+        validateIssue
+        ChangeSelectedIssue
 
-        issuesField =
-            Just
-                (selectField "Issue"
-                    selectedCaseCategoryIssues
-                    Issue.extractId
-                    .name
-                    validateIssue
-                    ChangeSelectedIssue
-                )
 
-        componentsField =
-            if selectedIssue.requiresComponent then
-                Just
-                    (selectField "Component"
-                        selectedClusterComponents
-                        Component.extractId
-                        .name
-                        (always Valid)
-                        ChangeSelectedComponent
-                    )
-            else
-                Nothing
+maybeComponentsField : State -> Maybe (Html Msg)
+maybeComponentsField state =
+    let
+        selectedClusterComponents =
+            SelectList.selected state.clusters |> .components
+
+        selectedIssue =
+            State.selectedIssue state
+    in
+    if selectedIssue.requiresComponent then
+        Just
+            (selectField "Component"
+                selectedClusterComponents
+                Component.extractId
+                .name
+                (always Valid)
+                ChangeSelectedComponent
+            )
+    else
+        Nothing
+
+
+detailsField : State -> Html Msg
+detailsField state =
+    let
+        selectedIssue =
+            State.selectedIssue state
 
         validateDetails =
             FieldValidation.validateWithEmptyError Issue.detailsValid
-
-        detailsField =
-            Just
-                (textareaField
-                    "Details"
-                    selectedIssue
-                    .details
-                    validateDetails
-                    ChangeDetails
-                )
-
-        formElements =
-            Maybe.Extra.values
-                [ clustersField
-                , caseCategoriesField
-                , issuesField
-                , componentsField
-                , detailsField
-                , submitButton state |> Just
-                ]
     in
-    Html.form [ onSubmit StartSubmit ] formElements
+    textareaField
+        "Details"
+        selectedIssue
+        .details
+        validateDetails
+        ChangeDetails
 
 
 selectField :
