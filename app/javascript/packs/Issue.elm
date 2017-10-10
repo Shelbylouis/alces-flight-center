@@ -38,12 +38,11 @@ availableForSelectedCluster : SelectList Cluster -> Issue -> Bool
 availableForSelectedCluster clusters issue =
     let
         issueIsManaged =
-            issue.supportType == Managed
+            SupportType.isManaged issue
 
         clusterIsAdvice =
             SelectList.selected clusters
-                |> .supportType
-                |> (==) Advice
+                |> SupportType.isAdvice
     in
     -- An Issue is available so long as it is not a managed issue while an
     -- advice-only Cluster is selected.

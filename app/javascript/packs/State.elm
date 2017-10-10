@@ -7,6 +7,7 @@ import Issue exposing (Issue)
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
+import SupportType
 import Utils
 
 

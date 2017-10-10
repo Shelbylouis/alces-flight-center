@@ -8,6 +8,10 @@ type SupportType
     | Advice
 
 
+type alias HasSupportType a =
+    { a | supportType : SupportType }
+
+
 decoder : D.Decoder SupportType
 decoder =
     let
@@ -24,3 +28,13 @@ decoder =
                         D.fail ("Unknown support type: " ++ other)
     in
     D.string |> D.andThen stringToSupportType
+
+
+isManaged : HasSupportType a -> Bool
+isManaged x =
+    x.supportType == Managed
+
+
+isAdvice : HasSupportType a -> Bool
+isAdvice x =
+    x.supportType == Advice
