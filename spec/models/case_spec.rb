@@ -2,79 +2,55 @@ require 'rails_helper'
 
 RSpec.describe Case, type: :model do
   describe '#valid?' do
+    subject do
+      build(
+        :case,
+        issue: issue,
+        cluster: cluster,
+        component: component
+      )
+    end
+    let :cluster { create(:cluster) }
+    let :component { nil }
+
     context 'when issue does not require component' do
       let :issue { create(:issue, requires_component: false) }
 
-      it 'passes if not associated with component' do
-        support_case = build(
-          :case,
-          issue: issue
-        )
-
-        expect(support_case.valid?).to be true
+      context 'when not associated with component' do
+        it { is_expected.to be_valid }
       end
 
-      it 'fails if associated with component' do
-        support_case = build(
-          :case,
-          issue: issue,
-          component: create(:component)
-        )
+      context 'when associated with component' do
+        let :component { create(:component) }
 
-        expect(support_case.valid?).to be false
-        expect(support_case.errors.messages).to include(component: [/does not require a component/])
+        it 'should be invalid' do
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to include(component: [/does not require a component/])
+        end
       end
     end
 
     context 'when issue requires component' do
       let :issue { create(:issue, requires_component: true) }
-      let :cluster { create(:cluster) }
-      let :component { create(:component, cluster: cluster) }
 
-      it 'passes if associated with component' do
-        support_case = build(
-          :case,
-          issue: issue,
-          component: component,
-          cluster: cluster
-        )
-
-        expect(support_case.valid?).to be true
+      context 'when not associated with component' do
+        it 'should be invalid' do
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to include(component: [/requires a component/])
+        end
       end
 
-      it 'fails if not associated with component' do
-        support_case = build(
-          :case,
-          issue: issue
-        )
-
-        expect(support_case.valid?).to be false
-        expect(support_case.errors.messages).to include(component: [/requires a component/])
+      context 'when associated with component that is part of associated cluster' do
+        let :component { create(:component, cluster: cluster) }
+        it { is_expected.to be_valid }
       end
 
-      it 'passes if component part of associated cluster' do
-        support_case = build(
-          :case,
-          issue: issue,
-          component: component,
-          cluster: cluster
-        )
-
-        expect(support_case.valid?).to be true
-      end
-
-      it 'fails if component not part of associated cluster' do
-        another_cluster = create(:cluster)
-        component = create(:component, cluster: another_cluster)
-        support_case = build(
-          :case,
-          issue: issue,
-          component: component,
-          cluster: cluster
-        )
-
-        expect(support_case.valid?).to be false
-        expect(support_case.errors.messages).to include(component: [/not part of given cluster/])
+      context 'when associated with component that is not part of associated cluster' do
+        let :component { create(:component, cluster: create(:cluster)) }
+        it 'should be invalid' do
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to include(component: [/not part of given cluster/])
+        end
       end
     end
   end
