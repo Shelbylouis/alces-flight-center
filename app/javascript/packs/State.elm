@@ -2,7 +2,7 @@ module State exposing (..)
 
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
-import Component
+import Component exposing (Component)
 import Issue exposing (Issue)
 import Json.Decode as D
 import Json.Encode as E
@@ -79,13 +79,34 @@ selectedComponent state =
         |> SelectList.selected
 
 
+componentAllowedForSelectedIssue : State -> Component -> Bool
+componentAllowedForSelectedIssue state component =
+    let
+        issue =
+            selectedIssue state
+
+        issueIsManaged =
+            SupportType.isManaged issue
+
+        componentIsAdvice =
+            SupportType.isAdvice component
+    in
+    -- A Component is allowed unless the selected Issue is a managed Issue, it
+    -- requires a Component, and the selected Component is advice-only.
+    not (issueIsManaged && issue.requiresComponent && componentIsAdvice)
+
+
 isInvalid : State -> Bool
 isInvalid state =
     let
         issue =
             selectedIssue state
+
+        component =
+            selectedComponent state
     in
     List.any not
         [ Issue.detailsValid issue
         , Issue.availableForSelectedCluster state.clusters issue
+        , componentAllowedForSelectedIssue state component
         ]

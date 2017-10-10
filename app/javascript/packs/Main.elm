@@ -173,6 +173,12 @@ maybeComponentsField state =
 
         selectedIssue =
             State.selectedIssue state
+
+        validateComponent =
+            FieldValidation.validateWithError
+                """This component is self-managed; if required you may only
+                request consultancy support from Alces Software."""
+                (State.componentAllowedForSelectedIssue state)
     in
     if selectedIssue.requiresComponent then
         Just
@@ -180,7 +186,7 @@ maybeComponentsField state =
                 selectedClusterComponents
                 Component.extractId
                 .name
-                (always Valid)
+                validateComponent
                 ChangeSelectedComponent
             )
     else
