@@ -214,9 +214,6 @@ selectField :
     -> Html Msg
 selectField fieldName items toId toOptionLabel validate changeMsg =
     let
-        identifier =
-            fieldIdentifier fieldName
-
         validatedField =
             SelectList.selected items |> validate
 
@@ -233,56 +230,70 @@ selectField fieldName items toId toOptionLabel validate changeMsg =
         options =
             SelectList.mapBy fieldOption items
                 |> SelectList.toList
-
-        classes =
-            "form-control "
-                ++ bootstrapValidationClass validatedField
     in
-    div [ class "form-group" ]
-        [ label
-            [ for identifier ]
-            [ text fieldName ]
-        , select
-            [ id identifier
-            , class classes
-            , onInput changeMsg
-            ]
-            options
-        , div
-            [ class "invalid-feedback" ]
-            [ FieldValidation.error validatedField |> text ]
-        ]
+    formField fieldName
+        validatedField
+        select
+        [ onInput changeMsg ]
+        options
 
 
 textareaField : String -> a -> (a -> String) -> (a -> FieldValidation) -> (String -> Msg) -> Html Msg
 textareaField fieldName item toContent validate inputMsg =
-    -- XXX De-duplicate this and `selectField`.
+    let
+        validatedField =
+            validate item
+
+        content =
+            toContent item
+    in
+    formField fieldName
+        validatedField
+        textarea
+        [ rows 10
+        , onInput inputMsg
+        , value content
+        ]
+        []
+
+
+type alias HtmlFunction msg =
+    List (Attribute msg) -> List (Html msg) -> Html msg
+
+
+formField :
+    String
+    -> FieldValidation
+    -> HtmlFunction msg
+    -> List (Attribute msg)
+    -> List (Html msg)
+    -> Html msg
+formField fieldName validation htmlFn additionalAttributes children =
     let
         identifier =
             fieldIdentifier fieldName
 
-        validatedField =
-            validate item
-
         classes =
-            "form-control "
-                ++ bootstrapValidationClass validatedField
+            "form-control " ++ bootstrapValidationClass validation
 
-        content =
-            toContent item
+        attributes =
+            List.append
+                [ id identifier
+                , class classes
+                ]
+                additionalAttributes
+
+        formElement =
+            htmlFn attributes children
     in
     div [ class "form-group" ]
         [ label
             [ for identifier ]
             [ text fieldName ]
-        , textarea
-            [ id identifier
-            , class classes
-            , rows 10
-            , onInput inputMsg
-            , value content
-            ]
-            []
+        , formElement
+        , div
+            [ class "invalid-feedback" ]
+            [ FieldValidation.error validation |> text ]
         ]
 
 
