@@ -7,14 +7,16 @@ RSpec.describe Component, type: :model do
         :component,
         id: 1,
         name: 'Some Component',
-        cluster: create(:cluster, id: 2)
+        cluster: create(:cluster, id: 2),
+        support_type: :managed,
       )
     end
 
     it 'gives correct JSON' do
       expect(subject.case_form_json).to eq({
         id: 1,
-        name: 'Some Component'
+        name: 'Some Component',
+        supportType: 'managed',
       })
     end
   end

@@ -1,6 +1,7 @@
 module Issue exposing (..)
 
 import Json.Decode as D
+import SupportType exposing (SupportType)
 
 
 type alias Issue =
@@ -8,6 +9,7 @@ type alias Issue =
     , name : String
     , requiresComponent : Bool
     , details : String
+    , supportType : SupportType
     }
 
 
@@ -17,11 +19,12 @@ type Id
 
 decoder : D.Decoder Issue
 decoder =
-    D.map4 Issue
+    D.map5 Issue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
         (D.field "detailsTemplate" D.string)
+        (D.field "supportType" SupportType.decoder)
 
 
 extractId : Issue -> Int

@@ -25,6 +25,7 @@ class Component < ApplicationRecord
     {
       id: id,
       name: name,
+      supportType: support_type,
     }
   end
 end

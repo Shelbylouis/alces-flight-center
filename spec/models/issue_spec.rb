@@ -8,7 +8,8 @@ RSpec.describe Issue, type: :model do
         id: 1,
         name: 'New user request',
         details_template: 'Give a username',
-        requires_component: true
+        requires_component: true,
+        support_type: :managed
       )
     end
 
@@ -17,7 +18,8 @@ RSpec.describe Issue, type: :model do
         id: 1,
         name: 'New user request',
         detailsTemplate: 'Give a username',
-        requiresComponent: true
+        requiresComponent: true,
+        supportType: 'managed',
       })
     end
   end
