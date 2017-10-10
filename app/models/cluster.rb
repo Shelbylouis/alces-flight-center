@@ -1,7 +1,7 @@
 class Cluster < ApplicationRecord
   include HasSupportType
 
-  SUPPORT_TYPES = Issue::SUPPORT_TYPES
+  SUPPORT_TYPES = SupportType::VALUES
 
   belongs_to :site
   has_many :component_groups, dependent: :destroy

@@ -1,7 +1,7 @@
 class Component < ApplicationRecord
   include HasSupportType
 
-  SUPPORT_TYPES = Issue::SUPPORT_TYPES + ['inherit']
+  SUPPORT_TYPES = SupportType::VALUES + ['inherit']
 
   belongs_to :component_group
   has_one :component_type, through: :component_group
@@ -13,14 +13,6 @@ class Component < ApplicationRecord
 
   def support_type
     super == 'inherit' ? cluster.support_type : super
-  end
-
-  def managed?
-    support_type == 'managed'
-  end
-
-  def advice?
-    support_type == 'advice'
   end
 
   # Automatically picked up by rails_admin so only these options displayed when

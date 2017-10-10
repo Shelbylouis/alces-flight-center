@@ -12,4 +12,12 @@ module HasSupportType
       raise "Unknown support type: #{support_type}"
     end
   end
+
+  def managed?
+    support_type == 'managed'
+  end
+
+  def advice?
+    support_type == 'advice'
+  end
 end

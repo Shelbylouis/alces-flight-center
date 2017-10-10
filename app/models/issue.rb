@@ -1,7 +1,7 @@
 class Issue < ApplicationRecord
   include HasSupportType
 
-  SUPPORT_TYPES = ['managed', 'advice'].freeze
+  SUPPORT_TYPES = SupportType::VALUES
 
   belongs_to :case_category
   validates :name, presence: true
