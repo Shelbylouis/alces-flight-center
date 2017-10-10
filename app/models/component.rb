@@ -13,6 +13,14 @@ class Component < ApplicationRecord
     super == 'inherit' ? cluster.support_type : super
   end
 
+  def managed?
+    support_type == 'managed'
+  end
+
+  def advice?
+    support_type == 'advice'
+  end
+
   # Automatically picked up by rails_admin so only these options displayed when
   # selecting support type.
   def support_type_enum

@@ -23,4 +23,12 @@ class Cluster < ApplicationRecord
       components: components.map(&:case_form_json),
     }
   end
+
+  def managed_components
+    components.select(&:managed?)
+  end
+
+  def advice_components
+    components.select(&:advice?)
+  end
 end
