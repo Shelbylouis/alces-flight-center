@@ -1,4 +1,6 @@
 class Component < ApplicationRecord
+  include HasSupportType
+
   SUPPORT_TYPES = Issue::SUPPORT_TYPES + ['inherit']
 
   belongs_to :component_group

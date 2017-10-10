@@ -1,4 +1,6 @@
 class Cluster < ApplicationRecord
+  include HasSupportType
+
   SUPPORT_TYPES = Issue::SUPPORT_TYPES
 
   belongs_to :site

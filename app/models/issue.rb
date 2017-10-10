@@ -1,4 +1,6 @@
 class Issue < ApplicationRecord
+  include HasSupportType
+
   SUPPORT_TYPES = ['managed', 'advice'].freeze
 
   belongs_to :case_category
