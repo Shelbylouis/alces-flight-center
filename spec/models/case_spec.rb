@@ -13,8 +13,16 @@ RSpec.describe Case, type: :model do
     let :cluster { create(:cluster) }
     let :component { nil }
 
+    let :issue { create(:issue, issue_attributes) }
+
+    # Specify advice issue to avoid managed issue-related validations failing,
+    # unless explicitly testing these.
+    let :issue_attributes { attributes_for(:advice_issue) }
+
     context 'when issue does not require component' do
-      let :issue { create(:issue, requires_component: false) }
+      before :each do
+        issue_attributes.merge!(requires_component: false)
+      end
 
       context 'when not associated with component' do
         it { is_expected.to be_valid }
@@ -28,10 +36,54 @@ RSpec.describe Case, type: :model do
           expect(subject.errors.messages).to include(component: [/does not require a component/])
         end
       end
+
+      context 'when `managed` issue' do
+        before :each do
+          issue_attributes.merge!(support_type: :managed)
+        end
+
+        context 'with `managed` cluster' do
+          let :cluster { create(:managed_cluster) }
+          it { is_expected.to be_valid }
+        end
+
+        context 'with `advice` cluster' do
+          let :cluster { create(:advice_cluster) }
+          it 'should be invalid' do
+            expect(subject).not_to be_valid
+            expect(subject.errors.messages).to include(
+              issue: [/is only available for fully managed clusters, but given cluster is self-managed/]
+            )
+          end
+        end
+      end
+
+      context 'when `advice` issue' do
+        before :each do
+          issue_attributes.merge!(support_type: :advice)
+        end
+
+        context 'with `managed` cluster' do
+          let :cluster { create(:managed_cluster) }
+          it { is_expected.to be_valid }
+        end
+
+        context 'with `advice` cluster' do
+          let :cluster { create(:advice_cluster) }
+          it { is_expected.to be_valid }
+        end
+      end
+
     end
 
     context 'when issue requires component' do
-      let :issue { create(:issue, requires_component: true) }
+      before :each do
+        issue_attributes.merge!(requires_component: true)
+      end
+
+      # Explicitly specify advice cluster to ensure only relying on component
+      # `support_type`, in tests where this is relevant.
+      let :cluster { create(:advice_cluster) }
 
       context 'when not associated with component' do
         it 'should be invalid' do
@@ -50,6 +102,43 @@ RSpec.describe Case, type: :model do
         it 'should be invalid' do
           expect(subject).not_to be_valid
           expect(subject.errors.messages).to include(component: [/not part of given cluster/])
+        end
+      end
+
+      context 'when `managed` issue' do
+        before :each do
+          issue_attributes.merge!(support_type: :managed)
+        end
+
+        context 'with `managed` component' do
+          let :component { create(:managed_component, cluster: cluster) }
+          it { is_expected.to be_valid }
+        end
+
+        context 'with `advice` component' do
+          let :component { create(:advice_component, cluster: cluster) }
+          it 'should be invalid' do
+            expect(subject).not_to be_valid
+            expect(subject.errors.messages).to include(
+              issue: [/is only available for fully managed components, but given component is self-managed/]
+            )
+          end
+        end
+      end
+
+      context 'when `advice` issue' do
+        before :each do
+          issue_attributes.merge!(support_type: :advice)
+        end
+
+        context 'with `managed` component' do
+          let :component { create(:managed_component, cluster: cluster) }
+          it { is_expected.to be_valid }
+        end
+
+        context 'with `advice` component' do
+          let :component { create(:advice_component, cluster: cluster) }
+          it { is_expected.to be_valid }
         end
       end
     end
