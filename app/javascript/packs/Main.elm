@@ -58,7 +58,7 @@ view model =
         Initialized state ->
             div []
                 (Maybe.Extra.values
-                    [ errorAlert state
+                    [ submitErrorAlert state
                     , caseForm state |> Just
                     ]
                 )
@@ -73,17 +73,14 @@ view model =
                 ]
 
 
-errorAlert : State -> Maybe (Html Msg)
-errorAlert state =
+submitErrorAlert : State -> Maybe (Html Msg)
+submitErrorAlert state =
     -- This closely matches the error alert we show from Rails, but is managed
     -- by Elm rather than Bootstrap JS.
     let
         displayError =
             \error ->
-                div
-                    [ class "alert alert-danger alert-dismissable fade show"
-                    , attribute "role" "alert"
-                    ]
+                errorAlert
                     [ button
                         [ type_ "button"
                         , class "close"
@@ -95,6 +92,15 @@ errorAlert state =
                     ]
     in
     Maybe.map displayError state.error
+
+
+errorAlert : List (Html msg) -> Html msg
+errorAlert children =
+    div
+        [ class "alert alert-danger alert-dismissable fade show"
+        , attribute "role" "alert"
+        ]
+        children
 
 
 caseForm : State -> Html Msg
