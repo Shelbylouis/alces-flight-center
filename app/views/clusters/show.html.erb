@@ -12,9 +12,7 @@
     </ul>
   </div>
 
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item"><%= @cluster.description %></li>
-  </ul>
+  <%= render 'clusters/details', cluster: @cluster %>
 </div>
 
 <% @cluster.component_groups.each do |group| %>
@@ -34,13 +32,15 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>Support type</th>
         </tr>
       </thead>
 
       <tbody>
       <% group.components.each do |c| %>
         <tr>
-          <td><%= link_to c.name, component_path(c) %></td>
+          <td width='50%'><%= link_to c.name, component_path(c) %></td>
+          <td width='50%'><%= c.readable_support_type.capitalize %></td>
         </tr>
       <% end %>
       </tbody>

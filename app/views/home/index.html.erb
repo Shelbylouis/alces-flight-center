@@ -18,9 +18,7 @@
       </ul>
     </div>
 
-    <div class='card-body'>
-      <%= cluster.components.length %> components
-    </div>
+    <%= render 'clusters/details', cluster: cluster %>
   </div>
 <% end %>
 
