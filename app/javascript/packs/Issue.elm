@@ -1,7 +1,9 @@
 module Issue exposing (..)
 
+import Cluster exposing (Cluster)
 import Json.Decode as D
-import SupportType exposing (SupportType)
+import SelectList exposing (SelectList)
+import SupportType exposing (SupportType(..))
 
 
 type alias Issue =
@@ -25,6 +27,27 @@ decoder =
         (D.field "requiresComponent" D.bool)
         (D.field "detailsTemplate" D.string)
         (D.field "supportType" SupportType.decoder)
+
+
+detailsValid : Issue -> Bool
+detailsValid issue =
+    String.isEmpty issue.details |> not
+
+
+availableForSelectedCluster : SelectList Cluster -> Issue -> Bool
+availableForSelectedCluster clusters issue =
+    let
+        issueIsManaged =
+            issue.supportType == Managed
+
+        clusterIsAdvice =
+            SelectList.selected clusters
+                |> .supportType
+                |> (==) Advice
+    in
+    -- An Issue is available so long as it is not a managed issue while an
+    -- advice-only Cluster is selected.
+    not (issueIsManaged && clusterIsAdvice)
 
 
 extractId : Issue -> Int

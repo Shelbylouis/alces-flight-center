@@ -3,6 +3,7 @@ module Main exposing (..)
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
 import Component exposing (Component)
+import FieldValidation exposing (FieldValidation(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -121,8 +122,13 @@ caseForm state =
                     state.clusters
                     Cluster.extractId
                     .name
+                    (always Valid)
                     ChangeSelectedCluster
                 )
+
+        validateCaseCategory =
+            FieldValidation.validateWithEmptyError
+                (CaseCategory.availableForSelectedCluster state.clusters)
 
         caseCategoriesField =
             Just
@@ -130,8 +136,15 @@ caseForm state =
                     state.caseCategories
                     CaseCategory.extractId
                     .name
+                    validateCaseCategory
                     ChangeSelectedCaseCategory
                 )
+
+        validateIssue =
+            FieldValidation.validateWithError
+                """This cluster is self-managed; you may only request
+                consultancy support from Alces Software."""
+                (Issue.availableForSelectedCluster state.clusters)
 
         issuesField =
             Just
@@ -139,6 +152,7 @@ caseForm state =
                     selectedCaseCategoryIssues
                     Issue.extractId
                     .name
+                    validateIssue
                     ChangeSelectedIssue
                 )
 
@@ -149,13 +163,24 @@ caseForm state =
                         selectedClusterComponents
                         Component.extractId
                         .name
+                        (always Valid)
                         ChangeSelectedComponent
                     )
             else
                 Nothing
 
+        validateDetails =
+            FieldValidation.validateWithEmptyError Issue.detailsValid
+
         detailsField =
-            Just (textareaField "Details" selectedIssue.details ChangeDetails)
+            Just
+                (textareaField
+                    "Details"
+                    selectedIssue
+                    .details
+                    validateDetails
+                    ChangeDetails
+                )
 
         formElements =
             Maybe.Extra.values
@@ -170,11 +195,21 @@ caseForm state =
     Html.form [ onSubmit StartSubmit ] formElements
 
 
-selectField : String -> SelectList a -> (a -> Int) -> (a -> String) -> (String -> Msg) -> Html Msg
-selectField fieldName items toId toOptionLabel changeMsg =
+selectField :
+    String
+    -> SelectList a
+    -> (a -> Int)
+    -> (a -> String)
+    -> (a -> FieldValidation)
+    -> (String -> Msg)
+    -> Html Msg
+selectField fieldName items toId toOptionLabel validate changeMsg =
     let
         identifier =
             fieldIdentifier fieldName
+
+        validatedField =
+            SelectList.selected items |> validate
 
         fieldOption =
             \position ->
@@ -182,12 +217,17 @@ selectField fieldName items toId toOptionLabel changeMsg =
                     option
                         [ toId item |> toString |> value
                         , position == Selected |> selected
+                        , validate item |> FieldValidation.isInvalid |> disabled
                         ]
                         [ toOptionLabel item |> text ]
 
         options =
             SelectList.mapBy fieldOption items
                 |> SelectList.toList
+
+        classes =
+            "form-control "
+                ++ bootstrapValidationClass validatedField
     in
     div [ class "form-group" ]
         [ label
@@ -195,19 +235,32 @@ selectField fieldName items toId toOptionLabel changeMsg =
             [ text fieldName ]
         , select
             [ id identifier
-            , class "form-control"
+            , class classes
             , onInput changeMsg
             ]
             options
+        , div
+            [ class "invalid-feedback" ]
+            [ FieldValidation.error validatedField |> text ]
         ]
 
 
-textareaField : String -> String -> (String -> Msg) -> Html Msg
-textareaField fieldName content inputMsg =
+textareaField : String -> a -> (a -> String) -> (a -> FieldValidation) -> (String -> Msg) -> Html Msg
+textareaField fieldName item toContent validate inputMsg =
     -- XXX De-duplicate this and `selectField`.
     let
         identifier =
             fieldIdentifier fieldName
+
+        validatedField =
+            validate item
+
+        classes =
+            "form-control "
+                ++ bootstrapValidationClass validatedField
+
+        content =
+            toContent item
     in
     div [ class "form-group" ]
         [ label
@@ -215,13 +268,23 @@ textareaField fieldName content inputMsg =
             [ text fieldName ]
         , textarea
             [ id identifier
-            , class "form-control"
+            , class classes
             , rows 10
             , onInput inputMsg
             , value content
             ]
             []
         ]
+
+
+bootstrapValidationClass : FieldValidation -> String
+bootstrapValidationClass validation =
+    case validation of
+        Valid ->
+            "is-valid"
+
+        Invalid _ ->
+            "is-invalid"
 
 
 fieldIdentifier : String -> String

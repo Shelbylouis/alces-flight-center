@@ -74,4 +74,11 @@ selectedIssue state =
 
 isInvalid : State -> Bool
 isInvalid state =
-    selectedIssue state |> .details |> String.isEmpty
+    let
+        issue =
+            selectedIssue state
+    in
+    List.any not
+        [ Issue.detailsValid issue
+        , Issue.availableForSelectedCluster state.clusters issue
+        ]
