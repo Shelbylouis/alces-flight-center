@@ -42,6 +42,17 @@ RailsAdmin.config do |config|
     end
   end
 
+  config.model 'Cluster' do
+    configure :canonical_name do
+      hide
+    end
+    show do
+      configure :documents_path do
+        show
+      end
+    end
+  end
+
   config.model 'ComponentGroup' do
     list do
       configure :genders_host_range do
