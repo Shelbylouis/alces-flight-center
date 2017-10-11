@@ -1,6 +1,9 @@
 require 'rails_helper'
+require 'shared_examples/canonical_name'
 
 RSpec.describe Cluster, type: :model do
+  include_examples 'canonical_name'
+
   describe '#case_form_json' do
     subject do
       create(

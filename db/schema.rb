@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171009164012) do
+ActiveRecord::Schema.define(version: 20171011114910) do
 
   create_table "case_categories", force: :cascade do |t|
     t.string "name", null: false
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 20171009164012) do
     t.integer "site_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "canonical_name"
     t.index ["site_id"], name: "index_clusters_on_site_id"
   end
 
@@ -88,6 +89,7 @@ ActiveRecord::Schema.define(version: 20171009164012) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "canonical_name"
   end
 
   create_table "users", force: :cascade do |t|

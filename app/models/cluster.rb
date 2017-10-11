@@ -11,6 +11,9 @@ class Cluster < ApplicationRecord
   validates_associated :site
   validates :name, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
+  validates :canonical_name, presence: true
+
+  before_validation CanonicalNameCreator.new, on: :create
 
   # Automatically picked up by rails_admin so only these options displayed when
   # selecting support type.
