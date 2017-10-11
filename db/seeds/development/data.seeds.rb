@@ -61,6 +61,9 @@ Cluster.create!(
       name: 'Rack A1 Omnipath Edge switch 45pt'
     )
   end
+
+  # Upload some documents to use in development for this cluster to S3.
+  Development::Utils.upload_document_fixtures_for(cluster)
 end
 
 Cluster.create!(

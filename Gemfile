@@ -23,6 +23,7 @@ gem 'uglifier', '>= 1.3.0'
 gem 'clearance'
 gem 'http'
 gem 'rails_admin', '~> 1.2'
+gem 'aws-sdk-s3'
 gem 'seedbank'
 gem 'webpacker', '~> 3.0'
 
