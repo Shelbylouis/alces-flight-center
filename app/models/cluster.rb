@@ -37,4 +37,12 @@ class Cluster < ApplicationRecord
   def advice_components
     components.select(&:advice?)
   end
+
+  def documents_path
+    File.join(
+      ENV.fetch('AWS_DOCUMENTS_PREFIX'),
+      site.canonical_name,
+      canonical_name
+    )
+  end
 end

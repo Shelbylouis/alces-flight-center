@@ -57,4 +57,19 @@ RSpec.describe Cluster, type: :model do
       expect(result.length).to be 5
     end
   end
+
+  context 'cluster document tests' do
+    subject { create(:cluster, name: 'Some Cluster', site: site) }
+    let :site { create(:site, name: 'The Site') }
+
+    before :each do
+      ENV['AWS_DOCUMENTS_PREFIX'] = 'test-documents'
+    end
+
+    describe '#documents_path' do
+      it 'returns correct path' do
+        expect(subject.documents_path).to eq 'test-documents/the-site/some-cluster'
+      end
+    end
+  end
 end
