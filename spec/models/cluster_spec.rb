@@ -71,5 +71,19 @@ RSpec.describe Cluster, type: :model do
         expect(subject.documents_path).to eq 'test-documents/the-site/some-cluster'
       end
     end
+
+    describe '#documents' do
+      it 'returns needed data for each Cluster document' do
+        VCR.use_cassette('s3_read_documents', re_record_interval: 7.days) do
+          Development::Utils.upload_document_fixtures_for(subject)
+
+          documents = subject.documents
+          expect(documents.length).to be 3
+
+          expect(documents.first.name).to eq "Alces+Flight+on+AWS.pdf"
+          expect(documents.first.url).to match(/https:\/\/.*#{CGI.escape("Alces+Flight+on+AWS.pdf")}.*/)
+        end
+      end
+    end
   end
 end
