@@ -29,4 +29,23 @@ class Component < ApplicationRecord
       supportType: support_type,
     }
   end
+
+  def asset_record
+    @asset_record ||= begin
+      group_record_fields = extract_asset_record_fields(component_group)
+      component_record_fields = extract_asset_record_fields(self)
+
+      # Merge fields set at component-level over those set at group-level, so
+      # those set at component-level take precedence.
+      group_record_fields.merge(component_record_fields).values.map do |field|
+        [field.name, field.value]
+      end.to_h
+    end
+  end
+
+  def extract_asset_record_fields(model)
+    model.asset_record_fields.map do |field|
+      [field.id, field]
+    end.to_h
+  end
 end

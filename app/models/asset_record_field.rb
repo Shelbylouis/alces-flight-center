@@ -10,6 +10,10 @@ class AssetRecordField < ApplicationRecord
   validate :definition_associated_with_component_type
   validate :field_settable_at_level
 
+  def name
+    asset_record_field_definition.field_name
+  end
+
   private
 
   def associated_with_component_xor_group
