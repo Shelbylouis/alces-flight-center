@@ -10,7 +10,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171011114910) do
+ActiveRecord::Schema.define(version: 20171012094322) do
+
+  create_table "asset_record_field_definitions", force: :cascade do |t|
+    t.string "field_name", null: false
+    t.string "level", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "asset_record_field_definitions_component_types", id: false, force: :cascade do |t|
+    t.integer "asset_record_field_definition_id", null: false
+    t.integer "component_type_id", null: false
+    t.index ["asset_record_field_definition_id"], name: "index_arfd_ct_on_asset_record_field_definition_id"
+    t.index ["component_type_id"], name: "index_arfd_ct_on_component_type_id"
+  end
+
+  create_table "asset_record_fields", force: :cascade do |t|
+    t.string "value", null: false
+    t.integer "component_id"
+    t.integer "component_group_id"
+    t.integer "asset_record_field_definition_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["asset_record_field_definition_id"], name: "index_asset_record_fields_on_asset_record_field_definition_id"
+    t.index ["component_group_id"], name: "index_asset_record_fields_on_component_group_id"
+    t.index ["component_id"], name: "index_asset_record_fields_on_component_id"
+  end
 
   create_table "case_categories", force: :cascade do |t|
     t.string "name", null: false
