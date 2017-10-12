@@ -18,4 +18,8 @@ class AssetRecordFieldDefinition < ApplicationRecord
   def level_enum
     SETTABLE_LEVELS
   end
+
+  def settable_for_group?
+    level == 'group'
+  end
 end
