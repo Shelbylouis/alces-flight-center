@@ -81,10 +81,9 @@ class AssetRecordField < ApplicationRecord
 
     asset_field_definitions = asset.asset_record_fields.map(&:definition)
     if asset_field_definitions.include?(definition)
-      readable_asset_description = asset.class.to_s.tableize.humanize(capitalize: false).pluralize(1)
       errors.add(
         :base,
-        "a field for this definition already exists for this #{readable_asset_description}, you should edit the existing field"
+        "a field for this definition already exists for this #{asset.readable_model_name}, you should edit the existing field"
       )
     end
   end
