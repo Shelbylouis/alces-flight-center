@@ -3,6 +3,8 @@ class AssetRecordField < ApplicationRecord
   belongs_to :component, optional: true
   belongs_to :component_group, optional: true
 
+  alias_attribute :definition, :asset_record_field_definition
+
   # Field value can be an empty string, but not null.
   validates :value, exclusion: { in: [nil] }
 
@@ -11,7 +13,7 @@ class AssetRecordField < ApplicationRecord
   validate :field_settable_at_level
 
   def name
-    asset_record_field_definition.field_name
+    definition.field_name
   end
 
   private
@@ -37,7 +39,7 @@ class AssetRecordField < ApplicationRecord
     # associated_with_component_xor_group validation.
     return unless component_type
 
-    if !available_field_definitions.include?(asset_record_field_definition)
+    if !available_field_definitions.include?(definition)
       errors.add(
         :asset_record_field_definition,
         'is not a field definition associated with component type'
@@ -61,7 +63,7 @@ class AssetRecordField < ApplicationRecord
     # It is not possible to define an asset record field associated with a
     # ComponentGroup if the field definition states it is not settable at a
     # group-level.
-    if component_group && !asset_record_field_definition.settable_for_group?
+    if component_group && !definition.settable_for_group?
       errors.add(
         :asset_record_field_definition,
         'this field is only settable at the component-level'

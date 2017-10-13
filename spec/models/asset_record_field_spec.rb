@@ -3,10 +3,7 @@ require 'rails_helper'
 RSpec.describe AssetRecordField, type: :model do
   describe('#valid?') do
     subject do
-      build(
-        :unassociated_asset_record_field,
-        asset_record_field_definition: field_definition
-      )
+      build(:unassociated_asset_record_field, definition: field_definition)
     end
 
     let :field_definition { create(:asset_record_field_definition) }
@@ -40,7 +37,7 @@ RSpec.describe AssetRecordField, type: :model do
 
       context 'when associated with field definition which is not associated with component type' do
         before :each do
-          subject.asset_record_field_definition = create(:asset_record_field_definition)
+          subject.definition = create(:asset_record_field_definition)
         end
 
         it 'should be invalid' do
@@ -61,7 +58,7 @@ RSpec.describe AssetRecordField, type: :model do
 
       context 'when associated with field definition which is not associated with component type' do
         before :each do
-          subject.asset_record_field_definition = create(:asset_record_field_definition)
+          subject.definition = create(:asset_record_field_definition)
         end
 
         it 'should be invalid' do
