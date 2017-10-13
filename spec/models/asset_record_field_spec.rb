@@ -47,6 +47,24 @@ RSpec.describe AssetRecordField, type: :model do
           )
         end
       end
+
+      context 'when a field using same definition is already associated with component' do
+        before :each do
+          create(
+            :unassociated_asset_record_field,
+            definition: subject.definition,
+            component: subject.component
+          )
+          component.reload
+        end
+
+        it 'should be invalid' do
+          expect(subject).to be_invalid
+          expect(subject.errors.messages).to include(
+            base: [/a field for this definition already exists for this component/]
+          )
+        end
+      end
     end
 
     context 'when associated with just group' do
@@ -78,6 +96,24 @@ RSpec.describe AssetRecordField, type: :model do
           expect(subject).to be_invalid
           expect(subject.errors.messages).to include(
             asset_record_field_definition: [/this field is only settable at the component-level/]
+          )
+        end
+      end
+
+      context 'when a field using same definition is already associated with component group' do
+        before :each do
+          create(
+            :unassociated_asset_record_field,
+            definition: subject.definition,
+            component_group: subject.component_group
+          )
+          component_group.reload
+        end
+
+        it 'should be invalid' do
+          expect(subject).to be_invalid
+          expect(subject.errors.messages).to include(
+            base: [/a field for this definition already exists for this component group/]
           )
         end
       end

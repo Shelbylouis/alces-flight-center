@@ -11,6 +11,7 @@ class AssetRecordField < ApplicationRecord
   validate :associated_with_component_xor_group
   validate :definition_associated_with_component_type
   validate :field_settable_at_level
+  validate :field_not_already_set
 
   def name
     definition.field_name
@@ -59,6 +60,10 @@ class AssetRecordField < ApplicationRecord
       component_group&.component_type
   end
 
+  def asset
+    component || component_group
+  end
+
   def field_settable_at_level
     # It is not possible to define an asset record field associated with a
     # ComponentGroup if the field definition states it is not settable at a
@@ -67,6 +72,19 @@ class AssetRecordField < ApplicationRecord
       errors.add(
         :asset_record_field_definition,
         'this field is only settable at the component-level'
+      )
+    end
+  end
+
+  def field_not_already_set
+    return unless asset
+
+    asset_field_definitions = asset.asset_record_fields.map(&:definition)
+    if asset_field_definitions.include?(definition)
+      readable_asset_description = asset.class.to_s.tableize.humanize(capitalize: false).pluralize(1)
+      errors.add(
+        :base,
+        "a field for this definition already exists for this #{readable_asset_description}, you should edit the existing field"
       )
     end
   end

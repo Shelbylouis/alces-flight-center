@@ -90,6 +90,8 @@ RSpec.describe Component, type: :model do
         value: 'Windows o_O'
       )
 
+      subject.reload
+
       expect(subject.asset_record).to eq({
         'Ip' => '1.2.3.4',
         'Model/manufacturer name' => 'Dell server',
