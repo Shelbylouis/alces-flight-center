@@ -181,8 +181,7 @@ all_types = [server, disk_array, network_switch]
     level: 'group',
     field_names: [
       'Firmware revision (BIOS/BMC/Other)',
-      'BMC username',
-      'BMC password',
+      'BMC username/password',
       'BIOS Profile Applied',
       'Non-standard settings (BMC or BIOS) (changes from standard base configuration listed as menu navigation links)',
       'Internal Disk Profile Applied',
@@ -202,7 +201,6 @@ all_types = [server, disk_array, network_switch]
     level: 'component',
     field_names: [
       'BMC IP Address/Netmask/Network/Gateway',
-      'Initial Hostname',
     ]
   }
 ].each do |definition_group|

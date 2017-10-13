@@ -47,11 +47,6 @@ Cluster.create!(
         asset_record_field_definition: AssetRecordFieldDefinition.find_by_field_name('BMC IP Address/Netmask/Network/Gateway'),
         value: "1.2.3.#{index + 1}"
       )
-      AssetRecordField.create!(
-        component: component,
-        asset_record_field_definition: AssetRecordFieldDefinition.find_by_field_name('Initial Hostname'),
-        value: component.name
-      )
     end
   end
 
