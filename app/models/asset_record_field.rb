@@ -20,7 +20,7 @@ class AssetRecordField < ApplicationRecord
   private
 
   def associated_with_component_xor_group
-    if !(component || component_group)
+    if !asset
       errors.add(
         :base,
         'must be associated with either component or component group'
@@ -34,11 +34,7 @@ class AssetRecordField < ApplicationRecord
   end
 
   def definition_associated_with_component_type
-    # We do not have a component_type => we have neither an associated
-    # Component nor an associated ComponentGroup => this validation is not
-    # relevant; this situation will be caught by
-    # associated_with_component_xor_group validation.
-    return unless component_type
+    return unless asset
 
     if !available_field_definitions.include?(definition)
       errors.add(
@@ -53,13 +49,11 @@ class AssetRecordField < ApplicationRecord
   end
 
   def component_type
-    # The ComponentType associated with either the associated Component's
-    # ComponentGroup, or the associated ComponentGroup, depending on which of
-    # these model's this AssetRecordField has an association with.
-    component&.component_group&.component_type ||
-      component_group&.component_type
+    asset&.component_type
   end
 
+  # An AssetRecordField should be associated with precisely one Component or
+  # ComponentGroup (the asset).
   def asset
     component || component_group
   end
