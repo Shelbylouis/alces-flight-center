@@ -21,6 +21,6 @@ class AssetRecordField < ApplicationRecord
   end
 
   def component_type
-    asset&.component_type
+    asset.component_type
   end
 end
