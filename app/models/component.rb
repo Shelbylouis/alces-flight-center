@@ -31,28 +31,26 @@ class Component < ApplicationRecord
   end
 
   def asset_record
-    @asset_record ||= begin
-      group_record_fields = extract_asset_record_fields(component_group)
-      component_record_fields = extract_asset_record_fields(self)
-
-      # Each entry is a hash of definition ID to asset record field.
-      asset_record_layers = [
-        empty_asset_record_fields,
-        group_record_fields,
-        component_record_fields
-      ]
-
       # Merge asset record layers to obtain hash for this Component of all
       # asset record fields for this ComponentType; fields set in later layers
       # will take precedence over those in earlier layers for the same
       # definition.
+    @asset_record ||=
       asset_record_layers.reduce({}, :merge).values.map do |field|
         [field.name, field.value]
       end.to_h
-    end
   end
 
   private
+
+  def asset_record_layers
+    # Each entry is a hash of definition ID to asset record field.
+    [
+      empty_asset_record_fields,
+      group_asset_record_fields,
+      component_asset_record_fields,
+    ]
+  end
 
   def empty_asset_record_fields
     component_type.asset_record_field_definitions.map do |definition|
@@ -61,6 +59,14 @@ class Component < ApplicationRecord
         # Placeholder empty AssetRecordField.
         AssetRecordField.new(definition: definition, value: '')]
     end.to_h
+  end
+
+  def group_asset_record_fields
+    extract_asset_record_fields(component_group)
+  end
+
+  def component_asset_record_fields
+    extract_asset_record_fields(self)
   end
 
   def extract_asset_record_fields(model)
