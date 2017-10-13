@@ -45,6 +45,7 @@ RSpec.describe Component, type: :model do
         { field_name: 'Ip', level: 'component' },
         { field_name: 'Model/manufacturer name', level: 'group' },
         { field_name: 'OS deployed', level: 'group' },
+        { field_name: 'Comments', level: 'group' },
       ].map do |props|
         create(
           :asset_record_field_definition,
@@ -95,7 +96,14 @@ RSpec.describe Component, type: :model do
       expect(subject.asset_record).to eq({
         'Ip' => '1.2.3.4',
         'Model/manufacturer name' => 'Dell server',
+
+        # Component-level field value should take precedence.
         'OS deployed' => 'Windows o_O',
+
+        # Field definition included in definitions associated with
+        # ComponentType, but without an AssetRecordField associated with
+        # Component or ComponentGroup, should still be included.
+        'Comments' => '',
       })
     end
   end
