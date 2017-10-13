@@ -43,6 +43,8 @@ class Component < ApplicationRecord
     end
   end
 
+  private
+
   def extract_asset_record_fields(model)
     model.asset_record_fields.map do |field|
       [field.id, field]
