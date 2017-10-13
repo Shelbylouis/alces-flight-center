@@ -48,6 +48,15 @@ RSpec.describe AssetRecordField, type: :model do
         end
       end
 
+      context 'when updating existing field' do
+        before :each do
+          subject.save!
+          subject.reload
+        end
+
+        it { is_expected.to be_valid }
+      end
+
       context 'when a field using same definition is already associated with component' do
         before :each do
           create(
@@ -61,7 +70,7 @@ RSpec.describe AssetRecordField, type: :model do
         it 'should be invalid' do
           expect(subject).to be_invalid
           expect(subject.errors.messages).to include(
-            base: [/a field for this definition already exists for this component/]
+            asset_record_field_definition: [/a field for this definition already exists for this component/]
           )
         end
       end
@@ -100,6 +109,15 @@ RSpec.describe AssetRecordField, type: :model do
         end
       end
 
+      context 'when updating existing field' do
+        before :each do
+          subject.save!
+          subject.reload
+        end
+
+        it { is_expected.to be_valid }
+      end
+
       context 'when a field using same definition is already associated with component group' do
         before :each do
           create(
@@ -113,7 +131,7 @@ RSpec.describe AssetRecordField, type: :model do
         it 'should be invalid' do
           expect(subject).to be_invalid
           expect(subject.errors.messages).to include(
-            base: [/a field for this definition already exists for this component group/]
+            asset_record_field_definition: [/a field for this definition already exists for this component group/]
           )
         end
       end

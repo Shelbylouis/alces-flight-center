@@ -3,10 +3,36 @@ class AssetRecordField < ApplicationRecord
   belongs_to :component, optional: true
   belongs_to :component_group, optional: true
 
+  class << self
+    private
+
+    def unique_for_asset_validation_message
+      Proc.new do |field|
+        <<-EOF.squish
+        a field for this definition already exists for this
+        #{field.asset.readable_model_name}, you should edit the existing field
+        EOF
+      end
+    end
+  end
+
   alias_attribute :definition, :asset_record_field_definition
 
   # Field value can be an empty string, but not null.
   validates :value, exclusion: { in: [nil] }
+
+  validates :asset_record_field_definition,
+    uniqueness: {
+      scope: :component,
+      if: :component,
+      message: unique_for_asset_validation_message,
+  }
+  validates :asset_record_field_definition,
+    uniqueness: {
+      scope: :component_group,
+      if: :component_group,
+      message: unique_for_asset_validation_message
+  }
 
   validates_with Validator
 

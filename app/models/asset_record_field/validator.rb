@@ -13,7 +13,6 @@ class AssetRecordField::Validator < ActiveModel::Validator
 
     validate_definition_associated_with_component_type
     validate_field_settable_at_level
-    validate_field_not_already_set
   end
 
   private
@@ -53,16 +52,6 @@ class AssetRecordField::Validator < ActiveModel::Validator
       record.errors.add(
         :asset_record_field_definition,
         'this field is only settable at the component-level'
-      )
-    end
-  end
-
-  def validate_field_not_already_set
-    asset_field_definitions = record.asset.asset_record_fields.map(&:definition)
-    if asset_field_definitions.include?(record.definition)
-      record.errors.add(
-        :base,
-        "a field for this definition already exists for this #{record.asset.readable_model_name}, you should edit the existing field"
       )
     end
   end
