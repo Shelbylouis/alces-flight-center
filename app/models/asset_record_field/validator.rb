@@ -4,7 +4,13 @@ class AssetRecordField::Validator < ActiveModel::Validator
 
   def validate(record)
     @record = record
+
     validate_associated_with_component_xor_group
+
+    # Following validations check record is valid given asset, so return now if
+    # no asset (record will be invalid from above validation anyway).
+    return unless record.asset
+
     validate_definition_associated_with_component_type
     validate_field_settable_at_level
     validate_field_not_already_set
@@ -27,8 +33,6 @@ class AssetRecordField::Validator < ActiveModel::Validator
   end
 
   def validate_definition_associated_with_component_type
-    return unless record.asset
-
     if !available_field_definitions.include?(record.definition)
       record.errors.add(
         :asset_record_field_definition,
@@ -54,8 +58,6 @@ class AssetRecordField::Validator < ActiveModel::Validator
   end
 
   def validate_field_not_already_set
-    return unless record.asset
-
     asset_field_definitions = record.asset.asset_record_fields.map(&:definition)
     if asset_field_definitions.include?(record.definition)
       record.errors.add(
