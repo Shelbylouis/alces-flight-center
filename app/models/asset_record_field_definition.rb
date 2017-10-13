@@ -1,6 +1,8 @@
 class AssetRecordFieldDefinition < ApplicationRecord
   include AdminConfig
 
+  IDENTIFIER_ROOT = name.underscore.parameterize(separator: '_')
+
   SETTABLE_LEVELS = [
     # Settable at group-level; overridable at component-level.
     'group',
@@ -14,6 +16,28 @@ class AssetRecordFieldDefinition < ApplicationRecord
 
   validates :field_name, presence: true
   validates :level, inclusion: { in: SETTABLE_LEVELS }, presence: true
+
+  class << self
+    def all_identifiers
+      all_identifiers_to_definitions.keys
+    end
+
+    def definition_for_identifier(identifier)
+      all_identifiers_to_definitions[identifier]
+    end
+
+    private
+
+    def all_identifiers_to_definitions
+      @all_identifiers_to_definitions ||= all.map do |definition|
+        [definition.identifier, definition]
+      end.to_h
+    end
+  end
+
+  def identifier
+    "#{IDENTIFIER_ROOT}_#{id}".to_sym
+  end
 
   # Automatically picked up by rails_admin so only these options displayed when
   # selecting level.
