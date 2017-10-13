@@ -1,4 +1,5 @@
 class Cluster < ApplicationRecord
+  include AdminConfig
   include HasSupportType
 
   SUPPORT_TYPES = SupportType::VALUES

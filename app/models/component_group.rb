@@ -1,4 +1,6 @@
 class ComponentGroup < ApplicationRecord
+  include AdminConfig
+
   belongs_to :cluster
   belongs_to :component_type
   has_many :components, dependent: :destroy

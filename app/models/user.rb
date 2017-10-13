@@ -2,6 +2,7 @@ require 'validates_email_format_of'
 
 class User < ApplicationRecord
   include Clearance::User
+  include AdminConfig
 
   # If more fields need to be added to User which are just for contact or admin
   # users (as well as site which is just for contacts), then we should split
