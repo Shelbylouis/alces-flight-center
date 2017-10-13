@@ -11,7 +11,10 @@ class AssetRecordField < ApplicationRecord
   validates_with Validator
 
   def name
-    definition.field_name
+    # Conditional access needed as RailsAdmin will call this method to
+    # determine the name to display for an instance, but when creating a new
+    # instance no definition will be associated yet.
+    definition&.field_name
   end
 
   # An AssetRecordField should be associated with precisely one Component or
