@@ -1,4 +1,6 @@
 class AssetRecordFieldDefinition < ApplicationRecord
+  include AdminConfig
+
   SETTABLE_LEVELS = [
     # Settable at group-level; overridable at component-level.
     'group',
