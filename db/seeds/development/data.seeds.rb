@@ -12,7 +12,7 @@ site = Site.create!(
 User.create!(
   site: site,
   name: 'Dr Cliff Addison',
-  email: 'caddison@liverpool.ac.uk',
+  email: 'caddison@example.com',
   password: 'password',
 )
 
