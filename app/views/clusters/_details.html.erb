@@ -1,6 +1,6 @@
 <ul class="list-group list-group-flush">
   <li class="list-group-item">
-    <%= cluster.description %>
+    <%= cluster.rendered_description.html_safe %>
   </li>
   <li class="list-group-item">
     <%= cluster.readable_support_type.capitalize %> cluster

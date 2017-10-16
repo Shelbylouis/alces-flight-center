@@ -1,4 +1,22 @@
 
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Overview
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+    <%= @site.rendered_description.html_safe %>
+    </li>
+  </ul>
+</div>
+
 <% @site.clusters.each do |cluster| %>
   <div class='card'>
     <div class='card-header'>

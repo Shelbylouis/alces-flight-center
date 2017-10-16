@@ -1,5 +1,6 @@
 class Site < ApplicationRecord
   include AdminConfig
+  include MarkdownDescription
 
   has_many :users, dependent: :destroy
   has_many :additional_contacts, dependent: :destroy

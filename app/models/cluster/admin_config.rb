@@ -16,6 +16,11 @@ module Cluster::AdminConfig
       end
 
       edit do
+        configure :description do
+          html_attributes rows: 10, cols: 100
+          help Constants::MARKDOWN_DESCRIPTION_EDIT_HELP
+        end
+
         configure :canonical_name do
           hide
         end

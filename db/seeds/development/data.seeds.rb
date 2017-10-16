@@ -3,8 +3,11 @@ site = Site.create!(
   name: 'Liverpool University',
   description: <<-EOF.strip_heredoc
     Clifton Computer Science Building
+
     Brownlow Hill
+
     Liverpool
+
     L69 72X
   EOF
 )

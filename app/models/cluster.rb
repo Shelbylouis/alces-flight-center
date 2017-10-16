@@ -1,6 +1,7 @@
 class Cluster < ApplicationRecord
   include AdminConfig
   include HasSupportType
+  include MarkdownDescription
 
   SUPPORT_TYPES = SupportType::VALUES
 
