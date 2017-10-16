@@ -11,7 +11,8 @@ class User < ApplicationRecord
 
   validates_associated :site
   validates :name, presence: true
-  validates :email, email_format: { message: "must be in format 'a@b.co'" }
+  validates :email,
+    email_format: { message: Constants::EMAIL_FORMAT_MESSAGE }
   validates :password, presence: true, length: { minimum: 5 }
 
   validates :site, {
