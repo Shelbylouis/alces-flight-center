@@ -10,7 +10,7 @@ RSpec.shared_examples 'Request Tracker interface' do
   let :new_ticket_params do
     {
       requestor_email: 'test@example.com',
-      cc: 'some.user@example.com,another.user@example.com',
+      cc: ['some.user@example.com]', 'another.user@example.com'],
       subject: 'Alces Flight Center test ticket - please delete',
       text: <<-EOF.strip_heredoc
             Testing
@@ -46,7 +46,7 @@ RSpec.describe RequestTrackerInterface do
           body: 'content=' + Utils.rt_format(
             Queue: 'Support',
             Requestor: new_ticket_params[:requestor_email],
-            Cc: new_ticket_params[:cc],
+            Cc: new_ticket_params[:cc].join(','),
             Subject: new_ticket_params[:subject],
             Text: new_ticket_params[:text],
           )

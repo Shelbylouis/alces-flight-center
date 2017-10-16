@@ -51,7 +51,7 @@ class RequestTrackerInterface
     Utils.rt_format(
       Queue: 'Support',
       Requestor: requestor_email,
-      Cc: cc,
+      Cc: cc.join(','),
       Subject: subject,
       Text: text
     )
