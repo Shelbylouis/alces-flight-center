@@ -163,6 +163,22 @@ RSpec.describe Case, type: :model do
       create(:user, name: 'Some User', email: 'someuser@somecluster.com')
     end
 
+    let :site do
+      create(:site)
+    end
+
+    let :another_user do
+      create(:user, site: site, email: 'another.user@somecluster.com' )
+    end
+
+    let :additional_contact do
+      create(
+        :additional_contact,
+        site: site,
+        email: 'mailing-list@somecluster.com'
+      )
+    end
+
     let :issue do
       create(
         :issue,
@@ -173,14 +189,18 @@ RSpec.describe Case, type: :model do
     end
 
     let :case_category { create(:case_category, name: 'Hardware issue') }
-    let :cluster { create(:cluster, name: 'somecluster') }
+    let :cluster { create(:cluster, site: site, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
     let :request_tracker { subject.send(:request_tracker) }
 
     it 'creates rt ticket with correct properties' do
       expected_create_ticket_args = {
         requestor_email: requestor.email,
-        cc: '',
+
+        # CC'ed emails should be those for all the site contacts and additional
+        # contacts, apart from the requestor.
+        cc: [another_user.email, additional_contact.email],
+
         subject: 'Alces Flight Center ticket: somecluster - Crashed node',
         text: <<-EOF.strip_heredoc
           Cluster: somecluster
