@@ -1,4 +1,6 @@
 class CaseCategory < ApplicationRecord
+  include AdminConfig
+
   has_many :issues
 
   validates :name, presence: true

@@ -22,6 +22,13 @@ module ComponentGroup::AdminConfig
             details of host range syntax.
           EOF
         end
+
+        configure :components do
+          hide
+        end
+        configure :asset_record_fields do
+          hide
+        end
       end
 
     end

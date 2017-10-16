@@ -1,31 +1,24 @@
 
-module Cluster::AdminConfig
+module Site::AdminConfig
   extend ActiveSupport::Concern
 
   included do
     rails_admin do
 
-      configure :canonical_name do
-        hide
-      end
-
-      show do
-        configure :documents_path do
-          show
-        end
-      end
-
       edit do
         configure :canonical_name do
           hide
         end
-        configure :component_groups do
+        configure :users do
           hide
         end
-        configure :components do
+        configure :clusters do
           hide
         end
         configure :cases do
+          hide
+        end
+        configure :components do
           hide
         end
       end

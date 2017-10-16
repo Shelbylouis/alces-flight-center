@@ -1,4 +1,6 @@
 class Site < ApplicationRecord
+  include AdminConfig
+
   has_many :users, dependent: :destroy
   has_many :clusters, dependent: :destroy
   has_many :cases, through: :clusters

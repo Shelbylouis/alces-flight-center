@@ -12,6 +12,18 @@ module Component::AdminConfig
         end
       end
 
+      edit do
+        configure :asset_record_fields do
+          hide
+        end
+        configure :component_type do
+          hide
+        end
+        configure :cluster do
+          hide
+        end
+      end
+
     end
   end
 end
