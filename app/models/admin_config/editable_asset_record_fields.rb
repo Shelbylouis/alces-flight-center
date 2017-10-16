@@ -43,6 +43,11 @@ module AdminConfig
     end
 
     def definition_identifiers
+      # Guard needed as when creating a new record of the model this module is
+      # included in we will not yet know what the component type will be, and
+      # so we cannot yet know what AssetRecordFieldDefinitions will be
+      # available.
+      return [] unless component_type
       component_type.asset_record_field_definitions.map(&:identifier)
     end
 
