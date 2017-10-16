@@ -19,6 +19,13 @@ User.create!(
   password: 'password',
 )
 
+User.create!(
+  site: site,
+  name: 'Another User',
+  email: 'another.user@example.com',
+  password: 'password',
+)
+
 AdditionalContact.create!(
   site: site,
   email: 'mailing-list@example.com'

@@ -9,6 +9,15 @@ FactoryGirl.define do
     name 'A Scientist'
     email 'a.scientist@liverpool.ac.uk'
     password 'definitely_encrypted'
+
+    factory :contact do
+      admin false
+    end
+  end
+
+  factory :additional_contact do
+    site
+    email 'additional.contact@example.com'
   end
 
   factory :cluster do

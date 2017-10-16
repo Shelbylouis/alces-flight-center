@@ -26,4 +26,8 @@ class User < ApplicationRecord
   def contact?
     !admin?
   end
+
+  def info
+    "#{name} <#{email}>"
+  end
 end

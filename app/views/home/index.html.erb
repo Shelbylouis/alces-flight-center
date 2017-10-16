@@ -14,6 +14,12 @@
     <li class="list-group-item">
     <%= @site.rendered_description.html_safe %>
     </li>
+    <li class="list-group-item">
+      Site contacts: <%= @site.contacts_info %>
+    </li>
+    <li class="list-group-item">
+      Additional site contacts: <%= @site.additional_contacts_info %>
+    </li>
   </ul>
 </div>
 
