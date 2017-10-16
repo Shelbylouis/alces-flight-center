@@ -16,6 +16,15 @@ User.create!(
   password: 'password',
 )
 
+AdditionalContact.create!(
+  site: site,
+  email: 'mailing-list@example.com'
+)
+AdditionalContact.create!(
+  site: site,
+  email: 'another.contact@example.com'
+)
+
 Cluster.create!(
   site: site,
   name: 'Hamilton Research Computing Cluster',
