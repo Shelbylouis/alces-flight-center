@@ -92,15 +92,22 @@ class Case < ApplicationRecord
   end
 
   def issue_valid_for_cluster_or_component
-    # Can open cases for `advice` issues for any cluster or component.
-    return if issue.advice?
-
-    if issue.requires_component
-      if component&.advice?
-        errors.add(:issue, managed_issue_for_advice_component_error)
+    if issue.managed?
+      if issue.requires_component
+        if component&.advice?
+          errors.add(:issue, managed_issue_for_advice_component_error)
+        end
+      elsif cluster.advice?
+        errors.add(:issue, managed_issue_for_advice_cluster_error)
       end
-    elsif cluster.advice?
-      errors.add(:issue, managed_issue_for_advice_cluster_error)
+    elsif issue.advice_only?
+      if issue.requires_component
+        if component.managed?
+          errors.add(:issue, advice_only_issue_for_managed_component_error)
+        end
+      elsif cluster.managed?
+        errors.add(:issue, advice_only_issue_for_managed_cluster_error)
+      end
     end
   end
 
@@ -117,6 +124,22 @@ class Case < ApplicationRecord
       is only available for #{SupportType::MANAGED_TEXT}
       #{model_type.pluralize}, but given #{model_type} is
       #{SupportType::ADVICE_TEXT}
+    EOF
+  end
+
+  def advice_only_issue_for_managed_component_error
+    advice_only_issue_error_for('component')
+  end
+
+  def advice_only_issue_for_managed_cluster_error
+    advice_only_issue_error_for('cluster')
+  end
+
+  def advice_only_issue_error_for(model_type)
+    <<-EOF.squish
+      is only available for #{SupportType::ADVICE_TEXT}
+      #{model_type.pluralize}, but given #{model_type} is
+      #{SupportType::MANAGED_TEXT}
     EOF
   end
 end

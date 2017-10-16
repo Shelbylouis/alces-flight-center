@@ -9,6 +9,10 @@ class Issue < ApplicationRecord
   validates :details_template, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
 
+  def advice_only?
+    support_type == 'advice-only'
+  end
+
   # Automatically picked up by rails_admin so only these options displayed when
   # selecting support type.
   def support_type_enum

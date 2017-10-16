@@ -73,6 +73,27 @@ RSpec.describe Case, type: :model do
           it { is_expected.to be_valid }
         end
       end
+
+      context 'when `advice-only` issue' do
+        before :each do
+          issue_attributes.merge!(support_type: 'advice-only')
+        end
+
+        context 'with `managed` cluster' do
+          let :cluster { create(:managed_cluster) }
+          it 'should be invalid' do
+            expect(subject).not_to be_valid
+            expect(subject.errors.messages).to include(
+              issue: [/is only available for self-managed clusters, but given cluster is fully managed/]
+            )
+          end
+        end
+
+        context 'with `advice` cluster' do
+          let :cluster { create(:advice_cluster) }
+          it { is_expected.to be_valid }
+        end
+      end
     end
 
     context 'when issue requires component' do
@@ -133,6 +154,27 @@ RSpec.describe Case, type: :model do
         context 'with `managed` component' do
           let :component { create(:managed_component, cluster: cluster) }
           it { is_expected.to be_valid }
+        end
+
+        context 'with `advice` component' do
+          let :component { create(:advice_component, cluster: cluster) }
+          it { is_expected.to be_valid }
+        end
+      end
+
+      context 'when `advice-only` issue' do
+        before :each do
+          issue_attributes.merge!(support_type: 'advice-only')
+        end
+
+        context 'with `managed` component' do
+          let :component { create(:managed_component, cluster: cluster) }
+          it 'should be invalid' do
+            expect(subject).not_to be_valid
+            expect(subject.errors.messages).to include(
+              issue: [/is only available for self-managed components, but given component is fully managed/]
+            )
+          end
         end
 
         context 'with `advice` component' do
