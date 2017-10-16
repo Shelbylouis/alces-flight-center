@@ -145,31 +145,41 @@ RSpec.describe Case, type: :model do
 
   describe '#create_rt_ticket' do
     subject do
-      user = create(:user, name: 'Some User', email: requestor_email)
-
-      create(:case,
-             cluster: cluster,
-             issue: issue,
-             component: component,
-             user: user,
-             details: <<-EOF.strip_heredoc
+      create(
+        :case,
+        cluster: cluster,
+        issue: issue,
+        component: component,
+        user: requestor,
+        details: <<-EOF.strip_heredoc
           Oh no
           my node
           is broken
         EOF
-            )
+      )
     end
 
-    let :issue { create(:issue, name: 'Crashed node', requires_component: true, case_category: case_category) }
+    let :requestor do
+      create(:user, name: 'Some User', email: 'someuser@somecluster.com')
+    end
+
+    let :issue do
+      create(
+        :issue,
+        name: 'Crashed node',
+        requires_component: true,
+        case_category: case_category
+      )
+    end
+
     let :case_category { create(:case_category, name: 'Hardware issue') }
     let :cluster { create(:cluster, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
-    let :requestor_email { 'someuser@somecluster.com' }
     let :request_tracker { subject.send(:request_tracker) }
 
     it 'creates rt ticket with correct properties' do
       expected_create_ticket_args = {
-        requestor_email: requestor_email,
+        requestor_email: requestor.email,
         cc: '',
         subject: 'Alces Flight Center ticket: somecluster - Crashed node',
         text: <<-EOF.strip_heredoc
