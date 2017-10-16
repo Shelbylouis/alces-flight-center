@@ -13,6 +13,10 @@ class Site < ApplicationRecord
 
   before_validation CanonicalNameCreator.new, on: :create
 
+  def all_contacts
+    users + additional_contacts
+  end
+
   def contacts_info
     users.map(&:info).join(', ')
   end

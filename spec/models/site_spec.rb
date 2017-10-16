@@ -53,4 +53,17 @@ RSpec.describe Site, type: :model do
 
     it { is_expected.to eq "#{additional_contact_1.email}, #{additional_contact_2.email}" }
   end
+
+  describe '#all_contacts' do
+    subject { site.all_contacts }
+
+    it 'should give all contacts and additional contacts' do
+      expect(subject).to match_array([
+        contact_1,
+        contact_2,
+        additional_contact_1,
+        additional_contact_2,
+      ])
+    end
+  end
 end
