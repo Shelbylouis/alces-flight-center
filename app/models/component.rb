@@ -1,4 +1,5 @@
 class Component < ApplicationRecord
+  include AdminConfig
   include ::AdminConfig::EditableAssetRecordFields
   include HasSupportType
 
@@ -43,6 +44,12 @@ class Component < ApplicationRecord
   end
 
   private
+
+  # Method to be called from AdminConfig to format Component asset record for
+  # displaying to admins.
+  def asset_record_view
+    asset_record.to_json
+  end
 
   def asset_record_layers
     # Each entry is a hash of definition ID to asset record field.
