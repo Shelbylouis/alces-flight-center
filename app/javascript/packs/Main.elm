@@ -16,6 +16,7 @@ import Rails
 import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import String.Extra
+import SupportType
 
 
 -- MODEL
@@ -175,10 +176,17 @@ maybeComponentsField state =
             State.selectedIssue state
 
         validateComponent =
-            FieldValidation.validateWithError
-                """This component is self-managed; if required you may only
-                request consultancy support from Alces Software."""
+            FieldValidation.validateWithErrorForItem
+                errorForComponent
                 (State.componentAllowedForSelectedIssue state)
+
+        errorForComponent =
+            \component ->
+                if SupportType.isManaged component then
+                    """This component is already fully managed."""
+                else
+                    """This component is self-managed; if required you may only
+                    request consultancy support from Alces Software."""
     in
     if selectedIssue.requiresComponent then
         Just
@@ -215,7 +223,7 @@ selectField :
     -> SelectList a
     -> (a -> Int)
     -> (a -> String)
-    -> (a -> FieldValidation)
+    -> (a -> FieldValidation a)
     -> (String -> Msg)
     -> Html Msg
 selectField fieldName items toId toOptionLabel validate changeMsg =
@@ -238,13 +246,14 @@ selectField fieldName items toId toOptionLabel validate changeMsg =
                 |> SelectList.toList
     in
     formField fieldName
+        (SelectList.selected items)
         validatedField
         select
         [ onInput changeMsg ]
         options
 
 
-textareaField : String -> a -> (a -> String) -> (a -> FieldValidation) -> (String -> Msg) -> Html Msg
+textareaField : String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> Msg) -> Html Msg
 textareaField fieldName item toContent validate inputMsg =
     let
         validatedField =
@@ -254,6 +263,7 @@ textareaField fieldName item toContent validate inputMsg =
             toContent item
     in
     formField fieldName
+        item
         validatedField
         textarea
         [ rows 10
@@ -269,12 +279,13 @@ type alias HtmlFunction msg =
 
 formField :
     String
-    -> FieldValidation
+    -> a
+    -> FieldValidation a
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
     -> Html msg
-formField fieldName validation htmlFn additionalAttributes children =
+formField fieldName item validation htmlFn additionalAttributes children =
     let
         identifier =
             fieldIdentifier fieldName
@@ -299,11 +310,11 @@ formField fieldName validation htmlFn additionalAttributes children =
         , formElement
         , div
             [ class "invalid-feedback" ]
-            [ FieldValidation.error validation |> text ]
+            [ FieldValidation.error item validation |> text ]
         ]
 
 
-bootstrapValidationClass : FieldValidation -> String
+bootstrapValidationClass : FieldValidation a -> String
 bootstrapValidationClass validation =
     case validation of
         Valid ->

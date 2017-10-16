@@ -1,7 +1,7 @@
 module FieldValidation exposing (..)
 
 
-isInvalid : FieldValidation -> Bool
+isInvalid : FieldValidation a -> Bool
 isInvalid validation =
     case validation of
         Valid ->
@@ -11,29 +11,34 @@ isInvalid validation =
             True
 
 
-error : FieldValidation -> String
-error validation =
+error : a -> FieldValidation a -> String
+error item validation =
     case validation of
         Valid ->
             ""
 
-        Invalid message ->
-            message
+        Invalid errorForItem ->
+            errorForItem item
 
 
-validateWithEmptyError : (a -> Bool) -> a -> FieldValidation
+validateWithEmptyError : (a -> Bool) -> a -> FieldValidation a
 validateWithEmptyError =
     validateWithError ""
 
 
-validateWithError : String -> (a -> Bool) -> a -> FieldValidation
+validateWithError : String -> (a -> Bool) -> a -> FieldValidation a
 validateWithError error itemIsValid item =
+    validateWithErrorForItem (always error) itemIsValid item
+
+
+validateWithErrorForItem : (a -> String) -> (a -> Bool) -> a -> FieldValidation a
+validateWithErrorForItem errorForItem itemIsValid item =
     if itemIsValid item then
         Valid
     else
-        Invalid error
+        Invalid errorForItem
 
 
-type FieldValidation
+type FieldValidation a
     = Valid
-    | Invalid String
+    | Invalid (a -> String)
