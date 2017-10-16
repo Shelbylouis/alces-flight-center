@@ -1,5 +1,6 @@
 class ComponentGroup < ApplicationRecord
   include AdminConfig
+  include ::AdminConfig::EditableAssetRecordFields
 
   belongs_to :cluster
   belongs_to :component_type
