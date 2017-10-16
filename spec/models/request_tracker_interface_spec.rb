@@ -46,6 +46,7 @@ RSpec.describe RequestTrackerInterface do
           body: 'content=' + Utils.rt_format(
             Queue: 'Support',
             Requestor: new_ticket_params[:requestor_email],
+            Cc: new_ticket_params[:cc],
             Subject: new_ticket_params[:subject],
             Text: new_ticket_params[:text],
           )

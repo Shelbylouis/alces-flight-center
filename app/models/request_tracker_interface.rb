@@ -19,6 +19,7 @@ class RequestTrackerInterface
   def create_ticket(requestor_email:, cc:, subject:, text:)
     content = new_ticket_request_content(
       requestor_email: requestor_email,
+      cc: cc,
       subject: subject,
       text: text
     )
@@ -46,10 +47,13 @@ class RequestTrackerInterface
     end
   end
 
-  def new_ticket_request_content(requestor_email:, subject:, text:)
-    Utils.rt_format(Queue: 'Support',
-                    Requestor: requestor_email,
-                    Subject: subject,
-                    Text: text)
+  def new_ticket_request_content(requestor_email:, cc:, subject:, text:)
+    Utils.rt_format(
+      Queue: 'Support',
+      Requestor: requestor_email,
+      Cc: cc,
+      Subject: subject,
+      Text: text
+    )
   end
 end
