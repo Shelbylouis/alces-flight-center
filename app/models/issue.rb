@@ -2,7 +2,7 @@ class Issue < ApplicationRecord
   include AdminConfig
   include HasSupportType
 
-  SUPPORT_TYPES = SupportType::VALUES
+  SUPPORT_TYPES = SupportType::VALUES + ['advice-only']
 
   belongs_to :case_category
   validates :name, presence: true
