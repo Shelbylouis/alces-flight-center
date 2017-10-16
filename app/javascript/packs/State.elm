@@ -7,7 +7,7 @@ import Issue exposing (Issue)
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
-import SupportType
+import SupportType exposing (SupportType(..))
 import Utils
 
 
@@ -84,16 +84,25 @@ componentAllowedForSelectedIssue state component =
     let
         issue =
             selectedIssue state
-
-        issueIsManaged =
-            SupportType.isManaged issue
-
-        componentIsAdvice =
-            SupportType.isAdvice component
     in
-    -- A Component is allowed unless the selected Issue is a managed Issue, it
-    -- requires a Component, and the selected Component is advice-only.
-    not (issueIsManaged && issue.requiresComponent && componentIsAdvice)
+    if issue.requiresComponent then
+        case ( issue.supportType, component.supportType ) of
+            ( Managed, Advice ) ->
+                -- An advice Component cannot be associated with a managed
+                -- issue.
+                False
+
+            ( AdviceOnly, Managed ) ->
+                -- A managed Component cannot be associated with an advice-only
+                -- issue.
+                False
+
+            _ ->
+                -- Everything else is valid.
+                True
+    else
+        -- This validation should always pass if component is not required.
+        True
 
 
 isInvalid : State -> Bool
