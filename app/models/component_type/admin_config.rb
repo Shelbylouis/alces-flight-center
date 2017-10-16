@@ -4,7 +4,6 @@ module ComponentType::AdminConfig
 
   included do
     rails_admin do
-
       edit do
         configure :component_groups do
           hide
@@ -13,7 +12,6 @@ module ComponentType::AdminConfig
           hide
         end
       end
-
     end
   end
 end

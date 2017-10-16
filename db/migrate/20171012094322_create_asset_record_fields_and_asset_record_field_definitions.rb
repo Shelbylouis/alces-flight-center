@@ -11,9 +11,9 @@ class CreateAssetRecordFieldsAndAssetRecordFieldDefinitions < ActiveRecord::Migr
       # Override default names as these go over index name limit (62
       # characters).
       t.index :asset_record_field_definition_id,
-        name: 'index_arfd_ct_on_asset_record_field_definition_id'
+              name: 'index_arfd_ct_on_asset_record_field_definition_id'
       t.index :component_type_id,
-        name:  'index_arfd_ct_on_component_type_id'
+              name: 'index_arfd_ct_on_component_type_id'
     end
 
     create_table :asset_record_fields do |t|

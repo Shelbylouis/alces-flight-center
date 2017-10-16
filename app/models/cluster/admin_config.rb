@@ -4,7 +4,6 @@ module Cluster::AdminConfig
 
   included do
     rails_admin do
-
       configure :canonical_name do
         hide
       end
@@ -34,7 +33,6 @@ module Cluster::AdminConfig
           hide
         end
       end
-
     end
   end
 end

@@ -34,7 +34,6 @@ RSpec.describe AssetRecordField, type: :model do
 
       it { is_expected.to be_valid }
 
-
       context 'when associated with field definition which is not associated with component type' do
         before :each do
           subject.definition = create(:asset_record_field_definition)

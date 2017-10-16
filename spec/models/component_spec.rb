@@ -11,16 +11,14 @@ RSpec.describe Component, type: :model do
         id: 1,
         name: 'Some Component',
         cluster: create(:cluster, id: 2),
-        support_type: :managed,
+        support_type: :managed
       )
     end
 
     it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq({
-        id: 1,
-        name: 'Some Component',
-        supportType: 'managed',
-      })
+      expect(subject.case_form_json).to eq(id: 1,
+                                           name: 'Some Component',
+                                           supportType: 'managed')
     end
   end
 
@@ -33,7 +31,7 @@ RSpec.describe Component, type: :model do
       expect(component.support_type).to eq('advice')
     end
 
-    it "returns own support_type otherwise" do
+    it 'returns own support_type otherwise' do
       component = create(:component, support_type: 'managed', cluster: cluster)
 
       expect(component.support_type).to eq('managed')
@@ -96,18 +94,16 @@ RSpec.describe Component, type: :model do
 
       subject.reload
 
-      expect(subject.asset_record).to eq({
-        'Ip' => '1.2.3.4',
-        'Model/manufacturer name' => 'Dell server',
+      expect(subject.asset_record).to eq('Ip' => '1.2.3.4',
+                                         'Model/manufacturer name' => 'Dell server',
 
-        # Component-level field value should take precedence.
-        'OS deployed' => 'Windows o_O',
+                                         # Component-level field value should take precedence.
+                                         'OS deployed' => 'Windows o_O',
 
-        # Field definition included in definitions associated with
-        # ComponentType, but without an AssetRecordField associated with
-        # Component or ComponentGroup, should still be included.
-        'Comments' => '',
-      })
+                                         # Field definition included in definitions associated with
+                                         # ComponentType, but without an AssetRecordField associated with
+                                         # Component or ComponentGroup, should still be included.
+                                         'Comments' => '')
     end
   end
 end

@@ -19,12 +19,10 @@ RSpec.describe Cluster, type: :model do
     end
 
     it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq({
-        id: 1,
-        name: 'Some Cluster',
-        components: subject.components.map(&:case_form_json),
-        supportType: 'managed',
-      })
+      expect(subject.case_form_json).to eq(id: 1,
+                                           name: 'Some Cluster',
+                                           components: subject.components.map(&:case_form_json),
+                                           supportType: 'managed')
     end
   end
 
@@ -82,7 +80,7 @@ RSpec.describe Cluster, type: :model do
           documents = subject.documents
           expect(documents.length).to be 3
 
-          expect(documents.first.name).to eq "Alces+Flight+on+AWS.pdf"
+          expect(documents.first.name).to eq 'Alces+Flight+on+AWS.pdf'
           expect(documents.first.url).to match(/https:\/\/.*#{CGI.escape("Alces+Flight+on+AWS.pdf")}.*/)
         end
       end

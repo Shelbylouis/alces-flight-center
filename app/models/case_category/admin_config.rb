@@ -4,13 +4,11 @@ module CaseCategory::AdminConfig
 
   included do
     rails_admin do
-
       edit do
         configure :issues do
           hide
         end
       end
-
     end
   end
 end

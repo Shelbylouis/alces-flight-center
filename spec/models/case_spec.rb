@@ -73,7 +73,6 @@ RSpec.describe Case, type: :model do
           it { is_expected.to be_valid }
         end
       end
-
     end
 
     context 'when issue requires component' do
@@ -149,16 +148,16 @@ RSpec.describe Case, type: :model do
       user = create(:user, name: 'Some User', email: requestor_email)
 
       create(:case,
-        cluster: cluster,
-        issue: issue,
-        component: component,
-        user: user,
-        details: <<-EOF.strip_heredoc
+             cluster: cluster,
+             issue: issue,
+             component: component,
+             user: user,
+             details: <<-EOF.strip_heredoc
           Oh no
           my node
           is broken
         EOF
-      )
+            )
     end
 
     let :issue { create(:issue, name: 'Crashed node', requires_component: true, case_category: case_category) }
@@ -213,7 +212,7 @@ RSpec.describe Case, type: :model do
   describe '#mailto_url' do
     it 'creates correct mailto URL' do
       cluster = create(:cluster, name: 'somecluster')
-      issue = create(:issue, name:  'New user request')
+      issue = create(:issue, name: 'New user request')
       rt_ticket_id = 12345
 
       support_case = described_class.new(

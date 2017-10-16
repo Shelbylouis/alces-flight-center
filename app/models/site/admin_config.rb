@@ -4,7 +4,6 @@ module Site::AdminConfig
 
   included do
     rails_admin do
-
       edit do
         configure :description do
           html_attributes rows: 10, cols: 100
@@ -30,7 +29,6 @@ module Site::AdminConfig
           hide
         end
       end
-
     end
   end
 end

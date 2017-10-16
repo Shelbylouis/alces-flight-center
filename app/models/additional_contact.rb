@@ -4,6 +4,6 @@ class AdditionalContact < ApplicationRecord
   belongs_to :site
 
   validates :email,
-    presence: true,
-    email_format: { message: Constants::EMAIL_FORMAT_MESSAGE }
+            presence: true,
+            email_format: { message: Constants::EMAIL_FORMAT_MESSAGE }
 end

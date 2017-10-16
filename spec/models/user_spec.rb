@@ -8,6 +8,6 @@ RSpec.describe User, type: :model do
 
     subject { user.info }
 
-    it { is_expected.to eq "Some User <some.user@example.com>" }
+    it { is_expected.to eq 'Some User <some.user@example.com>' }
   end
 end

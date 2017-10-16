@@ -33,10 +33,10 @@ class Component < ApplicationRecord
   end
 
   def asset_record
-      # Merge asset record layers to obtain hash for this Component of all
-      # asset record fields for this ComponentType; fields set in later layers
-      # will take precedence over those in earlier layers for the same
-      # definition.
+    # Merge asset record layers to obtain hash for this Component of all
+    # asset record fields for this ComponentType; fields set in later layers
+    # will take precedence over those in earlier layers for the same
+    # definition.
     @asset_record ||=
       asset_record_layers.reduce({}, :merge).values.map do |field|
         [field.name, field.value]
@@ -65,7 +65,8 @@ class Component < ApplicationRecord
       [
         definition.id,
         # Placeholder empty AssetRecordField.
-        AssetRecordField.new(definition: definition, value: '')]
+        AssetRecordField.new(definition: definition, value: ''),
+      ]
     end.to_h
   end
 

@@ -4,7 +4,6 @@ module ComponentGroup::AdminConfig
 
   included do
     rails_admin do
-
       list do
         configure :genders_host_range do
           hide
@@ -30,7 +29,6 @@ module ComponentGroup::AdminConfig
           hide
         end
       end
-
     end
   end
 end

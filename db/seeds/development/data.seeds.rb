@@ -16,14 +16,14 @@ User.create!(
   site: site,
   name: 'Dr Cliff Addison',
   email: 'caddison@example.com',
-  password: 'password',
+  password: 'password'
 )
 
 User.create!(
   site: site,
   name: 'Another User',
   email: 'another.user@example.com',
-  password: 'password',
+  password: 'password'
 )
 
 AdditionalContact.create!(
@@ -80,7 +80,6 @@ Cluster.create!(
     component.support_type = 'advice'
     component.save!
   end
-
 
   ComponentGroup.create!(
     cluster: cluster,
