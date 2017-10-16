@@ -16,7 +16,7 @@ class RequestTrackerInterface
     @api_endpoint = "http://#{api_host}/rt/REST/1.0/"
   end
 
-  def create_ticket(requestor_email:, subject:, text:)
+  def create_ticket(requestor_email:, cc:, subject:, text:)
     content = new_ticket_request_content(
       requestor_email: requestor_email,
       subject: subject,

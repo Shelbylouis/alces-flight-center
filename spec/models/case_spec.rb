@@ -170,6 +170,7 @@ RSpec.describe Case, type: :model do
     it 'creates rt ticket with correct properties' do
       expected_create_ticket_args = {
         requestor_email: requestor_email,
+        cc: '',
         subject: 'Alces Flight Center ticket: somecluster - Crashed node',
         text: <<-EOF.strip_heredoc
           Cluster: somecluster

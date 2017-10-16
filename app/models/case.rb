@@ -16,6 +16,7 @@ class Case < ApplicationRecord
   def create_rt_ticket
     ticket = request_tracker.create_ticket(
       requestor_email: user.email,
+      cc: '',
       subject: rt_ticket_subject,
       text: rt_ticket_text
     )
