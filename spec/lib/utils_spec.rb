@@ -1,4 +1,5 @@
 
+require 'rails_helper'
 require 'utils'
 
 RSpec.describe Utils do
@@ -21,6 +22,14 @@ RSpec.describe Utils do
           another_key: value
         EOF
       )
+    end
+  end
+
+  describe '#generate_password' do
+    it 'generates a string of uppercase, lowercase, or digit characters' do
+      expect(
+        described_class.generate_password(length: 20)
+      ).to match(/[a-zA-Z0-9]{20}/)
     end
   end
 end
