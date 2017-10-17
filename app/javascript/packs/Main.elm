@@ -180,6 +180,15 @@ maybeComponentsField state =
                 errorForComponent
                 (State.componentAllowedForSelectedIssue state)
 
+        labelForComponent =
+            \component ->
+                case component.supportType of
+                    SupportType.Advice ->
+                        component.name ++ " (self-managed)"
+
+                    _ ->
+                        component.name
+
         errorForComponent =
             \component ->
                 if SupportType.isManaged component then
@@ -193,7 +202,7 @@ maybeComponentsField state =
             (selectField "Component"
                 selectedClusterComponents
                 Component.extractId
-                .name
+                labelForComponent
                 validateComponent
                 ChangeSelectedComponent
             )
