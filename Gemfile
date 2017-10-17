@@ -53,6 +53,7 @@ group :development, :test do
 
   gem 'dotenv-rails'
   gem 'factory_girl_rails'
+  gem 'rails_email_preview', '~> 2.0.4'
   gem 'rspec-rails'
   gem 'vcr'
   gem 'webmock'

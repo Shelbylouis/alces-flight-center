@@ -2,6 +2,8 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
+  mount RailsEmailPreview::Engine, at: 'emails' if Rails.env.development?
+
   get '/reset-password' => 'passwords#new', as: 'passwords'
   post '/reset-password' => 'passwords#create'
   resources :users, controller: 'clearance/users' do
