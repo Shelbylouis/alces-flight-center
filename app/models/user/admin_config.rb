@@ -8,6 +8,9 @@ module User::AdminConfig
         configure :password_confirmation do
           hide
         end
+        configure :confirmation_token do
+          hide
+        end
       end
     end
   end
