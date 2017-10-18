@@ -1,6 +1,14 @@
 
-.email-icon {
+.archived-case-row {
+  opacity: 0.4;
+}
+
+.icon {
   width: 100%;
+}
+
+.interactive-icon {
+  @extend .icon;
 
   &:hover {
     opacity: 0.6;
