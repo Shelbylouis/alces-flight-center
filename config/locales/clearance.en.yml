@@ -3,13 +3,13 @@ en:
   clearance:
     models:
       clearance_mailer:
-        change_password: Change your password
+        change_password: '[Alces Flight Center] Reset your password'
   clearance_mailer:
     change_password:
-      closing: If you didn't request this, ignore this email. Your password has
-        not been changed.
-      link_text: Change my password
-      opening: "Someone, hopefully you, requested we send you a link to change
+      closing: If you didn't request this, ignore this email. Your password
+        will not be reset unless this link is clicked.
+      link_text: Reset my password
+      opening: "Someone, hopefully you, requested we send you a link to reset
         your password:"
   flashes:
     failure_after_create: Bad email or password.
@@ -38,8 +38,8 @@ en:
       sign_out: Sign out
   passwords:
     create:
-      description: You will receive an email within the next few minutes. It
-        contains instructions for changing your password.
+      description: You will receive an email within the next few minutes
+        containing a link to reset your password.
     edit:
       description: Your password has been reset. Choose a new password below.
       title: Change your password

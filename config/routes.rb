@@ -6,11 +6,11 @@ Rails.application.routes.draw do
 
   get '/reset-password' => 'passwords#new', as: 'passwords'
   post '/reset-password' => 'passwords#create'
-  resources :users, controller: 'clearance/users' do
-    resource :password,
-      controller: 'passwords',
-      only: [:edit, :update]
-  end
+
+  # URL to complete password reset process. This will cause a user's password
+  # to be changed (given the correct params), but `get` must be used as it will
+  # be reached from an email.
+  get '/reset-password/complete' => 'passwords#reset_complete'
 
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'rails_admin/main#dashboard'

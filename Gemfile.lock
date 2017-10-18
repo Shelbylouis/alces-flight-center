@@ -96,6 +96,10 @@ GEM
     dotenv-rails (2.2.1)
       dotenv (= 2.2.1)
       railties (>= 3.2, < 5.2)
+    email_spec (2.1.1)
+      htmlentities (~> 4.3.3)
+      launchy (~> 2.1)
+      mail (~> 2.6)
     email_validator (1.6.0)
       activemodel
     erubi (1.6.1)
@@ -114,6 +118,7 @@ GEM
       temple (>= 0.8.0)
       tilt
     hashdiff (0.3.6)
+    htmlentities (4.3.4)
     http (2.2.2)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -147,6 +152,8 @@ GEM
       kaminari-core (= 1.0.1)
     kaminari-core (1.0.1)
     kramdown (1.15.0)
+    launchy (2.4.3)
+      addressable (~> 2.3)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -344,6 +351,7 @@ DEPENDENCIES
   capybara (~> 2.13)
   clearance
   dotenv-rails
+  email_spec
   factory_girl_rails
   http
   jbuilder (~> 2.5)
