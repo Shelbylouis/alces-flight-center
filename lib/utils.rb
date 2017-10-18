@@ -10,5 +10,10 @@ module Utils
         "#{key}: #{indented_value}"
       end.join("\n").squeeze("\n")
     end
+
+    # From https://stackoverflow.com/a/7987501.
+    def generate_password(length:)
+      SecureRandom.urlsafe_base64(length).delete('_-')[0, length]
+    end
   end
 end

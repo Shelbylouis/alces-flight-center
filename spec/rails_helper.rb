@@ -8,6 +8,8 @@ require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 require 'webmock/rspec'
+require 'email_spec'
+require 'email_spec/rspec'
 
 require 'support/factory_girl.rb'
 

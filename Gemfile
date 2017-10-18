@@ -23,9 +23,10 @@ gem 'uglifier', '>= 1.3.0'
 gem 'aws-sdk-s3'
 gem 'clearance'
 gem 'http'
-gem 'markdown'
+gem 'kramdown'
 gem 'rails_admin', '~> 1.2'
 gem 'seedbank'
+gem 'validates_email_format_of'
 gem 'webpacker', '~> 3.0'
 
 gem 'bootstrap', '~> 4.0.0.beta'
@@ -53,9 +54,14 @@ group :development, :test do
 
   gem 'dotenv-rails'
   gem 'factory_girl_rails'
+  gem 'rails_email_preview', '~> 2.0.4'
   gem 'rspec-rails'
   gem 'vcr'
   gem 'webmock'
+end
+
+group :test do
+  gem 'email_spec'
 end
 
 group :development do
@@ -72,7 +78,3 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-
-group :validation do
-  gem 'validates_email_format_of'
-end

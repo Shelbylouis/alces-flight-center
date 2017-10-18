@@ -34,6 +34,13 @@ Rails.application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
+  # Host to use when generating URls in emails.
+  config.action_mailer.default_url_options = { host: 'localhost:3000' }
+
+  # Required so emails always appear in `ActionMailer::Base.deliveries` even if
+  # `deliver_later` is used.
+  config.active_job.queue_adapter = :inline
+
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
