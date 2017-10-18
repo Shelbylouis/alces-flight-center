@@ -10,6 +10,5 @@ class ClustersController < ApplicationController
                      'Self-managed'
                    end
     @subtitle = "#{support_type} cluster"
-    # @cluster.description
   end
 end
