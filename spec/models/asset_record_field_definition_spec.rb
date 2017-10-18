@@ -12,4 +12,16 @@ RSpec.describe AssetRecordFieldDefinition, type: :model do
       expect(definition.settable_for_group?).to be true
     end
   end
+
+  describe '#identifier' do
+    subject { create(:asset_record_field_definition) }
+
+    let :expected_identifier do
+      "asset_record_field_definition_#{subject.id}".to_sym
+    end
+
+    it 'returns identifier suitable to use for accessor methods for fields for definition' do
+      expect(subject.identifier).to eq expected_identifier
+    end
+  end
 end
