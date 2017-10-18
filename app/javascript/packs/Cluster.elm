@@ -23,3 +23,10 @@ decoder =
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "components" (Utils.selectListDecoder Component.decoder))
+
+
+extractId : Cluster -> Int
+extractId cluster =
+    case cluster.id of
+        Id id ->
+            id
