@@ -26,6 +26,7 @@ gem 'http'
 gem 'markdown'
 gem 'rails_admin', '~> 1.2'
 gem 'seedbank'
+gem 'validates_email_format_of'
 gem 'webpacker', '~> 3.0'
 
 gem 'bootstrap', '~> 4.0.0.beta'
@@ -73,7 +74,3 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-
-group :validation do
-  gem 'validates_email_format_of'
-end
