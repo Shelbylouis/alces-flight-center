@@ -1,5 +1,7 @@
 class Cluster < ApplicationRecord
-  SUPPORT_TYPES = ['managed', 'advice'].freeze
+  include HasSupportType
+
+  SUPPORT_TYPES = SupportType::VALUES
 
   belongs_to :site
   has_many :component_groups, dependent: :destroy
@@ -21,6 +23,15 @@ class Cluster < ApplicationRecord
       id: id,
       name: name,
       components: components.map(&:case_form_json),
+      supportType: support_type,
     }
+  end
+
+  def managed_components
+    components.select(&:managed?)
+  end
+
+  def advice_components
+    components.select(&:advice?)
   end
 end

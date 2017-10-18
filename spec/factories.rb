@@ -15,6 +15,14 @@ FactoryGirl.define do
     site
     name 'Hamilton Research Computing Cluster'
     support_type :managed
+
+    factory :managed_cluster do
+      support_type :managed
+    end
+
+    factory :advice_cluster do
+      support_type :advice
+    end
   end
 
   factory :component_type do
@@ -30,6 +38,15 @@ FactoryGirl.define do
   factory :component do
     component_group
     name 'node01'
+    support_type :inherit
+
+    factory :managed_component do
+      support_type :managed
+    end
+
+    factory :advice_component do
+      support_type :advice
+    end
   end
 
   factory :case_category do
@@ -41,6 +58,11 @@ FactoryGirl.define do
     name 'New user/group'
     requires_component false
     details_template 'Enter the usernames to create'
+    support_type :managed
+
+    factory :advice_issue do
+      support_type :advice
+    end
   end
 
   factory :case do

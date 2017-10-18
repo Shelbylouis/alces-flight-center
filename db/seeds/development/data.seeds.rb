@@ -29,6 +29,19 @@ Cluster.create!(
     genders_host_range: 'node[01-20]'
   )
 
+  group = ComponentGroup.create!(
+    cluster: cluster,
+    name: 'Self-managed nodes',
+    component_type: ComponentType.find_by_name('Server'),
+    genders_host_range: 'self_managed[01-03]'
+  )
+  group.reload
+  group.components.each do |component|
+    component.support_type = 'advice'
+    component.save!
+  end
+
+
   ComponentGroup.create!(
     cluster: cluster,
     name: 'Rack A1 switches',
@@ -40,7 +53,8 @@ Cluster.create!(
     )
     Component.create!(
       component_group: group,
-      name: 'Rack A1 Dell N1545 1Gb Ethernet switch 2'
+      name: 'Rack A1 Dell N1545 1Gb Ethernet switch 2 (self-managed)',
+      support_type: 'advice'
     )
     Component.create!(
       component_group: group,
@@ -55,10 +69,14 @@ Cluster.create!(
   description: 'An additional cluster for development',
   support_type: 'advice'
 ).tap do |cluster|
-  ComponentGroup.create!(
+  group = ComponentGroup.create!(
     cluster: cluster,
     name: 'Additional cluster nodes',
     component_type: ComponentType.find_by_name('Server'),
     genders_host_range: 'anode[01-05]'
   )
+  group.reload
+  managed_component = group.components.last
+  managed_component.support_type = 'managed'
+  managed_component.save!
 end

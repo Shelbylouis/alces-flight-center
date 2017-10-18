@@ -3,6 +3,7 @@ module Main exposing (..)
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
 import Component exposing (Component)
+import FieldValidation exposing (FieldValidation(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -58,7 +59,7 @@ view model =
         Initialized state ->
             div []
                 (Maybe.Extra.values
-                    [ errorAlert state
+                    [ submitErrorAlert state
                     , caseForm state |> Just
                     ]
                 )
@@ -73,17 +74,14 @@ view model =
                 ]
 
 
-errorAlert : State -> Maybe (Html Msg)
-errorAlert state =
+submitErrorAlert : State -> Maybe (Html Msg)
+submitErrorAlert state =
     -- This closely matches the error alert we show from Rails, but is managed
     -- by Elm rather than Bootstrap JS.
     let
         displayError =
             \error ->
-                div
-                    [ class "alert alert-danger alert-dismissable fade show"
-                    , attribute "role" "alert"
-                    ]
+                errorAlert
                     [ button
                         [ type_ "button"
                         , class "close"
@@ -97,78 +95,133 @@ errorAlert state =
     Maybe.map displayError state.error
 
 
+errorAlert : List (Html msg) -> Html msg
+errorAlert children =
+    div
+        [ class "alert alert-danger alert-dismissable fade show"
+        , attribute "role" "alert"
+        ]
+        children
+
+
 caseForm : State -> Html Msg
 caseForm state =
     let
-        selectedClusterComponents =
-            SelectList.selected state.clusters |> .components
-
-        selectedCaseCategoryIssues =
-            SelectList.selected state.caseCategories |> .issues
-
-        selectedIssue =
-            State.selectedIssue state
-
-        clustersField =
-            Just
-                (selectField "Cluster"
-                    state.clusters
-                    Cluster.extractId
-                    .name
-                    ChangeSelectedCluster
-                )
-
-        caseCategoriesField =
-            Just
-                (selectField "Case category"
-                    state.caseCategories
-                    CaseCategory.extractId
-                    .name
-                    ChangeSelectedCaseCategory
-                )
-
-        issuesField =
-            Just
-                (selectField "Issue"
-                    selectedCaseCategoryIssues
-                    Issue.extractId
-                    .name
-                    ChangeSelectedIssue
-                )
-
-        componentsField =
-            if selectedIssue.requiresComponent then
-                Just
-                    (selectField "Component"
-                        selectedClusterComponents
-                        Component.extractId
-                        .name
-                        ChangeSelectedComponent
-                    )
-            else
-                Nothing
-
-        detailsField =
-            Just (textareaField "Details" selectedIssue.details ChangeDetails)
-
         formElements =
             Maybe.Extra.values
-                [ clustersField
-                , caseCategoriesField
-                , issuesField
-                , componentsField
-                , detailsField
+                [ clustersField state.clusters |> Just
+                , caseCategoriesField state |> Just
+                , issuesField state |> Just
+                , maybeComponentsField state
+                , detailsField state |> Just
                 , submitButton state |> Just
                 ]
     in
     Html.form [ onSubmit StartSubmit ] formElements
 
 
-selectField : String -> SelectList a -> (a -> Int) -> (a -> String) -> (String -> Msg) -> Html Msg
-selectField fieldName items toId toOptionLabel changeMsg =
+clustersField : SelectList Cluster -> Html Msg
+clustersField clusters =
+    selectField "Cluster"
+        clusters
+        Cluster.extractId
+        .name
+        (always Valid)
+        ChangeSelectedCluster
+
+
+caseCategoriesField : State -> Html Msg
+caseCategoriesField state =
     let
-        identifier =
-            fieldIdentifier fieldName
+        validateCaseCategory =
+            FieldValidation.validateWithEmptyError
+                (CaseCategory.availableForSelectedCluster state.clusters)
+    in
+    selectField "Case category"
+        state.caseCategories
+        CaseCategory.extractId
+        .name
+        validateCaseCategory
+        ChangeSelectedCaseCategory
+
+
+issuesField : State -> Html Msg
+issuesField state =
+    let
+        selectedCaseCategoryIssues =
+            SelectList.selected state.caseCategories |> .issues
+
+        validateIssue =
+            FieldValidation.validateWithError
+                """This cluster is self-managed; you may only request
+                consultancy support from Alces Software."""
+                (Issue.availableForSelectedCluster state.clusters)
+    in
+    selectField "Issue"
+        selectedCaseCategoryIssues
+        Issue.extractId
+        .name
+        validateIssue
+        ChangeSelectedIssue
+
+
+maybeComponentsField : State -> Maybe (Html Msg)
+maybeComponentsField state =
+    let
+        selectedClusterComponents =
+            SelectList.selected state.clusters |> .components
+
+        selectedIssue =
+            State.selectedIssue state
+
+        validateComponent =
+            FieldValidation.validateWithError
+                """This component is self-managed; if required you may only
+                request consultancy support from Alces Software."""
+                (State.componentAllowedForSelectedIssue state)
+    in
+    if selectedIssue.requiresComponent then
+        Just
+            (selectField "Component"
+                selectedClusterComponents
+                Component.extractId
+                .name
+                validateComponent
+                ChangeSelectedComponent
+            )
+    else
+        Nothing
+
+
+detailsField : State -> Html Msg
+detailsField state =
+    let
+        selectedIssue =
+            State.selectedIssue state
+
+        validateDetails =
+            FieldValidation.validateWithEmptyError Issue.detailsValid
+    in
+    textareaField
+        "Details"
+        selectedIssue
+        .details
+        validateDetails
+        ChangeDetails
+
+
+selectField :
+    String
+    -> SelectList a
+    -> (a -> Int)
+    -> (a -> String)
+    -> (a -> FieldValidation)
+    -> (String -> Msg)
+    -> Html Msg
+selectField fieldName items toId toOptionLabel validate changeMsg =
+    let
+        validatedField =
+            SelectList.selected items |> validate
 
         fieldOption =
             \position ->
@@ -176,6 +229,7 @@ selectField fieldName items toId toOptionLabel changeMsg =
                     option
                         [ toId item |> toString |> value
                         , position == Selected |> selected
+                        , validate item |> FieldValidation.isInvalid |> disabled
                         ]
                         [ toOptionLabel item |> text ]
 
@@ -183,39 +237,80 @@ selectField fieldName items toId toOptionLabel changeMsg =
             SelectList.mapBy fieldOption items
                 |> SelectList.toList
     in
-    div [ class "form-group" ]
-        [ label
-            [ for identifier ]
-            [ text fieldName ]
-        , select
-            [ id identifier
-            , class "form-control"
-            , onInput changeMsg
-            ]
-            options
+    formField fieldName
+        validatedField
+        select
+        [ onInput changeMsg ]
+        options
+
+
+textareaField : String -> a -> (a -> String) -> (a -> FieldValidation) -> (String -> Msg) -> Html Msg
+textareaField fieldName item toContent validate inputMsg =
+    let
+        validatedField =
+            validate item
+
+        content =
+            toContent item
+    in
+    formField fieldName
+        validatedField
+        textarea
+        [ rows 10
+        , onInput inputMsg
+        , value content
         ]
+        []
 
 
-textareaField : String -> String -> (String -> Msg) -> Html Msg
-textareaField fieldName content inputMsg =
-    -- XXX De-duplicate this and `selectField`.
+type alias HtmlFunction msg =
+    List (Attribute msg) -> List (Html msg) -> Html msg
+
+
+formField :
+    String
+    -> FieldValidation
+    -> HtmlFunction msg
+    -> List (Attribute msg)
+    -> List (Html msg)
+    -> Html msg
+formField fieldName validation htmlFn additionalAttributes children =
     let
         identifier =
             fieldIdentifier fieldName
+
+        classes =
+            "form-control " ++ bootstrapValidationClass validation
+
+        attributes =
+            List.append
+                [ id identifier
+                , class classes
+                ]
+                additionalAttributes
+
+        formElement =
+            htmlFn attributes children
     in
     div [ class "form-group" ]
         [ label
             [ for identifier ]
             [ text fieldName ]
-        , textarea
-            [ id identifier
-            , class "form-control"
-            , rows 10
-            , onInput inputMsg
-            , value content
-            ]
-            []
+        , formElement
+        , div
+            [ class "invalid-feedback" ]
+            [ FieldValidation.error validation |> text ]
         ]
+
+
+bootstrapValidationClass : FieldValidation -> String
+bootstrapValidationClass validation =
+    case validation of
+        Valid ->
+            "is-valid"
+
+        Invalid _ ->
+            "is-invalid"
 
 
 fieldIdentifier : String -> String

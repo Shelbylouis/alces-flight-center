@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171009143220) do
+ActiveRecord::Schema.define(version: 20171009164012) do
 
   create_table "case_categories", force: :cascade do |t|
     t.string "name", null: false
@@ -68,6 +68,7 @@ ActiveRecord::Schema.define(version: 20171009143220) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "component_group_id"
+    t.string "support_type", default: "inherit", null: false
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end
 
@@ -78,6 +79,7 @@ ActiveRecord::Schema.define(version: 20171009143220) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "details_template"
+    t.string "support_type"
     t.index ["case_category_id"], name: "index_issues_on_case_category_id"
   end
 

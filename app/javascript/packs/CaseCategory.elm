@@ -1,5 +1,6 @@
 module CaseCategory exposing (..)
 
+import Cluster exposing (Cluster)
 import Issue exposing (Issue)
 import Json.Decode as D
 import SelectList exposing (SelectList)
@@ -23,6 +24,15 @@ decoder =
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "issues" (Utils.selectListDecoder Issue.decoder))
+
+
+availableForSelectedCluster : SelectList Cluster -> CaseCategory -> Bool
+availableForSelectedCluster clusters caseCategory =
+    -- A CaseCategory should be available only if any Issue within it is
+    -- available for the selected Cluster, otherwise there is no point allowing
+    -- selection of the CaseCategory.
+    SelectList.toList caseCategory.issues
+        |> List.any (Issue.availableForSelectedCluster clusters)
 
 
 extractId : CaseCategory -> Int
