@@ -124,6 +124,29 @@ CaseCategory.create!(name: 'End User Assistance').tap do |end_user_assistance|
   )
 end
 
+CaseCategory.create!(name: 'Change Component Status').tap do |change_status|
+  Issue.create!(
+    name: 'Request self-management of component',
+    case_category: change_status,
+    support_type: 'managed',
+    requires_component: true,
+    details_template: <<-EOF.squish
+      Please indicate why you would like self-management of this component.
+    EOF
+  )
+  Issue.create!(
+    name: 'Relinquish self-management of component',
+    case_category: change_status,
+    support_type: 'advice-only',
+    requires_component: true,
+    details_template: <<-EOF.squish
+      Note that when a component becomes managed it must first be reset to its
+      initial state, without any custom modifications. Please indicate why you
+      would like to relinquish self-management of this component.
+    EOF
+  )
+end
+
 CaseCategory.create!(name: 'Consultancy').tap do |consultancy|
   Issue.create!(
     name: 'Request custom consultancy',

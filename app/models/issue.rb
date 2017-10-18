@@ -2,12 +2,16 @@ class Issue < ApplicationRecord
   include AdminConfig
   include HasSupportType
 
-  SUPPORT_TYPES = SupportType::VALUES
+  SUPPORT_TYPES = SupportType::VALUES + ['advice-only']
 
   belongs_to :case_category
   validates :name, presence: true
   validates :details_template, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
+
+  def advice_only?
+    support_type == 'advice-only'
+  end
 
   # Automatically picked up by rails_admin so only these options displayed when
   # selecting support type.

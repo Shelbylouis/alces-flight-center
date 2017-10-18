@@ -9,8 +9,8 @@ class Case < ApplicationRecord
 
   validates :details, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
-  validate :correct_component_relationship
-  validate :issue_valid_for_cluster_or_component
+
+  validates_with Validator
 
   before_validation :create_rt_ticket, on: :create
 
@@ -77,46 +77,5 @@ class Case < ApplicationRecord
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
     Utils.rt_format(properties)
-  end
-
-  def correct_component_relationship
-    if issue.requires_component
-      if !component
-        errors.add(:component, 'issue requires a component but one was not given')
-      elsif component.cluster != cluster
-        errors.add(:component, 'given component is not part of given cluster')
-      end
-    elsif component
-      errors.add(:component, 'issue does not require a component but one was given')
-    end
-  end
-
-  def issue_valid_for_cluster_or_component
-    # Can open cases for `advice` issues for any cluster or component.
-    return if issue.advice?
-
-    if issue.requires_component
-      if component&.advice?
-        errors.add(:issue, managed_issue_for_advice_component_error)
-      end
-    elsif cluster.advice?
-      errors.add(:issue, managed_issue_for_advice_cluster_error)
-    end
-  end
-
-  def managed_issue_for_advice_cluster_error
-    managed_issue_error_for('cluster')
-  end
-
-  def managed_issue_for_advice_component_error
-    managed_issue_error_for('component')
-  end
-
-  def managed_issue_error_for(model_type)
-    <<-EOF.squish
-      is only available for #{SupportType::MANAGED_TEXT}
-      #{model_type.pluralize}, but given #{model_type} is
-      #{SupportType::ADVICE_TEXT}
-    EOF
   end
 end
