@@ -1,8 +1,10 @@
 class Case < ApplicationRecord
-  belongs_to :case_category
+  belongs_to :issue
   belongs_to :cluster
   belongs_to :component, required: false
   belongs_to :user
+
+  delegate :case_category, to: :issue
 
   validates :details, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
@@ -47,13 +49,14 @@ class Case < ApplicationRecord
   end
 
   def rt_ticket_subject
-    "Alces Flight Center ticket: #{cluster.name} - #{case_category.name}"
+    "Alces Flight Center ticket: #{cluster.name} - #{issue.name}"
   end
 
   def rt_ticket_text
     properties = {
       Cluster: cluster.name,
       'Case category': case_category.name,
+      'Issue': issue.name,
       'Associated component': component&.name,
       Details: details,
     }.reject { |_k, v| v.nil? }
@@ -64,14 +67,14 @@ class Case < ApplicationRecord
   end
 
   def correct_component_relationship
-    if case_category.requires_component
+    if issue.requires_component
       if !component
-        errors.add(:component, 'case category requires a component but one was not given')
+        errors.add(:component, 'issue requires a component but one was not given')
       elsif component.cluster != cluster
         errors.add(:component, 'given component is not part of given cluster')
       end
     elsif component
-      errors.add(:component, 'case category does not require a component but one was given')
+      errors.add(:component, 'issue does not require a component but one was given')
     end
   end
 end

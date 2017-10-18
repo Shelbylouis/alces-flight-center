@@ -7,12 +7,14 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
+import Issue exposing (Issue)
 import Json.Decode as D
 import Json.Encode as E
-import Maybe.Extra exposing (isNothing, unwrap)
+import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
+import String.Extra
 import Utils
 
 
@@ -71,6 +73,9 @@ formStateEncoder state =
         selectedCaseCategory =
             SelectList.selected state.caseCategories
 
+        selectedIssue =
+            SelectList.selected selectedCaseCategory.issues
+
         selectedCluster =
             SelectList.selected state.clusters
 
@@ -78,7 +83,7 @@ formStateEncoder state =
             SelectList.selected selectedCluster.components
 
         componentIdValue =
-            if selectedCaseCategory.requiresComponent then
+            if selectedIssue.requiresComponent then
                 componentIdToInt selectedComponent.id |> E.int
             else
                 E.null
@@ -87,7 +92,7 @@ formStateEncoder state =
         [ ( "case"
           , E.object
                 [ ( "cluster_id", clusterIdToInt selectedCluster.id |> E.int )
-                , ( "case_category_id", caseCategoryIdToInt selectedCaseCategory.id |> E.int )
+                , ( "issue_id", issueIdToInt selectedIssue.id |> E.int )
                 , ( "component_id", componentIdValue )
                 , ( "details", E.string state.details )
                 ]
@@ -114,6 +119,13 @@ caseCategoryId caseCategory =
             id
 
 
+issueId : Issue -> Int
+issueId issue =
+    case issue.id of
+        Issue.Id id ->
+            id
+
+
 componentId : Component -> Int
 componentId component =
     case component.id of
@@ -128,6 +140,11 @@ clusterIdToInt (Cluster.Id id) =
 
 caseCategoryIdToInt : CaseCategory.Id -> Int
 caseCategoryIdToInt (CaseCategory.Id id) =
+    id
+
+
+issueIdToInt : Issue.Id -> Int
+issueIdToInt (Issue.Id id) =
     id
 
 
@@ -206,10 +223,15 @@ caseForm state =
         selectedCaseCategory =
             SelectList.selected state.caseCategories
 
+        selectedCaseCategoryIssues =
+            selectedCaseCategory.issues
+
+        selectedIssue =
+            SelectList.selected selectedCaseCategoryIssues
+
         clustersField =
             Just
                 (selectField "Cluster"
-                    "cluster_id"
                     state.clusters
                     clusterId
                     .name
@@ -219,18 +241,25 @@ caseForm state =
         caseCategoriesField =
             Just
                 (selectField "Case category"
-                    "case_category_id"
                     state.caseCategories
                     caseCategoryId
                     .name
                     ChangeSelectedCaseCategory
                 )
 
+        issuesField =
+            Just
+                (selectField "Issue"
+                    selectedCaseCategoryIssues
+                    issueId
+                    .name
+                    ChangeSelectedIssue
+                )
+
         componentsField =
-            if selectedCaseCategory.requiresComponent then
+            if selectedIssue.requiresComponent then
                 Just
                     (selectField "Component"
-                        "component_id"
                         selectedClusterComponents
                         componentId
                         .name
@@ -240,17 +269,13 @@ caseForm state =
                 Nothing
 
         detailsField =
-            Just
-                (textareaField "Details"
-                    "details"
-                    state.details
-                    ChangeDetails
-                )
+            Just (textareaField "Details" state.details ChangeDetails)
 
         formElements =
             Maybe.Extra.values
                 [ clustersField
                 , caseCategoriesField
+                , issuesField
                 , componentsField
                 , detailsField
                 , submitButton state |> Just
@@ -259,18 +284,11 @@ caseForm state =
     Html.form [ onSubmit StartSubmit ] formElements
 
 
-selectField :
-    String
-    -> String
-    -> SelectList a
-    -> (a -> Int)
-    -> (a -> String)
-    -> (String -> Msg)
-    -> Html Msg
-selectField fieldName fieldIdentifier items toId toOptionLabel changeMsg =
+selectField : String -> SelectList a -> (a -> Int) -> (a -> String) -> (String -> Msg) -> Html Msg
+selectField fieldName items toId toOptionLabel changeMsg =
     let
-        namespacedId =
-            namespacedFieldId fieldIdentifier
+        identifier =
+            fieldIdentifier fieldName
 
         fieldOption =
             \position ->
@@ -287,10 +305,10 @@ selectField fieldName fieldIdentifier items toId toOptionLabel changeMsg =
     in
     div [ class "form-group" ]
         [ label
-            [ for namespacedId ]
+            [ for identifier ]
             [ text fieldName ]
         , select
-            [ id namespacedId
+            [ id identifier
             , class "form-control"
             , onInput changeMsg
             ]
@@ -298,19 +316,19 @@ selectField fieldName fieldIdentifier items toId toOptionLabel changeMsg =
         ]
 
 
-textareaField : String -> String -> String -> (String -> Msg) -> Html Msg
-textareaField fieldName fieldIdentifier content inputMsg =
+textareaField : String -> String -> (String -> Msg) -> Html Msg
+textareaField fieldName content inputMsg =
     -- XXX De-duplicate this and `selectField`.
     let
-        namespacedId =
-            namespacedFieldId fieldIdentifier
+        identifier =
+            fieldIdentifier fieldName
     in
     div [ class "form-group" ]
         [ label
-            [ for namespacedId ]
+            [ for identifier ]
             [ text fieldName ]
         , textarea
-            [ id namespacedId
+            [ id identifier
             , class "form-control"
             , rows 10
             , onInput inputMsg
@@ -319,9 +337,10 @@ textareaField fieldName fieldIdentifier content inputMsg =
         ]
 
 
-namespacedFieldId : String -> String
-namespacedFieldId fieldIdentifier =
-    "new-case-form-" ++ fieldIdentifier
+fieldIdentifier : String -> String
+fieldIdentifier fieldName =
+    String.toLower fieldName
+        |> String.Extra.dasherize
 
 
 submitButton : State -> Html Msg
@@ -342,6 +361,7 @@ submitButton state =
 type Msg
     = ChangeSelectedCluster String
     | ChangeSelectedCaseCategory String
+    | ChangeSelectedIssue String
     | ChangeSelectedComponent String
     | ChangeDetails String
     | StartSubmit
@@ -378,6 +398,10 @@ updateState msg state =
         ChangeSelectedCaseCategory id ->
             stringToId CaseCategory.Id id
                 |> Maybe.map (handleChangeSelectedCaseCategory state)
+
+        ChangeSelectedIssue id ->
+            stringToId Issue.Id id
+                |> Maybe.map (handleChangeSelectedIssue state)
 
         ChangeSelectedComponent id ->
             stringToId Component.Id id
@@ -435,6 +459,27 @@ handleChangeSelectedCaseCategory state caseCategoryId =
     let
         newCaseCategories =
             SelectList.select (sameId caseCategoryId) state.caseCategories
+    in
+    ( { state | caseCategories = newCaseCategories }
+    , Cmd.none
+    )
+
+
+handleChangeSelectedIssue : State -> Issue.Id -> ( State, Cmd Msg )
+handleChangeSelectedIssue state issueId =
+    let
+        newCaseCategories =
+            SelectList.mapBy updateSelectedCaseCategorySelectedIssue state.caseCategories
+
+        updateSelectedCaseCategorySelectedIssue =
+            \position ->
+                \caseCategory ->
+                    if position == Selected then
+                        { caseCategory
+                            | issues = SelectList.select (sameId issueId) caseCategory.issues
+                        }
+                    else
+                        caseCategory
     in
     ( { state | caseCategories = newCaseCategories }
     , Cmd.none

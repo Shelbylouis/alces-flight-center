@@ -2,13 +2,13 @@ require 'rails_helper'
 
 RSpec.describe Case, type: :model do
   describe '#valid?' do
-    context 'when case category does not require component' do
-      let :case_category { create(:case_category, requires_component: false) }
+    context 'when issue does not require component' do
+      let :issue { create(:issue, requires_component: false) }
 
       it 'passes if not associated with component' do
         support_case = build(
           :case,
-          case_category: case_category
+          issue: issue
         )
 
         expect(support_case.valid?).to be true
@@ -17,7 +17,7 @@ RSpec.describe Case, type: :model do
       it 'fails if associated with component' do
         support_case = build(
           :case,
-          case_category: case_category,
+          issue: issue,
           component: create(:component)
         )
 
@@ -26,15 +26,15 @@ RSpec.describe Case, type: :model do
       end
     end
 
-    context 'when case category requires component' do
-      let :case_category { create(:case_category, requires_component: true) }
+    context 'when issue requires component' do
+      let :issue { create(:issue, requires_component: true) }
       let :cluster { create(:cluster) }
       let :component { create(:component, cluster: cluster) }
 
       it 'passes if associated with component' do
         support_case = build(
           :case,
-          case_category: case_category,
+          issue: issue,
           component: component,
           cluster: cluster
         )
@@ -45,7 +45,7 @@ RSpec.describe Case, type: :model do
       it 'fails if not associated with component' do
         support_case = build(
           :case,
-          case_category: case_category
+          issue: issue
         )
 
         expect(support_case.valid?).to be false
@@ -55,7 +55,7 @@ RSpec.describe Case, type: :model do
       it 'passes if component part of associated cluster' do
         support_case = build(
           :case,
-          case_category: case_category,
+          issue: issue,
           component: component,
           cluster: cluster
         )
@@ -68,7 +68,7 @@ RSpec.describe Case, type: :model do
         component = create(:component, cluster: another_cluster)
         support_case = build(
           :case,
-          case_category: case_category,
+          issue: issue,
           component: component,
           cluster: cluster
         )
@@ -81,17 +81,11 @@ RSpec.describe Case, type: :model do
 
   describe '#create_rt_ticket' do
     subject do
-      # XXX Use FactoryGirl here.
-      cluster = Cluster.new(name: 'somecluster')
-      case_category = CaseCategory.new(name: 'Crashed node')
-      user = User.new(
-        name: 'Some User',
-        email: requestor_email
-      )
+      user = create(:user, name: 'Some User', email: requestor_email)
 
-      described_class.new(
+      create(:case,
         cluster: cluster,
-        case_category: case_category,
+        issue: issue,
         component: component,
         user: user,
         details: <<-EOF.strip_heredoc
@@ -102,7 +96,10 @@ RSpec.describe Case, type: :model do
       )
     end
 
-    let :component { Component.new(name: 'node01') }
+    let :issue { create(:issue, name: 'Crashed node', requires_component: true, case_category: case_category) }
+    let :case_category { create(:case_category, name: 'Hardware issue') }
+    let :cluster { create(:cluster, name: 'somecluster') }
+    let :component { create(:component, name: 'node01', cluster: cluster) }
     let :requestor_email { 'someuser@somecluster.com' }
     let :request_tracker { subject.send(:request_tracker) }
 
@@ -112,7 +109,8 @@ RSpec.describe Case, type: :model do
         subject: 'Alces Flight Center ticket: somecluster - Crashed node',
         text: <<-EOF.strip_heredoc
           Cluster: somecluster
-          Case category: Crashed node
+          Case category: Hardware issue
+          Issue: Crashed node
           Associated component: node01
           Details: Oh no
            my node
@@ -130,6 +128,7 @@ RSpec.describe Case, type: :model do
     end
 
     context 'when no associated component' do
+      let :issue { create(:issue, requires_component: false) }
       let :component { nil }
 
       it 'does not include corresponding line in ticket text' do
@@ -148,13 +147,13 @@ RSpec.describe Case, type: :model do
 
   describe '#mailto_url' do
     it 'creates correct mailto URL' do
-      cluster = Cluster.new(name: 'somecluster')
-      case_category = CaseCategory.new(name: 'New user request')
+      cluster = create(:cluster, name: 'somecluster')
+      issue = create(:issue, name:  'New user request')
       rt_ticket_id = 12345
 
       support_case = described_class.new(
         cluster: cluster,
-        case_category: case_category,
+        issue: issue,
         rt_ticket_id: rt_ticket_id
       )
 

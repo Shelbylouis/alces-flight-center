@@ -42,7 +42,7 @@ class CasesController < ApplicationController
 
   def case_params
     params.require(:case).permit(
-      :case_category_id, :cluster_id, :component_id, :details
+      :issue_id, :cluster_id, :component_id, :details
     )
   end
 
@@ -62,6 +62,5 @@ class CasesController < ApplicationController
   def assign_form_variables
     @case_categories = CaseCategory.all
     @site_clusters = current_site.clusters
-    @site_components = current_site.components
   end
 end

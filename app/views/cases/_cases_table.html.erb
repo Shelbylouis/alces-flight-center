@@ -27,6 +27,7 @@
         <th>Date</th>
         <th>Creator</th>
         <th>Category</th>
+        <th>Issue</th>
         <th>Cluster</th>
         <th>Associated component</th>
         <th>Details</th>
@@ -49,6 +50,7 @@
           <td><%= c.created_at %></td>
           <td><%= c.user.name %></td>
           <td><%= c.case_category.name %></td>
+          <td><%= c.issue.name %></td>
           <td><%= c.cluster.name %></td>
           <td><%= c.component&.name %></td>
           <td><%= c.details %></td>
