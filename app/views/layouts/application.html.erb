@@ -42,6 +42,9 @@
             <div class="col"></div>
             <div class="col-6">
               <h1 class="display-4"><%= @title %></h1>
+              <% if @subtitle %>
+                <p class="lead"><%= @subtitle %></p>
+              <% end %>
             </div>
             <div class="col"></div>
           </div>

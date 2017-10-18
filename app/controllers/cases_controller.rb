@@ -2,11 +2,6 @@ class CasesController < ApplicationController
   before_action :require_login
 
   def index
-    @open_cases = current_site.cases.where(archived: false)
-    @title = "Support for site #{current_site.name}"
-  end
-
-  def archive_index
     @cases = current_site.cases
     @title = 'Support case archive'
   end
@@ -22,7 +17,7 @@ class CasesController < ApplicationController
 
     if @case.save
       flash[:success] = 'Support case successfully created.'
-      redirect_to :cases
+      redirect_to root_path
     else
       flash_object_errors(@case)
       assign_form_variables

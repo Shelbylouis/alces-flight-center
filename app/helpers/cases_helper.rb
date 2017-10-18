@@ -3,7 +3,7 @@ module CasesHelper
     build_options_with_data_attributes(@site_components) do |site_component|
       {
         'component-type': site_component.component_type.id,
-        'cluster': site_component.cluster.id
+        'cluster': site_component.cluster.id,
       }
     end
   end
@@ -30,16 +30,15 @@ module CasesHelper
       [
         obj.name,
         obj.id,
-        convert_keys_to_data_id_tag(yield(obj))
+        convert_keys_to_data_id_tag(yield(obj)),
       ]
     end
     options_for_select(arr)
   end
 
   def convert_keys_to_data_id_tag(data_hash = {})
-    data_hash.inject({}) do |memo, (key, value)|
+    data_hash.each_with_object({}) do |(key, value), memo|
       memo["data-#{key}-id"] = value
-      memo
     end
   end
 end

@@ -25,6 +25,10 @@ class Case < ApplicationRecord
     "mailto:#{support_email}?subject=#{subject}"
   end
 
+  def open
+    !archived
+  end
+
   private
 
   def request_tracker
@@ -50,8 +54,8 @@ class Case < ApplicationRecord
       Cluster: cluster.name,
       'Case category': case_category.name,
       'Associated component': component&.name,
-      Details: details
-    }.reject { |k,v| v.nil? }
+      Details: details,
+    }.reject { |_k, v| v.nil? }
 
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.

@@ -31,7 +31,7 @@ RSpec.describe Case, type: :model do
     it 'creates rt ticket with correct properties' do
       expected_create_ticket_args = {
         requestor_email: requestor_email,
-        subject: "Alces Flight Center ticket: somecluster - Crashed node",
+        subject: 'Alces Flight Center ticket: somecluster - Crashed node',
         text: <<-EOF.strip_heredoc
           Cluster: somecluster
           Case category: Crashed node
@@ -77,7 +77,7 @@ RSpec.describe Case, type: :model do
       support_case = described_class.new(
         cluster: cluster,
         case_category: case_category,
-        rt_ticket_id: rt_ticket_id,
+        rt_ticket_id: rt_ticket_id
       )
 
       expected_subject = URI.escape(

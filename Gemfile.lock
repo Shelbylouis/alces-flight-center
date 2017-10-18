@@ -87,6 +87,11 @@ GEM
       activemodel
     erubi (1.6.1)
     execjs (2.7.0)
+    factory_girl (4.8.1)
+      activesupport (>= 3.0.0)
+    factory_girl_rails (4.8.0)
+      factory_girl (~> 4.8.0)
+      railties (>= 3.0.0)
     ffi (1.9.18)
     font-awesome-rails (4.7.0.2)
       railties (>= 3.2, < 5.2)
@@ -310,6 +315,7 @@ DEPENDENCIES
   capybara (~> 2.13)
   clearance
   dotenv-rails
+  factory_girl_rails
   http
   jbuilder (~> 2.5)
   jquery-rails
