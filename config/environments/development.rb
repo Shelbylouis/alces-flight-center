@@ -52,6 +52,6 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  # Supportware custom config.
+  # Alces Flight Center custom config.
   config.rt_interface_class = FakeRequestTrackerInterface.to_s
 end

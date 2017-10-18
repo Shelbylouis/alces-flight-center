@@ -89,6 +89,6 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  # Supportware custom config.
+  # Alces Flight Center custom config.
   config.rt_interface_class = RequestTrackerInterface.to_s
 end

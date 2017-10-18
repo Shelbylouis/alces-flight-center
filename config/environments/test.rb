@@ -40,6 +40,6 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  # Supportware custom config.
+  # Alces Flight Center custom config.
   config.rt_interface_class = RequestTrackerInterface.to_s
 end
