@@ -6,6 +6,7 @@ class Case < ApplicationRecord
 
   validates :details, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
+  validate :correct_component_relationship
 
   before_validation :create_rt_ticket, on: :create
 
@@ -60,5 +61,17 @@ class Case < ApplicationRecord
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
     Utils.rt_format(properties)
+  end
+
+  def correct_component_relationship
+    if case_category.requires_component
+      if !component
+        errors.add(:component, 'case category requires a component but one was not given')
+      elsif component.cluster != cluster
+        errors.add(:component, 'given component is not part of given cluster')
+      end
+    elsif component
+      errors.add(:component, 'case category does not require a component but one was given')
+    end
   end
 end

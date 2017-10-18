@@ -48,3 +48,7 @@ bower.json
 # b. ensure requests are actually made when tests first run and when cassettes
 # expire, so tests do not become obsolete.
 fixtures/vcr_cassettes/
+/public/packs
+/public/packs-test
+/elm-stuff
+/node_modules

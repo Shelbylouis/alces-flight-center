@@ -36,3 +36,16 @@
 .navbar-text {
   margin-right: 0.5rem;
 }
+
+body {
+  // Always show scroll bar, to avoid flash of sideways shifting page content
+  // if this changes to cross threshold where scrollbar would be needed while
+  // using app.
+  overflow-y: scroll;
+}
+
+footer {
+  // So Elm debugger appears in front of rather than behind footer in
+  // development.
+  z-index: -1;
+}

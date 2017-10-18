@@ -2,7 +2,7 @@ class Cluster < ApplicationRecord
   SUPPORT_TYPES = ['managed', 'advice'].freeze
 
   belongs_to :site
-  has_many :component_groups
+  has_many :component_groups, dependent: :destroy
   has_many :components, through: :component_groups, dependent: :destroy
   has_many :cases
 
@@ -14,5 +14,13 @@ class Cluster < ApplicationRecord
   # selecting support type.
   def support_type_enum
     SUPPORT_TYPES
+  end
+
+  def case_form_json
+    {
+      id: id,
+      name: name,
+      components: components.map(&:case_form_json),
+    }
   end
 end

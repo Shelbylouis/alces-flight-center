@@ -1,7 +1,7 @@
 class ComponentGroup < ApplicationRecord
   belongs_to :cluster
   belongs_to :component_type
-  has_many :components
+  has_many :components, dependent: :destroy
 
   validates :name, presence: true
 

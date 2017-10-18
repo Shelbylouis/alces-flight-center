@@ -17,11 +17,13 @@ class CasesController < ApplicationController
 
     if @case.save
       flash[:success] = 'Support case successfully created.'
-      redirect_to root_path
+
+      # Return no errors and success status to case form app; it will handle
+      # redirect appropriately.
+      render :json => {errors: ''}
     else
-      flash_object_errors(@case)
-      assign_form_variables
-      render :new
+      # Return errors to case form app.
+      render json: {errors: format_errors(@case)}, status: 422
     end
   end
 
@@ -33,7 +35,7 @@ class CasesController < ApplicationController
     else
       flash_object_errors(@case)
     end
-    redirect_to cases_path
+    redirect_to root_path
   end
 
   private
@@ -44,12 +46,17 @@ class CasesController < ApplicationController
     )
   end
 
-  def flash_object_errors(support_case)
-    # XXX Improve error handling
-    errors = support_case.errors.messages.map do |field, messages|
+  def format_errors(support_case)
+    # XXX Improve error handling - for now we just return a formatted string of
+    # all errors; could be worth returning JSON which can be decoded and
+    # displayed inline with fields in app.
+    support_case.errors.messages.map do |field, messages|
       "#{field} #{messages.join(', ')}"
     end.join('; ')
-    flash[:error] = "Error creating support case: #{errors}"
+  end
+
+  def flash_object_errors(support_case)
+    flash[:error] = "Error creating support case: #{format_errors(support_case)}"
   end
 
   def assign_form_variables

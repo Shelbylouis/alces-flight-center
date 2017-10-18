@@ -41,5 +41,5 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
 
   # Alces Flight Center custom config.
-  config.rt_interface_class = RequestTrackerInterface.to_s
+  config.rt_interface_class = FakeRequestTrackerInterface.to_s
 end

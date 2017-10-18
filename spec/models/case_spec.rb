@@ -1,9 +1,87 @@
 require 'rails_helper'
 
 RSpec.describe Case, type: :model do
+  describe '#valid?' do
+    context 'when case category does not require component' do
+      let :case_category { create(:case_category, requires_component: false) }
+
+      it 'passes if not associated with component' do
+        support_case = build(
+          :case,
+          case_category: case_category
+        )
+
+        expect(support_case.valid?).to be true
+      end
+
+      it 'fails if associated with component' do
+        support_case = build(
+          :case,
+          case_category: case_category,
+          component: create(:component)
+        )
+
+        expect(support_case.valid?).to be false
+        expect(support_case.errors.messages).to include(component: [/does not require a component/])
+      end
+    end
+
+    context 'when case category requires component' do
+      let :case_category { create(:case_category, requires_component: true) }
+      let :cluster { create(:cluster) }
+      let :component { create(:component, cluster: cluster) }
+
+      it 'passes if associated with component' do
+        support_case = build(
+          :case,
+          case_category: case_category,
+          component: component,
+          cluster: cluster
+        )
+
+        expect(support_case.valid?).to be true
+      end
+
+      it 'fails if not associated with component' do
+        support_case = build(
+          :case,
+          case_category: case_category
+        )
+
+        expect(support_case.valid?).to be false
+        expect(support_case.errors.messages).to include(component: [/requires a component/])
+      end
+
+      it 'passes if component part of associated cluster' do
+        support_case = build(
+          :case,
+          case_category: case_category,
+          component: component,
+          cluster: cluster
+        )
+
+        expect(support_case.valid?).to be true
+      end
+
+      it 'fails if component not part of associated cluster' do
+        another_cluster = create(:cluster)
+        component = create(:component, cluster: another_cluster)
+        support_case = build(
+          :case,
+          case_category: case_category,
+          component: component,
+          cluster: cluster
+        )
+
+        expect(support_case.valid?).to be false
+        expect(support_case.errors.messages).to include(component: [/not part of given cluster/])
+      end
+    end
+  end
+
   describe '#create_rt_ticket' do
     subject do
-      # XXX Consider best way to DRY up creating test data.
+      # XXX Use FactoryGirl here.
       cluster = Cluster.new(name: 'somecluster')
       case_category = CaseCategory.new(name: 'Crashed node')
       user = User.new(
