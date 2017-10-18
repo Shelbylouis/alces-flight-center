@@ -27,7 +27,28 @@ Cluster.create!(
     name: 'Rack A1 nodes',
     component_type: ComponentType.find_by_name('Server'),
     genders_host_range: 'node[01-20]'
-  )
+  ).tap do |group|
+
+    AssetRecordField.create!(
+      component_group: group,
+      asset_record_field_definition: AssetRecordFieldDefinition.find_by_field_name('Manufacturer/Model name'),
+      value: 'Dell C6420'
+    )
+    AssetRecordField.create!(
+      component_group: group,
+      asset_record_field_definition: AssetRecordFieldDefinition.find_by_field_name('OS Deployed/OS Profile'),
+      value: 'CentOS 7'
+    )
+
+    group.reload
+    group.components.each_with_index do |component, index|
+      AssetRecordField.create!(
+        component: component,
+        asset_record_field_definition: AssetRecordFieldDefinition.find_by_field_name('BMC IP Address/Netmask/Network/Gateway'),
+        value: "1.2.3.#{index + 1}"
+      )
+    end
+  end
 
   group = ComponentGroup.create!(
     cluster: cluster,
