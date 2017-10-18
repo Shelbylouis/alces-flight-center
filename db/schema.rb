@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170927103154) do
+ActiveRecord::Schema.define(version: 20170929115935) do
 
   create_table "case_categories", force: :cascade do |t|
     t.string "name", null: false
@@ -30,9 +30,11 @@ ActiveRecord::Schema.define(version: 20170927103154) do
     t.integer "cluster_id"
     t.integer "component_id"
     t.integer "user_id"
+    t.integer "rt_ticket_id", limit: 8
     t.index ["case_category_id"], name: "index_cases_on_case_category_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
+    t.index ["rt_ticket_id"], name: "index_cases_on_rt_ticket_id", unique: true
     t.index ["user_id"], name: "index_cases_on_user_id"
   end
 
