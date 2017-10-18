@@ -39,7 +39,7 @@ RSpec.shared_examples 'editable asset record fields' do
     end
 
     describe "when sent #{described_class::ASSET_RECORD_FIELD_WRITER_REGEX}" do
-      let :method { "#{definition.identifier}="}
+      let :method { "#{definition.identifier}=" }
 
       def field_for_definition(definition)
         subject
@@ -87,9 +87,9 @@ RSpec.shared_examples 'editable asset record fields' do
     end
 
     it 'behaves normally when sent other methods' do
-      expect{
+      expect do
         subject.send(:some_other_method)
-      }.to raise_error(NoMethodError)
+      end.to raise_error(NoMethodError)
     end
   end
 

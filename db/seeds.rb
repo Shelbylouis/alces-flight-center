@@ -76,7 +76,6 @@ CaseCategory.create!(name: 'Suspected Hardware Issue').tap do |hardware|
   )
 end
 
-
 CaseCategory.create!(name: 'End User Assistance').tap do |end_user_assistance|
   Issue.create!(
     name: 'Problem jobs',
@@ -149,8 +148,8 @@ all_types = [server, disk_array, network_switch]
     component_types: all_types,
     level: 'component',
     field_names: [
-      'Serial Number/Asset Tag'
-    ]
+      'Serial Number/Asset Tag',
+    ],
   },
   {
     component_types: all_types,
@@ -172,7 +171,7 @@ all_types = [server, disk_array, network_switch]
       'IP Address/Netmask/Network/Gateway',
       'Username/Password',
       'Non-standard settings (changes from standard base configuration listed as menu navigation links)',
-    ]
+    ],
   },
 
   # Define AssetRecordFieldDefinitions unique to server ComponentType.
@@ -194,15 +193,15 @@ all_types = [server, disk_array, network_switch]
       'Burn-in status',
       'Additional adapters installed, type and configuration notes',
       'Comments',
-    ]
+    ],
   },
   {
     component_types: [server],
     level: 'component',
     field_names: [
       'BMC IP Address/Netmask/Network/Gateway',
-    ]
-  }
+    ],
+  },
 ].each do |definition_group|
   definition_group[:field_names].each do |field_name|
     AssetRecordFieldDefinition.create!(

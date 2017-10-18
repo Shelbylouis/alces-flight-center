@@ -7,7 +7,7 @@ class AssetRecordField < ApplicationRecord
     private
 
     def unique_for_asset_validation_message
-      Proc.new do |field|
+      proc do |field|
         <<-EOF.squish
         a field for this definition already exists for this
         #{field.asset.readable_model_name}, you should edit the existing field
@@ -22,17 +22,17 @@ class AssetRecordField < ApplicationRecord
   validates :value, exclusion: { in: [nil] }
 
   validates :asset_record_field_definition,
-    uniqueness: {
-      scope: :component,
-      if: :component,
-      message: unique_for_asset_validation_message,
-  }
+            uniqueness: {
+              scope: :component,
+              if: :component,
+              message: unique_for_asset_validation_message,
+            }
   validates :asset_record_field_definition,
-    uniqueness: {
-      scope: :component_group,
-      if: :component_group,
-      message: unique_for_asset_validation_message
-  }
+            uniqueness: {
+              scope: :component_group,
+              if: :component_group,
+              message: unique_for_asset_validation_message,
+            }
 
   validates_with Validator
 

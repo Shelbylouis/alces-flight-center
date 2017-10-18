@@ -4,7 +4,6 @@ module Cluster::AdminConfig
 
   included do
     rails_admin do
-
       configure :canonical_name do
         hide
       end
@@ -16,6 +15,11 @@ module Cluster::AdminConfig
       end
 
       edit do
+        configure :description do
+          html_attributes rows: 10, cols: 100
+          help Constants::MARKDOWN_DESCRIPTION_EDIT_HELP
+        end
+
         configure :canonical_name do
           hide
         end
@@ -29,7 +33,6 @@ module Cluster::AdminConfig
           hide
         end
       end
-
     end
   end
 end

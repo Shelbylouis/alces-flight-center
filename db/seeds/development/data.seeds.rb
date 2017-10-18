@@ -3,8 +3,11 @@ site = Site.create!(
   name: 'Liverpool University',
   description: <<-EOF.strip_heredoc
     Clifton Computer Science Building
+
     Brownlow Hill
+
     Liverpool
+
     L69 72X
   EOF
 )
@@ -12,8 +15,24 @@ site = Site.create!(
 User.create!(
   site: site,
   name: 'Dr Cliff Addison',
-  email: 'caddison@liverpool.ac.uk',
-  password: 'password',
+  email: 'caddison@example.com',
+  password: 'password'
+)
+
+User.create!(
+  site: site,
+  name: 'Another User',
+  email: 'another.user@example.com',
+  password: 'password'
+)
+
+AdditionalContact.create!(
+  site: site,
+  email: 'mailing-list@example.com'
+)
+AdditionalContact.create!(
+  site: site,
+  email: 'another.contact@example.com'
 )
 
 Cluster.create!(
@@ -61,7 +80,6 @@ Cluster.create!(
     component.support_type = 'advice'
     component.save!
   end
-
 
   ComponentGroup.create!(
     cluster: cluster,

@@ -14,13 +14,11 @@ RSpec.describe Issue, type: :model do
     end
 
     it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq({
-        id: 1,
-        name: 'New user request',
-        detailsTemplate: 'Give a username',
-        requiresComponent: true,
-        supportType: 'managed',
-      })
+      expect(subject.case_form_json).to eq(id: 1,
+                                           name: 'New user request',
+                                           detailsTemplate: 'Give a username',
+                                           requiresComponent: true,
+                                           supportType: 'managed')
     end
   end
 end

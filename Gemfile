@@ -20,10 +20,11 @@ gem 'uglifier', '>= 1.3.0'
 # See https://github.com/rails/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
+gem 'aws-sdk-s3'
 gem 'clearance'
 gem 'http'
+gem 'markdown'
 gem 'rails_admin', '~> 1.2'
-gem 'aws-sdk-s3'
 gem 'seedbank'
 gem 'webpacker', '~> 3.0'
 

@@ -73,7 +73,6 @@ RSpec.describe Case, type: :model do
           it { is_expected.to be_valid }
         end
       end
-
     end
 
     context 'when issue requires component' do
@@ -146,13 +145,12 @@ RSpec.describe Case, type: :model do
 
   describe '#create_rt_ticket' do
     subject do
-      user = create(:user, name: 'Some User', email: requestor_email)
-
-      create(:case,
+      create(
+        :case,
         cluster: cluster,
         issue: issue,
         component: component,
-        user: user,
+        user: requestor,
         details: <<-EOF.strip_heredoc
           Oh no
           my node
@@ -161,16 +159,48 @@ RSpec.describe Case, type: :model do
       )
     end
 
-    let :issue { create(:issue, name: 'Crashed node', requires_component: true, case_category: case_category) }
+    let :requestor do
+      create(:user, name: 'Some User', email: 'someuser@somecluster.com')
+    end
+
+    let :site do
+      create(:site)
+    end
+
+    let :another_user do
+      create(:user, site: site, email: 'another.user@somecluster.com' )
+    end
+
+    let :additional_contact do
+      create(
+        :additional_contact,
+        site: site,
+        email: 'mailing-list@somecluster.com'
+      )
+    end
+
+    let :issue do
+      create(
+        :issue,
+        name: 'Crashed node',
+        requires_component: true,
+        case_category: case_category
+      )
+    end
+
     let :case_category { create(:case_category, name: 'Hardware issue') }
-    let :cluster { create(:cluster, name: 'somecluster') }
+    let :cluster { create(:cluster, site: site, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
-    let :requestor_email { 'someuser@somecluster.com' }
     let :request_tracker { subject.send(:request_tracker) }
 
     it 'creates rt ticket with correct properties' do
       expected_create_ticket_args = {
-        requestor_email: requestor_email,
+        requestor_email: requestor.email,
+
+        # CC'ed emails should be those for all the site contacts and additional
+        # contacts, apart from the requestor.
+        cc: [another_user.email, additional_contact.email],
+
         subject: 'Alces Flight Center ticket: somecluster - Crashed node',
         text: <<-EOF.strip_heredoc
           Cluster: somecluster
@@ -213,7 +243,7 @@ RSpec.describe Case, type: :model do
   describe '#mailto_url' do
     it 'creates correct mailto URL' do
       cluster = create(:cluster, name: 'somecluster')
-      issue = create(:issue, name:  'New user request')
+      issue = create(:issue, name: 'New user request')
       rt_ticket_id = 12345
 
       support_case = described_class.new(

@@ -21,7 +21,7 @@ class Issue < ApplicationRecord
       name: name,
       detailsTemplate: details_template,
       requiresComponent: requires_component,
-      supportType: support_type
+      supportType: support_type,
     }
   end
 end

@@ -5,6 +5,7 @@ class Case < ApplicationRecord
   belongs_to :user
 
   delegate :case_category, to: :issue
+  delegate :site, to: :cluster
 
   validates :details, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
@@ -15,7 +16,8 @@ class Case < ApplicationRecord
 
   def create_rt_ticket
     ticket = request_tracker.create_ticket(
-      requestor_email: user.email,
+      requestor_email: requestor_email,
+      cc: cc_emails,
       subject: rt_ticket_subject,
       text: rt_ticket_text
     )
@@ -42,6 +44,16 @@ class Case < ApplicationRecord
     # which would then cause things to blow up (e.g. see
     # https://stackoverflow.com/a/23008837).
     @rt ||= Rails.configuration.rt_interface_class.constantize.new
+  end
+
+  def requestor_email
+    user.email
+  end
+
+  def cc_emails
+    site.all_contacts
+      .reject { |contact| contact.email == requestor_email }
+      .map(&:email)
   end
 
   def rt_email_subject

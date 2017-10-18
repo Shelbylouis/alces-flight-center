@@ -10,7 +10,6 @@ module AdminConfig
 
     included do
       rails_admin do
-
         edit do
           # Define a textarea for every AssetRecordFieldDefinition when
           # creating/editing a Component. A Component instance responds to unique
@@ -18,9 +17,8 @@ module AdminConfig
           # RailsAdmin to transparently call the methods it expects to exist for
           # and have the behaviour we want to happen occur.
           AssetRecordFieldDefinition.all_identifiers.map do |definition_identifier|
-            self.instance_exec do
+            instance_exec do
               configure definition_identifier, :text do
-
                 html_attributes rows: 5, cols: 100
 
                 definition = AssetRecordFieldDefinition.definition_for_identifier(
@@ -38,7 +36,6 @@ module AdminConfig
             end
           end
         end
-
       end
     end
 
@@ -51,9 +48,9 @@ module AdminConfig
       component_type.asset_record_field_definitions.map(&:identifier)
     end
 
-    def respond_to?(method, include_private=false)
+    def respond_to?(method, include_private = false)
       if method.match?(ASSET_RECORD_FIELD_READER_REGEX) ||
-          method.match?(ASSET_RECORD_FIELD_WRITER_REGEX)
+         method.match?(ASSET_RECORD_FIELD_WRITER_REGEX)
         true
       else
         super
@@ -81,7 +78,6 @@ module AdminConfig
     end
 
     private
-
 
     def asset_record_field_value(definition_id:)
       asset_record_fields

@@ -20,10 +20,10 @@ class CasesController < ApplicationController
 
       # Return no errors and success status to case form app; it will handle
       # redirect appropriately.
-      render :json => {errors: ''}
+      render json: { errors: '' }
     else
       # Return errors to case form app.
-      render json: {errors: format_errors(@case)}, status: 422
+      render json: { errors: format_errors(@case) }, status: 422
     end
   end
 

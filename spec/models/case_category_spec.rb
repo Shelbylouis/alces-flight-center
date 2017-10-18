@@ -13,11 +13,9 @@ RSpec.describe CaseCategory, type: :model do
     end
 
     it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq({
-        id: 1,
-        name: 'Broken Cluster',
-        issues: subject.issues.map(&:case_form_json)
-      })
+      expect(subject.case_form_json).to eq(id: 1,
+                                           name: 'Broken Cluster',
+                                           issues: subject.issues.map(&:case_form_json))
     end
   end
 end

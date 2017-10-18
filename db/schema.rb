@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171012094322) do
+ActiveRecord::Schema.define(version: 20171016114644) do
+
+  create_table "additional_contacts", force: :cascade do |t|
+    t.string "email", null: false
+    t.integer "site_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["site_id"], name: "index_additional_contacts_on_site_id"
+  end
 
   create_table "asset_record_field_definitions", force: :cascade do |t|
     t.string "field_name", null: false

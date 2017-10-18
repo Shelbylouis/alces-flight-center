@@ -4,13 +4,11 @@ module User::AdminConfig
 
   included do
     rails_admin do
-
       edit do
         configure :password_confirmation do
           hide
         end
       end
-
     end
   end
 end

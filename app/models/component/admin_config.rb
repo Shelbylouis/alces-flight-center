@@ -4,7 +4,6 @@ module Component::AdminConfig
 
   included do
     rails_admin do
-
       show do
         configure :asset_record_view do
           label 'Asset record'
@@ -23,7 +22,6 @@ module Component::AdminConfig
           hide
         end
       end
-
     end
   end
 end

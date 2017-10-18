@@ -32,7 +32,7 @@ class AssetRecordField::Validator < ActiveModel::Validator
   end
 
   def validate_definition_associated_with_component_type
-    if !available_field_definitions.include?(record.definition)
+    unless available_field_definitions.include?(record.definition)
       record.errors.add(
         :asset_record_field_definition,
         'is not a field definition associated with component type'
