@@ -40,4 +40,15 @@ RSpec.feature 'password reset process', type: :feature do
     expect(reset_complete_email).to have_subject(/Password successfully reset/)
     expect(reset_complete_email).to have_body_text(/#{new_password}/)
   end
+
+  context 'when invalid/no parameters included in URL' do
+    it 'displays error and redirects to start of process' do
+      visit reset_password_complete_path(user_id: 'foo')
+
+      expect(current_path).to eq(passwords_path)
+      expect(
+        find('.alert-danger')
+      ).to have_text(/URL.*is invalid/)
+    end
+  end
 end
