@@ -1,5 +1,5 @@
 class CaseCategory < ApplicationRecord
-  include AdminConfig
+  include AdminConfig::CaseCategory
 
   has_many :issues
 

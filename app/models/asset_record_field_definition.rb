@@ -1,5 +1,5 @@
 class AssetRecordFieldDefinition < ApplicationRecord
-  include AdminConfig
+  include AdminConfig::AssetRecordFieldDefinition
 
   IDENTIFIER_ROOT = name.underscore.parameterize(separator: '_')
 
