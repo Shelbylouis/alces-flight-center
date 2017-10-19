@@ -1,5 +1,5 @@
 
-module Site::AdminConfig
+module AdminConfig::Site
   extend ActiveSupport::Concern
 
   included do

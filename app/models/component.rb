@@ -1,6 +1,6 @@
 class Component < ApplicationRecord
-  include AdminConfig
-  include ::AdminConfig::EditableAssetRecordFields
+  include AdminConfig::Component
+  include AdminConfig::Shared::EditableAssetRecordFields
   include HasSupportType
 
   SUPPORT_TYPES = SupportType::VALUES + ['inherit']

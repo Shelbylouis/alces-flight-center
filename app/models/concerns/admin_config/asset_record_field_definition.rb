@@ -1,5 +1,5 @@
 
-module AssetRecordFieldDefinition::AdminConfig
+module AdminConfig::AssetRecordFieldDefinition
   extend ActiveSupport::Concern
 
   included do

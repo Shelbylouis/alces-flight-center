@@ -1,5 +1,5 @@
 
-module ComponentGroup::AdminConfig
+module AdminConfig::ComponentGroup
   extend ActiveSupport::Concern
 
   included do
@@ -11,6 +11,8 @@ module ComponentGroup::AdminConfig
       end
 
       edit do
+        AdminConfig::Shared::EditableAssetRecordFields.define_asset_record_fields(self)
+
         configure :genders_host_range do
           help <<-EOF
             Specify a genders host range to have the corresponding components

@@ -1,5 +1,5 @@
 class Cluster < ApplicationRecord
-  include AdminConfig
+  include AdminConfig::Cluster
   include HasSupportType
   include MarkdownDescription
 
