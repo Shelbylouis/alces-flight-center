@@ -1,0 +1,47 @@
+version: '2'
+services:
+  # client:
+  #   image: launch-client
+  #   build:
+  #     context: ./client
+  #     args:
+  #       - USER_ID=${USER_ID}
+  #   command: yarn run start
+  #   volumes:
+  #     - ./client:/home/launch/launch
+  #     - ${HOME}/.cache/yarn:/home/launch/.cache/yarn
+  #     - ../flight-common:/home/flight-common
+  #   links:
+  #     - server
+  #   ports:
+  #     - "4002:4002"
+
+  rails-server:
+    image: flight-center-rails-server
+    build:
+      context: .
+      # args:
+      #   - USER_ID=${USER_ID}
+      #   - GROUP_ID=${GROUP_ID}
+    command: rails server -b '0.0.0.0'
+    # env_file: server/config/foreman/local.dev.env
+    # volumes:
+    #   - ./server:/app
+    ports:
+      - "3000:3000"
+    links:
+      - webpack-dev-server
+      - database
+
+  webpack-dev-server:
+    image: flight-center-webpack-dev-server
+    build:
+      context: .
+    command: bin/webpack-dev-server
+    # ports:
+    #   - "3035:3035"
+
+
+  database:
+    image: postgres:9.6
+
