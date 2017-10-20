@@ -4,7 +4,7 @@
     "repository": "https://github.com/user/project.git",
     "license": "BSD3",
     "source-directories": [
-        "/home/bob/projects/alces/alces-flight-center/app/javascript/packs"
+        "app/javascript/packs"
     ],
     "exposed-modules": [],
     "dependencies": {
