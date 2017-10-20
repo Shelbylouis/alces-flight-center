@@ -1,4 +1,6 @@
 class Case < ApplicationRecord
+  include AdminConfig::Case
+
   belongs_to :issue
   belongs_to :cluster
   belongs_to :component, required: false
