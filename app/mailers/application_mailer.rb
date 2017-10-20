@@ -1,5 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  # XXX Update me
-  default from: 'from@example.com'
+  default from: 'support@alces-flight.com'
   layout 'mailer'
 end

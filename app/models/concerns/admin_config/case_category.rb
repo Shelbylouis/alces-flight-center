@@ -1,5 +1,5 @@
 
-module CaseCategory::AdminConfig
+module AdminConfig::CaseCategory
   extend ActiveSupport::Concern
 
   included do

@@ -1,5 +1,5 @@
 class Cluster < ApplicationRecord
-  include AdminConfig
+  include AdminConfig::Cluster
   include HasSupportType
   include MarkdownDescription
 
@@ -58,6 +58,8 @@ class Cluster < ApplicationRecord
 
   module DocumentsRetriever
     class << self
+      ACCESS_KEY_ID = ENV.fetch('AWS_ACCESS_KEY_ID')
+      SECRET_ACCESS_KEY = ENV.fetch('AWS_SECRET_ACCESS_KEY')
       BUCKET = ENV.fetch('AWS_DOCUMENTS_BUCKET')
       REGION = ENV.fetch('AWS_REGION')
 
@@ -72,7 +74,11 @@ class Cluster < ApplicationRecord
       private
 
       def objects_under_path(path)
-        s3 = Aws::S3::Resource.new(region: REGION)
+        s3 = Aws::S3::Resource.new(
+          access_key_id: ACCESS_KEY_ID,
+          secret_access_key: SECRET_ACCESS_KEY,
+          region: REGION
+        )
         response = s3.client.list_objects(
           bucket: BUCKET,
           prefix: path

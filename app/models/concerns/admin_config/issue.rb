@@ -1,5 +1,5 @@
 
-module Issue::AdminConfig
+module AdminConfig::Issue
   extend ActiveSupport::Concern
 
   included do

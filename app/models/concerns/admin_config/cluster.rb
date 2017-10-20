@@ -1,5 +1,5 @@
 
-module Cluster::AdminConfig
+module AdminConfig::Cluster
   extend ActiveSupport::Concern
 
   included do

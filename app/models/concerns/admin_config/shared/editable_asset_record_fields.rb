@@ -1,38 +1,36 @@
 
-module AdminConfig
+module AdminConfig::Shared
   module EditableAssetRecordFields
     extend ActiveSupport::Concern
 
     ASSET_RECORD_FIELD_REGEX_PREFIX =
-      /^#{AssetRecordFieldDefinition::IDENTIFIER_ROOT}_(\d+)/
+      /^#{::AssetRecordFieldDefinition::IDENTIFIER_ROOT}_(\d+)/
     ASSET_RECORD_FIELD_READER_REGEX = /#{ASSET_RECORD_FIELD_REGEX_PREFIX}$/
     ASSET_RECORD_FIELD_WRITER_REGEX = /#{ASSET_RECORD_FIELD_REGEX_PREFIX}=$/
 
-    included do
-      rails_admin do
-        edit do
-          # Define a textarea for every AssetRecordFieldDefinition when
-          # creating/editing a Component. A Component instance responds to unique
-          # reader/writer methods for every AssetRecordFieldDefinition, allowing
-          # RailsAdmin to transparently call the methods it expects to exist for
-          # and have the behaviour we want to happen occur.
-          AssetRecordFieldDefinition.all_identifiers.map do |definition_identifier|
-            instance_exec do
-              configure definition_identifier, :text do
-                html_attributes rows: 5, cols: 100
+    def self.define_asset_record_fields(admin_config_context)
+      # Define a textarea for every AssetRecordFieldDefinition when
+      # creating/editing an object with associated AssetRecordFields. By
+      # including the EditableAssetRecordFields module in the object's class,
+      # it will respond to unique reader/writer methods for every
+      # AssetRecordFieldDefinition, allowing RailsAdmin to transparently call
+      # the methods it expects to exist and have the behaviour we want to
+      # happen occur.
+      ::AssetRecordFieldDefinition.all_identifiers.map do |definition_identifier|
+        admin_config_context.instance_exec do
+          configure definition_identifier, :text do
+            html_attributes rows: 5, cols: 100
 
-                definition = AssetRecordFieldDefinition.definition_for_identifier(
-                  definition_identifier
-                )
-                label definition.field_name
+            definition = ::AssetRecordFieldDefinition.definition_for_identifier(
+              definition_identifier
+            )
+            label definition.field_name
 
-                # If this AssetRecordFieldDefinition is not associated with the
-                # current Component's ComponentType, then do not include this
-                # field.
-                visible do
-                  bindings[:object].definition_identifiers.include?(definition_identifier)
-                end
-              end
+            # If this AssetRecordFieldDefinition is not associated with the
+            # current Component's ComponentType, then do not include this
+            # field.
+            visible do
+              bindings[:object].definition_identifiers.include?(definition_identifier)
             end
           end
         end

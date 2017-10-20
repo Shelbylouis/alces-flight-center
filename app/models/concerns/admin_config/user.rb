@@ -1,14 +1,14 @@
 
-module ComponentType::AdminConfig
+module AdminConfig::User
   extend ActiveSupport::Concern
 
   included do
     rails_admin do
       edit do
-        configure :component_groups do
+        configure :password_confirmation do
           hide
         end
-        configure :asset_record_field_definitions do
+        configure :confirmation_token do
           hide
         end
       end

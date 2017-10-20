@@ -67,8 +67,17 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Host to use when generating URls in emails.
-  # XXX Change this to correct URL when deploy.
-  config.action_mailer.default_url_options = { host: 'localhost:3000' }
+  config.action_mailer.default_url_options = { host: 'center.alces-flight.com' }
+
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch('SMTP_HOST'),
+    port: ENV['SMTP_PORT'] || '587',
+    enable_starttls_auto: true,
+    domain: 'alces-flight.com',
+    user_name: ENV.fetch('SMTP_USERNAME'),
+    password: ENV.fetch('SMTP_PASSWORD'),
+    authentication: :plain
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

@@ -1,5 +1,5 @@
 class Site < ApplicationRecord
-  include AdminConfig
+  include AdminConfig::Site
   include MarkdownDescription
 
   has_many :users, dependent: :destroy

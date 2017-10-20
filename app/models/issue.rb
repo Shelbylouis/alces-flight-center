@@ -1,5 +1,5 @@
 class Issue < ApplicationRecord
-  include AdminConfig
+  include AdminConfig::Issue
   include HasSupportType
 
   SUPPORT_TYPES = SupportType::VALUES + ['advice-only']

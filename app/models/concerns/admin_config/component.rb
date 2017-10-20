@@ -1,5 +1,5 @@
 
-module Component::AdminConfig
+module AdminConfig::Component
   extend ActiveSupport::Concern
 
   included do
@@ -12,6 +12,8 @@ module Component::AdminConfig
       end
 
       edit do
+        AdminConfig::Shared::EditableAssetRecordFields.define_asset_record_fields(self)
+
         configure :asset_record_fields do
           hide
         end
