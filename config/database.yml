@@ -81,6 +81,4 @@ test:
 #
 production:
   <<: *default
-  database: alces-flight-center_production
-  username: alces-flight-center
-  password: <%= ENV['ALCES-FLIGHT-CENTER_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
