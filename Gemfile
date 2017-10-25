@@ -63,6 +63,7 @@ end
 
 group :test do
   gem 'email_spec'
+  gem 'rails-controller-testing'
 end
 
 group :development do

@@ -10,7 +10,7 @@ class CasesController < ApplicationController
     @title = "Create new support case"
     @case = Case.new
     @case_categories = CaseCategory.all
-    @site_clusters = current_site.clusters
+    @clusters = current_site.clusters
   end
 
   def create
