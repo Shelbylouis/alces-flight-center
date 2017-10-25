@@ -31,7 +31,10 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :clusters, only: :show
+    resources :clusters, only: :show do
+      resources :cases, only: :new
+    end
+
     resources :components, only: :show
   end
 

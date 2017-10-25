@@ -10,7 +10,17 @@ class CasesController < ApplicationController
     @title = "Create new support case"
     @case = Case.new
     @case_categories = CaseCategory.all
-    @clusters = current_site.clusters
+
+    cluster_id = params[:cluster_id]
+    if cluster_id
+      cluster = Cluster.find_by(
+        id: cluster_id,
+        site: current_site
+      ) or not_found
+      @clusters = [cluster]
+    else
+      @clusters = current_site.clusters
+    end
   end
 
   def create
