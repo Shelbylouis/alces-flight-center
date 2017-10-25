@@ -23,17 +23,49 @@ decoder : D.Decoder State
 decoder =
     let
         createInitialState =
-            \clusters ->
-                \caseCategories ->
-                    { clusters = clusters
-                    , caseCategories = caseCategories
-                    , error = Nothing
-                    , isSubmitting = False
-                    }
+            \( clusters, caseCategories, singleComponentId ) ->
+                -- XXX Change state structure/how things are passed in to Elm
+                -- app to make invalid states in 'single component mode'
+                -- impossible?
+                case singleComponentId of
+                    Just id ->
+                        let
+                            singleClusterWithSingleComponentSelected =
+                                Cluster.setSelectedComponent clusters (Component.Id id)
+
+                            applicableCaseCategoriesAndIssues =
+                                -- Only include CaseCategorys, and Issues
+                                -- within them, which require a Component.
+                                SelectList.toList caseCategories
+                                    |> List.filter CaseCategory.hasAnyIssueRequiringComponent
+                                    |> Utils.selectListFromList
+                        in
+                        case applicableCaseCategoriesAndIssues of
+                            Just caseCategories ->
+                                D.succeed
+                                    { clusters = singleClusterWithSingleComponentSelected
+                                    , caseCategories = caseCategories
+                                    , error = Nothing
+                                    , isSubmitting = False
+                                    }
+
+                            Nothing ->
+                                D.fail "expected some Issues to exist requiring a Component, but none were found"
+
+                    Nothing ->
+                        D.succeed
+                            { clusters = clusters
+                            , caseCategories = caseCategories
+                            , error = Nothing
+                            , isSubmitting = False
+                            }
     in
-    D.map2 createInitialState
+    D.map3
+        (\a -> \b -> \c -> ( a, b, c ))
         (D.field "clusters" <| Utils.selectListDecoder Cluster.decoder)
         (D.field "caseCategories" <| Utils.selectListDecoder CaseCategory.decoder)
+        (D.field "singleComponentId" <| D.nullable D.int)
+        |> D.andThen createInitialState
 
 
 encoder : State -> E.Value

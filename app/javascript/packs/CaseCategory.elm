@@ -35,6 +35,12 @@ availableForSelectedCluster clusters caseCategory =
         |> List.any (Issue.availableForSelectedCluster clusters)
 
 
+hasAnyIssueRequiringComponent : CaseCategory -> Bool
+hasAnyIssueRequiringComponent caseCategory =
+    SelectList.toList caseCategory.issues
+        |> List.any .requiresComponent
+
+
 extractId : CaseCategory -> Int
 extractId caseCategory =
     case caseCategory.id of

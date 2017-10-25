@@ -15,6 +15,7 @@ const initializeFormApp = () => {
     const flags = {
       clusters: loadAttributeJson('data-clusters'),
       caseCategories: loadAttributeJson('data-case-categories'),
+      singleComponentId: loadAttributeJson('data-single-component-id'),
     }
 
     Elm.Main.embed(target, flags)
