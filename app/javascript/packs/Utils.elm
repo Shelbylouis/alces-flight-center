@@ -4,6 +4,11 @@ import Json.Decode as D
 import SelectList exposing (SelectList)
 
 
+sameId : b -> { a | id : b } -> Bool
+sameId id item =
+    item.id == id
+
+
 selectListDecoder : D.Decoder a -> D.Decoder (SelectList a)
 selectListDecoder itemDecoder =
     let

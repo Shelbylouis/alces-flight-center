@@ -17,6 +17,7 @@ import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import String.Extra
 import SupportType
+import Utils
 
 
 -- MODEL
@@ -458,7 +459,7 @@ handleChangeSelectedCluster : State -> Cluster.Id -> ( State, Cmd Msg )
 handleChangeSelectedCluster state clusterId =
     let
         newClusters =
-            SelectList.select (sameId clusterId) state.clusters
+            SelectList.select (Utils.sameId clusterId) state.clusters
     in
     ( { state | clusters = newClusters }
     , Cmd.none
@@ -469,7 +470,7 @@ handleChangeSelectedCaseCategory : State -> CaseCategory.Id -> ( State, Cmd Msg 
 handleChangeSelectedCaseCategory state caseCategoryId =
     let
         newCaseCategories =
-            SelectList.select (sameId caseCategoryId) state.caseCategories
+            SelectList.select (Utils.sameId caseCategoryId) state.caseCategories
     in
     ( { state | caseCategories = newCaseCategories }
     , Cmd.none
@@ -487,7 +488,7 @@ handleChangeSelectedIssue state issueId =
                 \caseCategory ->
                     if position == Selected then
                         { caseCategory
-                            | issues = SelectList.select (sameId issueId) caseCategory.issues
+                            | issues = SelectList.select (Utils.sameId issueId) caseCategory.issues
                         }
                     else
                         caseCategory
@@ -499,22 +500,10 @@ handleChangeSelectedIssue state issueId =
 
 handleChangeSelectedComponent : State -> Component.Id -> ( State, Cmd Msg )
 handleChangeSelectedComponent state componentId =
-    let
-        newClusters =
-            SelectList.mapBy updateSelectedClusterSelectedComponent state.clusters
-
-        updateSelectedClusterSelectedComponent =
-            \position ->
-                \cluster ->
-                    if position == Selected then
-                        { cluster
-                            | components =
-                                SelectList.select (sameId componentId) cluster.components
-                        }
-                    else
-                        cluster
-    in
-    ( { state | clusters = newClusters }
+    ( { state
+        | clusters =
+            Cluster.setSelectedComponent state.clusters componentId
+      }
     , Cmd.none
     )
 
@@ -545,11 +534,6 @@ handleChangeDetails state details =
                         issue
     in
     { state | caseCategories = newCaseCategories }
-
-
-sameId : b -> { a | id : b } -> Bool
-sameId id item =
-    item.id == id
 
 
 submitForm : State -> Cmd Msg
