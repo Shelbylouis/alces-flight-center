@@ -15,6 +15,7 @@ type alias State =
     { clusters : SelectList Cluster
     , caseCategories : SelectList CaseCategory
     , error : Maybe String
+    , singleComponent : Bool
     , isSubmitting : Bool
     }
 
@@ -46,6 +47,7 @@ decoder =
                                     { clusters = singleClusterWithSingleComponentSelected
                                     , caseCategories = caseCategories
                                     , error = Nothing
+                                    , singleComponent = True
                                     , isSubmitting = False
                                     }
 
@@ -57,6 +59,7 @@ decoder =
                             { clusters = clusters
                             , caseCategories = caseCategories
                             , error = Nothing
+                            , singleComponent = False
                             , isSubmitting = False
                             }
     in

@@ -212,7 +212,7 @@ maybeComponentsField state =
                     """This component is self-managed; if required you may only
                     request consultancy support from Alces Software."""
     in
-    if selectedIssue.requiresComponent then
+    if selectedIssue.requiresComponent && not state.singleComponent then
         Just
             (selectField "Component"
                 selectedClusterComponents
