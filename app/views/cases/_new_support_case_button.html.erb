@@ -1,6 +1,8 @@
 
 <% case_form_url = if defined?(cluster)
                      new_cluster_case_path(cluster_id: cluster.id)
+                   elsif defined?(component)
+                     new_component_case_path(component_id: component.id)
                    else
                      new_case_path
                    end
