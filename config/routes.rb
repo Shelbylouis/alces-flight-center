@@ -35,7 +35,9 @@ Rails.application.routes.draw do
       resources :cases, only: :new
     end
 
-    resources :components, only: :show
+    resources :components, only: :show do
+      resources :cases, only: :new
+    end
   end
 
   constraints Clearance::Constraints::SignedOut.new do

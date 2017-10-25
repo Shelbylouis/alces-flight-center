@@ -29,5 +29,26 @@ RSpec.describe CasesController, type: :controller do
         end.to raise_error(ActionController::RoutingError)
       end
     end
+
+    context 'from component-level route' do
+      let :component { create(:component, cluster: first_cluster) }
+
+      it "assigns just given component's cluster to @clusters" do
+        get :new, params: { component_id: component.id }
+        expect(assigns(:clusters)).to eq([first_cluster])
+      end
+
+      it 'assigns given component to @single_component' do
+        get :new, params: { component_id: component.id }
+        expect(assigns(:single_component)).to eq(component)
+      end
+
+      it 'gives 404 if component does not belong to user site' do
+        another_component = create(:component)
+        expect do
+          get :new, params: { component_id: another_component.id }
+        end.to raise_error(ActionController::RoutingError)
+      end
+    end
   end
 end
