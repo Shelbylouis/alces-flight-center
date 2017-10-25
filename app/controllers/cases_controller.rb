@@ -9,7 +9,8 @@ class CasesController < ApplicationController
   def new
     @title = "Create new support case"
     @case = Case.new
-    assign_form_variables
+    @case_categories = CaseCategory.all
+    @site_clusters = current_site.clusters
   end
 
   def create
@@ -57,10 +58,5 @@ class CasesController < ApplicationController
 
   def flash_object_errors(support_case)
     flash[:error] = "Error creating support case: #{format_errors(support_case)}"
-  end
-
-  def assign_form_variables
-    @case_categories = CaseCategory.all
-    @site_clusters = current_site.clusters
   end
 end
