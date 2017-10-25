@@ -110,7 +110,7 @@ caseForm state =
     let
         formElements =
             Maybe.Extra.values
-                [ clustersField state.clusters |> Just
+                [ maybeClustersField state.clusters
                 , caseCategoriesField state |> Just
                 , issuesField state |> Just
                 , maybeComponentsField state
@@ -121,14 +121,28 @@ caseForm state =
     Html.form [ onSubmit StartSubmit ] formElements
 
 
-clustersField : SelectList Cluster -> Html Msg
-clustersField clusters =
-    selectField "Cluster"
-        clusters
-        Cluster.extractId
-        .name
-        (always Valid)
-        ChangeSelectedCluster
+maybeClustersField : SelectList Cluster -> Maybe (Html Msg)
+maybeClustersField clusters =
+    let
+        singleCluster =
+            SelectList.toList clusters
+                |> List.length
+                |> (==) 1
+    in
+    if singleCluster then
+        -- Only one Cluster available => no need to display Cluster selection
+        -- field.
+        Nothing
+    else
+        Just
+            (selectField
+                "Cluster"
+                clusters
+                Cluster.extractId
+                .name
+                (always Valid)
+                ChangeSelectedCluster
+            )
 
 
 caseCategoriesField : State -> Html Msg
