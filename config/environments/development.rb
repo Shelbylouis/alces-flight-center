@@ -6,9 +6,11 @@ Rails.application.configure do
   # since you don't have to restart the web server when you make code changes.
   config.cache_classes = false
 
-  # Eager load to match production and catch loading problems early (see
-  # https://stackoverflow.com/a/40019108).
-  config.eager_load = true
+  # Using eager loading in development would be nice, to match production and
+  # catch loading problems early (see https://stackoverflow.com/a/40019108),
+  # but is causing issues at the moment (see
+  # https://stackoverflow.com/questions/44465118).
+  config.eager_load = false
 
   # Show full error reports.
   config.consider_all_requests_local = true
