@@ -54,7 +54,7 @@ RSpec.describe Cluster, type: :model do
     it 'returns all advice cluster components for cluster' do
       result = subject.advice_components
       expect(result).to all be_a(Component)
-      expect(result.length).to be 5
+      expect(result.length).to eq 5
     end
   end
 
@@ -78,7 +78,7 @@ RSpec.describe Cluster, type: :model do
           Development::Utils.upload_document_fixtures_for(subject)
 
           documents = subject.documents
-          expect(documents.length).to be 3
+          expect(documents.length).to eq 3
 
           expect(documents.first.name).to eq 'Alces+Flight+on+AWS.pdf'
           expect(documents.first.url).to match(/https:\/\/.*#{CGI.escape("Alces+Flight+on+AWS.pdf")}.*/)
