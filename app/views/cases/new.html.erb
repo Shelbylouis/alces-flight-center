@@ -3,6 +3,7 @@
 
 <div
   id='new-case-form'
-  data-clusters='<%= json_map(@site_clusters, :case_form_json) %>'
+  data-clusters='<%= json_map(@clusters, :case_form_json) %>'
   data-case-categories='<%= json_map(@case_categories, :case_form_json) %>'
+  <%= if @single_component then "data-single-component-id=#{@single_component.id}" end %>
 ></div>

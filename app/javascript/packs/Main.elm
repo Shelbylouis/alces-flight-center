@@ -17,6 +17,7 @@ import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import String.Extra
 import SupportType
+import Utils
 
 
 -- MODEL
@@ -110,7 +111,7 @@ caseForm state =
     let
         formElements =
             Maybe.Extra.values
-                [ clustersField state.clusters |> Just
+                [ maybeClustersField state.clusters
                 , caseCategoriesField state |> Just
                 , issuesField state |> Just
                 , maybeComponentsField state
@@ -121,14 +122,28 @@ caseForm state =
     Html.form [ onSubmit StartSubmit ] formElements
 
 
-clustersField : SelectList Cluster -> Html Msg
-clustersField clusters =
-    selectField "Cluster"
-        clusters
-        Cluster.extractId
-        .name
-        (always Valid)
-        ChangeSelectedCluster
+maybeClustersField : SelectList Cluster -> Maybe (Html Msg)
+maybeClustersField clusters =
+    let
+        singleCluster =
+            SelectList.toList clusters
+                |> List.length
+                |> (==) 1
+    in
+    if singleCluster then
+        -- Only one Cluster available => no need to display Cluster selection
+        -- field.
+        Nothing
+    else
+        Just
+            (selectField
+                "Cluster"
+                clusters
+                Cluster.extractId
+                .name
+                (always Valid)
+                ChangeSelectedCluster
+            )
 
 
 caseCategoriesField : State -> Html Msg
@@ -197,7 +212,18 @@ maybeComponentsField state =
                     """This component is self-managed; if required you may only
                     request consultancy support from Alces Software."""
     in
-    if selectedIssue.requiresComponent then
+    if state.singleComponent then
+        -- We're creating a Case for a specific Component => don't want to
+        -- allow selection of another Component, but do still want to display
+        -- any error between this Component and selected Issue.
+        Just
+            (hiddenInputWithVisibleError
+                (State.selectedComponent state)
+                validateComponent
+            )
+    else if selectedIssue.requiresComponent then
+        -- Issue requires a Component => allow selection from all Components
+        -- for Cluster.
         Just
             (selectField "Component"
                 selectedClusterComponents
@@ -207,6 +233,7 @@ maybeComponentsField state =
                 ChangeSelectedComponent
             )
     else
+        -- Issue does not require a Component => do not show any select.
         Nothing
 
 
@@ -299,13 +326,10 @@ formField fieldName item validation htmlFn additionalAttributes children =
         identifier =
             fieldIdentifier fieldName
 
-        classes =
-            "form-control " ++ bootstrapValidationClass validation
-
         attributes =
             List.append
                 [ id identifier
-                , class classes
+                , class (formControlClasses validation)
                 ]
                 additionalAttributes
 
@@ -317,10 +341,39 @@ formField fieldName item validation htmlFn additionalAttributes children =
             [ for identifier ]
             [ text fieldName ]
         , formElement
-        , div
-            [ class "invalid-feedback" ]
-            [ FieldValidation.error item validation |> text ]
+        , validationFeedback item validation
         ]
+
+
+hiddenInputWithVisibleError : a -> (a -> FieldValidation a) -> Html Msg
+hiddenInputWithVisibleError item validate =
+    let
+        validation =
+            validate item
+
+        formElement =
+            input
+                [ type_ "hidden"
+                , class (formControlClasses validation)
+                ]
+                []
+    in
+    div [ class "form-group" ]
+        [ formElement
+        , validationFeedback item validation
+        ]
+
+
+validationFeedback : a -> FieldValidation a -> Html msg
+validationFeedback item validation =
+    div
+        [ class "invalid-feedback" ]
+        [ FieldValidation.error item validation |> text ]
+
+
+formControlClasses : FieldValidation a -> String
+formControlClasses validation =
+    "form-control " ++ bootstrapValidationClass validation
 
 
 bootstrapValidationClass : FieldValidation a -> String
@@ -444,7 +497,7 @@ handleChangeSelectedCluster : State -> Cluster.Id -> ( State, Cmd Msg )
 handleChangeSelectedCluster state clusterId =
     let
         newClusters =
-            SelectList.select (sameId clusterId) state.clusters
+            SelectList.select (Utils.sameId clusterId) state.clusters
     in
     ( { state | clusters = newClusters }
     , Cmd.none
@@ -455,7 +508,7 @@ handleChangeSelectedCaseCategory : State -> CaseCategory.Id -> ( State, Cmd Msg 
 handleChangeSelectedCaseCategory state caseCategoryId =
     let
         newCaseCategories =
-            SelectList.select (sameId caseCategoryId) state.caseCategories
+            SelectList.select (Utils.sameId caseCategoryId) state.caseCategories
     in
     ( { state | caseCategories = newCaseCategories }
     , Cmd.none
@@ -473,7 +526,7 @@ handleChangeSelectedIssue state issueId =
                 \caseCategory ->
                     if position == Selected then
                         { caseCategory
-                            | issues = SelectList.select (sameId issueId) caseCategory.issues
+                            | issues = SelectList.select (Utils.sameId issueId) caseCategory.issues
                         }
                     else
                         caseCategory
@@ -485,22 +538,10 @@ handleChangeSelectedIssue state issueId =
 
 handleChangeSelectedComponent : State -> Component.Id -> ( State, Cmd Msg )
 handleChangeSelectedComponent state componentId =
-    let
-        newClusters =
-            SelectList.mapBy updateSelectedClusterSelectedComponent state.clusters
-
-        updateSelectedClusterSelectedComponent =
-            \position ->
-                \cluster ->
-                    if position == Selected then
-                        { cluster
-                            | components =
-                                SelectList.select (sameId componentId) cluster.components
-                        }
-                    else
-                        cluster
-    in
-    ( { state | clusters = newClusters }
+    ( { state
+        | clusters =
+            Cluster.setSelectedComponent state.clusters componentId
+      }
     , Cmd.none
     )
 
@@ -531,11 +572,6 @@ handleChangeDetails state details =
                         issue
     in
     { state | caseCategories = newCaseCategories }
-
-
-sameId : b -> { a | id : b } -> Bool
-sameId id item =
-    item.id == id
 
 
 submitForm : State -> Cmd Msg

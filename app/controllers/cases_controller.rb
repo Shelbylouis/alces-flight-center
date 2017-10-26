@@ -9,7 +9,18 @@ class CasesController < ApplicationController
   def new
     @title = "Create new support case"
     @case = Case.new
-    assign_form_variables
+    @case_categories = CaseCategory.all
+
+    cluster_id = params[:cluster_id]
+    component_id = params[:component_id]
+    @clusters = if cluster_id
+                  [current_site_cluster(id: cluster_id)]
+                elsif component_id
+                  @single_component = current_site_component(id: component_id)
+                  [@single_component.cluster]
+                else
+                  current_site.clusters
+    end
   end
 
   def create
@@ -40,6 +51,14 @@ class CasesController < ApplicationController
 
   private
 
+  def current_site_cluster(id:)
+    Cluster.find_by(id: id, site: current_site) || not_found
+  end
+
+  def current_site_component(id:)
+    current_site.components.find_by(id: id) || not_found
+  end
+
   def case_params
     params.require(:case).permit(
       :issue_id, :cluster_id, :component_id, :details
@@ -57,10 +76,5 @@ class CasesController < ApplicationController
 
   def flash_object_errors(support_case)
     flash[:error] = "Error creating support case: #{format_errors(support_case)}"
-  end
-
-  def assign_form_variables
-    @case_categories = CaseCategory.all
-    @site_clusters = current_site.clusters
   end
 end
