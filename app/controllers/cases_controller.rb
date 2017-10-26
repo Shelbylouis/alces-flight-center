@@ -13,20 +13,13 @@ class CasesController < ApplicationController
 
     cluster_id = params[:cluster_id]
     component_id = params[:component_id]
-    if cluster_id
-      cluster = Cluster.find_by(
-        id: cluster_id,
-        site: current_site
-      ) or not_found
-      @clusters = [cluster]
-    elsif component_id
-      component = current_site.components.find_by(
-        id: component_id
-      ) or not_found
-      @single_component = component
-      @clusters = [component.cluster]
-    else
-      @clusters = current_site.clusters
+    @clusters = if cluster_id
+                  [current_site_cluster(id: cluster_id)]
+                elsif component_id
+                  @single_component = current_site_component(id: component_id)
+                  [@single_component.cluster]
+                else
+                  current_site.clusters
     end
   end
 
@@ -57,6 +50,14 @@ class CasesController < ApplicationController
   end
 
   private
+
+  def current_site_cluster(id:)
+    Cluster.find_by(id: id, site: current_site) || not_found
+  end
+
+  def current_site_component(id:)
+    current_site.components.find_by(id: id) || not_found
+  end
 
   def case_params
     params.require(:case).permit(
