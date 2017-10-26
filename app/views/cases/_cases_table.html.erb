@@ -37,7 +37,7 @@
     </thead>
 
     <tbody>
-    <% cases.reverse.each do |c| %>
+    <% cases.order(created_at: :desc).each do |c| %>
       <% if archive || c.open %>
         <% if c.archived %>
           <tr
@@ -47,7 +47,11 @@
         <% else %>
           <tr>
         <% end %>
-          <td><%= c.created_at %></td>
+          <td
+            title="Support case created on <%= c.created_at.to_formatted_s(:long) %>"
+          >
+            <%= c.created_at.to_formatted_s(:short) %>
+          </td>
           <td><%= c.user.name %></td>
           <td><%= c.case_category.name %></td>
           <td><%= c.issue.name %></td>
