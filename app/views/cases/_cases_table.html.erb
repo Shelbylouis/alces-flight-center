@@ -37,7 +37,7 @@
     </thead>
 
     <tbody>
-    <% cases.reverse.each do |c| %>
+    <% cases.order(created_at: :desc).each do |c| %>
       <% if archive || c.open %>
         <% if c.archived %>
           <tr
