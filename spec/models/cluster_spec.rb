@@ -6,6 +6,58 @@ RSpec.describe Cluster, type: :model do
   include_examples 'canonical_name'
   include_examples 'markdown_description'
 
+  describe '#valid?' do
+    context 'when managed cluster' do
+      subject do
+        create(:managed_cluster)
+      end
+
+      context 'with managed node' do
+        before :each do
+          create(:managed_component, cluster: subject)
+        end
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'with advice node' do
+        before :each do
+          create(:advice_component, cluster: subject)
+        end
+
+        it { is_expected.to be_valid }
+      end
+    end
+
+    context 'when advice cluster' do
+      subject do
+        create(:advice_cluster)
+      end
+
+      context 'with managed node' do
+        before :each do
+          create(:managed_component, cluster: subject)
+          subject.reload
+        end
+
+        it 'should be invalid' do
+          expect(subject).to be_invalid
+          expect(subject.errors.messages).to include(
+            base: [/advice Cluster cannot be associated with managed Components/]
+          )
+        end
+      end
+
+      context 'with advice node' do
+        before :each do
+          create(:advice_component, cluster: subject)
+        end
+
+        it { is_expected.to be_valid }
+      end
+    end
+  end
+
   describe '#case_form_json' do
     subject do
       create(
@@ -48,6 +100,7 @@ RSpec.describe Cluster, type: :model do
         4.times { create(:component, cluster: cluster, support_type: 'inherit') }
         create(:component, cluster: cluster, support_type: 'managed')
         create(:component, cluster: cluster, support_type: 'advice')
+        cluster.reload
       end
     end
 

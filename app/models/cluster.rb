@@ -14,6 +14,7 @@ class Cluster < ApplicationRecord
   validates :name, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
   validates :canonical_name, presence: true
+  validate :validate_all_components_advice, if: :advice?
 
   before_validation CanonicalNameCreator.new, on: :create
 
@@ -53,6 +54,12 @@ class Cluster < ApplicationRecord
   end
 
   private
+
+  def validate_all_components_advice
+    unless components.all?(&:advice?)
+      errors.add(:base, 'advice Cluster cannot be associated with managed Components')
+    end
+  end
 
   Document = Struct.new(:name, :url)
 
