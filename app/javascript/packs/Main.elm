@@ -212,7 +212,18 @@ maybeComponentsField state =
                     """This component is self-managed; if required you may only
                     request consultancy support from Alces Software."""
     in
-    if selectedIssue.requiresComponent && not state.singleComponent then
+    if state.singleComponent then
+        -- We're creating a Case for a specific Component => don't want to
+        -- allow selection of another Component, but do still want to display
+        -- any error between this Component and selected Issue.
+        Just
+            (hiddenInputWithVisibleError
+                (State.selectedComponent state)
+                validateComponent
+            )
+    else if selectedIssue.requiresComponent then
+        -- Issue requires a Component => allow selection from all Components
+        -- for Cluster.
         Just
             (selectField "Component"
                 selectedClusterComponents
@@ -222,6 +233,7 @@ maybeComponentsField state =
                 ChangeSelectedComponent
             )
     else
+        -- Issue does not require a Component => do not show any select.
         Nothing
 
 
@@ -314,13 +326,10 @@ formField fieldName item validation htmlFn additionalAttributes children =
         identifier =
             fieldIdentifier fieldName
 
-        classes =
-            "form-control " ++ bootstrapValidationClass validation
-
         attributes =
             List.append
                 [ id identifier
-                , class classes
+                , class (formControlClasses validation)
                 ]
                 additionalAttributes
 
@@ -332,10 +341,39 @@ formField fieldName item validation htmlFn additionalAttributes children =
             [ for identifier ]
             [ text fieldName ]
         , formElement
-        , div
-            [ class "invalid-feedback" ]
-            [ FieldValidation.error item validation |> text ]
+        , validationFeedback item validation
         ]
+
+
+hiddenInputWithVisibleError : a -> (a -> FieldValidation a) -> Html Msg
+hiddenInputWithVisibleError item validate =
+    let
+        validation =
+            validate item
+
+        formElement =
+            input
+                [ type_ "hidden"
+                , class (formControlClasses validation)
+                ]
+                []
+    in
+    div [ class "form-group" ]
+        [ formElement
+        , validationFeedback item validation
+        ]
+
+
+validationFeedback : a -> FieldValidation a -> Html msg
+validationFeedback item validation =
+    div
+        [ class "invalid-feedback" ]
+        [ FieldValidation.error item validation |> text ]
+
+
+formControlClasses : FieldValidation a -> String
+formControlClasses validation =
+    "form-control " ++ bootstrapValidationClass validation
 
 
 bootstrapValidationClass : FieldValidation a -> String
