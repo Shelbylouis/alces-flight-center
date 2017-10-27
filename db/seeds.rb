@@ -172,11 +172,17 @@ all_types = [server, disk_array, network_switch]
   # ComponentTypes.
   {
     component_types: [disk_array, network_switch],
+    level: 'component',
+    field_names: [
+      'IP Address/Netmask/Network/Gateway',
+    ],
+  },
+  {
+    component_types: [disk_array, network_switch],
     level: 'group',
     field_names: [
       'Firmware revision',
       'Configuration profile applied',
-      'IP Address/Netmask/Network/Gateway',
       'Username/Password',
       'Non-standard settings (changes from standard base configuration listed as menu navigation links)',
     ],
