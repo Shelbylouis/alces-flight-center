@@ -10,15 +10,21 @@ module Cluster::DocumentsRetriever
 
     def retrieve(documents_path)
       objects_under_path(documents_path).map do |object|
-        object_bucket_path = Pathname.new(object.key)
-        name = object_bucket_path.relative_path_from(
-          Pathname.new(documents_path)
-        ).to_s
+        if object.size == 0
+          # An empty object ending with `/` is normally handled as a 'folder',
+          # which we don't want to display to users.
+          nil
+        else
+          object_bucket_path = Pathname.new(object.key)
+          name = object_bucket_path.relative_path_from(
+            Pathname.new(documents_path)
+          ).to_s
 
-        url = presigned_url_for(object)
+          url = presigned_url_for(object)
 
-        Document.new(name, url)
-      end
+          Document.new(name, url)
+        end
+      end.reject(&:nil?)
     end
 
     private

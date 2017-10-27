@@ -131,14 +131,19 @@ RSpec.describe Cluster, type: :model do
           Development::Utils.upload_document_fixtures_for(subject)
 
           documents = subject.documents
+
+          # `upload_document_fixtures_for` will upload 'folder' objects (S3
+          # doesn't have real folders but empty objects ending in `/` are
+          # normally displayed that way) for directories (as this is equivalent
+          # behaviour to AWS web interface), but `Cluster.documents` should
+          # only retrieve the non-'folder' objects.
           expect(documents.length).to eq 3
 
           expect(documents.first.name).to eq 'Alces+Flight+on+AWS.pdf'
           expect(documents.first.url).to match(/https:\/\/.*#{CGI.escape("Alces+Flight+on+AWS.pdf")}.*/)
 
-          # Loads document within 'folder' (S3 doesn't have real folders but
-          # matches standard prefix) including folder name in loaded Document
-          # name.
+          # Loads document within 'folder' with folder name included in
+          # Document name.
           expect(documents.last.name).to match(/nested\/\S+.pdf/)
         end
       end

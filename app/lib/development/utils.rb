@@ -13,14 +13,25 @@ module Development
         s3 = Aws::S3::Resource.new(region: ENV.fetch('AWS_REGION'))
         bucket = s3.bucket(ENV.fetch('AWS_DOCUMENTS_BUCKET'))
 
-        Pathname.glob("#{DOCUMENT_FIXTURES_PATH}/**/*").each do |document|
-          next unless document.file?
+        Pathname.glob("#{DOCUMENT_FIXTURES_PATH}/**/*").each do |fixture_path|
+
           document_object_path = File.join(
             cluster.documents_path,
-            document.relative_path_from(DOCUMENT_FIXTURES_PATH).to_s
+            fixture_path.relative_path_from(DOCUMENT_FIXTURES_PATH).to_s
           )
+          # Uploaded directory won't appear as 'folder' unless trailing `/`
+          # added.
+          document_object_path += '/' if fixture_path.directory?
+
           document_object = bucket.object(document_object_path)
-          document_object.upload_file(document)
+
+          if fixture_path.directory?
+            # Upload directory as empty object; this is functionally equivalent
+            # to what creating 'folder' in AWS interface does.
+            document_object.put(body: '')
+          else
+            document_object.upload_file(fixture_path)
+          end
         end
       end
     end
