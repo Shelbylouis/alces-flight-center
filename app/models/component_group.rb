@@ -8,6 +8,7 @@ class ComponentGroup < ApplicationRecord
   has_many :asset_record_fields
 
   validates :name, presence: true
+  validates_associated :cluster, :asset_record_fields
 
   attr_accessor :genders_host_range
 
