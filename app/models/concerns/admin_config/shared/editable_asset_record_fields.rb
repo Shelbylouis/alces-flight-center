@@ -8,7 +8,15 @@ module AdminConfig::Shared
     ASSET_RECORD_FIELD_READER_REGEX = /#{ASSET_RECORD_FIELD_REGEX_PREFIX}$/
     ASSET_RECORD_FIELD_WRITER_REGEX = /#{ASSET_RECORD_FIELD_REGEX_PREFIX}=$/
 
-    def self.define_asset_record_fields(admin_config_context)
+    # - `admin_config_context` = `self` within the `rails_admin do edit do ...`
+    # block we are defining the fields in.
+    # - `field_disabled` = Proc which takes an `AssetRecordFieldDefinition`
+    # instance and returns whether the field for setting this definition should
+    # be disabled; defaults to no fields being disabled.
+    def self.define_asset_record_fields(
+      admin_config_context,
+      field_disabled: lambda { |_definition| false }
+    )
       # Define a textarea for every AssetRecordFieldDefinition when
       # creating/editing an object with associated AssetRecordFields. By
       # including the EditableAssetRecordFields module in the object's class,
@@ -19,11 +27,26 @@ module AdminConfig::Shared
       ::AssetRecordFieldDefinition.all_identifiers.map do |definition_identifier|
         admin_config_context.instance_exec do
           configure definition_identifier, :text do
-            html_attributes rows: 5, cols: 100
-
             definition = ::AssetRecordFieldDefinition.definition_for_identifier(
               definition_identifier
             )
+
+            disabled = field_disabled.call(definition)
+
+            # Currently only a single reason that a field might be disabled
+            # exists; if more are added we should extract the reason displayed
+            # as title text from being hard-coded here.
+            title = if disabled
+                      'This field can only be set at the individual Component level'
+                    else
+                      nil
+                    end
+
+            html_attributes rows: 5,
+              cols: 100,
+              disabled: disabled,
+              title: title
+
             label definition.field_name
 
             # If this AssetRecordFieldDefinition is not associated with the
