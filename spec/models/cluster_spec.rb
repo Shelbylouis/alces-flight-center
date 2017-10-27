@@ -135,6 +135,11 @@ RSpec.describe Cluster, type: :model do
 
           expect(documents.first.name).to eq 'Alces+Flight+on+AWS.pdf'
           expect(documents.first.url).to match(/https:\/\/.*#{CGI.escape("Alces+Flight+on+AWS.pdf")}.*/)
+
+          # Loads document within 'folder' (S3 doesn't have real folders but
+          # matches standard prefix) including folder name in loaded Document
+          # name.
+          expect(documents.last.name).to match(/nested\/\S+.pdf/)
         end
       end
     end

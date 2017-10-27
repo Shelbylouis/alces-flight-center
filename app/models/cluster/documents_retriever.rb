@@ -10,8 +10,13 @@ module Cluster::DocumentsRetriever
 
     def retrieve(documents_path)
       objects_under_path(documents_path).map do |object|
-        name = File.basename(object.key)
+        object_bucket_path = Pathname.new(object.key)
+        name = object_bucket_path.relative_path_from(
+          Pathname.new(documents_path)
+        ).to_s
+
         url = presigned_url_for(object)
+
         Document.new(name, url)
       end
     end
