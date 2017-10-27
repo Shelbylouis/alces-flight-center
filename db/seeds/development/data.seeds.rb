@@ -99,13 +99,9 @@ site.clusters.create!(
   description: 'An additional cluster for development',
   support_type: 'advice'
 ).tap do |cluster|
-  group = cluster.component_groups.create!(
+  cluster.component_groups.create!(
     name: 'Additional cluster nodes',
     component_type: ComponentType.find_by_name('Server'),
     genders_host_range: 'anode[01-05]'
   )
-  group.reload
-  managed_component = group.components.last
-  managed_component.support_type = 'managed'
-  managed_component.save!
 end
