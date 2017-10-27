@@ -23,7 +23,7 @@ class ComponentGroup < ApplicationRecord
     new_node_names = expanded_genders_host_range - component_names
 
     new_node_names.map do |name|
-      Component.create!(name: name, component_group: self)
+      components.create!(name: name)
     end
   end
 
