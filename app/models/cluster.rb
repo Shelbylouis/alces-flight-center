@@ -19,6 +19,8 @@ class Cluster < ApplicationRecord
 
   before_validation CanonicalNameCreator.new, on: :create
 
+  after_create :create_automatic_services
+
   # Automatically picked up by rails_admin so only these options displayed when
   # selecting support type.
   def support_type_enum
@@ -59,6 +61,12 @@ class Cluster < ApplicationRecord
   def validate_all_components_advice
     unless components.all?(&:advice?)
       errors.add(:base, 'advice Cluster cannot be associated with managed Components')
+    end
+  end
+
+  def create_automatic_services
+    ServiceType.automatic.each do |service_type|
+      services.create!(name: service_type.name, service_type: service_type)
     end
   end
 end

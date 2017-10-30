@@ -91,4 +91,12 @@ FactoryGirl.define do
     asset_record_field_definition
     value ''
   end
+
+  factory :service_type do
+    name 'Some Service'
+
+    factory :automatic_service_type do
+      automatic true
+    end
+  end
 end
