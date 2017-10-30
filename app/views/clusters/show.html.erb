@@ -35,6 +35,36 @@
   </ul>
 </div>
 
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Services
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Support type</th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% @cluster.services.each do |s| %>
+      <tr>
+        <td width='50%'><%= link_to s.name, service_path(s) %></td>
+        <td width='50%'><%= s.readable_support_type.capitalize %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
 <% @cluster.component_groups.each do |group| %>
   <div class='card'>
     <div class='card-header'>
