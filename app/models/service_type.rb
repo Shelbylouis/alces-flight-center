@@ -1,5 +1,7 @@
 
 class ServiceType < ApplicationRecord
+  include AdminConfig::ServiceType
+
   has_many :services
 
   validates :name, presence: true

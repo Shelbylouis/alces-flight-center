@@ -32,6 +32,9 @@ module AdminConfig::Cluster
         configure :cases do
           hide
         end
+        configure :services do
+          hide
+        end
       end
     end
   end
