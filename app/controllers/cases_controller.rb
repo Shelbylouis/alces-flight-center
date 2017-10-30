@@ -26,15 +26,30 @@ class CasesController < ApplicationController
   def create
     @case = Case.new(case_params.merge(user: current_user))
 
-    if @case.save
-      flash[:success] = 'Support case successfully created.'
+    respond_to do |format|
+      if @case.save
+        flash[:success] = 'Support case successfully created.'
 
-      # Return no errors and success status to case form app; it will handle
-      # redirect appropriately.
-      render json: { errors: '' }
-    else
-      # Return errors to case form app.
-      render json: { errors: format_errors(@case) }, status: 422
+        format.json do
+          # Return no errors and success status to case form app; it will
+          # handle redirect appropriately.
+          render json: { errors: '' }
+        end
+      else
+        errors = format_errors(@case)
+
+        format.json do
+          # Return errors to case form app.
+          render json: { errors: errors }, status: 422
+        end
+      end
+
+      # HTML format should be used when using quick Case creation buttons, so
+      # we always want to redirect back to root page.
+      format.html do
+        flash[:error] = "Error creating support case: #{errors}." if errors
+        redirect_to root_path
+      end
     end
   end
 

@@ -63,6 +63,18 @@ RSpec.describe CasesController, type: :controller do
       }
     end
 
+    let :params_without_required_component do
+      valid_params.tap do |params|
+        params[:case][:component_id] = nil
+      end
+    end
+
+    def expect_case_created
+      user_cases = Case.where(user: user)
+      expect(user_cases.length).to eq 1
+      expect(user_cases.first.details).to eq('Useful info')
+    end
+
     context 'when JSON request' do
       let :response_json do
         JSON.parse(response.body).with_indifferent_access
@@ -74,20 +86,31 @@ RSpec.describe CasesController, type: :controller do
         expect(response).to have_http_status(:ok)
         expect(response_json).to match({errors: ''})
         expect(flash[:success]).to match(/successfully created/)
-
-        matching_cases = Case.where(user: user)
-        expect(matching_cases.length).to eq 1
-        expect(matching_cases.first.details).to eq('Useful info')
+        expect_case_created
       end
 
       it 'returns error status code and errors given invalid params' do
-        invalid_params = valid_params.tap do |params|
-          params[:case][:component_id] = nil
-        end
-        post :create, params: invalid_params, format: :json
+        post :create, params: params_without_required_component, format: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response_json).to match(errors: /component/)
+      end
+    end
+
+    context 'when HTML request' do
+      it 'creates Case and redirects given valid params' do
+        post :create, params: valid_params, format: :html
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:success]).to match(/successfully created/)
+        expect_case_created
+      end
+
+      it 'flashes errors and redirects given invalid params' do
+        post :create, params: params_without_required_component, format: :html
+
+        expect(response).to redirect_to(root_path)
+        expect(flash[:error]).to match(/Error creating support case: component/)
       end
     end
   end
