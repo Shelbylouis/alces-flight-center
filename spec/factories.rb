@@ -72,6 +72,10 @@ FactoryGirl.define do
     factory :advice_issue do
       support_type :advice
     end
+
+    factory :issue_requiring_component do
+      requires_component true
+    end
   end
 
   factory :case do
