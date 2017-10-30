@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ComponentGroup, type: :model do
-  include_examples 'editable asset record fields'
+  include_examples 'editable_asset_record_fields'
 
   describe '#genders_host_range=' do
     it 'causes any needed associated Components to be created on save, based on the expanded host range' do

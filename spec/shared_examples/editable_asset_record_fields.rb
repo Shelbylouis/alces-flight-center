@@ -1,5 +1,5 @@
 
-RSpec.shared_examples 'editable asset record fields' do
+RSpec.shared_examples 'editable_asset_record_fields' do
   describe '#method_missing' do
     let :subject { create(:component) }
 

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Component, type: :model do
-  include_examples 'editable asset record fields'
+  include_examples 'editable_asset_record_fields'
 
   describe '#case_form_json' do
     subject do
