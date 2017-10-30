@@ -99,4 +99,11 @@ FactoryGirl.define do
       automatic true
     end
   end
+
+  factory :service do
+    service_type
+    cluster
+    name 'Instance of Some Service'
+    support_type :inherit
+  end
 end
