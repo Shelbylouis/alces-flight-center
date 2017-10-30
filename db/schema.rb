@@ -10,7 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171017103257) do
+ActiveRecord::Schema.define(version: 20171030103231) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "additional_contacts", force: :cascade do |t|
     t.string "email", null: false
@@ -60,7 +63,7 @@ ActiveRecord::Schema.define(version: 20171017103257) do
     t.integer "cluster_id"
     t.integer "component_id"
     t.integer "user_id"
-    t.integer "rt_ticket_id", limit: 8
+    t.bigint "rt_ticket_id"
     t.boolean "archived", default: false, null: false
     t.integer "issue_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
@@ -118,6 +121,25 @@ ActiveRecord::Schema.define(version: 20171017103257) do
     t.index ["case_category_id"], name: "index_issues_on_case_category_id"
   end
 
+  create_table "service_types", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description"
+    t.boolean "automatic", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "services", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "support_type", default: "inherit", null: false
+    t.bigint "service_type_id"
+    t.bigint "cluster_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cluster_id"], name: "index_services_on_cluster_id"
+    t.index ["service_type_id"], name: "index_services_on_service_type_id"
+  end
+
   create_table "sites", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -141,4 +163,6 @@ ActiveRecord::Schema.define(version: 20171017103257) do
     t.index ["site_id"], name: "index_users_on_site_id"
   end
 
+  add_foreign_key "services", "clusters"
+  add_foreign_key "services", "service_types"
 end

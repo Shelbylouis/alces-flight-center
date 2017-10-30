@@ -8,6 +8,7 @@ class Cluster < ApplicationRecord
   belongs_to :site
   has_many :component_groups, dependent: :destroy
   has_many :components, through: :component_groups, dependent: :destroy
+  has_many :services, dependent: :destroy
   has_many :cases
 
   validates_associated :site
