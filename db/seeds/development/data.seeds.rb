@@ -12,56 +12,47 @@ site = Site.create!(
   EOF
 )
 
-User.create!(
-  site: site,
+site.users.create!(
   name: 'Dr Cliff Addison',
   email: 'caddison@example.com',
   password: 'password'
 )
 
-User.create!(
-  site: site,
+site.users.create!(
   name: 'Another User',
   email: 'another.user@example.com',
   password: 'password'
 )
 
-AdditionalContact.create!(
-  site: site,
+site.additional_contacts.create!(
   email: 'mailing-list@example.com'
 )
-AdditionalContact.create!(
-  site: site,
+site.additional_contacts.create!(
   email: 'another.contact@example.com'
 )
 
-Cluster.create!(
-  site: site,
+site.clusters.create!(
   name: 'Hamilton Research Computing Cluster',
   description: 'A cluster for research computing',
   support_type: 'managed'
 ).tap do |cluster|
-  ComponentGroup.create!(
-    cluster: cluster,
+  cluster.component_groups.create!(
     name: 'Rack A1 nodes',
     component_type: ComponentType.find_by_name('Server'),
     genders_host_range: 'node[01-20]'
   ).tap do |group|
 
-    AssetRecordField.create!(
-      component_group: group,
+    group.asset_record_fields.create!(
       asset_record_field_definition: AssetRecordFieldDefinition.find_by_field_name('Manufacturer/Model name'),
       value: 'Dell C6420'
     )
-    AssetRecordField.create!(
-      component_group: group,
+    group.asset_record_fields.create!(
       asset_record_field_definition: AssetRecordFieldDefinition.find_by_field_name('OS Deployed/OS Profile'),
       value: 'CentOS 7'
     )
 
-    group.reload
     group.components.each_with_index do |component, index|
-      AssetRecordField.create!(
+      component.asset_record_fields.create!(
         component: component,
         asset_record_field_definition: AssetRecordFieldDefinition.find_by_field_name('BMC IP Address/Netmask/Network/Gateway'),
         value: "1.2.3.#{index + 1}"
@@ -69,33 +60,31 @@ Cluster.create!(
     end
   end
 
-  group = ComponentGroup.create!(
-    cluster: cluster,
+  cluster.component_groups.create!(
     name: 'Self-managed nodes',
     component_type: ComponentType.find_by_name('Server'),
     genders_host_range: 'self_managed[01-03]'
-  )
-  group.reload
-  group.components.each do |component|
-    component.support_type = 'advice'
-    component.save!
+  ).tap do |group|
+    group.components.each do |component|
+      component.support_type = 'advice'
+      component.save!
+    end
   end
 
-  ComponentGroup.create!(
-    cluster: cluster,
+  cluster.component_groups.create!(
     name: 'Rack A1 switches',
     component_type: ComponentType.find_by_name('Network switch')
   ).tap do |group|
-    Component.create!(
+    group.components.create!(
       component_group: group,
       name: 'Rack A1 Dell N1545 1Gb Ethernet switch 1'
     )
-    Component.create!(
+    group.components.create!(
       component_group: group,
       name: 'Rack A1 Dell N1545 1Gb Ethernet switch 2 (self-managed)',
       support_type: 'advice'
     )
-    Component.create!(
+    group.components.create!(
       component_group: group,
       name: 'Rack A1 Omnipath Edge switch 45pt'
     )
@@ -105,20 +94,14 @@ Cluster.create!(
   Development::Utils.upload_document_fixtures_for(cluster)
 end
 
-Cluster.create!(
-  site: site,
+site.clusters.create!(
   name: 'Additional cluster',
   description: 'An additional cluster for development',
   support_type: 'advice'
 ).tap do |cluster|
-  group = ComponentGroup.create!(
-    cluster: cluster,
+  cluster.component_groups.create!(
     name: 'Additional cluster nodes',
     component_type: ComponentType.find_by_name('Server'),
     genders_host_range: 'anode[01-05]'
   )
-  group.reload
-  managed_component = group.components.last
-  managed_component.support_type = 'managed'
-  managed_component.save!
 end

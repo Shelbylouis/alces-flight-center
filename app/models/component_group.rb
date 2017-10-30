@@ -8,6 +8,7 @@ class ComponentGroup < ApplicationRecord
   has_many :asset_record_fields
 
   validates :name, presence: true
+  validates_associated :cluster, :asset_record_fields
 
   attr_accessor :genders_host_range
 
@@ -23,7 +24,7 @@ class ComponentGroup < ApplicationRecord
     new_node_names = expanded_genders_host_range - component_names
 
     new_node_names.map do |name|
-      Component.create!(name: name, component_group: self)
+      components.create!(name: name)
     end
   end
 

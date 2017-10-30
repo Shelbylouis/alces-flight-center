@@ -1,8 +1,7 @@
 
 CaseCategory.create!(name: 'User Management').tap do |user_management|
-  Issue.create!(
+  user_management.issues.create!(
     name: 'Additional users/groups',
-    case_category: user_management,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give the username, primary group, and any additional groups for
@@ -13,9 +12,8 @@ CaseCategory.create!(name: 'User Management').tap do |user_management|
 end
 
 CaseCategory.create!(name: 'Application Management').tap do |application_management|
-  Issue.create!(
+  application_management.issues.create!(
     name: 'From available Alces Gridware',
-    case_category: application_management,
     support_type: 'managed',
     details_template: <<-EOF.squish
       See https://gridware.alces-flight.com for the full directory of available
@@ -24,18 +22,16 @@ CaseCategory.create!(name: 'Application Management').tap do |application_managem
     EOF
 
   )
-  Issue.create!(
+  application_management.issues.create!(
     name: 'Custom open-source',
-    case_category: application_management,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give a URL where the open-source package to install can be found,
       and any special compilation settings or other additional details needed.
     EOF
   )
-  Issue.create!(
+  application_management.issues.create!(
     name: 'Custom commercial',
-    case_category: application_management,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give a URL where the commercial package to install can be found,
@@ -45,17 +41,15 @@ CaseCategory.create!(name: 'Application Management').tap do |application_managem
 end
 
 CaseCategory.create!(name: 'Quota/Fair Usage Management').tap do |quota_management|
-  Issue.create!(
+  quota_management.issues.create!(
     name: 'Storage quota changes',
-    case_category: quota_management,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give details of the storage quota changes you require.
     EOF
   )
-  Issue.create!(
+  quota_management.issues.create!(
     name: 'Scheduler changes',
-    case_category: quota_management,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give details of the scheduler changes you require.
@@ -64,9 +58,8 @@ CaseCategory.create!(name: 'Quota/Fair Usage Management').tap do |quota_manageme
 end
 
 CaseCategory.create!(name: 'Suspected Hardware Issue').tap do |hardware|
-  Issue.create!(
+  hardware.issues.create!(
     name: 'Hardware issue',
-    case_category: hardware,
     support_type: 'managed',
     requires_component: true,
     details_template: <<-EOF.squish
@@ -77,45 +70,40 @@ CaseCategory.create!(name: 'Suspected Hardware Issue').tap do |hardware|
 end
 
 CaseCategory.create!(name: 'End User Assistance').tap do |end_user_assistance|
-  Issue.create!(
+  end_user_assistance.issues.create!(
     name: 'Problem jobs',
-    case_category: end_user_assistance,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give as much information as possible about the problem job.
     EOF
 
   )
-  Issue.create!(
+  end_user_assistance.issues.create!(
     name: 'Job running how-to/assistance',
-    case_category: end_user_assistance,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give as much information as possible about the problems you are
       having running a job.
     EOF
   )
-  Issue.create!(
+  end_user_assistance.issues.create!(
     name: 'Job script how-to/assistance',
-    case_category: end_user_assistance,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give as much information as possible about the problems you are
       having with your job script.
     EOF
   )
-  Issue.create!(
+  end_user_assistance.issues.create!(
     name: 'Application problems/bugs',
-    case_category: end_user_assistance,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give as much information as possible about the application problem
       you are encountering .
     EOF
   )
-  Issue.create!(
+  end_user_assistance.issues.create!(
     name: 'Self application install assistance',
-    case_category: end_user_assistance,
     support_type: 'managed',
     details_template: <<-EOF.squish
       Please give as much information as possible about the application you are
@@ -125,18 +113,16 @@ CaseCategory.create!(name: 'End User Assistance').tap do |end_user_assistance|
 end
 
 CaseCategory.create!(name: 'Change Component Status').tap do |change_status|
-  Issue.create!(
+  change_status.issues.create!(
     name: 'Request self-management of component',
-    case_category: change_status,
     support_type: 'managed',
     requires_component: true,
     details_template: <<-EOF.squish
       Please indicate why you would like self-management of this component.
     EOF
   )
-  Issue.create!(
+  change_status.issues.create!(
     name: 'Relinquish self-management of component',
-    case_category: change_status,
     support_type: 'advice-only',
     requires_component: true,
     details_template: <<-EOF.squish
@@ -148,9 +134,8 @@ CaseCategory.create!(name: 'Change Component Status').tap do |change_status|
 end
 
 CaseCategory.create!(name: 'Consultancy').tap do |consultancy|
-  Issue.create!(
+  consultancy.issues.create!(
     name: 'Request custom consultancy',
-    case_category: consultancy,
     support_type: 'advice',
     details_template: <<-EOF.squish
       Please describe the specialist support you would like to request from
@@ -187,11 +172,17 @@ all_types = [server, disk_array, network_switch]
   # ComponentTypes.
   {
     component_types: [disk_array, network_switch],
+    level: 'component',
+    field_names: [
+      'IP Address/Netmask/Network/Gateway',
+    ],
+  },
+  {
+    component_types: [disk_array, network_switch],
     level: 'group',
     field_names: [
       'Firmware revision',
       'Configuration profile applied',
-      'IP Address/Netmask/Network/Gateway',
       'Username/Password',
       'Non-standard settings (changes from standard base configuration listed as menu navigation links)',
     ],

@@ -11,7 +11,10 @@ module AdminConfig::ComponentGroup
       end
 
       edit do
-        AdminConfig::Shared::EditableAssetRecordFields.define_asset_record_fields(self)
+        AdminConfig::Shared::EditableAssetRecordFields.define_asset_record_fields(
+          self,
+          field_disabled: lambda { |definition| !definition.settable_for_group? }
+        )
 
         configure :genders_host_range do
           help <<-EOF

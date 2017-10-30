@@ -10,7 +10,7 @@ class Component < ApplicationRecord
   has_one :cluster, through: :component_group
   has_many :asset_record_fields
 
-  validates_associated :component_group
+  validates_associated :component_group, :asset_record_fields
   validates :name, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
 
