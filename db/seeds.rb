@@ -226,6 +226,18 @@ all_types = [server, disk_array, network_switch]
   end
 end
 
+automatic_services = [
+  'User Management',
+  'Workload Scheduler Management',
+  'HPC Environment',
+]
+
+automatic_services.each do |service_name|
+  ServiceType.create!(name: service_name, automatic: true)
+end
+
+ServiceType.create!(name: 'File System', automatic: false)
+
 User.create!(
   name: 'Temporary admin',
   admin: true,
