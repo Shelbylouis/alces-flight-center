@@ -2,7 +2,7 @@
 RSpec.shared_examples 'markdown_description' do
   describe '#rendered_description' do
     let :class_factory_identifier do
-      described_class.to_s.downcase
+      SpecUtils.class_factory_identifier(described_class)
     end
 
     context 'when object has description' do
