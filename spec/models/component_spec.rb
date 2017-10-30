@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'shared_examples/editable_asset_record_fields'
 
 RSpec.describe Component, type: :model do
   include_examples 'editable asset record fields'

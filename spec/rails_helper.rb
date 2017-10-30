@@ -11,6 +11,9 @@ require 'webmock/rspec'
 require 'email_spec'
 require 'email_spec/rspec'
 
+# Load all shared examples.
+Dir[Rails.root.join('spec/shared_examples/**/*.rb')].each {|f| require f}
+
 require 'support/factory_girl.rb'
 require 'clearance/rspec'
 
