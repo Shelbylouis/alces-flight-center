@@ -1,9 +1,7 @@
 class Component < ApplicationRecord
   include AdminConfig::Component
   include AdminConfig::Shared::EditableAssetRecordFields
-  include HasSupportType
-
-  SUPPORT_TYPES = SupportType::VALUES + ['inherit']
+  include HasInheritableSupportType
 
   belongs_to :component_group
   has_one :component_type, through: :component_group
@@ -13,10 +11,6 @@ class Component < ApplicationRecord
   validates_associated :component_group, :asset_record_fields
   validates :name, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
-
-  def support_type
-    super == 'inherit' ? cluster.support_type : super
-  end
 
   # Automatically picked up by rails_admin so only these options displayed when
   # selecting support type.

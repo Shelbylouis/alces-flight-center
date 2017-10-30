@@ -1,6 +1,4 @@
 require 'rails_helper'
-require 'shared_examples/canonical_name'
-require 'shared_examples/markdown_description'
 
 RSpec.describe Cluster, type: :model do
   include_examples 'canonical_name'
@@ -147,6 +145,24 @@ RSpec.describe Cluster, type: :model do
           expect(documents.last.name).to match(/nested\/\S+.pdf/)
         end
       end
+    end
+  end
+
+  describe 'creation' do
+    let! :automatic_service_types do
+      ['User Management', 'Emotional Support'].map do |name|
+        create(:automatic_service_type, name: name)
+      end
+    end
+
+    it 'creates associated service for each existing automatic service type' do
+      cluster = create(:cluster)
+
+      cluster_service_names = cluster.services.map(&:name)
+      expect(cluster_service_names).to eq(automatic_service_types.map(&:name))
+
+      cluster_service_types = cluster.services.map(&:service_type)
+      expect(cluster_service_types).to eq(automatic_service_types)
     end
   end
 end

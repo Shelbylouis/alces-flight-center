@@ -11,7 +11,12 @@ require 'webmock/rspec'
 require 'email_spec'
 require 'email_spec/rspec'
 
-require 'support/factory_girl.rb'
+# Load all shared examples.
+Dir[Rails.root.join('spec/shared_examples/**/*.rb')].each {|f| require f}
+
+# Load spec support files.
+Dir[Rails.root.join('spec/support/**/*.rb')].each {|f| require f}
+
 require 'clearance/rspec'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
