@@ -76,6 +76,14 @@ FactoryGirl.define do
     factory :issue_requiring_component do
       requires_component true
     end
+
+    factory :request_component_becomes_advice_issue do
+      identifier Issue::IDENTIFIERS.request_component_becomes_advice
+    end
+
+    factory :request_component_becomes_managed_issue do
+      identifier Issue::IDENTIFIERS.request_component_becomes_managed
+    end
   end
 
   factory :case do
