@@ -8,6 +8,10 @@ module AdminConfig::Issue
         configure :details_template, :text do
           html_attributes rows: 5, cols: 100
         end
+
+        configure :identifier do
+          hide
+        end
       end
     end
   end

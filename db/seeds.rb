@@ -117,6 +117,7 @@ CaseCategory.create!(name: 'Change Component Status').tap do |change_status|
     name: 'Request self-management of component',
     support_type: 'managed',
     requires_component: true,
+    identifier: Issue::IDENTIFIERS.request_component_becomes_advice,
     details_template: <<-EOF.squish
       Please indicate why you would like self-management of this component.
     EOF
@@ -125,6 +126,7 @@ CaseCategory.create!(name: 'Change Component Status').tap do |change_status|
     name: 'Relinquish self-management of component',
     support_type: 'advice-only',
     requires_component: true,
+    identifier: Issue::IDENTIFIERS.request_component_becomes_managed,
     details_template: <<-EOF.squish
       Note that when a component becomes managed it must first be reset to its
       initial state, without any custom modifications. Please indicate why you
