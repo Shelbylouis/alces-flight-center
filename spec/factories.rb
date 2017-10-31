@@ -91,7 +91,6 @@ FactoryGirl.define do
     cluster
     user
     details "Oh no, my science isn't working"
-    rt_ticket_id 12345
   end
 
   factory :asset_record_field_definition do
