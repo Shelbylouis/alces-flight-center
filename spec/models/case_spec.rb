@@ -185,6 +185,16 @@ RSpec.describe Case, type: :model do
     end
   end
 
+  describe '#create' do
+    it 'only raises RecordInvalid when no Cluster' do
+      # Previously raised DelegationError as tried to use Cluster which wasn't
+      # present.
+      expect do
+        create(:case, cluster: nil)
+      end.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
   describe '#create_rt_ticket' do
     subject do
       create(

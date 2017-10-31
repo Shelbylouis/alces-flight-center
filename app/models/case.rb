@@ -17,6 +17,8 @@ class Case < ApplicationRecord
   before_validation :create_rt_ticket, on: :create
 
   def create_rt_ticket
+    return unless cluster
+
     ticket = request_tracker.create_ticket(
       requestor_email: requestor_email,
       cc: cc_emails,
