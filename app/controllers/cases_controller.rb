@@ -44,11 +44,10 @@ class CasesController < ApplicationController
         end
       end
 
-      # HTML format should be used when using quick Case creation buttons, so
-      # we always want to redirect back to root page.
       format.html do
         flash[:error] = "Error creating support case: #{errors}." if errors
-        redirect_to root_path
+        redirect_path = @case.cluster ? cluster_path(@case.cluster) : root_path
+        redirect_to redirect_path
       end
     end
   end

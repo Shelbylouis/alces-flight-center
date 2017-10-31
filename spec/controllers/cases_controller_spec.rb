@@ -98,10 +98,12 @@ RSpec.describe CasesController, type: :controller do
     end
 
     context 'when HTML request' do
+      let :expected_redirect_path { cluster_path(first_cluster) }
+
       it 'creates Case and redirects given valid params' do
         post :create, params: valid_params, format: :html
 
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(expected_redirect_path)
         expect(flash[:success]).to match(/successfully created/)
         expect_case_created
       end
@@ -109,8 +111,19 @@ RSpec.describe CasesController, type: :controller do
       it 'flashes errors and redirects given invalid params' do
         post :create, params: params_without_required_component, format: :html
 
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(expected_redirect_path)
         expect(flash[:error]).to match(/Error creating support case: component/)
+      end
+
+      context 'when not given Cluster' do
+        it 'redirects to root_path' do
+          params = valid_params.tap do |p|
+            p[:case].delete(:cluster_id)
+          end
+          post :create, params: params, format: :html
+
+          expect(response).to redirect_to(root_path)
+        end
       end
     end
   end
