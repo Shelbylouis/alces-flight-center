@@ -46,6 +46,8 @@ class Issue < ApplicationRecord
   end
 
   def case_form_json
+    return if requires_service
+
     {
       id: id,
       name: name,

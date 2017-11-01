@@ -6,10 +6,13 @@ class CaseCategory < ApplicationRecord
   validates :name, presence: true
 
   def case_form_json
+    issues_json = issues.map(&:case_form_json).reject(&:nil?)
+    return if issues_json.empty?
+
     {
       id: id,
       name: name,
-      issues: issues.map(&:case_form_json),
+      issues: issues_json,
     }
   end
 end
