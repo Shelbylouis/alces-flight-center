@@ -84,6 +84,14 @@ FactoryGirl.define do
     factory :request_component_becomes_managed_issue do
       identifier Issue::IDENTIFIERS.request_component_becomes_managed
     end
+
+    factory :request_service_becomes_advice_issue do
+      identifier Issue::IDENTIFIERS.request_service_becomes_advice
+    end
+
+    factory :request_service_becomes_managed_issue do
+      identifier Issue::IDENTIFIERS.request_service_becomes_managed
+    end
   end
 
   factory :case do

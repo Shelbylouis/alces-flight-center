@@ -55,10 +55,11 @@
     </thead>
 
     <tbody>
-    <% @cluster.services.each do |s| %>
+    <% @cluster.services.each do |service| %>
       <tr>
-        <td width='50%'><%= link_to s.name, service_path(s) %></td>
-        <td width='50%'><%= s.readable_support_type.capitalize %></td>
+        <td width='40%'><%= link_to service.name, service_path(service) %></td>
+        <td width='40%'><%= service.readable_support_type.capitalize %></td>
+        <td width='20%'><%= service.change_support_type_button %></td>
       </tr>
     <% end %>
     </tbody>
