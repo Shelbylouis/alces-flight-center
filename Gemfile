@@ -30,6 +30,7 @@ gem 'rails_email_preview', '~> 2.0.4'
 gem 'seedbank'
 gem 'validates_email_format_of'
 gem 'webpacker', '~> 3.0'
+gem 'draper'
 
 gem 'bootstrap', '~> 4.0.0.beta'
 gem 'jquery-rails' # Required for Bootstrap.

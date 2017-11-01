@@ -5,89 +5,107 @@ class Case::Validator < ActiveModel::Validator
   def validate(record)
     @record = record
 
-    validate_correct_component_relationship
-    validate_issue_allowed_for_cluster_or_component
+    PART_NAMES.each do |part_name|
+      validate_correct_cluster_part_relationship(part_name)
+    end
+    validate_issue_allowed_for_cluster_or_part
   end
 
   private
 
-  def validate_correct_component_relationship
-    if record.issue.requires_component
-      if !record.component
-        record.errors.add(:component, 'issue requires a component but one was not given')
-      elsif record.component.cluster != record.cluster
-        record.errors.add(:component, 'given component is not part of given cluster')
-      end
-    elsif record.component
-      record.errors.add(:component, 'issue does not require a component but one was given')
+  PART_NAMES = [:component, :service].freeze
+
+  def validate_correct_cluster_part_relationship(part_name)
+    part = part(part_name)
+    error = if part_required?(part_name)
+              if !part
+                "issue requires a #{part_name} but one was not given"
+              elsif part.cluster != record.cluster
+                "given #{part_name} is not part of given cluster"
+              end
+            elsif part
+              "issue does not require a #{part_name} but one was given"
+            end
+    record.errors.add(part_name, error) if error
+  end
+
+  def validate_issue_allowed_for_cluster_or_part
+    issue_errors_with_conditions.map do |error, condition|
+      record.errors.add(:issue, error) if condition
     end
   end
 
-  def validate_issue_allowed_for_cluster_or_component
+  def issue_errors_with_conditions
+    conditional_cluster_issue_errors.merge(
+      all_conditional_cluster_part_issue_errors
+    )
+  end
+
+  def conditional_cluster_issue_errors
     {
-      managed_issue_for_advice_component_error => managed_issue_for_advice_component?,
-      managed_issue_for_advice_cluster_error => managed_issue_for_advice_cluster?,
-      advice_only_issue_for_managed_component_error => advice_only_issue_for_managed_component?,
-      advice_only_issue_for_managed_cluster_error => advice_only_issue_for_managed_cluster?,
-    }.select { |_error, condition| condition }
-      .map do |error, _condition|
-      record.errors.add(:issue, error)
-    end
+      managed_issue_error_for('cluster') => managed_issue_for_advice_cluster?,
+      advice_only_issue_error_for('cluster') => advice_only_issue_for_managed_cluster?,
+    }
+  end
+
+  def all_conditional_cluster_part_issue_errors
+    PART_NAMES.map do |part_name|
+      conditional_cluster_part_issue_errors(part_name)
+    end.reduce(:merge)
+  end
+
+  def conditional_cluster_part_issue_errors(part_name)
+    {
+      managed_issue_error_for(part_name) => managed_issue_for_advice_part?(part_name),
+      advice_only_issue_error_for(part_name) => advice_only_issue_for_managed_part?(part_name),
+    }
   end
 
   def managed_issue_for_advice_cluster?
+    record.issue.managed? && no_parts_required? && record.cluster&.advice?
+  end
+
+  def managed_issue_for_advice_part?(part_name)
     record.issue.managed? &&
-      !record.issue.requires_component &&
-      record.cluster&.advice?
-  end
-
-  def managed_issue_for_advice_cluster_error
-    managed_issue_error_for('cluster')
-  end
-
-  def managed_issue_for_advice_component?
-    record.issue.managed? &&
-      record.issue.requires_component &&
-      record.component&.advice?
-  end
-
-  def managed_issue_for_advice_component_error
-    managed_issue_error_for('component')
+      part_required?(part_name) &&
+      part(part_name)&.advice?
   end
 
   def managed_issue_error_for(model_type)
     <<-EOF.squish
       is only available for #{SupportType::MANAGED_TEXT}
-      #{model_type.pluralize}, but given #{model_type} is
+      #{model_type.to_s.pluralize}, but given #{model_type} is
       #{SupportType::ADVICE_TEXT}
     EOF
   end
 
-  def advice_only_issue_for_managed_component?
-    record.issue.advice_only? &&
-      record.issue.requires_component &&
-      record.component.managed?
-  end
-
-  def advice_only_issue_for_managed_component_error
-    advice_only_issue_error_for('component')
-  end
-
   def advice_only_issue_for_managed_cluster?
-    record.issue.advice_only? &&
-      !record.issue.requires_component &&
-      record.cluster.managed?
+    record.issue.advice_only? && record.cluster.managed?
   end
 
-  def advice_only_issue_for_managed_cluster_error
-    advice_only_issue_error_for('cluster')
+  def advice_only_issue_for_managed_part?(part_name)
+    record.issue.advice_only? &&
+      part_required?(part_name) &&
+      part(part_name).managed?
   end
 
   def advice_only_issue_error_for(model_type)
     <<-EOF.squish
       is only available for #{SupportType::ADVICE_TEXT}
-      #{model_type.pluralize}, but given #{model_type} is
+      #{model_type.to_s.pluralize}, but given #{model_type} is
       #{SupportType::MANAGED_TEXT}
     EOF
+  end
+
+  def no_parts_required?
+    !PART_NAMES.map { |part_name| part_required?(part_name) }.any?
+  end
+
+  def part_required?(part_name)
+    record.issue.send("requires_#{part_name}")
+  end
+
+  def part(part_name)
+    record.send(part_name)
   end
 end

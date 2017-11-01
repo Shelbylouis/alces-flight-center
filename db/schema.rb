@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171030103231) do
+ActiveRecord::Schema.define(version: 20171031182236) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,10 +66,12 @@ ActiveRecord::Schema.define(version: 20171030103231) do
     t.bigint "rt_ticket_id"
     t.boolean "archived", default: false, null: false
     t.integer "issue_id"
+    t.bigint "service_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
     t.index ["issue_id"], name: "index_cases_on_issue_id"
     t.index ["rt_ticket_id"], name: "index_cases_on_rt_ticket_id", unique: true
+    t.index ["service_id"], name: "index_cases_on_service_id"
     t.index ["user_id"], name: "index_cases_on_user_id"
   end
 
@@ -118,6 +120,8 @@ ActiveRecord::Schema.define(version: 20171030103231) do
     t.datetime "updated_at", null: false
     t.string "details_template"
     t.string "support_type"
+    t.string "identifier"
+    t.boolean "requires_service", default: false, null: false
     t.index ["case_category_id"], name: "index_issues_on_case_category_id"
   end
 
@@ -163,6 +167,7 @@ ActiveRecord::Schema.define(version: 20171030103231) do
     t.index ["site_id"], name: "index_users_on_site_id"
   end
 
+  add_foreign_key "cases", "services"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
 end

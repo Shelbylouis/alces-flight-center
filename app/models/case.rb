@@ -4,6 +4,7 @@ class Case < ApplicationRecord
   belongs_to :issue
   belongs_to :cluster
   belongs_to :component, required: false
+  belongs_to :service, required: false
   belongs_to :user
 
   delegate :case_category, to: :issue
@@ -17,6 +18,8 @@ class Case < ApplicationRecord
   before_validation :create_rt_ticket, on: :create
 
   def create_rt_ticket
+    return unless cluster
+
     ticket = request_tracker.create_ticket(
       requestor_email: requestor_email,
       cc: cc_emails,
@@ -73,6 +76,7 @@ class Case < ApplicationRecord
       'Case category': case_category.name,
       'Issue': issue.name,
       'Associated component': component&.name,
+      'Associated service': service&.name,
       Details: details,
     }.reject { |_k, v| v.nil? }
 
