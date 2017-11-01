@@ -29,7 +29,7 @@
         <th>Category</th>
         <th>Issue</th>
         <th>Cluster</th>
-        <th>Associated component</th>
+        <th>Association</th>
         <th>Details</th>
         <th>Contact support</th>
         <th>Archive</th>
@@ -37,7 +37,7 @@
     </thead>
 
     <tbody>
-    <% cases.order(created_at: :desc).each do |c| %>
+    <% cases.order(created_at: :desc).decorate.each do |c| %>
       <% if archive || c.open %>
         <% if c.archived %>
           <tr
@@ -56,7 +56,7 @@
           <td><%= c.case_category.name %></td>
           <td><%= c.issue.name %></td>
           <td><%= c.cluster.name %></td>
-          <td><%= c.component&.name %></td>
+          <td><%= c.association_info %></td>
           <td><%= c.details %></td>
           <td><%= render 'cases/email_support_icon', support_case: c %></td>
           <td><%= render 'cases/archive_icon', support_case: c %></td>

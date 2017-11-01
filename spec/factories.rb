@@ -34,13 +34,6 @@ FactoryGirl.define do
     name 'User management'
   end
 
-  factory :case do
-    issue
-    cluster
-    user
-    details "Oh no, my science isn't working"
-  end
-
   factory :asset_record_field_definition do
     field_name 'Manufacturer/model name'
     level :group

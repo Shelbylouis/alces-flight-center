@@ -15,6 +15,10 @@ FactoryGirl.define do
       requires_component true
     end
 
+    factory :issue_requiring_service do
+      requires_service true
+    end
+
     factory :request_component_becomes_advice_issue do
       identifier Issue::IDENTIFIERS.request_component_becomes_advice
     end
