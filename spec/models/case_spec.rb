@@ -248,6 +248,7 @@ RSpec.describe Case, type: :model do
         cluster: cluster,
         issue: issue,
         component: component,
+        service: service,
         user: requestor,
         details: <<-EOF.strip_heredoc
           Oh no
@@ -281,14 +282,19 @@ RSpec.describe Case, type: :model do
       create(
         :issue,
         name: 'Crashed node',
-        requires_component: true,
+        requires_component: requires_component,
+        requires_service: requires_service,
         case_category: case_category
       )
     end
 
+    let :requires_component { true }
+    let :requires_service { true }
+
     let :case_category { create(:case_category, name: 'Hardware issue') }
     let :cluster { create(:cluster, site: site, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
+    let :service { create(:service, name: 'Some service', cluster: cluster) }
     let :request_tracker { subject.send(:request_tracker) }
 
     it 'creates rt ticket with correct properties' do
@@ -305,6 +311,7 @@ RSpec.describe Case, type: :model do
           Case category: Hardware issue
           Issue: Crashed node
           Associated component: node01
+          Associated service: Some service
           Details: Oh no
            my node
            is broken
@@ -321,13 +328,30 @@ RSpec.describe Case, type: :model do
     end
 
     context 'when no associated component' do
-      let :issue { create(:issue, requires_component: false) }
+      let :requires_component { false }
       let :component { nil }
 
       it 'does not include corresponding line in ticket text' do
         expect(request_tracker).to receive(:create_ticket).with(
           hash_excluding(
             text: /Associated component:/
+          )
+        ).and_return(
+          OpenStruct.new(id: :fake_ticket_id)
+        )
+
+        subject.create_rt_ticket
+      end
+    end
+
+    context 'when no associated service' do
+      let :requires_service { false }
+      let :service { nil }
+
+      it 'does not include corresponding line in ticket text' do
+        expect(request_tracker).to receive(:create_ticket).with(
+          hash_excluding(
+            text: /Associated service:/
           )
         ).and_return(
           OpenStruct.new(id: :fake_ticket_id)

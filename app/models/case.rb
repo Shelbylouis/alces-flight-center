@@ -76,6 +76,7 @@ class Case < ApplicationRecord
       'Case category': case_category.name,
       'Issue': issue.name,
       'Associated component': component&.name,
+      'Associated service': service&.name,
       Details: details,
     }.reject { |_k, v| v.nil? }
 
