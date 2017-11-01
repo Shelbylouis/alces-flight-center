@@ -4,6 +4,7 @@ class Case < ApplicationRecord
   belongs_to :issue
   belongs_to :cluster
   belongs_to :component, required: false
+  belongs_to :service, required: false
   belongs_to :user
 
   delegate :case_category, to: :issue

@@ -107,7 +107,8 @@ RSpec.describe Case, type: :model do
       attributes = {
         issue: issue,
         cluster: cluster,
-        component: component
+        component: component,
+        service: service
       }
 
       # If `part` is set, appropriately add Case attribute depending on `part`
@@ -116,6 +117,8 @@ RSpec.describe Case, type: :model do
         case part
         when Component
           attributes[:component] = part
+        when Service
+          attributes[:service] = part
         else
           raise "Unknown part class: #{part.class}"
         end
@@ -126,6 +129,7 @@ RSpec.describe Case, type: :model do
 
     let :cluster { create(:cluster) }
     let :component { nil }
+    let :service { nil }
     let :part { nil }
 
     let :issue { create(:issue, issue_attributes) }
@@ -135,13 +139,17 @@ RSpec.describe Case, type: :model do
     let :issue_attributes { attributes_for(:advice_issue) }
 
     include_examples 'associated Cluster part validation', :component
+    include_examples 'associated Cluster part validation', :service
 
-    context 'when issue does not require component' do
+    context 'when issue does not require component or service' do
       before :each do
-        issue_attributes.merge!(requires_component: false)
+        issue_attributes.merge!(
+          requires_component: false,
+          requires_service: false
+        )
       end
 
-      context 'when not associated with component' do
+      context 'when not associated with component or service' do
         it { is_expected.to be_valid }
       end
 
@@ -151,6 +159,15 @@ RSpec.describe Case, type: :model do
         it 'should be invalid' do
           expect(subject).not_to be_valid
           expect(subject.errors.messages).to include(component: [/does not require a component/])
+        end
+      end
+
+      context 'when associated with service' do
+        let :service { create(:service) }
+
+        it 'should be invalid' do
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to include(service: [/does not require a service/])
         end
       end
 
