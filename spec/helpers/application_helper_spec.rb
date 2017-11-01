@@ -15,5 +15,17 @@ RSpec.describe ApplicationHelper do
         )
       ).to eq(['one', 'two'].to_json)
     end
+
+    it 'filters out nil elements after map' do
+      expect(
+        json_map(
+          [
+            TestObject.new(:not_nil),
+            TestObject.new(nil),
+          ],
+          :property
+        )
+      ).to eq([:not_nil].to_json)
+    end
   end
 end

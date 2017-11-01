@@ -9,6 +9,6 @@ module ApplicationHelper
   # turn result into JSON; useful when want to transform collection before
   # turning into JSON.
   def json_map(enumerable, to_json_function)
-    enumerable.map(&to_json_function).to_json
+    enumerable.map(&to_json_function).reject(&:nil?).to_json
   end
 end
