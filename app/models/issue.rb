@@ -10,7 +10,9 @@ class Issue < ApplicationRecord
   # data.
   IDENTIFIERS = {
     request_component_becomes_advice: 'request_component_becomes_advice',
-    request_component_becomes_managed: 'request_component_becomes_managed'
+    request_component_becomes_managed: 'request_component_becomes_managed',
+    request_service_becomes_advice: 'request_service_becomes_advice',
+    request_service_becomes_managed: 'request_service_becomes_managed',
   }.to_struct
 
   belongs_to :case_category
@@ -26,6 +28,14 @@ class Issue < ApplicationRecord
 
     def request_component_becomes_managed_issue
       find_by_identifier(IDENTIFIERS.request_component_becomes_managed)
+    end
+
+    def request_service_becomes_advice_issue
+      find_by_identifier(IDENTIFIERS.request_service_becomes_advice)
+    end
+
+    def request_service_becomes_managed_issue
+      find_by_identifier(IDENTIFIERS.request_service_becomes_managed)
     end
   end
 
