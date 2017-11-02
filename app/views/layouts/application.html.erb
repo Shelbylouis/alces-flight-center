@@ -9,11 +9,15 @@
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'new_case_form' %>
+
+    <%= stylesheet_link_tag 'flight-branding/flight-chrome', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'flight-branding/fonts', media: 'all', 'data-turbolinks-track': 'reload' %>
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="/">Alces Flight Center</a>
+    <div id='brand-header'></div>
+    <nav class="navbar navbar-toggleable-md navbar-inverse product-bar fixed-top">
+      <%# <a class="navbar-brand" href="/">Alces Flight Center</a> %>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -36,42 +40,43 @@
       </div>
     </nav>
 
-    <% if @title %>
-      <div class="jumbotron">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col"></div>
-            <div class="col-6">
-              <h1 class="display-4"><%= @title %></h1>
-              <% if @subtitle %>
-                <p class="lead"><%= @subtitle %></p>
+    <div class='page-content'>
+
+      <% if @title %>
+        <div class="jumbotron">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col"></div>
+              <div class="col-6">
+                <h1 class="display-4"><%= @title %></h1>
+                <% if @subtitle %>
+                  <p class="lead"><%= @subtitle %></p>
               <% end %>
+              </div>
+              <div class="col"></div>
             </div>
-            <div class="col"></div>
           </div>
         </div>
-      </div>
-    <% end %>
+      <% end %>
 
-    <div class="container-fluid page-container">
-      <%= render 'partials/flash_alert', flash_key: :alert, alert_class: 'alert-danger' %>
-      <%= render 'partials/flash_alert', flash_key: :error, alert_class: 'alert-danger' %>
-      <%= render 'partials/flash_alert', flash_key: :success, alert_class: 'alert-success' %>
-      <%= render 'partials/flash_alert', flash_key: :notice, alert_class: 'alert-info' %>
+      <div class="container-fluid page-container">
+        <%= render 'partials/flash_alert', flash_key: :alert, alert_class: 'alert-danger' %>
+        <%= render 'partials/flash_alert', flash_key: :error, alert_class: 'alert-danger' %>
+        <%= render 'partials/flash_alert', flash_key: :success, alert_class: 'alert-success' %>
+        <%= render 'partials/flash_alert', flash_key: :notice, alert_class: 'alert-info' %>
 
-      <div class="row">
-        <div class="col"></div>
-        <div class="col-6">
-          <%= yield %>
+        <div class="row">
+          <div class="col"></div>
+          <div class="col-6">
+            <%= yield %>
+          </div>
+          <div class="col"></div>
         </div>
-        <div class="col"></div>
       </div>
+
     </div>
 
-    <footer class="footer">
-      <div class="container">
-        <span class="text-muted">© Alces Software Ltd 2017</span>
-      </div>
-    </footer>
+    <div id='brand-footer'></div>
+    <script src='/flight-branding/main.c559a37a.js'></script>
   </body>
 </html>

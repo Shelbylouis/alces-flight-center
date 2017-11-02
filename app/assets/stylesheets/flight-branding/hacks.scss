@@ -1,0 +1,38 @@
+
+.product-bar {
+  background-color: #2794d8;
+  box-shadow: 0px 0px 5px #707070;
+  margin-top: 100px;
+  z-index: 1029 !important;
+  min-height: 75px;
+  padding: 0.5rem 0.5rem;
+  position: fixed !important;
+}
+
+.page-content {
+  padding-top: 178px;
+}
+
+html {
+    background-color: black;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    // padding-top: 190px;
+    background-color: #fffdf6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    /*  text-transform: uppercase; */
+    font-weight: 700 !important;
+  }
