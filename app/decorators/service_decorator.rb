@@ -8,4 +8,8 @@ class ServiceDecorator < ApplicationDecorator
       part_id_symbol: :service_id
     )
   end
+
+  def path
+    h.service_path(self)
+  end
 end

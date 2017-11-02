@@ -24,10 +24,36 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <%# Add links like this here: %>
-          <%# <li class="nav-item"> %>
-          <%#   <%= link_to 'Hunter', :hunter, class: 'nav-link' %1> %>
-          <%# </li> %>
+
+          <% if signed_in? %>
+            <li class="nav-item">
+              <%= link_to (raw('<span class="fa fa-institution"></span> ') + current_site.name),
+                root_path,
+                class: "nav-link #{@cluster ? '' : 'nav-link--active'}"
+              %>
+            </li>
+
+            <% if @cluster %>
+              <li class="nav-item">
+                <%= link_to (raw('<span class="fa fa-cubes"></span> ') + @cluster.name),
+                  @cluster.decorate.path,
+                  class: "nav-link #{@cluster_part ? '' : 'nav-link--active'}"
+                %>
+
+                <% if @cluster_part %>
+                  <li class="nav-item">
+                    <%= link_to (raw('<span class="fa fa-cube"></span> ') + @cluster_part.name),
+                      @cluster_part.decorate.path,
+                      class: 'nav-link nav-link--active'
+                    %>
+                  </li>
+                <% end %>
+
+              </li>
+            <% end %>
+
+          <% end %>
+
         </ul>
         <% if signed_in? %>
           <span class="navbar-text text-light"><%= current_user.name %></span>

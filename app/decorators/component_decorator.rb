@@ -8,4 +8,8 @@ class ComponentDecorator < ApplicationDecorator
       part_id_symbol: :component_id
     )
   end
+
+  def path
+    h.component_path(self)
+  end
 end
