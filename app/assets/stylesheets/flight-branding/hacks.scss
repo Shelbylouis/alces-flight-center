@@ -1,18 +1,77 @@
 
 .product-bar {
+  position: fixed !important;
+
+  // Hacked and adapted from flight-reactware/lib/organisms/ProductBar.js
   background-color: #2794d8;
   box-shadow: 0px 0px 5px #707070;
   margin-top: 100px;
   z-index: 1029 !important;
   min-height: 75px;
-  padding: 0.5rem 0.5rem;
-  position: fixed !important;
+  padding: 0.5rem 0.5rem !important;
+
+  .navbar-nav {
+    .nav-item {
+      margin-left: 0.5rem !important;
+      margin-right: 0.5rem !important;
+      line-height: 20px;
+      font-size: 120%;
+      font-weight: 700;
+
+      .dropdown-toggle.active {
+        background-color: #2794d8;
+      }
+
+      a.dropdown-toggle.selected, a.active {
+        background-color: #2C3E50;
+        &:hover {
+          color: white !important;
+        }
+      }
+
+      a.dropdown-toggle {
+        border-radius: 5px;
+      }
+    }
+    .nav-item + .nav-item {
+      margin-left: 0;
+    }
+
+    .nav-link {
+      padding: 1rem !important;
+    }
+
+    .nav-link:hover {
+      color: #2C3E50 !important;
+    }
+
+    .nav-link--active:hover {
+      color: white !important;
+    }
+  }
+
+  .dropdown-menu {
+    background-color: #2794d8;
+  }
 }
 
+// Hacked and adapted from flight-reactware/lib/elements/NavLink.js.
+.nav-link {
+  background-color: #2794d8;
+  white-space: nowrap;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.nav-link--active {
+  background-color: #2C3E50;
+}
+
+// Wrapper around page content so shifted below header bars.
 .page-content {
   padding-top: 178px;
 }
 
+// Styles from @mjtko.
 html {
     background-color: black;
 }
