@@ -206,7 +206,10 @@ maybeServicesField : State -> Maybe (Html Msg)
 maybeServicesField state =
     let
         singleService =
-            Nothing
+            if state.singleService then
+                Just (State.selectedService state)
+            else
+                Nothing
     in
     maybePartsField "service"
         .services

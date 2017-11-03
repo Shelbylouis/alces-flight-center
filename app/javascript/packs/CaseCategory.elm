@@ -41,6 +41,12 @@ hasAnyIssueRequiringComponent caseCategory =
         |> List.any .requiresComponent
 
 
+hasAnyIssueRequiringService : CaseCategory -> Bool
+hasAnyIssueRequiringService caseCategory =
+    SelectList.toList caseCategory.issues
+        |> List.any .requiresService
+
+
 extractId : CaseCategory -> Int
 extractId caseCategory =
     case caseCategory.id of

@@ -7,6 +7,7 @@ module State
         , isInvalid
         , selectedComponent
         , selectedIssue
+        , selectedService
         )
 
 import CaseCategory exposing (CaseCategory)
@@ -27,6 +28,7 @@ type alias State =
     , caseCategories : SelectList CaseCategory
     , error : Maybe String
     , singleComponent : Bool
+    , singleService : Bool
     , isSubmitting : Bool
     }
 
@@ -59,19 +61,46 @@ decoder =
                                     , caseCategories = caseCategories
                                     , error = Nothing
                                     , singleComponent = True
+                                    , singleService = False
                                     , isSubmitting = False
                                     }
 
                             Nothing ->
                                 D.fail "expected some Issues to exist requiring a Component, but none were found"
 
-                    -- XXX handle SingleServiceMode
-                    _ ->
+                    SingleServiceMode id ->
+                        let
+                            singleClusterWithSingleServiceSelected =
+                                Cluster.setSelectedService clusters id
+
+                            applicableCaseCategoriesAndIssues =
+                                -- Only include CaseCategorys, and Issues
+                                -- within them, which require a Service.
+                                SelectList.toList caseCategories
+                                    |> List.filter CaseCategory.hasAnyIssueRequiringService
+                                    |> Utils.selectListFromList
+                        in
+                        case applicableCaseCategoriesAndIssues of
+                            Just caseCategories ->
+                                D.succeed
+                                    { clusters = singleClusterWithSingleServiceSelected
+                                    , caseCategories = caseCategories
+                                    , error = Nothing
+                                    , singleComponent = False
+                                    , singleService = True
+                                    , isSubmitting = False
+                                    }
+
+                            Nothing ->
+                                D.fail "expected some Issues to exist requiring a Service, but none were found"
+
+                    ClusterMode ->
                         D.succeed
                             { clusters = clusters
                             , caseCategories = caseCategories
                             , error = Nothing
                             , singleComponent = False
+                            , singleService = False
                             , isSubmitting = False
                             }
     in
