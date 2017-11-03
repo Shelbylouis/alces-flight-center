@@ -2,6 +2,7 @@ module State exposing (..)
 
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
+import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
 import Issue exposing (Issue)
 import Json.Decode as D
@@ -114,21 +115,20 @@ selectedComponent state =
         |> SelectList.selected
 
 
-componentAllowedForSelectedIssue : State -> Component -> Bool
-componentAllowedForSelectedIssue state component =
+clusterPartAllowedForSelectedIssue : State -> (Issue -> Bool) -> ClusterPart a -> Bool
+clusterPartAllowedForSelectedIssue state issueRequiresPart part =
     let
         issue =
             selectedIssue state
     in
-    if issue.requiresComponent then
-        case ( issue.supportType, component.supportType ) of
+    if issueRequiresPart issue then
+        case ( issue.supportType, part.supportType ) of
             ( Managed, Advice ) ->
-                -- An advice Component cannot be associated with a managed
-                -- issue.
+                -- An advice part cannot be associated with a managed issue.
                 False
 
             ( AdviceOnly, Managed ) ->
-                -- A managed Component cannot be associated with an advice-only
+                -- A managed part cannot be associated with an advice-only
                 -- issue.
                 False
 
@@ -136,7 +136,7 @@ componentAllowedForSelectedIssue state component =
                 -- Everything else is valid.
                 True
     else
-        -- This validation should always pass if component is not required.
+        -- This validation should always pass if part is not required.
         True
 
 
@@ -146,11 +146,14 @@ isInvalid state =
         issue =
             selectedIssue state
 
+        partAllowedForSelectedIssue =
+            clusterPartAllowedForSelectedIssue state
+
         component =
             selectedComponent state
     in
     List.any not
         [ Issue.detailsValid issue
         , Issue.availableForSelectedCluster state.clusters issue
-        , componentAllowedForSelectedIssue state component
+        , partAllowedForSelectedIssue .requiresComponent component
         ]
