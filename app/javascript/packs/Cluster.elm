@@ -53,3 +53,20 @@ setSelectedComponent clusters componentId =
                         cluster
     in
     SelectList.mapBy updateSelectedClusterSelectedComponent clusters
+
+
+setSelectedService : SelectList Cluster -> Service.Id -> SelectList Cluster
+setSelectedService clusters serviceId =
+    let
+        updateSelectedClusterSelectedService =
+            \position ->
+                \cluster ->
+                    if position == Selected then
+                        { cluster
+                            | services =
+                                SelectList.select (Utils.sameId serviceId) cluster.services
+                        }
+                    else
+                        cluster
+    in
+    SelectList.mapBy updateSelectedClusterSelectedService clusters

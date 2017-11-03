@@ -8,6 +8,7 @@ import Issue exposing (Issue)
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
+import Service exposing (Service)
 import SupportType exposing (SupportType(..))
 import Utils
 
@@ -88,6 +89,14 @@ encoder state =
                     |> E.int
             else
                 E.null
+
+        serviceIdValue =
+            if issue.requiresService then
+                selectedService state
+                    |> Service.extractId
+                    |> E.int
+            else
+                E.null
     in
     E.object
         [ ( "case"
@@ -95,6 +104,7 @@ encoder state =
                 [ ( "cluster_id", Cluster.extractId cluster |> E.int )
                 , ( "issue_id", Issue.extractId issue |> E.int )
                 , ( "component_id", componentIdValue )
+                , ( "service_id", serviceIdValue )
                 , ( "details", E.string issue.details )
                 ]
           )
@@ -112,6 +122,13 @@ selectedComponent : State -> Component
 selectedComponent state =
     SelectList.selected state.clusters
         |> .components
+        |> SelectList.selected
+
+
+selectedService : State -> Service
+selectedService state =
+    SelectList.selected state.clusters
+        |> .services
         |> SelectList.selected
 
 
@@ -151,9 +168,13 @@ isInvalid state =
 
         component =
             selectedComponent state
+
+        service =
+            selectedService state
     in
     List.any not
         [ Issue.detailsValid issue
         , Issue.availableForSelectedCluster state.clusters issue
         , partAllowedForSelectedIssue .requiresComponent component
+        , partAllowedForSelectedIssue .requiresService service
         ]

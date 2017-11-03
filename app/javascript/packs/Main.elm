@@ -15,6 +15,7 @@ import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
+import Service
 import State exposing (State)
 import String.Extra
 import SupportType exposing (HasSupportType)
@@ -116,6 +117,7 @@ caseForm state =
                 , caseCategoriesField state |> Just
                 , issuesField state |> Just
                 , maybeComponentsField state
+                , maybeServicesField state
                 , detailsField state |> Just
                 , submitButton state |> Just
                 ]
@@ -198,6 +200,21 @@ maybeComponentsField state =
         .requiresComponent
         state
         ChangeSelectedComponent
+
+
+maybeServicesField : State -> Maybe (Html Msg)
+maybeServicesField state =
+    let
+        singleService =
+            Nothing
+    in
+    maybePartsField "service"
+        .services
+        Service.extractId
+        singleService
+        .requiresService
+        state
+        ChangeSelectedService
 
 
 maybePartsField :
@@ -448,6 +465,7 @@ type Msg
     | ChangeSelectedCaseCategory String
     | ChangeSelectedIssue String
     | ChangeSelectedComponent String
+    | ChangeSelectedService String
     | ChangeDetails String
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
@@ -491,6 +509,10 @@ updateState msg state =
         ChangeSelectedComponent id ->
             stringToId Component.Id id
                 |> Maybe.map (handleChangeSelectedComponent state)
+
+        ChangeSelectedService id ->
+            stringToId Service.Id id
+                |> Maybe.map (handleChangeSelectedService state)
 
         ChangeDetails details ->
             Just
@@ -577,6 +599,16 @@ handleChangeSelectedComponent state componentId =
     ( { state
         | clusters =
             Cluster.setSelectedComponent state.clusters componentId
+      }
+    , Cmd.none
+    )
+
+
+handleChangeSelectedService : State -> Service.Id -> ( State, Cmd Msg )
+handleChangeSelectedService state serviceId =
+    ( { state
+        | clusters =
+            Cluster.setSelectedService state.clusters serviceId
       }
     , Cmd.none
     )
