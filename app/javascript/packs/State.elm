@@ -82,21 +82,26 @@ encoder state =
         cluster =
             SelectList.selected state.clusters
 
+        partIdValue =
+            \required ->
+                \selected ->
+                    \extractId ->
+                        if required issue then
+                            selected state |> extractId |> E.int
+                        else
+                            E.null
+
         componentIdValue =
-            if issue.requiresComponent then
-                selectedComponent state
-                    |> Component.extractId
-                    |> E.int
-            else
-                E.null
+            partIdValue
+                .requiresComponent
+                selectedComponent
+                Component.extractId
 
         serviceIdValue =
-            if issue.requiresService then
-                selectedService state
-                    |> Service.extractId
-                    |> E.int
-            else
-                E.null
+            partIdValue
+                .requiresService
+                selectedService
+                Service.extractId
     in
     E.object
         [ ( "case"
