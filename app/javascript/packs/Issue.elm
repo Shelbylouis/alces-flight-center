@@ -10,6 +10,7 @@ type alias Issue =
     { id : Id
     , name : String
     , requiresComponent : Bool
+    , requiresService : Bool
     , details : String
     , supportType : SupportType
     }
@@ -21,10 +22,11 @@ type Id
 
 decoder : D.Decoder Issue
 decoder =
-    D.map5 Issue
+    D.map6 Issue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
+        (D.field "requiresService" D.bool)
         (D.field "detailsTemplate" D.string)
         (D.field "supportType" SupportType.decoder)
 

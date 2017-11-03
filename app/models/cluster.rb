@@ -32,6 +32,7 @@ class Cluster < ApplicationRecord
       id: id,
       name: name,
       components: components.map(&:case_form_json),
+      services: services.map(&:case_form_json),
       supportType: support_type,
     }
   end

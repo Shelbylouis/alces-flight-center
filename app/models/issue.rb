@@ -51,6 +51,7 @@ class Issue < ApplicationRecord
       name: name,
       detailsTemplate: details_template,
       requiresComponent: requires_component,
+      requiresService: requires_service,
       supportType: support_type,
     }
   end
