@@ -1,0 +1,51 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+// Custom bootstrap variables must be set or imported *before* bootstrap.
+@import "bootstrap";
+
+.page-container {
+  margin-top: 1rem;
+  padding-bottom: 3rem;
+}
+
+.card {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+  .card-header {
+    li {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+.navbar-text {
+  margin-right: 0.5rem;
+}
+
+body {
+  // Always show scroll bar, to avoid flash of sideways shifting page content
+  // if this changes to cross threshold where scrollbar would be needed while
+  // using app.
+  overflow-y: scroll;
+}
+
+footer {
+  // So Elm debugger appears in front of rather than behind footer in
+  // development.
+  z-index: -1;
+}

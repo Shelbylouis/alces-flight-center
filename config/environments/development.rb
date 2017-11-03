@@ -6,7 +6,10 @@ Rails.application.configure do
   # since you don't have to restart the web server when you make code changes.
   config.cache_classes = false
 
-  # Do not eager load code on boot.
+  # Using eager loading in development would be nice, to match production and
+  # catch loading problems early (see https://stackoverflow.com/a/40019108),
+  # but is causing issues at the moment (see
+  # https://stackoverflow.com/questions/44465118).
   config.eager_load = false
 
   # Show full error reports.
@@ -31,6 +34,9 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
+  # Host to use when generating URls in emails.
+  config.action_mailer.default_url_options = { host: 'localhost:3000' }
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
@@ -51,4 +57,7 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  # Alces Flight Center custom config.
+  config.rt_interface_class = FakeRequestTrackerInterface.to_s
 end

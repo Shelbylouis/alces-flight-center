@@ -1,18 +1,48 @@
 
-<p>
-  <strong>Name:</strong>
-  <%= @component.name %>
-</p>
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Overview
+        </span>
+      </li>
+      <%= render 'cases/new_support_case_button', component: @component %>
+    </ul>
+  </div>
 
-<p>
-  <strong>Description:</strong>
-  <%= @component.description %>
-</p>
- 
-<p>
-  <strong>Component Type:</strong>
-  <%= @component.component_type %>
-</p>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+    <%= @component.readable_support_type.capitalize %> component
+  </li>
+</div>
 
-<%= link_to 'Back', cluster_path(@cluster) %>
-<%= link_to 'Edit', edit_cluster_component_path(@cluster, @component) %>
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+      <span class="navbar-brand">
+        Asset Record
+      </span>
+      </li>
+    </ul>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% @component.asset_record.each do |name, value| %>
+      <tr>
+      <td><%= name %></td>
+      <td><%= value %></td>
+    </tr>
+  <% end %>
+    </tbody>
+  </table>
+</div>

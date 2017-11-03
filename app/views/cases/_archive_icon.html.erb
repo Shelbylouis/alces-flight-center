@@ -1,0 +1,13 @@
+
+<% if support_case.archived %>
+  <%= icon 'x' %>
+<% else %>
+  <%= link_to raw(icon 'x', interactive: true),
+    archive_case_path(support_case.id),
+    method: :post,
+    title: 'Archive this support case if it has been resolved or is no longer relevant',
+    data: {
+      confirm: 'Are you sure you want to archive this support case?'
+    }
+  %>
+<% end %>

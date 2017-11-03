@@ -1,0 +1,18 @@
+
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Overview
+        </span>
+      </li>
+      <%= render 'cases/new_support_case_button', service: @service %>
+    </ul>
+  </div>
+
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+    <%= @service.readable_support_type.capitalize %> service
+  </li>
+</div>

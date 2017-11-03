@@ -1,38 +1,107 @@
 
-<p>
-  <strong>Name:</strong>
-  <%= @cluster.name %>
-</p>
 
-<p>
-  <strong>Description:</strong>
-  <%= @cluster.description %>
-</p>
- 
-<p>
-  <strong>Support Type:</strong>
-  <%= @cluster.support_type %>
-</p>
-<p>
-  <strong>Components</strong>
-  <table>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-    </tr>
-    <% @cluster.components.each do |component| %>
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Overview
+        </span>
+      </li>
+      <%= render 'cases/new_support_case_button', cluster: @cluster %>
+    </ul>
+  </div>
+
+  <%= render 'clusters/details', cluster: @cluster %>
+</div>
+
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Documents
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <ul class="list-group list-group-flush">
+    <% @cluster.documents.each do |document| %>
+      <li class="list-group-item">
+        <%= link_to document.name, document.url, target: '_blank' %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Services
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <table class="table">
+    <thead>
       <tr>
-        <td><%= component.name %></td>
-        <td><%= component.component_type %></td>
-        <td><%= link_to 'show', cluster_component_path(@cluster, component)  %></td>
-        <td><%= link_to 'edit', edit_cluster_component_path(@cluster, component)  %></td>
-        <td><%= link_to 'delete', cluster_component_path(@cluster, component),
-                method: :delete,
-                data: { confirm: 'Are you sure?' } %></td>
+        <th>Name</th>
+        <th>Support type</th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% @cluster.services.each do |service| %>
+      <tr>
+        <td width='40%'><%= link_to service.name, service_path(service) %></td>
+        <td width='40%'><%= service.readable_support_type.capitalize %></td>
+        <td width='20%'><%= service.change_support_type_button %></td>
       </tr>
     <% end %>
+    </tbody>
   </table>
-  <%= link_to 'New Component', new_cluster_component_path(@cluster) %>
-</p>
-<%= link_to 'Back', site_path(@site) %>
-<%= link_to 'Edit', edit_site_cluster_path(@site, @cluster) %>
+</div>
+
+<% @cluster.component_groups.each do |group| %>
+  <div class='card'>
+    <div class='card-header'>
+      <ul class="nav">
+        <li class="nav-item">
+          <span class="navbar-brand">
+            <% group_size = group.components.length %>
+            <%= group.name %> &mdash; <%= pluralize(group_size, group.component_type.name) %>
+          </span>
+        </li>
+      </ul>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Support type</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <% group.components.each do |component| %>
+        <tr>
+          <td width='40%'>
+            <%= link_to component.name, component_path(component) %>
+          </td>
+          <td width='40%'>
+            <%= component.readable_support_type.capitalize %>
+          </td>
+          <td width='20%'>
+            <%= component.change_support_type_button %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

@@ -1,14 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Supportware</title>
+    <title>Alces Flight Center</title>
     <%= csrf_meta_tags %>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag 'new_case_form' %>
+
+    <%= stylesheet_link_tag 'flight-branding/flight-chrome', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'flight-branding/fonts', media: 'all', 'data-turbolinks-track': 'reload' %>
   </head>
 
   <body>
-    <%= yield %>
+    <div id='brand-header'></div>
+    <nav class="navbar navbar-toggleable-md navbar-inverse product-bar fixed-top">
+      <%# <a class="navbar-brand" href="/">Alces Flight Center</a> %>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+
+          <% if signed_in? %>
+            <li class="nav-item">
+              <%= link_to (raw('<span class="fa fa-institution"></span> ') + current_site.name),
+                root_path,
+                class: "nav-link #{@cluster ? '' : 'nav-link--active'}"
+              %>
+            </li>
+
+            <% if @cluster %>
+              <li class="nav-item">
+                <%= link_to (raw('<span class="fa fa-cubes"></span> ') + @cluster.name),
+                  @cluster.decorate.path,
+                  class: "nav-link #{@cluster_part ? '' : 'nav-link--active'}"
+                %>
+
+                <% if @cluster_part %>
+                  <li class="nav-item">
+                    <%= link_to (raw('<span class="fa fa-cube"></span> ') + @cluster_part.name),
+                      @cluster_part.decorate.path,
+                      class: 'nav-link nav-link--active'
+                    %>
+                  </li>
+                <% end %>
+
+              </li>
+            <% end %>
+
+          <% end %>
+
+        </ul>
+        <% if signed_in? %>
+          <span class="navbar-text text-light"><%= current_user.name %></span>
+          <%= button_to 'Sign out',
+            sign_out_path,
+            method: :delete,
+            class: ['btn', 'btn-light']
+          %>
+        <% end %>
+      </div>
+    </nav>
+
+    <div class='page-content'>
+
+      <% if @title %>
+        <div class="jumbotron">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col"></div>
+              <div class="col-6">
+                <h1 class="display-4"><%= @title %></h1>
+                <% if @subtitle %>
+                  <p class="lead"><%= @subtitle %></p>
+              <% end %>
+              </div>
+              <div class="col"></div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="container-fluid page-container">
+        <%= render 'partials/flash_alert', flash_key: :alert, alert_class: 'alert-danger' %>
+        <%= render 'partials/flash_alert', flash_key: :error, alert_class: 'alert-danger' %>
+        <%= render 'partials/flash_alert', flash_key: :success, alert_class: 'alert-success' %>
+        <%= render 'partials/flash_alert', flash_key: :notice, alert_class: 'alert-info' %>
+
+        <div class="row">
+          <div class="col"></div>
+          <div class="col-6">
+            <%= yield %>
+          </div>
+          <div class="col"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id='brand-footer'></div>
+    <script src='/flight-branding/main.c559a37a.js'></script>
   </body>
 </html>

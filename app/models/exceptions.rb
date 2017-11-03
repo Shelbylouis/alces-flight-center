@@ -1,0 +1,2 @@
+
+class UnexpectedRtApiResponseException < StandardError; end

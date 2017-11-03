@@ -1,0 +1,19 @@
+<ul class="list-group list-group-flush">
+  <li class="list-group-item">
+    <%= cluster.rendered_description.html_safe %>
+  </li>
+  <li class="list-group-item">
+    <%= cluster.readable_support_type.capitalize %> cluster
+  </li>
+  <li class="list-group-item">
+    <%= cluster.managed_components.length %>
+    <%= SupportType::MANAGED_TEXT %>
+    <%= 'component'.pluralize(cluster.managed_components.length) %>
+  </li>
+  <li class="list-group-item">
+    <%= cluster.advice_components.tap {|c| puts c.to_json}.length %>
+    <%= SupportType::ADVICE_TEXT %>
+    <%= 'component'.pluralize(cluster.advice_components.length) %>
+  </li>
+</ul>
+

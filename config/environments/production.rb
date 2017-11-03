@@ -59,12 +59,25 @@ Rails.application.configure do
 
   # Use a real queuing backend for Active Job (and separate queues per environment)
   # config.active_job.queue_adapter     = :resque
-  # config.active_job.queue_name_prefix = "supportware_#{Rails.env}"
+  # config.active_job.queue_name_prefix = "alces_flight_center_#{Rails.env}"
   config.action_mailer.perform_caching = false
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
+
+  # Host to use when generating URls in emails.
+  config.action_mailer.default_url_options = { host: 'center.alces-flight.com' }
+
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch('SMTP_HOST'),
+    port: ENV['SMTP_PORT'] || '587',
+    enable_starttls_auto: true,
+    domain: 'alces-flight.com',
+    user_name: ENV.fetch('SMTP_USERNAME'),
+    password: ENV.fetch('SMTP_PASSWORD'),
+    authentication: :plain
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
@@ -88,4 +101,7 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  # Alces Flight Center custom config.
+  config.rt_interface_class = RequestTrackerInterface.to_s
 end

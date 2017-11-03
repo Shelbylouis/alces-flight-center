@@ -1,0 +1,19 @@
+
+<% case_form_url = if defined?(cluster)
+                     new_cluster_case_path(cluster_id: cluster.id)
+                   elsif defined?(component)
+                     new_component_case_path(component_id: component.id)
+                   elsif defined?(service)
+                     new_service_case_path(service_id: service.id)
+                   else
+                     new_case_path
+                   end
+                 %>
+
+<li class="nav-item">
+  <%= link_to 'Create new support case',
+    case_form_url,
+    class: ['nav-link', 'btn', 'btn-dark'],
+    role: 'button'
+  %>
+</li>
