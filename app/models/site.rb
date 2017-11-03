@@ -7,6 +7,7 @@ class Site < ApplicationRecord
   has_many :clusters, dependent: :destroy
   has_many :cases, through: :clusters
   has_many :components, through: :clusters
+  has_many :services, through: :clusters
 
   validates :name, presence: true
   validates :canonical_name, presence: true

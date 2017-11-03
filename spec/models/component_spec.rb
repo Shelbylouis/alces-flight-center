@@ -10,7 +10,6 @@ RSpec.describe Component, type: :model do
         :component,
         id: 1,
         name: 'Some Component',
-        cluster: create(:cluster, id: 2),
         support_type: :managed
       )
     end

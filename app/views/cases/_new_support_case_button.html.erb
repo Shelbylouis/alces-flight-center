@@ -3,6 +3,8 @@
                      new_cluster_case_path(cluster_id: cluster.id)
                    elsif defined?(component)
                      new_component_case_path(component_id: component.id)
+                   elsif defined?(service)
+                     new_service_case_path(service_id: service.id)
                    else
                      new_case_path
                    end

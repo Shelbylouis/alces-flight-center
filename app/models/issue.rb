@@ -46,13 +46,12 @@ class Issue < ApplicationRecord
   end
 
   def case_form_json
-    return if requires_service
-
     {
       id: id,
       name: name,
       detailsTemplate: details_template,
       requiresComponent: requires_component,
+      requiresService: requires_service,
       supportType: support_type,
     }
   end

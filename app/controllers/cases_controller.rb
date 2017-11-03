@@ -13,11 +13,15 @@ class CasesController < ApplicationController
 
     cluster_id = params[:cluster_id]
     component_id = params[:component_id]
+    service_id = params[:service_id]
     @clusters = if cluster_id
                   [current_site_cluster(id: cluster_id)]
                 elsif component_id
-                  @single_component = current_site_component(id: component_id)
-                  [@single_component.cluster]
+                  @single_part = current_site_component(id: component_id)
+                  [@single_part.cluster]
+                elsif service_id
+                  @single_part = current_site_service(id: service_id)
+                  [@single_part.cluster]
                 else
                   current_site.clusters
     end
@@ -71,6 +75,10 @@ class CasesController < ApplicationController
 
   def current_site_component(id:)
     current_site.components.find_by(id: id) || not_found
+  end
+
+  def current_site_service(id:)
+    current_site.services.find_by(id: id) || not_found
   end
 
   def case_params

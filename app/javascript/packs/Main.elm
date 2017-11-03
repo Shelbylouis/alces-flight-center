@@ -2,6 +2,7 @@ module Main exposing (..)
 
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
+import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
 import FieldValidation exposing (FieldValidation(..))
 import Html exposing (..)
@@ -14,9 +15,10 @@ import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
+import Service
 import State exposing (State)
 import String.Extra
-import SupportType
+import SupportType exposing (HasSupportType)
 import Utils
 
 
@@ -115,6 +117,7 @@ caseForm state =
                 , caseCategoriesField state |> Just
                 , issuesField state |> Just
                 , maybeComponentsField state
+                , maybeServicesField state
                 , detailsField state |> Just
                 , submitButton state |> Just
                 ]
@@ -184,57 +187,110 @@ issuesField state =
 maybeComponentsField : State -> Maybe (Html Msg)
 maybeComponentsField state =
     let
-        selectedClusterComponents =
-            SelectList.selected state.clusters |> .components
+        singleComponent =
+            if state.singleComponent then
+                Just (State.selectedComponent state)
+            else
+                Nothing
+    in
+    maybePartsField "component"
+        .components
+        Component.extractId
+        singleComponent
+        .requiresComponent
+        state
+        ChangeSelectedComponent
+
+
+maybeServicesField : State -> Maybe (Html Msg)
+maybeServicesField state =
+    let
+        singleService =
+            if state.singleService then
+                Just (State.selectedService state)
+            else
+                Nothing
+    in
+    maybePartsField "service"
+        .services
+        Service.extractId
+        singleService
+        .requiresService
+        state
+        ChangeSelectedService
+
+
+maybePartsField :
+    String
+    -> (Cluster -> SelectList (ClusterPart a))
+    -> (ClusterPart a -> Int)
+    -> Maybe (ClusterPart a)
+    -> (Issue -> Bool)
+    -> State
+    -> (String -> Msg)
+    -> Maybe (Html Msg)
+maybePartsField partName partsForCluster toId singlePart issueRequiresPart state changeMsg =
+    let
+        fieldLabel =
+            String.Extra.toTitleCase partName
+
+        partsForSelectedCluster =
+            SelectList.selected state.clusters |> partsForCluster
 
         selectedIssue =
             State.selectedIssue state
 
-        validateComponent =
-            FieldValidation.validateWithErrorForItem
-                errorForComponent
-                (State.componentAllowedForSelectedIssue state)
+        partRequired =
+            issueRequiresPart selectedIssue
 
-        labelForComponent =
-            \component ->
-                case component.supportType of
+        validatePart =
+            FieldValidation.validateWithErrorForItem
+                (errorForClusterPart partName)
+                (State.clusterPartAllowedForSelectedIssue state issueRequiresPart)
+
+        labelForPart =
+            \part ->
+                case part.supportType of
                     SupportType.Advice ->
-                        component.name ++ " (self-managed)"
+                        part.name ++ " (self-managed)"
 
                     _ ->
-                        component.name
-
-        errorForComponent =
-            \component ->
-                if SupportType.isManaged component then
-                    """This component is already fully managed."""
-                else
-                    """This component is self-managed; if required you may only
-                    request consultancy support from Alces Software."""
+                        part.name
     in
-    if state.singleComponent then
-        -- We're creating a Case for a specific Component => don't want to
-        -- allow selection of another Component, but do still want to display
-        -- any error between this Component and selected Issue.
-        Just
-            (hiddenInputWithVisibleError
-                (State.selectedComponent state)
-                validateComponent
-            )
-    else if selectedIssue.requiresComponent then
-        -- Issue requires a Component => allow selection from all Components
-        -- for Cluster.
-        Just
-            (selectField "Component"
-                selectedClusterComponents
-                Component.extractId
-                labelForComponent
-                validateComponent
-                ChangeSelectedComponent
-            )
+    case singlePart of
+        Just part ->
+            -- We're creating a Case for a specific part => don't want to allow
+            -- selection of another part, but do still want to display any
+            -- error between this part and selected Issue.
+            Just (hiddenInputWithVisibleError part validatePart)
+
+        Nothing ->
+            if partRequired then
+                -- Issue requires a part of this type => allow selection from
+                -- all parts of this type for Cluster.
+                Just
+                    (selectField fieldLabel
+                        partsForSelectedCluster
+                        toId
+                        labelForPart
+                        validatePart
+                        changeMsg
+                    )
+            else
+                -- Issue does not require a part of this type => do not show
+                -- any select.
+                Nothing
+
+
+errorForClusterPart : String -> HasSupportType a -> String
+errorForClusterPart partName part =
+    if SupportType.isManaged part then
+        "This " ++ partName ++ " is already fully managed."
     else
-        -- Issue does not require a Component => do not show any select.
-        Nothing
+        "This "
+            ++ partName
+            ++ """ is self-managed; if required you may only
+        request consultancy support from Alces Software."""
 
 
 detailsField : State -> Html Msg
@@ -412,6 +468,7 @@ type Msg
     | ChangeSelectedCaseCategory String
     | ChangeSelectedIssue String
     | ChangeSelectedComponent String
+    | ChangeSelectedService String
     | ChangeDetails String
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
@@ -455,6 +512,10 @@ updateState msg state =
         ChangeSelectedComponent id ->
             stringToId Component.Id id
                 |> Maybe.map (handleChangeSelectedComponent state)
+
+        ChangeSelectedService id ->
+            stringToId Service.Id id
+                |> Maybe.map (handleChangeSelectedService state)
 
         ChangeDetails details ->
             Just
@@ -541,6 +602,16 @@ handleChangeSelectedComponent state componentId =
     ( { state
         | clusters =
             Cluster.setSelectedComponent state.clusters componentId
+      }
+    , Cmd.none
+    )
+
+
+handleChangeSelectedService : State -> Service.Id -> ( State, Cmd Msg )
+handleChangeSelectedService state serviceId =
+    ( { state
+        | clusters =
+            Cluster.setSelectedService state.clusters serviceId
       }
     , Cmd.none
     )

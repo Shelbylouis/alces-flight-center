@@ -65,6 +65,7 @@ RSpec.describe Cluster, type: :model do
         support_type: :managed
       ).tap do |cluster|
         cluster.components = [create(:component, cluster: cluster)]
+        cluster.services = [create(:service, cluster: cluster)]
       end
     end
 
@@ -72,6 +73,7 @@ RSpec.describe Cluster, type: :model do
       expect(subject.case_form_json).to eq(id: 1,
                                            name: 'Some Cluster',
                                            components: subject.components.map(&:case_form_json),
+                                           services: subject.services.map(&:case_form_json),
                                            supportType: 'managed')
     end
   end
