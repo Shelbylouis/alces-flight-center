@@ -69,6 +69,18 @@ CaseCategory.create!(name: 'Suspected Hardware Issue').tap do |hardware|
   )
 end
 
+CaseCategory.create!(name: 'Suspected Service Issue').tap do |service|
+  service.issues.create!(
+    name: 'Service issue',
+    support_type: 'managed',
+    requires_service: true,
+    details_template: <<-EOF.squish
+      Please give as much additional information as possible about the
+      suspected service issue.
+    EOF
+  )
+end
+
 CaseCategory.create!(name: 'End User Assistance').tap do |end_user_assistance|
   end_user_assistance.issues.create!(
     name: 'Problem jobs',
