@@ -38,6 +38,11 @@ extractId cluster =
             id
 
 
+
+-- XXX de-duplicate following two functions; also
+-- Main.handleChangeSelectedIssue is similar.
+
+
 setSelectedComponent : SelectList Cluster -> Component.Id -> SelectList Cluster
 setSelectedComponent clusters componentId =
     let
