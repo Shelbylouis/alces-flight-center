@@ -35,16 +35,15 @@ availableForSelectedCluster clusters caseCategory =
         |> List.any (Issue.availableForSelectedCluster clusters)
 
 
-hasAnyIssueRequiringComponent : CaseCategory -> Bool
-hasAnyIssueRequiringComponent caseCategory =
-    SelectList.toList caseCategory.issues
-        |> List.any .requiresComponent
-
-
-hasAnyIssueRequiringService : CaseCategory -> Bool
-hasAnyIssueRequiringService caseCategory =
-    SelectList.toList caseCategory.issues
-        |> List.any .requiresService
+filterByIssues : SelectList CaseCategory -> (Issue -> Bool) -> Maybe (SelectList CaseCategory)
+filterByIssues caseCategories condition =
+    let
+        caseCategoryHasMatchingIssues =
+            .issues >> SelectList.toList >> List.any condition
+    in
+    SelectList.toList caseCategories
+        |> List.filter caseCategoryHasMatchingIssues
+        |> Utils.selectListFromList
 
 
 extractId : CaseCategory -> Int

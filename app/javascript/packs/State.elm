@@ -41,28 +41,34 @@ decoder =
                 -- XXX Change state structure/how things are passed in to Elm
                 -- app to make invalid states in 'single component mode'
                 -- impossible?
+                let
+                    initialState =
+                        { clusters = clusters
+                        , caseCategories = caseCategories
+                        , error = Nothing
+                        , singleComponent = False
+                        , singleService = False
+                        , isSubmitting = False
+                        }
+                in
                 case mode of
                     SingleComponentMode id ->
                         let
                             singleClusterWithSingleComponentSelected =
                                 Cluster.setSelectedComponent clusters id
 
-                            applicableCaseCategoriesAndIssues =
+                            applicableCaseCategories =
                                 -- Only include CaseCategorys, and Issues
                                 -- within them, which require a Component.
-                                SelectList.toList caseCategories
-                                    |> List.filter CaseCategory.hasAnyIssueRequiringComponent
-                                    |> Utils.selectListFromList
+                                CaseCategory.filterByIssues caseCategories .requiresComponent
                         in
-                        case applicableCaseCategoriesAndIssues of
+                        case applicableCaseCategories of
                             Just caseCategories ->
                                 D.succeed
-                                    { clusters = singleClusterWithSingleComponentSelected
-                                    , caseCategories = caseCategories
-                                    , error = Nothing
-                                    , singleComponent = True
-                                    , singleService = False
-                                    , isSubmitting = False
+                                    { initialState
+                                        | clusters = singleClusterWithSingleComponentSelected
+                                        , caseCategories = caseCategories
+                                        , singleComponent = True
                                     }
 
                             Nothing ->
@@ -73,36 +79,25 @@ decoder =
                             singleClusterWithSingleServiceSelected =
                                 Cluster.setSelectedService clusters id
 
-                            applicableCaseCategoriesAndIssues =
+                            applicableCaseCategories =
                                 -- Only include CaseCategorys, and Issues
                                 -- within them, which require a Service.
-                                SelectList.toList caseCategories
-                                    |> List.filter CaseCategory.hasAnyIssueRequiringService
-                                    |> Utils.selectListFromList
+                                CaseCategory.filterByIssues caseCategories .requiresService
                         in
-                        case applicableCaseCategoriesAndIssues of
+                        case applicableCaseCategories of
                             Just caseCategories ->
                                 D.succeed
-                                    { clusters = singleClusterWithSingleServiceSelected
-                                    , caseCategories = caseCategories
-                                    , error = Nothing
-                                    , singleComponent = False
-                                    , singleService = True
-                                    , isSubmitting = False
+                                    { initialState
+                                        | clusters = singleClusterWithSingleServiceSelected
+                                        , caseCategories = caseCategories
+                                        , singleService = True
                                     }
 
                             Nothing ->
                                 D.fail "expected some Issues to exist requiring a Service, but none were found"
 
                     ClusterMode ->
-                        D.succeed
-                            { clusters = clusters
-                            , caseCategories = caseCategories
-                            , error = Nothing
-                            , singleComponent = False
-                            , singleService = False
-                            , isSubmitting = False
-                            }
+                        D.succeed initialState
     in
     D.map3
         (\a -> \b -> \c -> ( a, b, c ))
