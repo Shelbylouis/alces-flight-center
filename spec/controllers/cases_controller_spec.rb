@@ -6,6 +6,7 @@ RSpec.describe CasesController, type: :controller do
   let! :first_cluster { create(:cluster, site: site, name: 'First cluster') }
   let! :second_cluster { create(:cluster, site: site, name: 'Second cluster') }
   let :first_cluster_component { create(:component, cluster: first_cluster) }
+  let! :first_cluster_service { create(:service, cluster: first_cluster) }
 
   before :each { sign_in_as(user) }
 
@@ -37,15 +38,34 @@ RSpec.describe CasesController, type: :controller do
         expect(assigns(:clusters)).to eq([first_cluster])
       end
 
-      it 'assigns given component to @single_component' do
+      it 'assigns given component to @single_part' do
         get :new, params: { component_id: first_cluster_component.id }
-        expect(assigns(:single_component)).to eq(first_cluster_component)
+        expect(assigns(:single_part)).to eq(first_cluster_component)
       end
 
       it 'gives 404 if component does not belong to user site' do
         another_component = create(:component)
         expect do
           get :new, params: { component_id: another_component.id }
+        end.to raise_error(ActionController::RoutingError)
+      end
+    end
+
+    context 'from service-level route' do
+      it "assigns just given service's cluster to @clusters" do
+        get :new, params: { service_id: first_cluster_service.id }
+        expect(assigns(:clusters)).to eq([first_cluster])
+      end
+
+      it 'assigns given service to @single_part' do
+        get :new, params: { service_id: first_cluster_service.id }
+        expect(assigns(:single_part)).to eq(first_cluster_service)
+      end
+
+      it 'gives 404 if service does not belong to user site' do
+        another_service = create(:service)
+        expect do
+          get :new, params: { service_id: another_service.id }
         end.to raise_error(ActionController::RoutingError)
       end
     end

@@ -1,4 +1,13 @@
-module State exposing (..)
+module State
+    exposing
+        ( State
+        , clusterPartAllowedForSelectedIssue
+        , decoder
+        , encoder
+        , isInvalid
+        , selectedComponent
+        , selectedIssue
+        )
 
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
@@ -26,15 +35,15 @@ decoder : D.Decoder State
 decoder =
     let
         createInitialState =
-            \( clusters, caseCategories, singleComponentId ) ->
+            \( clusters, caseCategories, mode ) ->
                 -- XXX Change state structure/how things are passed in to Elm
                 -- app to make invalid states in 'single component mode'
                 -- impossible?
-                case singleComponentId of
-                    Just id ->
+                case mode of
+                    SingleComponentMode id ->
                         let
                             singleClusterWithSingleComponentSelected =
-                                Cluster.setSelectedComponent clusters (Component.Id id)
+                                Cluster.setSelectedComponent clusters id
 
                             applicableCaseCategoriesAndIssues =
                                 -- Only include CaseCategorys, and Issues
@@ -56,7 +65,8 @@ decoder =
                             Nothing ->
                                 D.fail "expected some Issues to exist requiring a Component, but none were found"
 
-                    Nothing ->
+                    -- XXX handle SingleServiceMode
+                    _ ->
                         D.succeed
                             { clusters = clusters
                             , caseCategories = caseCategories
@@ -69,8 +79,48 @@ decoder =
         (\a -> \b -> \c -> ( a, b, c ))
         (D.field "clusters" <| Utils.selectListDecoder Cluster.decoder)
         (D.field "caseCategories" <| Utils.selectListDecoder CaseCategory.decoder)
-        (D.field "singleComponentId" <| D.nullable D.int)
+        (D.field "singlePart" <| modeDecoder)
         |> D.andThen createInitialState
+
+
+type Mode
+    = ClusterMode
+    | SingleComponentMode Component.Id
+    | SingleServiceMode Service.Id
+
+
+type alias SinglePartModeFields =
+    { id : Int
+    , type_ : String
+    }
+
+
+modeDecoder : D.Decoder Mode
+modeDecoder =
+    let
+        singlePartModeFieldsDecoder =
+            D.map2 SinglePartModeFields
+                (D.field "id" D.int)
+                (D.field "type" D.string)
+
+        fieldsToMode =
+            Maybe.map singlePartModeDecoder
+                >> Maybe.withDefault (D.succeed ClusterMode)
+    in
+    D.nullable singlePartModeFieldsDecoder |> D.andThen fieldsToMode
+
+
+singlePartModeDecoder : SinglePartModeFields -> D.Decoder Mode
+singlePartModeDecoder fields =
+    case fields.type_ of
+        "component" ->
+            Component.Id fields.id |> SingleComponentMode |> D.succeed
+
+        "service" ->
+            Service.Id fields.id |> SingleServiceMode |> D.succeed
+
+        _ ->
+            "Unknown type: " ++ fields.type_ |> D.fail
 
 
 encoder : State -> E.Value
