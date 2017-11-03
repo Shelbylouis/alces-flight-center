@@ -91,8 +91,16 @@ site.clusters.create!(
   end
 
   file_system = ServiceType.find_by_name('File System')
-  ['lustre', 'nfs1', 'nfs2'].each do |name|
-    cluster.services.create!(service_type: file_system, name: name)
+  {
+    lustre: :managed,
+    nfs1: :advice,
+    nfs2: :managed
+  }.each do |name, support_type|
+    cluster.services.create!(
+      service_type: file_system,
+      name: name,
+      support_type: support_type
+    )
   end
 
   # Upload some documents to use in development for this cluster to S3.
