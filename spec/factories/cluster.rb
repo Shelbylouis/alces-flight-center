@@ -1,5 +1,5 @@
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :cluster do
     site
     name 'Hamilton Research Computing Cluster'
