@@ -179,7 +179,7 @@ issuesField state =
     selectField "Issue"
         selectedCaseCategoryIssues
         Issue.extractId
-        .name
+        Issue.name
         validateIssue
         ChangeSelectedIssue
 
@@ -197,7 +197,7 @@ maybeComponentsField state =
         .components
         Component.extractId
         singleComponent
-        .requiresComponent
+        Issue.requiresComponent
         state
         ChangeSelectedComponent
 
@@ -215,7 +215,7 @@ maybeServicesField state =
         .services
         Service.extractId
         singleService
-        .requiresService
+        Issue.requiresService
         state
         ChangeSelectedService
 
@@ -305,7 +305,7 @@ detailsField state =
     textareaField
         "Details"
         selectedIssue
-        .details
+        Issue.details
         validateDetails
         ChangeDetails
 
@@ -587,7 +587,7 @@ handleChangeSelectedIssue state issueId =
                 \caseCategory ->
                     if position == Selected then
                         { caseCategory
-                            | issues = SelectList.select (Utils.sameId issueId) caseCategory.issues
+                            | issues = SelectList.select (Issue.sameId issueId) caseCategory.issues
                         }
                     else
                         caseCategory
@@ -638,7 +638,7 @@ handleChangeDetails state details =
             \position ->
                 \issue ->
                     if position == Selected then
-                        { issue | details = details }
+                        Issue.setDetails issue details
                     else
                         issue
     in
