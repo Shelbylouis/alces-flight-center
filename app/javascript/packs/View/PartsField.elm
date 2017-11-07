@@ -1,4 +1,4 @@
-module View.PartsField exposing (maybePartsField)
+module View.PartsField exposing (PartsFieldConfig(..), maybePartsField)
 
 import Cluster exposing (Cluster)
 import ClusterPart exposing (ClusterPart)
@@ -12,28 +12,24 @@ import SupportType exposing (HasSupportType)
 import View.Fields as Fields
 
 
+type PartsFieldConfig a
+    = SelectionField (Cluster -> SelectList (ClusterPart a))
+    | SinglePartField (ClusterPart a)
+    | NotRequired
+
+
 maybePartsField :
     String
-    -> (Cluster -> SelectList (ClusterPart a))
+    -> PartsFieldConfig a
     -> (ClusterPart a -> Int)
-    -> Maybe (ClusterPart a)
     -> (Issue -> Bool)
     -> State
     -> (String -> msg)
     -> Maybe (Html msg)
-maybePartsField partName partsForCluster toId singlePart issueRequiresPart state changeMsg =
+maybePartsField partName partsFieldConfig toId issueRequiresPart state changeMsg =
     let
         fieldLabel =
             String.Extra.toTitleCase partName
-
-        partsForSelectedCluster =
-            SelectList.selected state.clusters |> partsForCluster
-
-        selectedIssue =
-            State.selectedIssue state
-
-        partRequired =
-            issueRequiresPart selectedIssue
 
         validatePart =
             FieldValidation.validateWithErrorForItem
@@ -49,29 +45,33 @@ maybePartsField partName partsForCluster toId singlePart issueRequiresPart state
                     _ ->
                         part.name
     in
-    case singlePart of
-        Just part ->
+    case partsFieldConfig of
+        SelectionField partsForCluster ->
+            let
+                partsForSelectedCluster =
+                    SelectList.selected state.clusters |> partsForCluster
+            in
+            -- Issue requires a part of this type => allow selection from all
+            -- parts of this type for Cluster.
+            Just
+                (Fields.selectField fieldLabel
+                    partsForSelectedCluster
+                    toId
+                    labelForPart
+                    validatePart
+                    changeMsg
+                )
+
+        SinglePartField part ->
             -- We're creating a Case for a specific part => don't want to allow
             -- selection of another part, but do still want to display any
             -- error between this part and selected Issue.
             Just (Fields.hiddenInputWithVisibleError part validatePart)
 
-        Nothing ->
-            if partRequired then
-                -- Issue requires a part of this type => allow selection from
-                -- all parts of this type for Cluster.
-                Just
-                    (Fields.selectField fieldLabel
-                        partsForSelectedCluster
-                        toId
-                        labelForPart
-                        validatePart
-                        changeMsg
-                    )
-            else
-                -- Issue does not require a part of this type => do not show
-                -- any select.
-                Nothing
+        NotRequired ->
+            -- Issue does not require a part of this type => do not show any
+            -- select.
+            Nothing
 
 
 errorForClusterPart : String -> HasSupportType a -> String

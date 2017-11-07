@@ -18,7 +18,7 @@ import Service
 import State exposing (State)
 import Utils
 import View.Fields as Fields
-import View.PartsField as PartsField
+import View.PartsField as PartsField exposing (PartsFieldConfig(..))
 
 
 -- MODEL
@@ -186,16 +186,17 @@ issuesField state =
 maybeComponentsField : State -> Maybe (Html Msg)
 maybeComponentsField state =
     let
-        singleComponent =
-            if state.singleComponent then
-                Just (State.selectedComponent state)
+        config =
+            if State.selectedIssue state |> Issue.requiresComponent |> not then
+                NotRequired
+            else if state.singleComponent then
+                SinglePartField (State.selectedComponent state)
             else
-                Nothing
+                SelectionField .components
     in
     PartsField.maybePartsField "component"
-        .components
+        config
         Component.extractId
-        singleComponent
         Issue.requiresComponent
         state
         ChangeSelectedComponent
@@ -204,16 +205,17 @@ maybeComponentsField state =
 maybeServicesField : State -> Maybe (Html Msg)
 maybeServicesField state =
     let
-        singleService =
-            if state.singleService then
-                Just (State.selectedService state)
+        config =
+            if State.selectedIssue state |> Issue.requiresService |> not then
+                NotRequired
+            else if state.singleService then
+                SinglePartField (State.selectedService state)
             else
-                Nothing
+                SelectionField .services
     in
     PartsField.maybePartsField "service"
-        .services
+        config
         Service.extractId
-        singleService
         Issue.requiresService
         state
         ChangeSelectedService
