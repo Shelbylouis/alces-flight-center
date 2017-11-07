@@ -18,6 +18,7 @@ module Issue
 import Cluster exposing (Cluster)
 import Json.Decode as D
 import SelectList exposing (SelectList)
+import ServiceType exposing (ServiceType)
 import SupportType exposing (SupportType(..))
 import Utils
 
@@ -25,6 +26,7 @@ import Utils
 type Issue
     = ComponentRequiredIssue IssueData
     | ServiceRequiredIssue IssueData
+    | SpecificServiceRequiredIssue ServiceType IssueData
     | StandardIssue IssueData
 
 
@@ -50,24 +52,31 @@ decoder =
                         \requiresService ->
                             \detailsTemplate ->
                                 \supportType ->
-                                    let
-                                        data =
-                                            IssueData id name detailsTemplate supportType
-                                    in
-                                    if requiresComponent then
-                                        ComponentRequiredIssue data
-                                    else if requiresService then
-                                        ServiceRequiredIssue data
-                                    else
-                                        StandardIssue data
+                                    \serviceType ->
+                                        let
+                                            data =
+                                                IssueData id name detailsTemplate supportType
+                                        in
+                                        if requiresComponent then
+                                            ComponentRequiredIssue data
+                                        else if requiresService then
+                                            case serviceType of
+                                                Just type_ ->
+                                                    SpecificServiceRequiredIssue type_ data
+
+                                                Nothing ->
+                                                    ServiceRequiredIssue data
+                                        else
+                                            StandardIssue data
     in
-    D.map6 createIssue
+    D.map7 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
         (D.field "requiresService" D.bool)
         (D.field "detailsTemplate" D.string)
         (D.field "supportType" SupportType.decoder)
+        (D.field "serviceType" (D.nullable ServiceType.decoder))
 
 
 detailsValid : Issue -> Bool
@@ -106,6 +115,9 @@ requiresComponent issue =
         ServiceRequiredIssue _ ->
             False
 
+        SpecificServiceRequiredIssue _ _ ->
+            False
+
         StandardIssue _ ->
             False
 
@@ -117,6 +129,9 @@ requiresService issue =
             False
 
         ServiceRequiredIssue _ ->
+            True
+
+        SpecificServiceRequiredIssue _ _ ->
             True
 
         StandardIssue _ ->
@@ -149,6 +164,9 @@ setDetails issue details =
         ServiceRequiredIssue _ ->
             ServiceRequiredIssue newData
 
+        SpecificServiceRequiredIssue type_ _ ->
+            SpecificServiceRequiredIssue type_ newData
+
         StandardIssue _ ->
             StandardIssue newData
 
@@ -165,6 +183,9 @@ data issue =
             data
 
         ServiceRequiredIssue data ->
+            data
+
+        SpecificServiceRequiredIssue _ data ->
             data
 
         StandardIssue data ->
