@@ -30,6 +30,8 @@ class Issue < ApplicationRecord
   end.to_h.to_struct
 
   belongs_to :case_category
+  belongs_to :service_type, required: false
+
   validates :name, presence: true
   validates :details_template, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
