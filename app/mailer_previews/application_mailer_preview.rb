@@ -8,7 +8,7 @@ class ApplicationMailerPreview
   end
 
   def mock_user
-    FactoryGirl.build(
+    FactoryBot.build(
       :user,
       id: 9001,
       name: 'Some User',

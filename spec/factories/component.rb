@@ -1,5 +1,5 @@
 
-FactoryGirl.define do
+FactoryBot.define do
   factory :component do
     component_group
     name 'node01'
