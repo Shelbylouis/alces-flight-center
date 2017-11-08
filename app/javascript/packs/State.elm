@@ -60,7 +60,7 @@ decoder =
                             applicableCaseCategories =
                                 -- Only include CaseCategorys, and Issues
                                 -- within them, which require a Component.
-                                CaseCategory.filterByIssues caseCategories .requiresComponent
+                                CaseCategory.filterByIssues caseCategories Issue.requiresComponent
                         in
                         case applicableCaseCategories of
                             Just caseCategories ->
@@ -82,7 +82,7 @@ decoder =
                             applicableCaseCategories =
                                 -- Only include CaseCategorys, and Issues
                                 -- within them, which require a Service.
-                                CaseCategory.filterByIssues caseCategories .requiresService
+                                CaseCategory.filterByIssues caseCategories Issue.requiresService
                         in
                         case applicableCaseCategories of
                             Just caseCategories ->
@@ -167,13 +167,13 @@ encoder state =
 
         componentIdValue =
             partIdValue
-                .requiresComponent
+                Issue.requiresComponent
                 selectedComponent
                 Component.extractId
 
         serviceIdValue =
             partIdValue
-                .requiresService
+                Issue.requiresService
                 selectedService
                 Service.extractId
     in
@@ -184,7 +184,7 @@ encoder state =
                 , ( "issue_id", Issue.extractId issue |> E.int )
                 , ( "component_id", componentIdValue )
                 , ( "service_id", serviceIdValue )
-                , ( "details", E.string issue.details )
+                , ( "details", Issue.details issue |> E.string )
                 ]
           )
         ]
@@ -218,7 +218,7 @@ clusterPartAllowedForSelectedIssue state issueRequiresPart part =
             selectedIssue state
     in
     if issueRequiresPart issue then
-        case ( issue.supportType, part.supportType ) of
+        case ( Issue.supportType issue, part.supportType ) of
             ( Managed, Advice ) ->
                 -- An advice part cannot be associated with a managed issue.
                 False
@@ -254,6 +254,6 @@ isInvalid state =
     List.any not
         [ Issue.detailsValid issue
         , Issue.availableForSelectedCluster state.clusters issue
-        , partAllowedForSelectedIssue .requiresComponent component
-        , partAllowedForSelectedIssue .requiresService service
+        , partAllowedForSelectedIssue Issue.requiresComponent component
+        , partAllowedForSelectedIssue Issue.requiresService service
         ]

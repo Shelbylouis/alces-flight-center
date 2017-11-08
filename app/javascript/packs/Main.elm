@@ -2,12 +2,11 @@ module Main exposing (..)
 
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
-import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
 import FieldValidation exposing (FieldValidation(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Events exposing (onClick, onSubmit)
 import Http
 import Issue exposing (Issue)
 import Json.Decode as D
@@ -17,9 +16,9 @@ import Rails
 import SelectList exposing (Position(..), SelectList)
 import Service
 import State exposing (State)
-import String.Extra
-import SupportType exposing (HasSupportType)
 import Utils
+import View.Fields as Fields
+import View.PartsField as PartsField
 
 
 -- MODEL
@@ -139,7 +138,7 @@ maybeClustersField clusters =
         Nothing
     else
         Just
-            (selectField
+            (Fields.selectField
                 "Cluster"
                 clusters
                 Cluster.extractId
@@ -156,7 +155,7 @@ caseCategoriesField state =
             FieldValidation.validateWithEmptyError
                 (CaseCategory.availableForSelectedCluster state.clusters)
     in
-    selectField "Case category"
+    Fields.selectField "Case category"
         state.caseCategories
         CaseCategory.extractId
         .name
@@ -176,10 +175,10 @@ issuesField state =
                 consultancy support from Alces Software."""
                 (Issue.availableForSelectedCluster state.clusters)
     in
-    selectField "Issue"
+    Fields.selectField "Issue"
         selectedCaseCategoryIssues
         Issue.extractId
-        .name
+        Issue.name
         validateIssue
         ChangeSelectedIssue
 
@@ -193,11 +192,11 @@ maybeComponentsField state =
             else
                 Nothing
     in
-    maybePartsField "component"
+    PartsField.maybePartsField "component"
         .components
         Component.extractId
         singleComponent
-        .requiresComponent
+        Issue.requiresComponent
         state
         ChangeSelectedComponent
 
@@ -211,86 +210,13 @@ maybeServicesField state =
             else
                 Nothing
     in
-    maybePartsField "service"
+    PartsField.maybePartsField "service"
         .services
         Service.extractId
         singleService
-        .requiresService
+        Issue.requiresService
         state
         ChangeSelectedService
-
-
-maybePartsField :
-    String
-    -> (Cluster -> SelectList (ClusterPart a))
-    -> (ClusterPart a -> Int)
-    -> Maybe (ClusterPart a)
-    -> (Issue -> Bool)
-    -> State
-    -> (String -> Msg)
-    -> Maybe (Html Msg)
-maybePartsField partName partsForCluster toId singlePart issueRequiresPart state changeMsg =
-    let
-        fieldLabel =
-            String.Extra.toTitleCase partName
-
-        partsForSelectedCluster =
-            SelectList.selected state.clusters |> partsForCluster
-
-        selectedIssue =
-            State.selectedIssue state
-
-        partRequired =
-            issueRequiresPart selectedIssue
-
-        validatePart =
-            FieldValidation.validateWithErrorForItem
-                (errorForClusterPart partName)
-                (State.clusterPartAllowedForSelectedIssue state issueRequiresPart)
-
-        labelForPart =
-            \part ->
-                case part.supportType of
-                    SupportType.Advice ->
-                        part.name ++ " (self-managed)"
-
-                    _ ->
-                        part.name
-    in
-    case singlePart of
-        Just part ->
-            -- We're creating a Case for a specific part => don't want to allow
-            -- selection of another part, but do still want to display any
-            -- error between this part and selected Issue.
-            Just (hiddenInputWithVisibleError part validatePart)
-
-        Nothing ->
-            if partRequired then
-                -- Issue requires a part of this type => allow selection from
-                -- all parts of this type for Cluster.
-                Just
-                    (selectField fieldLabel
-                        partsForSelectedCluster
-                        toId
-                        labelForPart
-                        validatePart
-                        changeMsg
-                    )
-            else
-                -- Issue does not require a part of this type => do not show
-                -- any select.
-                Nothing
-
-
-errorForClusterPart : String -> HasSupportType a -> String
-errorForClusterPart partName part =
-    if SupportType.isManaged part then
-        "This " ++ partName ++ " is already fully managed."
-    else
-        "This "
-            ++ partName
-            ++ """ is self-managed; if required you may only
-        request consultancy support from Alces Software."""
 
 
 detailsField : State -> Html Msg
@@ -302,150 +228,12 @@ detailsField state =
         validateDetails =
             FieldValidation.validateWithEmptyError Issue.detailsValid
     in
-    textareaField
+    Fields.textareaField
         "Details"
         selectedIssue
-        .details
+        Issue.details
         validateDetails
         ChangeDetails
-
-
-selectField :
-    String
-    -> SelectList a
-    -> (a -> Int)
-    -> (a -> String)
-    -> (a -> FieldValidation a)
-    -> (String -> Msg)
-    -> Html Msg
-selectField fieldName items toId toOptionLabel validate changeMsg =
-    let
-        validatedField =
-            SelectList.selected items |> validate
-
-        fieldOption =
-            \position ->
-                \item ->
-                    option
-                        [ toId item |> toString |> value
-                        , position == Selected |> selected
-                        , validate item |> FieldValidation.isInvalid |> disabled
-                        ]
-                        [ toOptionLabel item |> text ]
-
-        options =
-            SelectList.mapBy fieldOption items
-                |> SelectList.toList
-    in
-    formField fieldName
-        (SelectList.selected items)
-        validatedField
-        select
-        [ onInput changeMsg ]
-        options
-
-
-textareaField : String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> Msg) -> Html Msg
-textareaField fieldName item toContent validate inputMsg =
-    let
-        validatedField =
-            validate item
-
-        content =
-            toContent item
-    in
-    formField fieldName
-        item
-        validatedField
-        textarea
-        [ rows 10
-        , onInput inputMsg
-        , value content
-        ]
-        []
-
-
-type alias HtmlFunction msg =
-    List (Attribute msg) -> List (Html msg) -> Html msg
-
-
-formField :
-    String
-    -> a
-    -> FieldValidation a
-    -> HtmlFunction msg
-    -> List (Attribute msg)
-    -> List (Html msg)
-    -> Html msg
-formField fieldName item validation htmlFn additionalAttributes children =
-    let
-        identifier =
-            fieldIdentifier fieldName
-
-        attributes =
-            List.append
-                [ id identifier
-                , class (formControlClasses validation)
-                ]
-                additionalAttributes
-
-        formElement =
-            htmlFn attributes children
-    in
-    div [ class "form-group" ]
-        [ label
-            [ for identifier ]
-            [ text fieldName ]
-        , formElement
-        , validationFeedback item validation
-        ]
-
-
-hiddenInputWithVisibleError : a -> (a -> FieldValidation a) -> Html Msg
-hiddenInputWithVisibleError item validate =
-    let
-        validation =
-            validate item
-
-        formElement =
-            input
-                [ type_ "hidden"
-                , class (formControlClasses validation)
-                ]
-                []
-    in
-    div [ class "form-group" ]
-        [ formElement
-        , validationFeedback item validation
-        ]
-
-
-validationFeedback : a -> FieldValidation a -> Html msg
-validationFeedback item validation =
-    div
-        [ class "invalid-feedback" ]
-        [ FieldValidation.error item validation |> text ]
-
-
-formControlClasses : FieldValidation a -> String
-formControlClasses validation =
-    "form-control " ++ bootstrapValidationClass validation
-
-
-bootstrapValidationClass : FieldValidation a -> String
-bootstrapValidationClass validation =
-    case validation of
-        Valid ->
-            "is-valid"
-
-        Invalid _ ->
-            "is-invalid"
-
-
-fieldIdentifier : String -> String
-fieldIdentifier fieldName =
-    String.toLower fieldName
-        |> String.Extra.dasherize
 
 
 submitButton : State -> Html Msg
@@ -587,7 +375,7 @@ handleChangeSelectedIssue state issueId =
                 \caseCategory ->
                     if position == Selected then
                         { caseCategory
-                            | issues = SelectList.select (Utils.sameId issueId) caseCategory.issues
+                            | issues = SelectList.select (Issue.sameId issueId) caseCategory.issues
                         }
                     else
                         caseCategory
@@ -638,7 +426,7 @@ handleChangeDetails state details =
             \position ->
                 \issue ->
                     if position == Selected then
-                        { issue | details = details }
+                        Issue.setDetails issue details
                     else
                         issue
     in
