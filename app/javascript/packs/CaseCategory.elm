@@ -4,7 +4,7 @@ import Cluster exposing (Cluster)
 import Issue exposing (Issue)
 import Json.Decode as D
 import SelectList exposing (SelectList)
-import Utils
+import SelectList.Extra
 
 
 type alias CaseCategory =
@@ -23,7 +23,7 @@ decoder =
     D.map3 CaseCategory
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
-        (D.field "issues" (Utils.selectListDecoder Issue.decoder))
+        (D.field "issues" (SelectList.Extra.decoder Issue.decoder))
 
 
 availableForSelectedCluster : SelectList Cluster -> CaseCategory -> Bool
@@ -43,7 +43,7 @@ filterByIssues caseCategories condition =
     in
     SelectList.toList caseCategories
         |> List.filter caseCategoryHasMatchingIssues
-        |> Utils.selectListFromList
+        |> SelectList.Extra.fromList
 
 
 extractId : CaseCategory -> Int
