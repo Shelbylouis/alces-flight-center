@@ -210,21 +210,26 @@ maybeServicesField state =
             \serviceType ->
                 .serviceType >> Utils.sameId serviceType.id
 
-        config =
+        servicePartName =
+            "service"
+
+        ( partName, config ) =
             if state.singleService then
-                SinglePartField (State.selectedService state)
+                ( servicePartName, SinglePartField (State.selectedService state) )
             else
                 case State.selectedIssue state |> Issue.serviceRequired of
                     ServiceType.None ->
-                        NotRequired
+                        ( servicePartName, NotRequired )
 
                     ServiceType.Any ->
-                        SelectionField .services
+                        ( servicePartName, SelectionField .services )
 
                     ServiceType.SpecificType serviceType ->
-                        SubSetSelectionField .services (serviceHasType serviceType)
+                        ( serviceType.name
+                        , SubSetSelectionField .services (serviceHasType serviceType)
+                        )
     in
-    PartsField.maybePartsField "service"
+    PartsField.maybePartsField partName
         config
         Service.extractId
         Issue.requiresService
