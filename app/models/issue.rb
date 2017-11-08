@@ -37,6 +37,12 @@ class Issue < ApplicationRecord
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
   validates :identifier, uniqueness: true, if: :identifier
 
+  validates :service_type,
+            absence: {
+              message: 'can only require particular service type if issue requires service',
+            },
+            unless: :requires_service
+
   def advice_only?
     support_type == 'advice-only'
   end

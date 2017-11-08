@@ -1,6 +1,37 @@
 require 'rails_helper'
 
 RSpec.describe Issue, type: :model do
+  describe '#valid?' do
+    context 'when associated with service_type and does not require_service' do
+      subject do
+        build(
+          :issue,
+          service_type: create(:service_type),
+          requires_service: false
+        )
+      end
+
+      it 'should be invalid' do
+        expect(subject).to be_invalid
+        expect(subject.errors.messages).to match(
+          service_type: ['can only require particular service type if issue requires service']
+        )
+      end
+    end
+
+    context 'when associated with service_type and does require_service' do
+      subject do
+        build(
+          :issue,
+          service_type: create(:service_type),
+          requires_service: true
+        )
+      end
+
+      it { is_expected.to be_valid }
+    end
+  end
+
   describe '#case_form_json' do
     subject do
       create(
