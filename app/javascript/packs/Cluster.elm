@@ -1,4 +1,13 @@
-module Cluster exposing (..)
+module Cluster
+    exposing
+        ( Cluster
+        , Id(..)
+        , decoder
+        , extractId
+        , setSelectedComponent
+        , setSelectedService
+        , setSelectedServiceWhere
+        )
 
 import Component exposing (Component)
 import Json.Decode as D
@@ -39,40 +48,34 @@ extractId cluster =
             id
 
 
-
--- XXX de-duplicate following two functions; also
--- Main.handleChangeSelectedIssue is similar.
-
-
 setSelectedComponent : SelectList Cluster -> Component.Id -> SelectList Cluster
 setSelectedComponent clusters componentId =
-    let
-        updateSelectedClusterSelectedComponent =
-            \position ->
-                \cluster ->
-                    if position == Selected then
-                        { cluster
-                            | components =
-                                SelectList.select (Utils.sameId componentId) cluster.components
-                        }
-                    else
-                        cluster
-    in
-    SelectList.mapBy updateSelectedClusterSelectedComponent clusters
+    SelectList.Extra.nestedSelect
+        clusters
+        .components
+        asComponentsIn
+        (Utils.sameId componentId)
+
+
+asComponentsIn : Cluster -> SelectList Component -> Cluster
+asComponentsIn cluster components =
+    { cluster | components = components }
 
 
 setSelectedService : SelectList Cluster -> Service.Id -> SelectList Cluster
 setSelectedService clusters serviceId =
-    let
-        updateSelectedClusterSelectedService =
-            \position ->
-                \cluster ->
-                    if position == Selected then
-                        { cluster
-                            | services =
-                                SelectList.select (Utils.sameId serviceId) cluster.services
-                        }
-                    else
-                        cluster
-    in
-    SelectList.mapBy updateSelectedClusterSelectedService clusters
+    setSelectedServiceWhere clusters (Utils.sameId serviceId)
+
+
+setSelectedServiceWhere : SelectList Cluster -> (Service -> Bool) -> SelectList Cluster
+setSelectedServiceWhere clusters shouldSelect =
+    SelectList.Extra.nestedSelect
+        clusters
+        .services
+        asServicesIn
+        shouldSelect
+
+
+asServicesIn : Cluster -> SelectList Service -> Cluster
+asServicesIn cluster services =
+    { cluster | services = services }

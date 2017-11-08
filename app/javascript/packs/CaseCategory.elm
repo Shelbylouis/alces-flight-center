@@ -1,4 +1,13 @@
-module CaseCategory exposing (..)
+module CaseCategory
+    exposing
+        ( CaseCategory
+        , Id(..)
+        , availableForSelectedCluster
+        , decoder
+        , extractId
+        , filterByIssues
+        , setSelectedIssue
+        )
 
 import Cluster exposing (Cluster)
 import Issue exposing (Issue)
@@ -51,3 +60,17 @@ extractId caseCategory =
     case caseCategory.id of
         Id id ->
             id
+
+
+setSelectedIssue : SelectList CaseCategory -> Issue.Id -> SelectList CaseCategory
+setSelectedIssue caseCategories issueId =
+    SelectList.Extra.nestedSelect
+        caseCategories
+        .issues
+        asIssuesIn
+        (Issue.sameId issueId)
+
+
+asIssuesIn : CaseCategory -> SelectList Issue -> CaseCategory
+asIssuesIn caseCategory issues =
+    { caseCategory | issues = issues }
