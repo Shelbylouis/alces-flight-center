@@ -11,6 +11,8 @@ module Issue
         , requiresComponent
         , requiresService
         , sameId
+        , serviceAllowedFor
+        , serviceRequired
         , setDetails
         , supportType
         )
@@ -18,6 +20,8 @@ module Issue
 import Cluster exposing (Cluster)
 import Json.Decode as D
 import SelectList exposing (SelectList)
+import Service exposing (Service)
+import ServiceType exposing (ServiceType)
 import SupportType exposing (SupportType(..))
 import Utils
 
@@ -25,6 +29,7 @@ import Utils
 type Issue
     = ComponentRequiredIssue IssueData
     | ServiceRequiredIssue IssueData
+    | SpecificServiceRequiredIssue ServiceType IssueData
     | StandardIssue IssueData
 
 
@@ -50,24 +55,31 @@ decoder =
                         \requiresService ->
                             \detailsTemplate ->
                                 \supportType ->
-                                    let
-                                        data =
-                                            IssueData id name detailsTemplate supportType
-                                    in
-                                    if requiresComponent then
-                                        ComponentRequiredIssue data
-                                    else if requiresService then
-                                        ServiceRequiredIssue data
-                                    else
-                                        StandardIssue data
+                                    \serviceType ->
+                                        let
+                                            data =
+                                                IssueData id name detailsTemplate supportType
+                                        in
+                                        if requiresComponent then
+                                            ComponentRequiredIssue data
+                                        else if requiresService then
+                                            case serviceType of
+                                                Just type_ ->
+                                                    SpecificServiceRequiredIssue type_ data
+
+                                                Nothing ->
+                                                    ServiceRequiredIssue data
+                                        else
+                                            StandardIssue data
     in
-    D.map6 createIssue
+    D.map7 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
         (D.field "requiresService" D.bool)
         (D.field "detailsTemplate" D.string)
         (D.field "supportType" SupportType.decoder)
+        (D.field "serviceType" (D.nullable ServiceType.decoder))
 
 
 detailsValid : Issue -> Bool
@@ -106,21 +118,53 @@ requiresComponent issue =
         ServiceRequiredIssue _ ->
             False
 
+        SpecificServiceRequiredIssue _ _ ->
+            False
+
         StandardIssue _ ->
             False
 
 
 requiresService : Issue -> Bool
 requiresService issue =
-    case issue of
-        ComponentRequiredIssue _ ->
+    case serviceRequired issue of
+        ServiceType.None ->
             False
 
-        ServiceRequiredIssue _ ->
+        _ ->
             True
 
+
+serviceRequired : Issue -> ServiceType.ServiceRequired
+serviceRequired issue =
+    case issue of
+        ComponentRequiredIssue _ ->
+            ServiceType.None
+
+        ServiceRequiredIssue _ ->
+            ServiceType.Any
+
+        SpecificServiceRequiredIssue type_ _ ->
+            ServiceType.SpecificType type_
+
         StandardIssue _ ->
-            False
+            ServiceType.None
+
+
+serviceAllowedFor : Issue -> Service -> Bool
+serviceAllowedFor issue service =
+    case serviceRequired issue of
+        ServiceType.None ->
+            -- Doesn't matter what Service is as Issue doesn't require one.
+            True
+
+        ServiceType.SpecificType serviceType ->
+            -- Service is allowed iff has ServiceType that Issue requires.
+            Utils.sameId serviceType.id service.serviceType
+
+        ServiceType.Any ->
+            -- Any Service is allowed.
+            True
 
 
 name : Issue -> String
@@ -149,6 +193,9 @@ setDetails issue details =
         ServiceRequiredIssue _ ->
             ServiceRequiredIssue newData
 
+        SpecificServiceRequiredIssue type_ _ ->
+            SpecificServiceRequiredIssue type_ newData
+
         StandardIssue _ ->
             StandardIssue newData
 
@@ -165,6 +212,9 @@ data issue =
             data
 
         ServiceRequiredIssue data ->
+            data
+
+        SpecificServiceRequiredIssue _ data ->
             data
 
         StandardIssue data ->

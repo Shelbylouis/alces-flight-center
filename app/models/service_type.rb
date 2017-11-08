@@ -7,4 +7,11 @@ class ServiceType < ApplicationRecord
   validates :name, presence: true
 
   scope :automatic, -> { where(automatic: true) }
+
+  def case_form_json
+    {
+      id: id,
+      name: name,
+    }
+  end
 end

@@ -18,6 +18,7 @@ class Service < ApplicationRecord
       id: id,
       name: name,
       supportType: support_type,
+      serviceType: service_type.case_form_json,
     }
   end
 end

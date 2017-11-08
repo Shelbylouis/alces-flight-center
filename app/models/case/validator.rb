@@ -9,6 +9,7 @@ class Case::Validator < ActiveModel::Validator
       validate_correct_cluster_part_relationship(part_name)
     end
     validate_issue_allowed_for_cluster_or_part
+    validate_service_correct_type
   end
 
   private
@@ -32,6 +33,21 @@ class Case::Validator < ActiveModel::Validator
   def validate_issue_allowed_for_cluster_or_part
     issue_errors_with_conditions.map do |error, condition|
       record.errors.add(:issue, error) if condition
+    end
+  end
+
+  def validate_service_correct_type
+    if part_required?(:service) && part(:service)
+      required_service_type = record.issue.service_type
+      return unless required_service_type
+
+      associated_service_type = part(:service).service_type
+
+      if associated_service_type != required_service_type
+        error = "must be associated with #{required_service_type.name} " \
+          "service but given a #{associated_service_type.name} service"
+        record.errors.add(:service, error)
+      end
     end
   end
 

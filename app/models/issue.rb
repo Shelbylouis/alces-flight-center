@@ -30,10 +30,18 @@ class Issue < ApplicationRecord
   end.to_h.to_struct
 
   belongs_to :case_category
+  belongs_to :service_type, required: false
+
   validates :name, presence: true
   validates :details_template, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
   validates :identifier, uniqueness: true, if: :identifier
+
+  validates :service_type,
+            absence: {
+              message: 'can only require particular service type if issue requires service',
+            },
+            unless: :requires_service
 
   def advice_only?
     support_type == 'advice-only'
@@ -52,6 +60,7 @@ class Issue < ApplicationRecord
       detailsTemplate: details_template,
       requiresComponent: requires_component,
       requiresService: requires_service,
+      serviceType: service_type&.case_form_json,
       supportType: support_type,
     }
   end

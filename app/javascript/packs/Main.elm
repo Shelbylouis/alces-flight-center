@@ -14,11 +14,12 @@ import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
-import Service
+import Service exposing (Service)
+import ServiceType exposing (ServiceType)
 import State exposing (State)
 import Utils
 import View.Fields as Fields
-import View.PartsField as PartsField
+import View.PartsField as PartsField exposing (PartsFieldConfig(..))
 
 
 -- MODEL
@@ -186,16 +187,17 @@ issuesField state =
 maybeComponentsField : State -> Maybe (Html Msg)
 maybeComponentsField state =
     let
-        singleComponent =
-            if state.singleComponent then
-                Just (State.selectedComponent state)
+        config =
+            if State.selectedIssue state |> Issue.requiresComponent |> not then
+                NotRequired
+            else if state.singleComponent then
+                SinglePartField (State.selectedComponent state)
             else
-                Nothing
+                SelectionField .components
     in
     PartsField.maybePartsField "component"
-        .components
+        config
         Component.extractId
-        singleComponent
         Issue.requiresComponent
         state
         ChangeSelectedComponent
@@ -204,16 +206,32 @@ maybeComponentsField state =
 maybeServicesField : State -> Maybe (Html Msg)
 maybeServicesField state =
     let
-        singleService =
+        serviceHasType =
+            \serviceType ->
+                .serviceType >> Utils.sameId serviceType.id
+
+        servicePartName =
+            "service"
+
+        ( partName, config ) =
             if state.singleService then
-                Just (State.selectedService state)
+                ( servicePartName, SinglePartField (State.selectedService state) )
             else
-                Nothing
+                case State.selectedIssue state |> Issue.serviceRequired of
+                    ServiceType.None ->
+                        ( servicePartName, NotRequired )
+
+                    ServiceType.Any ->
+                        ( servicePartName, SelectionField .services )
+
+                    ServiceType.SpecificType serviceType ->
+                        ( serviceType.name
+                        , SubSetSelectionField .services (serviceHasType serviceType)
+                        )
     in
-    PartsField.maybePartsField "service"
-        .services
+    PartsField.maybePartsField partName
+        config
         Service.extractId
-        singleService
         Issue.requiresService
         state
         ChangeSelectedService
@@ -359,9 +377,9 @@ handleChangeSelectedCaseCategory state caseCategoryId =
         newCaseCategories =
             SelectList.select (Utils.sameId caseCategoryId) state.caseCategories
     in
-    ( { state | caseCategories = newCaseCategories }
-    , Cmd.none
-    )
+    updateSelectedServiceForSelectedIssue
+        { state | caseCategories = newCaseCategories }
+        ! []
 
 
 handleChangeSelectedIssue : State -> Issue.Id -> ( State, Cmd Msg )
@@ -380,9 +398,40 @@ handleChangeSelectedIssue state issueId =
                     else
                         caseCategory
     in
-    ( { state | caseCategories = newCaseCategories }
-    , Cmd.none
-    )
+    updateSelectedServiceForSelectedIssue
+        { state | caseCategories = newCaseCategories }
+        ! []
+
+
+updateSelectedServiceForSelectedIssue : State -> State
+updateSelectedServiceForSelectedIssue state =
+    let
+        serviceAllowedForSelectedIssue =
+            State.selectedIssue state |> Issue.serviceAllowedFor
+
+        selectedServiceAllowedForSelectedIssue =
+            State.selectedService state |> serviceAllowedForSelectedIssue
+
+        newClusters =
+            if selectedServiceAllowedForSelectedIssue then
+                state.clusters
+            else
+                SelectList.mapBy selectFirstAllowedServiceForSelectedIssue state.clusters
+
+        selectFirstAllowedServiceForSelectedIssue =
+            \position ->
+                \cluster ->
+                    if position == Selected then
+                        { cluster
+                            | services =
+                                SelectList.select
+                                    serviceAllowedForSelectedIssue
+                                    cluster.services
+                        }
+                    else
+                        cluster
+    in
+    { state | clusters = newClusters }
 
 
 handleChangeSelectedComponent : State -> Component.Id -> ( State, Cmd Msg )
