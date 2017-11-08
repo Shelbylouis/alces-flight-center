@@ -256,4 +256,5 @@ isInvalid state =
         , Issue.availableForSelectedCluster state.clusters issue
         , partAllowedForSelectedIssue Issue.requiresComponent component
         , partAllowedForSelectedIssue Issue.requiresService service
+        , Issue.serviceAllowedFor issue service
         ]

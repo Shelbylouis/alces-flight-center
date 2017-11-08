@@ -17,6 +17,12 @@ type Id
     = Id Int
 
 
+type ServiceRequired
+    = Any
+    | SpecificType ServiceType
+    | None
+
+
 decoder : D.Decoder ServiceType
 decoder =
     D.map2 ServiceType

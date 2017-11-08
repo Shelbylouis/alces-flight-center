@@ -11,6 +11,8 @@ module Issue
         , requiresComponent
         , requiresService
         , sameId
+        , serviceAllowedFor
+        , serviceRequired
         , setDetails
         , supportType
         )
@@ -18,6 +20,7 @@ module Issue
 import Cluster exposing (Cluster)
 import Json.Decode as D
 import SelectList exposing (SelectList)
+import Service exposing (Service)
 import ServiceType exposing (ServiceType)
 import SupportType exposing (SupportType(..))
 import Utils
@@ -124,18 +127,44 @@ requiresComponent issue =
 
 requiresService : Issue -> Bool
 requiresService issue =
+    case serviceRequired issue of
+        ServiceType.None ->
+            False
+
+        _ ->
+            True
+
+
+serviceRequired : Issue -> ServiceType.ServiceRequired
+serviceRequired issue =
     case issue of
         ComponentRequiredIssue _ ->
-            False
+            ServiceType.None
 
         ServiceRequiredIssue _ ->
-            True
+            ServiceType.Any
 
-        SpecificServiceRequiredIssue _ _ ->
-            True
+        SpecificServiceRequiredIssue type_ _ ->
+            ServiceType.SpecificType type_
 
         StandardIssue _ ->
-            False
+            ServiceType.None
+
+
+serviceAllowedFor : Issue -> Service -> Bool
+serviceAllowedFor issue service =
+    case serviceRequired issue of
+        ServiceType.None ->
+            -- Doesn't matter what Service is as Issue doesn't require one.
+            True
+
+        ServiceType.SpecificType serviceType ->
+            -- Service is allowed iff has ServiceType that Issue requires.
+            Utils.sameId serviceType.id service.serviceType
+
+        ServiceType.Any ->
+            -- Any Service is allowed.
+            True
 
 
 name : Issue -> String

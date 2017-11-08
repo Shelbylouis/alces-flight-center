@@ -13,9 +13,14 @@ import View.Fields as Fields
 
 
 type PartsFieldConfig a
-    = SelectionField (Cluster -> SelectList (ClusterPart a))
+    = SelectionField (PartsFromCluster a)
+    | SubSetSelectionField (PartsFromCluster a) (ClusterPart a -> Bool)
     | SinglePartField (ClusterPart a)
     | NotRequired
+
+
+type alias PartsFromCluster a =
+    Cluster -> SelectList (ClusterPart a)
 
 
 maybePartsField :
@@ -44,23 +49,60 @@ maybePartsField partName partsFieldConfig toId issueRequiresPart state changeMsg
 
                     _ ->
                         part.name
-    in
-    case partsFieldConfig of
-        SelectionField partsForCluster ->
-            let
-                partsForSelectedCluster =
-                    SelectList.selected state.clusters |> partsForCluster
-            in
-            -- Issue requires a part of this type => allow selection from all
-            -- parts of this type for Cluster.
-            Just
-                (Fields.selectField fieldLabel
-                    partsForSelectedCluster
+
+        selectField =
+            \parts ->
+                Fields.selectField
+                    fieldLabel
+                    parts
                     toId
                     labelForPart
                     validatePart
                     changeMsg
-                )
+                    |> Just
+
+        cluster =
+            SelectList.selected state.clusters
+    in
+    case partsFieldConfig of
+        SelectionField partsForCluster ->
+            let
+                allParts =
+                    partsForCluster cluster
+            in
+            -- Issue requires a part of this type => allow selection from all
+            -- parts of this type for Cluster.
+            selectField allParts
+
+        SubSetSelectionField partsForCluster partAllowed ->
+            let
+                allParts =
+                    partsForCluster cluster
+
+                selectedPart =
+                    SelectList.selected allParts
+
+                filtered =
+                    List.filter partAllowed
+
+                filteredParts =
+                    SelectList.fromLists
+                        (SelectList.before allParts |> filtered)
+                        selectedPart
+                        (SelectList.after allParts |> filtered)
+            in
+            if partAllowed selectedPart then
+                -- Issue requires a part from a filtered subset of those for
+                -- this Cluster.
+                selectField filteredParts
+            else
+                -- Issue requires a part from a filtered subset of those for
+                -- this Cluster, but the selected part is not in that subset.
+                -- This should never happen as we should appropriately change
+                -- the selected part in update, but we don't rule it out using
+                -- type system at the moment => allow selection from all parts
+                -- so we can try and get back to valid state.
+                selectField allParts
 
         SinglePartField part ->
             -- We're creating a Case for a specific part => don't want to allow
