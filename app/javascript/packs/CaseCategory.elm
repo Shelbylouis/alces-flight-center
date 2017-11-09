@@ -12,6 +12,7 @@ module CaseCategory
 import Cluster exposing (Cluster)
 import Issue exposing (Issue)
 import Json.Decode as D
+import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
 
@@ -46,13 +47,18 @@ availableForSelectedCluster clusters caseCategory =
 
 filterByIssues : SelectList CaseCategory -> (Issue -> Bool) -> Maybe (SelectList CaseCategory)
 filterByIssues caseCategories condition =
-    let
-        caseCategoryHasMatchingIssues =
-            .issues >> SelectList.toList >> List.any condition
-    in
-    SelectList.toList caseCategories
-        |> List.filter caseCategoryHasMatchingIssues
+    SelectList.map (withJustMatchingIssues condition) caseCategories
+        |> SelectList.toList
+        |> Maybe.Extra.values
         |> SelectList.Extra.fromList
+
+
+withJustMatchingIssues : (Issue -> Bool) -> CaseCategory -> Maybe CaseCategory
+withJustMatchingIssues condition caseCategory =
+    SelectList.toList caseCategory.issues
+        |> List.filter condition
+        |> SelectList.Extra.fromList
+        |> Maybe.map (asIssuesIn caseCategory)
 
 
 extractId : CaseCategory -> Int
