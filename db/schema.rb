@@ -112,6 +112,9 @@ ActiveRecord::Schema.define(version: 20171108124629) do
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end
 
+  create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
+  end
+
   create_table "issues", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "requires_component", default: false, null: false
