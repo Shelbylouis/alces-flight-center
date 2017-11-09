@@ -386,17 +386,7 @@ handleChangeSelectedIssue : State -> Issue.Id -> ( State, Cmd Msg )
 handleChangeSelectedIssue state issueId =
     let
         newCaseCategories =
-            SelectList.mapBy updateSelectedCaseCategorySelectedIssue state.caseCategories
-
-        updateSelectedCaseCategorySelectedIssue =
-            \position ->
-                \caseCategory ->
-                    if position == Selected then
-                        { caseCategory
-                            | issues = SelectList.select (Issue.sameId issueId) caseCategory.issues
-                        }
-                    else
-                        caseCategory
+            CaseCategory.setSelectedIssue state.caseCategories issueId
     in
     updateSelectedServiceForSelectedIssue
         { state | caseCategories = newCaseCategories }
@@ -416,20 +406,9 @@ updateSelectedServiceForSelectedIssue state =
             if selectedServiceAllowedForSelectedIssue then
                 state.clusters
             else
-                SelectList.mapBy selectFirstAllowedServiceForSelectedIssue state.clusters
-
-        selectFirstAllowedServiceForSelectedIssue =
-            \position ->
-                \cluster ->
-                    if position == Selected then
-                        { cluster
-                            | services =
-                                SelectList.select
-                                    serviceAllowedForSelectedIssue
-                                    cluster.services
-                        }
-                    else
-                        cluster
+                Cluster.setSelectedServiceWhere
+                    state.clusters
+                    serviceAllowedForSelectedIssue
     in
     { state | clusters = newClusters }
 

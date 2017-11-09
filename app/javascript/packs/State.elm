@@ -18,9 +18,9 @@ import Issue exposing (Issue)
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
+import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType(..))
-import Utils
 
 
 type alias State =
@@ -79,18 +79,29 @@ decoder =
                             singleClusterWithSingleServiceSelected =
                                 Cluster.setSelectedService clusters id
 
+                            partialNewState =
+                                { initialState
+                                    | clusters = singleClusterWithSingleServiceSelected
+                                    , singleService = True
+                                }
+
+                            singleService =
+                                selectedService partialNewState
+
                             applicableCaseCategories =
                                 -- Only include CaseCategorys, and Issues
-                                -- within them, which require a Service.
-                                CaseCategory.filterByIssues caseCategories Issue.requiresService
+                                -- within them, which require a Service and
+                                -- that single Service has acceptable
+                                -- ServiceType for.
+                                CaseCategory.filterByIssues
+                                    caseCategories
+                                    (Issue.serviceCanBeAssociatedWith singleService)
                         in
                         case applicableCaseCategories of
                             Just caseCategories ->
                                 D.succeed
-                                    { initialState
-                                        | clusters = singleClusterWithSingleServiceSelected
-                                        , caseCategories = caseCategories
-                                        , singleService = True
+                                    { partialNewState
+                                        | caseCategories = caseCategories
                                     }
 
                             Nothing ->
@@ -101,8 +112,8 @@ decoder =
     in
     D.map3
         (\a -> \b -> \c -> ( a, b, c ))
-        (D.field "clusters" <| Utils.selectListDecoder Cluster.decoder)
-        (D.field "caseCategories" <| Utils.selectListDecoder CaseCategory.decoder)
+        (D.field "clusters" <| SelectList.Extra.decoder Cluster.decoder)
+        (D.field "caseCategories" <| SelectList.Extra.decoder CaseCategory.decoder)
         (D.field "singlePart" <| modeDecoder)
         |> D.andThen createInitialState
 

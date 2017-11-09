@@ -1,10 +1,20 @@
-module CaseCategory exposing (..)
+module CaseCategory
+    exposing
+        ( CaseCategory
+        , Id(..)
+        , availableForSelectedCluster
+        , decoder
+        , extractId
+        , filterByIssues
+        , setSelectedIssue
+        )
 
 import Cluster exposing (Cluster)
 import Issue exposing (Issue)
 import Json.Decode as D
+import Maybe.Extra
 import SelectList exposing (SelectList)
-import Utils
+import SelectList.Extra
 
 
 type alias CaseCategory =
@@ -23,7 +33,7 @@ decoder =
     D.map3 CaseCategory
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
-        (D.field "issues" (Utils.selectListDecoder Issue.decoder))
+        (D.field "issues" (SelectList.Extra.decoder Issue.decoder))
 
 
 availableForSelectedCluster : SelectList Cluster -> CaseCategory -> Bool
@@ -37,13 +47,18 @@ availableForSelectedCluster clusters caseCategory =
 
 filterByIssues : SelectList CaseCategory -> (Issue -> Bool) -> Maybe (SelectList CaseCategory)
 filterByIssues caseCategories condition =
-    let
-        caseCategoryHasMatchingIssues =
-            .issues >> SelectList.toList >> List.any condition
-    in
-    SelectList.toList caseCategories
-        |> List.filter caseCategoryHasMatchingIssues
-        |> Utils.selectListFromList
+    SelectList.map (withJustMatchingIssues condition) caseCategories
+        |> SelectList.toList
+        |> Maybe.Extra.values
+        |> SelectList.Extra.fromList
+
+
+withJustMatchingIssues : (Issue -> Bool) -> CaseCategory -> Maybe CaseCategory
+withJustMatchingIssues condition caseCategory =
+    SelectList.toList caseCategory.issues
+        |> List.filter condition
+        |> SelectList.Extra.fromList
+        |> Maybe.map (asIssuesIn caseCategory)
 
 
 extractId : CaseCategory -> Int
@@ -51,3 +66,17 @@ extractId caseCategory =
     case caseCategory.id of
         Id id ->
             id
+
+
+setSelectedIssue : SelectList CaseCategory -> Issue.Id -> SelectList CaseCategory
+setSelectedIssue caseCategories issueId =
+    SelectList.Extra.nestedSelect
+        caseCategories
+        .issues
+        asIssuesIn
+        (Issue.sameId issueId)
+
+
+asIssuesIn : CaseCategory -> SelectList Issue -> CaseCategory
+asIssuesIn caseCategory issues =
+    { caseCategory | issues = issues }
