@@ -79,18 +79,29 @@ decoder =
                             singleClusterWithSingleServiceSelected =
                                 Cluster.setSelectedService clusters id
 
+                            partialNewState =
+                                { initialState
+                                    | clusters = singleClusterWithSingleServiceSelected
+                                    , singleService = True
+                                }
+
+                            singleService =
+                                selectedService partialNewState
+
                             applicableCaseCategories =
                                 -- Only include CaseCategorys, and Issues
-                                -- within them, which require a Service.
-                                CaseCategory.filterByIssues caseCategories Issue.requiresService
+                                -- within them, which require a Service and
+                                -- that single Service has acceptable
+                                -- ServiceType for.
+                                CaseCategory.filterByIssues
+                                    caseCategories
+                                    (Issue.serviceCanBeAssociatedWith singleService)
                         in
                         case applicableCaseCategories of
                             Just caseCategories ->
                                 D.succeed
-                                    { initialState
-                                        | clusters = singleClusterWithSingleServiceSelected
-                                        , caseCategories = caseCategories
-                                        , singleService = True
+                                    { partialNewState
+                                        | caseCategories = caseCategories
                                     }
 
                             Nothing ->
