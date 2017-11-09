@@ -91,13 +91,17 @@
         <%= render 'partials/flash_alert', flash_key: :success, alert_class: 'alert-success' %>
         <%= render 'partials/flash_alert', flash_key: :notice, alert_class: 'alert-info' %>
 
-        <div class="row">
-          <div class="col"></div>
-          <div class="col-6">
-            <%= yield %>
+        <% if signed_in? %>
+          <div class="row">
+            <div class="col"></div>
+            <div class="col-6">
+              <%= yield %>
+            </div>
+            <div class="col"></div>
           </div>
-          <div class="col"></div>
-        </div>
+        <% else %>
+          <%= yield %>
+        <% end %>
       </div>
 
     </div>
