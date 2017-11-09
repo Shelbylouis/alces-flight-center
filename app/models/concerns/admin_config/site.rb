@@ -25,6 +25,9 @@ module AdminConfig::Site
         configure :components do
           hide
         end
+        configure :services do
+          hide
+        end
         configure :additional_contacts do
           hide
         end
