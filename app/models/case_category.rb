@@ -2,6 +2,9 @@ class CaseCategory < ApplicationRecord
   include AdminConfig::CaseCategory
 
   has_many :issues
+  belongs_to :controlling_service_type,
+    class_name: 'ServiceType',
+    required: false
 
   validates :name, presence: true
 

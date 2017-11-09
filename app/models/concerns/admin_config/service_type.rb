@@ -20,6 +20,9 @@ module AdminConfig::ServiceType
         configure :services do
           hide
         end
+        configure :controlled_case_categories do
+          hide
+        end
       end
     end
   end

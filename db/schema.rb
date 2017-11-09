@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171108124629) do
+ActiveRecord::Schema.define(version: 20171109122821) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -54,6 +54,8 @@ ActiveRecord::Schema.define(version: 20171108124629) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "controlling_service_type_id"
+    t.index ["controlling_service_type_id"], name: "index_case_categories_on_controlling_service_type_id"
   end
 
   create_table "cases", force: :cascade do |t|
@@ -110,6 +112,9 @@ ActiveRecord::Schema.define(version: 20171108124629) do
     t.integer "component_group_id"
     t.string "support_type", default: "inherit", null: false
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
+  end
+
+  create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
   end
 
   create_table "issues", force: :cascade do |t|
@@ -169,6 +174,7 @@ ActiveRecord::Schema.define(version: 20171108124629) do
     t.index ["site_id"], name: "index_users_on_site_id"
   end
 
+  add_foreign_key "case_categories", "service_types", column: "controlling_service_type_id"
   add_foreign_key "cases", "services"
   add_foreign_key "issues", "service_types"
   add_foreign_key "services", "clusters"
