@@ -27,9 +27,13 @@ RSpec.feature 'password reset process', type: :feature do
 
     reset_start_email = ActionMailer::Base.deliveries.first
     expect(reset_start_email).to have_subject(/Reset your password/)
-    expect(reset_start_email).to have_body_text(
-      /#{Regexp.escape(user_reset_complete_path)}/
-    )
+
+    # Work around for `have_body_text` expectation failing after updating
+    # `mail` Gem; see https://github.com/email-spec/email-spec/issues/202.
+    expect(reset_start_email.to_s).to include(user_reset_complete_path)
+    # expect(reset_start_email).to have_body_text(
+    #   /#{Regexp.escape(user_reset_complete_path)}/
+    # )
 
     visit user_reset_complete_path
     expect(

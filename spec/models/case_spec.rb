@@ -132,7 +132,7 @@ RSpec.describe Case, type: :model do
     let :service { nil }
     let :part { nil }
 
-    let :issue { create(:issue, issue_attributes) }
+    let :issue { create(:issue, **issue_attributes) }
 
     # Specify advice issue to avoid managed issue-related validations failing,
     # unless explicitly testing these.
@@ -226,6 +226,41 @@ RSpec.describe Case, type: :model do
         context 'with `advice` cluster' do
           let :cluster { create(:advice_cluster) }
           it { is_expected.to be_valid }
+        end
+      end
+    end
+
+    context "when issue requires service of particular type" do
+      let :issue do
+        create(:issue, requires_service: true, service_type: service_type)
+      end
+
+      let :service_type do
+        create(:service_type, name: 'File System')
+      end
+
+      context 'when associated with service of that type' do
+        let :service do
+          create(:service, cluster: cluster, service_type: service_type)
+        end
+
+        it { is_expected.to be_valid }
+      end
+
+      context 'when associated with service of a different type' do
+        let :service do
+          create(
+            :service,
+            cluster: cluster,
+            service_type: create(:service_type, name: 'User Management')
+          )
+        end
+
+        it 'should be invalid' do
+          expect(subject).to be_invalid
+          expect(subject.errors.messages).to match(
+            service: [/must be.*File System.*but.*User Management/]
+          )
         end
       end
     end

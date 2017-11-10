@@ -31,6 +31,7 @@ gem 'seedbank'
 gem 'validates_email_format_of'
 gem 'webpacker', '~> 3.0'
 gem 'draper'
+gem 'rails-data-migrations'
 
 gem 'bootstrap', '~> 4.0.0.beta'
 gem 'jquery-rails' # Required for Bootstrap.
@@ -56,7 +57,7 @@ group :development, :test do
   gem 'selenium-webdriver'
 
   gem 'dotenv-rails'
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'rspec-rails'
   gem 'vcr'
   gem 'webmock'

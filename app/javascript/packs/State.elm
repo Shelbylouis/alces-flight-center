@@ -18,9 +18,9 @@ import Issue exposing (Issue)
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
+import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType(..))
-import Utils
 
 
 type alias State =
@@ -60,7 +60,7 @@ decoder =
                             applicableCaseCategories =
                                 -- Only include CaseCategorys, and Issues
                                 -- within them, which require a Component.
-                                CaseCategory.filterByIssues caseCategories .requiresComponent
+                                CaseCategory.filterByIssues caseCategories Issue.requiresComponent
                         in
                         case applicableCaseCategories of
                             Just caseCategories ->
@@ -79,18 +79,29 @@ decoder =
                             singleClusterWithSingleServiceSelected =
                                 Cluster.setSelectedService clusters id
 
+                            partialNewState =
+                                { initialState
+                                    | clusters = singleClusterWithSingleServiceSelected
+                                    , singleService = True
+                                }
+
+                            singleService =
+                                selectedService partialNewState
+
                             applicableCaseCategories =
                                 -- Only include CaseCategorys, and Issues
-                                -- within them, which require a Service.
-                                CaseCategory.filterByIssues caseCategories .requiresService
+                                -- within them, which require a Service and
+                                -- that single Service has acceptable
+                                -- ServiceType for.
+                                CaseCategory.filterByIssues
+                                    caseCategories
+                                    (Issue.serviceCanBeAssociatedWith singleService)
                         in
                         case applicableCaseCategories of
                             Just caseCategories ->
                                 D.succeed
-                                    { initialState
-                                        | clusters = singleClusterWithSingleServiceSelected
-                                        , caseCategories = caseCategories
-                                        , singleService = True
+                                    { partialNewState
+                                        | caseCategories = caseCategories
                                     }
 
                             Nothing ->
@@ -101,8 +112,8 @@ decoder =
     in
     D.map3
         (\a -> \b -> \c -> ( a, b, c ))
-        (D.field "clusters" <| Utils.selectListDecoder Cluster.decoder)
-        (D.field "caseCategories" <| Utils.selectListDecoder CaseCategory.decoder)
+        (D.field "clusters" <| SelectList.Extra.decoder Cluster.decoder)
+        (D.field "caseCategories" <| SelectList.Extra.decoder CaseCategory.decoder)
         (D.field "singlePart" <| modeDecoder)
         |> D.andThen createInitialState
 
@@ -167,13 +178,13 @@ encoder state =
 
         componentIdValue =
             partIdValue
-                .requiresComponent
+                Issue.requiresComponent
                 selectedComponent
                 Component.extractId
 
         serviceIdValue =
             partIdValue
-                .requiresService
+                Issue.requiresService
                 selectedService
                 Service.extractId
     in
@@ -184,7 +195,7 @@ encoder state =
                 , ( "issue_id", Issue.extractId issue |> E.int )
                 , ( "component_id", componentIdValue )
                 , ( "service_id", serviceIdValue )
-                , ( "details", E.string issue.details )
+                , ( "details", Issue.details issue |> E.string )
                 ]
           )
         ]
@@ -218,7 +229,7 @@ clusterPartAllowedForSelectedIssue state issueRequiresPart part =
             selectedIssue state
     in
     if issueRequiresPart issue then
-        case ( issue.supportType, part.supportType ) of
+        case ( Issue.supportType issue, part.supportType ) of
             ( Managed, Advice ) ->
                 -- An advice part cannot be associated with a managed issue.
                 False
@@ -254,6 +265,7 @@ isInvalid state =
     List.any not
         [ Issue.detailsValid issue
         , Issue.availableForSelectedCluster state.clusters issue
-        , partAllowedForSelectedIssue .requiresComponent component
-        , partAllowedForSelectedIssue .requiresService service
+        , partAllowedForSelectedIssue Issue.requiresComponent component
+        , partAllowedForSelectedIssue Issue.requiresService service
+        , Issue.serviceAllowedFor issue service
         ]

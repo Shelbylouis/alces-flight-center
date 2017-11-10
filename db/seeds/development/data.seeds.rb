@@ -118,3 +118,7 @@ site.clusters.create!(
     genders_host_range: 'anode[01-05]'
   )
 end
+
+# Run data migrations (from `rails-data-migrations` Gem) to (attempt to) keep
+# seeds in sync with production data.
+Rake::Task['data:migrate'].invoke

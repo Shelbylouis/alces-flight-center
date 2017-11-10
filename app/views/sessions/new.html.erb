@@ -1,13 +1,45 @@
-<div id='clearance' class='card sign-in'>
-  <div class='card-header'>
-    <ul class='nav'>
-      <li class='nav-item'>
-        <span class='navbar-brand'><%= t('.title') %></span>
-      </li>
-    </ul>
-  </div>
 
-  <div class='card-body'>
-    <%= render partial: '/sessions/form' %>
+<div class="row">
+  <div class="col" style="text-align:center">
+    <h1>Welcome to Alces Flight Center.</h1>
+    <p style="font-size: 18px;">
+      Your primary destination for professional support of your Alces Flight systems.
+    </p>
   </div>
+</div>
+
+<div class="row">
+  <div class="col"></div>
+  <div class="col-4">
+    <h4>What is Flight Center?</h4>
+    <p>
+      Designed to help you to make the most of your HPC resources, Alces Flight
+      Center gives you access to the expert systems management and support of
+      your Alces Flight systems.
+    </p>
+    <p>
+      Your Alces Flight account manager will provide you with your Flight
+      Center account details when your Alces Flight system is commissioned.
+      Simply sign in to view the current status of your support entitlement and
+      to log systems management and support requests with the Alces Flight
+      Crew.
+    </p>
+  </div>
+  <div class="col-md-4">
+    <div id='clearance' class='card sign-in'>
+      <div class='card-header'>
+        <ul class='nav'>
+          <li class='nav-item'>
+          <span class='navbar-brand'><%= t('.title') %></span>
+          </li>
+        </ul>
+      </div>
+
+      <div class='card-body'>
+        <%= render partial: '/sessions/form' %>
+      </div>
+    </div>
+
+  </div>
+  <div class="col"></div>
 </div>

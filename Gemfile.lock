@@ -115,10 +115,10 @@ GEM
       activemodel
     erubi (1.7.0)
     execjs (2.7.0)
-    factory_girl (4.9.0)
+    factory_bot (4.8.2)
       activesupport (>= 3.0.0)
-    factory_girl_rails (4.9.0)
-      factory_girl (~> 4.9.0)
+    factory_bot_rails (4.8.2)
+      factory_bot (~> 4.8.2)
       railties (>= 3.0.0)
     ffi (1.9.18)
     font-awesome-rails (4.7.0.2)
@@ -226,6 +226,8 @@ GEM
       actionpack (~> 5.x, >= 5.0.1)
       actionview (~> 5.x, >= 5.0.1)
       activesupport (~> 5.x)
+    rails-data-migrations (1.0.6)
+      rails (>= 4.0.0)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
@@ -367,7 +369,7 @@ DEPENDENCIES
   dotenv-rails
   draper
   email_spec
-  factory_girl_rails
+  factory_bot_rails
   http
   jbuilder (~> 2.5)
   jquery-rails
@@ -379,6 +381,7 @@ DEPENDENCIES
   puma (~> 3.7)
   rails (~> 5.1.4)
   rails-controller-testing
+  rails-data-migrations
   rails_admin (~> 1.2)
   rails_email_preview (~> 2.0.4)
   rspec-rails
