@@ -44,8 +44,7 @@ body {
   overflow-y: scroll;
 }
 
-footer {
-  // So Elm debugger appears in front of rather than behind footer in
-  // development.
-  z-index: -1;
+.elm-overlay {
+  // So Elm debugger always appears on top in development.
+  z-index: 10000;
 }
