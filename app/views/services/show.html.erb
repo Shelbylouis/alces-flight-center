@@ -13,6 +13,12 @@
 
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
-    <%= @service.readable_support_type.capitalize %> service
-  </li>
+      <%= @service.readable_support_type.capitalize %> service
+    </li>
+    <% if @service.description.present? %>
+      <li class="list-group-item">
+        <%= @service.description %>
+      </li>
+    <% end %>
+  </ul>
 </div>

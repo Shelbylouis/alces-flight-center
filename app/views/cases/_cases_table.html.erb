@@ -32,7 +32,7 @@
         <th>Association</th>
         <th>Details</th>
         <th>Contact support</th>
-        <th>Archive</th>
+        <th>Archive<%= archive ? '/Restore' : '' %></th>
       </tr>
     </thead>
 
@@ -42,7 +42,7 @@
         <% if c.archived %>
           <tr
             class="archived-case-row"
-            title="This support case has been archived; you must open a new support case if you wish to contact Alces Flight Support"
+            title="This support case has been archived; you should open a new support case if you wish to contact Alces Flight Support"
           >
         <% else %>
           <tr>

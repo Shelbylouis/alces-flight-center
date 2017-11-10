@@ -167,4 +167,57 @@ RSpec.describe Cluster, type: :model do
       expect(cluster_service_types).to eq(automatic_service_types)
     end
   end
+
+  describe '#component_groups_by_type' do
+    subject do
+      create(:cluster).tap do |cluster|
+
+        # 2 groups of servers.
+        cluster.component_groups.create!(
+          name: 'Node group',
+          component_type: server_component_type,
+          genders_host_range: 'node[01-03]',
+        )
+        cluster.component_groups.create!(
+          name: 'Other node group',
+          component_type: server_component_type,
+          genders_host_range: 'othernodes[01-02]',
+        )
+
+        cluster.component_groups.create!(
+          name: 'Another group',
+          component_type: another_component_type,
+        ).tap do |group|
+          group.components.create!(
+            name: 'Single component'
+          )
+        end
+      end.component_groups_by_type
+    end
+
+    let! :server_component_type do
+      create(:component_type, name: 'Server')
+    end
+    let! :another_component_type do
+      create(:component_type, name: 'Another Type')
+    end
+    let! :unused_component_type do
+      create(:component_type, name: 'Unused')
+    end
+
+    it "returns cluster's component groups, with intermediate type-related object" do
+      server_group = subject.first
+      expect(server_group.name).to eq('Server')
+      expect(server_group.component_groups.length).to eq 2
+
+      node_group = server_group.component_groups.first
+      expect(node_group.name).to eq 'Node group'
+      expect(node_group.components.length).to eq 3
+    end
+
+    it 'only includes component types that cluster has some components for' do
+      type_names = subject.map(&:name)
+      expect(type_names).to eq(['Server', 'Another Type'])
+    end
+  end
 end

@@ -66,42 +66,54 @@
   </table>
 </div>
 
-<% @cluster.component_groups.each do |group| %>
+<% @cluster.component_groups_by_type.each do |type| %>
   <div class='card'>
     <div class='card-header'>
       <ul class="nav">
         <li class="nav-item">
           <span class="navbar-brand">
-            <% group_size = group.components.length %>
-            <%= group.name %> &mdash; <%= pluralize(group_size, group.component_type.name) %>
+            <%= type.name.pluralize %>
           </span>
         </li>
       </ul>
     </div>
 
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Support type</th>
-        </tr>
-      </thead>
+    <div class='card-body'>
+      <% type.component_groups.each do |group| %>
+        <h6 class="card-title">
+          <% group_size = group.components.length %>
+          <%= group.name %> &mdash; <%= pluralize(group_size, group.component_type.name) %>
+        </h6>
 
-      <tbody>
-      <% group.components.each do |component| %>
-        <tr>
-          <td width='40%'>
-            <%= link_to component.name, component_path(component) %>
-          </td>
-          <td width='40%'>
-            <%= component.readable_support_type.capitalize %>
-          </td>
-          <td width='20%'>
-            <%= component.change_support_type_button %>
-          </td>
-        </tr>
+        <table class="table">
+
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Support type</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% group.decorate.components.each do |component| %>
+              <tr>
+                <td width='40%'>
+                  <%= link_to component.name, component_path(component) %>
+                </td>
+                <td width='40%'>
+                  <%= component.readable_support_type.capitalize %>
+                </td>
+                <td width='20%'>
+                  <%= component.change_support_type_button %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+
+        </table>
       <% end %>
-      </tbody>
-    </table>
+    </div>
+
   </div>
 <% end %>

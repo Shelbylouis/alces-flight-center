@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     resources :cases, only: [:new, :index, :create] do
       member do
         post :archive
+        post :restore
       end
     end
 

@@ -57,14 +57,17 @@ class CasesController < ApplicationController
   end
 
   def archive
-    @case = Case.find(params[:id])
-    @case.archived = true
-    if @case.save
-      flash[:success] = 'Support case archived.'
-    else
-      flash_object_errors(@case)
-    end
-    redirect_to root_path
+    archived_change_action(
+      archived: true,
+      success_flash: 'Support case archived.'
+    )
+  end
+
+  def restore
+    archived_change_action(
+      archived: false,
+      success_flash: 'Support case restored from archive.'
+    )
   end
 
   private
@@ -85,6 +88,17 @@ class CasesController < ApplicationController
     params.require(:case).permit(
       :issue_id, :cluster_id, :component_id, :service_id, :details
     )
+  end
+
+  def archived_change_action(archived:, success_flash:)
+    @case = Case.find(params[:id])
+    @case.archived = archived
+    if @case.save
+      flash[:success] = success_flash
+    else
+      flash_object_errors(@case)
+    end
+    redirect_to root_path
   end
 
   def format_errors(support_case)
