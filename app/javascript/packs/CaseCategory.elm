@@ -6,6 +6,7 @@ module CaseCategory
         , decoder
         , extractId
         , filterByIssues
+        , isControlledByService
         , setSelectedIssue
         )
 
@@ -15,12 +16,16 @@ import Json.Decode as D
 import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
+import Service exposing (Service)
+import ServiceType exposing (ServiceType)
+import Utils
 
 
 type alias CaseCategory =
     { id : Id
     , name : String
     , issues : SelectList Issue
+    , controllingServiceType : Maybe ServiceType
     }
 
 
@@ -30,10 +35,11 @@ type Id
 
 decoder : D.Decoder CaseCategory
 decoder =
-    D.map3 CaseCategory
+    D.map4 CaseCategory
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "issues" (SelectList.Extra.decoder Issue.decoder))
+        (D.field "controllingServiceType" (D.nullable ServiceType.decoder))
 
 
 availableForSelectedCluster : SelectList Cluster -> CaseCategory -> Bool
@@ -80,3 +86,17 @@ setSelectedIssue caseCategories issueId =
 asIssuesIn : CaseCategory -> SelectList Issue -> CaseCategory
 asIssuesIn caseCategory issues =
     { caseCategory | issues = issues }
+
+
+{-|
+
+    A CaseCategory is 'controlled by' a Service iff its
+    `controllingServiceType` is the same as the Service's ServiceType.
+
+-}
+isControlledByService : Service -> CaseCategory -> Bool
+isControlledByService service caseCategory =
+    Maybe.map
+        (Utils.sameId service.serviceType.id)
+        caseCategory.controllingServiceType
+        |> Maybe.withDefault False

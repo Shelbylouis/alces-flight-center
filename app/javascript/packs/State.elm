@@ -21,6 +21,7 @@ import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType(..))
+import Utils
 
 
 type alias State =
@@ -88,16 +89,42 @@ decoder =
                             singleService =
                                 selectedService partialNewState
 
-                            applicableCaseCategories =
-                                -- Only include CaseCategorys, and Issues
-                                -- within them, which require a Service and
-                                -- that single Service has acceptable
-                                -- ServiceType for.
+                            caseCategoriesControlledByService =
+                                -- Want to show CaseCategorys, and all Issues
+                                -- within them, which are controlled by the
+                                -- current Service.
+                                SelectList.toList caseCategories
+                                    |> List.filter (CaseCategory.isControlledByService singleService)
+
+                            otherCaseCategoriesWithIssuesTakingThisService =
+                                -- Also want to show other Issues, and parent
+                                -- CaseCategorys, which require a Service and
+                                -- this Service is acceptable for.
                                 CaseCategory.filterByIssues
                                     caseCategories
                                     (Issue.serviceCanBeAssociatedWith singleService)
+                                    |> Maybe.map
+                                        (SelectList.toList
+                                            -- Filter out the CaseCategorys
+                                            -- which will already be included
+                                            -- in the final list by
+                                            -- `caseCategoriesControlledByService`.
+                                            >> List.filter
+                                                (\caseCategory ->
+                                                    List.any
+                                                        (Utils.sameId caseCategory.id)
+                                                        caseCategoriesControlledByService
+                                                        |> not
+                                                )
+                                        )
+                                    |> Maybe.withDefault []
+
+                            availableCaseCategories =
+                                caseCategoriesControlledByService
+                                    ++ otherCaseCategoriesWithIssuesTakingThisService
+                                    |> SelectList.Extra.fromList
                         in
-                        case applicableCaseCategories of
+                        case availableCaseCategories of
                             Just caseCategories ->
                                 D.succeed
                                     { partialNewState
