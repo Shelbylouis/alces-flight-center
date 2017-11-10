@@ -15,12 +15,14 @@ import Json.Decode as D
 import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
+import ServiceType exposing (ServiceType)
 
 
 type alias CaseCategory =
     { id : Id
     , name : String
     , issues : SelectList Issue
+    , controllingServiceType : Maybe ServiceType
     }
 
 
@@ -30,10 +32,11 @@ type Id
 
 decoder : D.Decoder CaseCategory
 decoder =
-    D.map3 CaseCategory
+    D.map4 CaseCategory
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "issues" (SelectList.Extra.decoder Issue.decoder))
+        (D.field "controllingServiceType" (D.nullable ServiceType.decoder))
 
 
 availableForSelectedCluster : SelectList Cluster -> CaseCategory -> Bool
