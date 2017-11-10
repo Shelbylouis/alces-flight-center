@@ -22,7 +22,7 @@ Rails.application.routes.draw do
   end
 
   constraints Clearance::Constraints::SignedIn.new do
-    root 'home#index'
+    root 'sites#show'
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
     resources :cases, only: [:new, :index, :create] do

@@ -1,5 +1,5 @@
-class HomeController < ApplicationController
-  def index
+class SitesController < ApplicationController
+  def show
     @title = "#{current_site.name} Management Dashboard"
     @subtitle = "Welcome #{current_user.name}"
 
