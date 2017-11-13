@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   before_action :define_navigation_variables
 
   def current_site
-    current_user.site
+    @site
   end
 
   # From https://stackoverflow.com/a/4983354/2620402.
@@ -14,7 +14,14 @@ class ApplicationController < ActionController::Base
   end
 
   def define_navigation_variables
+    return unless current_user
+
+    @site = current_user.site
+
     case request.path
+    when /^\/sites/
+      id = params[:id]
+      @site = Site.find(id) if current_user.admin?
     when /^\/clusters/
       id = params[:cluster_id] || params[:id]
       @cluster = Cluster.find(id)
@@ -25,6 +32,8 @@ class ApplicationController < ActionController::Base
       id = params[:service_id] || params[:id]
       @cluster_part = Service.find(id)
     end
+
     @cluster = @cluster_part.cluster if @cluster_part
+    @site = @cluster.site if @cluster && current_user.admin?
   end
 end

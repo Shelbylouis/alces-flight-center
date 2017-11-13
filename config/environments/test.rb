@@ -47,6 +47,9 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
+  # Enable Clearance back door in feature and request specs.
+  config.middleware.use Clearance::BackDoor
+
   # Alces Flight Center custom config.
   config.rt_interface_class = FakeRequestTrackerInterface.to_s
 end

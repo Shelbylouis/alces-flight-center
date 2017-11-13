@@ -13,7 +13,8 @@ Rails.application.routes.draw do
   get '/reset-password/complete' => 'passwords#reset_complete'
 
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
-    root 'rails_admin/main#dashboard'
+    root 'sites#index'
+    resources :sites, only: [:show, :index]
 
     # To display a working link to sign users out of the admin dashboard,
     # rails-admin expects a `logout_path` route helper to exist which will sign
@@ -22,7 +23,7 @@ Rails.application.routes.draw do
   end
 
   constraints Clearance::Constraints::SignedIn.new do
-    root 'home#index'
+    root 'sites#show'
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
     resources :cases, only: [:new, :index, :create] do

@@ -127,7 +127,7 @@ RSpec.describe Cluster, type: :model do
 
     describe '#documents' do
       it 'returns needed data for each Cluster document' do
-        VCR.use_cassette('s3_read_documents', re_record_interval: 7.days) do
+        VCR.use_cassette('s3_read_documents') do
           Development::Utils.upload_document_fixtures_for(subject)
 
           documents = subject.documents

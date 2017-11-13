@@ -23,7 +23,7 @@ RSpec.shared_examples 'Request Tracker interface' do
 
   describe '#create_ticket' do
     it 'creates a ticket and returns object with id' do
-      VCR.use_cassette(RT_CREATE_TICKET_CASSETTE, re_record_interval: 7.days) do
+      VCR.use_cassette(RT_CREATE_TICKET_CASSETTE) do
         ticket = subject.create_ticket(new_ticket_params)
 
         # All tickets now have IDs greater than this.
@@ -53,7 +53,7 @@ RSpec.describe RequestTrackerInterface do
         )
       ).and_call_original
 
-      VCR.use_cassette(RT_CREATE_TICKET_CASSETTE, re_record_interval: 7.days) do
+      VCR.use_cassette(RT_CREATE_TICKET_CASSETTE) do
         subject.create_ticket(new_ticket_params)
       end
     end
