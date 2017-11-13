@@ -13,17 +13,18 @@
 
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
-    <%= @component.readable_support_type.capitalize %> component
-  </li>
+      <%= @component.readable_support_type.capitalize %> component
+    </li>
+  </ul>
 </div>
 
 <div class='card'>
   <div class='card-header'>
     <ul class="nav">
       <li class="nav-item">
-      <span class="navbar-brand">
-        Asset Record
-      </span>
+        <span class="navbar-brand">
+          Asset Record
+        </span>
       </li>
     </ul>
   </div>
@@ -39,10 +40,10 @@
     <tbody>
     <% @component.asset_record.each do |name, value| %>
       <tr>
-      <td><%= name %></td>
-      <td><%= value %></td>
-    </tr>
-  <% end %>
+        <td><%= name %></td>
+        <td><%= value %></td>
+      </tr>
+    <% end %>
     </tbody>
   </table>
 </div>
