@@ -13,6 +13,9 @@ class ApplicationDecorator < Draper::Decorator
     request_managed_issue:,
     part_id_symbol:
   )
+    # Do nothing if both `support_type` change Issues not passed.
+    return unless request_advice_issue && request_managed_issue
+
     params = if managed?
                {
                  change_description: 'self-management',
