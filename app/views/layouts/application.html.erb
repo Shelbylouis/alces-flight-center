@@ -28,7 +28,7 @@
           <% if signed_in? %>
             <% if current_user.admin? %>
               <li class="nav-item">
-                <%= link_to (raw('<span class="fa fa-globe"></span> ') + 'Alces'),
+                <%= link_to (raw('<span class="fa fa-globe"></span> ') + 'All Sites'),
                   root_path,
                   class: "nav-link #{@site ? '' : 'nav-link--active'}"
                 %>
@@ -66,7 +66,19 @@
           <% end %>
 
         </ul>
+
         <% if signed_in? %>
+          <% if current_user.admin? %>
+            <ul class="navbar-nav justify-content-end">
+              <li class="nav-item">
+                <%= link_to (raw('<span class="fa fa-database"></span> ') + 'Admin Interface'),
+                  rails_admin_path,
+                  class: "nav-link"
+                %>
+              </li>
+            </ul>
+          <% end %>
+
           <span class="navbar-text text-light"><%= current_user.name %></span>
           <%= button_to 'Sign out',
             sign_out_path,
