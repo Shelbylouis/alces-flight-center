@@ -1,5 +1,9 @@
 
 FactoryBot.define do
+  sequence :email do |n|
+    "a.scientist.#{n}@liverpool.ac.uk"
+  end
+
   factory :site do
     name 'Liverpool University'
   end
@@ -7,7 +11,7 @@ FactoryBot.define do
   factory :user do
     site
     name 'A Scientist'
-    email 'a.scientist@liverpool.ac.uk'
+    email
     password 'definitely_encrypted'
 
     factory :contact do
@@ -22,7 +26,7 @@ FactoryBot.define do
 
   factory :additional_contact do
     site
-    email 'additional.contact@example.com'
+    email
   end
 
   factory :component_type do
