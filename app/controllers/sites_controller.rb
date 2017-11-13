@@ -1,8 +1,11 @@
 class SitesController < ApplicationController
-  def show
-    @title = "#{current_site.name} Management Dashboard"
-    @subtitle = "Welcome #{current_user.name}"
+  def index
+    @title = 'Alces Admin Sites Dashboard'
+    @sites = Site.all
+  end
 
-    @site = current_site
+  def show
+    @title = "#{@site.name} Management Dashboard"
+    @subtitle = "Welcome #{@site.name}"
   end
 end

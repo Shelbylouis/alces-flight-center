@@ -13,6 +13,11 @@ FactoryBot.define do
     factory :contact do
       admin false
     end
+
+    factory :admin do
+      admin true
+      site nil
+    end
   end
 
   factory :additional_contact do
