@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171113165616) do
+ActiveRecord::Schema.define(version: 20171113170755) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -114,6 +114,16 @@ ActiveRecord::Schema.define(version: 20171113165616) do
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end
 
+  create_table "credit_charges", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "case_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "amount", null: false
+    t.index ["case_id"], name: "index_credit_charges_on_case_id"
+    t.index ["user_id"], name: "index_credit_charges_on_user_id"
+  end
+
   create_table "credit_deposits", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -186,6 +196,8 @@ ActiveRecord::Schema.define(version: 20171113165616) do
 
   add_foreign_key "case_categories", "service_types", column: "controlling_service_type_id"
   add_foreign_key "cases", "services"
+  add_foreign_key "credit_charges", "cases"
+  add_foreign_key "credit_charges", "users"
   add_foreign_key "credit_deposits", "clusters"
   add_foreign_key "credit_deposits", "users"
   add_foreign_key "issues", "service_types"
