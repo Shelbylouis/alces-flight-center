@@ -6,6 +6,7 @@ class Case < ApplicationRecord
   belongs_to :component, required: false
   belongs_to :service, required: false
   belongs_to :user
+  has_one :credit_charge, required: false
 
   delegate :case_category, to: :issue
   delegate :site, to: :cluster

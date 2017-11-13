@@ -220,4 +220,26 @@ RSpec.describe Cluster, type: :model do
       expect(type_names).to eq(['Server', 'Another Type'])
     end
   end
+
+  describe '#credits' do
+    subject do
+      create(:cluster).tap do |cluster|
+        create(:credit_deposit, cluster: cluster, amount: 20)
+        create(:credit_deposit, cluster: cluster, amount: 2)
+
+        create(:case, cluster: cluster).tap do |case_|
+          create(:credit_charge, case: case_, amount: 5)
+        end
+
+        create(:case, cluster: cluster).tap do |case_|
+          create(:credit_charge, case: case_, amount: 2)
+        end
+
+        # Case without CreditCharge; should not effect total credits.
+        create(:case, cluster: cluster)
+      end.credits
+    end
+
+    it { is_expected.to eq 15 }
+  end
 end

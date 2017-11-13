@@ -60,4 +60,16 @@ FactoryBot.define do
       automatic true
     end
   end
+
+  factory :credit_deposit do
+    cluster
+    user { create(:admin) }
+    amount 10
+  end
+
+  factory :credit_charge do
+    add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
+    user { create(:admin) }
+    amount 2
+  end
 end
