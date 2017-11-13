@@ -6,19 +6,32 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'new_case_form' %>
 
-    <%= stylesheet_link_tag 'flight-branding/flight-chrome', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= stylesheet_link_tag 'flight-branding/fonts', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'flight-branding/flight-chrome',
+      media: 'all',
+      'data-turbolinks-track': 'reload'
+    %>
+    <%= stylesheet_link_tag 'flight-branding/fonts',
+      media: 'all',
+      'data-turbolinks-track': 'reload'
+    %>
   </head>
 
   <body>
     <div id='brand-header'></div>
     <nav class="navbar navbar-toggleable-md navbar-inverse product-bar fixed-top">
-      <%# <a class="navbar-brand" href="/">Alces Flight Center</a> %>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
         <span class="navbar-toggler-icon"></span>
       </button>
 
