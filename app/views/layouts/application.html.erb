@@ -27,7 +27,7 @@
 
           <% if signed_in? %>
             <li class="nav-item">
-              <%= link_to (raw('<span class="fa fa-institution"></span> ') + current_site.name),
+              <%= link_to (raw('<span class="fa fa-institution"></span> ') + @site.name),
                 root_path,
                 class: "nav-link #{@cluster ? '' : 'nav-link--active'}"
               %>

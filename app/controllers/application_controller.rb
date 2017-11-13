@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   before_action :define_navigation_variables
 
   def current_site
-    current_user.site
+    current_user&.site
   end
 
   # From https://stackoverflow.com/a/4983354/2620402.
@@ -14,6 +14,8 @@ class ApplicationController < ActionController::Base
   end
 
   def define_navigation_variables
+    @site = current_site
+
     case request.path
     when /^\/clusters/
       id = params[:cluster_id] || params[:id]
