@@ -12,21 +12,9 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     allow_any_instance_of(Cluster).to receive(:documents).and_return []
   end
 
-  RSpec.shared_examples 'assigns @site' do
-    it 'assigns @site' do
-      expect(assigns(:site)).to eq site
-    end
-  end
-
-  RSpec.shared_examples 'assigns @cluster' do
-    it 'assigns @cluster' do
-      expect(assigns(:cluster)).to eq cluster
-    end
-  end
-
-  RSpec.shared_examples 'does not assign @cluster_part' do
-    it 'does not assign @cluster_part' do
-      expect(assigns(:cluster_part)).to be nil
+  def assigns_navigation_variables(vars)
+    vars.each do |var, value|
+      expect(assigns(var)).to eq value
     end
   end
 
@@ -36,8 +24,12 @@ RSpec.describe 'Navigation variable assignments', type: :request do
         get root_path
       end
 
-      it 'does not assign @site' do
-        expect(assigns(:site)).to be nil
+      it 'assigns correct navigation variables' do
+        assigns_navigation_variables(
+          site: nil,
+          cluster: nil,
+          cluster_part: nil
+        )
       end
     end
   end
@@ -48,11 +40,12 @@ RSpec.describe 'Navigation variable assignments', type: :request do
         get root_path(as: contact)
       end
 
-      include_examples 'assigns @site'
-      include_examples 'does not assign @cluster_part'
-
-      it 'does not assign @cluster' do
-        expect(assigns(:cluster)).to be nil
+      it 'assigns correct navigation variables' do
+        assigns_navigation_variables(
+          site: site,
+          cluster: nil,
+          cluster_part: nil
+        )
       end
     end
 
@@ -61,9 +54,14 @@ RSpec.describe 'Navigation variable assignments', type: :request do
         get cluster_path(cluster.id, as: contact)
       end
 
-      include_examples 'assigns @site'
-      include_examples 'assigns @cluster'
-      include_examples 'does not assign @cluster_part'
+      it 'assigns correct navigation variables' do
+        assigns_navigation_variables(
+          site: site,
+          cluster: cluster,
+          cluster_part: nil
+        )
+      end
+
     end
 
     describe "get /components/*" do
@@ -71,11 +69,12 @@ RSpec.describe 'Navigation variable assignments', type: :request do
         get component_path(component.id, as: contact)
       end
 
-      include_examples 'assigns @site'
-      include_examples 'assigns @cluster'
-
-      it 'assigns @cluster_part to Component' do
-        expect(assigns(:cluster_part)).to eq component
+      it 'assigns correct navigation variables' do
+        assigns_navigation_variables(
+          site: site,
+          cluster: cluster,
+          cluster_part: component
+        )
       end
     end
 
@@ -84,11 +83,12 @@ RSpec.describe 'Navigation variable assignments', type: :request do
         get service_path(service.id, as: contact)
       end
 
-      include_examples 'assigns @site'
-      include_examples 'assigns @cluster'
-
-      it 'assigns @cluster_part to Service' do
-        expect(assigns(:cluster_part)).to eq service
+      it 'assigns correct navigation variables' do
+        assigns_navigation_variables(
+          site: site,
+          cluster: cluster,
+          cluster_part: service
+        )
       end
     end
   end
