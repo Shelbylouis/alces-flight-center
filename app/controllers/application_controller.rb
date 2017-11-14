@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
 
     case request.path
     when /^\/sites/
-      id = params[:id]
+      id = params[:site_id] || params[:id]
       @site = Site.find(id) if current_user.admin?
     when /^\/clusters/
       id = params[:cluster_id] || params[:id]

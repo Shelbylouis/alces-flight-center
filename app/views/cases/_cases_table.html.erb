@@ -11,7 +11,7 @@
       <% unless archive %>
         <li class="nav-item">
           <%= link_to 'View all',
-            cases_path,
+            current_user.admin? ? site_cases_path(@site) : cases_path,
             class: ['nav-link', 'btn', 'btn-dark'],
             role: 'button'
           %>
