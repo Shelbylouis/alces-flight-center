@@ -1,4 +1,6 @@
 
+<% manage_cases_page = current_user.admin? && archive %>
+
 <div class='card'>
   <div class='card-header'>
     <ul class="nav">
@@ -31,15 +33,17 @@
         <th>Cluster</th>
         <th>Association</th>
         <th>Details</th>
-        <th>Contact support</th>
-        <th>Archive<%= archive ? '/Restore' : '' %></th>
+        <% unless manage_cases_page %>
+          <th>Contact support</th>
+          <th>Archive<%= archive ? '/Restore' : '' %></th>
+        <% end %>
       </tr>
     </thead>
 
     <tbody>
     <% cases.order(created_at: :desc).decorate.each do |c| %>
       <% if archive || c.open %>
-        <% if c.archived %>
+        <% if c.archived && !manage_cases_page %>
           <tr
             class="archived-case-row"
             title="This support case has been archived; you should open a new support case if you wish to contact Alces Flight Support"
@@ -58,8 +62,10 @@
           <td><%= c.cluster.name %></td>
           <td><%= c.association_info %></td>
           <td><%= c.details %></td>
-          <td><%= render 'cases/email_support_icon', support_case: c %></td>
-          <td><%= render 'cases/archive_icon', support_case: c %></td>
+          <% unless manage_cases_page %>
+            <td><%= render 'cases/email_support_icon', support_case: c %></td>
+            <td><%= render 'cases/archive_icon', support_case: c %></td>
+          <% end %>
         </tr>
       <% end %>
     <% end %>

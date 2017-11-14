@@ -3,7 +3,11 @@ class CasesController < ApplicationController
 
   def index
     @cases = current_site.cases
-    @title = 'Support case archive'
+    @title = if current_user.admin?
+               'Manage support cases'
+             else
+               'Support case archive'
+             end
   end
 
   def new

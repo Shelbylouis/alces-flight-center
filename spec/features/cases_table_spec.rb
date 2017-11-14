@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Cases table', type: :feature do
   let! :contact { create(:contact, site: site) }
+  let! :admin { create(:admin) }
   let :site { create(:site) }
   let :cluster { create(:cluster, site: site) }
 
@@ -13,27 +14,33 @@ RSpec.describe 'Cases table', type: :feature do
     create(:archived_case, cluster: cluster, details: 'Archived case')
   end
 
+  RSpec.shared_examples 'open cases table rendered' do
+    it 'renders table of open Cases' do
+      visit path
+
+      expect(page).to have_text('Open support cases')
+
+      cases = all('tr').map(&:text)
+      expect(cases).to have_text('Open case')
+      expect(cases).not_to have_text('Archived case')
+
+      headings = all('th').map(&:text)
+      expect(headings).to include('Contact support')
+      expect(headings).to include('Archive')
+
+      links = all('a').map { |a| a[:href] }
+      expect(links).to include(open_case.mailto_url)
+      expect(links).to include(archive_case_path(open_case))
+    end
+  end
+
   context 'when user is contact' do
     let :user { contact }
 
     context 'when visit site dashboard' do
-      it 'renders table of open Cases' do
-        visit root_path(as: user)
+      let :path { root_path(as: user) }
 
-        expect(page).to have_text('Open support cases')
-
-        cases = all('tr').map(&:text)
-        expect(cases).to have_text('Open case')
-        expect(cases).not_to have_text('Archived case')
-
-        headings = all('th').map(&:text)
-        expect(headings).to include('Contact support')
-        expect(headings).to include('Archive')
-
-        links = all('a').map { |a| a[:href] }
-        expect(links).to include(open_case.mailto_url)
-        expect(links).to include(archive_case_path(open_case))
-      end
+      include_examples 'open cases table rendered'
     end
 
     context 'when visit cases page' do
@@ -61,4 +68,41 @@ RSpec.describe 'Cases table', type: :feature do
     end
   end
 
+  context 'when user is admin' do
+    let :user { admin }
+
+    context 'when visit site dashboard' do
+      let :path { site_path(site, as: user) }
+
+      # At least for now, want to render open Cases table on Site dashboard the
+      # same for both admins as contacts.
+      include_examples 'open cases table rendered'
+    end
+
+    context 'when visit cases page' do
+      it 'renders table of all Cases, without Contact-specific buttons/info' do
+        visit site_cases_path(site, as: user)
+
+        cases = all('tr').map(&:text)
+        expect(cases).to have_text('Open case')
+        expect(cases).to have_text('Archived case')
+
+        headings = all('th').map(&:text)
+        expect(headings).not_to include('Contact support')
+        expect(headings).not_to include('Archive/Restore')
+
+        links = all('a')
+
+        mailto_links = links.select { |a| a[:href].match?('mailto') }
+        expect(mailto_links).to eq []
+
+        archive_links = links.select { |a| a[:href].match?('archive') }
+        expect(archive_links).to eq []
+
+        expect do
+          find('.archived-case-row')
+        end.to raise_error(Capybara::ElementNotFound)
+      end
+    end
+  end
 end
