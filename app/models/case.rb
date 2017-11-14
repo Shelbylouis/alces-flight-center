@@ -1,6 +1,15 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
 
+  TICKET_STATUSES = [
+    'new',
+    'open',
+    'stalled',
+    'resolved',
+    'rejected',
+    'deleted',
+  ].freeze
+
   belongs_to :issue
   belongs_to :cluster
   belongs_to :component, required: false
@@ -13,6 +22,10 @@ class Case < ApplicationRecord
 
   validates :details, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
+
+  validates :last_known_ticket_status,
+    presence: true,
+    inclusion: {in: TICKET_STATUSES}
 
   validates_with Validator
 

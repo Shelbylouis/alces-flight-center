@@ -12,6 +12,9 @@ module AdminConfig::Case
         configure :rt_ticket_id do
           hide
         end
+        configure :last_known_ticket_status do
+          hide
+        end
         configure :credit_charge do
           hide
         end
