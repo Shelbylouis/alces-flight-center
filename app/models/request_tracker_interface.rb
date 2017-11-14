@@ -37,9 +37,16 @@ class RequestTrackerInterface
   def show_ticket(id)
     path = "ticket/#{id}/show"
     response = api_request(path)
+    response_text = response.to_s
+
+    # Rudimentary check that response is in expected format.
+    response_appears_correct = response_text.match?(/id: ticket\//)
+    unless response_appears_correct
+      raise UnexpectedRtApiResponseException, response.body
+    end
 
     # Ticket data is sandwiched between blank lines at both ends.
-    ticket_data = response.to_s.split("\n\n").second
+    ticket_data = response_text.split("\n\n").second
 
     ticket_struct_from_data(ticket_data)
   end

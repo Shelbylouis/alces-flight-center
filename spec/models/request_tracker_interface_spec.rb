@@ -101,6 +101,12 @@ RSpec.describe RequestTrackerInterface do
       VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) { subject }
     end
   end
+
+  describe '#show_ticket' do
+    subject { rt_interface.show_ticket(10003) }
+
+    include_examples 'error_handling'
+  end
 end
 
 RSpec.describe FakeRequestTrackerInterface do
