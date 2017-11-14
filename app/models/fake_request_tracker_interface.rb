@@ -6,4 +6,10 @@ class FakeRequestTrackerInterface
     current_max_rt_ticket_id = Case.maximum(:rt_ticket_id) || 10000
     RequestTrackerInterface::Ticket.new(current_max_rt_ticket_id + 1)
   end
+
+  def show_ticket(id)
+    {
+      status: 'resolved'
+    }.to_struct
+  end
 end

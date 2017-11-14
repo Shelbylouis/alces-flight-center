@@ -27,6 +27,20 @@ RSpec.shared_examples 'Request Tracker interface' do
       end
     end
   end
+
+  describe '#show_ticket [interface]' do
+    it 'returns ticket data including status' do
+      VCR.use_cassette(VcrCassettes::RT_SHOW_TICKET) do
+        ticket = subject.show_ticket(10003)
+
+        # Ticket 10003 happens to be a real ticket which is 'resolved' (see
+        # http://helpdesk.alces-software.com/rt/REST/1.0/ticket/10003), and we
+        # also want fake interface to give 'resolved' status by default, so
+        # this expectation should pass for both implementations.
+        expect(ticket.status).to eq 'resolved'
+      end
+    end
+  end
 end
 
 RSpec.describe RequestTrackerInterface do

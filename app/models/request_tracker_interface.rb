@@ -24,7 +24,7 @@ class RequestTrackerInterface
       text: text
     )
 
-    response = api_request(NEW_TICKET_PATH, content: content)
+    response = api_request(NEW_TICKET_PATH, body:  "content=#{content}")
 
     ticket_id_regex = /Ticket (\d{5,}) created./
     response_match = response.to_s.match(ticket_id_regex)
@@ -34,14 +34,24 @@ class RequestTrackerInterface
     Ticket.new(id)
   end
 
+  def show_ticket(id)
+    path = "ticket/#{id}/show"
+    response = api_request(path)
+
+    # Ticket data is sandwiched between blank lines at both ends.
+    ticket_data = response.to_s.split("\n\n").second
+
+    ticket_struct_from_data(ticket_data)
+  end
+
   private
 
-  def api_request(path, content:)
+  def api_request(path, body: nil)
     url = URI.join(api_endpoint, path)
     HTTP.timeout(write: 2, connect: 5, read: 10).post(
       url,
       params: { user: username, pass: password },
-      body: "content=#{content}"
+      body: body
     ).tap do |r|
       raise UnexpectedRtApiResponseException, r.body unless r.status.success?
     end
@@ -55,5 +65,15 @@ class RequestTrackerInterface
       Subject: subject,
       Text: text
     )
+  end
+
+  def ticket_struct_from_data(ticket_data)
+    ticket_data.lines.map do |line|
+      line.split(':').map(&:strip)
+    end.map do |property, value|
+      # Create nice method name from ticket property name.
+      property_access_method = property.downcase.gsub('-', '_').to_sym
+      [property_access_method, value]
+    end.to_h.to_struct
   end
 end
