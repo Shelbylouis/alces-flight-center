@@ -46,27 +46,8 @@ end
 RSpec.describe RequestTrackerInterface do
   include_context 'Request Tracker interface'
 
-  describe '#create_ticket' do
-    subject { rt_interface.create_ticket(new_ticket_params) }
-
+  RSpec.shared_examples 'error_handling' do
     let :bad_response_body { 'Oh no, things went wrong' }
-
-    it 'includes correct request body' do
-      expect_any_instance_of(HTTP::Client).to receive(:post).with(
-        any_args,
-        hash_including(
-          body: 'content=' + Utils.rt_format(
-            Queue: 'Support',
-            Requestor: new_ticket_params[:requestor_email],
-            Cc: new_ticket_params[:cc].join(','),
-            Subject: new_ticket_params[:subject],
-            Text: new_ticket_params[:text],
-          )
-        )
-      ).and_call_original
-
-      VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) { subject }
-    end
 
     it 'raises when API responds with an unexpected status' do
       stub_request(
@@ -95,6 +76,29 @@ RSpec.describe RequestTrackerInterface do
           UnexpectedRtApiResponseException, bad_response_body
         )
       end
+    end
+  end
+
+  describe '#create_ticket' do
+    subject { rt_interface.create_ticket(new_ticket_params) }
+
+    include_examples 'error_handling'
+
+    it 'includes correct request body' do
+      expect_any_instance_of(HTTP::Client).to receive(:post).with(
+        any_args,
+        hash_including(
+          body: 'content=' + Utils.rt_format(
+            Queue: 'Support',
+            Requestor: new_ticket_params[:requestor_email],
+            Cc: new_ticket_params[:cc].join(','),
+            Subject: new_ticket_params[:subject],
+            Text: new_ticket_params[:text],
+          )
+        )
+      ).and_call_original
+
+      VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) { subject }
     end
   end
 end
