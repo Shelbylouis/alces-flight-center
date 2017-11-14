@@ -3,10 +3,6 @@ require 'rails_helper'
 RSpec.shared_examples 'Request Tracker interface' do
   subject { described_class.new }
 
-  unless defined?(RT_CREATE_TICKET_CASSETTE)
-    RT_CREATE_TICKET_CASSETTE = 'rt_create_ticket'
-  end
-
   let :new_ticket_params do
     {
       requestor_email: 'test@example.com',
@@ -23,7 +19,7 @@ RSpec.shared_examples 'Request Tracker interface' do
 
   describe '#create_ticket' do
     it 'creates a ticket and returns object with id' do
-      VCR.use_cassette(RT_CREATE_TICKET_CASSETTE) do
+      VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) do
         ticket = subject.create_ticket(new_ticket_params)
 
         # All tickets now have IDs greater than this.
@@ -53,7 +49,7 @@ RSpec.describe RequestTrackerInterface do
         )
       ).and_call_original
 
-      VCR.use_cassette(RT_CREATE_TICKET_CASSETTE) do
+      VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) do
         subject.create_ticket(new_ticket_params)
       end
     end
