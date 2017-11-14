@@ -35,6 +35,12 @@ module AdminConfig::Cluster
         configure :services do
           hide
         end
+        configure :credit_charges do
+          hide
+        end
+        configure :credit_deposits do
+          hide
+        end
       end
     end
   end
