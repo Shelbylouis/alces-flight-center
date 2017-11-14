@@ -17,7 +17,7 @@ RSpec.shared_examples 'Request Tracker interface' do
     }
   end
 
-  describe '#create_ticket' do
+  describe '#create_ticket [interface]' do
     it 'creates a ticket and returns object with id' do
       VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) do
         ticket = subject.create_ticket(new_ticket_params)
