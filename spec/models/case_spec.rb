@@ -330,7 +330,7 @@ RSpec.describe Case, type: :model do
     let :cluster { create(:cluster, site: site, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
     let :service { create(:service, name: 'Some service', cluster: cluster) }
-    let :request_tracker { subject.send(:request_tracker) }
+    let :request_tracker { described_class.send(:request_tracker) }
 
     let :fake_rt_ticket { OpenStruct.new(id: 1234) }
 

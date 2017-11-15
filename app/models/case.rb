@@ -46,7 +46,7 @@ class Case < ApplicationRecord
   def create_rt_ticket
     return unless cluster
 
-    ticket = request_tracker.create_ticket(
+    ticket = rt.create_ticket(
       requestor_email: requestor_email,
       cc: cc_emails,
       subject: rt_ticket_subject,
@@ -56,7 +56,11 @@ class Case < ApplicationRecord
     self.rt_ticket_id = ticket.id
   end
 
-  def request_tracker
+  def rt
+    self.class.request_tracker
+  end
+
+  def self.request_tracker
     # Note: `rt_interface_class` is a string which we `constantize`, rather
     # than a constant directly, otherwise Rails autoloading in development
     # could leave us holding a reference to an outdated version of the class,
