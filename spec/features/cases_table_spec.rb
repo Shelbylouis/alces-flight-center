@@ -118,11 +118,22 @@ RSpec.describe 'Cases table', type: :feature do
           expect(open_case.reload.last_known_ticket_status).to eq 'open'
           expect(archived_case.reload.last_known_ticket_status).to eq completion_status
 
+          tds = all('td').map(&:text)
+          expect(tds).to include('open')
+          expect(tds).to include(completion_status)
+
           # Archived Case has reached completion status so ticket status is not
           # reloaded.
           visit site_cases_path(site, as: user)
           expect(open_case.reload.last_known_ticket_status).to eq 'stalled'
           expect(archived_case.reload.last_known_ticket_status).to eq completion_status
+
+          tds = all('td').map(&:text)
+          expect(tds).to include('stalled')
+          expect(tds).to include(completion_status)
+
+          headings = all('th').map(&:text)
+          expect(headings).to include('Ticket status')
         end
       end
     end
