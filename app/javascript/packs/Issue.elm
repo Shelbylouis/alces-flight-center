@@ -39,6 +39,7 @@ type alias IssueData =
     , name : String
     , details : String
     , supportType : SupportType
+    , chargeable : Bool
     }
 
 
@@ -57,23 +58,24 @@ decoder =
                             \detailsTemplate ->
                                 \supportType ->
                                     \serviceType ->
-                                        let
-                                            data =
-                                                IssueData id name detailsTemplate supportType
-                                        in
-                                        if requiresComponent then
-                                            ComponentRequiredIssue data
-                                        else if requiresService then
-                                            case serviceType of
-                                                Just type_ ->
-                                                    SpecificServiceRequiredIssue type_ data
+                                        \chargeable ->
+                                            let
+                                                data =
+                                                    IssueData id name detailsTemplate supportType chargeable
+                                            in
+                                            if requiresComponent then
+                                                ComponentRequiredIssue data
+                                            else if requiresService then
+                                                case serviceType of
+                                                    Just type_ ->
+                                                        SpecificServiceRequiredIssue type_ data
 
-                                                Nothing ->
-                                                    ServiceRequiredIssue data
-                                        else
-                                            StandardIssue data
+                                                    Nothing ->
+                                                        ServiceRequiredIssue data
+                                            else
+                                                StandardIssue data
     in
-    D.map7 createIssue
+    D.map8 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
@@ -81,6 +83,7 @@ decoder =
         (D.field "detailsTemplate" D.string)
         (D.field "supportType" SupportType.decoder)
         (D.field "serviceType" (D.nullable ServiceType.decoder))
+        (D.field "chargeable" D.bool)
 
 
 detailsValid : Issue -> Bool

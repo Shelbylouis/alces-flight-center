@@ -36,6 +36,8 @@ class Cluster < ApplicationRecord
       components: components.map(&:case_form_json),
       services: services.map(&:case_form_json),
       supportType: support_type,
+      chargingInfo: charging_info,
+      credits: credits
     }
   end
 

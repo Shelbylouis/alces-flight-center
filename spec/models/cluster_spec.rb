@@ -62,10 +62,15 @@ RSpec.describe Cluster, type: :model do
         :cluster,
         id: 1,
         name: 'Some Cluster',
-        support_type: :managed
+        support_type: :managed,
+        charging_info: '£1000'
       ).tap do |cluster|
         cluster.components = [create(:component, cluster: cluster)]
         cluster.services = [create(:service, cluster: cluster)]
+        cluster.credit_deposits = [create(:credit_deposit, amount: 20)]
+        cluster.cases = [
+          create(:case, credit_charge: create(:credit_charge, amount: 3))
+        ]
       end
     end
 
@@ -75,7 +80,9 @@ RSpec.describe Cluster, type: :model do
         name: 'Some Cluster',
         components: subject.components.map(&:case_form_json),
         services: subject.services.map(&:case_form_json),
-        supportType: 'managed'
+        supportType: 'managed',
+        chargingInfo: '£1000',
+        credits: 17 # Calculated by `credits` method as deposits - charges.
       )
     end
   end

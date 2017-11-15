@@ -63,6 +63,7 @@ class Issue < ApplicationRecord
       requiresService: requires_service,
       serviceType: service_type&.case_form_json,
       supportType: support_type,
+      chargeable: chargeable
     }
   end
 end

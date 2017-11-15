@@ -42,7 +42,8 @@ RSpec.describe Issue, type: :model do
         requires_component: false,
         requires_service: service_type.present?,
         service_type: service_type,
-        support_type: :managed
+        support_type: :managed,
+        chargeable: true
       )
     end
 
@@ -59,7 +60,8 @@ RSpec.describe Issue, type: :model do
           id: service_type.id,
           name: service_type.name,
         },
-        supportType: 'managed'
+        supportType: 'managed',
+        chargeable: true
       )
     end
 
