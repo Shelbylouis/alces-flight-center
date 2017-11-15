@@ -276,9 +276,9 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe '#create_rt_ticket' do
+  describe 'RT ticket creation on Case creation' do
     subject do
-      create(
+      build(
         :case,
         cluster: cluster,
         issue: issue,
@@ -332,6 +332,8 @@ RSpec.describe Case, type: :model do
     let :service { create(:service, name: 'Some service', cluster: cluster) }
     let :request_tracker { subject.send(:request_tracker) }
 
+    let :fake_rt_ticket { OpenStruct.new(id: 1234) }
+
     it 'creates rt ticket with correct properties' do
       expected_create_ticket_args = {
         requestor_email: requestor.email,
@@ -355,11 +357,9 @@ RSpec.describe Case, type: :model do
 
       expect(request_tracker).to receive(:create_ticket).with(
         expected_create_ticket_args
-      ).and_return(
-        OpenStruct.new(id: :fake_ticket_id)
-      )
+      ).and_return(fake_rt_ticket)
 
-      subject.create_rt_ticket
+      subject.save!
     end
 
     context 'when no associated component' do
@@ -371,11 +371,9 @@ RSpec.describe Case, type: :model do
           hash_excluding(
             text: /Associated component:/
           )
-        ).and_return(
-          OpenStruct.new(id: :fake_ticket_id)
-        )
+        ).and_return(fake_rt_ticket)
 
-        subject.create_rt_ticket
+        subject.save!
       end
     end
 
@@ -388,11 +386,9 @@ RSpec.describe Case, type: :model do
           hash_excluding(
             text: /Associated service:/
           )
-        ).and_return(
-          OpenStruct.new(id: :fake_ticket_id)
-        )
+        ).and_return(fake_rt_ticket)
 
-        subject.create_rt_ticket
+        subject.save!
       end
     end
   end

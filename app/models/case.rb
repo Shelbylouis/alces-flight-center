@@ -31,6 +31,18 @@ class Case < ApplicationRecord
 
   before_validation :create_rt_ticket, on: :create
 
+  def mailto_url
+    support_email = 'support@alces-software.com'
+    subject = CGI.escape(rt_email_subject)
+    "mailto:#{support_email}?subject=#{subject}"
+  end
+
+  def open
+    !archived
+  end
+
+  private
+
   def create_rt_ticket
     return unless cluster
 
@@ -43,18 +55,6 @@ class Case < ApplicationRecord
 
     self.rt_ticket_id = ticket.id
   end
-
-  def mailto_url
-    support_email = 'support@alces-software.com'
-    subject = CGI.escape(rt_email_subject)
-    "mailto:#{support_email}?subject=#{subject}"
-  end
-
-  def open
-    !archived
-  end
-
-  private
 
   def request_tracker
     # Note: `rt_interface_class` is a string which we `constantize`, rather
