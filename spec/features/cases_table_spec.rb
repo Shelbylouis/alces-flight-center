@@ -103,6 +103,28 @@ RSpec.describe 'Cases table', type: :feature do
           find('.archived-case-row')
         end.to raise_error(Capybara::ElementNotFound)
       end
+
+      ['resolved', 'rejected', 'deleted'].each do |completion_status|
+        it "reloads Case ticket status on load until reaches #{completion_status}" do
+          expect(Case.request_tracker).to receive(:show_ticket).thrice.and_return(
+            OpenStruct.new(status: 'open'),
+            OpenStruct.new(status: completion_status),
+            OpenStruct.new(status: 'stalled'),
+          )
+
+          # Neither Case's ticket has reached completion status yet so both
+          # should have reloaded RT ticket status.
+          visit site_cases_path(site, as: user)
+          expect(open_case.reload.last_known_ticket_status).to eq 'open'
+          expect(archived_case.reload.last_known_ticket_status).to eq completion_status
+
+          # Archived Case has reached completion status so ticket status is not
+          # reloaded.
+          visit site_cases_path(site, as: user)
+          expect(open_case.reload.last_known_ticket_status).to eq 'stalled'
+          expect(archived_case.reload.last_known_ticket_status).to eq completion_status
+        end
+      end
     end
   end
 end

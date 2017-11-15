@@ -8,6 +8,8 @@ class CasesController < ApplicationController
              else
                'Support case archive'
              end
+
+    @cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
   def new

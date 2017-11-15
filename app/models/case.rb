@@ -1,14 +1,19 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
 
-  TICKET_STATUSES = [
-    'new',
-    'open',
-    'stalled',
+  COMPLETED_TICKET_STATUSES = [
     'resolved',
     'rejected',
     'deleted',
-  ].freeze
+  ]
+
+  TICKET_STATUSES = (
+    [
+      'new',
+      'open',
+      'stalled',
+    ] + COMPLETED_TICKET_STATUSES
+  ).freeze
 
   belongs_to :issue
   belongs_to :cluster
@@ -31,6 +36,15 @@ class Case < ApplicationRecord
 
   before_validation :create_rt_ticket, on: :create
 
+  def self.request_tracker
+    # Note: `rt_interface_class` is a string which we `constantize`, rather
+    # than a constant directly, otherwise Rails autoloading in development
+    # could leave us holding a reference to an outdated version of the class,
+    # which would then cause things to blow up (e.g. see
+    # https://stackoverflow.com/a/23008837).
+    @rt ||= Rails.configuration.rt_interface_class.constantize.new
+  end
+
   def mailto_url
     support_email = 'support@alces-software.com'
     subject = CGI.escape(rt_email_subject)
@@ -39,6 +53,13 @@ class Case < ApplicationRecord
 
   def open
     !archived
+  end
+
+  def update_ticket_status!
+    return if ticket_completed?
+
+    self.last_known_ticket_status = associated_rt_ticket.status
+    save!
   end
 
   private
@@ -56,17 +77,16 @@ class Case < ApplicationRecord
     self.rt_ticket_id = ticket.id
   end
 
-  def rt
-    self.class.request_tracker
+  def ticket_completed?
+    COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
-  def self.request_tracker
-    # Note: `rt_interface_class` is a string which we `constantize`, rather
-    # than a constant directly, otherwise Rails autoloading in development
-    # could leave us holding a reference to an outdated version of the class,
-    # which would then cause things to blow up (e.g. see
-    # https://stackoverflow.com/a/23008837).
-    @rt ||= Rails.configuration.rt_interface_class.constantize.new
+  def associated_rt_ticket
+    rt.show_ticket(rt_ticket_id)
+  end
+
+  def rt
+    self.class.request_tracker
   end
 
   def requestor_email
