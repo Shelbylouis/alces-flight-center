@@ -8,8 +8,9 @@ class FakeRequestTrackerInterface
   end
 
   def show_ticket(id)
+    status = id % 2 == 0 ? 'open' : 'resolved'
     {
-      status: 'resolved'
+      status: status
     }.to_struct
   end
 end

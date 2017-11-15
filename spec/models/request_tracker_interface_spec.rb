@@ -35,7 +35,7 @@ RSpec.shared_examples 'Request Tracker interface' do
       VCR.use_cassette(VcrCassettes::RT_SHOW_TICKET) do
         # Ticket 10003 happens to be a real ticket which is 'resolved' (see
         # http://helpdesk.alces-software.com/rt/REST/1.0/ticket/10003), and we
-        # also want fake interface to give 'resolved' status by default, so
+        # also want fake interface to give 'resolved' status in this case, so
         # this expectation should pass for both implementations.
         expect(subject.status).to eq 'resolved'
       end
@@ -122,6 +122,18 @@ RSpec.describe FakeRequestTrackerInterface do
 
       new_rt_ticket_id = subject.id
       expect(new_rt_ticket_id).to eq(max_rt_ticket_id + 1)
+    end
+  end
+
+  describe '#show_ticket' do
+    # Use simple, predictable scheme to simulate mix of open and completed
+    # tickets in development.
+    it 'gives `resolved` status when ticket ID is odd' do
+      expect(rt_interface.show_ticket(10001).status).to eq('resolved')
+    end
+
+    it 'gives `open` status when ticket ID is even' do
+      expect(rt_interface.show_ticket(10002).status).to eq('open')
     end
   end
 end
