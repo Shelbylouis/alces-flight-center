@@ -65,7 +65,9 @@
           <td><%= c.association_info %></td>
           <td><%= c.details %></td>
           <% if manage_cases_page %>
-            <td><%= c.last_known_ticket_status %></td>
+            <td>
+              <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
+            </td>
           <% else %>
             <td><%= render 'cases/email_support_icon', support_case: c %></td>
             <td><%= render 'cases/archive_icon', support_case: c %></td>
