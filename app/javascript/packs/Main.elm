@@ -77,9 +77,24 @@ view model =
                 [ text
                     ("Error initializing form: "
                         ++ message
-                        ++ ". Please contact support@alces-software.com"
+                        ++ ". Please contact "
                     )
+                , supportEmailLink
+                , text "."
                 ]
+
+
+supportEmailLink : Html msg
+supportEmailLink =
+    let
+        email =
+            "support@alces-software.com"
+    in
+    a
+        [ "mailto:" ++ email |> href
+        , target "_blank"
+        ]
+        [ text email ]
 
 
 submitErrorAlert : State -> Maybe (Html Msg)
