@@ -62,6 +62,11 @@ class Case < ApplicationRecord
     save!
   end
 
+  def requires_credit_charge?
+    return false if credit_charge
+    ticket_completed? && issue.chargeable
+  end
+
   private
 
   def create_rt_ticket
