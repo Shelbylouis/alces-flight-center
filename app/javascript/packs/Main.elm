@@ -69,6 +69,7 @@ view model =
             div []
                 (Maybe.Extra.values
                     [ chargingInfoModal state |> Just
+                    , chargeableIssuePreSubmissionModal state |> Just
                     , State.selectedIssue state |> chargeableIssueAlert
                     , submitErrorAlert state
                     , caseForm state |> Just
@@ -134,6 +135,38 @@ chargingInfoModal state =
         |> Modal.view state.clusterChargingInfoModal
 
 
+chargeableIssuePreSubmissionModal : State -> Html Msg
+chargeableIssuePreSubmissionModal state =
+    let
+        bodyContent =
+            [ p []
+                [ text "The selected issue ("
+                , em [] [ State.selectedIssue state |> Issue.name |> text ]
+                , text ") is chargeable, and creating this support case may incur a support credit charge."
+                ]
+            , p [] [ text "Do you wish to continue?" ]
+            ]
+    in
+    Modal.config ChargeableIssuePreSubmissionModal
+        |> Modal.h5 [] [ text "This support case may incur charges" ]
+        |> Modal.body [] bodyContent
+        |> Modal.footer []
+            [ Button.button
+                [ Button.outlinePrimary
+                , Button.attrs
+                    [ ChargeableIssuePreSubmissionModal Modal.hiddenState |> onClick ]
+                ]
+                [ text "Cancel" ]
+            , Button.button
+                [ Button.outlineWarning
+                , Button.attrs
+                    [ onClick StartSubmit ]
+                ]
+                [ text "Create Case" ]
+            ]
+        |> Modal.view state.chargeableIssuePreSubmissionModal
+
+
 submitErrorAlert : State -> Maybe (Html Msg)
 submitErrorAlert state =
     -- This closely matches the error alert we show from Rails, but is managed
@@ -191,6 +224,12 @@ chargeableIssueAlert issue =
 caseForm : State -> Html Msg
 caseForm state =
     let
+        submitMsg =
+            if State.selectedIssue state |> Issue.isChargeable then
+                ChargeableIssuePreSubmissionModal Modal.visibleState
+            else
+                StartSubmit
+
         formElements =
             Maybe.Extra.values
                 [ maybeClustersField state.clusters
@@ -202,7 +241,7 @@ caseForm state =
                 , submitButton state |> Just
                 ]
     in
-    Html.form [ onSubmit StartSubmit ] formElements
+    Html.form [ onSubmit submitMsg ] formElements
 
 
 maybeClustersField : SelectList Cluster -> Maybe (Html Msg)
@@ -360,6 +399,7 @@ type Msg
     | SubmitResponse (Result (Rails.Error String) ())
     | ClearError
     | ClusterChargingInfoModal Modal.State
+    | ChargeableIssuePreSubmissionModal Modal.State
 
 
 
@@ -435,6 +475,9 @@ updateState msg state =
 
         ClusterChargingInfoModal modalState ->
             Just ({ state | clusterChargingInfoModal = modalState } ! [])
+
+        ChargeableIssuePreSubmissionModal modalState ->
+            Just ({ state | chargeableIssuePreSubmissionModal = modalState } ! [])
 
 
 stringToId : (Int -> id) -> String -> Maybe id

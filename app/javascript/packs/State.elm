@@ -33,6 +33,7 @@ type alias State =
     , singleService : Bool
     , isSubmitting : Bool
     , clusterChargingInfoModal : Modal.State
+    , chargeableIssuePreSubmissionModal : Modal.State
     }
 
 
@@ -53,6 +54,7 @@ decoder =
                         , singleService = False
                         , isSubmitting = False
                         , clusterChargingInfoModal = Modal.hiddenState
+                        , chargeableIssuePreSubmissionModal = Modal.hiddenState
                         }
                 in
                 case mode of
