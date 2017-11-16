@@ -18,6 +18,8 @@ Rails.application.routes.draw do
       resources :cases, only: [:new, :index]
     end
 
+    resources :credit_charges, only: [:create, :update]
+
     # To display a working link to sign users out of the admin dashboard,
     # rails-admin expects a `logout_path` route helper to exist which will sign
     # them out; this declaration defines this.

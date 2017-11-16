@@ -22,7 +22,7 @@ class Case < ApplicationRecord
   belongs_to :user
   has_one :credit_charge, required: false
 
-  delegate :case_category, to: :issue
+  delegate :case_category, :chargeable, to: :issue
   delegate :site, to: :cluster
 
   validates :details, presence: true
@@ -64,7 +64,11 @@ class Case < ApplicationRecord
 
   def requires_credit_charge?
     return false if credit_charge
-    ticket_completed? && issue.chargeable
+    credit_charge_allowed?
+  end
+
+  def credit_charge_allowed?
+    ticket_completed? && chargeable
   end
 
   private
