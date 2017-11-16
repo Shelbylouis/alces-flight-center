@@ -20,6 +20,7 @@ import State exposing (State)
 import Utils
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
+import View.Utils exposing (AlertType(..))
 
 
 -- MODEL
@@ -85,7 +86,7 @@ submitErrorAlert state =
     let
         displayError =
             \error ->
-                errorAlert
+                View.Utils.alert Danger
                     [ button
                         [ type_ "button"
                         , class "close"
@@ -97,15 +98,6 @@ submitErrorAlert state =
                     ]
     in
     Maybe.map displayError state.error
-
-
-errorAlert : List (Html msg) -> Html msg
-errorAlert children =
-    div
-        [ class "alert alert-danger alert-dismissable fade show"
-        , attribute "role" "alert"
-        ]
-        children
 
 
 caseForm : State -> Html Msg
