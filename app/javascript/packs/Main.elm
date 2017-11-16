@@ -64,7 +64,8 @@ view model =
         Initialized state ->
             div []
                 (Maybe.Extra.values
-                    [ submitErrorAlert state
+                    [ State.selectedIssue state |> chargeableIssueAlert
+                    , submitErrorAlert state
                     , caseForm state |> Just
                     ]
                 )
@@ -98,6 +99,40 @@ submitErrorAlert state =
                     ]
     in
     Maybe.map displayError state.error
+
+
+chargeableIssueAlert : Issue -> Maybe (Html Msg)
+chargeableIssueAlert issue =
+    let
+        dollar =
+            span [ class "fa fa-dollar" ] []
+
+        chargingInfo =
+            " This issue is chargeable and may incur a charge of support credits. "
+
+        clusterChargingInfoLinkText =
+            "Click here for the charging details for this cluster."
+    in
+    if Issue.isChargeable issue then
+        View.Utils.alert Warning
+            [ dollar
+            , dollar
+            , dollar
+            , text chargingInfo
+            , a
+                [ class "alert-link"
+                , onClick ShowClusterChargingInfo
+
+                -- This makes this display as a normal link, but clicking on it
+                -- not reload the page. There may be a better way to do this;
+                -- `href="#"` does not work.
+                , href "javascript:void(0)"
+                ]
+                [ text clusterChargingInfoLinkText ]
+            ]
+            |> Just
+    else
+        Nothing
 
 
 caseForm : State -> Html Msg
@@ -271,6 +306,8 @@ type Msg
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
     | ClearError
+    | ShowClusterChargingInfo
+    | HideClusterChargingInfo
 
 
 
@@ -343,6 +380,12 @@ updateState msg state =
 
         ClearError ->
             Just ( { state | error = Nothing }, Cmd.none )
+
+        ShowClusterChargingInfo ->
+            Just ({ state | showingClusterChargingInfo = True } ! [])
+
+        HideClusterChargingInfo ->
+            Just ({ state | showingClusterChargingInfo = False } ! [])
 
 
 stringToId : (Int -> id) -> String -> Maybe id

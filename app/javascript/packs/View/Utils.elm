@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 
 type AlertType
     = Danger
+    | Warning
 
 
 alert : AlertType -> List (Html msg) -> Html msg

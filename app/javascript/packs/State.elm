@@ -31,6 +31,7 @@ type alias State =
     , singleComponent : Bool
     , singleService : Bool
     , isSubmitting : Bool
+    , showingClusterChargingInfo : Bool
     }
 
 
@@ -50,6 +51,7 @@ decoder =
                         , singleComponent = False
                         , singleService = False
                         , isSubmitting = False
+                        , showingClusterChargingInfo = False
                         }
                 in
                 case mode of

@@ -7,6 +7,7 @@ module Issue
         , details
         , detailsValid
         , extractId
+        , isChargeable
         , name
         , requiresComponent
         , requiresService
@@ -228,6 +229,11 @@ setDetails issue details =
 supportType : Issue -> SupportType
 supportType issue =
     data issue |> .supportType
+
+
+isChargeable : Issue -> Bool
+isChargeable issue =
+    data issue |> .chargeable
 
 
 data : Issue -> IssueData
