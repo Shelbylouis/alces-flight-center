@@ -1,6 +1,8 @@
 module Main exposing (..)
 
 import Bootstrap.Alert as Alert
+import Bootstrap.Button as Button
+import Bootstrap.Modal as Modal
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
 import Component exposing (Component)
@@ -66,7 +68,8 @@ view model =
         Initialized state ->
             div []
                 (Maybe.Extra.values
-                    [ State.selectedIssue state |> chargeableIssueAlert
+                    [ chargingInfoModal state |> Just
+                    , State.selectedIssue state |> chargeableIssueAlert
                     , submitErrorAlert state
                     , caseForm state |> Just
                     ]
@@ -95,6 +98,40 @@ supportEmailLink =
         , target "_blank"
         ]
         [ text email ]
+
+
+chargingInfoModal : State -> Html Msg
+chargingInfoModal state =
+    let
+        cluster =
+            SelectList.selected state.clusters
+
+        chargingInfo =
+            cluster.chargingInfo
+                |> Maybe.map text
+                |> Maybe.withDefault noChargingInfoAvailable
+
+        noChargingInfoAvailable =
+            span []
+                [ text "No charging info has been provided by Alces Software for "
+                , strong [] [ text cluster.name ]
+                , text "; if you require clarification on what charges you may incur please contact "
+                , supportEmailLink
+                , text "."
+                ]
+    in
+    Modal.config ClusterChargingInfoModal
+        |> Modal.h5 [] [ cluster.name ++ " charging info" |> text ]
+        |> Modal.body [] [ chargingInfo ]
+        |> Modal.footer []
+            [ Button.button
+                [ Button.outlinePrimary
+                , Button.attrs
+                    [ ClusterChargingInfoModal Modal.hiddenState |> onClick ]
+                ]
+                [ text "Close" ]
+            ]
+        |> Modal.view state.clusterChargingInfoModal
 
 
 submitErrorAlert : State -> Maybe (Html Msg)
@@ -137,7 +174,7 @@ chargeableIssueAlert issue =
             , dollar
             , text chargingInfo
             , Alert.link
-                [ onClick ShowClusterChargingInfo
+                [ ClusterChargingInfoModal Modal.visibleState |> onClick
 
                 -- This makes this display as a normal link, but clicking on it
                 -- not reload the page. There may be a better way to do this;
@@ -322,8 +359,7 @@ type Msg
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
     | ClearError
-    | ShowClusterChargingInfo
-    | HideClusterChargingInfo
+    | ClusterChargingInfoModal Modal.State
 
 
 
@@ -397,11 +433,8 @@ updateState msg state =
         ClearError ->
             Just ( { state | error = Nothing }, Cmd.none )
 
-        ShowClusterChargingInfo ->
-            Just ({ state | showingClusterChargingInfo = True } ! [])
-
-        HideClusterChargingInfo ->
-            Just ({ state | showingClusterChargingInfo = False } ! [])
+        ClusterChargingInfoModal modalState ->
+            Just ({ state | clusterChargingInfoModal = modalState } ! [])
 
 
 stringToId : (Int -> id) -> String -> Maybe id

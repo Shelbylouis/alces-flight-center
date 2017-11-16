@@ -10,6 +10,7 @@ module State
         , selectedService
         )
 
+import Bootstrap.Modal as Modal
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
 import ClusterPart exposing (ClusterPart)
@@ -31,7 +32,7 @@ type alias State =
     , singleComponent : Bool
     , singleService : Bool
     , isSubmitting : Bool
-    , showingClusterChargingInfo : Bool
+    , clusterChargingInfoModal : Modal.State
     }
 
 
@@ -51,7 +52,7 @@ decoder =
                         , singleComponent = False
                         , singleService = False
                         , isSubmitting = False
-                        , showingClusterChargingInfo = False
+                        , clusterChargingInfoModal = Modal.hiddenState
                         }
                 in
                 case mode of
