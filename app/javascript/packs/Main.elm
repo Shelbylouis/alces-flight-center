@@ -1,5 +1,6 @@
 module Main exposing (..)
 
+import Bootstrap.Alert as Alert
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
 import Component exposing (Component)
@@ -20,7 +21,6 @@ import State exposing (State)
 import Utils
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
-import View.Utils exposing (AlertType(..))
 
 
 -- MODEL
@@ -56,6 +56,8 @@ init flags =
 
 
 -- VIEW
+-- XXX Refactor functions in here and in `View.*` modules to use
+-- `elm-bootstrap`.
 
 
 view : Model -> Html Msg
@@ -87,7 +89,7 @@ submitErrorAlert state =
     let
         displayError =
             \error ->
-                View.Utils.alert Danger
+                Alert.danger
                     [ button
                         [ type_ "button"
                         , class "close"
@@ -114,14 +116,13 @@ chargeableIssueAlert issue =
             "Click here for the charging details for this cluster."
     in
     if Issue.isChargeable issue then
-        View.Utils.alert Warning
+        Alert.warning
             [ dollar
             , dollar
             , dollar
             , text chargingInfo
-            , a
-                [ class "alert-link"
-                , onClick ShowClusterChargingInfo
+            , Alert.link
+                [ onClick ShowClusterChargingInfo
 
                 -- This makes this display as a normal link, but clicking on it
                 -- not reload the page. There may be a better way to do this;
