@@ -102,12 +102,8 @@ class CasesController < ApplicationController
     if @case.save
       flash[:success] = success_flash
     else
-      flash_object_errors(@case)
+      flash[:error] = "Error updating support case: #{format_errors(support_case)}"
     end
     redirect_to root_path
-  end
-
-  def flash_object_errors(support_case)
-    flash[:error] = "Error creating support case: #{format_errors(support_case)}"
   end
 end
