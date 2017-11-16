@@ -4,6 +4,8 @@ class ApplicationController < ActionController::Base
 
   before_action :define_navigation_variables
 
+  private
+
   def current_site
     @site
   end
