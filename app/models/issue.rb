@@ -36,6 +36,7 @@ class Issue < ApplicationRecord
   validates :details_template, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
   validates :identifier, uniqueness: true, if: :identifier
+  validates :chargeable, inclusion: {in: [true, false]}
 
   validates :service_type,
             absence: {
@@ -62,6 +63,7 @@ class Issue < ApplicationRecord
       requiresService: requires_service,
       serviceType: service_type&.case_form_json,
       supportType: support_type,
+      chargeable: chargeable
     }
   end
 end

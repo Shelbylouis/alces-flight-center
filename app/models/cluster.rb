@@ -10,6 +10,8 @@ class Cluster < ApplicationRecord
   has_many :components, through: :component_groups, dependent: :destroy
   has_many :services, dependent: :destroy
   has_many :cases
+  has_many :credit_deposits
+  has_many :credit_charges, through: :cases
 
   validates_associated :site
   validates :name, presence: true
@@ -34,6 +36,8 @@ class Cluster < ApplicationRecord
       components: components.map(&:case_form_json),
       services: services.map(&:case_form_json),
       supportType: support_type,
+      chargingInfo: charging_info,
+      credits: credits
     }
   end
 
@@ -65,6 +69,15 @@ class Cluster < ApplicationRecord
         name: component_type.name,
         component_groups: groups
       }.to_struct
+    end
+  end
+
+  def credits
+    deposits = credit_deposits.reduce(0) do |total, deposit|
+      total += deposit.amount
+    end
+    credit_charges.reduce(deposits) do |total, charge|
+      total -= charge.amount
     end
   end
 

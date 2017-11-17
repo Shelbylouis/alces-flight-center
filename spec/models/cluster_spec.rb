@@ -62,19 +62,28 @@ RSpec.describe Cluster, type: :model do
         :cluster,
         id: 1,
         name: 'Some Cluster',
-        support_type: :managed
+        support_type: :managed,
+        charging_info: '£1000'
       ).tap do |cluster|
         cluster.components = [create(:component, cluster: cluster)]
         cluster.services = [create(:service, cluster: cluster)]
+        cluster.credit_deposits = [create(:credit_deposit, amount: 20)]
+        cluster.cases = [
+          create(:case, credit_charge: create(:credit_charge, amount: 3))
+        ]
       end
     end
 
     it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq(id: 1,
-                                           name: 'Some Cluster',
-                                           components: subject.components.map(&:case_form_json),
-                                           services: subject.services.map(&:case_form_json),
-                                           supportType: 'managed')
+      expect(subject.case_form_json).to eq(
+        id: 1,
+        name: 'Some Cluster',
+        components: subject.components.map(&:case_form_json),
+        services: subject.services.map(&:case_form_json),
+        supportType: 'managed',
+        chargingInfo: '£1000',
+        credits: 17 # Calculated by `credits` method as deposits - charges.
+      )
     end
   end
 
@@ -127,7 +136,7 @@ RSpec.describe Cluster, type: :model do
 
     describe '#documents' do
       it 'returns needed data for each Cluster document' do
-        VCR.use_cassette('s3_read_documents') do
+        VCR.use_cassette(VcrCassettes::S3_READ_DOCUMENTS) do
           Development::Utils.upload_document_fixtures_for(subject)
 
           documents = subject.documents
@@ -219,5 +228,27 @@ RSpec.describe Cluster, type: :model do
       type_names = subject.map(&:name)
       expect(type_names).to eq(['Server', 'Another Type'])
     end
+  end
+
+  describe '#credits' do
+    subject do
+      create(:cluster).tap do |cluster|
+        create(:credit_deposit, cluster: cluster, amount: 20)
+        create(:credit_deposit, cluster: cluster, amount: 2)
+
+        create(:case, cluster: cluster).tap do |case_|
+          create(:credit_charge, case: case_, amount: 5)
+        end
+
+        create(:case, cluster: cluster).tap do |case_|
+          create(:credit_charge, case: case_, amount: 2)
+        end
+
+        # Case without CreditCharge; should not effect total credits.
+        create(:case, cluster: cluster)
+      end.credits
+    end
+
+    it { is_expected.to eq 15 }
   end
 end

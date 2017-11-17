@@ -42,23 +42,27 @@ RSpec.describe Issue, type: :model do
         requires_component: false,
         requires_service: service_type.present?,
         service_type: service_type,
-        support_type: :managed
+        support_type: :managed,
+        chargeable: true
       )
     end
 
     let :service_type { create(:service_type) }
 
     it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq(id: 1,
-                                           name: 'New user request',
-                                           detailsTemplate: 'Give a username',
-                                           requiresComponent: false,
-                                           requiresService: true,
-                                           serviceType: {
-                                             id: service_type.id,
-                                             name: service_type.name,
-                                           },
-                                           supportType: 'managed')
+      expect(subject.case_form_json).to eq(
+        id: 1,
+        name: 'New user request',
+        detailsTemplate: 'Give a username',
+        requiresComponent: false,
+        requiresService: true,
+        serviceType: {
+          id: service_type.id,
+          name: service_type.name,
+        },
+        supportType: 'managed',
+        chargeable: true
+      )
     end
 
     context 'when no associated service_type' do

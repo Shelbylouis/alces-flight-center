@@ -14,7 +14,11 @@ Rails.application.routes.draw do
 
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'sites#index'
-    resources :sites, only: [:show, :index]
+    resources :sites, only: [:show, :index] do
+      resources :cases, only: [:new, :index]
+    end
+
+    resources :credit_charges, only: [:create, :update]
 
     # To display a working link to sign users out of the admin dashboard,
     # rails-admin expects a `logout_path` route helper to exist which will sign

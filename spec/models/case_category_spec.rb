@@ -16,14 +16,15 @@ RSpec.describe CaseCategory, type: :model do
     let :service_type { create(:service_type) }
 
     it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq(id: 1,
-                                           name: 'Broken Cluster',
-                                           issues: subject.issues.map(&:case_form_json),
-                                           controllingServiceType: {
-                                             id: service_type.id,
-                                             name: service_type.name,
-                                           },
-                                          )
+      expect(subject.case_form_json).to eq(
+        id: 1,
+        name: 'Broken Cluster',
+        issues: subject.issues.map(&:case_form_json),
+        controllingServiceType: {
+          id: service_type.id,
+          name: service_type.name,
+        },
+      )
     end
 
     context 'when no associated service_type' do
