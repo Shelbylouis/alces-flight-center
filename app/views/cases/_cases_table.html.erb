@@ -32,11 +32,12 @@
         <th>Issue</th>
         <th>Cluster</th>
         <th>Association</th>
-        <th>Details</th>
         <% if manage_cases_page %>
           <th>Ticket status</th>
+          <th>Chargeable</th>
           <th>Credits</th>
         <% else %>
+          <th>Details</th>
           <th>Contact support</th>
           <th>Archive<%= archive ? '/Restore' : '' %></th>
         <% end %>
@@ -69,11 +70,11 @@
           <td><%= c.issue.name %></td>
           <td><%= c.cluster.name %></td>
           <td><%= c.association_info %></td>
-          <td><%= c.details %></td>
           <% if manage_cases_page %>
             <td>
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
             </td>
+            <td><%= raw(c.chargeable ? '&check;' : '&cross;') %></td>
             <td>
               <% if c.credit_charge_allowed? %>
                 <% credit_charge = c.credit_charge || CreditCharge.new(case: c) %>
@@ -89,6 +90,7 @@
               <% end %>
             </td>
           <% else %>
+            <td><%= c.details %></td>
             <td><%= render 'cases/email_support_icon', support_case: c %></td>
             <td><%= render 'cases/archive_icon', support_case: c %></td>
           <% end %>
