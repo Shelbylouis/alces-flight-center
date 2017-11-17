@@ -35,12 +35,12 @@
         <% if manage_cases_page %>
           <th>Ticket status</th>
           <th>Chargeable</th>
-          <th>Credits</th>
         <% else %>
           <th>Details</th>
           <th>Contact support</th>
           <th>Archive<%= archive ? '/Restore' : '' %></th>
         <% end %>
+        <th>Credits</th>
       </tr>
     </thead>
 
@@ -75,25 +75,31 @@
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
             </td>
             <td><%= raw(c.chargeable ? '&check;' : '&cross;') %></td>
-            <td>
-              <% if c.credit_charge_allowed? %>
+          <% else %>
+            <td><%= c.details %></td>
+            <td><%= render 'cases/email_support_icon', support_case: c %></td>
+            <td><%= render 'cases/archive_icon', support_case: c %></td>
+          <% end %>
+          <td>
+            <% if c.credit_charge_allowed? %>
+              <% if manage_cases_page %>
                 <% credit_charge = c.credit_charge || CreditCharge.new(case: c) %>
                 <%= form_for credit_charge, class: 'form-inline' do |f| %>
                   <%= f.hidden_field :case_id %>
                   <%= f.number_field :amount, class: 'form-control', required: true %>
                   <%= f.submit '+', class: 'btn btn-success', style: 'width: 100%' %>
                 <% end %>
-              <% elsif !c.chargeable %>
-                <em>N/A</em>
+              <% elsif c.credit_charge %>
+                <%= c.credit_charge.amount %>
               <% else %>
                 <em>Incomplete</em>
               <% end %>
-            </td>
-          <% else %>
-            <td><%= c.details %></td>
-            <td><%= render 'cases/email_support_icon', support_case: c %></td>
-            <td><%= render 'cases/archive_icon', support_case: c %></td>
-          <% end %>
+            <% elsif !c.chargeable %>
+              <em>N/A</em>
+            <% else %>
+              <em>Incomplete</em>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     <% end %>
