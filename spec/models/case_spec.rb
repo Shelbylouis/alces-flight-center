@@ -454,4 +454,82 @@ RSpec.describe Case, type: :model do
       it { is_expected.to be false }
     end
   end
+
+  describe 'maintenance windows' do
+    subject { create(:case) }
+
+    describe '#start_maintenance_window!' do
+      let :admin { create(:admin) }
+
+      it 'creates new maintenance window' do
+        subject.start_maintenance_window!(requestor: admin)
+
+        maintenance_window = subject.maintenance_windows.first
+        expect(maintenance_window.ended_at).to be nil
+        expect(maintenance_window.user).to eq admin
+      end
+    end
+
+    describe '#end_maintenance_window!' do
+      context 'when no maintenance window' do
+        it 'raises error' do
+          expect do
+            subject.end_maintenance_window!
+          end.to raise_error(NoOpenMaintenanceWindowException)
+        end
+      end
+
+      context 'when no open maintenance window' do
+        before :each do
+          create(:maintenance_window, case: subject, ended_at: 3.days.ago)
+        end
+
+        it 'raises error' do
+          expect do
+            subject.end_maintenance_window!
+          end.to raise_error(NoOpenMaintenanceWindowException)
+        end
+      end
+
+      context 'when open maintenance window' do
+        before :each do
+          create(:maintenance_window, case: subject)
+        end
+
+        it 'closes this maintenance window' do
+          end_time = DateTime.new(2018)
+          allow(DateTime).to receive(:current).and_return(end_time)
+
+          subject.end_maintenance_window!
+
+          expect(subject.maintenance_windows.length).to eq 1
+          expect(subject.maintenance_windows.first.ended_at).to eq(end_time)
+        end
+      end
+    end
+
+    describe '#under_maintenance?' do
+      context 'when has no maintenance windows' do
+        it { is_expected.not_to be_under_maintenance }
+      end
+
+      context 'when has maintenance window without end' do
+        before :each do
+          create(:maintenance_window, case: subject, ended_at: 3.days.ago)
+          create(:maintenance_window, case: subject)
+        end
+
+        it { is_expected.to be_under_maintenance }
+      end
+
+      context 'when has no maintenance windows without end' do
+        before :each do
+          create(:maintenance_window, case: subject, ended_at: 3.days.ago)
+          create(:maintenance_window, case: subject, ended_at: 5.hours.ago)
+        end
+
+        it { is_expected.not_to be_under_maintenance }
+      end
+    end
+  end
 end

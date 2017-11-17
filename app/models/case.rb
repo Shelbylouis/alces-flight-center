@@ -21,6 +21,7 @@ class Case < ApplicationRecord
   belongs_to :service, required: false
   belongs_to :user
   has_one :credit_charge, required: false
+  has_many :maintenance_windows
 
   delegate :case_category, :chargeable, to: :issue
   delegate :site, to: :cluster
@@ -69,6 +70,19 @@ class Case < ApplicationRecord
 
   def credit_charge_allowed?
     ticket_completed? && chargeable
+  end
+
+  def start_maintenance_window!(requestor:)
+    maintenance_windows.create!(user: requestor)
+  end
+
+  def end_maintenance_window!
+    raise NoOpenMaintenanceWindowException unless open_maintenance_windows.present?
+    open_maintenance_windows.first.update!(ended_at: DateTime.current)
+  end
+
+  def under_maintenance?
+    open_maintenance_windows.present?
   end
 
   private
@@ -130,5 +144,9 @@ class Case < ApplicationRecord
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
     Utils.rt_format(properties)
+  end
+
+  def open_maintenance_windows
+    maintenance_windows.where(ended_at: nil)
   end
 end
