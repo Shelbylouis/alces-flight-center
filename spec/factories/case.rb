@@ -14,11 +14,18 @@ FactoryBot.define do
       archived true
     end
 
-    factory :case_with_component do
+    factory :case_requiring_component do
       association :issue, factory: :issue_requiring_component
+
       before :create do |instance|
-        instance.component = create(:component)
-        instance.cluster = instance.component.cluster
+        instance.cluster = instance.component&.cluster
+      end
+
+      factory :case_with_component do
+        before :create do |instance|
+          instance.component = create(:component)
+          instance.cluster = instance.component.cluster
+        end
       end
     end
 
