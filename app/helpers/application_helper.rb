@@ -1,8 +1,7 @@
 module ApplicationHelper
   def icon(name, interactive: false)
-    octicon name,
-            height: 28,
-            class: interactive ? 'interactive-icon' : 'icon'
+    classes = 'fa-2x ' + (interactive ? 'interactive-icon' : 'icon')
+    fa_icon name, class: classes
   end
 
   # Map function with given name over enumerable collection of objects, then
