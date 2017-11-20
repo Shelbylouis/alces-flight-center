@@ -11,9 +11,13 @@
     <%= 'component'.pluralize(cluster.managed_components.length) %>
   </li>
   <li class="list-group-item">
-    <%= cluster.advice_components.tap {|c| puts c.to_json}.length %>
+    <%= cluster.advice_components.length %>
     <%= SupportType::ADVICE_TEXT %>
     <%= 'component'.pluralize(cluster.advice_components.length) %>
+  </li>
+  <li class="list-group-item">
+    <%= cluster.credits %>
+    support <%= 'credit'.pluralize(cluster.credits) %> available
   </li>
 </ul>
 

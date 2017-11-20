@@ -6,19 +6,32 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'new_case_form' %>
 
-    <%= stylesheet_link_tag 'flight-branding/flight-chrome', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= stylesheet_link_tag 'flight-branding/fonts', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_link_tag 'flight-branding/flight-chrome',
+      media: 'all',
+      'data-turbolinks-track': 'reload'
+    %>
+    <%= stylesheet_link_tag 'flight-branding/fonts',
+      media: 'all',
+      'data-turbolinks-track': 'reload'
+    %>
   </head>
 
   <body>
     <div id='brand-header'></div>
     <nav class="navbar navbar-toggleable-md navbar-inverse product-bar fixed-top">
-      <%# <a class="navbar-brand" href="/">Alces Flight Center</a> %>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
         <span class="navbar-toggler-icon"></span>
       </button>
 
@@ -26,36 +39,59 @@
         <ul class="navbar-nav mr-auto">
 
           <% if signed_in? %>
-            <li class="nav-item">
-              <%= link_to (raw('<span class="fa fa-institution"></span> ') + current_site.name),
-                root_path,
-                class: "nav-link #{@cluster ? '' : 'nav-link--active'}"
-              %>
-            </li>
-
-            <% if @cluster %>
+            <% if current_user.admin? %>
               <li class="nav-item">
-                <%= link_to (raw('<span class="fa fa-cubes"></span> ') + @cluster.name),
-                  @cluster.decorate.path,
-                  class: "nav-link #{@cluster_part ? '' : 'nav-link--active'}"
+                <%= link_to (raw('<span class="fa fa-globe"></span> ') + 'All Sites'),
+                  root_path,
+                  class: "nav-link #{@site ? '' : 'nav-link--active'}"
                 %>
-
-                <% if @cluster_part %>
-                  <li class="nav-item">
-                    <%= link_to (raw('<span class="fa fa-cube"></span> ') + @cluster_part.name),
-                      @cluster_part.decorate.path,
-                      class: 'nav-link nav-link--active'
-                    %>
-                  </li>
-                <% end %>
-
               </li>
+            <% end %>
+
+            <% if @site %>
+              <li class="nav-item">
+                <%= link_to (raw('<span class="fa fa-institution"></span> ') + @site.name),
+                  (current_user.admin? ? site_path(@site) : root_path),
+                  class: "nav-link #{@cluster ? '' : 'nav-link--active'}"
+                %>
+              </li>
+
+              <% if @cluster %>
+                <li class="nav-item">
+                  <%= link_to (raw('<span class="fa fa-cubes"></span> ') + @cluster.name),
+                    @cluster.decorate.path,
+                    class: "nav-link #{@cluster_part ? '' : 'nav-link--active'}"
+                  %>
+
+                  <% if @cluster_part %>
+                    <li class="nav-item">
+                      <%= link_to (raw('<span class="fa fa-cube"></span> ') + @cluster_part.name),
+                        @cluster_part.decorate.path,
+                        class: 'nav-link nav-link--active'
+                      %>
+                    </li>
+                  <% end %>
+
+                </li>
+              <% end %>
             <% end %>
 
           <% end %>
 
         </ul>
+
         <% if signed_in? %>
+          <% if current_user.admin? %>
+            <ul class="navbar-nav justify-content-end">
+              <li class="nav-item">
+                <%= link_to (raw('<span class="fa fa-database"></span> ') + 'Admin Interface'),
+                  rails_admin_path,
+                  class: "nav-link"
+                %>
+              </li>
+            </ul>
+          <% end %>
+
           <span class="navbar-text text-light"><%= current_user.name %></span>
           <%= button_to 'Sign out',
             sign_out_path,

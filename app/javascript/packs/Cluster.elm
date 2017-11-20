@@ -24,6 +24,8 @@ type alias Cluster =
     , components : SelectList Component
     , services : SelectList Service
     , supportType : SupportType
+    , chargingInfo : Maybe String
+    , credits : Int
     }
 
 
@@ -33,12 +35,14 @@ type Id
 
 decoder : D.Decoder Cluster
 decoder =
-    D.map5 Cluster
+    D.map7 Cluster
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "components" (SelectList.Extra.decoder Component.decoder))
         (D.field "services" (SelectList.Extra.decoder Service.decoder))
         (D.field "supportType" SupportType.decoder)
+        (D.field "chargingInfo" (D.nullable D.string))
+        (D.field "credits" D.int)
 
 
 extractId : Cluster -> Int

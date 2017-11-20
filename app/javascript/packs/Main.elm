@@ -1,5 +1,8 @@
 module Main exposing (..)
 
+import Bootstrap.Alert as Alert
+import Bootstrap.Button as Button
+import Bootstrap.Modal as Modal
 import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
 import Component exposing (Component)
@@ -55,6 +58,8 @@ init flags =
 
 
 -- VIEW
+-- XXX Refactor functions in here and in `View.*` modules to use
+-- `elm-bootstrap`.
 
 
 view : Model -> Html Msg
@@ -63,7 +68,10 @@ view model =
         Initialized state ->
             div []
                 (Maybe.Extra.values
-                    [ submitErrorAlert state
+                    [ chargingInfoModal state |> Just
+                    , chargeableIssuePreSubmissionModal state |> Just
+                    , State.selectedIssue state |> chargeableIssueAlert
+                    , submitErrorAlert state
                     , caseForm state |> Just
                     ]
                 )
@@ -73,9 +81,90 @@ view model =
                 [ text
                     ("Error initializing form: "
                         ++ message
-                        ++ ". Please contact support@alces-software.com"
+                        ++ ". Please contact "
                     )
+                , supportEmailLink
+                , text "."
                 ]
+
+
+supportEmailLink : Html msg
+supportEmailLink =
+    let
+        email =
+            "support@alces-software.com"
+    in
+    a
+        [ "mailto:" ++ email |> href
+        , target "_blank"
+        ]
+        [ text email ]
+
+
+chargingInfoModal : State -> Html Msg
+chargingInfoModal state =
+    let
+        cluster =
+            SelectList.selected state.clusters
+
+        chargingInfo =
+            cluster.chargingInfo
+                |> Maybe.map text
+                |> Maybe.withDefault noChargingInfoAvailable
+
+        noChargingInfoAvailable =
+            span []
+                [ text "No charging info has been provided by Alces Software for "
+                , strong [] [ text cluster.name ]
+                , text "; if you require clarification on what charges you may incur please contact "
+                , supportEmailLink
+                , text "."
+                ]
+    in
+    Modal.config ClusterChargingInfoModal
+        |> Modal.h5 [] [ cluster.name ++ " charging info" |> text ]
+        |> Modal.body [] [ chargingInfo ]
+        |> Modal.footer []
+            [ Button.button
+                [ Button.outlinePrimary
+                , Button.attrs
+                    [ ClusterChargingInfoModal Modal.hiddenState |> onClick ]
+                ]
+                [ text "Close" ]
+            ]
+        |> Modal.view state.clusterChargingInfoModal
+
+
+chargeableIssuePreSubmissionModal : State -> Html Msg
+chargeableIssuePreSubmissionModal state =
+    let
+        bodyContent =
+            [ p []
+                [ text "The selected issue ("
+                , em [] [ State.selectedIssue state |> Issue.name |> text ]
+                , text ") is chargeable, and creating this support case may incur a support credit charge."
+                ]
+            , p [] [ text "Do you wish to continue?" ]
+            ]
+    in
+    Modal.config ChargeableIssuePreSubmissionModal
+        |> Modal.h5 [] [ text "This support case may incur charges" ]
+        |> Modal.body [] bodyContent
+        |> Modal.footer []
+            [ Button.button
+                [ Button.outlinePrimary
+                , Button.attrs
+                    [ ChargeableIssuePreSubmissionModal Modal.hiddenState |> onClick ]
+                ]
+                [ text "Cancel" ]
+            , Button.button
+                [ Button.outlineWarning
+                , Button.attrs
+                    [ onClick StartSubmit ]
+                ]
+                [ text "Create Case" ]
+            ]
+        |> Modal.view state.chargeableIssuePreSubmissionModal
 
 
 submitErrorAlert : State -> Maybe (Html Msg)
@@ -85,7 +174,7 @@ submitErrorAlert state =
     let
         displayError =
             \error ->
-                errorAlert
+                Alert.danger
                     [ button
                         [ type_ "button"
                         , class "close"
@@ -99,18 +188,48 @@ submitErrorAlert state =
     Maybe.map displayError state.error
 
 
-errorAlert : List (Html msg) -> Html msg
-errorAlert children =
-    div
-        [ class "alert alert-danger alert-dismissable fade show"
-        , attribute "role" "alert"
-        ]
-        children
+chargeableIssueAlert : Issue -> Maybe (Html Msg)
+chargeableIssueAlert issue =
+    let
+        dollar =
+            span [ class "fa fa-dollar" ] []
+
+        chargingInfo =
+            " This issue is chargeable and may incur a charge of support credits. "
+
+        clusterChargingInfoLinkText =
+            "Click here for the charging details for this cluster."
+    in
+    if Issue.isChargeable issue then
+        Alert.warning
+            [ dollar
+            , dollar
+            , dollar
+            , text chargingInfo
+            , Alert.link
+                [ ClusterChargingInfoModal Modal.visibleState |> onClick
+
+                -- This makes this display as a normal link, but clicking on it
+                -- not reload the page. There may be a better way to do this;
+                -- `href="#"` does not work.
+                , href "javascript:void(0)"
+                ]
+                [ text clusterChargingInfoLinkText ]
+            ]
+            |> Just
+    else
+        Nothing
 
 
 caseForm : State -> Html Msg
 caseForm state =
     let
+        submitMsg =
+            if State.selectedIssue state |> Issue.isChargeable then
+                ChargeableIssuePreSubmissionModal Modal.visibleState
+            else
+                StartSubmit
+
         formElements =
             Maybe.Extra.values
                 [ maybeClustersField state.clusters
@@ -122,7 +241,7 @@ caseForm state =
                 , submitButton state |> Just
                 ]
     in
-    Html.form [ onSubmit StartSubmit ] formElements
+    Html.form [ onSubmit submitMsg ] formElements
 
 
 maybeClustersField : SelectList Cluster -> Maybe (Html Msg)
@@ -279,6 +398,8 @@ type Msg
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
     | ClearError
+    | ClusterChargingInfoModal Modal.State
+    | ChargeableIssuePreSubmissionModal Modal.State
 
 
 
@@ -351,6 +472,12 @@ updateState msg state =
 
         ClearError ->
             Just ( { state | error = Nothing }, Cmd.none )
+
+        ClusterChargingInfoModal modalState ->
+            Just ({ state | clusterChargingInfoModal = modalState } ! [])
+
+        ChargeableIssuePreSubmissionModal modalState ->
+            Just ({ state | chargeableIssuePreSubmissionModal = modalState } ! [])
 
 
 stringToId : (Int -> id) -> String -> Maybe id

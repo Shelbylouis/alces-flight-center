@@ -6,6 +6,14 @@ FactoryBot.define do
     user
     details "Oh no, my science isn't working"
 
+    factory :open_case do
+      archived false
+    end
+
+    factory :archived_case do
+      archived true
+    end
+
     factory :case_with_component do
       association :issue, factory: :issue_requiring_component
       before :create do |instance|

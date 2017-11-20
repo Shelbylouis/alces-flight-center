@@ -276,9 +276,9 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe '#create_rt_ticket' do
+  describe 'RT ticket creation on Case creation' do
     subject do
-      create(
+      build(
         :case,
         cluster: cluster,
         issue: issue,
@@ -330,7 +330,9 @@ RSpec.describe Case, type: :model do
     let :cluster { create(:cluster, site: site, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
     let :service { create(:service, name: 'Some service', cluster: cluster) }
-    let :request_tracker { subject.send(:request_tracker) }
+    let :request_tracker { described_class.send(:request_tracker) }
+
+    let :fake_rt_ticket { OpenStruct.new(id: 1234) }
 
     it 'creates rt ticket with correct properties' do
       expected_create_ticket_args = {
@@ -355,11 +357,9 @@ RSpec.describe Case, type: :model do
 
       expect(request_tracker).to receive(:create_ticket).with(
         expected_create_ticket_args
-      ).and_return(
-        OpenStruct.new(id: :fake_ticket_id)
-      )
+      ).and_return(fake_rt_ticket)
 
-      subject.create_rt_ticket
+      subject.save!
     end
 
     context 'when no associated component' do
@@ -371,11 +371,9 @@ RSpec.describe Case, type: :model do
           hash_excluding(
             text: /Associated component:/
           )
-        ).and_return(
-          OpenStruct.new(id: :fake_ticket_id)
-        )
+        ).and_return(fake_rt_ticket)
 
-        subject.create_rt_ticket
+        subject.save!
       end
     end
 
@@ -388,11 +386,9 @@ RSpec.describe Case, type: :model do
           hash_excluding(
             text: /Associated service:/
           )
-        ).and_return(
-          OpenStruct.new(id: :fake_ticket_id)
-        )
+        ).and_return(fake_rt_ticket)
 
-        subject.create_rt_ticket
+        subject.save!
       end
     end
   end
@@ -414,6 +410,48 @@ RSpec.describe Case, type: :model do
       )
       expected_mailto_url = "mailto:support@alces-software.com?subject=#{expected_subject}"
       expect(support_case.mailto_url).to eq expected_mailto_url
+    end
+  end
+
+  describe '#requires_credit_charge?' do
+    let :support_case do
+      create(
+        :case,
+        issue: issue,
+        last_known_ticket_status: last_known_ticket_status
+      )
+    end
+
+    subject { support_case.requires_credit_charge? }
+
+    context 'when Issue chargeable and ticket complete' do
+      let :issue { create(:issue, chargeable: true) }
+      let :last_known_ticket_status { 'resolved' }
+
+      it { is_expected.to be true }
+
+      context 'when Case already has credit charge associated' do
+        before :each do
+          create(:credit_charge, case: support_case)
+          support_case.reload
+        end
+
+        it { is_expected.to be false }
+      end
+    end
+
+    context 'when Issue chargeable and ticket incomplete' do
+      let :issue { create(:issue, chargeable: true) }
+      let :last_known_ticket_status { 'stalled' }
+
+      it { is_expected.to be false }
+    end
+
+    context 'when Issue non-chargeable and ticket complete' do
+      let :issue { create(:issue, chargeable: false) }
+      let :last_known_ticket_status { 'resolved' }
+
+      it { is_expected.to be false }
     end
   end
 end

@@ -17,10 +17,12 @@ RSpec.describe Service, type: :model do
     let :service_type { create(:service_type) }
 
     it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq(id: 1,
-                                          name: 'Some Service',
-                                          supportType: 'managed',
-                                          serviceType: service_type.case_form_json)
+      expect(subject.case_form_json).to eq(
+        id: 1,
+        name: 'Some Service',
+        supportType: 'managed',
+        serviceType: service_type.case_form_json
+      )
     end
   end
 end

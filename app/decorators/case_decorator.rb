@@ -10,4 +10,8 @@ class CaseDecorator < ApplicationDecorator
       h.raw('<em>N/A</em>')
     end
   end
+
+  def rt_ticket_url
+    "http://helpdesk.alces-software.com/rt/Ticket/Display.html?id=#{rt_ticket_id}"
+  end
 end

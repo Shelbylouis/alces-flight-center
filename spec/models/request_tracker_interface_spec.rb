@@ -1,11 +1,7 @@
 require 'rails_helper'
 
 RSpec.shared_examples 'Request Tracker interface' do
-  subject { described_class.new }
-
-  unless defined?(RT_CREATE_TICKET_CASSETTE)
-    RT_CREATE_TICKET_CASSETTE = 'rt_create_ticket'
-  end
+  let :rt_interface { described_class.new }
 
   let :new_ticket_params do
     {
@@ -21,13 +17,27 @@ RSpec.shared_examples 'Request Tracker interface' do
     }
   end
 
-  describe '#create_ticket' do
-    it 'creates a ticket and returns object with id' do
-      VCR.use_cassette(RT_CREATE_TICKET_CASSETTE, re_record_interval: 7.days) do
-        ticket = subject.create_ticket(new_ticket_params)
+  describe '#create_ticket [interface]' do
+    subject { rt_interface.create_ticket(new_ticket_params) }
 
+    it 'creates a ticket and returns object with id' do
+      VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) do
         # All tickets now have IDs greater than this.
-        expect(ticket.id).to be > 10000
+        expect(subject.id).to be > 10000
+      end
+    end
+  end
+
+  describe '#show_ticket [interface]' do
+    subject { rt_interface.show_ticket(10003) }
+
+    it 'returns ticket data including status' do
+      VCR.use_cassette(VcrCassettes::RT_SHOW_TICKET) do
+        # Ticket 10003 happens to be a real ticket which is 'resolved' (see
+        # http://helpdesk.alces-software.com/rt/REST/1.0/ticket/10003), and we
+        # also want fake interface to give 'resolved' status in this case, so
+        # this expectation should pass for both implementations.
+        expect(subject.status).to eq 'resolved'
       end
     end
   end
@@ -36,8 +46,43 @@ end
 RSpec.describe RequestTrackerInterface do
   include_context 'Request Tracker interface'
 
-  describe '#create_ticket' do
+  RSpec.shared_examples 'error_handling' do
     let :bad_response_body { 'Oh no, things went wrong' }
+
+    it 'raises when API responds with an unexpected status' do
+      stub_request(
+        :any, /#{rt_interface.api_endpoint}/
+      ).to_return(
+        status: 418,
+        body: bad_response_body
+      )
+
+      VCR.turned_off do
+        expect { subject }.to raise_error(
+          UnexpectedRtApiResponseException, bad_response_body
+        )
+      end
+    end
+
+    it 'raises when API responds with an unexpected body format' do
+      stub_request(
+        :any, /#{rt_interface.api_endpoint}/
+      ).to_return(
+        body: bad_response_body
+      )
+
+      VCR.turned_off do
+        expect { subject }.to raise_error(
+          UnexpectedRtApiResponseException, bad_response_body
+        )
+      end
+    end
+  end
+
+  describe '#create_ticket' do
+    subject { rt_interface.create_ticket(new_ticket_params) }
+
+    include_examples 'error_handling'
 
     it 'includes correct request body' do
       expect_any_instance_of(HTTP::Client).to receive(:post).with(
@@ -53,43 +98,14 @@ RSpec.describe RequestTrackerInterface do
         )
       ).and_call_original
 
-      VCR.use_cassette(RT_CREATE_TICKET_CASSETTE, re_record_interval: 7.days) do
-        subject.create_ticket(new_ticket_params)
-      end
+      VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) { subject }
     end
+  end
 
-    it 'raises when API responds with an unexpected status' do
-      stub_request(
-        :any, /#{subject.api_endpoint}/
-      ).to_return(
-        status: 418,
-        body: bad_response_body
-      )
+  describe '#show_ticket' do
+    subject { rt_interface.show_ticket(10003) }
 
-      VCR.turned_off do
-        expect do
-          subject.create_ticket(new_ticket_params)
-        end.to raise_error(
-          UnexpectedRtApiResponseException, bad_response_body
-        )
-      end
-    end
-
-    it 'raises when API responds with an unexpected body format' do
-      stub_request(
-        :any, /#{subject.api_endpoint}/
-      ).to_return(
-        body: bad_response_body
-      )
-
-      VCR.turned_off do
-        expect do
-          subject.create_ticket(new_ticket_params)
-        end.to raise_error(
-          UnexpectedRtApiResponseException, bad_response_body
-        )
-      end
-    end
+    include_examples 'error_handling'
   end
 end
 
@@ -97,13 +113,27 @@ RSpec.describe FakeRequestTrackerInterface do
   include_context 'Request Tracker interface'
 
   describe '#create_ticket' do
+    subject { rt_interface.create_ticket(new_ticket_params) }
+
     it 'produces tickets with incrementing IDs' do
       # Mock that we have a Case with the current maximum rt ticket id.
       max_rt_ticket_id = 10001
       allow(Case).to receive(:maximum).and_return(max_rt_ticket_id)
 
-      new_rt_ticket_id = subject.create_ticket(new_ticket_params).id
+      new_rt_ticket_id = subject.id
       expect(new_rt_ticket_id).to eq(max_rt_ticket_id + 1)
+    end
+  end
+
+  describe '#show_ticket' do
+    # Use simple, predictable scheme to simulate mix of open and completed
+    # tickets in development.
+    it 'gives `resolved` status when ticket ID is odd' do
+      expect(rt_interface.show_ticket(10001).status).to eq('resolved')
+    end
+
+    it 'gives `open` status when ticket ID is even' do
+      expect(rt_interface.show_ticket(10002).status).to eq('open')
     end
   end
 end

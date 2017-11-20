@@ -13,6 +13,7 @@ class CaseCategory < ApplicationRecord
       id: id,
       name: name,
       issues: issues.map(&:case_form_json),
+      controllingServiceType: controlling_service_type&.case_form_json
     }
   end
 end

@@ -3,7 +3,13 @@ class CasesController < ApplicationController
 
   def index
     @cases = current_site.cases
-    @title = 'Support case archive'
+    @title = if current_user.admin?
+               'Manage support cases'
+             else
+               'Support case archive'
+             end
+
+    @cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
   def new
@@ -57,14 +63,17 @@ class CasesController < ApplicationController
   end
 
   def archive
-    @case = Case.find(params[:id])
-    @case.archived = true
-    if @case.save
-      flash[:success] = 'Support case archived.'
-    else
-      flash_object_errors(@case)
-    end
-    redirect_to root_path
+    archived_change_action(
+      archived: true,
+      success_flash: 'Support case archived.'
+    )
+  end
+
+  def restore
+    archived_change_action(
+      archived: false,
+      success_flash: 'Support case restored from archive.'
+    )
   end
 
   private
@@ -87,16 +96,14 @@ class CasesController < ApplicationController
     )
   end
 
-  def format_errors(support_case)
-    # XXX Improve error handling - for now we just return a formatted string of
-    # all errors; could be worth returning JSON which can be decoded and
-    # displayed inline with fields in app.
-    support_case.errors.messages.map do |field, messages|
-      "#{field} #{messages.join(', ')}"
-    end.join('; ')
-  end
-
-  def flash_object_errors(support_case)
-    flash[:error] = "Error creating support case: #{format_errors(support_case)}"
+  def archived_change_action(archived:, success_flash:)
+    @case = Case.find(params[:id])
+    @case.archived = archived
+    if @case.save
+      flash[:success] = success_flash
+    else
+      flash[:error] = "Error updating support case: #{format_errors(support_case)}"
+    end
+    redirect_to root_path
   end
 end

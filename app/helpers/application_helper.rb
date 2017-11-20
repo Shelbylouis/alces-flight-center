@@ -11,8 +11,4 @@ module ApplicationHelper
   def json_map(enumerable, to_json_function)
     enumerable.map(&to_json_function).reject(&:nil?).to_json
   end
-
-  def current_site
-    current_user&.site
-  end
 end

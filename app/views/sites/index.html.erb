@@ -4,20 +4,18 @@
     <ul class="nav">
       <li class="nav-item">
         <span class="navbar-brand">
-          Overview
+          All Sites
         </span>
       </li>
-      <%= render 'cases/new_support_case_button', service: @service %>
     </ul>
   </div>
 
   <ul class="list-group list-group-flush">
-    <li class="list-group-item">
-      <%= @service.readable_support_type.capitalize %> service
-    </li>
-    <% if @service.description.present? %>
+    <% @sites.each do |site| %>
       <li class="list-group-item">
-        <%= @service.description %>
+        <%= link_to site.name, site_path(site) %>
+        &mdash;
+        <%= link_to 'Manage Support Cases', site_cases_path(site) %>
       </li>
     <% end %>
   </ul>
