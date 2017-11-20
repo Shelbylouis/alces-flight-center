@@ -12,6 +12,7 @@ RSpec.shared_examples 'Request Tracker interface' do
             Testing
             multiline
             text
+            with semicolon ;
             works
       EOF
     }
@@ -38,6 +39,12 @@ RSpec.shared_examples 'Request Tracker interface' do
         # also want fake interface to give 'resolved' status in this case, so
         # this expectation should pass for both implementations.
         expect(subject.status).to eq 'resolved'
+      end
+    end
+
+    it 'returns ID in ticket as integer' do
+      VCR.use_cassette(VcrCassettes::RT_SHOW_TICKET) do
+        expect(subject.id).to eq 10003
       end
     end
   end
@@ -88,12 +95,14 @@ RSpec.describe RequestTrackerInterface do
       expect_any_instance_of(HTTP::Client).to receive(:post).with(
         any_args,
         hash_including(
-          body: 'content=' + Utils.rt_format(
-            Queue: 'Support',
-            Requestor: new_ticket_params[:requestor_email],
-            Cc: new_ticket_params[:cc].join(','),
-            Subject: new_ticket_params[:subject],
-            Text: new_ticket_params[:text],
+          body: 'content=' + CGI.escape(
+            Utils.rt_format(
+              Queue: 'Support',
+              Requestor: new_ticket_params[:requestor_email],
+              Cc: new_ticket_params[:cc].join(','),
+              Subject: new_ticket_params[:subject],
+              Text: new_ticket_params[:text],
+            )
           )
         )
       ).and_call_original
