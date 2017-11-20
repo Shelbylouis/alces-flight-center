@@ -41,6 +41,12 @@ RSpec.shared_examples 'Request Tracker interface' do
         expect(subject.status).to eq 'resolved'
       end
     end
+
+    it 'returns ID in ticket as integer' do
+      VCR.use_cassette(VcrCassettes::RT_SHOW_TICKET) do
+        expect(subject.id).to eq 10003
+      end
+    end
   end
 end
 

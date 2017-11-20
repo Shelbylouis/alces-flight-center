@@ -48,7 +48,11 @@ class RequestTrackerInterface
     # Ticket data is sandwiched between blank lines at both ends.
     ticket_data = response_text.split("\n\n").second
 
-    ticket_struct_from_data(ticket_data)
+    ticket_struct_from_data(ticket_data).tap do |ticket|
+      # Set ID in ticket to ID passed; without this it is returned in
+      # `"ticket/12345"` format from RT. Which is not very helpful.
+      ticket.id = id
+    end
   end
 
   private
