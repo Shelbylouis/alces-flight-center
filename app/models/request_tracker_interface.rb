@@ -65,12 +65,14 @@ class RequestTrackerInterface
   end
 
   def new_ticket_request_content(requestor_email:, cc:, subject:, text:)
-    Utils.rt_format(
-      Queue: 'Support',
-      Requestor: requestor_email,
-      Cc: cc.join(','),
-      Subject: subject,
-      Text: text
+    CGI.escape(
+      Utils.rt_format(
+        Queue: 'Support',
+        Requestor: requestor_email,
+        Cc: cc.join(','),
+        Subject: subject,
+        Text: text
+      )
     )
   end
 
