@@ -9,7 +9,7 @@
     }
   %>
 <% else %>
-  <%= link_to raw(icon 'x', interactive: true),
+  <%= link_to raw(icon 'times', interactive: true),
     archive_case_path(support_case.id),
     method: :post,
     title: 'Archive this support case if it has been resolved or is no longer relevant',

@@ -32,10 +32,10 @@ gem 'validates_email_format_of'
 gem 'webpacker', '~> 3.0'
 gem 'draper'
 gem 'rails-data-migrations'
+gem 'font-awesome-rails'
 
 gem 'bootstrap', '~> 4.0.0.beta'
 gem 'jquery-rails' # Required for Bootstrap.
-gem 'octicons_helper'
 
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
 gem 'turbolinks', '~> 5'
