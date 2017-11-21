@@ -36,6 +36,7 @@
         <% if manage_cases_page %>
           <th>Ticket status</th>
           <th>Chargeable</th>
+          <th>Actions</th>
         <% else %>
           <th>Details</th>
           <th>Contact support</th>
@@ -77,6 +78,27 @@
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
             </td>
             <td><%= raw(c.chargeable ? '&check;' : '&cross;') %></td>
+            <td>
+              <% if c.under_maintenance? %>
+                <%= link_to raw(icon 'heartbeat', interactive: true),
+                  end_maintenance_window_case_path(c.id),
+                  method: :post,
+                  title: 'Remove component from being under maintenance and return to active service',
+                  data: {
+                    confirm: 'Are you sure you remove this component from being under maintenance?'
+                  }
+                %>
+              <% else %>
+                <%= link_to raw(icon 'wrench', interactive: true),
+                  start_maintenance_window_case_path(c.id),
+                  method: :post,
+                  title: 'Bring component under maintenance',
+                  data: {
+                    confirm: 'Are you sure you want to bring this component under maintenance?'
+                  }
+                %>
+              <% end %>
+            </td>
           <% else %>
             <td><%= c.details %></td>
             <td><%= render 'cases/email_support_icon', support_case: c %></td>

@@ -96,10 +96,10 @@ RSpec.describe 'Cases table', type: :feature do
 
         links = all('a')
 
-        mailto_links = links.select { |a| a[:href].match?('mailto') }
+        mailto_links = links.select { |a| a[:href]&.match?('mailto') }
         expect(mailto_links).to eq []
 
-        archive_links = links.select { |a| a[:href].match?('archive') }
+        archive_links = links.select { |a| a[:href]&.match?('archive') }
         expect(archive_links).to eq []
 
         expect do
