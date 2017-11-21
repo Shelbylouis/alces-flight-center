@@ -152,6 +152,19 @@ RSpec.describe Case, type: :model do
         it { is_expected.to be_valid }
       end
 
+      context 'when has associated maintenance window' do
+        before :each do
+          subject.save!
+          subject.start_maintenance_window!(requestor: create(:admin))
+        end
+
+        # Does not make sense to have a MaintenanceWindow for a Case which does
+        # not have a Component; MaintenanceWindows only exist for the purpose
+        # of taking a Component out of service for maintenance in relation to a
+        # particular Case.
+        it { is_expected.to be_invalid }
+      end
+
       context 'when associated with component' do
         let :component { create(:component) }
 

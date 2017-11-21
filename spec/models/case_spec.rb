@@ -191,7 +191,7 @@ RSpec.describe Case, type: :model do
   end
 
   describe 'maintenance windows' do
-    subject { create(:case) }
+    subject { create(:case_with_component) }
 
     describe '#start_maintenance_window!' do
       let :admin { create(:admin) }
