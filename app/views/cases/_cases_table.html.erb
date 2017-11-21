@@ -79,24 +79,26 @@
             </td>
             <td><%= raw(c.chargeable ? '&check;' : '&cross;') %></td>
             <td>
-              <% if c.under_maintenance? %>
-                <%= link_to raw(icon 'heartbeat', interactive: true),
-                  end_maintenance_window_case_path(c.id),
-                  method: :post,
-                  title: 'Remove component from being under maintenance and return to active service',
-                  data: {
-                    confirm: 'Are you sure you remove this component from being under maintenance?'
-                  }
-                %>
-              <% else %>
-                <%= link_to raw(icon 'wrench', interactive: true),
-                  start_maintenance_window_case_path(c.id),
-                  method: :post,
-                  title: 'Bring component under maintenance',
-                  data: {
-                    confirm: 'Are you sure you want to bring this component under maintenance?'
-                  }
-                %>
+              <% if c.can_bring_under_maintenance? %>
+                <% if c.under_maintenance? %>
+                  <%= link_to raw(icon 'heartbeat', interactive: true),
+                    end_maintenance_window_case_path(c.id),
+                    method: :post,
+                    title: 'Remove component from being under maintenance and return to active service',
+                    data: {
+                      confirm: 'Are you sure you remove this component from being under maintenance?'
+                    }
+                  %>
+                <% else %>
+                  <%= link_to raw(icon 'wrench', interactive: true),
+                    start_maintenance_window_case_path(c.id),
+                    method: :post,
+                    title: 'Bring component under maintenance',
+                    data: {
+                      confirm: 'Are you sure you want to bring this component under maintenance?'
+                    }
+                  %>
+                <% end %>
               <% end %>
             </td>
           <% else %>
