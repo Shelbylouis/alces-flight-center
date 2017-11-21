@@ -57,6 +57,8 @@ RSpec.shared_examples 'editable_asset_record_fields' do
           expect(
             field_for_definition(definition_with_field).value
           ).to eq 'new value'
+
+          expect(subject).to be_valid
         end
 
         it 'deletes associated field if sent empty value' do
@@ -64,6 +66,8 @@ RSpec.shared_examples 'editable_asset_record_fields' do
           expect(
             field_for_definition(definition_with_field)
           ).to be nil
+
+          expect(subject).to be_valid
         end
       end
 
@@ -75,6 +79,8 @@ RSpec.shared_examples 'editable_asset_record_fields' do
           expect(
             field_for_definition(definition_without_field).value
           ).to eq 'new value'
+
+          expect(subject).to be_valid
         end
 
         it 'does not create associated field if sent empty value' do
@@ -82,6 +88,8 @@ RSpec.shared_examples 'editable_asset_record_fields' do
           expect(
             field_for_definition(definition_without_field)
           ).to be nil
+
+          expect(subject).to be_valid
         end
       end
     end
