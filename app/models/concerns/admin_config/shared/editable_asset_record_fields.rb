@@ -107,19 +107,28 @@ module AdminConfig::Shared
     end
 
     def assign_asset_record_field_value(definition_id:, value:)
-      field = asset_record_fields.find_or_initialize_by(
+      field = asset_record_fields.find_by(
         asset_record_field_definition_id: definition_id
       )
 
-      if value.strip.empty?
-        # If we've been sent an empty value, destroy any current AssetRecordField
-        # so asset record falls back to next level up.
-        field.destroy!
-      else
-        # Otherwise create/update AssetRecordField for given definition with
-        # given value.
+      value_present = value.strip.present?
+
+      if field && value_present
+        # We have an existing AssetRecordField and have received a new value,
+        # so update it.
         field.value = value
         field.save!
+      elsif field
+        # We have an existing AssetRecordField and the new value is empty, so
+        # delete it so asset record falls back to next level up.
+        field.destroy!
+      elsif value_present
+        # We don't have an existing AssetRecordField and have received a new
+        # value, so create it.
+        asset_record_fields.create!(
+          asset_record_field_definition_id: definition_id,
+          value: value
+        )
       end
     end
   end
