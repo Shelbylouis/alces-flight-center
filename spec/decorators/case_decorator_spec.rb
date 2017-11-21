@@ -16,6 +16,24 @@ RSpec.describe CaseDecorator do
           h.link_to(component.name, h.component_path(component))
         )
       end
+
+      context 'when Case is under maintenance' do
+        before :each do
+          subject.start_maintenance_window!(requestor: create(:admin))
+        end
+
+        it 'includes under maintenance icon' do
+          expect(subject.association_info).to include(
+            h.icon('wrench', inline: true)
+          )
+        end
+
+        it 'includes title text about maintenance' do
+          expect(subject.association_info).to match(
+            /title="Component.*under maintenance.*Case"/
+          )
+        end
+      end
     end
 
     context 'when Case has Service' do

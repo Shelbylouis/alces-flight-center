@@ -1,6 +1,10 @@
 module ApplicationHelper
-  def icon(name, interactive: false)
-    classes = 'fa-2x ' + (interactive ? 'interactive-icon' : 'icon')
+  def icon(name, interactive: false, inline: false)
+    classes = [
+      (inline ? 'inline-icon' : 'fa-2x'),
+      (interactive ? 'interactive-icon' : 'icon')
+    ].join(' ')
+
     fa_icon name, class: classes
   end
 
