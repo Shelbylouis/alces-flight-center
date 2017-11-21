@@ -84,18 +84,30 @@
                   <%= link_to raw(icon 'heartbeat', interactive: true),
                     end_maintenance_window_case_path(c.id),
                     method: :post,
-                    title: 'Remove component from being under maintenance and return to active service',
+                    title: <<~EOF,
+                      Remove component from being under maintenance in relation
+                      to this case and return to active service
+                    EOF
                     data: {
-                      confirm: 'Are you sure you remove this component from being under maintenance?'
+                      confirm: <<~EOF
+                        Are you sure you remove this component from being under
+                        maintenance in relation to this case?
+                      EOF
                     }
                   %>
                 <% else %>
                   <%= link_to raw(icon 'wrench', interactive: true),
                     start_maintenance_window_case_path(c.id),
                     method: :post,
-                    title: 'Bring component under maintenance',
+                    title: <<~EOF,
+                      Bring component under maintenance in relation to this
+                      case
+                    EOF
                     data: {
-                      confirm: 'Are you sure you want to bring this component under maintenance?'
+                      confirm: <<~EOF
+                        Are you sure you want to bring this component under
+                        maintenance in relation to this case?
+                      EOF
                     }
                   %>
                 <% end %>
