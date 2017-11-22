@@ -6,6 +6,14 @@ class ApplicationDecorator < Draper::Decorator
   #     h.number_to_percentage object.amount, precision: 2
   #   end
 
+  def under_maintenance_icon
+    h.icon(
+      'wrench',
+      inline: true,
+      title: "#{readable_model_name.capitalize} currently under maintenance"
+    ) if under_maintenance?
+  end
+
   private
 
   def render_change_support_type_button(

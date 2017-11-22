@@ -100,13 +100,7 @@
               <tr>
                 <td width='40%'>
                   <%= link_to component.name, component_path(component) %>
-                  <% if component.under_maintenance? %>
-                    <%= icon(
-                      'wrench',
-                      inline: true,
-                      title: 'Component currently under maintenance'
-                    ) %>
-                  <% end %>
+                  <%= component.under_maintenance_icon %>
                 </td>
                 <td width='40%'>
                   <%= component.readable_support_type.capitalize %>
