@@ -38,8 +38,8 @@ decoder =
     D.map7 Cluster
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
-        (D.field "components" (SelectList.Extra.decoder Component.decoder))
-        (D.field "services" (SelectList.Extra.decoder Service.decoder))
+        (D.field "components" (SelectList.Extra.nameOrderedDecoder Component.decoder))
+        (D.field "services" (SelectList.Extra.nameOrderedDecoder Service.decoder))
         (D.field "supportType" SupportType.decoder)
         (D.field "chargingInfo" (D.nullable D.string))
         (D.field "credits" D.int)

@@ -1,7 +1,39 @@
-module SelectList.Extra exposing (..)
+module SelectList.Extra
+    exposing
+        ( fromList
+        , nameOrderedDecoder
+        , nestedSelect
+        , orderedDecoder
+        )
 
 import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
+
+
+nameOrderedDecoder : D.Decoder { a | name : comparable } -> D.Decoder (SelectList { a | name : comparable })
+nameOrderedDecoder =
+    orderedDecoder .name
+
+
+orderedDecoder : (a -> comparable) -> D.Decoder a -> D.Decoder (SelectList a)
+orderedDecoder compare itemDecoder =
+    let
+        maybeToDecoder =
+            \maybe ->
+                case maybe of
+                    Just selectList ->
+                        D.succeed selectList
+
+                    Nothing ->
+                        D.fail "Failed to sort SelectList (should never happen?)"
+    in
+    decoder itemDecoder
+        |> D.andThen
+            (SelectList.toList
+                >> List.sortBy compare
+                >> fromList
+                >> maybeToDecoder
+            )
 
 
 decoder : D.Decoder a -> D.Decoder (SelectList a)
