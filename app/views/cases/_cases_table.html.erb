@@ -92,12 +92,12 @@
               <% elsif c.credit_charge %>
                 <%= c.credit_charge.amount %>
               <% else %>
-                <em>Incomplete</em>
+                <em>Pending</em>
               <% end %>
             <% elsif !c.chargeable %>
               <em>N/A</em>
             <% else %>
-              <em>Incomplete</em>
+              <em>Pending</em>
             <% end %>
           </td>
         </tr>
