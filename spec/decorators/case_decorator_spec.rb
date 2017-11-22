@@ -22,6 +22,8 @@ RSpec.describe CaseDecorator do
   end
 
   describe '#association_info' do
+    let :cluster { subject.cluster }
+
     context 'when Case has Component' do
       subject do
         create(:case_with_component).decorate
@@ -31,11 +33,19 @@ RSpec.describe CaseDecorator do
 
       include_examples 'indicate under maintenance', 'Component'
 
-      it 'returns link to Component' do
+      it 'includes link to Component' do
         expect(
           subject.association_info
-        ).to eq(
+        ).to include(
           h.link_to(component.name, h.component_path(component))
+        )
+      end
+
+      it 'includes link to Cluster' do
+        expect(
+          subject.association_info
+        ).to include(
+          h.link_to(cluster.name, h.cluster_path(cluster))
         )
       end
     end
@@ -47,11 +57,20 @@ RSpec.describe CaseDecorator do
 
       let :service { subject.service }
 
-      it 'returns link to Service' do
+      it 'includes link to Service' do
         expect(
           subject.association_info
-        ).to eq(
+        ).to include(
           h.link_to(service.name, h.service_path(service))
+        )
+      end
+
+      # XXX Same as test for Component.
+      it 'includes link to Cluster' do
+        expect(
+          subject.association_info
+        ).to include(
+          h.link_to(cluster.name, h.cluster_path(cluster))
         )
       end
     end
@@ -61,11 +80,11 @@ RSpec.describe CaseDecorator do
         create(:case).decorate
       end
 
-      it 'returns N/A' do
+      it 'returns link to Cluster' do
         expect(
           subject.association_info
         ).to eq(
-          h.raw('<em>N/A</em>')
+          h.link_to(cluster.name, h.cluster_path(cluster))
         )
       end
     end
