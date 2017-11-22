@@ -29,11 +29,19 @@ FactoryBot.define do
       end
     end
 
-    factory :case_with_service do
+    # XXX Very similar to above for Services.
+    factory :case_requiring_service do
       association :issue, factory: :issue_requiring_service
+
       before :create do |instance|
-        instance.service = create(:service)
-        instance.cluster = instance.service.cluster
+        instance.cluster = instance.service&.cluster
+      end
+
+      factory :case_with_service do
+        before :create do |instance|
+          instance.service = create(:service)
+          instance.cluster = instance.service.cluster
+        end
       end
     end
   end
