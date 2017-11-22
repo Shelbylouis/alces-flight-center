@@ -5,12 +5,11 @@ class CaseDecorator < ApplicationDecorator
     cluster_link = h.link_to cluster.name, h.cluster_path(cluster)
 
     info = if component
-             "#{link_to_associated_component} (#{cluster_link})"
+             "#{association_link(component)} (#{cluster_link})"
            elsif service
-             service_link = h.link_to service.name, h.service_path(service)
-             "#{service_link} (#{cluster_link})"
+             "#{association_link(service)} (#{cluster_link})"
            else
-             cluster_link
+             association_link(cluster)
            end
 
     h.raw(info)
@@ -22,15 +21,22 @@ class CaseDecorator < ApplicationDecorator
 
   private
 
-  def link_to_associated_component
-    link_text = component.name
+  # Link to main association for Case; indicates if association is under
+  # maintenance due to this Case.
+  def association_link(model)
+    link_text = model.name
     title = nil
+
+    model_name = model.readable_model_name
 
     if under_maintenance?
       link_text += '&nbsp;' + h.icon('wrench', inline: true)
-      title = 'Component currently under maintenance for this Case'
+      title = "#{model_name.capitalize} currently under maintenance for this Case"
     end
 
-    h.link_to h.raw(link_text), h.component_path(component), title: title
+    path_helper = "#{model_name}_path"
+    path = h.send(path_helper, model)
+
+    h.link_to h.raw(link_text), path, title: title
   end
 end

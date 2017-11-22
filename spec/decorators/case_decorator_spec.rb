@@ -57,6 +57,8 @@ RSpec.describe CaseDecorator do
 
       let :service { subject.service }
 
+      include_examples 'indicate under maintenance', 'Service'
+
       it 'includes link to Service' do
         expect(
           subject.association_info
@@ -79,6 +81,8 @@ RSpec.describe CaseDecorator do
       subject do
         create(:case).decorate
       end
+
+      include_examples 'indicate under maintenance', 'Cluster'
 
       it 'returns link to Cluster' do
         expect(
