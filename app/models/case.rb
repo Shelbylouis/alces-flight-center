@@ -28,7 +28,6 @@ class Case < ApplicationRecord
 
   validates :details, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
-  validates :maintenance_windows, absence: true, unless: :can_bring_under_maintenance?
 
   validates :last_known_ticket_status,
     presence: true,
@@ -84,10 +83,6 @@ class Case < ApplicationRecord
 
   def under_maintenance?
     open_maintenance_windows.present?
-  end
-
-  def can_bring_under_maintenance?
-    issue.requires_component
   end
 
   private

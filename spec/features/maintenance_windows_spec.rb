@@ -11,17 +11,6 @@ RSpec.feature "Maintenance windows", type: :feature do
       end_maintenance_window_case_path(support_case.id)
     end
 
-    context 'when Case has no Component' do
-      let :support_case { create(:case) }
-
-      it 'does not show start/end maintenance links' do
-        visit site_cases_path(support_case.site, as: user)
-
-        expect(page).not_to have_link(href: start_link_path)
-        expect(page).not_to have_link(href: end_link_path)
-      end
-    end
-
     context 'when Case has Component' do
       let :support_case { create(:case_with_component) }
 
