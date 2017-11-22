@@ -251,4 +251,44 @@ RSpec.describe Cluster, type: :model do
 
     it { is_expected.to eq 15 }
   end
+
+  # XXX Duplicated, with additions, from Component specs.
+  describe '#under_maintenance?' do
+    subject do
+      create(:cluster).tap do |cluster|
+        create(:case, cluster: cluster).tap do |support_case|
+          create(:closed_maintenance_window, case: support_case)
+        end
+      end
+    end
+
+    context 'when has case which is under maintenance' do
+      before :each do
+        subject.tap do |cluster|
+          create(:case, cluster: cluster).tap do |support_case|
+            create(:open_maintenance_window, case: support_case)
+          end
+        end
+      end
+
+      it { is_expected.to be_under_maintenance }
+    end
+
+    context 'when has no case which is under maintenance' do
+      it { is_expected.not_to be_under_maintenance }
+    end
+
+    # XXX This is additional to Component specs.
+    context 'when has part with case which is under maintenance' do
+      before :each do
+        create(:component, cluster: subject).tap do |component|
+          create(:case_requiring_component, component: component).tap do |support_case|
+            create(:open_maintenance_window, case: support_case)
+          end
+        end
+      end
+
+      it { is_expected.not_to be_under_maintenance }
+    end
+  end
 end
