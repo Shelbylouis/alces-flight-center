@@ -32,6 +32,7 @@
         <th>Issue</th>
         <th>Cluster</th>
         <th>Association</th>
+        <th>Ticket ID</th>
         <% if manage_cases_page %>
           <th>Ticket status</th>
           <th>Chargeable</th>
@@ -70,6 +71,7 @@
           <td><%= c.issue.name %></td>
           <td><%= c.cluster.name %></td>
           <td><%= c.association_info %></td>
+          <td><%= c.rt_ticket_id %></td>
           <% if manage_cases_page %>
             <td>
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
