@@ -7,17 +7,18 @@
           Overview
         </span>
       </li>
-      <%= render 'cases/new_support_case_button', service: @service %>
+      <%= render 'cases/new_support_case_button', service: service %>
     </ul>
   </div>
 
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
-      <%= @service.readable_support_type.capitalize %> service
+      <%= service.readable_support_type.capitalize %> service
+      <%= service.under_maintenance_icon %>
     </li>
-    <% if @service.description.present? %>
+    <% if service.description.present? %>
       <li class="list-group-item">
-        <%= @service.description %>
+        <%= service.description %>
       </li>
     <% end %>
   </ul>
