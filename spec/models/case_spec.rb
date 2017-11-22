@@ -267,4 +267,35 @@ RSpec.describe Case, type: :model do
       end
     end
   end
+
+  describe '#associated_model' do
+    context 'when Case with Component' do
+      subject { create(:case_with_component) }
+
+      it 'gives Component' do
+        expect(subject.associated_model).to eq(subject.component)
+      end
+    end
+
+    context 'when Case with Service' do
+      subject { create(:case_with_service) }
+
+      it 'gives Service' do
+        expect(subject.associated_model).to eq(subject.service)
+      end
+    end
+
+    context 'when Case with just Cluster' do
+      subject { create(:case) }
+
+      it 'gives Cluster' do
+        expect(subject.associated_model).to eq(subject.cluster)
+      end
+    end
+  end
+
+  describe '#associated_model_type' do
+    subject { create(:case_with_component).associated_model_type }
+    it { is_expected.to eq 'component' }
+  end
 end

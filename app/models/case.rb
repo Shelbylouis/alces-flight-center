@@ -85,6 +85,14 @@ class Case < ApplicationRecord
     open_maintenance_windows.present?
   end
 
+  def associated_model
+    component || service || cluster
+  end
+
+  def associated_model_type
+    associated_model.readable_model_name
+  end
+
   private
 
   def create_rt_ticket
