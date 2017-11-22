@@ -84,13 +84,14 @@
                   end_maintenance_window_case_path(c.id),
                   method: :post,
                   title: <<~EOF,
-                    Remove component from being under maintenance in relation
-                    to this case and return to active service
+                    Remove #{c.associated_model_type} from being under
+                    maintenance in relation to this case and return to active
+                    service
                   EOF
                   data: {
                     confirm: <<~EOF
-                      Are you sure you remove this component from being under
-                      maintenance in relation to this case?
+                      Are you sure you remove this #{c.associated_model_type}
+                      from being under maintenance in relation to this case?
                     EOF
                   }
                 %>
@@ -99,13 +100,14 @@
                   start_maintenance_window_case_path(c.id),
                   method: :post,
                   title: <<~EOF,
-                    Bring component under maintenance in relation to this
-                    case
+                    Bring #{c.associated_model_type} under maintenance in
+                    relation to this case
                   EOF
                   data: {
                     confirm: <<~EOF
-                      Are you sure you want to bring this component under
-                      maintenance in relation to this case?
+                      Are you sure you want to bring this
+                      #{c.associated_model_type} under maintenance in relation
+                      to this case?
                     EOF
                   }
                 %>
