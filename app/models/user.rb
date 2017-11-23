@@ -17,8 +17,8 @@ class User < ApplicationRecord
   validates :password, presence: true, length: { minimum: 5 }
 
   validates :site, {
-    :presence => {if: :contact?},
-    :absence => {if: :admin?}
+    presence: {if: :contact?},
+    absence: {if: :admin?}
   }
 
   alias_attribute :admin?, :admin
