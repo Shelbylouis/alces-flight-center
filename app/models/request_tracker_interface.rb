@@ -24,7 +24,7 @@ class RequestTrackerInterface
       text: text
     )
 
-    response = api_request(NEW_TICKET_PATH, body:  "content=#{content}")
+    response = api_request(NEW_TICKET_PATH, body: "content=#{content}")
 
     ticket_id_regex = /Ticket (\d{5,}) created./
     response_match = response.to_s.match(ticket_id_regex)
