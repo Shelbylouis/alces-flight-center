@@ -72,4 +72,16 @@ FactoryBot.define do
     user { create(:admin) }
     amount 2
   end
+
+  factory :maintenance_window do
+    add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
+    user { create(:admin) }
+    created_at 7.days.ago
+
+    factory :open_maintenance_window {}
+
+    factory :closed_maintenance_window do
+      ended_at 3.days.ago
+    end
+  end
 end

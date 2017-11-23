@@ -18,6 +18,13 @@ Rails.application.routes.draw do
       resources :cases, only: [:new, :index]
     end
 
+    resources :cases do
+      member do
+        post :start_maintenance_window
+        post :end_maintenance_window
+      end
+    end
+
     resources :credit_charges, only: [:create, :update]
 
     # To display a working link to sign users out of the admin dashboard,

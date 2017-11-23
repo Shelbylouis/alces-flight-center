@@ -30,12 +30,12 @@
         <th>Creator</th>
         <th>Category</th>
         <th>Issue</th>
-        <th>Cluster</th>
         <th>Association</th>
         <th>Ticket ID</th>
         <% if manage_cases_page %>
           <th>Ticket status</th>
           <th>Chargeable</th>
+          <th>Actions</th>
         <% else %>
           <th>Details</th>
           <th>Contact support</th>
@@ -69,7 +69,6 @@
           <td><%= c.user.name %></td>
           <td><%= c.case_category.name %></td>
           <td><%= c.issue.name %></td>
-          <td><%= c.cluster.name %></td>
           <td><%= c.association_info %></td>
           <td><%= c.rt_ticket_id %></td>
           <% if manage_cases_page %>
@@ -77,6 +76,41 @@
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
             </td>
             <td><%= raw(c.chargeable ? '&check;' : '&cross;') %></td>
+            <td>
+              <% if c.under_maintenance? %>
+                <%= link_to raw(icon 'heartbeat', interactive: true),
+                  end_maintenance_window_case_path(c.id),
+                  method: :post,
+                  title: <<~EOF,
+                    Remove #{c.associated_model_type} from being under
+                    maintenance in relation to this case and return to active
+                    service
+                  EOF
+                  data: {
+                    confirm: <<~EOF
+                      Are you sure you remove this #{c.associated_model_type}
+                      from being under maintenance in relation to this case?
+                    EOF
+                  }
+                %>
+              <% else %>
+                <%= link_to raw(icon 'wrench', interactive: true),
+                  start_maintenance_window_case_path(c.id),
+                  method: :post,
+                  title: <<~EOF,
+                    Bring #{c.associated_model_type} under maintenance in
+                    relation to this case
+                  EOF
+                  data: {
+                    confirm: <<~EOF
+                      Are you sure you want to bring this
+                      #{c.associated_model_type} under maintenance in relation
+                      to this case?
+                    EOF
+                  }
+                %>
+              <% end %>
+            </td>
           <% else %>
             <td><%= c.details %></td>
             <td><%= render 'cases/email_support_icon', support_case: c %></td>

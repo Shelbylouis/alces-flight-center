@@ -21,6 +21,7 @@ class Case < ApplicationRecord
   belongs_to :service, required: false
   belongs_to :user
   has_one :credit_charge, required: false
+  has_many :maintenance_windows
 
   delegate :case_category, :chargeable, to: :issue
   delegate :site, to: :cluster
@@ -71,6 +72,33 @@ class Case < ApplicationRecord
     ticket_completed? && chargeable
   end
 
+  def start_maintenance_window!(requestor:)
+    maintenance_windows.create!(user: requestor)
+    add_rt_ticket_correspondence(
+      "#{associated_model.name} is now under maintenance by #{requestor.name}"
+    )
+  end
+
+  def end_maintenance_window!
+    raise NoOpenMaintenanceWindowException unless open_maintenance_windows.present?
+    open_maintenance_windows.first.update!(ended_at: DateTime.current)
+    add_rt_ticket_correspondence(
+      "#{associated_model.name} is no longer under maintenance"
+    )
+  end
+
+  def under_maintenance?
+    open_maintenance_windows.present?
+  end
+
+  def associated_model
+    component || service || cluster
+  end
+
+  def associated_model_type
+    associated_model.readable_model_name
+  end
+
   private
 
   def create_rt_ticket
@@ -84,6 +112,10 @@ class Case < ApplicationRecord
     )
 
     self.rt_ticket_id = ticket.id
+  end
+
+  def add_rt_ticket_correspondence(text)
+    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
   end
 
   def ticket_completed?
@@ -130,5 +162,9 @@ class Case < ApplicationRecord
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
     Utils.rt_format(properties)
+  end
+
+  def open_maintenance_windows
+    maintenance_windows.where(ended_at: nil)
   end
 end

@@ -57,7 +57,10 @@
     <tbody>
     <% @cluster.services.each do |service| %>
       <tr>
-        <td width='40%'><%= link_to service.name, service_path(service) %></td>
+        <td width='40%'>
+          <%= link_to service.name, service_path(service) %>
+          <%= service.under_maintenance_icon %>
+        </td>
         <td width='40%'><%= service.readable_support_type.capitalize %></td>
         <td width='20%'><%= service.change_support_type_button %></td>
       </tr>
@@ -100,6 +103,7 @@
               <tr>
                 <td width='40%'>
                   <%= link_to component.name, component_path(component) %>
+                  <%= component.under_maintenance_icon %>
                 </td>
                 <td width='40%'>
                   <%= component.readable_support_type.capitalize %>

@@ -7,6 +7,7 @@ class Component < ApplicationRecord
   has_one :component_type, through: :component_group
   has_one :cluster, through: :component_group
   has_many :asset_record_fields
+  has_many :cases
 
   validates_associated :component_group, :asset_record_fields
   validates :name, presence: true
@@ -35,6 +36,10 @@ class Component < ApplicationRecord
       asset_record_layers.reduce({}, :merge).values.map do |field|
         [field.name, field.value]
       end.to_h
+  end
+
+  def under_maintenance?
+    cases.select(&:under_maintenance?).present?
   end
 
   private

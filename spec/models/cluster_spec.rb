@@ -136,8 +136,8 @@ RSpec.describe Cluster, type: :model do
 
     describe '#documents' do
       it 'returns needed data for each Cluster document' do
-        VCR.use_cassette(VcrCassettes::S3_READ_DOCUMENTS) do
-          Development::Utils.upload_document_fixtures_for(subject)
+        VCR.use_cassette(VcrCassettes::S3_READ_DOCUMENTS) do |cassette|
+          Development::Utils.upload_document_fixtures_for(subject) if cassette.recording?
 
           documents = subject.documents
 
@@ -250,5 +250,45 @@ RSpec.describe Cluster, type: :model do
     end
 
     it { is_expected.to eq 15 }
+  end
+
+  # XXX Duplicated, with additions, from Component specs.
+  describe '#under_maintenance?' do
+    subject do
+      create(:cluster).tap do |cluster|
+        create(:case, cluster: cluster).tap do |support_case|
+          create(:closed_maintenance_window, case: support_case)
+        end
+      end
+    end
+
+    context 'when has case which is under maintenance' do
+      before :each do
+        subject.tap do |cluster|
+          create(:case, cluster: cluster).tap do |support_case|
+            create(:open_maintenance_window, case: support_case)
+          end
+        end
+      end
+
+      it { is_expected.to be_under_maintenance }
+    end
+
+    context 'when has no case which is under maintenance' do
+      it { is_expected.not_to be_under_maintenance }
+    end
+
+    # XXX This is additional to Component specs.
+    context 'when has part with case which is under maintenance' do
+      before :each do
+        create(:component, cluster: subject).tap do |component|
+          create(:case_requiring_component, component: component).tap do |support_case|
+            create(:open_maintenance_window, case: support_case)
+          end
+        end
+      end
+
+      it { is_expected.not_to be_under_maintenance }
+    end
   end
 end

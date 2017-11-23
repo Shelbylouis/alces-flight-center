@@ -1,7 +1,11 @@
 module ApplicationHelper
-  def icon(name, interactive: false)
-    classes = 'fa-2x ' + (interactive ? 'interactive-icon' : 'icon')
-    fa_icon name, class: classes
+  def icon(name, interactive: false, inline: false, **args)
+    classes = [
+      (inline ? 'inline-icon' : 'fa-2x'),
+      (interactive ? 'interactive-icon' : 'icon')
+    ].join(' ')
+
+    fa_icon name, class: classes, **args
   end
 
   # Map function with given name over enumerable collection of objects, then

@@ -3,6 +3,7 @@ class Service < ApplicationRecord
 
   belongs_to :service_type
   belongs_to :cluster
+  has_many :cases
 
   validates :name, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
@@ -22,5 +23,10 @@ class Service < ApplicationRecord
       supportType: support_type,
       serviceType: service_type.case_form_json,
     }
+  end
+
+  # XXX duplicated from Component.
+  def under_maintenance?
+    cases.select(&:under_maintenance?).present?
   end
 end

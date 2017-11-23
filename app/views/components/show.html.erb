@@ -7,13 +7,14 @@
           Overview
         </span>
       </li>
-      <%= render 'cases/new_support_case_button', component: @component %>
+      <%= render 'cases/new_support_case_button', component: component %>
     </ul>
   </div>
 
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
-      <%= @component.readable_support_type.capitalize %> component
+      <%= component.readable_support_type.capitalize %> component
+      <%= component.under_maintenance_icon %>
     </li>
   </ul>
 </div>
@@ -38,7 +39,7 @@
     </thead>
 
     <tbody>
-    <% @component.asset_record.each do |name, value| %>
+    <% component.asset_record.each do |name, value| %>
       <tr>
         <td><%= name %></td>
         <td><%= value %></td>

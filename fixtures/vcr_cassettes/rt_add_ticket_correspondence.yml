@@ -1,0 +1,44 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: http://helpdesk.alces-software.com/rt/REST/1.0/ticket/11272/comment?pass=<RT_PASSWORD>&user=bob.whitelock
+    body:
+      encoding: UTF-8
+      string: content=id%3A+11272%0AAction%3A+correspond%0AText%3A+Alces+Flight+Center+test+comment%0A
+    headers:
+      Connection:
+      - close
+      Host:
+      - helpdesk.alces-software.com
+      User-Agent:
+      - http.rb/3.0.0
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Thu, 23 Nov 2017 12:43:35 GMT
+      Server:
+      - Apache/2.2.9 (Debian) mod_perl/2.0.4 Perl/v5.10.0
+      Set-Cookie:
+      - RT_SID_helpdesk.alces-software.com.80=9ec2f098610e061797d8387bdea97f21; path=/rt
+      Vary:
+      - Accept-Encoding
+      Connection:
+      - close
+      Transfer-Encoding:
+      - chunked
+      Content-Type:
+      - text/plain; charset=utf-8
+    body:
+      encoding: UTF-8
+      string: |+
+        RT/3.6.7 200 Ok
+
+        # Message recorded
+
+    http_version: 
+  recorded_at: Thu, 23 Nov 2017 12:44:00 GMT
+recorded_with: VCR 3.0.3

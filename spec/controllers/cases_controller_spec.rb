@@ -14,7 +14,7 @@ RSpec.describe CasesController, type: :controller do
     context 'from top-level route' do
       it 'assigns all site clusters to @clusters' do
         get :new
-        expect(assigns(:clusters)).to eq([first_cluster, second_cluster])
+        expect(assigns(:clusters)).to match_array([first_cluster, second_cluster])
       end
     end
 

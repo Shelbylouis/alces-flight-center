@@ -12,18 +12,18 @@
 
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
-      <%= @site.rendered_description.html_safe %>
+      <%= site.rendered_description.html_safe %>
     </li>
     <li class="list-group-item">
-      Site contacts: <%= @site.contacts_info %>
+      Site contacts: <%= site.contacts_info %>
     </li>
     <li class="list-group-item">
-      Additional site contacts: <%= @site.additional_contacts_info %>
+      Additional site contacts: <%= site.additional_contacts_info %>
     </li>
   </ul>
 </div>
 
-<% @site.clusters.each do |cluster| %>
+<% site.clusters.each do |cluster| %>
   <div class='card'>
     <div class='card-header'>
       <ul class="nav">
@@ -46,4 +46,4 @@
   </div>
 <% end %>
 
-<%= render 'cases/cases_table', cases: @site.cases, archive: false %>
+<%= render 'cases/cases_table', cases: site.cases, archive: false %>

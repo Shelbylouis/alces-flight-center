@@ -17,36 +17,47 @@ class RequestTrackerInterface
   end
 
   def create_ticket(requestor_email:, cc:, subject:, text:)
-    content = new_ticket_request_content(
-      requestor_email: requestor_email,
-      cc: cc,
-      subject: subject,
-      text: text
+    body = request_body(
+      Queue: 'Support',
+      Requestor: requestor_email,
+      Cc: cc.join(','),
+      Subject: subject,
+      Text: text
     )
 
-    response = api_request(NEW_TICKET_PATH, body:  "content=#{content}")
+    response = api_request(NEW_TICKET_PATH, body: body)
 
-    ticket_id_regex = /Ticket (\d{5,}) created./
-    response_match = response.to_s.match(ticket_id_regex)
-    raise UnexpectedRtApiResponseException, response.body unless response_match
+    ticket_id = validate_response!(
+      response,
+      /Ticket (\d{5,}) created./
+    )[1].to_i
 
-    id = response_match[1].to_i
-    Ticket.new(id)
+    Ticket.new(ticket_id)
+  end
+
+  def add_ticket_correspondence(id:, text:)
+    path = "ticket/#{id}/comment"
+    body = request_body(
+      id: id,
+      Action: 'correspond',
+      Text: text
+    )
+
+    response = api_request(path, body: body)
+    validate_response!(response, 'Message recorded')
+
+    # Just return response body at the moment so can check this looks correct,
+    # as apart from success message no useful information is returned.
+    response.to_s
   end
 
   def show_ticket(id)
     path = "ticket/#{id}/show"
     response = api_request(path)
-    response_text = response.to_s
-
-    # Rudimentary check that response is in expected format.
-    response_appears_correct = response_text.match?(/id: ticket\//)
-    unless response_appears_correct
-      raise UnexpectedRtApiResponseException, response.body
-    end
+    validate_response!(response, /id: ticket\//)
 
     # Ticket data is sandwiched between blank lines at both ends.
-    ticket_data = response_text.split("\n\n").second
+    ticket_data = response.to_s.split("\n\n").second
 
     ticket_struct_from_data(ticket_data).tap do |ticket|
       # Set ID in ticket to ID passed; without this it is returned in
@@ -68,16 +79,15 @@ class RequestTrackerInterface
     end
   end
 
-  def new_ticket_request_content(requestor_email:, cc:, subject:, text:)
-    CGI.escape(
-      Utils.rt_format(
-        Queue: 'Support',
-        Requestor: requestor_email,
-        Cc: cc.join(','),
-        Subject: subject,
-        Text: text
-      )
-    )
+  def request_body(request_params)
+    content = CGI.escape(Utils.rt_format(request_params))
+    "content=#{content}"
+  end
+
+  def validate_response!(response, regex)
+    response.to_s.match(regex).tap do |response_match|
+      raise UnexpectedRtApiResponseException, response.body unless response_match
+    end
   end
 
   def ticket_struct_from_data(ticket_data)

@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   include Clearance::Controller
   protect_from_forgery with: :exception
+  decorates_assigned :site
 
   before_action :define_navigation_variables
 

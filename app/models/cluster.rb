@@ -81,6 +81,13 @@ class Cluster < ApplicationRecord
     end
   end
 
+  def under_maintenance?
+    cases.select do |support_case|
+      cluster_wide_case = support_case.associated_model == self
+      support_case.under_maintenance? && cluster_wide_case
+    end.present?
+  end
+
   private
 
   def validate_all_components_advice
