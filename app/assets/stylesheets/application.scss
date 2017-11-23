@@ -48,3 +48,21 @@ body {
   // So Elm debugger always appears on top in development.
   z-index: 10000;
 }
+
+.icon {
+  width: 100%;
+  text-align: center;
+  color: black;
+}
+
+.interactive-icon {
+  @extend .icon;
+
+  &:hover {
+    opacity: 0.6;
+  }
+}
+
+.fa.inline-icon {
+  display: inline;
+}
