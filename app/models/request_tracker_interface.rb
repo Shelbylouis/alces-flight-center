@@ -34,6 +34,32 @@ class RequestTrackerInterface
     Ticket.new(id)
   end
 
+  def add_ticket_correspondence(id:, text:)
+    path = "ticket/#{id}/comment"
+    # XXX de-duplicate this and below.
+    content = CGI.escape(
+      Utils.rt_format(
+        id: id.to_s,
+        Action: 'correspond',
+        Text: text
+      )
+    )
+
+    response = api_request(path, body: "content=#{content}")
+    response_text = response.to_s
+
+    # Rudimentary check that response is in expected format.
+    # XXX de-duplicate this and below.
+    response_appears_correct = response_text.include?('Message recorded')
+    unless response_appears_correct
+      raise UnexpectedRtApiResponseException, response.body
+    end
+
+    # Just return response body at the moment so can check this looks correct,
+    # as apart from success message no useful information is returned.
+    response_text
+  end
+
   def show_ticket(id)
     path = "ticket/#{id}/show"
     response = api_request(path)

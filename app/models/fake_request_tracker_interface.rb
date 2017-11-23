@@ -7,6 +7,10 @@ class FakeRequestTrackerInterface
     RequestTrackerInterface::Ticket.new(current_max_rt_ticket_id + 1)
   end
 
+  def add_ticket_correspondence(id:, text:)
+    '# Message recorded'
+  end
+
   def show_ticket(id)
     status = id % 2 == 0 ? 'open' : 'resolved'
     {
