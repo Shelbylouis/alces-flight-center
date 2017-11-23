@@ -6,7 +6,7 @@ module Utils
     # which is also fairly human readable.
     def rt_format(properties)
       properties.map do |key, value|
-        indented_value = value.gsub("\n", "\n ").strip + "\n"
+        indented_value = value.to_s.gsub("\n", "\n ").strip + "\n"
         "#{key}: #{indented_value}"
       end.join("\n").squeeze("\n")
     end
