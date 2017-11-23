@@ -74,11 +74,17 @@ class Case < ApplicationRecord
 
   def start_maintenance_window!(requestor:)
     maintenance_windows.create!(user: requestor)
+    add_rt_ticket_correspondence(
+      "#{associated_model.name} is now under maintenance by #{requestor.name}"
+    )
   end
 
   def end_maintenance_window!
     raise NoOpenMaintenanceWindowException unless open_maintenance_windows.present?
     open_maintenance_windows.first.update!(ended_at: DateTime.current)
+    add_rt_ticket_correspondence(
+      "#{associated_model.name} is no longer under maintenance"
+    )
   end
 
   def under_maintenance?
@@ -106,6 +112,10 @@ class Case < ApplicationRecord
     )
 
     self.rt_ticket_id = ticket.id
+  end
+
+  def add_rt_ticket_correspondence(text)
+    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
   end
 
   def ticket_completed?
