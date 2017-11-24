@@ -64,4 +64,18 @@ RSpec.describe Site, type: :model do
       ])
     end
   end
+
+  describe '#primary_contact' do
+    subject { site.primary_contact }
+    it 'gives Site primary contact' do
+      expect(subject).to eq(primary_contact)
+    end
+  end
+
+  describe '#secondary_contacts' do
+    subject { site.secondary_contacts }
+    it 'gives Site secondary contacts' do
+      expect(subject).to eq([secondary_contact])
+    end
+  end
 end

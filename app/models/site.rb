@@ -18,6 +18,14 @@ class Site < ApplicationRecord
     users + additional_contacts
   end
 
+  def primary_contact
+    users.find_by(primary_contact: true)
+  end
+
+  def secondary_contacts
+    users.where(primary_contact: false)
+  end
+
   def contacts_info
     users.map(&:info).join(', ')
   end
