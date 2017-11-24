@@ -4,7 +4,7 @@ RSpec.describe CaseDecorator do
   shared_examples 'indicate under maintenance' do |model_name|
     context 'when Case is under maintenance' do
       before :each do
-        subject.start_maintenance_window!(requestor: create(:admin))
+        subject.request_maintenance_window!(requestor: create(:admin))
       end
 
       it 'includes under maintenance icon' do

@@ -95,17 +95,17 @@
                 %>
               <% else %>
                 <%= link_to raw(icon 'wrench', interactive: true),
-                  start_maintenance_window_case_path(c.id),
+                  request_maintenance_window_case_path(c.id),
                   method: :post,
                   title: <<~EOF,
-                    Bring #{c.associated_model_type} under maintenance in
-                    relation to this case
+                    Request #{c.associated_model_type} be brought under
+                    maintenance in relation to this case
                   EOF
                   data: {
                     confirm: <<~EOF
-                      Are you sure you want to bring this
-                      #{c.associated_model_type} under maintenance in relation
-                      to this case?
+                      Are you sure you want to request
+                      #{c.associated_model_type} be brought under maintenance
+                      in relation to this case?
                     EOF
                   }
                 %>

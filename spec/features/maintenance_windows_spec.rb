@@ -14,7 +14,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     let :start_link_path do
-      start_maintenance_window_case_path(support_case.id)
+      request_maintenance_window_case_path(support_case.id)
     end
     let :end_link_path do
       end_maintenance_window_case_path(support_case.id)

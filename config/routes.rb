@@ -20,7 +20,7 @@ Rails.application.routes.draw do
 
     resources :cases do
       member do
-        post :start_maintenance_window
+        post :request_maintenance_window
         post :end_maintenance_window
       end
     end

@@ -72,7 +72,7 @@ class Case < ApplicationRecord
     ticket_completed? && chargeable
   end
 
-  def start_maintenance_window!(requestor:)
+  def request_maintenance_window!(requestor:)
     maintenance_windows.create!(user: requestor)
     add_rt_ticket_correspondence(
       "#{associated_model.name} is now under maintenance by #{requestor.name}"
