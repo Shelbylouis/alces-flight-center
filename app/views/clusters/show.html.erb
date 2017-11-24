@@ -42,7 +42,15 @@
         <td><%= window.created_at.to_formatted_s(:short) %></td>
         <td><%= window.case.associated_model.decorate.links %></td>
         <td><%= window.user.name %></td>
-        <td><%= window.confirmed_by&.name %></td>
+        <td>
+          <% if window.confirmed_by %>
+            <%= window.confirmed_by.name %></td>
+          <% else %>
+            <%= button_to raw('Unconfirmed &mdash; click to confirm'),
+              confirm_maintenance_window_path(window),
+              class: ['btn', 'btn-success']
+            %>
+          <% end %>
       </tr>
     <% end %>
     </tbody>

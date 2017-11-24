@@ -87,6 +87,10 @@ class Case < ApplicationRecord
     )
   end
 
+  def add_rt_ticket_correspondence(text)
+    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
+  end
+
   def under_maintenance?
     open_maintenance_windows.present?
   end
@@ -112,10 +116,6 @@ class Case < ApplicationRecord
     )
 
     self.rt_ticket_id = ticket.id
-  end
-
-  def add_rt_ticket_correspondence(text)
-    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
   end
 
   def ticket_completed?

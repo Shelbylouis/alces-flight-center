@@ -55,6 +55,12 @@ Rails.application.routes.draw do
     resources :services, only: :show do
       resources :cases, only: :new
     end
+
+    resources :maintenance_windows do
+      member do
+        post :confirm
+      end
+    end
   end
 
   constraints Clearance::Constraints::SignedOut.new do
