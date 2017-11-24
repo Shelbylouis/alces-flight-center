@@ -21,6 +21,8 @@ RSpec.describe CaseDecorator do
     end
   end
 
+  # XXX Parts of these tests and corresponding code duplicated and adapted for
+  # {Cluster,Component,Service}Decorator.
   describe '#association_info' do
     let :cluster { subject.cluster }
 
