@@ -23,11 +23,11 @@ class Site < ApplicationRecord
   end
 
   def secondary_contacts
-    users.where(primary_contact: false)
+    users.where(primary_contact: false).order(:id)
   end
 
-  def contacts_info
-    users.map(&:info).join(', ')
+  def secondary_contacts_info
+    secondary_contacts.map(&:info).join(', ')
   end
 
   def additional_contacts_info
