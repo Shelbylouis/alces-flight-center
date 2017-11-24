@@ -105,7 +105,7 @@ RSpec.describe Component, type: :model do
       before :each do
         subject.tap do |component|
           create(:case_requiring_component, component: component).tap do |support_case|
-            create(:open_maintenance_window, case: support_case)
+            create(:unconfirmed_maintenance_window, case: support_case)
           end
         end
       end

@@ -266,7 +266,7 @@ RSpec.describe Cluster, type: :model do
       before :each do
         subject.tap do |cluster|
           create(:case, cluster: cluster).tap do |support_case|
-            create(:open_maintenance_window, case: support_case)
+            create(:unconfirmed_maintenance_window, case: support_case)
           end
         end
       end
@@ -283,7 +283,7 @@ RSpec.describe Cluster, type: :model do
       before :each do
         create(:component, cluster: subject).tap do |component|
           create(:case_requiring_component, component: component).tap do |support_case|
-            create(:open_maintenance_window, case: support_case)
+            create(:unconfirmed_maintenance_window, case: support_case)
           end
         end
       end

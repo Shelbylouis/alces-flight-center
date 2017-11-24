@@ -40,7 +40,7 @@ RSpec.describe Service, type: :model do
       before :each do
         subject.tap do |service|
           create(:case_requiring_service, service: service).tap do |support_case|
-            create(:open_maintenance_window, case: support_case)
+            create(:unconfirmed_maintenance_window, case: support_case)
           end
         end
       end
