@@ -17,7 +17,8 @@ site = Site.create!(
 first_user = site.users.create!(
   name: 'Dr Cliff Addison',
   email: 'caddison@example.com',
-  password: 'password'
+  password: 'password',
+  primary_contact: true
 )
 
 second_user = site.users.create!(
