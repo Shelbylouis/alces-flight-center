@@ -16,6 +16,14 @@ FactoryBot.define do
 
     factory :contact do
       admin false
+
+      factory :primary_contact do
+        primary_contact true
+      end
+
+      factory :secondary_contact do
+        primary_contact false
+      end
     end
 
     factory :admin do

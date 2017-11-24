@@ -7,23 +7,30 @@ RSpec.describe Site, type: :model do
   let :site do
     create(
       :site,
-      users: [contact_1, contact_2],
+      users: [primary_contact, secondary_contact, another_secondary_contact],
       additional_contacts: [additional_contact_1, additional_contact_2]
     )
   end
 
-  let :contact_1 do
+  let :primary_contact do
     create(
-      :contact,
+      :primary_contact,
       name: 'Some Contact',
       email: 'some.contact@example.com'
     )
   end
-  let :contact_2 do
+  let :secondary_contact do
     create(
-      :contact,
+      :secondary_contact,
       name: 'Another Contact',
       email: 'another.contact@example.com'
+    )
+  end
+  let :another_secondary_contact do
+    create(
+      :secondary_contact,
+      name: 'Yet Another Contact',
+      email: 'yet.another.contact@example.com'
     )
   end
 
@@ -40,10 +47,10 @@ RSpec.describe Site, type: :model do
     )
   end
 
-  describe '#contacts_info' do
-    subject { site.contacts_info }
+  describe '#secondary_contacts_info' do
+    subject { site.secondary_contacts_info }
 
-    it { is_expected.to eq "#{contact_1.info}, #{contact_2.info}" }
+    it { is_expected.to eq "#{secondary_contact.info}, #{another_secondary_contact.info}" }
   end
 
   describe '#additional_contacts_info' do
@@ -57,11 +64,26 @@ RSpec.describe Site, type: :model do
 
     it 'should give all contacts and additional contacts' do
       expect(subject).to match_array([
-        contact_1,
-        contact_2,
+        primary_contact,
+        secondary_contact,
+        another_secondary_contact,
         additional_contact_1,
         additional_contact_2,
       ])
+    end
+  end
+
+  describe '#primary_contact' do
+    subject { site.primary_contact }
+    it 'gives Site primary contact' do
+      expect(subject).to eq(primary_contact)
+    end
+  end
+
+  describe '#secondary_contacts' do
+    subject { site.secondary_contacts }
+    it 'gives Site secondary contacts' do
+      expect(subject).to eq([secondary_contact, another_secondary_contact])
     end
   end
 end
