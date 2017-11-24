@@ -20,6 +20,40 @@
     <ul class="nav">
       <li class="nav-item">
         <span class="navbar-brand">
+          Maintenance
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>For</th>
+        <th>Requested By</th>
+        <th>Confirmed By</th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% @cluster.open_maintenance_windows.order(created_at: :desc).each do |window| %>
+      <tr>
+        <td><%= window.created_at.to_formatted_s(:short) %></td>
+        <td><%= window.case.associated_model.decorate.links %></td>
+        <td><%= window.user.name %></td>
+        <td><%= window.confirmed_by&.name %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
           Documents
         </span>
       </li>
