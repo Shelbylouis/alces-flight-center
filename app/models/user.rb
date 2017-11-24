@@ -24,11 +24,16 @@ class User < ApplicationRecord
     inclusion: {in: [true, false], if: :contact?},
     absence: {if: :admin?}
   }
+  alias_attribute :primary_contact?, :primary_contact
 
   alias_attribute :admin?, :admin
 
   def contact?
     !admin?
+  end
+
+  def secondary_contact?
+    contact? && !primary_contact?
   end
 
   def info
