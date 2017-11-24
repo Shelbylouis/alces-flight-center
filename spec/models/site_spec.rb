@@ -7,21 +7,21 @@ RSpec.describe Site, type: :model do
   let :site do
     create(
       :site,
-      users: [contact_1, contact_2],
+      users: [primary_contact, secondary_contact],
       additional_contacts: [additional_contact_1, additional_contact_2]
     )
   end
 
-  let :contact_1 do
+  let :primary_contact do
     create(
-      :contact,
+      :primary_contact,
       name: 'Some Contact',
       email: 'some.contact@example.com'
     )
   end
-  let :contact_2 do
+  let :secondary_contact do
     create(
-      :contact,
+      :secondary_contact,
       name: 'Another Contact',
       email: 'another.contact@example.com'
     )
@@ -43,7 +43,7 @@ RSpec.describe Site, type: :model do
   describe '#contacts_info' do
     subject { site.contacts_info }
 
-    it { is_expected.to eq "#{contact_1.info}, #{contact_2.info}" }
+    it { is_expected.to eq "#{primary_contact.info}, #{secondary_contact.info}" }
   end
 
   describe '#additional_contacts_info' do
@@ -57,8 +57,8 @@ RSpec.describe Site, type: :model do
 
     it 'should give all contacts and additional contacts' do
       expect(subject).to match_array([
-        contact_1,
-        contact_2,
+        primary_contact,
+        secondary_contact,
         additional_contact_1,
         additional_contact_2,
       ])
