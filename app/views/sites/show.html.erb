@@ -15,7 +15,11 @@
       <%= site.rendered_description.html_safe %>
     </li>
     <li class="list-group-item">
-      Site contacts: <%= site.contacts_info %>
+      Primary site contact: <%= site.primary_contact&.info || raw('<em>Unset</em>') %>
+    </li>
+    <li class="list-group-item">
+      Secondary site <%= 'contact'.pluralize(site.secondary_contacts.length.tap {|a| p a}) %>:
+      <%= site.secondary_contacts.present? ? site.secondary_contacts_info : raw('<em>None</em>') %>
     </li>
     <li class="list-group-item">
       Additional site contacts: <%= site.additional_contacts_info %>
