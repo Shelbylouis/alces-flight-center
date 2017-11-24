@@ -291,4 +291,29 @@ RSpec.describe Cluster, type: :model do
       it { is_expected.not_to be_under_maintenance }
     end
   end
+
+  describe '#open_maintenance_windows' do
+    subject do
+      create(:cluster).tap do |cluster|
+        3.times { create(:case, cluster: cluster) }
+      end
+    end
+
+    let! :unconfirmed_maintenance_window do
+      create(:unconfirmed_maintenance_window, case: subject.cases.first)
+    end
+    let! :confirmed_maintenance_window do
+      create(:confirmed_maintenance_window, case: subject.cases.second)
+    end
+    let! :closed_maintenance_window do
+      create(:closed_maintenance_window, case: subject.cases.third)
+    end
+
+    it 'gives non-closed maintenance windows' do
+      expect(subject.open_maintenance_windows).to match_array([
+        unconfirmed_maintenance_window,
+        confirmed_maintenance_window
+      ])
+    end
+  end
 end

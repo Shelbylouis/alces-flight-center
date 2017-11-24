@@ -12,6 +12,7 @@ class Cluster < ApplicationRecord
   has_many :cases
   has_many :credit_deposits
   has_many :credit_charges, through: :cases
+  has_many :maintenance_windows, through: :cases
 
   validates_associated :site
   validates :name, presence: true
@@ -86,6 +87,10 @@ class Cluster < ApplicationRecord
       cluster_wide_case = support_case.associated_model == self
       support_case.under_maintenance? && cluster_wide_case
     end.present?
+  end
+
+  def open_maintenance_windows
+    maintenance_windows.where(ended_at: nil)
   end
 
   private

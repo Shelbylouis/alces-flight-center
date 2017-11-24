@@ -88,8 +88,12 @@ FactoryBot.define do
 
     factory :unconfirmed_maintenance_window {}
 
-    factory :closed_maintenance_window do
-      ended_at 3.days.ago
+    factory :confirmed_maintenance_window do
+      confirmed_by { create(:contact) }
+
+      factory :closed_maintenance_window do
+        ended_at 3.days.ago
+      end
     end
   end
 end
