@@ -24,6 +24,12 @@ class Cluster < ApplicationRecord
 
   after_create :create_automatic_services
 
+  # So can get the Cluster for the associated model for a Case, even if the
+  # associated model is the Cluster itself.
+  def cluster
+    self
+  end
+
   # Automatically picked up by rails_admin so only these options displayed when
   # selecting support type.
   def support_type_enum

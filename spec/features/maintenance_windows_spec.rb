@@ -10,6 +10,12 @@ RSpec.feature "Maintenance windows", type: :feature do
 
   let :site { support_case.site }
 
+  before :each do
+    # The only way I can get Capybara to use the correct URL; may be a better
+    # way though.
+    default_url_options[:host] = Rails.application.routes.default_url_options[:host]
+  end
+
   context 'when user is an admin' do
     let :user_name { 'Steve User' }
     let :user { create(:admin, name: user_name) }
@@ -28,7 +34,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         :add_ticket_correspondence
       ).with(
         id: support_case.rt_ticket_id,
-        text: /#{component_name}.*under maintenance.*#{user_name}/
+        text: /requested.*#{component_name}.*by #{user_name}.*must be confirmed.*#{cluster_url(cluster)}/
       )
 
       start_link = page.find_link(href: start_link_path)
