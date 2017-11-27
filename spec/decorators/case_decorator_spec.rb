@@ -4,7 +4,7 @@ RSpec.describe CaseDecorator do
   shared_examples 'indicate under maintenance' do |model_name|
     context 'when Case is under maintenance' do
       before :each do
-        subject.start_maintenance_window!(requestor: create(:admin))
+        subject.request_maintenance_window!(requestor: create(:admin))
       end
 
       it 'includes under maintenance icon' do
@@ -21,6 +21,8 @@ RSpec.describe CaseDecorator do
     end
   end
 
+  # XXX Parts of these tests and corresponding code duplicated and adapted for
+  # {Cluster,Component,Service}Decorator.
   describe '#association_info' do
     let :cluster { subject.cluster }
 

@@ -193,11 +193,11 @@ RSpec.describe Case, type: :model do
   describe 'maintenance windows' do
     subject { create(:case_with_component) }
 
-    describe '#start_maintenance_window!' do
+    describe '#request_maintenance_window!' do
       let :admin { create(:admin) }
 
       it 'creates new maintenance window' do
-        subject.start_maintenance_window!(requestor: admin)
+        subject.request_maintenance_window!(requestor: admin)
 
         maintenance_window = subject.maintenance_windows.first
         expect(maintenance_window.ended_at).to be nil

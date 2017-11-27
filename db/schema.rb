@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171123163501) do
+ActiveRecord::Schema.define(version: 20171124140736) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -161,7 +161,9 @@ ActiveRecord::Schema.define(version: 20171123163501) do
     t.datetime "ended_at"
     t.bigint "user_id", null: false
     t.bigint "case_id", null: false
+    t.bigint "confirmed_by_id"
     t.index ["case_id"], name: "index_maintenance_windows_on_case_id"
+    t.index ["confirmed_by_id"], name: "index_maintenance_windows_on_confirmed_by_id"
     t.index ["user_id"], name: "index_maintenance_windows_on_user_id"
   end
 
@@ -215,6 +217,7 @@ ActiveRecord::Schema.define(version: 20171123163501) do
   add_foreign_key "credit_deposits", "clusters"
   add_foreign_key "credit_deposits", "users"
   add_foreign_key "issues", "service_types"
+  add_foreign_key "maintenance_windows", "users", column: "confirmed_by_id"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
 end

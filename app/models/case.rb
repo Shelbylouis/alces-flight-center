@@ -72,10 +72,17 @@ class Case < ApplicationRecord
     ticket_completed? && chargeable
   end
 
-  def start_maintenance_window!(requestor:)
+  def request_maintenance_window!(requestor:)
     maintenance_windows.create!(user: requestor)
+
+    cluster_dashboard_url =
+      Rails.application.routes.url_helpers.cluster_url(associated_model.cluster)
     add_rt_ticket_correspondence(
-      "#{associated_model.name} is now under maintenance by #{requestor.name}"
+      <<-EOF.squish
+        Maintenance requested for #{associated_model.name} by #{requestor.name};
+        to proceed this maintenance must be confirmed on the cluster dashboard:
+        #{cluster_dashboard_url}.
+      EOF
     )
   end
 
@@ -83,8 +90,12 @@ class Case < ApplicationRecord
     raise NoOpenMaintenanceWindowException unless open_maintenance_windows.present?
     open_maintenance_windows.first.update!(ended_at: DateTime.current)
     add_rt_ticket_correspondence(
-      "#{associated_model.name} is no longer under maintenance"
+      "#{associated_model.name} is no longer under maintenance."
     )
+  end
+
+  def add_rt_ticket_correspondence(text)
+    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
   end
 
   def under_maintenance?
@@ -112,10 +123,6 @@ class Case < ApplicationRecord
     )
 
     self.rt_ticket_id = ticket.id
-  end
-
-  def add_rt_ticket_correspondence(text)
-    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
   end
 
   def ticket_completed?
