@@ -90,7 +90,7 @@ class Case < ApplicationRecord
     raise NoOpenMaintenanceWindowException unless open_maintenance_windows.present?
     open_maintenance_windows.first.update!(ended_at: DateTime.current)
     add_rt_ticket_correspondence(
-      "#{associated_model.name} is no longer under maintenance"
+      "#{associated_model.name} is no longer under maintenance."
     )
   end
 
