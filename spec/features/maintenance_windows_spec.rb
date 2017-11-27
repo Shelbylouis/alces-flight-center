@@ -1,9 +1,13 @@
 require 'rails_helper'
 
 RSpec.feature "Maintenance windows", type: :feature do
-  let :support_case { create(:case, cluster: cluster) }
-  let :cluster { create(:cluster, name: cluster_name) }
-  let :cluster_name { 'Some Cluster' }
+  let :support_case { create(:case_with_component) }
+
+  let :component { support_case.component }
+  let :component_name { component.name }
+
+  let :cluster { support_case.cluster }
+
   let :site { support_case.site }
 
   context 'when user is an admin' do
@@ -24,7 +28,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         :add_ticket_correspondence
       ).with(
         id: support_case.rt_ticket_id,
-        text: /#{cluster_name}.*under maintenance.*#{user_name}/
+        text: /#{component_name}.*under maintenance.*#{user_name}/
       )
 
       start_link = page.find_link(href: start_link_path)
@@ -37,7 +41,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         :add_ticket_correspondence
       ).with(
         id: support_case.rt_ticket_id,
-        text: /#{cluster_name}.*no longer under maintenance/
+        text: /#{component_name}.*no longer under maintenance/
       )
 
       end_link = page.find_link(href: end_link_path)
@@ -65,7 +69,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         :add_ticket_correspondence
       ).with(
         id: support_case.rt_ticket_id,
-        text: /Maintenance.*#{cluster_name}.*confirmed by #{user_name}.*cluster.*now under maintenance/
+        text: /Maintenance.*#{component_name}.*confirmed by #{user_name}.*component.*now under maintenance/
       )
 
       visit cluster_path(cluster, as: user)
