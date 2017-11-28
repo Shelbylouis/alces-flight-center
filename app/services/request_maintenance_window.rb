@@ -1,11 +1,12 @@
 
-class RequestMaintenanceWindow
-  attr_reader :support_case, :user, :associated_model
-
-  def initialize(support_case:, user:, associated_model: nil)
-    @support_case = support_case
-    @user = user
-    @associated_model = associated_model || support_case.associated_model
+RequestMaintenanceWindow = KeywordStruct.new(
+  :support_case,
+  :user,
+  :associated_model
+) do
+  def initialize(associated_model: nil, **kwargs)
+    associated_model = associated_model || kwargs[:support_case]&.associated_model
+    super(**kwargs, associated_model: associated_model)
   end
 
   def run
