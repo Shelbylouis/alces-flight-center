@@ -106,9 +106,9 @@
         <td width='30%'><%= service.readable_support_type.capitalize %></td>
         <% if current_user.admin? %>
           <td width='10%'>
-            <%# XXX Add title text here %>
             <%= link_to raw(icon 'wrench', interactive: true),
-              new_service_maintenance_window_path(service)
+              new_service_maintenance_window_path(service),
+              title: 'Start request for maintenance of this service'
             %>
           </td>
         <% end %>
