@@ -10,14 +10,16 @@ RequestMaintenanceWindow = KeywordStruct.new(
   end
 
   def run
-    maintenance_window = MaintenanceWindow.create!(
+    MaintenanceWindow.create!(
       user: user,
       case: support_case,
       associated_model: associated_model
-    )
+    ).tap { add_rt_ticket_correspondence }
+  end
 
-    cluster_dashboard_url =
-      Rails.application.routes.url_helpers.cluster_url(associated_model.cluster)
+  private
+
+  def add_rt_ticket_correspondence
     support_case.add_rt_ticket_correspondence(
       <<-EOF.squish
         Maintenance requested for #{associated_model.name} by #{user.name};
@@ -25,7 +27,9 @@ RequestMaintenanceWindow = KeywordStruct.new(
         #{cluster_dashboard_url}.
       EOF
     )
+  end
 
-    maintenance_window
+  def cluster_dashboard_url
+    Rails.application.routes.url_helpers.cluster_url(associated_model.cluster)
   end
 end
