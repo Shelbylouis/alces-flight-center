@@ -9,12 +9,7 @@
         </span>
       </li>
       <li class="nav-item">
-        <% if current_user.admin? %>
-          <%= link_to raw(icon 'wrench', interactive: true),
-            new_cluster_maintenance_window_path(cluster),
-            title: 'Start request for maintenance of this cluster'
-          %>
-        <% end %>
+        <%= cluster.start_maintenance_request_link %>
       </li>
       <%= render 'cases/new_support_case_button', cluster: cluster %>
     </ul>
@@ -112,14 +107,9 @@
           <%= service.under_maintenance_icon %>
         </td>
         <td width='30%'><%= service.readable_support_type.capitalize %></td>
-        <% if current_user.admin? %>
-          <td width='10%'>
-            <%= link_to raw(icon 'wrench', interactive: true),
-              new_service_maintenance_window_path(service),
-              title: 'Start request for maintenance of this service'
-            %>
-          </td>
-        <% end %>
+        <td width='10%'>
+          <%= service.start_maintenance_request_link %>
+        </td>
         <td width='20%'>
           <%= service.change_support_type_button %>
         </td>
@@ -168,14 +158,9 @@
                 <td width='30%'>
                   <%= component.readable_support_type.capitalize %>
                 </td>
-                <% if current_user.admin? %>
-                  <td width='10%'>
-                    <%= link_to raw(icon 'wrench', interactive: true),
-                      new_component_maintenance_window_path(component),
-                      title: 'Start request for maintenance of this component'
-                    %>
-                  </td>
-                <% end %>
+                <td width='10%'>
+                  <%= component.start_maintenance_request_link %>
+                </td>
                 <td width='20%'>
                   <%= component.change_support_type_button %>
                 </td>
