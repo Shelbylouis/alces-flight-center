@@ -86,6 +86,10 @@ FactoryBot.define do
     user { create(:admin) }
     created_at 7.days.ago
 
+    # This could also be a Cluster or Service; but one of these must be
+    # associated and is the item under maintenance.
+    component
+
     factory :unconfirmed_maintenance_window {}
 
     factory :confirmed_maintenance_window do

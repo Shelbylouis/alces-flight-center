@@ -9,6 +9,8 @@ class MaintenanceWindow < ApplicationRecord
   belongs_to :component, required: false
   belongs_to :service, required: false
 
+  validate :validate_precisely_one_associated_model
+
   def associated_model
     component || service || cluster
   end
@@ -22,5 +24,17 @@ class MaintenanceWindow < ApplicationRecord
     when Service
       self.service = model
     end
+  end
+
+  private
+
+  def validate_precisely_one_associated_model
+    errors.add(
+      :base, 'precisely one Cluster, Component, or Service can be under maintenance'
+    ) unless number_associated_models == 1
+  end
+
+  def number_associated_models
+    [cluster, component, service].select(&:present?).length
   end
 end
