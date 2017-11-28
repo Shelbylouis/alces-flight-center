@@ -8,6 +8,14 @@
           Overview
         </span>
       </li>
+      <li class="nav-item">
+        <% if current_user.admin? %>
+          <%= link_to raw(icon 'wrench', interactive: true),
+            new_cluster_maintenance_window_path(@cluster),
+            title: 'Start request for maintenance of this cluster'
+          %>
+        <% end %>
+      </li>
       <%= render 'cases/new_support_case_button', cluster: @cluster %>
     </ul>
   </div>
@@ -160,6 +168,14 @@
                 <td width='30%'>
                   <%= component.readable_support_type.capitalize %>
                 </td>
+                <% if current_user.admin? %>
+                  <td width='10%'>
+                    <%= link_to raw(icon 'wrench', interactive: true),
+                      new_component_maintenance_window_path(component),
+                      title: 'Start request for maintenance of this component'
+                    %>
+                  </td>
+                <% end %>
                 <td width='20%'>
                   <%= component.change_support_type_button %>
                 </td>

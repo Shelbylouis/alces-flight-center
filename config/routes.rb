@@ -25,10 +25,18 @@ Rails.application.routes.draw do
       end
     end
 
-    # XXX do the same for Components.
+    resources :clusters do
+      resources :maintenance_windows, only: :new
+    end
+
+    resources :components do
+      resources :maintenance_windows, only: :new
+    end
+
     resources :services do
       resources :maintenance_windows, only: :new
     end
+
     resources :maintenance_windows, only: :create
 
     resources :credit_charges, only: [:create, :update]

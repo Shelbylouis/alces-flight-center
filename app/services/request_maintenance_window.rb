@@ -27,11 +27,11 @@ RequestMaintenanceWindow = KeywordStruct.new(
 
   def associated_model
     @associated_model ||=
-      if component_id
+      if component_id.present?
         Component.find(component_id)
-      elsif service_id
+      elsif service_id.present?
         Service.find(service_id)
-      elsif cluster_id
+      elsif cluster_id.present?
         Cluster.find(cluster_id)
       else
         support_case.associated_model
