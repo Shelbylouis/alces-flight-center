@@ -73,17 +73,7 @@ class Case < ApplicationRecord
   end
 
   def request_maintenance_window!(requestor:)
-    maintenance_windows.create!(user: requestor)
-
-    cluster_dashboard_url =
-      Rails.application.routes.url_helpers.cluster_url(associated_model.cluster)
-    add_rt_ticket_correspondence(
-      <<-EOF.squish
-        Maintenance requested for #{associated_model.name} by #{requestor.name};
-        to proceed this maintenance must be confirmed on the cluster dashboard:
-        #{cluster_dashboard_url}.
-      EOF
-    )
+    RequestMaintenanceWindow.new(support_case: self, user: requestor).run
   end
 
   def end_maintenance_window!
