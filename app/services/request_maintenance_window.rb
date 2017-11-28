@@ -1,16 +1,19 @@
 
 class RequestMaintenanceWindow
-  attr_reader :support_case, :user
+  attr_reader :support_case, :user, :associated_model
 
-  def initialize(support_case:, user:)
+  def initialize(support_case:, user:, associated_model: nil)
     @support_case = support_case
     @user = user
+    @associated_model = associated_model || support_case.associated_model
   end
 
   def run
-    associated_model = support_case.associated_model
-
-    maintenance_window = MaintenanceWindow.create!(user: user, case: support_case)
+    maintenance_window = MaintenanceWindow.create!(
+      user: user,
+      case: support_case,
+      associated_model: associated_model
+    )
 
     cluster_dashboard_url =
       Rails.application.routes.url_helpers.cluster_url(associated_model.cluster)
