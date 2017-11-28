@@ -25,6 +25,12 @@ Rails.application.routes.draw do
       end
     end
 
+    # XXX do the same for Components.
+    resources :services do
+      resources :maintenance_windows, only: :new
+    end
+    resources :maintenance_windows, only: :create
+
     resources :credit_charges, only: [:create, :update]
 
     # To display a working link to sign users out of the admin dashboard,

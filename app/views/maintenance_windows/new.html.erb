@@ -1,0 +1,18 @@
+
+<%= form_for @maintenance_window do |f| %>
+  <div class="form-group">
+    <%= f.hidden_field :service_id %>
+
+    <%= f.label :case_id, 'Select Case to associate this maintenance with' %>
+    <%= f.collection_select(
+      :case_id,
+      @cluster.cases.order(created_at: :desc).decorate,
+      :id,
+      :maintenance_window_form_info,
+      {},
+      {class: ['form-control']}
+    ) %>
+  </div>
+
+  <%= f.submit "Request Maintenance", class: 'btn btn-dark btn-block' %>
+<% end %>

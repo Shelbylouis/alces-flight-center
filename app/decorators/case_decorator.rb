@@ -1,6 +1,16 @@
 class CaseDecorator < ApplicationDecorator
   delegate_all
 
+  def maintenance_window_form_info
+    [
+      "RT ticket #{rt_ticket_id}",
+      created_at.to_formatted_s(:long),
+      "#{case_category.name} - #{issue.name}",
+      associated_model.name,
+      "Created by #{user.name}"
+    ].join(' | ')
+  end
+
   def association_info
     cluster_link = h.link_to cluster.name, h.cluster_path(cluster)
 

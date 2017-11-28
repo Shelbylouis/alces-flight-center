@@ -40,7 +40,8 @@
     <% @cluster.open_maintenance_windows.order(created_at: :desc).each do |window| %>
       <tr>
         <td><%= window.created_at.to_formatted_s(:short) %></td>
-        <td><%= window.case.associated_model.decorate.links %></td>
+        <%# XXX hacks; assign the Case's model to the MaintenanceWindow instead %>
+        <td><%= (window.associated_model || window.case.associated_model).decorate.links %></td>
         <td><%= window.user.name %></td>
         <td>
           <% if window.confirmed_by %>
@@ -103,8 +104,18 @@
           <%= link_to service.name, service_path(service) %>
           <%= service.under_maintenance_icon %>
         </td>
-        <td width='40%'><%= service.readable_support_type.capitalize %></td>
-        <td width='20%'><%= service.change_support_type_button %></td>
+        <td width='30%'><%= service.readable_support_type.capitalize %></td>
+        <% if current_user.admin? %>
+          <td width='10%'>
+            <%# XXX Add title text here %>
+            <%= link_to raw(icon 'wrench', interactive: true),
+              new_service_maintenance_window_path(service)
+            %>
+          </td>
+        <% end %>
+        <td width='20%'>
+          <%= service.change_support_type_button %>
+        </td>
       </tr>
     <% end %>
     </tbody>
@@ -147,7 +158,7 @@
                   <%= link_to component.name, component_path(component) %>
                   <%= component.under_maintenance_icon %>
                 </td>
-                <td width='40%'>
+                <td width='30%'>
                   <%= component.readable_support_type.capitalize %>
                 </td>
                 <td width='20%'>

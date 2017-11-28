@@ -1,4 +1,24 @@
 class MaintenanceWindowsController < ApplicationController
+  def new
+    @title = "Request Maintenance"
+
+    @maintenance_window = MaintenanceWindow.new(
+      service_id: params[:service_id]
+    )
+  end
+
+  def create
+    @maintenance_window = MaintenanceWindow.new(maintenance_window_params)
+
+    if @maintenance_window.save
+      flash[:success] = 'Maintenance requested.'
+      redirect_to @maintenance_window.associated_model.cluster
+    else
+      flash[:error] = "Error requesting maintenance: #{format_errors(@maintenance_window)}"
+      render :new
+    end
+  end
+
   def confirm
     window = MaintenanceWindow.find(params[:id])
     window.update!(confirmed_by: current_user)
@@ -10,5 +30,13 @@ class MaintenanceWindowsController < ApplicationController
     EOF
     support_case.add_rt_ticket_correspondence(confirmation_message)
     redirect_to cluster_path(window.case.cluster)
+  end
+
+  private
+
+  def maintenance_window_params
+    params.require(:maintenance_window).permit(
+      :cluster_id, :component_id, :service_id, :case_id
+    ).merge(user: current_user)
   end
 end
