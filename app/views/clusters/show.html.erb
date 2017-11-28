@@ -11,16 +11,16 @@
       <li class="nav-item">
         <% if current_user.admin? %>
           <%= link_to raw(icon 'wrench', interactive: true),
-            new_cluster_maintenance_window_path(@cluster),
+            new_cluster_maintenance_window_path(cluster),
             title: 'Start request for maintenance of this cluster'
           %>
         <% end %>
       </li>
-      <%= render 'cases/new_support_case_button', cluster: @cluster %>
+      <%= render 'cases/new_support_case_button', cluster: cluster %>
     </ul>
   </div>
 
-  <%= render 'clusters/details', cluster: @cluster %>
+  <%= render 'clusters/details', cluster: cluster %>
 </div>
 
 <div class='card'>
@@ -45,7 +45,7 @@
     </thead>
 
     <tbody>
-    <% @cluster.open_maintenance_windows.order(created_at: :desc).each do |window| %>
+    <% cluster.open_maintenance_windows.order(created_at: :desc).each do |window| %>
       <tr>
         <td><%= window.created_at.to_formatted_s(:short) %></td>
         <td><%= window.associated_model.decorate.links %></td>
@@ -77,7 +77,7 @@
   </div>
 
   <ul class="list-group list-group-flush">
-    <% @cluster.documents.each do |document| %>
+    <% cluster.documents.each do |document| %>
       <li class="list-group-item">
         <%= link_to document.name, document.url, target: '_blank' %>
       </li>
@@ -105,7 +105,7 @@
     </thead>
 
     <tbody>
-    <% @cluster.services.each do |service| %>
+    <% cluster.services.each do |service| %>
       <tr>
         <td width='40%'>
           <%= link_to service.name, service_path(service) %>
@@ -129,7 +129,7 @@
   </table>
 </div>
 
-<% @cluster.component_groups_by_type.each do |type| %>
+<% cluster.component_groups_by_type.each do |type| %>
   <div class='card'>
     <div class='card-header'>
       <ul class="nav">
