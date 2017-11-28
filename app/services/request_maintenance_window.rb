@@ -22,8 +22,8 @@ RequestMaintenanceWindow = KeywordStruct.new(
   def add_rt_ticket_correspondence
     support_case.add_rt_ticket_correspondence(
       <<-EOF.squish
-        Maintenance requested for #{associated_model.name} by #{user.name};
-        to proceed this maintenance must be confirmed on the cluster dashboard:
+        Maintenance requested for #{associated_model.name} by #{user.name}; to
+        proceed this maintenance must be confirmed on the cluster dashboard:
         #{cluster_dashboard_url}.
       EOF
     )
