@@ -1,12 +1,14 @@
 
 RequestMaintenanceWindow = KeywordStruct.new(
-  :support_case,
+  :case_id,
   :user,
-  :associated_model
+  :cluster_id,
+  :component_id,
+  :service_id
 ) do
-  def initialize(associated_model: nil, **kwargs)
-    associated_model = associated_model || kwargs[:support_case]&.associated_model
-    super(**kwargs, associated_model: associated_model)
+  def initialize(**kwargs)
+    defaults = {cluster_id: nil, component_id: nil, service_id: nil}
+    super(**defaults.merge(kwargs))
   end
 
   def run
@@ -18,6 +20,23 @@ RequestMaintenanceWindow = KeywordStruct.new(
   end
 
   private
+
+  def support_case
+    @support_case ||= Case.find(case_id)
+  end
+
+  def associated_model
+    @associated_model ||=
+      if component_id
+        Component.find(component_id)
+      elsif service_id
+        Service.find(service_id)
+      elsif cluster_id
+        Cluster.find(cluster_id)
+      else
+        support_case.associated_model
+      end
+  end
 
   def add_rt_ticket_correspondence
     support_case.add_rt_ticket_correspondence(

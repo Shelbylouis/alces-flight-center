@@ -73,7 +73,7 @@ class Case < ApplicationRecord
   end
 
   def request_maintenance_window!(requestor:)
-    RequestMaintenanceWindow.new(support_case: self, user: requestor).run
+    RequestMaintenanceWindow.new(case_id: id, user: requestor).run
   end
 
   def end_maintenance_window!

@@ -8,27 +8,31 @@ RSpec.describe RequestMaintenanceWindow do
   let :user { create(:user) }
   let :user_name { user.name }
   let :support_case { create(:case) }
-  let :associated_model { nil }
+  let :cluster { nil }
+  let :component { nil }
+  let :service { nil }
 
   subject do
     RequestMaintenanceWindow.new(
-      support_case: support_case,
+      case_id: support_case.id,
       user: user,
-      associated_model: associated_model
+      cluster_id: cluster&.id,
+      component_id: component&.id,
+      service_id: service&.id
     ).run
   end
 
   describe 'main behaviour' do
-    let :associated_model { create(:component) }
+    let :component { create(:component) }
 
     it 'creates new MaintenanceWindow and adds RT correspondence' do
-      cluster = associated_model.cluster
+      cluster = component.cluster
 
       expect(Case.request_tracker).to receive(
         :add_ticket_correspondence
       ).with(
         id: support_case.rt_ticket_id,
-        text: /requested.*#{associated_model.name}.*by #{user_name}.*must be confirmed.*#{cluster_url(cluster)}/
+        text: /requested.*#{component.name}.*by #{user_name}.*must be confirmed.*#{cluster_url(cluster)}/
       )
 
       expect(subject.ended_at).to be nil
@@ -47,7 +51,6 @@ RSpec.describe RequestMaintenanceWindow do
 
   context 'when given associated Component' do
     let :component { create(:component) }
-    let :associated_model { component }
 
     it 'is associated with Component' do
       expect(subject.associated_model).to eq component
@@ -56,7 +59,6 @@ RSpec.describe RequestMaintenanceWindow do
 
   context 'when given associated Cluster' do
     let :cluster { create(:cluster) }
-    let :associated_model { cluster }
 
     it 'is associated with Cluster'  do
       expect(subject.associated_model).to eq cluster
@@ -65,7 +67,6 @@ RSpec.describe RequestMaintenanceWindow do
 
   context 'when given associated Service' do
     let :service { create(:service) }
-    let :associated_model { service }
 
     it 'is associated with Service' do
       expect(subject.associated_model).to eq service
