@@ -8,15 +8,10 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def create
-    @maintenance_window = MaintenanceWindow.new(maintenance_window_params)
-
-    if @maintenance_window.save
-      flash[:success] = 'Maintenance requested.'
-      redirect_to @maintenance_window.associated_model.cluster
-    else
-      flash[:error] = "Error requesting maintenance: #{format_errors(@maintenance_window)}"
-      render :new
-    end
+    @maintenance_window =
+      RequestMaintenanceWindow.new(**maintenance_window_params).run
+    flash[:success] = 'Maintenance requested.'
+    redirect_to @maintenance_window.associated_model.cluster
   end
 
   def confirm
@@ -37,6 +32,8 @@ class MaintenanceWindowsController < ApplicationController
   def maintenance_window_params
     params.require(:maintenance_window).permit(
       :cluster_id, :component_id, :service_id, :case_id
-    ).merge(user: current_user)
+    ).merge(
+      user: current_user
+    ).to_h.symbolize_keys
   end
 end
