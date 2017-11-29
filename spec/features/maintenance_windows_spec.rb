@@ -69,17 +69,16 @@ RSpec.feature "Maintenance windows", type: :feature do
       # visited.
       allow_any_instance_of(Cluster).to receive(:documents).and_return([])
 
-      window = create(:unconfirmed_maintenance_window, case: support_case)
+      window = create(:unconfirmed_maintenance_window, component: component)
 
       expect(Case.request_tracker).to receive(
         :add_ticket_correspondence
       ).with(
-        id: support_case.rt_ticket_id,
+        id: window.case.rt_ticket_id,
         text: /Maintenance.*#{component_name}.*confirmed by #{user_name}.*component.*now under maintenance/
       )
 
-      visit cluster_path(cluster, as: user)
-
+      visit cluster_path(component.cluster, as: user)
       button_text = "Unconfirmed"
       click_button(button_text)
 

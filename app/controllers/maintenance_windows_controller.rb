@@ -19,14 +19,14 @@ class MaintenanceWindowsController < ApplicationController
   def confirm
     window = MaintenanceWindow.find(params[:id])
     window.update!(confirmed_by: current_user)
-    support_case = window.case
+    associated_model = window.associated_model
     confirmation_message = <<~EOF.squish
-      Maintenance of #{support_case.associated_model.name} confirmed by
-      #{current_user.name}; this #{support_case.associated_model_type} is now
+      Maintenance of #{associated_model.name} confirmed by
+      #{current_user.name}; this #{associated_model.readable_model_name} is now
       under maintenance.
     EOF
-    support_case.add_rt_ticket_correspondence(confirmation_message)
-    redirect_to cluster_path(window.case.cluster)
+    window.add_rt_ticket_correspondence(confirmation_message)
+    redirect_to cluster_path(associated_model.cluster)
   end
 
   private
