@@ -7,7 +7,9 @@ FactoryBot.define do
 
     # This could also be a Cluster or Service; but one of these must be
     # associated and is the item under maintenance.
-    component
+    component do
+      create(:component) unless cluster || service
+    end
 
     factory :unconfirmed_maintenance_window {}
 
