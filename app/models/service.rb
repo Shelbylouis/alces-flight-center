@@ -1,9 +1,11 @@
 class Service < ApplicationRecord
   include HasInheritableSupportType
+  include HasMaintenanceWindows
 
   belongs_to :service_type
   belongs_to :cluster
   has_many :cases
+  has_many :maintenance_windows
 
   validates :name, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
