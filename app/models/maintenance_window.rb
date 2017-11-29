@@ -11,6 +11,8 @@ class MaintenanceWindow < ApplicationRecord
 
   validate :validate_precisely_one_associated_model
 
+  delegate :add_rt_ticket_correspondence, to: :case
+
   def associated_model
     component || service || cluster
   end

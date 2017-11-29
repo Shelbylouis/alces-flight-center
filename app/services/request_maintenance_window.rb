@@ -16,7 +16,9 @@ RequestMaintenanceWindow = KeywordStruct.new(
       user: user,
       case: support_case,
       associated_model: associated_model
-    ).tap { add_rt_ticket_correspondence }
+    ).tap do |window|
+      add_rt_ticket_correspondence(window)
+    end
   end
 
   private
@@ -38,8 +40,8 @@ RequestMaintenanceWindow = KeywordStruct.new(
       end
   end
 
-  def add_rt_ticket_correspondence
-    support_case.add_rt_ticket_correspondence(
+  def add_rt_ticket_correspondence(window)
+    window.add_rt_ticket_correspondence(
       <<-EOF.squish
         Maintenance requested for #{associated_model.name} by #{user.name}; to
         proceed this maintenance must be confirmed on the cluster dashboard:
