@@ -29,11 +29,13 @@ class ApplicationDecorator < Draper::Decorator
 
     if window.awaiting_confirmation?
       classNames = 'faded-icon'
-      title = "Maintenance has been requested for #{name}"
+      title_base = "Maintenance has been requested for #{name}"
     elsif window.under_maintenance?
       classNames = nil
-      title = "#{name} currently under maintenance"
+      title_base = "#{name} currently under maintenance"
     end
+
+    title = "#{title_base} for ticket #{window.case.rt_ticket_id}"
 
     h.icon('wrench', inline: true, class: classNames, title: title)
   end

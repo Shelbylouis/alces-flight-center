@@ -33,26 +33,28 @@ RSpec.describe ApplicationDecorator do
     let :component { create(:component, name: 'mycomponent') }
 
     it 'includes correct icon when has unconfirmed maintenance window' do
-      create(:unconfirmed_maintenance_window, component: component)
+      window = create(:unconfirmed_maintenance_window, component: component)
+      ticket_id = window.case.rt_ticket_id
 
       expect(subject).to include(
         h.icon(
           'wrench',
           inline: true,
           class: 'faded-icon',
-          title: "Maintenance has been requested for #{component.name}"
+          title: "Maintenance has been requested for #{component.name} for ticket #{ticket_id}"
         )
       )
     end
 
     it 'includes correct icon when has confirmed maintenance window' do
-      create(:confirmed_maintenance_window, component: component)
+      window = create(:confirmed_maintenance_window, component: component)
+      ticket_id = window.case.rt_ticket_id
 
       expect(subject).to include(
         h.icon(
           'wrench',
           inline: true,
-          title: "#{component.name} currently under maintenance"
+          title: "#{component.name} currently under maintenance for ticket #{ticket_id}"
         )
       )
     end
