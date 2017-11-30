@@ -77,23 +77,11 @@
             </td>
             <td><%= raw(c.chargeable ? '&check;' : '&cross;') %></td>
             <td>
-              <% if c.under_maintenance? %>
-                <%= link_to raw(icon 'heartbeat', interactive: true),
-                  end_maintenance_window_case_path(c.id),
-                  method: :post,
-                  title: <<~EOF,
-                    Remove #{c.associated_model_type} from being under
-                    maintenance in relation to this case and return to active
-                    service
-                  EOF
-                  data: {
-                    confirm: <<~EOF
-                      Are you sure you remove this #{c.associated_model_type}
-                      from being under maintenance in relation to this case?
-                    EOF
-                  }
-                %>
-              <% else %>
+              <%# Show icon to bring Case's associated model under maintenance
+                in relation to Case, unless this is already the case.
+                XXX extract this if we keep this logic.
+              %>
+              <% unless c.associated_model.open_maintenance_windows.select { |window| window.case == c }.present? %>
                 <%= link_to raw(icon 'wrench', interactive: true),
                   request_maintenance_window_case_path(c.id),
                   method: :post,
