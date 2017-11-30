@@ -76,20 +76,8 @@ class Case < ApplicationRecord
     RequestMaintenanceWindow.new(case_id: id, user: requestor).run
   end
 
-  def end_maintenance_window!
-    raise NoOpenMaintenanceWindowException unless open_maintenance_windows.present?
-    open_maintenance_windows.first.update!(ended_at: DateTime.current)
-    add_rt_ticket_correspondence(
-      "#{associated_model.name} is no longer under maintenance."
-    )
-  end
-
   def add_rt_ticket_correspondence(text)
     rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
-  end
-
-  def under_maintenance?
-    open_maintenance_windows.present?
   end
 
   def associated_model
@@ -159,9 +147,5 @@ class Case < ApplicationRecord
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
     Utils.rt_format(properties)
-  end
-
-  def open_maintenance_windows
-    maintenance_windows.where(ended_at: nil)
   end
 end

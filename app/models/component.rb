@@ -40,10 +40,6 @@ class Component < ApplicationRecord
       end.to_h
   end
 
-  def under_maintenance?
-    cases.select(&:under_maintenance?).present?
-  end
-
   private
 
   # Method to be called from AdminConfig to format Component asset record for

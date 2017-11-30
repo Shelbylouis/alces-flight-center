@@ -26,9 +26,4 @@ class Service < ApplicationRecord
       serviceType: service_type.case_form_json,
     }
   end
-
-  # XXX duplicated from Component.
-  def under_maintenance?
-    cases.select(&:under_maintenance?).present?
-  end
 end
