@@ -28,6 +28,20 @@ class MaintenanceWindow < ApplicationRecord
     end
   end
 
+  def awaiting_confirmation?
+    return false if ended_at
+    !confirmed_by
+  end
+
+  def under_maintenance?
+    return false if ended_at
+    confirmed_by
+  end
+
+  def ended?
+    !!ended_at
+  end
+
   private
 
   def validate_precisely_one_associated_model
