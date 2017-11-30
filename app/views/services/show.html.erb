@@ -14,7 +14,7 @@
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
       <%= service.readable_support_type.capitalize %> service
-      <%= service.under_maintenance_icon %>
+      <%= service.maintenance_icons %>
     </li>
     <% if service.description.present? %>
       <li class="list-group-item">

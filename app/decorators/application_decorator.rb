@@ -17,15 +17,26 @@ class ApplicationDecorator < Draper::Decorator
     )
   end
 
-  def under_maintenance_icon
-    h.icon(
-      'wrench',
-      inline: true,
-      title: "#{readable_model_name.capitalize} currently under maintenance"
-    ) if under_maintenance?
+  def maintenance_icons
+    icons = maintenance_windows.map { |window| maintenance_icon(window) }
+    h.raw(icons.join)
   end
 
   private
+
+  def maintenance_icon(window)
+    return if window.ended?
+
+    if window.awaiting_confirmation?
+      classNames = 'faded-icon'
+      title = "Maintenance has been requested for #{name}"
+    elsif window.under_maintenance?
+      classNames = nil
+      title = "#{name} currently under maintenance"
+    end
+
+    h.icon('wrench', inline: true, class: classNames, title: title)
+  end
 
   def new_maintenance_window_path
     link_helper = "new_#{readable_model_name}_maintenance_window_path"

@@ -104,7 +104,7 @@
       <tr>
         <td width='40%'>
           <%= link_to service.name, service_path(service) %>
-          <%= service.under_maintenance_icon %>
+          <%= service.maintenance_icons %>
         </td>
         <td width='30%'><%= service.readable_support_type.capitalize %></td>
         <td width='10%'>
@@ -153,7 +153,7 @@
               <tr>
                 <td width='40%'>
                   <%= link_to component.name, component_path(component) %>
-                  <%= component.under_maintenance_icon %>
+                  <%= component.maintenance_icons %>
                 </td>
                 <td width='30%'>
                   <%= component.readable_support_type.capitalize %>
