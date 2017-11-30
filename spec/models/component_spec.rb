@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Component, type: :model do
   include_examples 'editable_asset_record_fields'
   include_examples 'inheritable_support_type'
+  include_examples 'maintenance_windows'
 
   describe '#case_form_json' do
     subject do
@@ -89,32 +90,6 @@ RSpec.describe Component, type: :model do
                                          # ComponentType, but without an AssetRecordField associated with
                                          # Component or ComponentGroup, should still be included.
                                          'Comments' => '')
-    end
-  end
-
-  describe '#under_maintenance?' do
-    subject do
-      create(:component).tap do |component|
-        create(:case_requiring_component, component: component).tap do |support_case|
-          create(:closed_maintenance_window, case: support_case)
-        end
-      end
-    end
-
-    context 'when has case which is under maintenance' do
-      before :each do
-        subject.tap do |component|
-          create(:case_requiring_component, component: component).tap do |support_case|
-            create(:unconfirmed_maintenance_window, case: support_case)
-          end
-        end
-      end
-
-      it { is_expected.to be_under_maintenance }
-    end
-
-    context 'when has no case which is under maintenance' do
-      it { is_expected.not_to be_under_maintenance }
     end
   end
 end

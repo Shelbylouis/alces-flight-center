@@ -2,7 +2,8 @@ module ApplicationHelper
   def icon(name, interactive: false, inline: false, **args)
     classes = [
       (inline ? 'inline-icon' : 'fa-2x'),
-      (interactive ? 'interactive-icon' : 'icon')
+      (interactive ? 'interactive-icon' : 'icon'),
+      args.delete(:class)
     ].join(' ')
 
     fa_icon name, class: classes, **args

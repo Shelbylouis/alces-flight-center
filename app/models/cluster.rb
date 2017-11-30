@@ -2,6 +2,7 @@ class Cluster < ApplicationRecord
   include AdminConfig::Cluster
   include HasSupportType
   include MarkdownDescription
+  include HasMaintenanceWindows
 
   SUPPORT_TYPES = SupportType::VALUES
 
@@ -12,7 +13,7 @@ class Cluster < ApplicationRecord
   has_many :cases
   has_many :credit_deposits
   has_many :credit_charges, through: :cases
-  has_many :maintenance_windows, through: :cases
+  has_many :maintenance_windows
 
   validates_associated :site
   validates :name, presence: true
@@ -88,15 +89,9 @@ class Cluster < ApplicationRecord
     end
   end
 
-  def under_maintenance?
-    cases.select do |support_case|
-      cluster_wide_case = support_case.associated_model == self
-      support_case.under_maintenance? && cluster_wide_case
-    end.present?
-  end
-
-  def open_maintenance_windows
-    maintenance_windows.where(ended_at: nil)
+  def open_related_maintenance_windows
+    parts = [self, *components, *services]
+    parts.flat_map(&:open_maintenance_windows).sort_by(&:created_at).reverse
   end
 
   private

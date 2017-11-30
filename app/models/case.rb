@@ -73,33 +73,11 @@ class Case < ApplicationRecord
   end
 
   def request_maintenance_window!(requestor:)
-    maintenance_windows.create!(user: requestor)
-
-    cluster_dashboard_url =
-      Rails.application.routes.url_helpers.cluster_url(associated_model.cluster)
-    add_rt_ticket_correspondence(
-      <<-EOF.squish
-        Maintenance requested for #{associated_model.name} by #{requestor.name};
-        to proceed this maintenance must be confirmed on the cluster dashboard:
-        #{cluster_dashboard_url}.
-      EOF
-    )
-  end
-
-  def end_maintenance_window!
-    raise NoOpenMaintenanceWindowException unless open_maintenance_windows.present?
-    open_maintenance_windows.first.update!(ended_at: DateTime.current)
-    add_rt_ticket_correspondence(
-      "#{associated_model.name} is no longer under maintenance."
-    )
+    RequestMaintenanceWindow.new(case_id: id, user: requestor).run
   end
 
   def add_rt_ticket_correspondence(text)
     rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
-  end
-
-  def under_maintenance?
-    open_maintenance_windows.present?
   end
 
   def associated_model
@@ -169,9 +147,5 @@ class Case < ApplicationRecord
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
     Utils.rt_format(properties)
-  end
-
-  def open_maintenance_windows
-    maintenance_windows.where(ended_at: nil)
   end
 end

@@ -1,6 +1,8 @@
 class ClustersController < ApplicationController
+  decorates_assigned :cluster
+
   def show
-    @cluster = Cluster.find(params[:id]).decorate
+    @cluster = Cluster.find(params[:id])
     @title = "#{@cluster.name} Management Dashboard"
 
     support_type = case @cluster.support_type.to_sym

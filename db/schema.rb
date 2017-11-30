@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171124140736) do
+ActiveRecord::Schema.define(version: 20171127152203) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -162,8 +162,14 @@ ActiveRecord::Schema.define(version: 20171124140736) do
     t.bigint "user_id", null: false
     t.bigint "case_id", null: false
     t.bigint "confirmed_by_id"
+    t.bigint "cluster_id"
+    t.bigint "component_id"
+    t.bigint "service_id"
     t.index ["case_id"], name: "index_maintenance_windows_on_case_id"
+    t.index ["cluster_id"], name: "index_maintenance_windows_on_cluster_id"
+    t.index ["component_id"], name: "index_maintenance_windows_on_component_id"
     t.index ["confirmed_by_id"], name: "index_maintenance_windows_on_confirmed_by_id"
+    t.index ["service_id"], name: "index_maintenance_windows_on_service_id"
     t.index ["user_id"], name: "index_maintenance_windows_on_user_id"
   end
 
