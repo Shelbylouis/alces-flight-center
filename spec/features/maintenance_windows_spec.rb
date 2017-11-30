@@ -2,12 +2,8 @@ require 'rails_helper'
 
 RSpec.feature "Maintenance windows", type: :feature do
   let :support_case { create(:case_with_component) }
-
   let :component { support_case.component }
-  let :component_name { component.name }
-
   let :cluster { support_case.cluster }
-
   let :site { support_case.site }
 
   before :each do
@@ -38,7 +34,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         :add_ticket_correspondence
       ).with(
         id: support_case.rt_ticket_id,
-        text: /requested.*#{component_name}.*by #{user_name}.*must be confirmed.*#{cluster_url(cluster)}/
+        text: /requested.*#{component.name}.*by #{user_name}.*must be confirmed.*#{cluster_url(cluster)}/
       )
       request_link = page.find_link(href: request_link_path)
       expect(request_link).to have_css('.fa-wrench.interactive-icon')
@@ -81,7 +77,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         :add_ticket_correspondence
       ).with(
         id: window.case.rt_ticket_id,
-        text: /Maintenance.*#{component_name}.*confirmed by #{user_name}.*component.*now under maintenance/
+        text: /Maintenance.*#{component.name}.*confirmed by #{user_name}.*component.*now under maintenance/
       )
 
       visit cluster_path(component.cluster, as: user)
