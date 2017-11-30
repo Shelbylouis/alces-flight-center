@@ -24,14 +24,14 @@ RSpec.feature "Maintenance windows", type: :feature do
     let :user_name { 'Steve User' }
     let :user { create(:admin, name: user_name) }
 
-    let :start_link_path do
+    let :request_link_path do
       request_maintenance_window_case_path(support_case.id)
     end
     let :end_link_path do
       end_maintenance_window_case_path(support_case.id)
     end
 
-    it 'can switch a Case to/from under maintenance' do
+    it 'can request maintenance for a Case' do
       visit site_cases_path(site, as: user)
 
       expect(Case.request_tracker).to receive(
@@ -40,25 +40,15 @@ RSpec.feature "Maintenance windows", type: :feature do
         id: support_case.rt_ticket_id,
         text: /requested.*#{component_name}.*by #{user_name}.*must be confirmed.*#{cluster_url(cluster)}/
       )
+      request_link = page.find_link(href: request_link_path)
+      expect(request_link).to have_css('.fa-wrench.interactive-icon')
 
-      start_link = page.find_link(href: start_link_path)
-      expect(start_link).to have_css('.fa-wrench.interactive-icon')
-      start_link.click
-      expect(support_case).to be_under_maintenance
-      expect(page).not_to have_link(href: start_link_path)
+      request_link.click
 
-      expect(Case.request_tracker).to receive(
-        :add_ticket_correspondence
-      ).with(
-        id: support_case.rt_ticket_id,
-        text: /#{component_name}.*no longer under maintenance/
-      )
-
-      end_link = page.find_link(href: end_link_path)
-      expect(end_link).to have_css('.fa-heartbeat.interactive-icon')
-      end_link.click
-      expect(support_case).not_to be_under_maintenance
-      expect(page).not_to have_link(href: end_link_path)
+      new_window = support_case.maintenance_windows.first
+      expect(new_window.user).to eq user
+      expect(new_window).to be_awaiting_confirmation
+      expect(page).not_to have_link(href: request_link_path)
     end
 
     it 'can end a confirmed maintenance window' do
