@@ -75,9 +75,10 @@ class Cluster < ApplicationRecord
     end.map do |component_type, groups|
       {
         name: component_type.name,
+        ordering: component_type.ordering,
         component_groups: groups
       }.to_struct
-    end
+    end.sort_by(&:ordering)
   end
 
   def credits

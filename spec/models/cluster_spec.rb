@@ -206,18 +206,17 @@ RSpec.describe Cluster, type: :model do
     end
 
     let! :server_component_type do
-      create(:component_type, name: 'Server')
+      create(:component_type, name: 'Server', ordering: 2)
     end
     let! :another_component_type do
-      create(:component_type, name: 'Another Type')
+      create(:component_type, name: 'Another Type', ordering: 1)
     end
     let! :unused_component_type do
       create(:component_type, name: 'Unused')
     end
 
     it "returns cluster's component groups, with intermediate type-related object" do
-      server_group = subject.first
-      expect(server_group.name).to eq('Server')
+      server_group = subject.find {|type| type.name == 'Server'}
       expect(server_group.component_groups.length).to eq 2
 
       node_group = server_group.component_groups.first
@@ -225,9 +224,9 @@ RSpec.describe Cluster, type: :model do
       expect(node_group.components.length).to eq 3
     end
 
-    it 'only includes component types that cluster has some components for' do
+    it 'includes component types that has some components for, ordered by ordering' do
       type_names = subject.map(&:name)
-      expect(type_names).to eq(['Server', 'Another Type'])
+      expect(type_names).to eq(['Another Type', 'Server'])
     end
   end
 
