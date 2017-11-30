@@ -47,13 +47,14 @@
         <td><%= window.user.name %></td>
         <td>
           <% if window.confirmed_by %>
-            <%= window.confirmed_by.name %></td>
+            <%= window.confirmed_by.name %>
           <% else %>
             <%= button_to raw('Unconfirmed &mdash; click to confirm'),
               confirm_maintenance_window_path(window),
               class: ['btn', 'btn-success']
             %>
           <% end %>
+        </td>
       </tr>
     <% end %>
     </tbody>
