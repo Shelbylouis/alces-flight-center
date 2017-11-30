@@ -1,26 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe CaseDecorator do
-  shared_examples 'indicate under maintenance' do |model_name|
-    context 'when Case is under maintenance' do
-      before :each do
-        subject.request_maintenance_window!(requestor: create(:admin))
-      end
-
-      it 'includes under maintenance icon' do
-        expect(subject.association_info).to include(
-          h.icon('wrench', inline: true)
-        )
-      end
-
-      it 'includes title text about maintenance' do
-        expect(subject.association_info).to match(
-          /title="#{model_name}.*under maintenance.*Case"/
-        )
-      end
-    end
-  end
-
   # XXX Parts of these tests and corresponding code duplicated and adapted for
   # {Cluster,Component,Service}Decorator.
   describe '#association_info' do
@@ -32,8 +12,6 @@ RSpec.describe CaseDecorator do
       end
 
       let :component { subject.component }
-
-      include_examples 'indicate under maintenance', 'Component'
 
       it 'includes link to Component' do
         expect(
@@ -59,8 +37,6 @@ RSpec.describe CaseDecorator do
 
       let :service { subject.service }
 
-      include_examples 'indicate under maintenance', 'Service'
-
       it 'includes link to Service' do
         expect(
           subject.association_info
@@ -83,8 +59,6 @@ RSpec.describe CaseDecorator do
       subject do
         create(:case).decorate
       end
-
-      include_examples 'indicate under maintenance', 'Cluster'
 
       it 'returns link to Cluster' do
         expect(
