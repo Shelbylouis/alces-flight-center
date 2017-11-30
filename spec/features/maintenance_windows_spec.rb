@@ -14,6 +14,10 @@ RSpec.feature "Maintenance windows", type: :feature do
     # The only way I can get Capybara to use the correct URL; may be a better
     # way though.
     default_url_options[:host] = Rails.application.routes.default_url_options[:host]
+
+    # Prevent attempting to retrieve documents from S3 when Cluster page
+    # visited.
+    allow_any_instance_of(Cluster).to receive(:documents).and_return([])
   end
 
   context 'when user is an admin' do
@@ -56,6 +60,22 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(support_case).not_to be_under_maintenance
       expect(page).not_to have_link(href: end_link_path)
     end
+
+    it 'can end a confirmed maintenance window' do
+      end_time = DateTime.new(2018)
+      allow(DateTime).to receive(:current).and_return(end_time)
+      window = create(:confirmed_maintenance_window, component: component)
+      expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
+        id: window.case.rt_ticket_id,
+        text: "#{component.name} is no longer under maintenance."
+      )
+
+      visit cluster_path(component.cluster, as: user)
+      click_button('End Maintenance')
+
+      expect(window.reload.ended_at).to eq(end_time)
+      expect(current_path).to eq(cluster_path(component.cluster))
+    end
   end
 
   context 'when user is contact' do
@@ -65,10 +85,6 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     it 'can confirm an unconfirmed maintenance window' do
-      # Prevent attempting to retrieve documents from S3 when Cluster page
-      # visited.
-      allow_any_instance_of(Cluster).to receive(:documents).and_return([])
-
       window = create(:unconfirmed_maintenance_window, component: component)
 
       expect(Case.request_tracker).to receive(
