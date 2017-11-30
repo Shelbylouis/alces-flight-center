@@ -30,11 +30,12 @@
         <th>Creator</th>
         <th>Category</th>
         <th>Issue</th>
-        <th>Cluster</th>
         <th>Association</th>
+        <th>Ticket ID</th>
         <% if manage_cases_page %>
           <th>Ticket status</th>
           <th>Chargeable</th>
+          <th>Actions</th>
         <% else %>
           <th>Details</th>
           <th>Contact support</th>
@@ -68,13 +69,36 @@
           <td><%= c.user.name %></td>
           <td><%= c.case_category.name %></td>
           <td><%= c.issue.name %></td>
-          <td><%= c.cluster.name %></td>
           <td><%= c.association_info %></td>
+          <td><%= c.rt_ticket_id %></td>
           <% if manage_cases_page %>
             <td>
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
             </td>
             <td><%= raw(c.chargeable ? '&check;' : '&cross;') %></td>
+            <td>
+              <%# Show icon to bring Case's associated model under maintenance
+                in relation to Case, unless this is already the case.
+                XXX extract this if we keep this logic.
+              %>
+              <% unless c.associated_model.open_maintenance_windows.select { |window| window.case == c }.present? %>
+                <%= link_to raw(icon 'wrench', interactive: true),
+                  request_maintenance_window_case_path(c.id),
+                  method: :post,
+                  title: <<~EOF,
+                    Request #{c.associated_model_type} be brought under
+                    maintenance in relation to this case
+                  EOF
+                  data: {
+                    confirm: <<~EOF
+                      Are you sure you want to request
+                      #{c.associated_model_type} be brought under maintenance
+                      in relation to this case?
+                    EOF
+                  }
+                %>
+              <% end %>
+            </td>
           <% else %>
             <td><%= c.details %></td>
             <td><%= render 'cases/email_support_icon', support_case: c %></td>
@@ -92,12 +116,12 @@
               <% elsif c.credit_charge %>
                 <%= c.credit_charge.amount %>
               <% else %>
-                <em>Incomplete</em>
+                <em>Pending</em>
               <% end %>
             <% elsif !c.chargeable %>
               <em>N/A</em>
             <% else %>
-              <em>Incomplete</em>
+              <em>Pending</em>
             <% end %>
           </td>
         </tr>

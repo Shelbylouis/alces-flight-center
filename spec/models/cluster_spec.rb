@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Cluster, type: :model do
   include_examples 'canonical_name'
   include_examples 'markdown_description'
+  include_examples 'maintenance_windows'
 
   describe '#valid?' do
     context 'when managed cluster' do
@@ -136,8 +137,8 @@ RSpec.describe Cluster, type: :model do
 
     describe '#documents' do
       it 'returns needed data for each Cluster document' do
-        VCR.use_cassette(VcrCassettes::S3_READ_DOCUMENTS) do
-          Development::Utils.upload_document_fixtures_for(subject)
+        VCR.use_cassette(VcrCassettes::S3_READ_DOCUMENTS) do |cassette|
+          Development::Utils.upload_document_fixtures_for(subject) if cassette.recording?
 
           documents = subject.documents
 
@@ -250,5 +251,33 @@ RSpec.describe Cluster, type: :model do
     end
 
     it { is_expected.to eq 15 }
+  end
+
+  describe '#open_related_maintenance_windows' do
+    subject { create(:cluster) }
+
+    it 'gives non-closed maintenance windows for Cluster and parts' do
+      create(:unconfirmed_maintenance_window, cluster: subject, id: 1)
+      create(:confirmed_maintenance_window, cluster: subject, id: 2)
+      create(:closed_maintenance_window, cluster: subject, id: 3)
+
+      component = create(:component, cluster: subject)
+      create(:unconfirmed_maintenance_window, component: component, id: 4)
+      create(:confirmed_maintenance_window, component: component, id: 5)
+      create(:closed_maintenance_window, component: component, id: 6)
+
+      resulting_window_ids = subject.open_related_maintenance_windows.map(&:id)
+
+      expect(resulting_window_ids).to match_array([1, 2, 4, 5])
+    end
+
+    it 'gives maintenance windows with newest first' do
+      create(:unconfirmed_maintenance_window, cluster: subject, id: 1, created_at: 2.days.ago)
+      create(:confirmed_maintenance_window, cluster: subject, id: 2, created_at: 1.day.ago)
+
+      resulting_window_ids = subject.open_related_maintenance_windows.map(&:id)
+
+      expect(resulting_window_ids).to eq([2, 1])
+    end
   end
 end

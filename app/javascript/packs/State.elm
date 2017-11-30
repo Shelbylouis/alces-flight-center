@@ -144,8 +144,8 @@ decoder =
     in
     D.map3
         (\a -> \b -> \c -> ( a, b, c ))
-        (D.field "clusters" <| SelectList.Extra.decoder Cluster.decoder)
-        (D.field "caseCategories" <| SelectList.Extra.decoder CaseCategory.decoder)
+        (D.field "clusters" <| SelectList.Extra.nameOrderedDecoder Cluster.decoder)
+        (D.field "caseCategories" <| SelectList.Extra.nameOrderedDecoder CaseCategory.decoder)
         (D.field "singlePart" <| modeDecoder)
         |> D.andThen createInitialState
 

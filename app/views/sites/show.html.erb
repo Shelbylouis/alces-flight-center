@@ -12,18 +12,22 @@
 
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
-      <%= @site.rendered_description.html_safe %>
+      <%= site.rendered_description.html_safe %>
     </li>
     <li class="list-group-item">
-      Site contacts: <%= @site.contacts_info %>
+      Primary site contact: <%= site.primary_contact&.info || raw('<em>Unset</em>') %>
     </li>
     <li class="list-group-item">
-      Additional site contacts: <%= @site.additional_contacts_info %>
+      Secondary site <%= 'contact'.pluralize(site.secondary_contacts.length) %>:
+      <%= site.secondary_contacts.present? ? site.secondary_contacts_info : raw('<em>None</em>') %>
+    </li>
+    <li class="list-group-item">
+      Additional site contacts: <%= site.additional_contacts_info %>
     </li>
   </ul>
 </div>
 
-<% @site.clusters.each do |cluster| %>
+<% site.clusters.each do |cluster| %>
   <div class='card'>
     <div class='card-header'>
       <ul class="nav">
@@ -46,4 +50,4 @@
   </div>
 <% end %>
 
-<%= render 'cases/cases_table', cases: @site.cases, archive: false %>
+<%= render 'cases/cases_table', cases: site.cases, archive: false %>

@@ -21,6 +21,7 @@ class Case < ApplicationRecord
   belongs_to :service, required: false
   belongs_to :user
   has_one :credit_charge, required: false
+  has_many :maintenance_windows
 
   delegate :case_category, :chargeable, to: :issue
   delegate :site, to: :cluster
@@ -69,6 +70,22 @@ class Case < ApplicationRecord
 
   def credit_charge_allowed?
     ticket_completed? && chargeable
+  end
+
+  def request_maintenance_window!(requestor:)
+    RequestMaintenanceWindow.new(case_id: id, user: requestor).run
+  end
+
+  def add_rt_ticket_correspondence(text)
+    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
+  end
+
+  def associated_model
+    component || service || cluster
+  end
+
+  def associated_model_type
+    associated_model.readable_model_name
   end
 
   private

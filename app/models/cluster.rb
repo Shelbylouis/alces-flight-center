@@ -2,6 +2,7 @@ class Cluster < ApplicationRecord
   include AdminConfig::Cluster
   include HasSupportType
   include MarkdownDescription
+  include HasMaintenanceWindows
 
   SUPPORT_TYPES = SupportType::VALUES
 
@@ -12,6 +13,7 @@ class Cluster < ApplicationRecord
   has_many :cases
   has_many :credit_deposits
   has_many :credit_charges, through: :cases
+  has_many :maintenance_windows
 
   validates_associated :site
   validates :name, presence: true
@@ -22,6 +24,12 @@ class Cluster < ApplicationRecord
   before_validation CanonicalNameCreator.new, on: :create
 
   after_create :create_automatic_services
+
+  # So can get the Cluster for the associated model for a Case, even if the
+  # associated model is the Cluster itself.
+  def cluster
+    self
+  end
 
   # Automatically picked up by rails_admin so only these options displayed when
   # selecting support type.
@@ -79,6 +87,11 @@ class Cluster < ApplicationRecord
     credit_charges.reduce(deposits) do |total, charge|
       total -= charge.amount
     end
+  end
+
+  def open_related_maintenance_windows
+    parts = [self, *components, *services]
+    parts.flat_map(&:open_maintenance_windows).sort_by(&:created_at).reverse
   end
 
   private

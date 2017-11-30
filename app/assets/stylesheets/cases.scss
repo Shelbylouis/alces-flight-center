@@ -6,17 +6,3 @@
 .credit-charge-required-case-row {
   background-color: lightgreen;
 }
-
-.icon {
-  width: 100%;
-  text-align: center;
-  color: black;
-}
-
-.interactive-icon {
-  @extend .icon;
-
-  &:hover {
-    opacity: 0.6;
-  }
-}

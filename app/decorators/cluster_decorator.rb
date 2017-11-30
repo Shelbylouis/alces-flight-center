@@ -6,4 +6,8 @@ class ClusterDecorator < ApplicationDecorator
   def path
     h.cluster_path(self)
   end
+
+  def links
+    h.link_to name, path
+  end
 end

@@ -18,13 +18,32 @@ RSpec.shared_examples 'Request Tracker interface' do
     }
   end
 
+  let! :created_ticket do
+    VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) do
+      rt_interface.create_ticket(new_ticket_params)
+    end
+  end
+
   describe '#create_ticket [interface]' do
-    subject { rt_interface.create_ticket(new_ticket_params) }
+    subject { created_ticket }
 
     it 'creates a ticket and returns object with id' do
-      VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) do
-        # All tickets now have IDs greater than this.
-        expect(subject.id).to be > 10000
+      # All tickets now have IDs greater than this.
+      expect(subject.id).to be > 10000
+    end
+  end
+
+  describe '#add_ticket_correspondence [interface]' do
+    subject do
+      rt_interface.add_ticket_correspondence(
+        id: created_ticket.id,
+        text: 'Alces Flight Center test comment'
+      )
+    end
+
+    it 'returns RT success response' do
+      VCR.use_cassette(VcrCassettes::RT_ADD_TICKET_CORRESPONDENCE) do
+        expect(subject).to include '# Message recorded'
       end
     end
   end
@@ -109,6 +128,17 @@ RSpec.describe RequestTrackerInterface do
 
       VCR.use_cassette(VcrCassettes::RT_CREATE_TICKET) { subject }
     end
+  end
+
+  describe '#add_ticket_correspondence' do
+    subject do
+      rt_interface.add_ticket_correspondence(
+        id: created_ticket.id,
+        text: 'Alces Flight Center test comment'
+      )
+    end
+
+    include_examples 'error_handling'
   end
 
   describe '#show_ticket' do

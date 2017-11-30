@@ -38,7 +38,7 @@ decoder =
     D.map4 CaseCategory
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
-        (D.field "issues" (SelectList.Extra.decoder Issue.decoder))
+        (D.field "issues" (SelectList.Extra.orderedDecoder Issue.name Issue.decoder))
         (D.field "controllingServiceType" (D.nullable ServiceType.decoder))
 
 

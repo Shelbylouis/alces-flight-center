@@ -6,6 +6,6 @@ class SitesController < ApplicationController
 
   def show
     @title = "#{@site.name} Management Dashboard"
-    @subtitle = "Welcome #{@site.name}"
+    @subtitle = "Welcome #{current_user.name}"
   end
 end

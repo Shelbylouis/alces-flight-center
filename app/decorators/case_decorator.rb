@@ -1,14 +1,18 @@
 class CaseDecorator < ApplicationDecorator
   delegate_all
 
+  def maintenance_window_form_info
+    [
+      "RT ticket #{rt_ticket_id}",
+      created_at.to_formatted_s(:long),
+      "#{case_category.name} - #{issue.name}",
+      associated_model.name,
+      "Created by #{user.name}"
+    ].join(' | ')
+  end
+
   def association_info
-    if component
-      h.link_to component.name, h.component_path(component)
-    elsif service
-      h.link_to service.name, h.service_path(service)
-    else
-      h.raw('<em>N/A</em>')
-    end
+    associated_model.decorate.links
   end
 
   def rt_ticket_url
