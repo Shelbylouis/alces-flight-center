@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171127165221) do
+ActiveRecord::Schema.define(version: 20171201133815) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -114,6 +114,7 @@ ActiveRecord::Schema.define(version: 20171127165221) do
     t.datetime "updated_at", null: false
     t.integer "component_group_id"
     t.string "support_type", default: "inherit", null: false
+    t.boolean "internal", default: false
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end
 
@@ -189,6 +190,7 @@ ActiveRecord::Schema.define(version: 20171127165221) do
     t.bigint "cluster_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "internal", default: false
     t.index ["cluster_id"], name: "index_services_on_cluster_id"
     t.index ["service_type_id"], name: "index_services_on_service_type_id"
   end
