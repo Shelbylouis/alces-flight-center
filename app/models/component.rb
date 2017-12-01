@@ -1,8 +1,6 @@
 class Component < ApplicationRecord
   include AdminConfig::Component
   include AdminConfig::Shared::EditableAssetRecordFields
-  include HasInheritableSupportType
-
   include ClusterPart
 
   belongs_to :component_group

@@ -3,6 +3,7 @@ module ClusterPart
   extend ActiveSupport::Concern
 
   include HasMaintenanceWindows
+  include HasSupportType
 
   SUPPORT_TYPES = SupportType::VALUES + ['inherit']
 
@@ -18,5 +19,9 @@ module ClusterPart
   # selecting support type.
   def support_type_enum
     SUPPORT_TYPES
+  end
+
+  def support_type
+    super == 'inherit' ? cluster.support_type : super
   end
 end

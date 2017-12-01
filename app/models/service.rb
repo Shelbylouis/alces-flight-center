@@ -1,6 +1,4 @@
 class Service < ApplicationRecord
-  include HasInheritableSupportType
-
   include ClusterPart
 
   belongs_to :service_type
