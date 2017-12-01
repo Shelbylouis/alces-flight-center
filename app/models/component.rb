@@ -10,14 +10,6 @@ class Component < ApplicationRecord
 
   validates_associated :component_group, :asset_record_fields
 
-  def case_form_json
-    {
-      id: id,
-      name: name,
-      supportType: support_type,
-    }
-  end
-
   def asset_record
     # Merge asset record layers to obtain hash for this Component of all
     # asset record fields for this ComponentType; fields set in later layers

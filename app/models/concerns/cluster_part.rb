@@ -24,4 +24,12 @@ module ClusterPart
   def support_type
     super == 'inherit' ? cluster.support_type : super
   end
+
+  def case_form_json
+    {
+      id: id,
+      name: name,
+      supportType: support_type,
+    }
+  end
 end
