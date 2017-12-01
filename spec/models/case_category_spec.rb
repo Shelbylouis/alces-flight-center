@@ -34,5 +34,13 @@ RSpec.describe CaseCategory, type: :model do
         expect(subject.case_form_json[:controllingServiceType]).to be nil
       end
     end
+
+    it 'gives nothing when CaseCategory only contains toggle issues' do
+      category = create(:case_category).tap do |category|
+        category.issues = [create(:toggle_issue)]
+      end
+
+      expect(category.case_form_json).to be nil
+    end
   end
 end

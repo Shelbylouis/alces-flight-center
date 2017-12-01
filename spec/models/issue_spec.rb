@@ -74,7 +74,7 @@ RSpec.describe Issue, type: :model do
     end
   end
 
-  describe 'special finder methods' do
+  describe 'support type toggle issues' do
     let! :component_becomes_advice_issue do
       create(:issue, identifier: 'request_component_becomes_advice')
     end
@@ -88,35 +88,56 @@ RSpec.describe Issue, type: :model do
       create(:issue, identifier: 'request_service_becomes_managed')
     end
 
-    describe '#request_component_becomes_advice_issue' do
-      it 'returns correct issue' do
-        expect(
-          Issue.request_component_becomes_advice_issue
-        ).to eq component_becomes_advice_issue
+    describe 'finder methods' do
+      describe '#request_component_becomes_advice_issue' do
+        it 'returns correct issue' do
+          expect(
+            Issue.request_component_becomes_advice_issue
+          ).to eq component_becomes_advice_issue
+        end
+      end
+
+      describe '#request_component_becomes_managed_issue' do
+        it 'returns correct issue' do
+          expect(
+            Issue.request_component_becomes_managed_issue
+          ).to eq component_becomes_managed_issue
+        end
+      end
+
+      describe '#request_service_becomes_advice_issue' do
+        it 'returns correct issue' do
+          expect(
+            Issue.request_service_becomes_advice_issue
+          ).to eq service_becomes_advice_issue
+        end
+      end
+
+      describe '#request_service_becomes_managed_issue' do
+        it 'returns correct issue' do
+          expect(
+            Issue.request_service_becomes_managed_issue
+          ).to eq service_becomes_managed_issue
+        end
       end
     end
 
-    describe '#request_component_becomes_managed_issue' do
-      it 'returns correct issue' do
-        expect(
-          Issue.request_component_becomes_managed_issue
-        ).to eq component_becomes_managed_issue
-      end
-    end
+    describe '#toggle?' do
+      it 'returns true for all toggle issues' do
+        toggle_issues = [
+          component_becomes_advice_issue,
+          component_becomes_managed_issue,
+          service_becomes_advice_issue,
+          service_becomes_managed_issue,
+        ]
 
-    describe '#request_service_becomes_advice_issue' do
-      it 'returns correct issue' do
-        expect(
-          Issue.request_service_becomes_advice_issue
-        ).to eq service_becomes_advice_issue
+        expect(toggle_issues.map(&:toggle?)).to eq([true, true, true, true])
       end
-    end
 
-    describe '#request_service_becomes_managed_issue' do
-      it 'returns correct issue' do
-        expect(
-          Issue.request_service_becomes_managed_issue
-        ).to eq service_becomes_managed_issue
+      it 'returns false for any other issue' do
+        issue = create(:issue)
+
+        expect(issue).not_to be_toggle
       end
     end
   end
