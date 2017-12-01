@@ -17,12 +17,29 @@ class ApplicationDecorator < Draper::Decorator
     )
   end
 
-  def maintenance_icons
-    icons = maintenance_windows.map { |window| maintenance_icon(window) }
+  # Strictly speaking this gives the icons for a ClusterPart or entire Cluster,
+  # but I don't have a better name for that yet.
+  def cluster_part_icons
+    icons = [internal_icon, *maintenance_icons]
     h.raw(icons.join)
   end
 
   private
+
+  def internal_icon
+    internal_text = "#{readable_model_name.capitalize} for internal Alces usage"
+    if respond_to?(:internal) && internal
+      h.image_tag(
+        'flight-icon',
+        alt: internal_text,
+        title: internal_text,
+      )
+    end
+  end
+
+  def maintenance_icons
+    maintenance_windows.map { |window| maintenance_icon(window) }
+  end
 
   def maintenance_icon(window)
     return if window.ended?

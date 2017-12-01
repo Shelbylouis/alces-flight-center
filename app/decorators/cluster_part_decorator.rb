@@ -14,6 +14,8 @@ class ClusterPartDecorator < ApplicationDecorator
     request_managed_issue:,
     part_id_symbol:
   )
+    return if internal
+
     # Do nothing if both `support_type` change Issues not passed.
     return unless request_advice_issue && request_managed_issue
 

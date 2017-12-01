@@ -58,6 +58,12 @@ RSpec.describe ServiceDecorator do
           })
       end
     end
+
+    it 'gives nothing for internal Service' do
+      service = create(:service, internal: true).decorate
+
+      expect(service.change_support_type_button).to be nil
+    end
   end
 
   describe '#links' do
