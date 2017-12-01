@@ -28,8 +28,8 @@ RSpec.describe ApplicationDecorator do
     end
   end
 
-  describe '#maintenance_icons' do
-    subject { component.decorate.maintenance_icons }
+  describe '#cluster_part_icons' do
+    subject { component.decorate.cluster_part_icons }
     let :component { create(:component, name: 'mycomponent') }
 
     it 'includes correct icon when has unconfirmed maintenance window' do

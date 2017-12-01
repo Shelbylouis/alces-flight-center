@@ -17,9 +17,11 @@ class ApplicationDecorator < Draper::Decorator
     )
   end
 
-  def maintenance_icons
-    icons = maintenance_windows.map { |window| maintenance_icon(window) }
-    h.raw(icons.join)
+  # Strictly speaking this gives the icons for a ClusterPart or entire Cluster,
+  # but I don't have a better name for that yet.
+  def cluster_part_icons
+    maintenance_icons = maintenance_windows.map { |window| maintenance_icon(window) }
+    h.raw(maintenance_icons.join)
   end
 
   private
