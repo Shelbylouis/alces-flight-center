@@ -180,9 +180,9 @@ CaseCategory.create!(name: 'Consultancy').tap do |consultancy|
   )
 end
 
-server = ComponentType.create!(name: 'Server')
-disk_array = ComponentType.create!(name: 'Disk array')
-network_switch = ComponentType.create!(name: 'Network switch')
+server = ComponentType.create!(name: 'Server', ordering: 1)
+disk_array = ComponentType.create!(name: 'Disk array', ordering: 2)
+network_switch = ComponentType.create!(name: 'Network switch', ordering: 3)
 
 all_types = [server, disk_array, network_switch]
 

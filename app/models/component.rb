@@ -1,33 +1,14 @@
 class Component < ApplicationRecord
   include AdminConfig::Component
   include AdminConfig::Shared::EditableAssetRecordFields
-  include HasInheritableSupportType
-  include HasMaintenanceWindows
+  include ClusterPart
 
   belongs_to :component_group
   has_one :component_type, through: :component_group
   has_one :cluster, through: :component_group
   has_many :asset_record_fields
-  has_many :cases
-  has_many :maintenance_windows
 
   validates_associated :component_group, :asset_record_fields
-  validates :name, presence: true
-  validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
-
-  # Automatically picked up by rails_admin so only these options displayed when
-  # selecting support type.
-  def support_type_enum
-    SUPPORT_TYPES
-  end
-
-  def case_form_json
-    {
-      id: id,
-      name: name,
-      supportType: support_type,
-    }
-  end
 
   def asset_record
     # Merge asset record layers to obtain hash for this Component of all
