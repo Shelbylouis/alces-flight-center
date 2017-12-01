@@ -55,6 +55,12 @@ RSpec.describe ComponentDecorator do
           })
       end
     end
+
+    it 'gives nothing for internal Component' do
+      component = create(:component, internal: true).decorate
+
+      expect(component.change_support_type_button).to be nil
+    end
   end
 
   describe '#links' do
