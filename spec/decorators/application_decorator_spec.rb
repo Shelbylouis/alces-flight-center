@@ -78,4 +78,31 @@ RSpec.describe ApplicationDecorator do
       end
     end
   end
+
+  describe 'internal icon' do
+    it 'includes internal icon when internal' do
+      part = create(:service, internal: true)
+
+      expect(part.decorate.cluster_part_icons).to include(
+        h.image_tag(
+          'flight-icon',
+          alt: 'Service for internal Alces usage',
+          title: 'Service for internal Alces usage'
+        )
+      )
+    end
+
+    it 'does not include internal icon when not internal' do
+      part = create(:component, internal: false)
+
+      expect(part.decorate.cluster_part_icons).to be_empty
+    end
+
+    it 'does not include internal icon when does not have internal field' do
+      cluster = create(:cluster)
+
+      expect(cluster.decorate.cluster_part_icons).to be_empty
+
+    end
+  end
 end
