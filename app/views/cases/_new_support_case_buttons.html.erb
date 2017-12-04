@@ -1,16 +1,26 @@
 
-<% case_form_url = if defined?(cluster)
-                     new_cluster_case_path(cluster_id: cluster.id)
-                   elsif defined?(component)
-                     new_component_case_path(component_id: component.id)
-                   elsif defined?(service)
-                     new_service_case_path(service_id: service.id)
-                   elsif current_user.admin?
-                     new_site_case_path(@site)
-                   else
-                     new_case_path
-                   end
-                 %>
+<% case_form_url, consultancy_form_url =
+  if defined?(cluster)
+    [
+      new_cluster_case_path(cluster_id: cluster.id),
+      new_cluster_consultancy_path(cluster_id: cluster.id),
+    ]
+  elsif defined?(component)
+    [
+      new_component_case_path(component_id: component.id),
+      new_component_consultancy_path(component_id: component.id),
+    ]
+  elsif defined?(service)
+    [
+      new_service_case_path(service_id: service.id),
+      new_service_consultancy_path(service_id: service.id),
+    ]
+  elsif current_user.admin?
+    [new_site_case_path(@site), nil]
+  else
+    [new_case_path, nil]
+  end
+%>
 
 <li class="nav-item">
   <%= link_to 'Create new support case',
@@ -19,3 +29,13 @@
     role: 'button'
   %>
 </li>
+
+<% if consultancy_form_url %>
+  <li class="nav-item">
+    <%= link_to 'Request consultancy',
+      consultancy_form_url,
+      class: ['nav-link', 'btn', 'btn-dark'],
+      role: 'button'
+    %>
+  </li>
+<% end %>
