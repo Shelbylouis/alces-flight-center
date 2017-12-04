@@ -61,4 +61,23 @@ class ApplicationDecorator < Draper::Decorator
     link_helper = "new_#{readable_model_name}_maintenance_window_path"
     h.send(link_helper, self)
   end
+
+  # XXX de-dupe these?
+  def case_form_button(path)
+    link = h.link_to 'Create new support case',
+      path,
+      class: ['nav-link', 'btn', 'btn-dark'],
+      role: 'button'
+
+    h.raw("<li class=\"nav-item\">#{link}</li>")
+  end
+
+  def consultancy_form_button(path)
+    link = h.link_to 'Request consultancy',
+      path,
+      class: ['nav-link', 'btn', 'btn-dark'],
+      role: 'button'
+
+    h.raw("<li class=\"nav-item\">#{link}</li>")
+  end
 end

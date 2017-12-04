@@ -82,4 +82,20 @@ RSpec.describe ComponentDecorator do
       )
     end
   end
+
+  describe '#case_form_buttons' do
+    subject { create(:component).decorate }
+
+    it 'includes link to Component Case form' do
+      expect(subject.case_form_buttons).to include(
+        h.new_component_case_path(component_id: subject.id)
+      )
+    end
+
+    it 'includes link to Component consultancy form' do
+      expect(subject.case_form_buttons).to include(
+        h.new_component_consultancy_path(component_id: subject.id)
+      )
+    end
+  end
 end
