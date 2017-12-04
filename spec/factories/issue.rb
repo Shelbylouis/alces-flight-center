@@ -35,8 +35,8 @@ FactoryBot.define do
       identifier Issue::IDENTIFIERS.request_service_becomes_managed
     end
 
-    factory :toggle_issue do
-      identifier Issue::SUPPORT_TYPE_TOGGLE_IDENTIFIERS.first
+    factory :special_issue do
+      identifier Issue::IDENTIFIER_NAMES.first
     end
   end
 end

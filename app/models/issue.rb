@@ -15,7 +15,7 @@ class Issue < ApplicationRecord
     end
   end
 
-  SUPPORT_TYPE_TOGGLE_IDENTIFIERS = [
+  IDENTIFIER_NAMES = [
     :request_component_becomes_advice,
     :request_component_becomes_managed,
     :request_service_becomes_advice,
@@ -26,7 +26,7 @@ class Issue < ApplicationRecord
   # concept of optional, unique identifiers (including the following) allows us
   # to do this, while still allowing all Issues to be treated as user-editable
   # data.
-  IDENTIFIERS = SUPPORT_TYPE_TOGGLE_IDENTIFIERS.map do |identifier|
+  IDENTIFIERS = IDENTIFIER_NAMES.map do |identifier|
     define_finder_method(identifier)
     [identifier, identifier.to_s]
   end.to_h.to_struct
@@ -56,8 +56,8 @@ class Issue < ApplicationRecord
     SUPPORT_TYPES
   end
 
-  def toggle?
-    SUPPORT_TYPE_TOGGLE_IDENTIFIERS.include?(identifier&.to_sym)
+  def special?
+    IDENTIFIER_NAMES.include?(identifier&.to_sym)
   end
 
   def case_form_json
