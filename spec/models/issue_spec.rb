@@ -75,6 +75,7 @@ RSpec.describe Issue, type: :model do
   end
 
   describe 'special issues' do
+    # Toggle issues.
     let! :component_becomes_advice_issue do
       create(:issue, identifier: 'request_component_becomes_advice')
     end
@@ -88,6 +89,19 @@ RSpec.describe Issue, type: :model do
       create(:issue, identifier: 'request_service_becomes_managed')
     end
 
+    # Consultancy issues.
+    let! :cluster_consultancy_issue do
+      create(:issue, identifier: 'cluster_consultancy')
+    end
+    let! :component_consultancy_issue do
+      create(:issue, identifier: 'component_consultancy')
+    end
+    let! :service_consultancy_issue do
+      create(:issue, identifier: 'service_consultancy')
+    end
+
+    # There's a whole lot of pretty much identical tests here, may be worth
+    # changing things to tidy this up.
     describe 'finder methods' do
       describe '#request_component_becomes_advice_issue' do
         it 'returns correct issue' do
@@ -120,6 +134,30 @@ RSpec.describe Issue, type: :model do
           ).to eq service_becomes_managed_issue
         end
       end
+
+      describe '#cluster_consultancy_issue' do
+        it 'returns correct issue' do
+          expect(
+            Issue.cluster_consultancy_issue
+          ).to eq cluster_consultancy_issue
+        end
+      end
+
+      describe '#component_consultancy_issue' do
+        it 'returns correct issue' do
+          expect(
+            Issue.component_consultancy_issue
+          ).to eq component_consultancy_issue
+        end
+      end
+
+      describe '#service_consultancy_issue' do
+        it 'returns correct issue' do
+          expect(
+            Issue.service_consultancy_issue
+          ).to eq service_consultancy_issue
+        end
+      end
     end
 
     describe '#special?' do
@@ -129,9 +167,12 @@ RSpec.describe Issue, type: :model do
           component_becomes_managed_issue,
           service_becomes_advice_issue,
           service_becomes_managed_issue,
+          cluster_consultancy_issue,
+          component_consultancy_issue,
+          service_consultancy_issue,
         ]
 
-        expect(special_issues.map(&:special?)).to eq([true, true, true, true])
+        expect(special_issues.map(&:special?)).to eq([true] * special_issues.length)
       end
 
       it 'returns false for any other issue' do

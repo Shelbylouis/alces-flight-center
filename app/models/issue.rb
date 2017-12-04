@@ -20,6 +20,9 @@ class Issue < ApplicationRecord
     :request_component_becomes_managed,
     :request_service_becomes_advice,
     :request_service_becomes_managed,
+    :cluster_consultancy,
+    :component_consultancy,
+    :service_consultancy,
   ]
 
   # We need to be able to find and use certain Issues in custom ways; the
