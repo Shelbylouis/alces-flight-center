@@ -64,14 +64,17 @@ Rails.application.routes.draw do
 
     resources :clusters, only: :show do
       resources :cases, only: :new
+      resources :consultancy, only: :new
     end
 
     resources :components, only: :show do
       resources :cases, only: :new
+      resources :consultancy, only: :new
     end
 
     resources :services, only: :show do
       resources :cases, only: :new
+      resources :consultancy, only: :new
     end
 
     resources :maintenance_windows do
