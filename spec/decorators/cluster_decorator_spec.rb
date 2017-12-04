@@ -14,6 +14,8 @@ RSpec.describe ClusterDecorator do
   end
 
   describe '#case_form_buttons' do
+    include_examples 'case_form_buttons', 'cluster'
+
     it 'includes link to Cluster Case form' do
       expect(subject.case_form_buttons).to include(
         h.new_cluster_case_path(cluster_id: subject.id)

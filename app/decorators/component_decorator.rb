@@ -13,7 +13,7 @@ class ComponentDecorator < ClusterPartDecorator
 
   def case_form_buttons
     buttons = [
-      case_form_button(h.new_component_case_path(component_id: self.id)),
+      case_form_button(h.new_component_case_path(component_id: self.id), disabled: advice?),
       consultancy_form_button(h.new_component_consultancy_path(component_id: self.id))
     ].join
     h.raw(buttons)

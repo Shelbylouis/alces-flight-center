@@ -63,13 +63,23 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   # XXX de-dupe these?
-  def case_form_button(path)
+  def case_form_button(path, disabled: false)
+    title = if disabled
+              <<~EOF.squish
+                This #{readable_model_name} is self-managed; if required you
+                may only request consultancy support from Alces Software.
+              EOF
+            else
+              nil
+            end
+
     link = h.link_to 'Create new support case',
       path,
-      class: ['nav-link', 'btn', 'btn-dark'],
-      role: 'button'
+      class: ['nav-link', 'btn', 'btn-dark', disabled ? 'disabled' : nil],
+      role: 'button',
+      title: title
 
-    h.raw("<li class=\"nav-item\">#{link}</li>")
+    h.raw("<li class=\"nav-item\" title=\"#{title}\">#{link}</li>")
   end
 
   def consultancy_form_button(path)
