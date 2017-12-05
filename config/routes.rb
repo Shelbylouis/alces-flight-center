@@ -18,22 +18,22 @@ Rails.application.routes.draw do
       resources :cases, only: [:new, :index]
     end
 
-    resources :cases do
+    resources :cases, only: [] do
       member do
         post :request_maintenance_window
         post :end_maintenance_window
       end
     end
 
-    resources :clusters do
+    resources :clusters, only: []  do
       resources :maintenance_windows, only: :new
     end
 
-    resources :components do
+    resources :components, only: []  do
       resources :maintenance_windows, only: :new
     end
 
-    resources :services do
+    resources :services, only: []  do
       resources :maintenance_windows, only: :new
     end
 
@@ -77,7 +77,7 @@ Rails.application.routes.draw do
       resources :consultancy, only: :new
     end
 
-    resources :maintenance_windows do
+    resources :maintenance_windows, only: [] do
       member do
         post :confirm
       end
