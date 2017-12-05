@@ -138,7 +138,11 @@ RSpec.describe CasesController, type: :controller do
       context 'when not given Cluster' do
         it 'redirects to root_path' do
           params = valid_params.tap do |p|
-            p[:case].delete(:cluster_id)
+            p[:case].reject! do |k,v|
+              # Delete Cluster and part (which might cause automatic
+              # association with Cluster on Case creation).
+              [:cluster_id, :component_id, :service_id].include?(k)
+            end
           end
           post :create, params: params, format: :html
 

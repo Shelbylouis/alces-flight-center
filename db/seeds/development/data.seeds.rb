@@ -176,3 +176,19 @@ main_cluster.cases.create!(
   user: second_user,
   details: 'More support please'
 )
+
+main_cluster.component_groups.create!(
+  name: 'Appliances',
+  component_type: ComponentType.find_by_name('Virtual server')
+).tap do |group|
+  group.components.create!(
+    name: 'Alces Controller Appliance',
+    internal: true
+  )
+
+  group.components.create!(
+    name: 'Crazy Site Appliance',
+    internal: false,
+    support_type: 'advice'
+  )
+end

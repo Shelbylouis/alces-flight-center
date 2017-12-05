@@ -39,6 +39,7 @@ FactoryBot.define do
 
   factory :component_type do
     name 'server'
+    ordering 5
   end
 
   factory :component_group do

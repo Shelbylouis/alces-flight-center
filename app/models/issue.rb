@@ -15,16 +15,21 @@ class Issue < ApplicationRecord
     end
   end
 
-  # We need to be able to find and use certain Issues in custom ways; the
-  # concept of optional, unique identifiers (including the following) allows us
-  # to do this, while still allowing all Issues to be treated as user-editable
-  # data.
-  IDENTIFIERS = [
+  IDENTIFIER_NAMES = [
     :request_component_becomes_advice,
     :request_component_becomes_managed,
     :request_service_becomes_advice,
     :request_service_becomes_managed,
-  ].map do |identifier|
+    :cluster_consultancy,
+    :component_consultancy,
+    :service_consultancy,
+  ]
+
+  # We need to be able to find and use certain Issues in custom ways; the
+  # concept of optional, unique identifiers (including the following) allows us
+  # to do this, while still allowing all Issues to be treated as user-editable
+  # data.
+  IDENTIFIERS = IDENTIFIER_NAMES.map do |identifier|
     define_finder_method(identifier)
     [identifier, identifier.to_s]
   end.to_h.to_struct
@@ -52,6 +57,10 @@ class Issue < ApplicationRecord
   # selecting support type.
   def support_type_enum
     SUPPORT_TYPES
+  end
+
+  def special?
+    IDENTIFIER_NAMES.include?(identifier&.to_sym)
   end
 
   def case_form_json

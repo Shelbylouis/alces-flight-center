@@ -11,7 +11,7 @@
       <li class="nav-item">
         <%= cluster.start_maintenance_request_link %>
       </li>
-      <%= render 'cases/new_support_case_button', cluster: cluster %>
+      <%= cluster.case_form_buttons %>
     </ul>
   </div>
 
@@ -111,7 +111,7 @@
       <tr>
         <td width='40%'>
           <%= link_to service.name, service_path(service) %>
-          <%= service.maintenance_icons %>
+          <%= service.cluster_part_icons %>
         </td>
         <td width='30%'><%= service.readable_support_type.capitalize %></td>
         <td width='10%'>
@@ -160,7 +160,7 @@
               <tr>
                 <td width='40%'>
                   <%= link_to component.name, component_path(component) %>
-                  <%= component.maintenance_icons %>
+                  <%= component.cluster_part_icons %>
                 </td>
                 <td width='30%'>
                   <%= component.readable_support_type.capitalize %>

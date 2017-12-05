@@ -58,6 +58,12 @@ RSpec.describe ServiceDecorator do
           })
       end
     end
+
+    it 'gives nothing for internal Service' do
+      service = create(:service, internal: true).decorate
+
+      expect(service.change_support_type_button).to be nil
+    end
   end
 
   describe '#links' do
@@ -76,6 +82,24 @@ RSpec.describe ServiceDecorator do
         subject.links
       ).to include(
         h.link_to(subject.cluster.name, h.cluster_path(subject.cluster))
+      )
+    end
+  end
+
+  describe '#case_form_buttons' do
+    subject { create(:service).decorate }
+
+    include_examples 'case_form_buttons', 'service'
+
+    it 'includes link to Service Case form' do
+      expect(subject.case_form_buttons).to include(
+        h.new_service_case_path(service_id: subject.id)
+      )
+    end
+
+    it 'includes link to Service consultancy form' do
+      expect(subject.case_form_buttons).to include(
+        h.new_service_consultancy_path(service_id: subject.id)
       )
     end
   end

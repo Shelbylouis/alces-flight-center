@@ -86,4 +86,19 @@ RSpec.describe Site, type: :model do
       expect(subject).to eq([secondary_contact, another_secondary_contact])
     end
   end
+
+  describe '#managed_clusters' do
+    it 'gives all managed Clusters for Site' do
+      site = create(:site)
+      create(:managed_cluster, site: site, name: 'First managed')
+      create(:advice_cluster, site: site, name: 'Advice')
+      create(:managed_cluster, site: site, name: 'Second managed')
+
+      managed_cluster_names = site.managed_clusters.map(&:name)
+
+      expect(managed_cluster_names).to eq(
+        ['First managed', 'Second managed']
+      )
+    end
+  end
 end

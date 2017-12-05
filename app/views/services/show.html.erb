@@ -7,14 +7,14 @@
           Overview
         </span>
       </li>
-      <%= render 'cases/new_support_case_button', service: service %>
+      <%= service.case_form_buttons %>
     </ul>
   </div>
 
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
       <%= service.readable_support_type.capitalize %> service
-      <%= service.maintenance_icons %>
+      <%= service.cluster_part_icons %>
     </li>
     <% if service.description.present? %>
       <li class="list-group-item">

@@ -7,14 +7,14 @@
           Overview
         </span>
       </li>
-      <%= render 'cases/new_support_case_button', component: component %>
+      <%= component.case_form_buttons %>
     </ul>
   </div>
 
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
       <%= component.readable_support_type.capitalize %> component
-      <%= component.maintenance_icons %>
+      <%= component.cluster_part_icons %>
     </li>
   </ul>
 </div>

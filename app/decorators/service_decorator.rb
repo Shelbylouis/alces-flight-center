@@ -1,6 +1,5 @@
-class ServiceDecorator < ApplicationDecorator
-  delegate_all
-  decorates_association :cluster
+class ServiceDecorator < ClusterPartDecorator
+  alias :case_form_buttons :cluster_part_case_form_buttons
 
   def change_support_type_button
     render_change_support_type_button(
@@ -12,11 +11,5 @@ class ServiceDecorator < ApplicationDecorator
 
   def path
     h.service_path(self)
-  end
-
-  def links
-    # XXX identical to `ComponentDecorator#links` .
-    self_link = h.link_to name, path
-    h.raw("#{self_link} (#{cluster.links})")
   end
 end

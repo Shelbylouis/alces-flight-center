@@ -5,4 +5,5 @@ class ComponentType < ApplicationRecord
   has_and_belongs_to_many :asset_record_field_definitions
 
   validates :name, presence: true
+  validates :ordering, presence: true
 end

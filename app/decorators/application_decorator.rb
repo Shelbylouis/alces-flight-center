@@ -1,3 +1,7 @@
+
+# XXX Nothing in here is applicable to every decorated model in the app, it's
+# just a bit of a dumping ground. At some point should pull things out to
+# better places.
 class ApplicationDecorator < Draper::Decorator
   # Define methods for all decorated objects.
   # Helpers are accessed through `helpers` (aka `h`). For example:
@@ -17,12 +21,39 @@ class ApplicationDecorator < Draper::Decorator
     )
   end
 
-  def maintenance_icons
-    icons = maintenance_windows.map { |window| maintenance_icon(window) }
+  # Strictly speaking this gives the icons for a ClusterPart or entire Cluster,
+  # but I don't have a better name for that yet.
+  def cluster_part_icons
+    icons = [internal_icon, *maintenance_icons]
     h.raw(icons.join)
   end
 
+  # As above: strictly speaking this gives the buttons for a ClusterPart or
+  # entire Cluster, but I don't have a better name for that yet.
+  def cluster_part_case_form_buttons
+    buttons = [
+      case_form_button(case_form_path, disabled: advice?),
+      consultancy_form_button(consultancy_form_path)
+    ].join
+    h.raw(buttons)
+  end
+
   private
+
+  def internal_icon
+    internal_text = "#{readable_model_name.capitalize} for internal Alces usage"
+    if respond_to?(:internal) && internal
+      h.image_tag(
+        'flight-icon',
+        alt: internal_text,
+        title: internal_text,
+      )
+    end
+  end
+
+  def maintenance_icons
+    maintenance_windows.map { |window| maintenance_icon(window) }
+  end
 
   def maintenance_icon(window)
     return if window.ended?
@@ -45,50 +76,43 @@ class ApplicationDecorator < Draper::Decorator
     h.send(link_helper, self)
   end
 
-  def render_change_support_type_button(
-    request_advice_issue:,
-    request_managed_issue:,
-    part_id_symbol:
-  )
-    # Do nothing if both `support_type` change Issues not passed.
-    return unless request_advice_issue && request_managed_issue
-
-    params = if managed?
-               {
-                 change_description: 'self-management',
-                 button_class: 'btn-danger',
-                 issue: request_advice_issue,
-               }
-             elsif advice?
-               {
-                 change_description: 'Alces management',
-                 button_class: 'btn-success',
-                 issue: request_managed_issue,
-               }
-             end.merge(part_id_symbol: part_id_symbol)
-    change_support_type_button_with(**params)
+  def case_form_path
+    helper = "new_#{readable_model_name}_case_path"
+    h.send(helper, id_key => self.id)
   end
 
-  def change_support_type_button_with(
-    change_description:,
-    button_class:,
-    issue:,
-    part_id_symbol:
-  )
-    h.button_to "Request #{change_description}",
-      h.cases_path,
-      class: "btn #{button_class} support-type-button",
-      title: issue.name,
-      params: {
-        case: {
-          cluster_id: cluster.id,
-          part_id_symbol => id,
-          issue_id: issue.id,
-          details: 'User-requested from management dashboard'
-        }
-      },
-      data: {
-        confirm: "Are you sure you want to request #{change_description} of #{name}?"
-      }
+  def consultancy_form_path
+    helper = "new_#{readable_model_name}_consultancy_path"
+    h.send(helper, id_key => self.id)
+  end
+
+  def id_key
+    "#{readable_model_name}_id".to_sym
+  end
+
+  def case_form_button(path, disabled: false)
+    title = <<~EOF.squish if disabled
+      This #{readable_model_name} is self-managed; if required you
+      may only request consultancy support from Alces Software.
+    EOF
+
+    card_header_button_link 'Create new support case',
+      path,
+      disabled: disabled,
+      title: title
+  end
+
+  def consultancy_form_button(path)
+    card_header_button_link 'Request consultancy', path
+  end
+
+  def card_header_button_link(text, path, disabled: false, title: nil)
+    link = h.link_to text,
+      path,
+      class: ['nav-link', 'btn', 'btn-dark', disabled ? 'disabled' : nil],
+      role: 'button',
+      title: title
+
+    h.raw("<li class=\"nav-item\" title=\"#{title}\">#{link}</li>")
   end
 end

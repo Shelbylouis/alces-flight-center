@@ -11,6 +11,50 @@ RSpec.describe Case, type: :model do
     end
   end
 
+  describe 'Cluster assignment on Case creation' do
+    it 'assigns Cluster appropriately when only associated with Component' do
+      component = create(:component)
+
+      support_case = create(
+        :case,
+        component: component,
+        issue: create(:issue_requiring_component),
+        cluster: nil
+      )
+
+      expect(support_case.cluster).to eq(component.cluster)
+    end
+
+    it 'assigns Cluster appropriately when only associated with Service' do
+      service = create(:service)
+
+      support_case = create(
+        :case,
+        service: service,
+        issue: create(:issue_requiring_service),
+        cluster: nil
+      )
+
+
+      expect(support_case.cluster).to eq(service.cluster)
+    end
+
+    it 'does not change Cluster if already present' do
+      cluster = create(:cluster)
+
+      # Don't use create otherwise test will fail as validation will fail.
+      support_case = build(
+        :case,
+        service: create(:service),
+        issue: create(:issue_requiring_service),
+        cluster: cluster
+      )
+      support_case.save
+
+      expect(support_case.cluster).to eq cluster
+    end
+  end
+
   describe 'RT ticket creation on Case creation' do
     subject do
       build(
