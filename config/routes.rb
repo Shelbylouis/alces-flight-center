@@ -88,4 +88,10 @@ Rails.application.routes.draw do
     root 'clearance/sessions#new', as: 'sign_in'
     post '/' => 'clearance/sessions#create', as: 'session'
   end
+
+  # Routes defined here are only defined/used in certain tests which need
+  # access to special routes/controllers.
+  if Rails.env.test?
+    resource :request_test, only: :show
+  end
 end

@@ -33,6 +33,7 @@ gem 'webpacker', '~> 3.0'
 gem 'draper'
 gem 'rails-data-migrations'
 gem 'font-awesome-rails'
+gem 'request_store'
 
 gem 'bootstrap', '~> 4.0.0.beta'
 gem 'jquery-rails' # Required for Bootstrap.

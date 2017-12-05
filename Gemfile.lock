@@ -379,6 +379,7 @@ DEPENDENCIES
   rails-data-migrations
   rails_admin (~> 1.2)
   rails_email_preview (~> 2.0.4)
+  request_store
   rspec-rails
   rubocop
   sass-rails (~> 5.0)
@@ -399,4 +400,4 @@ RUBY VERSION
    ruby 2.4.1p111
 
 BUNDLED WITH
-   1.15.3
+   1.16.0
