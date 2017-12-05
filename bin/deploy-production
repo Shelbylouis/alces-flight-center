@@ -19,9 +19,9 @@ main() {
 
   today="$(date +'%Y-%m-%d')"
 
-  git tag production -f
-  git tag "$today"
-  git push --tags -f
+  git tag production master -f
+  git tag "$today" master
+  git push --tags -f origin master
 
   echo; echo
   echo "Don't forget to rename the 'Done' Trello list to '$today'!"
