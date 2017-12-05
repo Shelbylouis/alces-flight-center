@@ -3,6 +3,8 @@ class SiteDecorator < ApplicationDecorator
   decorates_association :clusters
 
   def case_form_buttons
+    return unless managed_clusters.present?
+
     path = if h.current_user.admin?
              h.new_site_case_path(self)
            else

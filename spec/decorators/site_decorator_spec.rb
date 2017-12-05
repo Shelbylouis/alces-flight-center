@@ -7,25 +7,36 @@ RSpec.describe SiteDecorator do
     end
 
     subject { create(:site, users: [contact]).decorate }
+    let :user { create(:user) }
     let :contact { create(:contact) }
 
-    context 'when contact' do
-      let :user { contact }
-
-      it 'includes link to top level Case form' do
-        expect(subject.case_form_buttons).to include(
-          h.new_case_path
-        )
-      end
+    it 'gives nothing when Site has no managed Clusters' do
+      expect(subject.case_form_buttons).to be nil
     end
 
-    context 'when admin' do
-      let :user { create(:admin) }
+    context 'when Site has managed Clusters' do
+      before :each do
+        create(:managed_cluster, site: subject)
+      end
 
-      it 'includes link to Site Case form' do
-        expect(subject.case_form_buttons).to include(
-          h.new_site_case_path(subject)
-        )
+      context 'when contact' do
+        let :user { contact }
+
+        it 'includes link to top level Case form' do
+          expect(subject.case_form_buttons).to include(
+            h.new_case_path
+          )
+        end
+      end
+
+      context 'when admin' do
+        let :user { create(:admin) }
+
+        it 'includes link to Site Case form' do
+          expect(subject.case_form_buttons).to include(
+            h.new_site_case_path(subject)
+          )
+        end
       end
     end
   end
