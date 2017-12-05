@@ -1,3 +1,7 @@
+
+# XXX Nothing in here is applicable to every decorated model in the app, it's
+# just a bit of a dumping ground. At some point should pull things out to
+# better places.
 class ApplicationDecorator < Draper::Decorator
   # Define methods for all decorated objects.
   # Helpers are accessed through `helpers` (aka `h`). For example:
@@ -22,6 +26,16 @@ class ApplicationDecorator < Draper::Decorator
   def cluster_part_icons
     icons = [internal_icon, *maintenance_icons]
     h.raw(icons.join)
+  end
+
+  # As above: strictly speaking this gives the buttons for a ClusterPart or
+  # entire Cluster, but I don't have a better name for that yet.
+  def cluster_part_case_form_buttons
+    buttons = [
+      case_form_button(case_form_path, disabled: advice?),
+      consultancy_form_button(consultancy_form_path)
+    ].join
+    h.raw(buttons)
   end
 
   private
@@ -60,5 +74,45 @@ class ApplicationDecorator < Draper::Decorator
   def new_maintenance_window_path
     link_helper = "new_#{readable_model_name}_maintenance_window_path"
     h.send(link_helper, self)
+  end
+
+  def case_form_path
+    helper = "new_#{readable_model_name}_case_path"
+    h.send(helper, id_key => self.id)
+  end
+
+  def consultancy_form_path
+    helper = "new_#{readable_model_name}_consultancy_path"
+    h.send(helper, id_key => self.id)
+  end
+
+  def id_key
+    "#{readable_model_name}_id".to_sym
+  end
+
+  def case_form_button(path, disabled: false)
+    title = <<~EOF.squish if disabled
+      This #{readable_model_name} is self-managed; if required you
+      may only request consultancy support from Alces Software.
+    EOF
+
+    card_header_button_link 'Create new support case',
+      path,
+      disabled: disabled,
+      title: title
+  end
+
+  def consultancy_form_button(path)
+    card_header_button_link 'Request consultancy', path
+  end
+
+  def card_header_button_link(text, path, disabled: false, title: nil)
+    link = h.link_to text,
+      path,
+      class: ['nav-link', 'btn', 'btn-dark', disabled ? 'disabled' : nil],
+      role: 'button',
+      title: title
+
+    h.raw("<li class=\"nav-item\" title=\"#{title}\">#{link}</li>")
   end
 end

@@ -33,4 +33,8 @@ class Site < ApplicationRecord
   def additional_contacts_info
     additional_contacts.map(&:email).join(', ')
   end
+
+  def managed_clusters
+    clusters.select(&:managed?)
+  end
 end

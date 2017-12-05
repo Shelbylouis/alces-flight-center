@@ -11,7 +11,7 @@
       <li class="nav-item">
         <%= cluster.start_maintenance_request_link %>
       </li>
-      <%= render 'cases/new_support_case_button', cluster: cluster %>
+      <%= cluster.case_form_buttons %>
     </ul>
   </div>
 

@@ -9,7 +9,7 @@ class CaseCategory < ApplicationRecord
   validates :name, presence: true
 
   def case_form_json
-    return nil if issues.any?(&:toggle?)
+    return nil if issues.any?(&:special?)
     {
       id: id,
       name: name,

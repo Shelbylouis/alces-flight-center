@@ -13,13 +13,13 @@
       <% unless archive %>
         <li class="nav-item">
           <%= link_to 'View all',
-            current_user.admin? ? site_cases_path(@site) : cases_path,
+            current_user.admin? ? site_cases_path(site) : cases_path,
             class: ['nav-link', 'btn', 'btn-dark'],
             role: 'button'
           %>
         </li>
       <% end %>
-      <%= render 'cases/new_support_case_button' %>
+      <%= site.case_form_buttons %>
     </ul>
   </div>
 

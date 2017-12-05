@@ -35,9 +35,13 @@ RSpec.describe CaseCategory, type: :model do
       end
     end
 
-    it 'gives nothing when CaseCategory only contains toggle issues' do
+    # XXX Currently every CaseCategory which contains special Issues only
+    # contains these, so we can just remove these categories entirely; if this
+    # ever changes then we'll probably need to change this to handle filtering
+    # these out instead.
+    it 'gives nothing when CaseCategory contains any special issues' do
       category = create(:case_category).tap do |category|
-        category.issues = [create(:toggle_issue)]
+        category.issues = [create(:special_issue)]
       end
 
       expect(category.case_form_json).to be nil

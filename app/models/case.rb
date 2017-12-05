@@ -35,6 +35,10 @@ class Case < ApplicationRecord
 
   validates_with Validator
 
+  before_validation :assign_cluster_if_necessary
+
+  # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
+  # if this is possible but it was not explicitly passed.
   before_validation :create_rt_ticket, on: :create
 
   def self.request_tracker
@@ -101,6 +105,12 @@ class Case < ApplicationRecord
     )
 
     self.rt_ticket_id = ticket.id
+  end
+
+  def assign_cluster_if_necessary
+    return if cluster
+    self.cluster = component.cluster if component
+    self.cluster = service.cluster if service
   end
 
   def ticket_completed?
