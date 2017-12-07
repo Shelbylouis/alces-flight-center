@@ -71,7 +71,11 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     it 'can confirm an unconfirmed maintenance window' do
-      window = create(:unconfirmed_maintenance_window, component: component)
+      window = create(
+        :unconfirmed_maintenance_window,
+        component: component,
+        case: support_case
+      )
 
       expect(Case.request_tracker).to receive(
         :add_ticket_correspondence

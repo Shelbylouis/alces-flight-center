@@ -14,6 +14,8 @@ module ClusterPart
     validates :name, presence: true
     validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
     validates :internal, inclusion: {in: [true, false]}
+
+    delegate :site, to: :cluster
   end
 
   # Automatically picked up by rails_admin so only these options displayed when

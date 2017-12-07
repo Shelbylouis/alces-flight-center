@@ -1,11 +1,20 @@
+require 'exceptions'
+
 class ApplicationController < ActionController::Base
   include Clearance::Controller
   protect_from_forgery with: :exception
   decorates_assigned :site
 
+  before_action :assign_current_user
   before_action :define_navigation_variables
 
+  rescue_from ReadPermissionsError, with: :not_found
+
   private
+
+  def assign_current_user
+    RequestStore.store[:current_user] = current_user
+  end
 
   def current_site
     @site
