@@ -1,3 +1,5 @@
+require 'exceptions'
+
 class ApplicationController < ActionController::Base
   include Clearance::Controller
   protect_from_forgery with: :exception
@@ -5,6 +7,8 @@ class ApplicationController < ActionController::Base
 
   before_action :assign_current_user
   before_action :define_navigation_variables
+
+  rescue_from ReadPermissionsError, with: :not_found
 
   private
 
