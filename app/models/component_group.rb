@@ -3,6 +3,7 @@ class ComponentGroup < ApplicationRecord
   include AdminConfig::Shared::EditableAssetRecordFields
 
   belongs_to :cluster
+  has_one :site, through: :cluster
   belongs_to :component_type
   has_many :components, dependent: :destroy
   has_many :asset_record_fields

@@ -24,7 +24,7 @@ class Case < ApplicationRecord
   has_many :maintenance_windows
 
   delegate :case_category, :chargeable, to: :issue
-  delegate :site, to: :cluster
+  delegate :site, to: :cluster, allow_nil: true
 
   validates :details, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
