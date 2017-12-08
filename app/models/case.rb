@@ -52,8 +52,7 @@ class Case < ApplicationRecord
 
   def mailto_url
     support_email = 'support@alces-software.com'
-    subject = CGI.escape(rt_email_subject)
-    "mailto:#{support_email}?subject=#{subject}"
+    "mailto:#{support_email}?subject=#{rt_email_subject}"
   end
 
   def open

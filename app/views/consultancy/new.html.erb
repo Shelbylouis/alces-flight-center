@@ -1,4 +1,12 @@
 
+<% cluster = @case.cluster %>
+<% if cluster.charging_info %>
+  <div class="alert alert-warning">
+    <p><strong><%= cluster.name %> charging info</strong></p>
+    <p><%= cluster.charging_info %></p>
+  </div>
+<% end %>
+
 <%= form_for @case do |f| %>
   <%= f.hidden_field(:cluster_id) %>
   <%= f.hidden_field(:component_id) %>
@@ -17,14 +25,13 @@
       )
     %>
     <%= f.text_area :details,
-      required: true,
-      class: ['form-control'],
+      class: ['form-control', 'consultancy-details'],
       rows: 10
     %>
   </div>
 
   <%= f.submit(
-    class: ['btn', 'btn-dark', 'btn-block'],
+    class: ['btn', 'btn-dark', 'btn-block', 'consultancy-submit'],
     data: {
       confirm: <<~EOF
         Are you sure you would like to request consultancy from Alces Software?

@@ -184,9 +184,8 @@ RSpec.describe Case, type: :model do
         rt_ticket_id: rt_ticket_id
       )
 
-      expected_subject = CGI.escape(
+      expected_subject =
         'RE: [helpdesk.alces-software.com #12345] Alces Flight Center ticket: somecluster - New user request'
-      )
       expected_mailto_url = "mailto:support@alces-software.com?subject=#{expected_subject}"
       expect(support_case.mailto_url).to eq expected_mailto_url
     end
