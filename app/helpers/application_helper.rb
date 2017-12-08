@@ -9,13 +9,6 @@ module ApplicationHelper
     fa_icon name, class: classes, **args
   end
 
-  # Map function with given name over enumerable collection of objects, then
-  # turn result into JSON; useful when want to transform collection before
-  # turning into JSON.
-  def json_map(enumerable, to_json_function)
-    enumerable.map(&to_json_function).reject(&:nil?).to_json
-  end
-
   def new_case_form(clusters:, single_part: nil)
     clusters_json = json_map(clusters, :case_form_json)
     categories_json = json_map(CaseCategory.all, :case_form_json)
@@ -32,6 +25,14 @@ module ApplicationHelper
   end
 
   private
+
+  # Map function with given name over enumerable collection of objects, then
+  # turn result into JSON; useful when want to transform collection before
+  # turning into JSON.
+  def json_map(enumerable, to_json_function)
+    enumerable.map(&to_json_function).reject(&:nil?).to_json
+  end
+
 
   def single_part_data_attr(single_part)
     return unless single_part
