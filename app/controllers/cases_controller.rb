@@ -1,15 +1,17 @@
 class CasesController < ApplicationController
   before_action :require_login
 
+  decorates_assigned :site
+
   def index
-    @cases = current_site.cases
+    @site = current_site
     @title = if current_user.admin?
                'Manage support cases'
              else
                'Support case archive'
              end
 
-    @cases.map(&:update_ticket_status!) if current_user.admin?
+    current_site.cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
   def new
