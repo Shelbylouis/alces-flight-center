@@ -6,7 +6,7 @@
     <ul class="nav">
       <li class="nav-item">
         <span class="navbar-brand">
-          <%= archive ? 'All' : 'Open' %>
+          <%= (archive ? '' : 'Open ') + model.name %>
           support cases
         </span>
       </li>
