@@ -4,7 +4,23 @@
     <ul class="nav">
       <li class="nav-item">
         <span class="navbar-brand">
-          Overview
+          Create support case
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card-body">
+    <%= new_case_form(clusters: site.clusters) %>
+  </div>
+</div>
+
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          <%= site.name %> overview
         </span>
       </li>
     </ul>
