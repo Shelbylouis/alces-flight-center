@@ -13,13 +13,13 @@
       <% unless archive %>
         <li class="nav-item">
           <%= link_to 'View all',
-            current_user.admin? ? site_cases_path(site) : cases_path,
+            current_user.admin? ? site_cases_path(model) : cases_path,
             class: ['nav-link', 'btn', 'btn-dark'],
             role: 'button'
           %>
         </li>
       <% end %>
-      <%= site.case_form_buttons %>
+      <%= model.case_form_buttons %>
     </ul>
   </div>
 
@@ -45,7 +45,7 @@
     </thead>
 
     <tbody>
-    <% cases.order(created_at: :desc).decorate.each do |c| %>
+    <% model.cases.order(created_at: :desc).decorate.each do |c| %>
       <% if archive || c.open %>
         <% if c.archived && !manage_cases_page %>
           <tr
