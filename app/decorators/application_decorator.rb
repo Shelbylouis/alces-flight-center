@@ -98,18 +98,21 @@ class ApplicationDecorator < Draper::Decorator
 
     card_header_button_link 'Create new support case',
       path,
+      buttonClass: 'btn-dark',
       disabled: disabled,
       title: title
   end
 
   def consultancy_form_button(path)
-    card_header_button_link 'Request consultancy', path
+    card_header_button_link 'Request consultancy',
+      path,
+      buttonClass: 'btn-danger'
   end
 
-  def card_header_button_link(text, path, disabled: false, title: nil)
+  def card_header_button_link(text, path, buttonClass:, disabled: false, title: nil)
     link = h.link_to text,
       path,
-      class: ['nav-link', 'btn', 'btn-dark', disabled ? 'disabled' : nil],
+      class: ['nav-link', 'btn', buttonClass, disabled ? 'disabled' : nil],
       role: 'button',
       title: title
 
