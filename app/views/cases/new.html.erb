@@ -1,13 +1,2 @@
 
-<div
-  id='new-case-form'
-  data-clusters='<%= json_map(@clusters, :case_form_json) %>'
-  data-case-categories='<%= json_map(@case_categories, :case_form_json) %>'
-  <% if @single_part %>
-    data-single-part=<%= {
-      id: @single_part.id,
-      type: @single_part.class.to_s.downcase
-    }.to_json
-    %>
-  <% end %>
-></div>
+<%= new_case_form(clusters: @clusters, single_part: @single_part) %>

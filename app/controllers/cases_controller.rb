@@ -14,7 +14,6 @@ class CasesController < ApplicationController
 
   def new
     @title = "Create new support case"
-    @case_categories = CaseCategory.all
 
     cluster_id = params[:cluster_id]
     component_id = params[:component_id]
