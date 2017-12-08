@@ -25,14 +25,13 @@
       )
     %>
     <%= f.text_area :details,
-      required: true,
-      class: ['form-control'],
+      class: ['form-control', 'consultancy-details'],
       rows: 10
     %>
   </div>
 
   <%= f.submit(
-    class: ['btn', 'btn-dark', 'btn-block'],
+    class: ['btn', 'btn-dark', 'btn-block', 'consultancy-submit'],
     data: {
       confirm: <<~EOF
         Are you sure you would like to request consultancy from Alces Software?
