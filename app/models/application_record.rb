@@ -7,7 +7,7 @@ class ApplicationRecord < ActiveRecord::Base
   # is explicitly defined as global by adding it to this whitelist.
   GLOBAL_MODELS = [
     AssetRecordFieldDefinition,
-    CaseCategory,
+    Category,
     ComponentType,
     Issue,
     ServiceType,

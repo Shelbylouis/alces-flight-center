@@ -23,7 +23,7 @@ class Case < ApplicationRecord
   has_one :credit_charge, required: false
   has_many :maintenance_windows
 
-  delegate :case_category, :chargeable, to: :issue
+  delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true
 
   validates :details, presence: true
@@ -146,7 +146,7 @@ class Case < ApplicationRecord
   def rt_ticket_text
     properties = {
       Cluster: cluster.name,
-      'Case category': case_category.name,
+      Category: category&.name,
       'Issue': issue.name,
       'Associated component': component&.name,
       'Associated service': service&.name,

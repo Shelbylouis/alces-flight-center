@@ -2,6 +2,10 @@ class AdaptCaseCategoriesForControllingServiceTypes < ActiveRecord::DataMigratio
   WORKLOAD_SCHEDULER_MANAGEMENT = ServiceType.find_by_name!('Workload Scheduler Management')
 
   def up
+    # This data migration is obsolete with new changes to remove CaseCategorys,
+    # make Services top-level etc.
+    return
+
     alter_user_management_case_category
     add_queue_configuration_case_category
     replace_quota_management_case_category

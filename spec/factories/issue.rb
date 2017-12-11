@@ -1,7 +1,6 @@
 
 FactoryBot.define do
   factory :issue do
-    case_category
     name 'New user/group'
     requires_component false
     details_template 'Enter the usernames to create'

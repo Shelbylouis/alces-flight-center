@@ -1,6 +1,6 @@
 class AddClusterPartConsultancyIssues < ActiveRecord::DataMigration
   def up
-    category = CaseCategory.find_by_name('Consultancy')
+    category = Category.find_by_name('Consultancy')
 
     existing_issue = category.issues.first
     existing_issue.name = consultancy_issue_text('cluster')

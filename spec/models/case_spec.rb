@@ -98,14 +98,14 @@ RSpec.describe Case, type: :model do
         name: 'Crashed node',
         requires_component: requires_component,
         requires_service: requires_service,
-        case_category: case_category
+        category: category
       )
     end
 
     let :requires_component { true }
     let :requires_service { true }
 
-    let :case_category { create(:case_category, name: 'Hardware issue') }
+    let :category { create(:category, name: 'Hardware issue') }
     let :cluster { create(:cluster, site: site, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
     let :service { create(:service, name: 'Some service', cluster: cluster) }
@@ -124,7 +124,7 @@ RSpec.describe Case, type: :model do
         subject: 'Alces Flight Center ticket: somecluster - Crashed node',
         text: <<-EOF.strip_heredoc
           Cluster: somecluster
-          Case category: Hardware issue
+          Category: Hardware issue
           Issue: Crashed node
           Associated component: node01
           Associated service: Some service

@@ -34,7 +34,7 @@ class Issue < ApplicationRecord
     [identifier, identifier.to_s]
   end.to_h.to_struct
 
-  belongs_to :case_category
+  belongs_to :category, required: false
   belongs_to :service_type, required: false
 
   validates :name, presence: true

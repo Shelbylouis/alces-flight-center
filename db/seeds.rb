@@ -1,5 +1,5 @@
 
-CaseCategory.create!(name: 'User Management').tap do |user_management|
+Category.create!(name: 'User Management').tap do |user_management|
   user_management.issues.create!(
     name: 'Additional users/groups',
     support_type: 'managed',
@@ -11,7 +11,7 @@ CaseCategory.create!(name: 'User Management').tap do |user_management|
   )
 end
 
-CaseCategory.create!(name: 'Application Management').tap do |application_management|
+Category.create!(name: 'Application Management').tap do |application_management|
   application_management.issues.create!(
     name: 'From available Alces Gridware',
     support_type: 'managed',
@@ -40,7 +40,7 @@ CaseCategory.create!(name: 'Application Management').tap do |application_managem
   )
 end
 
-CaseCategory.create!(name: 'Quota/Fair Usage Management').tap do |quota_management|
+Category.create!(name: 'Quota/Fair Usage Management').tap do |quota_management|
   quota_management.issues.create!(
     name: 'Storage quota changes',
     support_type: 'managed',
@@ -57,7 +57,7 @@ CaseCategory.create!(name: 'Quota/Fair Usage Management').tap do |quota_manageme
   )
 end
 
-CaseCategory.create!(name: 'Suspected Hardware Issue').tap do |hardware|
+Category.create!(name: 'Suspected Hardware Issue').tap do |hardware|
   hardware.issues.create!(
     name: 'Hardware issue',
     support_type: 'managed',
@@ -69,7 +69,7 @@ CaseCategory.create!(name: 'Suspected Hardware Issue').tap do |hardware|
   )
 end
 
-CaseCategory.create!(name: 'Suspected Service Issue').tap do |service|
+Category.create!(name: 'Suspected Service Issue').tap do |service|
   service.issues.create!(
     name: 'Service issue',
     support_type: 'managed',
@@ -81,7 +81,7 @@ CaseCategory.create!(name: 'Suspected Service Issue').tap do |service|
   )
 end
 
-CaseCategory.create!(name: 'End User Assistance').tap do |end_user_assistance|
+Category.create!(name: 'End User Assistance').tap do |end_user_assistance|
   end_user_assistance.issues.create!(
     name: 'Problem jobs',
     support_type: 'managed',
@@ -124,7 +124,7 @@ CaseCategory.create!(name: 'End User Assistance').tap do |end_user_assistance|
   )
 end
 
-CaseCategory.create!(name: 'Change Component Status').tap do |change_status|
+Category.create!(name: 'Change Component Status').tap do |change_status|
   change_status.issues.create!(
     name: 'Request self-management of component',
     support_type: 'managed',
@@ -147,7 +147,7 @@ CaseCategory.create!(name: 'Change Component Status').tap do |change_status|
   )
 end
 
-CaseCategory.create!(name: 'Change Service Status').tap do |change_status|
+Category.create!(name: 'Change Service Status').tap do |change_status|
   change_status.issues.create!(
     name: 'Request self-management of service',
     support_type: 'managed',
@@ -169,7 +169,7 @@ CaseCategory.create!(name: 'Change Service Status').tap do |change_status|
   )
 end
 
-CaseCategory.create!(name: 'Consultancy').tap do |consultancy|
+Category.create!(name: 'Consultancy').tap do |consultancy|
   consultancy.issues.create!(
     name: 'Request custom consultancy',
     support_type: 'advice',

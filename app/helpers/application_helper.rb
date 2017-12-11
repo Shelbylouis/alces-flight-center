@@ -11,7 +11,7 @@ module ApplicationHelper
 
   def new_case_form(clusters:, single_part: nil)
     clusters_json = json_map(clusters, :case_form_json)
-    categories_json = json_map(CaseCategory.all, :case_form_json)
+    categories_json = json_map(Category.all, :case_form_json)
     raw(
       <<~EOF
         <div
