@@ -4,6 +4,7 @@ module SelectList.Extra
         , nameOrderedDecoder
         , nestedSelect
         , orderedDecoder
+        , updateNested
         )
 
 import Json.Decode as D
@@ -87,6 +88,33 @@ nestedSelect selectList getNested asNestedIn isSelectable =
                     if position == Selected then
                         getNested item
                             |> SelectList.select isSelectable
+                            |> asNestedIn item
+                    else
+                        item
+    in
+    SelectList.mapBy updateNested selectList
+
+
+{-|
+
+    As above but more general; apply an arbitrary `transform` to the nested
+    SelectList.
+
+-}
+updateNested :
+    SelectList a
+    -> (a -> SelectList b)
+    -> (a -> SelectList b -> a)
+    -> (SelectList b -> SelectList b)
+    -> SelectList a
+updateNested selectList getNested asNestedIn transform =
+    let
+        updateNested =
+            \position ->
+                \item ->
+                    if position == Selected then
+                        getNested item
+                            |> transform
                             |> asNestedIn item
                     else
                         item

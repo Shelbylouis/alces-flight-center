@@ -6,10 +6,12 @@ module Cluster
         , extractId
         , setSelectedComponent
         , setSelectedService
+        , setSelectedServiceSelectedIssue
         , setSelectedServiceWhere
         )
 
 import Component exposing (Component)
+import Issue
 import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
@@ -78,6 +80,24 @@ setSelectedServiceWhere clusters shouldSelect =
         .services
         asServicesIn
         shouldSelect
+
+
+setSelectedServiceSelectedIssue : SelectList Cluster -> Issue.Id -> SelectList Cluster
+setSelectedServiceSelectedIssue clusters issueId =
+    let
+        updateService =
+            \services ->
+                SelectList.Extra.nestedSelect
+                    services
+                    .issues
+                    Service.asIssuesIn
+                    (Issue.sameId issueId)
+    in
+    SelectList.Extra.updateNested
+        clusters
+        .services
+        asServicesIn
+        updateService
 
 
 asServicesIn : Cluster -> SelectList Service -> Cluster

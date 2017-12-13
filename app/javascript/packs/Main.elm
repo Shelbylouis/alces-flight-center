@@ -3,7 +3,6 @@ module Main exposing (..)
 import Bootstrap.Alert as Alert
 import Bootstrap.Button as Button
 import Bootstrap.Modal as Modal
-import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
 import Component exposing (Component)
 import FieldValidation exposing (FieldValidation(..))
@@ -19,7 +18,6 @@ import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
 import Service exposing (Service)
-import ServiceType exposing (ServiceType)
 import State exposing (State)
 import Utils
 import View.Fields as Fields
@@ -234,10 +232,9 @@ caseForm state =
         formElements =
             Maybe.Extra.values
                 [ maybeClustersField state.clusters
-                , caseCategoriesField state |> Just
+                , maybeServicesField state
                 , issuesField state |> Just
                 , maybeComponentsField state
-                , maybeServicesField state
                 , detailsField state |> Just
                 , submitButton state |> Just
                 ]
@@ -269,26 +266,11 @@ maybeClustersField clusters =
             )
 
 
-caseCategoriesField : State -> Html Msg
-caseCategoriesField state =
-    let
-        validateCaseCategory =
-            FieldValidation.validateWithEmptyError
-                (CaseCategory.availableForSelectedCluster state.clusters)
-    in
-    Fields.selectField "Case category"
-        state.caseCategories
-        CaseCategory.extractId
-        .name
-        validateCaseCategory
-        ChangeSelectedCaseCategory
-
-
 issuesField : State -> Html Msg
 issuesField state =
     let
-        selectedCaseCategoryIssues =
-            SelectList.selected state.caseCategories |> .issues
+        selectedServiceIssues =
+            State.selectedService state |> .issues
 
         validateIssue =
             FieldValidation.validateWithError
@@ -297,7 +279,7 @@ issuesField state =
                 (Issue.Utils.availableForSelectedCluster state.clusters)
     in
     Fields.selectField "Issue"
-        selectedCaseCategoryIssues
+        selectedServiceIssues
         Issue.extractId
         Issue.name
         validateIssue
@@ -326,33 +308,16 @@ maybeComponentsField state =
 maybeServicesField : State -> Maybe (Html Msg)
 maybeServicesField state =
     let
-        serviceHasType =
-            \serviceType ->
-                .serviceType >> Utils.sameId serviceType.id
-
-        servicePartName =
-            "service"
-
-        ( partName, config ) =
+        config =
             if state.singleService then
-                ( servicePartName, SinglePartField (State.selectedService state) )
+                SinglePartField (State.selectedService state)
             else
-                case State.selectedIssue state |> Issue.serviceRequired of
-                    ServiceType.None ->
-                        ( servicePartName, NotRequired )
-
-                    ServiceType.Any ->
-                        ( servicePartName, SelectionField .services )
-
-                    ServiceType.SpecificType serviceType ->
-                        ( serviceType.name
-                        , SubSetSelectionField .services (serviceHasType serviceType)
-                        )
+                SelectionField .services
     in
-    PartsField.maybePartsField partName
+    PartsField.maybePartsField "service"
         config
         Service.extractId
-        Issue.requiresService
+        (always True)
         state
         ChangeSelectedService
 
@@ -391,7 +356,6 @@ submitButton state =
 
 type Msg
     = ChangeSelectedCluster String
-    | ChangeSelectedCaseCategory String
     | ChangeSelectedIssue String
     | ChangeSelectedComponent String
     | ChangeSelectedService String
@@ -428,10 +392,6 @@ updateState msg state =
         ChangeSelectedCluster id ->
             stringToId Cluster.Id id
                 |> Maybe.map (handleChangeSelectedCluster state)
-
-        ChangeSelectedCaseCategory id ->
-            stringToId CaseCategory.Id id
-                |> Maybe.map (handleChangeSelectedCaseCategory state)
 
         ChangeSelectedIssue id ->
             stringToId Issue.Id id
@@ -499,46 +459,14 @@ handleChangeSelectedCluster state clusterId =
     )
 
 
-handleChangeSelectedCaseCategory : State -> CaseCategory.Id -> ( State, Cmd Msg )
-handleChangeSelectedCaseCategory state caseCategoryId =
-    let
-        newCaseCategories =
-            SelectList.select (Utils.sameId caseCategoryId) state.caseCategories
-    in
-    updateSelectedServiceForSelectedIssue
-        { state | caseCategories = newCaseCategories }
-        ! []
-
-
 handleChangeSelectedIssue : State -> Issue.Id -> ( State, Cmd Msg )
 handleChangeSelectedIssue state issueId =
-    let
-        newCaseCategories =
-            CaseCategory.setSelectedIssue state.caseCategories issueId
-    in
-    updateSelectedServiceForSelectedIssue
-        { state | caseCategories = newCaseCategories }
-        ! []
-
-
-updateSelectedServiceForSelectedIssue : State -> State
-updateSelectedServiceForSelectedIssue state =
-    let
-        serviceAllowedForSelectedIssue =
-            State.selectedIssue state |> Issue.Utils.serviceAllowedFor
-
-        selectedServiceAllowedForSelectedIssue =
-            State.selectedService state |> serviceAllowedForSelectedIssue
-
-        newClusters =
-            if selectedServiceAllowedForSelectedIssue then
-                state.clusters
-            else
-                Cluster.setSelectedServiceWhere
-                    state.clusters
-                    serviceAllowedForSelectedIssue
-    in
-    { state | clusters = newClusters }
+    ( { state
+        | clusters =
+            Cluster.setSelectedServiceSelectedIssue state.clusters issueId
+      }
+    , Cmd.none
+    )
 
 
 handleChangeSelectedComponent : State -> Component.Id -> ( State, Cmd Msg )
@@ -564,19 +492,32 @@ handleChangeSelectedService state serviceId =
 handleChangeDetails : State -> String -> State
 handleChangeDetails state details =
     let
-        newCaseCategories =
-            SelectList.mapBy updateSelectedCaseCategorySelectedIssue state.caseCategories
+        newClusters =
+            SelectList.mapBy updateSelectedClusterSelectedService state.clusters
 
-        updateSelectedCaseCategorySelectedIssue =
+        -- XXX Lots of duplication here - possible to DRY up here
+        -- and in other places we do similar nested updates?
+        updateSelectedClusterSelectedService =
             \position ->
-                \caseCategory ->
+                \cluster ->
                     if position == Selected then
-                        { caseCategory
-                            | issues =
-                                SelectList.mapBy updateSelectedIssueDetails caseCategory.issues
+                        { cluster
+                            | services =
+                                SelectList.mapBy updateSelectedServiceSelectedIssue cluster.services
                         }
                     else
-                        caseCategory
+                        cluster
+
+        updateSelectedServiceSelectedIssue =
+            \position ->
+                \service ->
+                    if position == Selected then
+                        { service
+                            | issues =
+                                SelectList.mapBy updateSelectedIssueDetails service.issues
+                        }
+                    else
+                        service
 
         updateSelectedIssueDetails =
             \position ->
@@ -586,7 +527,7 @@ handleChangeDetails state details =
                     else
                         issue
     in
-    { state | caseCategories = newCaseCategories }
+    { state | clusters = newClusters }
 
 
 submitForm : State -> Cmd Msg

@@ -11,7 +11,6 @@ module State
         )
 
 import Bootstrap.Modal as Modal
-import CaseCategory exposing (CaseCategory)
 import Cluster exposing (Cluster)
 import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
@@ -23,12 +22,10 @@ import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType(..))
-import Utils
 
 
 type alias State =
     { clusters : SelectList Cluster
-    , caseCategories : SelectList CaseCategory
     , error : Maybe String
     , singleComponent : Bool
     , singleService : Bool
@@ -42,14 +39,13 @@ decoder : D.Decoder State
 decoder =
     let
         createInitialState =
-            \( clusters, caseCategories, mode ) ->
+            \( clusters, mode ) ->
                 -- XXX Change state structure/how things are passed in to Elm
                 -- app to make invalid states in 'single component mode'
                 -- impossible?
                 let
                     initialState =
                         { clusters = clusters
-                        , caseCategories = caseCategories
                         , error = Nothing
                         , singleComponent = False
                         , singleService = False
@@ -59,28 +55,24 @@ decoder =
                         }
                 in
                 case mode of
-                    SingleComponentMode id ->
-                        let
-                            singleClusterWithSingleComponentSelected =
-                                Cluster.setSelectedComponent clusters id
-
-                            applicableCaseCategories =
-                                -- Only include CaseCategorys, and Issues
-                                -- within them, which require a Component.
-                                CaseCategory.filterByIssues caseCategories Issue.requiresComponent
-                        in
-                        case applicableCaseCategories of
-                            Just caseCategories ->
-                                D.succeed
-                                    { initialState
-                                        | clusters = singleClusterWithSingleComponentSelected
-                                        , caseCategories = caseCategories
-                                        , singleComponent = True
-                                    }
-
-                            Nothing ->
-                                D.fail "expected some Issues to exist requiring a Component, but none were found"
-
+                    -- SingleComponentMode id ->
+                    --     let
+                    --         singleClusterWithSingleComponentSelected =
+                    --             Cluster.setSelectedComponent clusters id
+                    --         applicableCaseCategories =
+                    --             -- Only include CaseCategorys, and Issues
+                    --             -- within them, which require a Component.
+                    --             CaseCategory.filterByIssues caseCategories Issue.requiresComponent
+                    --     in
+                    --     case applicableCaseCategories of
+                    --         Just caseCategories ->
+                    --             D.succeed
+                    --                 { initialState
+                    --                     | clusters = singleClusterWithSingleComponentSelected
+                    --                     , singleComponent = True
+                    --                 }
+                    --         Nothing ->
+                    --             D.fail "expected some Issues to exist requiring a Component, but none were found"
                     SingleServiceMode id ->
                         let
                             singleClusterWithSingleServiceSelected =
@@ -94,66 +86,24 @@ decoder =
 
                             singleService =
                                 selectedService partialNewState
-
-                            caseCategoriesControlledByService =
-                                -- Want to show CaseCategorys, and all Issues
-                                -- within them, which are controlled by the
-                                -- current Service.
-                                SelectList.toList caseCategories
-                                    |> List.filter (CaseCategory.isControlledByService singleService)
-
-                            otherCaseCategoriesWithIssuesTakingThisService =
-                                -- Also want to show other Issues, and parent
-                                -- CaseCategorys, which require a Service and
-                                -- this Service is acceptable for.
-                                CaseCategory.filterByIssues
-                                    caseCategories
-                                    (Issue.Utils.serviceCanBeAssociatedWith singleService)
-                                    |> Maybe.map
-                                        (SelectList.toList
-                                            -- Filter out the CaseCategorys
-                                            -- which will already be included
-                                            -- in the final list by
-                                            -- `caseCategoriesControlledByService`.
-                                            >> List.filter
-                                                (\caseCategory ->
-                                                    List.any
-                                                        (Utils.sameId caseCategory.id)
-                                                        caseCategoriesControlledByService
-                                                        |> not
-                                                )
-                                        )
-                                    |> Maybe.withDefault []
-
-                            availableCaseCategories =
-                                caseCategoriesControlledByService
-                                    ++ otherCaseCategoriesWithIssuesTakingThisService
-                                    |> SelectList.Extra.fromList
                         in
-                        case availableCaseCategories of
-                            Just caseCategories ->
-                                D.succeed
-                                    { partialNewState
-                                        | caseCategories = caseCategories
-                                    }
-
-                            Nothing ->
-                                D.fail "expected some Issues to exist requiring a Service, but none were found"
+                        D.succeed partialNewState
 
                     ClusterMode ->
                         D.succeed initialState
     in
-    D.map3
-        (\a -> \b -> \c -> ( a, b, c ))
+    D.map2
+        (,)
         (D.field "clusters" <| SelectList.Extra.nameOrderedDecoder Cluster.decoder)
-        (D.field "caseCategories" <| SelectList.Extra.nameOrderedDecoder CaseCategory.decoder)
         (D.field "singlePart" <| modeDecoder)
         |> D.andThen createInitialState
 
 
 type Mode
     = ClusterMode
-    | SingleComponentMode Component.Id
+      -- XXX re-enable handling of SingleComponentMode - will require filtering
+      -- Service issues by whether they require a Component.
+      -- | SingleComponentMode Component.Id
     | SingleServiceMode Service.Id
 
 
@@ -181,9 +131,8 @@ modeDecoder =
 singlePartModeDecoder : SinglePartModeFields -> D.Decoder Mode
 singlePartModeDecoder fields =
     case fields.type_ of
-        "component" ->
-            Component.Id fields.id |> SingleComponentMode |> D.succeed
-
+        -- "component" ->
+        --     Component.Id fields.id |> SingleComponentMode |> D.succeed
         "service" ->
             Service.Id fields.id |> SingleServiceMode |> D.succeed
 
@@ -236,7 +185,7 @@ encoder state =
 
 selectedIssue : State -> Issue
 selectedIssue state =
-    SelectList.selected state.caseCategories
+    selectedService state
         |> .issues
         |> SelectList.selected
 
