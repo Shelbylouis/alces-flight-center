@@ -2,7 +2,6 @@ module Issue
     exposing
         ( Id(..)
         , Issue
-        , availableForSelectedCluster
         , decoder
         , details
         , detailsValid
@@ -12,17 +11,13 @@ module Issue
         , requiresComponent
         , requiresService
         , sameId
-        , serviceAllowedFor
-        , serviceCanBeAssociatedWith
         , serviceRequired
         , setDetails
         , supportType
         )
 
-import Cluster exposing (Cluster)
 import Json.Decode as D
 import SelectList exposing (SelectList)
-import Service exposing (Service)
 import ServiceType exposing (ServiceType)
 import SupportType exposing (SupportType(..))
 import Utils
@@ -92,21 +87,6 @@ detailsValid issue =
     details issue |> String.isEmpty |> not
 
 
-availableForSelectedCluster : SelectList Cluster -> Issue -> Bool
-availableForSelectedCluster clusters issue =
-    let
-        issueIsManaged =
-            data issue |> SupportType.isManaged
-
-        clusterIsAdvice =
-            SelectList.selected clusters
-                |> SupportType.isAdvice
-    in
-    -- An Issue is available so long as it is not a managed issue while an
-    -- advice-only Cluster is selected.
-    not (issueIsManaged && clusterIsAdvice)
-
-
 extractId : Issue -> Int
 extractId issue =
     case data issue |> .id of
@@ -154,43 +134,6 @@ serviceRequired issue =
 
         StandardIssue _ ->
             ServiceType.None
-
-
-{-|
-
-    Whether given Service can be selected along with given Issue. Returns True
-    either when this Service can be associated with this Issue, or Issue does
-    not require a Service (so it doesn't matter which is selected).
-
--}
-serviceAllowedFor : Issue -> Service -> Bool
-serviceAllowedFor issue service =
-    if serviceRequired issue == ServiceType.None then
-        True
-    else
-        serviceCanBeAssociatedWith service issue
-
-
-{-|
-
-    Whether given Service can be associated with given Issue. Returns True iff
-    Issue requires Service and Service is correct type.
-
--}
-serviceCanBeAssociatedWith : Service -> Issue -> Bool
-serviceCanBeAssociatedWith service issue =
-    case serviceRequired issue of
-        ServiceType.None ->
-            -- Issue does not require a Service.
-            False
-
-        ServiceType.SpecificType serviceType ->
-            -- Service is allowed iff has ServiceType that Issue requires.
-            Utils.sameId serviceType.id service.serviceType
-
-        ServiceType.Any ->
-            -- Issue takes any Service.
-            True
 
 
 name : Issue -> String

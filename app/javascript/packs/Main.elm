@@ -12,6 +12,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onSubmit)
 import Http
 import Issue exposing (Issue)
+import Issue.Utils
 import Json.Decode as D
 import Maybe.Extra
 import Navigation
@@ -293,7 +294,7 @@ issuesField state =
             FieldValidation.validateWithError
                 """This cluster is self-managed; you may only request
                 consultancy support from Alces Software."""
-                (Issue.availableForSelectedCluster state.clusters)
+                (Issue.Utils.availableForSelectedCluster state.clusters)
     in
     Fields.selectField "Issue"
         selectedCaseCategoryIssues
@@ -524,7 +525,7 @@ updateSelectedServiceForSelectedIssue : State -> State
 updateSelectedServiceForSelectedIssue state =
     let
         serviceAllowedForSelectedIssue =
-            State.selectedIssue state |> Issue.serviceAllowedFor
+            State.selectedIssue state |> Issue.Utils.serviceAllowedFor
 
         selectedServiceAllowedForSelectedIssue =
             State.selectedService state |> serviceAllowedForSelectedIssue

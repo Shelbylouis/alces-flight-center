@@ -16,6 +16,7 @@ import Cluster exposing (Cluster)
 import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
 import Issue exposing (Issue)
+import Issue.Utils
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
@@ -107,7 +108,7 @@ decoder =
                                 -- this Service is acceptable for.
                                 CaseCategory.filterByIssues
                                     caseCategories
-                                    (Issue.serviceCanBeAssociatedWith singleService)
+                                    (Issue.Utils.serviceCanBeAssociatedWith singleService)
                                     |> Maybe.map
                                         (SelectList.toList
                                             -- Filter out the CaseCategorys
@@ -296,8 +297,8 @@ isInvalid state =
     in
     List.any not
         [ Issue.detailsValid issue
-        , Issue.availableForSelectedCluster state.clusters issue
+        , Issue.Utils.availableForSelectedCluster state.clusters issue
         , partAllowedForSelectedIssue Issue.requiresComponent component
         , partAllowedForSelectedIssue Issue.requiresService service
-        , Issue.serviceAllowedFor issue service
+        , Issue.Utils.serviceAllowedFor issue service
         ]

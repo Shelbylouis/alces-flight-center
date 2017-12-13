@@ -12,6 +12,7 @@ module CaseCategory
 
 import Cluster exposing (Cluster)
 import Issue exposing (Issue)
+import Issue.Utils
 import Json.Decode as D
 import Maybe.Extra
 import SelectList exposing (SelectList)
@@ -48,7 +49,7 @@ availableForSelectedCluster clusters caseCategory =
     -- available for the selected Cluster, otherwise there is no point allowing
     -- selection of the CaseCategory.
     SelectList.toList caseCategory.issues
-        |> List.any (Issue.availableForSelectedCluster clusters)
+        |> List.any (Issue.Utils.availableForSelectedCluster clusters)
 
 
 filterByIssues : SelectList CaseCategory -> (Issue -> Bool) -> Maybe (SelectList CaseCategory)
