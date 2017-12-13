@@ -11,12 +11,11 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe 'Cluster assignment on Case creation' do
+  describe 'Cluster assignment on Case initialize' do
     it 'assigns Cluster appropriately when only associated with Component' do
       component = create(:component)
 
-      support_case = create(
-        :case,
+      support_case = Case.new(
         component: component,
         issue: create(:issue_requiring_component),
         cluster: nil
@@ -28,8 +27,7 @@ RSpec.describe Case, type: :model do
     it 'assigns Cluster appropriately when only associated with Service' do
       service = create(:service)
 
-      support_case = create(
-        :case,
+      support_case = Case.new(
         service: service,
         issue: create(:issue_requiring_service),
         cluster: nil

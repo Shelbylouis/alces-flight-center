@@ -35,7 +35,7 @@ class Case < ApplicationRecord
 
   validates_with Validator
 
-  before_validation :assign_cluster_if_necessary
+  after_initialize :assign_cluster_if_necessary
 
   # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
   # if this is possible but it was not explicitly passed.
