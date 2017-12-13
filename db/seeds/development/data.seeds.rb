@@ -139,7 +139,7 @@ Rake::Task['data:migrate'].invoke
 # This seed data depends on the data migrations changes above...
 
 chargeable_issue = Issue.where(chargeable: true).first
-non_chargeable_issue = Issue.where(chargeable: false).first
+non_chargeable_issue = Issue.where(chargeable: false, service_type: nil).first
 
 main_cluster.cases.create!(
   issue: chargeable_issue,
