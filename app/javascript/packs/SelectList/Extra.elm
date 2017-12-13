@@ -81,18 +81,11 @@ nestedSelect :
     -> (b -> Bool)
     -> SelectList a
 nestedSelect selectList getNested asNestedIn isSelectable =
-    let
-        updateNested =
-            \position ->
-                \item ->
-                    if position == Selected then
-                        getNested item
-                            |> SelectList.select isSelectable
-                            |> asNestedIn item
-                    else
-                        item
-    in
-    SelectList.mapBy updateNested selectList
+    updateNested
+        selectList
+        getNested
+        asNestedIn
+        (SelectList.select isSelectable)
 
 
 {-|
