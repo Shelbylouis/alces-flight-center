@@ -9,7 +9,7 @@ class Service < ApplicationRecord
   def case_form_json
     super.merge(
       serviceType: service_type.case_form_json,
-      issues: non_special_applicable_issues,
+      issues: non_special_applicable_issues.map(&:case_form_json),
     )
   end
 
