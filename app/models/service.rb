@@ -9,11 +9,15 @@ class Service < ApplicationRecord
   def case_form_json
     super.merge(
       serviceType: service_type.case_form_json,
-      issues: applicable_issues,
+      issues: non_special_applicable_issues,
     )
   end
 
   private
+
+  def non_special_applicable_issues
+    applicable_issues.reject(&:special?)
+  end
 
   def applicable_issues
     issues_requiring_any_service = Issue.where(

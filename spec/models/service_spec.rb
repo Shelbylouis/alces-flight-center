@@ -67,5 +67,11 @@ RSpec.describe Service, type: :model do
 
       expect(case_form_json_issue_names).to eq []
     end
+
+    it 'does not include special Issue which would otherwise be included' do
+      create(:special_issue, requires_service: true, name: 'my issue')
+
+      expect(case_form_json_issue_names).to eq []
+    end
   end
 end
