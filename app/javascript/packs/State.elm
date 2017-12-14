@@ -165,10 +165,9 @@ encoder state =
                 Component.extractId
 
         serviceIdValue =
-            partIdValue
-                Issue.requiresService
-                selectedService
-                Service.extractId
+            selectedService state
+                |> Service.extractId
+                |> E.int
     in
     E.object
         [ ( "case"
@@ -248,6 +247,11 @@ isInvalid state =
         [ Issue.detailsValid issue
         , Issue.Utils.availableForSelectedCluster state.clusters issue
         , partAllowedForSelectedIssue Issue.requiresComponent component
-        , partAllowedForSelectedIssue Issue.requiresService service
-        , Issue.Utils.serviceAllowedFor issue service
+
+        -- Every Issue which can be associated with a Case using this form now
+        -- requires a Service, and the Ruby encoding of the data used to
+        -- initialize this form combined with the State data model ensures only
+        -- a compatible Service and Issue can be selected, therefore we just
+        -- need to check the compatibilities of their support types here.
+        , partAllowedForSelectedIssue (always True) service
         ]

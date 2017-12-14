@@ -9,9 +9,7 @@ module Issue
         , isChargeable
         , name
         , requiresComponent
-        , requiresService
         , sameId
-        , serviceRequired
         , setDetails
         , supportType
         )
@@ -25,8 +23,6 @@ import Utils
 
 type Issue
     = ComponentRequiredIssue IssueData
-    | ServiceRequiredIssue IssueData
-    | SpecificServiceRequiredIssue ServiceType IssueData
     | StandardIssue IssueData
 
 
@@ -50,32 +46,23 @@ decoder =
             \id ->
                 \name ->
                     \requiresComponent ->
-                        \requiresService ->
-                            \detailsTemplate ->
-                                \supportType ->
-                                    \serviceType ->
-                                        \chargeable ->
-                                            let
-                                                data =
-                                                    IssueData id name detailsTemplate supportType chargeable
-                                            in
-                                            if requiresComponent then
-                                                ComponentRequiredIssue data
-                                            else if requiresService then
-                                                case serviceType of
-                                                    Just type_ ->
-                                                        SpecificServiceRequiredIssue type_ data
-
-                                                    Nothing ->
-                                                        ServiceRequiredIssue data
-                                            else
-                                                StandardIssue data
+                        \detailsTemplate ->
+                            \supportType ->
+                                \serviceType ->
+                                    \chargeable ->
+                                        let
+                                            data =
+                                                IssueData id name detailsTemplate supportType chargeable
+                                        in
+                                        if requiresComponent then
+                                            ComponentRequiredIssue data
+                                        else
+                                            StandardIssue data
     in
-    D.map8 createIssue
+    D.map7 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
-        (D.field "requiresService" D.bool)
         (D.field "detailsTemplate" D.string)
         (D.field "supportType" SupportType.decoder)
         (D.field "serviceType" (D.nullable ServiceType.decoder))
@@ -100,40 +87,8 @@ requiresComponent issue =
         ComponentRequiredIssue _ ->
             True
 
-        ServiceRequiredIssue _ ->
-            False
-
-        SpecificServiceRequiredIssue _ _ ->
-            False
-
         StandardIssue _ ->
             False
-
-
-requiresService : Issue -> Bool
-requiresService issue =
-    case serviceRequired issue of
-        ServiceType.None ->
-            False
-
-        _ ->
-            True
-
-
-serviceRequired : Issue -> ServiceType.ServiceRequired
-serviceRequired issue =
-    case issue of
-        ComponentRequiredIssue _ ->
-            ServiceType.None
-
-        ServiceRequiredIssue _ ->
-            ServiceType.Any
-
-        SpecificServiceRequiredIssue type_ _ ->
-            ServiceType.SpecificType type_
-
-        StandardIssue _ ->
-            ServiceType.None
 
 
 name : Issue -> String
@@ -159,12 +114,6 @@ setDetails issue details =
         ComponentRequiredIssue _ ->
             ComponentRequiredIssue newData
 
-        ServiceRequiredIssue _ ->
-            ServiceRequiredIssue newData
-
-        SpecificServiceRequiredIssue type_ _ ->
-            SpecificServiceRequiredIssue type_ newData
-
         StandardIssue _ ->
             StandardIssue newData
 
@@ -183,12 +132,6 @@ data : Issue -> IssueData
 data issue =
     case issue of
         ComponentRequiredIssue data ->
-            data
-
-        ServiceRequiredIssue data ->
-            data
-
-        SpecificServiceRequiredIssue _ data ->
             data
 
         StandardIssue data ->
