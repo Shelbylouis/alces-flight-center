@@ -8,6 +8,7 @@ module Cluster
         , setSelectedService
         , setSelectedServiceSelectedIssue
         , setSelectedServiceWhere
+        , setServices
         )
 
 import Component exposing (Component)
@@ -100,6 +101,11 @@ setSelectedServiceSelectedIssue clusters issueId =
         updateService
 
 
-asServicesIn : Cluster -> SelectList Service -> Cluster
-asServicesIn cluster services =
+setServices : SelectList Service -> Cluster -> Cluster
+setServices services cluster =
     { cluster | services = services }
+
+
+asServicesIn : Cluster -> SelectList Service -> Cluster
+asServicesIn =
+    flip setServices

@@ -2,6 +2,7 @@ module Service exposing (..)
 
 import Issue exposing (Issue)
 import Json.Decode as D
+import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import ServiceType exposing (ServiceType)
@@ -19,6 +20,22 @@ type alias Service =
 
 type Id
     = Id Int
+
+
+filterByIssues : (Issue -> Bool) -> SelectList Service -> Maybe (SelectList Service)
+filterByIssues condition services =
+    SelectList.map (withJustMatchingIssues condition) services
+        |> SelectList.toList
+        |> Maybe.Extra.values
+        |> SelectList.Extra.fromList
+
+
+withJustMatchingIssues : (Issue -> Bool) -> Service -> Maybe Service
+withJustMatchingIssues condition service =
+    SelectList.toList service.issues
+        |> List.filter condition
+        |> SelectList.Extra.fromList
+        |> Maybe.map (asIssuesIn service)
 
 
 asIssuesIn : Service -> SelectList Issue -> Service

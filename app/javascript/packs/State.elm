@@ -55,24 +55,37 @@ decoder =
                         }
                 in
                 case mode of
-                    -- SingleComponentMode id ->
-                    --     let
-                    --         singleClusterWithSingleComponentSelected =
-                    --             Cluster.setSelectedComponent clusters id
-                    --         applicableCaseCategories =
-                    --             -- Only include CaseCategorys, and Issues
-                    --             -- within them, which require a Component.
-                    --             CaseCategory.filterByIssues caseCategories Issue.requiresComponent
-                    --     in
-                    --     case applicableCaseCategories of
-                    --         Just caseCategories ->
-                    --             D.succeed
-                    --                 { initialState
-                    --                     | clusters = singleClusterWithSingleComponentSelected
-                    --                     , singleComponent = True
-                    --                 }
-                    --         Nothing ->
-                    --             D.fail "expected some Issues to exist requiring a Component, but none were found"
+                    SingleComponentMode id ->
+                        let
+                            singleClusterWithSingleComponentSelected =
+                                Cluster.setSelectedComponent clusters id
+
+                            applicableServices =
+                                -- Only include Services, and Issues within
+                                -- them, which require a Component.
+                                SelectList.selected singleClusterWithSingleComponentSelected
+                                    |> .services
+                                    |> Service.filterByIssues Issue.requiresComponent
+                        in
+                        case applicableServices of
+                            Just services ->
+                                let
+                                    newClusters =
+                                        -- Set just the applicable Services in
+                                        -- the single Cluster SelectList.
+                                        SelectList.selected singleClusterWithSingleComponentSelected
+                                            |> Cluster.setServices services
+                                            |> SelectList.singleton
+                                in
+                                D.succeed
+                                    { initialState
+                                        | clusters = newClusters
+                                        , singleComponent = True
+                                    }
+
+                            Nothing ->
+                                D.fail "expected some Issues to exist requiring a Component, but none were found"
+
                     SingleServiceMode id ->
                         let
                             singleClusterWithSingleServiceSelected =
@@ -101,9 +114,7 @@ decoder =
 
 type Mode
     = ClusterMode
-      -- XXX re-enable handling of SingleComponentMode - will require filtering
-      -- Service issues by whether they require a Component.
-      -- | SingleComponentMode Component.Id
+    | SingleComponentMode Component.Id
     | SingleServiceMode Service.Id
 
 
@@ -131,8 +142,9 @@ modeDecoder =
 singlePartModeDecoder : SinglePartModeFields -> D.Decoder Mode
 singlePartModeDecoder fields =
     case fields.type_ of
-        -- "component" ->
-        --     Component.Id fields.id |> SingleComponentMode |> D.succeed
+        "component" ->
+            Component.Id fields.id |> SingleComponentMode |> D.succeed
+
         "service" ->
             Service.Id fields.id |> SingleServiceMode |> D.succeed
 
