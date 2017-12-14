@@ -308,10 +308,20 @@ maybeServicesField : State -> Maybe (Html Msg)
 maybeServicesField state =
     let
         config =
-            if state.singleService then
+            if state.singleComponent && singleServiceApplicable then
+                -- No need to allow selection of a Service if we're in single
+                -- Component mode and there's only one Service with Issues
+                -- which require a Component.
+                NotRequired
+            else if state.singleService then
                 SinglePartField (State.selectedService state)
             else
                 SelectionField .services
+
+        singleServiceApplicable =
+            SelectList.toList state.clusters
+                |> List.length
+                |> (==) 1
     in
     PartsField.maybePartsField "service"
         config
