@@ -139,7 +139,8 @@ Rake::Task['data:migrate'].invoke
 # This seed data depends on the data migrations changes above...
 
 chargeable_issue = Issue.where(chargeable: true).first
-non_chargeable_issue = Issue.where(chargeable: false, service_type: nil).first
+non_chargeable_issue = Issue.find_by_name!('Application problems/bugs')
+main_cluster_hpc_environment = Service.find_by_name('HPC Environment')
 
 main_cluster.cases.create!(
   issue: chargeable_issue,
@@ -168,13 +169,15 @@ main_cluster.cases.create!(
 main_cluster.cases.create!(
   issue: non_chargeable_issue,
   user: second_user,
-  details: 'I need support please'
+  details: 'I need support please',
+  service: main_cluster_hpc_environment,
 )
 
 main_cluster.cases.create!(
   issue: non_chargeable_issue,
   user: second_user,
-  details: 'More support please'
+  details: 'More support please',
+  service: main_cluster_hpc_environment,
 )
 
 main_cluster.component_groups.create!(

@@ -42,13 +42,6 @@ end
 
 Category.create!(name: 'Quota/Fair Usage Management').tap do |quota_management|
   quota_management.issues.create!(
-    name: 'Storage quota changes',
-    support_type: 'managed',
-    details_template: <<-EOF.squish
-      Please give details of the storage quota changes you require.
-    EOF
-  )
-  quota_management.issues.create!(
     name: 'Scheduler changes',
     support_type: 'managed',
     details_template: <<-EOF.squish
@@ -177,6 +170,14 @@ Category.create!(name: 'Consultancy').tap do |consultancy|
       Please describe the specialist support you would like to request from
       Alces Software.
     EOF
+  )
+end
+
+Category.create!(name: 'Queue Configuration').tap do |category|
+  category.issues.create!(
+    name: 'Discuss alterations to queue configuration',
+    support_type: 'managed',
+    details_template: 'TODO Add details template'
   )
 end
 

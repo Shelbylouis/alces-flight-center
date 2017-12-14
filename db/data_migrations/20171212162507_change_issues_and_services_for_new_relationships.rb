@@ -14,19 +14,6 @@ class ChangeIssuesAndServicesForNewRelationships < ActiveRecord::DataMigration
       cluster.services.create!(name: hardware.name, service_type: hardware)
     end
 
-    # This Issue was added in a now otherwise obsolete data migration
-    # (db/data_migrations/20171109152749_adapt_case_categories_for_controlling_service_types.rb)
-    # so may not exist locally, though it should exist in production, so create
-    # it if it doesn't.
-    queue_config_issue = 'Discuss alterations to queue configuration'
-    unless Issue.find_by_name(queue_config_issue)
-      Issue.create!(
-        name: queue_config_issue,
-        support_type: 'managed',
-        details_template: 'TODO Add details template'
-      )
-    end
-
     # Set ServiceType each Issue should be associated with (or nil for any).
     issue_names_to_service_types = {
       'Hardware issue' => hardware,
