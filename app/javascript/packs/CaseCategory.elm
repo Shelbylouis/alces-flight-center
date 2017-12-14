@@ -2,7 +2,7 @@ module CaseCategory
     exposing
         ( CaseCategory
         , Id(..)
-        , availableForSelectedCluster
+          -- , availableForSelectedCluster
         , decoder
         , extractId
         , filterByIssues
@@ -12,7 +12,6 @@ module CaseCategory
 
 import Cluster exposing (Cluster)
 import Issue exposing (Issue)
-import Issue.Utils
 import Json.Decode as D
 import Maybe.Extra
 import SelectList exposing (SelectList)
@@ -43,13 +42,15 @@ decoder =
         (D.field "controllingServiceType" (D.nullable ServiceType.decoder))
 
 
-availableForSelectedCluster : SelectList Cluster -> CaseCategory -> Bool
-availableForSelectedCluster clusters caseCategory =
-    -- A CaseCategory should be available only if any Issue within it is
-    -- available for the selected Cluster, otherwise there is no point allowing
-    -- selection of the CaseCategory.
-    SelectList.toList caseCategory.issues
-        |> List.any (Issue.Utils.availableForSelectedCluster clusters)
+
+-- XXX disabled for now; may adapt and add back later when add back Categorys.
+-- availableForSelectedCluster : SelectList Cluster -> CaseCategory -> Bool
+-- availableForSelectedCluster clusters caseCategory =
+--     -- A CaseCategory should be available only if any Issue within it is
+--     -- available for the selected Cluster, otherwise there is no point allowing
+--     -- selection of the CaseCategory.
+--     SelectList.toList caseCategory.issues
+--         |> List.any (Issue.Utils.availableForSelectedCluster clusters)
 
 
 filterByIssues : SelectList CaseCategory -> (Issue -> Bool) -> Maybe (SelectList CaseCategory)

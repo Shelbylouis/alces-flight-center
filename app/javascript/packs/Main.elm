@@ -11,7 +11,6 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onSubmit)
 import Http
 import Issue exposing (Issue)
-import Issue.Utils
 import Json.Decode as D
 import Maybe.Extra
 import Navigation
@@ -276,7 +275,7 @@ issuesField state =
             FieldValidation.validateWithError
                 """This cluster is self-managed; you may only request
                 consultancy support from Alces Software."""
-                (Issue.Utils.availableForSelectedCluster state.clusters)
+                (State.issueAvailableForSelectedCluster state.clusters)
     in
     Fields.selectField "Issue"
         selectedServiceIssues

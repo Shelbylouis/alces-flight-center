@@ -5,6 +5,7 @@ module State
         , decoder
         , encoder
         , isInvalid
+        , issueAvailableForSelectedCluster
         , selectedComponent
         , selectedIssue
         , selectedService
@@ -15,7 +16,6 @@ import Cluster exposing (Cluster)
 import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
 import Issue exposing (Issue)
-import Issue.Utils
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
@@ -228,6 +228,21 @@ clusterPartAllowedForSelectedIssue state issueRequiresPart part =
         True
 
 
+issueAvailableForSelectedCluster : SelectList Cluster -> Issue -> Bool
+issueAvailableForSelectedCluster clusters issue =
+    let
+        issueIsManaged =
+            Issue.supportType issue == SupportType.Managed
+
+        clusterIsAdvice =
+            SelectList.selected clusters
+                |> SupportType.isAdvice
+    in
+    -- An Issue is available so long as it is not a managed issue while an
+    -- advice-only Cluster is selected.
+    not (issueIsManaged && clusterIsAdvice)
+
+
 isInvalid : State -> Bool
 isInvalid state =
     let
@@ -245,7 +260,7 @@ isInvalid state =
     in
     List.any not
         [ Issue.detailsValid issue
-        , Issue.Utils.availableForSelectedCluster state.clusters issue
+        , issueAvailableForSelectedCluster state.clusters issue
         , partAllowedForSelectedIssue Issue.requiresComponent component
 
         -- Every Issue which can be associated with a Case using this form now
