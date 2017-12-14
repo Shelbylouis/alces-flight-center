@@ -275,7 +275,7 @@ issuesField state =
             FieldValidation.validateWithError
                 """This cluster is self-managed; you may only request
                 consultancy support from Alces Software."""
-                (State.issueAvailableForSelectedCluster state.clusters)
+                (State.issueAvailableForSelectedCluster state)
     in
     Fields.selectField "Issue"
         selectedServiceIssues

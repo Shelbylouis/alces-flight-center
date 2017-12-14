@@ -228,14 +228,14 @@ clusterPartAllowedForSelectedIssue state issueRequiresPart part =
         True
 
 
-issueAvailableForSelectedCluster : SelectList Cluster -> Issue -> Bool
-issueAvailableForSelectedCluster clusters issue =
+issueAvailableForSelectedCluster : State -> Issue -> Bool
+issueAvailableForSelectedCluster state issue =
     let
         issueIsManaged =
             Issue.supportType issue == SupportType.Managed
 
         clusterIsAdvice =
-            SelectList.selected clusters
+            SelectList.selected state.clusters
                 |> SupportType.isAdvice
     in
     -- An Issue is available so long as it is not a managed issue while an
@@ -260,7 +260,7 @@ isInvalid state =
     in
     List.any not
         [ Issue.detailsValid issue
-        , issueAvailableForSelectedCluster state.clusters issue
+        , issueAvailableForSelectedCluster state issue
         , partAllowedForSelectedIssue Issue.requiresComponent component
 
         -- Every Issue which can be associated with a Case using this form now
