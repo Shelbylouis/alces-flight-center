@@ -130,6 +130,10 @@ RSpec.describe Service, type: :model do
         hash_including(
           name: 'Other',
           issues: [hash_including(name: 'uncategorised issue')],
+          # 'Other' category, which does not exist in database, should just be
+          # given an ID which will never otherwise be used so can decode and
+          # uniquely identify it in the Case form app.
+          id: -1
         ),
       ])
     end

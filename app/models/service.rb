@@ -31,7 +31,7 @@ class Service < ApplicationRecord
     applicable_issues
       .group_by(&:category)
       .transform_keys do |category|
-      category.nil? ? Category.new(name: 'Other') : category
+      category.nil? ? Category.new(name: 'Other', id: -1) : category
     end.map do |category, issues|
       category.case_form_json.merge(issues: issues.map(&:case_form_json))
     end.reject(&:nil?)
