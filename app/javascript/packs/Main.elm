@@ -235,6 +235,7 @@ caseForm state =
             Maybe.Extra.values
                 [ maybeClustersField state.clusters
                 , maybeServicesField state
+                , maybeCategoriesField state
                 , issuesField state |> Just
                 , maybeComponentsField state
                 , detailsField state |> Just
@@ -265,6 +266,22 @@ maybeClustersField clusters =
                 .name
                 (always Valid)
                 ChangeSelectedCluster
+            )
+
+
+maybeCategoriesField : State -> Maybe (Html Msg)
+maybeCategoriesField state =
+    State.selectedService state
+        |> .issues
+        |> Issues.categories
+        |> Maybe.map
+            (\categories_ ->
+                Fields.selectField "Category"
+                    categories_
+                    Category.extractId
+                    .name
+                    (always Valid)
+                    ChangeSelectedCategory
             )
 
 
@@ -368,6 +385,7 @@ submitButton state =
 
 type Msg
     = ChangeSelectedCluster String
+    | ChangeSelectedCategory String
     | ChangeSelectedIssue String
     | ChangeSelectedComponent String
     | ChangeSelectedService String
@@ -404,6 +422,10 @@ updateState msg state =
         ChangeSelectedCluster id ->
             stringToId Cluster.Id id
                 |> Maybe.map (handleChangeSelectedCluster state)
+
+        ChangeSelectedCategory id ->
+            stringToId Category.Id id
+                |> Maybe.map (handleChangeSelectedCategory state)
 
         ChangeSelectedIssue id ->
             stringToId Issue.Id id
@@ -467,6 +489,16 @@ handleChangeSelectedCluster state clusterId =
             SelectList.select (Utils.sameId clusterId) state.clusters
     in
     ( { state | clusters = newClusters }
+    , Cmd.none
+    )
+
+
+handleChangeSelectedCategory : State -> Category.Id -> ( State, Cmd Msg )
+handleChangeSelectedCategory state categoryId =
+    ( { state
+        | clusters =
+            Cluster.setSelectedServiceSelectedCategory state.clusters categoryId
+      }
     , Cmd.none
     )
 

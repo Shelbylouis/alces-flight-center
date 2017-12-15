@@ -64,3 +64,9 @@ setSelectedIssue : Issue.Id -> Service -> Service
 setSelectedIssue issueId service =
     Issues.selectIssue issueId service.issues
         |> asIssuesIn service
+
+
+setSelectedCategory : Category.Id -> Service -> Service
+setSelectedCategory categoryId service =
+    Issues.selectCategory categoryId service.issues
+        |> asIssuesIn service

@@ -2,9 +2,11 @@ module Issues
     exposing
         ( Issues
         , availableIssues
+        , categories
         , decoder
         , mapIssue
         , matchingIssues
+        , selectCategory
         , selectIssue
         , selectedIssue
         )
@@ -15,6 +17,7 @@ import Json.Decode as D
 import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
+import Utils
 
 
 type Issues
@@ -32,6 +35,16 @@ decoder =
             |> D.map CategorisedIssues
             |> D.field "categories"
         ]
+
+
+categories : Issues -> Maybe (SelectList Category)
+categories issues =
+    case issues of
+        CategorisedIssues categories ->
+            Just categories
+
+        JustIssues _ ->
+            Nothing
 
 
 mapIssue : (Issue -> Issue) -> Issues -> Issues
@@ -77,6 +90,17 @@ selectedIssue issues =
 
         JustIssues issues ->
             SelectList.selected issues
+
+
+selectCategory : Category.Id -> Issues -> Issues
+selectCategory categoryId issues =
+    case issues of
+        CategorisedIssues categories ->
+            SelectList.select (Utils.sameId categoryId) categories
+                |> CategorisedIssues
+
+        JustIssues issues ->
+            JustIssues issues
 
 
 availableIssues : Issues -> SelectList Issue
