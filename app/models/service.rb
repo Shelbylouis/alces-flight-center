@@ -19,16 +19,16 @@ class Service < ApplicationRecord
     if any_categorised_issues?
       {categories: categorised_applicable_issues}
     else
-      {issues: non_special_applicable_issues.map(&:case_form_json)}
+      {issues: applicable_issues.map(&:case_form_json)}
     end
   end
 
   def any_categorised_issues?
-    non_special_applicable_issues.any?(&:category)
+    applicable_issues.any?(&:category)
   end
 
   def categorised_applicable_issues
-    non_special_applicable_issues
+    applicable_issues
       .group_by(&:category)
       .transform_keys do |category|
       category.nil? ? Category.new(name: 'Other') : category
@@ -37,15 +37,11 @@ class Service < ApplicationRecord
     end.reject(&:nil?)
   end
 
-  def non_special_applicable_issues
-    applicable_issues.reject(&:special?)
-  end
-
   def applicable_issues
     issues_requiring_any_service = Issue.where(
       requires_service: true,
       service_type: nil
     )
-    service_type.issues + issues_requiring_any_service
+    (service_type.issues + issues_requiring_any_service).reject(&:special?)
   end
 end
