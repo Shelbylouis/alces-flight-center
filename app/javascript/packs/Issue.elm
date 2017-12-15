@@ -16,7 +16,6 @@ module Issue
 
 import Json.Decode as D
 import SelectList exposing (SelectList)
-import ServiceType exposing (ServiceType)
 import SupportType exposing (SupportType(..))
 import Utils
 
@@ -48,24 +47,22 @@ decoder =
                     \requiresComponent ->
                         \detailsTemplate ->
                             \supportType ->
-                                \serviceType ->
-                                    \chargeable ->
-                                        let
-                                            data =
-                                                IssueData id name detailsTemplate supportType chargeable
-                                        in
-                                        if requiresComponent then
-                                            ComponentRequiredIssue data
-                                        else
-                                            StandardIssue data
+                                \chargeable ->
+                                    let
+                                        data =
+                                            IssueData id name detailsTemplate supportType chargeable
+                                    in
+                                    if requiresComponent then
+                                        ComponentRequiredIssue data
+                                    else
+                                        StandardIssue data
     in
-    D.map7 createIssue
+    D.map6 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
         (D.field "detailsTemplate" D.string)
         (D.field "supportType" SupportType.decoder)
-        (D.field "serviceType" (D.nullable ServiceType.decoder))
         (D.field "chargeable" D.bool)
 
 

@@ -7,7 +7,6 @@ import Json.Decode as D
 import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
-import ServiceType exposing (ServiceType)
 import SupportType exposing (SupportType)
 
 
@@ -15,7 +14,6 @@ type alias Service =
     { id : Id
     , name : String
     , supportType : SupportType
-    , serviceType : ServiceType
     , issues : Issues
     }
 
@@ -45,11 +43,10 @@ asIssuesIn service issues =
 
 decoder : D.Decoder Service
 decoder =
-    D.map5 Service
+    D.map4 Service
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "supportType" SupportType.decoder)
-        (D.field "serviceType" ServiceType.decoder)
         Issues.decoder
 
 
