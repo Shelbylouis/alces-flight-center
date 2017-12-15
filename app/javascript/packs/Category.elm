@@ -37,17 +37,17 @@ decoder =
 
 -- XXX disabled for now; may adapt and add back later when add back Categorys.
 -- availableForSelectedCluster : SelectList Cluster -> Category -> Bool
--- availableForSelectedCluster clusters caseCategory =
+-- availableForSelectedCluster clusters category =
 --     -- A Category should be available only if any Issue within it is
 --     -- available for the selected Cluster, otherwise there is no point allowing
 --     -- selection of the Category.
---     SelectList.toList caseCategory.issues
+--     SelectList.toList category.issues
 --         |> List.any (Issue.Utils.availableForSelectedCluster clusters)
 
 
 extractId : Category -> Int
-extractId caseCategory =
-    case caseCategory.id of
+extractId category =
+    case category.id of
         Id id ->
             id
 
@@ -62,5 +62,5 @@ setSelectedIssue caseCategories issueId =
 
 
 asIssuesIn : Category -> SelectList Issue -> Category
-asIssuesIn caseCategory issues =
-    { caseCategory | issues = issues }
+asIssuesIn category issues =
+    { category | issues = issues }
