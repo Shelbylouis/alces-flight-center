@@ -79,5 +79,59 @@ RSpec.describe Service, type: :model do
 
       expect(case_form_json_issue_names).to eq []
     end
+
+    it 'includes Issues nested within categories when an Issue has a Category' do
+      category = create(:category)
+      create(
+        :issue_requiring_service,
+        category: category,
+        name: 'good category issue'
+      )
+      create(
+        :issue_requiring_service,
+        service_type: service_type,
+        category: category,
+        name: 'another good category issue'
+      )
+      create(:issue, category: category, name: 'bad category issue')
+
+      categories = subject.case_form_json[:categories]
+
+      expect(categories).to match [
+        hash_including(category.case_form_json)
+      ]
+
+      category_issue_names = categories.first[:issues].pluck(:name)
+      expect(category_issue_names).to match_array([
+        'good category issue',
+        'another good category issue',
+      ])
+    end
+
+    it "includes 'Other' Category when only some Issues have categories" do
+      category = create(:category, name: 'my category')
+      create(
+        :issue_requiring_service,
+        category: category,
+        name: 'category issue'
+      )
+      create(
+        :issue_requiring_service,
+        name: 'uncategorised issue'
+      )
+
+      categories = subject.case_form_json[:categories]
+
+      expect(categories).to match_array([
+        hash_including(
+          name: 'my category',
+          issues: [hash_including(name: 'category issue')],
+        ),
+        hash_including(
+          name: 'Other',
+          issues: [hash_including(name: 'uncategorised issue')],
+        ),
+      ])
+    end
   end
 end
