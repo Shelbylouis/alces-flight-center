@@ -96,8 +96,8 @@ extractId component =
             id
 
 
-setSelectedIssue : Service -> Issue.Id -> Service
-setSelectedIssue service issueId =
+setSelectedIssue : Issue.Id -> Service -> Service
+setSelectedIssue issueId service =
     { service
         | issues =
             case service.issues of

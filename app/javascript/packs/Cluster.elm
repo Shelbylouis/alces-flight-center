@@ -2,6 +2,7 @@ module Cluster
     exposing
         ( Cluster
         , Id(..)
+        , asServicesIn
         , decoder
         , extractId
         , setSelectedComponent
@@ -87,16 +88,7 @@ setSelectedServiceSelectedIssue : SelectList Cluster -> Issue.Id -> SelectList C
 setSelectedServiceSelectedIssue clusters issueId =
     let
         updateService =
-            \services ->
-                SelectList.mapBy
-                    (\position ->
-                        \service ->
-                            if position == Selected then
-                                Service.setSelectedIssue service issueId
-                            else
-                                service
-                    )
-                    services
+            SelectList.Extra.mapSelected (Service.setSelectedIssue issueId)
     in
     SelectList.Extra.updateNested
         clusters

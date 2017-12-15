@@ -3,6 +3,7 @@ module Main exposing (..)
 import Bootstrap.Alert as Alert
 import Bootstrap.Button as Button
 import Bootstrap.Modal as Modal
+import Category
 import Cluster exposing (Cluster)
 import Component exposing (Component)
 import FieldValidation exposing (FieldValidation(..))
@@ -16,6 +17,7 @@ import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
+import SelectList.Extra
 import Service exposing (Issues(..), Service)
 import State exposing (State)
 import Utils
@@ -502,61 +504,36 @@ handleChangeDetails : State -> String -> State
 handleChangeDetails state details =
     let
         newClusters =
-            SelectList.mapBy updateSelectedClusterSelectedService state.clusters
+            SelectList.Extra.mapSelected updateCluster state.clusters
 
-        -- XXX Lots of duplication here - possible to DRY up here
-        -- and in other places we do similar nested updates?
-        updateSelectedClusterSelectedService =
-            \position ->
-                \cluster ->
-                    if position == Selected then
-                        { cluster
-                            | services =
-                                SelectList.mapBy updateSelectedServiceSelectedIssue cluster.services
-                        }
-                    else
-                        cluster
+        updateCluster =
+            \cluster ->
+                SelectList.Extra.mapSelected updateService cluster.services
+                    |> Cluster.asServicesIn cluster
 
-        updateSelectedServiceSelectedIssue =
-            \position ->
-                \service ->
-                    if position == Selected then
-                        { service
-                            | issues =
-                                updateSelectedIssueDetailsInIssues service.issues
-                        }
-                    else
-                        service
+        updateService =
+            \service ->
+                updateIssues service.issues
+                    |> Service.asIssuesIn service
 
-        updateSelectedIssueDetailsInIssues =
+        updateIssues =
             \issues ->
                 case issues of
                     CategorisedIssues categories ->
-                        SelectList.mapBy updateSelectedCategorySelectedIssue categories
+                        SelectList.Extra.mapSelected updateCategory categories
                             |> CategorisedIssues
 
                     JustIssues issues ->
-                        SelectList.mapBy updateSelectedIssueDetails issues
+                        SelectList.Extra.mapSelected updateIssueDetails issues
                             |> JustIssues
 
-        updateSelectedCategorySelectedIssue =
-            \position ->
-                \category ->
-                    if position == Selected then
-                        { category
-                            | issues =
-                                SelectList.mapBy updateSelectedIssueDetails category.issues
-                        }
-                    else
-                        category
+        updateCategory =
+            \category ->
+                SelectList.Extra.mapSelected updateIssueDetails category.issues
+                    |> Category.asIssuesIn category
 
-        updateSelectedIssueDetails =
-            \position ->
-                \issue ->
-                    if position == Selected then
-                        Issue.setDetails issue details
-                    else
-                        issue
+        updateIssueDetails =
+            Issue.setDetails details
     in
     { state | clusters = newClusters }
 

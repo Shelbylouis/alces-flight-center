@@ -1,6 +1,7 @@
 module SelectList.Extra
     exposing
         ( fromList
+        , mapSelected
         , nameOrderedDecoder
         , nestedSelect
         , orderedDecoder
@@ -69,6 +70,25 @@ fromList list =
 
 {-|
 
+    Create a new SelectList by applying given `transform` to selected element
+    in existing SelectList.
+
+-}
+mapSelected : (a -> a) -> SelectList a -> SelectList a
+mapSelected transform selectList =
+    SelectList.mapBy
+        (\position ->
+            \item ->
+                if position == Selected then
+                    transform item
+                else
+                    item
+        )
+        selectList
+
+
+{-|
+
     Given a SelectList of `a`, where an `a` also contains a SelectList of `b`,
     update the selected `a` to change its SelectList of `b` to select the first
     `b` that isSelectable returns True for.
@@ -103,13 +123,9 @@ updateNested :
 updateNested selectList getNested asNestedIn transform =
     let
         updateNested =
-            \position ->
-                \item ->
-                    if position == Selected then
-                        getNested item
-                            |> transform
-                            |> asNestedIn item
-                    else
-                        item
+            \item ->
+                getNested item
+                    |> transform
+                    |> asNestedIn item
     in
-    SelectList.mapBy updateNested selectList
+    mapSelected updateNested selectList

@@ -101,8 +101,8 @@ details issue =
     data issue |> .details
 
 
-setDetails : Issue -> String -> Issue
-setDetails issue details =
+setDetails : String -> Issue -> Issue
+setDetails details issue =
     let
         data_ =
             data issue
