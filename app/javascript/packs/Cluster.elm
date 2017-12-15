@@ -16,7 +16,7 @@ import Issue
 import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
-import Service exposing (Service)
+import Service exposing (Issues(..), Service)
 import SupportType exposing (SupportType)
 import Utils
 
@@ -88,11 +88,15 @@ setSelectedServiceSelectedIssue clusters issueId =
     let
         updateService =
             \services ->
-                SelectList.Extra.nestedSelect
+                SelectList.mapBy
+                    (\position ->
+                        \service ->
+                            if position == Selected then
+                                Service.setSelectedIssue service issueId
+                            else
+                                service
+                    )
                     services
-                    .issues
-                    Service.asIssuesIn
-                    (Issue.sameId issueId)
     in
     SelectList.Extra.updateNested
         clusters

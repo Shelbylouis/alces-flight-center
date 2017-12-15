@@ -16,7 +16,7 @@ import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
-import Service exposing (Service)
+import Service exposing (Issues(..), Service)
 import State exposing (State)
 import Utils
 import View.Fields as Fields
@@ -269,7 +269,7 @@ issuesField : State -> Html Msg
 issuesField state =
     let
         selectedServiceIssues =
-            State.selectedService state |> .issues
+            State.selectedServiceIssues state
 
         validateIssue =
             FieldValidation.validateWithError
@@ -523,10 +523,32 @@ handleChangeDetails state details =
                     if position == Selected then
                         { service
                             | issues =
-                                SelectList.mapBy updateSelectedIssueDetails service.issues
+                                updateSelectedIssueDetailsInIssues service.issues
                         }
                     else
                         service
+
+        updateSelectedIssueDetailsInIssues =
+            \issues ->
+                case issues of
+                    CategorisedIssues categories ->
+                        SelectList.mapBy updateSelectedCategorySelectedIssue categories
+                            |> CategorisedIssues
+
+                    JustIssues issues ->
+                        SelectList.mapBy updateSelectedIssueDetails issues
+                            |> JustIssues
+
+        updateSelectedCategorySelectedIssue =
+            \position ->
+                \category ->
+                    if position == Selected then
+                        { category
+                            | issues =
+                                SelectList.mapBy updateSelectedIssueDetails category.issues
+                        }
+                    else
+                        category
 
         updateSelectedIssueDetails =
             \position ->

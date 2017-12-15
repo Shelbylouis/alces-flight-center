@@ -2,6 +2,7 @@ module Category
     exposing
         ( Category
         , Id(..)
+        , asIssuesIn
           -- , availableForSelectedCluster
         , decoder
         , extractId
