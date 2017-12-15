@@ -1,6 +1,6 @@
-module CaseCategory
+module Category
     exposing
-        ( CaseCategory
+        ( Category
         , Id(..)
           -- , availableForSelectedCluster
         , decoder
@@ -21,7 +21,7 @@ import ServiceType exposing (ServiceType)
 import Utils
 
 
-type alias CaseCategory =
+type alias Category =
     { id : Id
     , name : String
     , issues : SelectList Issue
@@ -33,9 +33,9 @@ type Id
     = Id Int
 
 
-decoder : D.Decoder CaseCategory
+decoder : D.Decoder Category
 decoder =
-    D.map4 CaseCategory
+    D.map4 Category
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "issues" (SelectList.Extra.orderedDecoder Issue.name Issue.decoder))
@@ -44,16 +44,16 @@ decoder =
 
 
 -- XXX disabled for now; may adapt and add back later when add back Categorys.
--- availableForSelectedCluster : SelectList Cluster -> CaseCategory -> Bool
+-- availableForSelectedCluster : SelectList Cluster -> Category -> Bool
 -- availableForSelectedCluster clusters caseCategory =
---     -- A CaseCategory should be available only if any Issue within it is
+--     -- A Category should be available only if any Issue within it is
 --     -- available for the selected Cluster, otherwise there is no point allowing
---     -- selection of the CaseCategory.
+--     -- selection of the Category.
 --     SelectList.toList caseCategory.issues
 --         |> List.any (Issue.Utils.availableForSelectedCluster clusters)
 
 
-filterByIssues : SelectList CaseCategory -> (Issue -> Bool) -> Maybe (SelectList CaseCategory)
+filterByIssues : SelectList Category -> (Issue -> Bool) -> Maybe (SelectList Category)
 filterByIssues caseCategories condition =
     SelectList.map (withJustMatchingIssues condition) caseCategories
         |> SelectList.toList
@@ -61,7 +61,7 @@ filterByIssues caseCategories condition =
         |> SelectList.Extra.fromList
 
 
-withJustMatchingIssues : (Issue -> Bool) -> CaseCategory -> Maybe CaseCategory
+withJustMatchingIssues : (Issue -> Bool) -> Category -> Maybe Category
 withJustMatchingIssues condition caseCategory =
     SelectList.toList caseCategory.issues
         |> List.filter condition
@@ -69,14 +69,14 @@ withJustMatchingIssues condition caseCategory =
         |> Maybe.map (asIssuesIn caseCategory)
 
 
-extractId : CaseCategory -> Int
+extractId : Category -> Int
 extractId caseCategory =
     case caseCategory.id of
         Id id ->
             id
 
 
-setSelectedIssue : SelectList CaseCategory -> Issue.Id -> SelectList CaseCategory
+setSelectedIssue : SelectList Category -> Issue.Id -> SelectList Category
 setSelectedIssue caseCategories issueId =
     SelectList.Extra.nestedSelect
         caseCategories
@@ -85,18 +85,18 @@ setSelectedIssue caseCategories issueId =
         (Issue.sameId issueId)
 
 
-asIssuesIn : CaseCategory -> SelectList Issue -> CaseCategory
+asIssuesIn : Category -> SelectList Issue -> Category
 asIssuesIn caseCategory issues =
     { caseCategory | issues = issues }
 
 
 {-|
 
-    A CaseCategory is 'controlled by' a Service iff its
+    A Category is 'controlled by' a Service iff its
     `controllingServiceType` is the same as the Service's ServiceType.
 
 -}
-isControlledByService : Service -> CaseCategory -> Bool
+isControlledByService : Service -> Category -> Bool
 isControlledByService service caseCategory =
     Maybe.map
         (Utils.sameId service.serviceType.id)
