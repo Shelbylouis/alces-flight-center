@@ -9,7 +9,7 @@ module State
         , selectedComponent
         , selectedIssue
         , selectedService
-        , selectedServiceIssues
+        , selectedServiceAvailableIssues
         )
 
 import Bootstrap.Modal as Modal
@@ -17,11 +17,12 @@ import Cluster exposing (Cluster)
 import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
 import Issue exposing (Issue)
+import Issues
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
 import SelectList.Extra
-import Service exposing (Issues(..), Service)
+import Service exposing (Service)
 import SupportType exposing (SupportType(..))
 
 
@@ -199,7 +200,7 @@ selectedIssue : State -> Issue
 selectedIssue state =
     selectedService state
         |> .issues
-        |> Service.selectedIssueInIssues
+        |> Issues.selectedIssue
 
 
 selectedComponent : State -> Component
@@ -216,15 +217,9 @@ selectedService state =
         |> SelectList.selected
 
 
-selectedServiceIssues : State -> SelectList Issue
-selectedServiceIssues state =
-    case selectedService state |> .issues of
-        CategorisedIssues categories ->
-            SelectList.selected categories
-                |> .issues
-
-        JustIssues issues ->
-            issues
+selectedServiceAvailableIssues : State -> SelectList Issue
+selectedServiceAvailableIssues state =
+    selectedService state |> .issues |> Issues.availableIssues
 
 
 clusterPartAllowedForSelectedIssue : State -> (Issue -> Bool) -> ClusterPart a -> Bool

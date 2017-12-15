@@ -12,13 +12,14 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onSubmit)
 import Http
 import Issue exposing (Issue)
+import Issues
 import Json.Decode as D
 import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
-import Service exposing (Issues(..), Service)
+import Service exposing (Service)
 import State exposing (State)
 import Utils
 import View.Fields as Fields
@@ -270,8 +271,8 @@ maybeClustersField clusters =
 issuesField : State -> Html Msg
 issuesField state =
     let
-        selectedServiceIssues =
-            State.selectedServiceIssues state
+        selectedServiceAvailableIssues =
+            State.selectedServiceAvailableIssues state
 
         validateIssue =
             FieldValidation.validateWithError
@@ -280,7 +281,7 @@ issuesField state =
                 (State.issueAvailableForSelectedCluster state)
     in
     Fields.selectField "Issue"
-        selectedServiceIssues
+        selectedServiceAvailableIssues
         Issue.extractId
         Issue.name
         validateIssue
@@ -517,15 +518,7 @@ handleChangeDetails state details =
                     |> Service.asIssuesIn service
 
         updateIssues =
-            \issues ->
-                case issues of
-                    CategorisedIssues categories ->
-                        SelectList.Extra.mapSelected updateCategory categories
-                            |> CategorisedIssues
-
-                    JustIssues issues ->
-                        SelectList.Extra.mapSelected updateIssueDetails issues
-                            |> JustIssues
+            Issues.mapIssue updateIssueDetails
 
         updateCategory =
             \category ->

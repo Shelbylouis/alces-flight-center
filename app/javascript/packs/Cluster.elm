@@ -17,7 +17,7 @@ import Issue
 import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
-import Service exposing (Issues(..), Service)
+import Service exposing (Service)
 import SupportType exposing (SupportType)
 import Utils
 

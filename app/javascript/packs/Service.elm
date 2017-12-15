@@ -2,6 +2,7 @@ module Service exposing (..)
 
 import Category exposing (Category)
 import Issue exposing (Issue)
+import Issues exposing (Issues(..))
 import Json.Decode as D
 import Maybe.Extra
 import SelectList exposing (SelectList)
@@ -23,11 +24,6 @@ type Id
     = Id Int
 
 
-type Issues
-    = CategorisedIssues (SelectList Category)
-    | JustIssues (SelectList Issue)
-
-
 filterByIssues : (Issue -> Bool) -> SelectList Service -> Maybe (SelectList Service)
 filterByIssues condition services =
     SelectList.map (withJustMatchingIssues condition) services
@@ -38,28 +34,8 @@ filterByIssues condition services =
 
 withJustMatchingIssues : (Issue -> Bool) -> Service -> Maybe Service
 withJustMatchingIssues condition service =
-    let
-        filterIssues =
-            \issues ->
-                SelectList.toList issues
-                    |> List.filter condition
-                    |> SelectList.Extra.fromList
-    in
-    case service.issues of
-        CategorisedIssues categories ->
-            SelectList.toList categories
-                |> List.map
-                    (\category ->
-                        filterIssues category.issues
-                            |> Maybe.map (Category.asIssuesIn category)
-                    )
-                |> Maybe.Extra.values
-                |> SelectList.Extra.fromList
-                |> Maybe.map (CategorisedIssues >> asIssuesIn service)
-
-        JustIssues issues ->
-            filterIssues issues
-                |> Maybe.map (JustIssues >> asIssuesIn service)
+    Issues.matchingIssues condition service.issues
+        |> Maybe.map (asIssuesIn service)
 
 
 asIssuesIn : Service -> Issues -> Service
@@ -74,19 +50,7 @@ decoder =
         (D.field "name" D.string)
         (D.field "supportType" SupportType.decoder)
         (D.field "serviceType" ServiceType.decoder)
-        issuesDecoder
-
-
-issuesDecoder : D.Decoder Issues
-issuesDecoder =
-    D.oneOf
-        [ SelectList.Extra.orderedDecoder Issue.name Issue.decoder
-            |> D.map JustIssues
-            |> D.field "issues"
-        , SelectList.Extra.orderedDecoder .name Category.decoder
-            |> D.map CategorisedIssues
-            |> D.field "categories"
-        ]
+        Issues.decoder
 
 
 extractId : Service -> Int
@@ -98,26 +62,5 @@ extractId component =
 
 setSelectedIssue : Issue.Id -> Service -> Service
 setSelectedIssue issueId service =
-    { service
-        | issues =
-            case service.issues of
-                CategorisedIssues categories ->
-                    Category.setSelectedIssue categories issueId
-                        |> CategorisedIssues
-
-                JustIssues issues ->
-                    SelectList.select (Issue.sameId issueId) issues
-                        |> JustIssues
-    }
-
-
-selectedIssueInIssues : Issues -> Issue
-selectedIssueInIssues issues =
-    case issues of
-        CategorisedIssues categories ->
-            SelectList.selected categories
-                |> .issues
-                |> SelectList.selected
-
-        JustIssues issues ->
-            SelectList.selected issues
+    Issues.selectIssue issueId service.issues
+        |> asIssuesIn service
