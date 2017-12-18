@@ -8,4 +8,8 @@ class ServiceType < ApplicationRecord
   validates :name, presence: true
 
   scope :automatic, -> { where(automatic: true) }
+
+  def self.globally_available?
+    true
+  end
 end

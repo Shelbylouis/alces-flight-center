@@ -3,23 +3,20 @@ require 'exceptions'
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
-  # Every model in app is assumed to be related to a specific Site, unless it
-  # is explicitly defined as global by adding it to this whitelist.
-  GLOBAL_MODELS = [
-    AssetRecordFieldDefinition,
-    Category,
-    ComponentType,
-    Issue,
-    ServiceType,
-  ]
-
-
   after_find :check_read_permissions
 
   delegate :current_user, to: Request
 
   def readable_model_name
     self.class.to_s.tableize.humanize(capitalize: false).singularize
+  end
+
+  class << self
+    # Every model in app is assumed to be related to a specific Site, unless it
+    # is explicitly defined as global by overriding this method.
+    def globally_available?
+      false
+    end
   end
 
   private
@@ -37,10 +34,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def permissions_check_unneeded?
-    return true if globally_available_model?
-
-    # Users can always access themselves and other Users.
-    return true if self.class == User
+    return true if self.class.globally_available?
 
     # `current_user` will be unset either when we're in a web request but no
     # User is logged in or we are not in a web request; in the former case
@@ -55,9 +49,5 @@ class ApplicationRecord < ActiveRecord::Base
 
   def model_identifier
     respond_to?(:name) ? "#{readable_model_name} #{name}" : to_s
-  end
-
-  def globally_available_model?
-    GLOBAL_MODELS.include?(self.class)
   end
 end

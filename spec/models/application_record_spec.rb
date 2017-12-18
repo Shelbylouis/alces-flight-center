@@ -15,6 +15,14 @@ RSpec.describe ApplicationRecord, type: :model do
       allow(Request).to receive(:current_user).and_return(user)
     end
 
+    GLOBAL_MODELS = [
+      AssetRecordFieldDefinition,
+      Category,
+      ComponentType,
+      Issue,
+      ServiceType,
+    ]
+
     describe 'every Site-related record defines site for permissions purposes' do
       ActiveRecord::Base.connection.tables.each do |table|
         begin
@@ -25,7 +33,7 @@ RSpec.describe ApplicationRecord, type: :model do
           next
         end
 
-        globally_available_model = ApplicationRecord::GLOBAL_MODELS.include?(klass)
+        globally_available_model = GLOBAL_MODELS.include?(klass)
         next if globally_available_model
 
         it "site defined for #{klass.to_s}" do
