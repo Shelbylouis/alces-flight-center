@@ -23,7 +23,7 @@ class Case < ApplicationRecord
   has_one :credit_charge, required: false
   has_many :maintenance_windows
 
-  delegate :case_category, :chargeable, to: :issue
+  delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true
 
   validates :details, presence: true
@@ -35,7 +35,7 @@ class Case < ApplicationRecord
 
   validates_with Validator
 
-  before_validation :assign_cluster_if_necessary
+  after_initialize :assign_cluster_if_necessary
 
   # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
   # if this is possible but it was not explicitly passed.
@@ -146,7 +146,7 @@ class Case < ApplicationRecord
   def rt_ticket_text
     properties = {
       Cluster: cluster.name,
-      'Case category': case_category.name,
+      Category: category&.name,
       'Issue': issue.name,
       'Associated component': component&.name,
       'Associated service': service&.name,

@@ -5,7 +5,7 @@ class CaseDecorator < ApplicationDecorator
     [
       "RT ticket #{rt_ticket_id}",
       created_at.to_formatted_s(:long),
-      "#{case_category.name} - #{issue.name}",
+      "#{category.name} - #{issue.name}",
       associated_model.name,
       "Created by #{user.name}"
     ].join(' | ')

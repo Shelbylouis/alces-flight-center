@@ -2,7 +2,7 @@ class ChangeConsultancyIssuesForSplitFromCaseForm < ActiveRecord::DataMigration
   def up
     consultancy_category = 'Consultancy'
 
-    categories = CaseCategory.all.reject do |category|
+    categories = Category.all.reject do |category|
       # Just want to keep consultancy issues in consultancy category.
       category.name == consultancy_category
     end
@@ -14,7 +14,7 @@ class ChangeConsultancyIssuesForSplitFromCaseForm < ActiveRecord::DataMigration
     end
 
     # Add identifiers so can find needed consultancy issues.
-    consultancy_issues = CaseCategory.find_by_name(consultancy_category).issues
+    consultancy_issues = Category.find_by_name(consultancy_category).issues
     cluster_issue, component_issue, service_issue = *consultancy_issues
 
     cluster_issue.update!(identifier: 'cluster_consultancy')

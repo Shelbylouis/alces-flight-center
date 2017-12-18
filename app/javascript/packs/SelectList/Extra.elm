@@ -1,9 +1,11 @@
 module SelectList.Extra
     exposing
         ( fromList
+        , mapSelected
         , nameOrderedDecoder
         , nestedSelect
         , orderedDecoder
+        , updateNested
         )
 
 import Json.Decode as D
@@ -68,6 +70,25 @@ fromList list =
 
 {-|
 
+    Create a new SelectList by applying given `transform` to selected element
+    in existing SelectList.
+
+-}
+mapSelected : (a -> a) -> SelectList a -> SelectList a
+mapSelected transform selectList =
+    SelectList.mapBy
+        (\position ->
+            \item ->
+                if position == Selected then
+                    transform item
+                else
+                    item
+        )
+        selectList
+
+
+{-|
+
     Given a SelectList of `a`, where an `a` also contains a SelectList of `b`,
     update the selected `a` to change its SelectList of `b` to select the first
     `b` that isSelectable returns True for.
@@ -80,15 +101,31 @@ nestedSelect :
     -> (b -> Bool)
     -> SelectList a
 nestedSelect selectList getNested asNestedIn isSelectable =
+    updateNested
+        selectList
+        getNested
+        asNestedIn
+        (SelectList.select isSelectable)
+
+
+{-|
+
+    As above but more general; apply an arbitrary `transform` to the nested
+    SelectList.
+
+-}
+updateNested :
+    SelectList a
+    -> (a -> SelectList b)
+    -> (a -> SelectList b -> a)
+    -> (SelectList b -> SelectList b)
+    -> SelectList a
+updateNested selectList getNested asNestedIn transform =
     let
         updateNested =
-            \position ->
-                \item ->
-                    if position == Selected then
-                        getNested item
-                            |> SelectList.select isSelectable
-                            |> asNestedIn item
-                    else
-                        item
+            \item ->
+                getNested item
+                    |> transform
+                    |> asNestedIn item
     in
-    SelectList.mapBy updateNested selectList
+    mapSelected updateNested selectList
