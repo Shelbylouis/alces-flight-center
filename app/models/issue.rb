@@ -69,8 +69,6 @@ class Issue < ApplicationRecord
       name: name,
       detailsTemplate: details_template,
       requiresComponent: requires_component,
-      requiresService: requires_service,
-      serviceType: service_type&.case_form_json,
       supportType: support_type,
       chargeable: chargeable
     }

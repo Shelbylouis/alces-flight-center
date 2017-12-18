@@ -7,10 +7,7 @@ class Service < ApplicationRecord
   delegate :description, to: :service_type
 
   def case_form_json
-    super.merge(
-      serviceType: service_type.case_form_json,
-      **categories_or_issues
-    )
+    super.merge(categories_or_issues)
   end
 
   private

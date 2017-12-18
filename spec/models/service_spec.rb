@@ -28,7 +28,6 @@ RSpec.describe Service, type: :model do
         id: 1,
         name: 'Some Service',
         supportType: 'managed',
-        serviceType: service_type.case_form_json, # XXX remove?
         issues: []
       )
     end
