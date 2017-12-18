@@ -5,6 +5,10 @@ class Issue < ApplicationRecord
   SUPPORT_TYPES = SupportType::VALUES + ['advice-only']
 
   class << self
+    def globally_available?
+      true
+    end
+
     private
 
     def define_finder_method(identifier)

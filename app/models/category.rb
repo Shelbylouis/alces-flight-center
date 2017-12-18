@@ -11,4 +11,8 @@ class Category < ApplicationRecord
       name: name,
     }
   end
+
+  def self.globally_available?
+    true
+  end
 end

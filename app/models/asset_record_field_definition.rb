@@ -26,6 +26,10 @@ class AssetRecordFieldDefinition < ApplicationRecord
       all_identifiers_to_definitions[identifier]
     end
 
+    def globally_available?
+      true
+    end
+
     private
 
     def all_identifiers_to_definitions

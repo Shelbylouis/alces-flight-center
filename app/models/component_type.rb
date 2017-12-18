@@ -6,4 +6,8 @@ class ComponentType < ApplicationRecord
 
   validates :name, presence: true
   validates :ordering, presence: true
+
+  def self.globally_available?
+    true
+  end
 end
