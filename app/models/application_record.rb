@@ -36,9 +36,6 @@ class ApplicationRecord < ActiveRecord::Base
   def permissions_check_unneeded?
     return true if self.class.globally_available?
 
-    # Users can always access themselves and other Users.
-    return true if self.class == User
-
     # `current_user` will be unset either when we're in a web request but no
     # User is logged in or we are not in a web request; in the former case
     # nothing can be exposed already due to routing contraints, and in the
