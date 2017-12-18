@@ -1,19 +1,5 @@
 
-<div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          Create support case
-        </span>
-      </li>
-    </ul>
-  </div>
-
-  <div class="card-body">
-    <%= new_case_form(clusters: site.clusters) %>
-  </div>
-</div>
+<%= render 'cases/cases_table', model: site, archive: false %>
 
 <div class='card'>
   <div class='card-header'>
@@ -65,5 +51,3 @@
     <%= render 'clusters/details', cluster: cluster %>
   </div>
 <% end %>
-
-<%= render 'cases/cases_table', model: site, archive: false %>

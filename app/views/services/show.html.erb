@@ -1,4 +1,6 @@
 
+<%= render 'cases/cases_table', model: service, archive: true %>
+
 <div class='card'>
   <div class='card-header'>
     <ul class="nav">
@@ -7,7 +9,6 @@
           Overview
         </span>
       </li>
-      <%= service.case_form_buttons %>
     </ul>
   </div>
 
@@ -23,5 +24,3 @@
     <% end %>
   </ul>
 </div>
-
-<%= render 'cases/cases_table', model: service, archive: true %>
