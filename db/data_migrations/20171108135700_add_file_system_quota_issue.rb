@@ -1,11 +1,11 @@
 class AddFileSystemQuotaIssue < ActiveRecord::DataMigration
   def up
-    category = CaseCategory.find_by_name('Quota/Fair Usage Management')
+    category = Category.find_by_name('Quota/Fair Usage Management')
     service_type = ServiceType.find_by_name('File System')
     raise unless category && service_type
 
     Issue.create!(
-      case_category: category,
+      category: category,
       name: 'File System storage quota changes',
       support_type: 'managed',
       requires_service: true,

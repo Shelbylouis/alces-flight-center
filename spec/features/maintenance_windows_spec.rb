@@ -71,7 +71,11 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     it 'can confirm an unconfirmed maintenance window' do
-      window = create(:unconfirmed_maintenance_window, component: component)
+      window = create(
+        :unconfirmed_maintenance_window,
+        component: component,
+        case: support_case
+      )
 
       expect(Case.request_tracker).to receive(
         :add_ticket_correspondence
@@ -85,7 +89,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       click_button(button_text)
 
       expect(page).not_to have_button(button_text)
-      expect(page.all('table').first).to have_text(user_name)
+      expect(page.all('table')[1]).to have_text(user_name)
       expect(window.reload.confirmed_by).to eq(user)
     end
   end

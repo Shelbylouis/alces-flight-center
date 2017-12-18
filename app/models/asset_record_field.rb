@@ -52,4 +52,8 @@ class AssetRecordField < ApplicationRecord
   def component_type
     asset.component_type
   end
+
+  def site
+    asset.site
+  end
 end

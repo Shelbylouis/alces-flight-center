@@ -48,7 +48,7 @@ FactoryBot.define do
     name 'nodes'
   end
 
-  factory :case_category do
+  factory :category do
     name 'User management'
   end
 

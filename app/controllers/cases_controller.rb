@@ -1,31 +1,32 @@
 class CasesController < ApplicationController
   before_action :require_login
 
+  decorates_assigned :site
+
   def index
-    @cases = current_site.cases
+    @site = current_site
     @title = if current_user.admin?
                'Manage support cases'
              else
                'Support case archive'
              end
 
-    @cases.map(&:update_ticket_status!) if current_user.admin?
+    current_site.cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
   def new
     @title = "Create new support case"
-    @case_categories = CaseCategory.all
 
     cluster_id = params[:cluster_id]
     component_id = params[:component_id]
     service_id = params[:service_id]
     @clusters = if cluster_id
-                  [current_site_cluster(id: cluster_id)]
+                  [Cluster.find(cluster_id)]
                 elsif component_id
-                  @single_part = current_site_component(id: component_id)
+                  @single_part = Component.find(component_id)
                   [@single_part.cluster]
                 elsif service_id
-                  @single_part = current_site_service(id: service_id)
+                  @single_part = Service.find(service_id)
                   [@single_part.cluster]
                 else
                   current_site.clusters
@@ -88,18 +89,6 @@ class CasesController < ApplicationController
   end
 
   private
-
-  def current_site_cluster(id:)
-    Cluster.find_by(id: id, site: current_site) || not_found
-  end
-
-  def current_site_component(id:)
-    current_site.components.find_by(id: id) || not_found
-  end
-
-  def current_site_service(id:)
-    current_site.services.find_by(id: id) || not_found
-  end
 
   def case_params
     params.require(:case).permit(

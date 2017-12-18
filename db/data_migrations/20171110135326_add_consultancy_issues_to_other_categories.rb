@@ -1,5 +1,10 @@
 class AddConsultancyIssuesToOtherCategories < ActiveRecord::DataMigration
   def up
+    # This data migration is obsolete with new changes to remove CaseCategorys,
+    # make Services top-level etc, combined with simplifying of consultancy
+    # Issues.
+    return
+
     requested_categories = {
       'Application Management' => {},
       'End User Assistance' => {},

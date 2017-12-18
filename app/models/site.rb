@@ -14,6 +14,10 @@ class Site < ApplicationRecord
 
   before_validation CanonicalNameCreator.new, on: :create
 
+  def site
+    self
+  end
+
   def all_contacts
     users + additional_contacts
   end

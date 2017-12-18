@@ -13,7 +13,6 @@ const initializeFormApp = () => {
 
     const flags = {
       clusters: loadAttributeJson('data-clusters'),
-      caseCategories: loadAttributeJson('data-case-categories'),
       singlePart: loadAttributeJson('data-single-part'),
     };
 

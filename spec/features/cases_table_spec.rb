@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Cases table', type: :feature do
   let! :contact { create(:contact, site: site) }
   let! :admin { create(:admin) }
-  let :site { create(:site) }
+  let :site { create(:site, name: 'My Site') }
   let :cluster { create(:cluster, site: site) }
 
   let! :open_case do
@@ -18,7 +18,7 @@ RSpec.describe 'Cases table', type: :feature do
     it 'renders table of open Cases' do
       visit path
 
-      expect(page).to have_text('Open support cases')
+      expect(page).to have_text("#{site.name} support cases")
 
       cases = all('tr').map(&:text)
       expect(cases).to have_text('Open case')

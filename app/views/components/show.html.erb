@@ -1,4 +1,6 @@
 
+<%= render 'cases/cases_table', model: component, archive: true %>
+
 <div class='card'>
   <div class='card-header'>
     <ul class="nav">
@@ -7,7 +9,6 @@
           Overview
         </span>
       </li>
-      <%= component.case_form_buttons %>
     </ul>
   </div>
 
@@ -30,7 +31,7 @@
     </ul>
   </div>
 
-  <table class="table">
+  <table class="table table-responsive">
     <thead>
       <tr>
         <th>Field</th>

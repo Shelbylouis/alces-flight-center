@@ -55,22 +55,9 @@ RSpec.describe Issue, type: :model do
         name: 'New user request',
         detailsTemplate: 'Give a username',
         requiresComponent: false,
-        requiresService: true,
-        serviceType: {
-          id: service_type.id,
-          name: service_type.name,
-        },
         supportType: 'managed',
         chargeable: true
       )
-    end
-
-    context 'when no associated service_type' do
-      let :service_type { nil }
-
-      it 'has null serviceType' do
-        expect(subject.case_form_json[:serviceType]).to be nil
-      end
     end
   end
 

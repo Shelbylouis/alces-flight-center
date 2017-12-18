@@ -11,12 +11,11 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe 'Cluster assignment on Case creation' do
+  describe 'Cluster assignment on Case initialize' do
     it 'assigns Cluster appropriately when only associated with Component' do
       component = create(:component)
 
-      support_case = create(
-        :case,
+      support_case = Case.new(
         component: component,
         issue: create(:issue_requiring_component),
         cluster: nil
@@ -28,8 +27,7 @@ RSpec.describe Case, type: :model do
     it 'assigns Cluster appropriately when only associated with Service' do
       service = create(:service)
 
-      support_case = create(
-        :case,
+      support_case = Case.new(
         service: service,
         issue: create(:issue_requiring_service),
         cluster: nil
@@ -98,14 +96,14 @@ RSpec.describe Case, type: :model do
         name: 'Crashed node',
         requires_component: requires_component,
         requires_service: requires_service,
-        case_category: case_category
+        category: category
       )
     end
 
     let :requires_component { true }
     let :requires_service { true }
 
-    let :case_category { create(:case_category, name: 'Hardware issue') }
+    let :category { create(:category, name: 'Hardware issue') }
     let :cluster { create(:cluster, site: site, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
     let :service { create(:service, name: 'Some service', cluster: cluster) }
@@ -124,7 +122,7 @@ RSpec.describe Case, type: :model do
         subject: 'Alces Flight Center ticket: somecluster - Crashed node',
         text: <<-EOF.strip_heredoc
           Cluster: somecluster
-          Case category: Hardware issue
+          Category: Hardware issue
           Issue: Crashed node
           Associated component: node01
           Associated service: Some service
@@ -184,9 +182,8 @@ RSpec.describe Case, type: :model do
         rt_ticket_id: rt_ticket_id
       )
 
-      expected_subject = CGI.escape(
+      expected_subject =
         'RE: [helpdesk.alces-software.com #12345] Alces Flight Center ticket: somecluster - New user request'
-      )
       expected_mailto_url = "mailto:support@alces-software.com?subject=#{expected_subject}"
       expect(support_case.mailto_url).to eq expected_mailto_url
     end
