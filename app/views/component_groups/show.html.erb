@@ -1,0 +1,51 @@
+
+<%= render 'cases/cases_table', model: component, archive: true %>
+
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Overview
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">
+      <%= component.readable_support_type.capitalize %> component
+      <%= component.cluster_part_icons %>
+    </li>
+  </ul>
+</div>
+
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Asset Record
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <table class="table table-responsive">
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% component.asset_record.each do |name, value| %>
+      <tr>
+        <td><%= name %></td>
+        <td><%= value %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
