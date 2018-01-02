@@ -1,24 +1,5 @@
 
-<%= render 'cases/cases_table', model: component, archive: true %>
-
-<div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          Overview
-        </span>
-      </li>
-    </ul>
-  </div>
-
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">
-      <%= component.readable_support_type.capitalize %> component
-      <%= component.cluster_part_icons %>
-    </li>
-  </ul>
-</div>
+<%# <%= render 'cases/cases_table', model: component_group, archive: true %1> %>
 
 <div class='card'>
   <div class='card-header'>
@@ -40,7 +21,7 @@
     </thead>
 
     <tbody>
-    <% component.asset_record.each do |name, value| %>
+    <% component_group.asset_record.each do |name, value| %>
       <tr>
         <td><%= name %></td>
         <td><%= value %></td>
