@@ -72,7 +72,7 @@ Rails.application.routes.draw do
       resources :consultancy, only: :new
     end
 
-    resources :component_groups, only: :show
+    resources :component_groups, path: 'component-groups', only: :show
 
     resources :services, only: :show do
       resources :cases, only: :new
