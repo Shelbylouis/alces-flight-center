@@ -4,7 +4,8 @@ class ComponentGroup < ApplicationRecord
 
   belongs_to :cluster
   has_one :site, through: :cluster
-  belongs_to :component_type
+  belongs_to :component_make
+  has_one :component_type, through: :component_make
   has_many :components, dependent: :destroy
   has_many :asset_record_fields
 
