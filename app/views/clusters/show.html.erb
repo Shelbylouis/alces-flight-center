@@ -141,7 +141,7 @@
     <div class='card-body'>
       <% type.component_groups.each do |group| %>
         <h6 class="card-title">
-          <%= link_to group.decorate.link_text, component_group_path(group) %>
+          <%= group.decorate.link %>
         </h6>
 
         <table class="table table-responsive">
