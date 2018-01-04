@@ -34,6 +34,13 @@ site.additional_contacts.create!(
   email: 'another.contact@example.com'
 )
 
+dell_server = ComponentMake.create!(
+  manufacturer: 'Dell',
+  model: 'zippy',
+  knowledgebase_url: 'http://why.did@i-write.this/in#full',
+  component_type: ComponentType.find_by_name('Server')
+)
+
 main_cluster = site.clusters.create!(
   name: 'Hamilton Research Computing Cluster',
   description: 'A cluster for research computing',
@@ -50,7 +57,7 @@ main_cluster = site.clusters.create!(
 
   cluster.component_groups.create!(
     name: 'Rack A1 nodes',
-    component_type: ComponentType.find_by_name('Server'),
+    component_make: dell_server,
     genders_host_range: 'node[01-20]'
   ).tap do |group|
 
@@ -74,7 +81,7 @@ main_cluster = site.clusters.create!(
 
   cluster.component_groups.create!(
     name: 'Self-managed nodes',
-    component_type: ComponentType.find_by_name('Server'),
+    component_make: dell_server,
     genders_host_range: 'self_managed[01-03]'
   ).tap do |group|
     group.components.each do |component|
@@ -126,7 +133,7 @@ site.clusters.create!(
 ).tap do |cluster|
   cluster.component_groups.create!(
     name: 'Additional cluster nodes',
-    component_type: ComponentType.find_by_name('Server'),
+    component_make: dell_server,
     genders_host_range: 'anode[01-05]'
   )
 end

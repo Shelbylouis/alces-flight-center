@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171211134412) do
+ActiveRecord::Schema.define(version: 20180103183931) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -91,11 +91,19 @@ ActiveRecord::Schema.define(version: 20171211134412) do
   create_table "component_groups", force: :cascade do |t|
     t.string "name", null: false
     t.integer "cluster_id", null: false
-    t.integer "component_type_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "component_make_id"
     t.index ["cluster_id"], name: "index_component_groups_on_cluster_id"
-    t.index ["component_type_id"], name: "index_component_groups_on_component_type_id"
+    t.index ["component_make_id"], name: "index_component_groups_on_component_make_id"
+  end
+
+  create_table "component_makes", force: :cascade do |t|
+    t.string "manufacturer", null: false
+    t.string "model", null: false
+    t.string "knowledgebase_url", null: false
+    t.bigint "component_type_id", null: false
+    t.index ["component_type_id"], name: "index_component_makes_on_component_type_id"
   end
 
   create_table "component_types", force: :cascade do |t|
@@ -218,6 +226,8 @@ ActiveRecord::Schema.define(version: 20171211134412) do
   end
 
   add_foreign_key "cases", "services"
+  add_foreign_key "component_groups", "component_makes"
+  add_foreign_key "component_makes", "component_types"
   add_foreign_key "credit_charges", "cases"
   add_foreign_key "credit_charges", "users"
   add_foreign_key "credit_deposits", "clusters"
