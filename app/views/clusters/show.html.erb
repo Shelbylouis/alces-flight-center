@@ -141,8 +141,7 @@
     <div class='card-body'>
       <% type.component_groups.each do |group| %>
         <h6 class="card-title">
-          <% group_size = group.components.length %>
-          <%= group.name %> &mdash; <%= pluralize(group_size, group.component_type.name) %>
+          <%= group.decorate.link %>
         </h6>
 
         <table class="table table-responsive">

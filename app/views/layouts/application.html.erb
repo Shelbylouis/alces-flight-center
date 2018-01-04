@@ -58,10 +58,19 @@
 
               <% if @cluster %>
                 <li class="nav-item">
-                  <%= link_to (raw('<span class="fa fa-cubes"></span> ') + @cluster.name),
+                  <%= link_to (raw('<span class="fa fa-server"></span> ') + @cluster.name),
                     @cluster.decorate.path,
-                    class: "nav-link #{@cluster_part ? '' : 'nav-link--active'}"
+                    class: "nav-link #{(@cluster_part || @component_group) ? '' : 'nav-link--active'}"
                   %>
+
+                  <% if @component_group %>
+                    <li class="nav-item">
+                      <%= link_to (raw('<span class="fa fa-cubes"></span> ') + @component_group.name),
+                        @component_group.decorate.path,
+                        class: "nav-link #{@cluster_part ? '' : 'nav-link--active'}"
+                      %>
+                    </li>
+                  <% end %>
 
                   <% if @cluster_part %>
                     <li class="nav-item">
