@@ -1,5 +1,8 @@
 
 FactoryBot.define do
+  factory :expansion_type do
+    name "ExpansionDummy"
+  end
   sequence :email do |n|
     "a.scientist.#{n}@liverpool.ac.uk"
   end
