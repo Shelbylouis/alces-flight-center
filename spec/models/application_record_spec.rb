@@ -19,6 +19,7 @@ RSpec.describe ApplicationRecord, type: :model do
       AssetRecordFieldDefinition,
       Category,
       ComponentType,
+      ComponentMake,
       Issue,
       ServiceType,
     ]
