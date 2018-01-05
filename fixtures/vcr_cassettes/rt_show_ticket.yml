@@ -19,11 +19,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 23 Nov 2017 10:36:53 GMT
+      - Fri, 05 Jan 2018 15:55:31 GMT
       Server:
       - Apache/2.2.9 (Debian) mod_perl/2.0.4 Perl/v5.10.0
       Set-Cookie:
-      - RT_SID_helpdesk.alces-software.com.80=95206c57abe7293d9b43fddc841177d5; path=/rt
+      - RT_SID_helpdesk.alces-software.com.80=7379ede11e84d3830ccc0dda3346d1bf; path=/rt
       Vary:
       - Accept-Encoding
       Connection:
@@ -65,5 +65,5 @@ http_interactions:
         CF-ClusterID: KELVIN
 
     http_version: 
-  recorded_at: Thu, 23 Nov 2017 10:37:18 GMT
-recorded_with: VCR 3.0.3
+  recorded_at: Fri, 05 Jan 2018 15:55:59 GMT
+recorded_with: VCR 4.0.0
