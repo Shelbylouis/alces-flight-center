@@ -42,9 +42,16 @@ FactoryBot.define do
     ordering 5
   end
 
+  factory :component_make do
+    component_type
+    manufacturer 'manufacturer'
+    model 'model'
+    knowledgebase_url 'knowledgebase_url'
+  end
+
   factory :component_group do
     cluster
-    component_type
+    component_make
     name 'nodes'
   end
 
