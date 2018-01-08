@@ -35,4 +35,8 @@ chdir APP_ROOT do
 
   puts "\n== Restarting application server =="
   system! 'bin/rails restart'
+
+  puts "\n== Next steps! =="
+  puts '1. In development you may want to run `bin/rails db:seed` to create some useful seed data.'
+  puts '2. Update this script to document or fix anything which broke or you had trouble with.'
 end
