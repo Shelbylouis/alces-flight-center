@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180104172429) do
+ActiveRecord::Schema.define(version: 20180108120842) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -153,6 +153,16 @@ ActiveRecord::Schema.define(version: 20180104172429) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "expansions", force: :cascade do |t|
+    t.string "slot", null: false
+    t.integer "ports", null: false
+    t.bigint "expansion_type_id", null: false
+    t.string "type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expansion_type_id"], name: "index_expansions_on_expansion_type_id"
+  end
+
   create_table "issues", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "requires_component", default: false, null: false
@@ -238,6 +248,7 @@ ActiveRecord::Schema.define(version: 20180104172429) do
   add_foreign_key "credit_charges", "users"
   add_foreign_key "credit_deposits", "clusters"
   add_foreign_key "credit_deposits", "users"
+  add_foreign_key "expansions", "expansion_types"
   add_foreign_key "issues", "service_types"
   add_foreign_key "maintenance_windows", "users", column: "confirmed_by_id"
   add_foreign_key "services", "clusters"
