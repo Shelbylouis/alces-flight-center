@@ -7,6 +7,7 @@ class Component < ApplicationRecord
   has_one :component_type, through: :component_group
   has_one :cluster, through: :component_group
   has_many :asset_record_fields
+  has_many :component_expansions
 
   validates_associated :component_group, :asset_record_fields
 
