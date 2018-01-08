@@ -13,12 +13,12 @@ chdir APP_ROOT do
   puts '== Installing dependencies =='
   system! 'gem install bundler --conservative'
   system('bundle check') || system!('bundle install')
-  system('bin/yarn')
+  system! 'bin/yarn'
 
   # Install system dependencies in same way as in production (refer to
   # https://github.com/F4-Group/dokku-apt).
   File.read('apt-packages').lines.map(&:chomp).reject(&:empty?).map do |package|
-    system("sudo apt-get install #{package}")
+    system! "sudo apt-get install #{package}"
   end
 
   puts "\n== Copying sample files =="
