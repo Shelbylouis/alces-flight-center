@@ -22,22 +22,17 @@ RSpec.describe ApplicationRecord, type: :model do
     # accessible by any User).
 
     describe 'regular models should be related to a Site xor explicitly globally available' do
+      # Eager load app so get all descendants of ApplicationRecord, not just
+      # those which happen to already be loaded.
+      Rails.application.eager_load!
 
-      ActiveRecord::Base.connection.tables.each do |table|
-        begin
-          klass = table.singularize.camelize.constantize
+      ApplicationRecord.descendants.each do |klass|
+        # Irregular models:
+        # Users: have a relation with a Site but are also global
+        # Exception: is a base class for STI and is neither
+        irregular_models = [User, Expansion]
 
-          # Irregular models:
-          # Users: have a relation with a Site but are also global
-          # Expansion: is a base class for STI and is neither
-          irregular_models = [User, Expansion]
-
-          next if irregular_models.include? klass
-        rescue NameError
-          # Some tables do not have corresponding AR class; we don't care about
-          # those.
-          next
-        end
+        next if irregular_models.include? klass
 
         it "#{klass.to_s} has Site xor is global" do
           related_to_site = klass.new.respond_to?(:site)
