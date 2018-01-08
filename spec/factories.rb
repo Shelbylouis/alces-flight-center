@@ -1,16 +1,5 @@
 
 FactoryBot.define do
-  factory :expansion do
-    slot "my-expansion"
-    ports 4
-    expasion_type expansion_type
-    type "expansion"
-  end
-
-  factory :expansion_type do
-    name "ExpansionDummy"
-  end
-
   sequence :email do |n|
     "a.scientist.#{n}@liverpool.ac.uk"
   end
