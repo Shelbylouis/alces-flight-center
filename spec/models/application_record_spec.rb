@@ -27,12 +27,13 @@ RSpec.describe ApplicationRecord, type: :model do
       Rails.application.eager_load!
 
       ApplicationRecord.descendants.each do |klass|
-        # Irregular models:
-        # Users: have a relation with a Site but are also global
-        # Exception: is a base class for STI and is neither
-        irregular_models = [User, Expansion]
+        # The class is a base class for use in STI; skip it and just its
+        # subclasses will be checked.
+        next if klass.descendants.present?
 
-        next if irregular_models.include? klass
+        # Users are special, they have a relation with a Site but are also
+        # globally available, i.e. able to be read by any other User.
+        next if klass == User
 
         it "#{klass.to_s} has Site xor is global" do
           related_to_site = klass.new.respond_to?(:site)
