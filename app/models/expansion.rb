@@ -1,4 +1,4 @@
 class Expansion < ApplicationRecord
   belongs_to :expansion_type
-  validates :type, presence: true
+  validates :type, :slot, :ports, presence: true
 end
