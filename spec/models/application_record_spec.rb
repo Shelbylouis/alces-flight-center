@@ -20,14 +20,19 @@ RSpec.describe ApplicationRecord, type: :model do
     # enforce that a non-admin User is a contact for that Site in order to
     # access it) or by specifying that it is globally available (and so will be
     # accessible by any User).
-    describe 'every non-User model should be related to a Site xor explicitly globally available' do
+
+    describe 'regular models should be related to a Site xor explicitly globally available' do
+
       ActiveRecord::Base.connection.tables.each do |table|
         begin
           klass = table.singularize.camelize.constantize
 
-          # Users are special, they have a relation with a Site but are also
-          # globally available, i.e. able to be read by any other User.
-          next if klass == User
+          # Irregular models:
+          # Users: have a relation with a Site but are also global
+          # Expansion: is a base class for STI and is neither
+          irregular_models = [User, Expansion]
+
+          next if irregular_models.include? klass
         rescue NameError
           # Some tables do not have corresponding AR class; we don't care about
           # those.
