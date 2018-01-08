@@ -2,15 +2,15 @@
 http_interactions:
 - request:
     method: post
-    uri: http://helpdesk.alces-software.com/rt/REST/1.0/ticket/11408/comment?pass=<RT_PASSWORD>&user=bob.whitelock
+    uri: http://<RT_API_HOST>/rt/REST/1.0/ticket/11420/comment?pass=<RT_PASSWORD>&user=<RT_USERNAME>
     body:
       encoding: UTF-8
-      string: content=id%3A+11408%0AAction%3A+correspond%0AText%3A+Alces+Flight+Center+test+comment%0A
+      string: content=id%3A+11420%0AAction%3A+correspond%0AText%3A+Alces+Flight+Center+test+comment%0A
     headers:
       Connection:
       - close
       Host:
-      - helpdesk.alces-software.com
+      - "<RT_API_HOST>"
       User-Agent:
       - http.rb/3.0.0
   response:
@@ -19,11 +19,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Fri, 05 Jan 2018 17:28:53 GMT
+      - Mon, 08 Jan 2018 17:55:37 GMT
       Server:
       - Apache/2.2.9 (Debian) mod_perl/2.0.4 Perl/v5.10.0
       Set-Cookie:
-      - RT_SID_helpdesk.alces-software.com.80=3ddc3a5754030a46a9c8111088037191; path=/rt
+      - RT_SID_<RT_API_HOST>.80=e57be9e29f86e1cb36d0d66ae0886443; path=/rt
       Vary:
       - Accept-Encoding
       Connection:
@@ -40,5 +40,5 @@ http_interactions:
         # Message recorded
 
     http_version: 
-  recorded_at: Fri, 05 Jan 2018 17:29:22 GMT
+  recorded_at: Mon, 08 Jan 2018 17:56:07 GMT
 recorded_with: VCR 4.0.0
