@@ -29,7 +29,7 @@ RSpec.describe ApplicationRecord, type: :model do
 
           # Irregular models:
           # Users: have a relation with a Site but are also global
-          # Exception: is a base class for STI and is neither
+          # Expansion: is a base class for STI and is neither
           irregular_models = [User, Expansion]
 
           next if irregular_models.include? klass
