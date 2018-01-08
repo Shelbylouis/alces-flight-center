@@ -1,3 +1,3 @@
 class Expansion < ApplicationRecord
-  belongs_to :expasion_type
+  belongs_to :expansion_type
 end
