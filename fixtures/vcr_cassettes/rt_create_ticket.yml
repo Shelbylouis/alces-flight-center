@@ -19,11 +19,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 23 Nov 2017 10:36:52 GMT
+      - Fri, 05 Jan 2018 15:55:29 GMT
       Server:
       - Apache/2.2.9 (Debian) mod_perl/2.0.4 Perl/v5.10.0
       Set-Cookie:
-      - RT_SID_helpdesk.alces-software.com.80=482fbe9196fcae9e79e7381a6072e2f7; path=/rt
+      - RT_SID_helpdesk.alces-software.com.80=cd7a60a39ab0c99e27b9e31a502f2aa2; path=/rt
       Vary:
       - Accept-Encoding
       Connection:
@@ -37,8 +37,8 @@ http_interactions:
       string: |+
         RT/3.6.7 200 Ok
 
-        # Ticket 11272 created.
+        # Ticket 11408 created.
 
     http_version: 
-  recorded_at: Thu, 23 Nov 2017 10:37:18 GMT
-recorded_with: VCR 3.0.3
+  recorded_at: Fri, 05 Jan 2018 15:55:58 GMT
+recorded_with: VCR 4.0.0

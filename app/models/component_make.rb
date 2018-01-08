@@ -3,4 +3,8 @@ class ComponentMake < ApplicationRecord
   has_many :component_groups
 
   validates :manufacturer, :model, :knowledgebase_url, presence: true
+
+  def self.globally_available?
+    true
+  end
 end
