@@ -18,12 +18,12 @@ RSpec.describe HasAssetRecordFields, type: :model do
     OpenStruct.new(
       name: 'Component-ish',
       asset_record_fields: assets,
-      parent_asset_record_fields: parent&.asset_record_fields
+      parent_for_asset_record_fields: parent
     ).tap { |x| x.extend(HasAssetRecordFields) }
   end
 
   def asset_values(obj = subject)
-    obj.asset_record_fields.map(&:value)
+    obj.combined_asset_record_fields.map(&:value)
   end
 
   it 'includes the asset_record_fields for the current layer' do

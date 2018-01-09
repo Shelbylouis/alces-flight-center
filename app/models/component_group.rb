@@ -13,8 +13,7 @@ class ComponentGroup < ApplicationRecord
 
   validates :name, presence: true
 
-  # TODO: fix this validation
-  #validates_associated :cluster, :asset_record_fields
+  validates_associated :cluster, :asset_record_fields
 
   attr_accessor :genders_host_range
 
@@ -48,7 +47,7 @@ class ComponentGroup < ApplicationRecord
     end
   end
 
-  def parent_asset_record_fields
-    component_type.asset_record_fields
+  def parent_for_asset_record_fields
+    component_type
   end
 end

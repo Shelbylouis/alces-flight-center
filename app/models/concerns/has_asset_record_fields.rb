@@ -10,14 +10,14 @@ module HasAssetRecordFields
 
   def asset_record
     @asset_record ||=
-      asset_record_fields.map(&:value).map do |field|
+      combined_asset_record_fields.map do |field|
         [field.name, field.value]
       end.to_h
   end
 
-  def asset_record_fields
+  def combined_asset_record_fields
     hashify_asset_record_fields(parent_asset_record_fields)
-      .merge(hashify_asset_record_fields(super))
+      .merge(hashify_asset_record_fields(asset_record_fields))
       .values
   end
 
@@ -27,5 +27,9 @@ module HasAssetRecordFields
     (records || []).map do |field|
       [field.definition.id, field]
     end.to_h
+  end
+
+  def parent_asset_record_fields
+    parent_for_asset_record_fields&.combined_asset_record_fields
   end
 end
