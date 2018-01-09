@@ -92,4 +92,29 @@ RSpec.describe Component, type: :model do
                                          'Comments' => '')
     end
   end
+
+  describe '#create_component_expansions_from_defaults' do
+    let :expansion_names { (1..2).map { |i| "expansion#{i}" } }
+    let :default_expansions do
+      expansion_names.map { |slot| create(:default_expansion, slot: slot) }
+    end
+    let :component_make do
+      create(:component_make, default_expansions: default_expansions)
+    end
+    let :component_group do
+      create(:component_group, component_make: component_make)
+    end
+
+    subject do
+      component_group.components.create!(name: 'test').component_expansions
+    end
+
+    it 'creates the correct number of expansions' do
+      expect(subject.length).to eq(expansion_names.length)
+    end
+
+    it 'creates the component_expansions' do
+      expect(subject.map(&:slot)).to include(*expansion_names)
+    end
+  end
 end
