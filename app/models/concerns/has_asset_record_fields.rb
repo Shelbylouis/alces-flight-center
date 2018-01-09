@@ -2,6 +2,10 @@
 module HasAssetRecordFields
   extend ActiveSupport::Concern
 
+  def asset_record_fields
+    super
+  end
+  
   def asset_record_layers
     # Each entry is a hash of definition ID to asset record field.
     [
