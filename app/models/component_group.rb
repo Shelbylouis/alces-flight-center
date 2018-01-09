@@ -24,17 +24,6 @@ class ComponentGroup < ApplicationRecord
     components.map(&:name)
   end
 
-  def asset_record
-    # Merge asset record layers to obtain hash for this Component of all
-    # asset record fields for this ComponentType; fields set in later layers
-    # will take precedence over those in earlier layers for the same
-    # definition.
-    @asset_record ||=
-      asset_record_layers.reduce({}, :merge).values.map do |field|
-        [field.name, field.value]
-      end.to_h
-  end
-
   private
 
   def create_needed_components_for_host_range
