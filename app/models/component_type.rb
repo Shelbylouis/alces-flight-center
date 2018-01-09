@@ -11,4 +11,10 @@ class ComponentType < ApplicationRecord
   def self.globally_available?
     true
   end
+
+  def asset_record_fields
+    asset_record_field_definitions.map do |definition|
+      AssetRecordField.new(definition: definition, value: '')
+    end
+  end
 end

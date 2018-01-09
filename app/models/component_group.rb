@@ -49,8 +49,6 @@ class ComponentGroup < ApplicationRecord
   end
 
   def parent_asset_record_fields
-    component_type.asset_record_field_definitions.map do |definition|
-      AssetRecordField.new(definition: definition, value: '')
-    end
+    component_type.asset_record_fields
   end
 end
