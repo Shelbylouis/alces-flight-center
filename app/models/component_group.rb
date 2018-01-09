@@ -2,6 +2,8 @@ class ComponentGroup < ApplicationRecord
   include AdminConfig::ComponentGroup
   include AdminConfig::Shared::EditableAssetRecordFields
 
+  include HasAssetRecordFields
+
   belongs_to :cluster
   has_one :site, through: :cluster
   belongs_to :component_make
@@ -55,14 +57,6 @@ class ComponentGroup < ApplicationRecord
     end
   end
 
-  def asset_record_layers
-    # Each entry is a hash of definition ID to asset record field.
-    [
-      empty_asset_record_fields,
-      group_asset_record_fields,
-    ]
-  end
-
   def empty_asset_record_fields
     component_type.asset_record_field_definitions.map do |definition|
       [
@@ -70,16 +64,6 @@ class ComponentGroup < ApplicationRecord
         # Placeholder empty AssetRecordField.
         AssetRecordField.new(definition: definition, value: ''),
       ]
-    end.to_h
-  end
-
-  def group_asset_record_fields
-    extract_asset_record_fields(self)
-  end
-
-  def extract_asset_record_fields(model)
-    model.asset_record_fields.map do |field|
-      [field.definition.id, field]
     end.to_h
   end
 end
