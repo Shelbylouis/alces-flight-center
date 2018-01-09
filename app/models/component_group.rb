@@ -12,7 +12,9 @@ class ComponentGroup < ApplicationRecord
   has_many :asset_record_fields
 
   validates :name, presence: true
-  validates_associated :cluster, :asset_record_fields
+
+  # TODO: fix this validation
+  #validates_associated :cluster, :asset_record_fields
 
   attr_accessor :genders_host_range
 
@@ -57,13 +59,9 @@ class ComponentGroup < ApplicationRecord
     end
   end
 
-  def empty_asset_record_fields
+  def parent_asset_record_fields
     component_type.asset_record_field_definitions.map do |definition|
-      [
-        definition.id,
-        # Placeholder empty AssetRecordField.
-        AssetRecordField.new(definition: definition, value: ''),
-      ]
-    end.to_h
+      AssetRecordField.new(definition: definition, value: '')
+    end
   end
 end
