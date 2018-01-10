@@ -9,7 +9,14 @@ class Component < ApplicationRecord
   has_many :asset_record_fields
   has_many :component_expansions
 
-  validates_associated :component_group, :asset_record_fields
+  has_one :component_make, through: :component_group
+  has_many :default_expansions, through: :component_make
+
+  validates_associated :component_group,
+                       :asset_record_fields,
+                       :component_expansions
+
+  after_create :create_component_expansions_from_defaults
 
   def asset_record
     # Merge asset record layers to obtain hash for this Component of all
@@ -23,6 +30,13 @@ class Component < ApplicationRecord
   end
 
   private
+
+  def create_component_expansions_from_defaults
+    default_expansions.each do |d|
+      data = d.slice(:expansion_type, :slot, :ports)
+      component_expansions.create!(**data.symbolize_keys)
+    end
+  end
 
   # Method to be called from AdminConfig to format Component asset record for
   # displaying to admins.

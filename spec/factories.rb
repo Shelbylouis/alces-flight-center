@@ -55,6 +55,17 @@ FactoryBot.define do
     name 'nodes'
   end
 
+  factory :expansion_type do
+    name 'switch'
+  end
+
+  factory :default_expansion do
+    expansion_type
+    component_make
+    ports 4
+    slot 'a'
+  end
+
   factory :category do
     name 'User management'
   end
