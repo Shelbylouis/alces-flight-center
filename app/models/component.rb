@@ -33,11 +33,8 @@ class Component < ApplicationRecord
 
   def create_component_expansions_from_defaults
     default_expansions.each do |d|
-      component_expansions.create!(
-        expansion_type: d.expansion_type,
-        slot: d.slot,
-        ports: d.ports
-      )
+      data = d.slice(:expansion_type, :slot, :ports)
+      component_expansions.create!(**data.symbolize_keys)
     end
   end
 
