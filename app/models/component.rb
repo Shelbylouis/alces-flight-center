@@ -12,7 +12,9 @@ class Component < ApplicationRecord
   has_one :component_make, through: :component_group
   has_many :default_expansions, through: :component_make
 
-  validates_associated :component_group, :asset_record_fields
+  validates_associated :component_group,
+                       :asset_record_fields,
+                       :component_expansions
 
   after_create :create_component_expansions_from_defaults
 
