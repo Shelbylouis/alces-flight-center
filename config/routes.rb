@@ -70,9 +70,12 @@ Rails.application.routes.draw do
     resources :components, only: :show do
       resources :cases, only: :new
       resources :consultancy, only: :new
+      resource :asset_record, only: :edit
     end
 
-    resources :component_groups, path: 'component-groups', only: :show
+    resources :component_groups, path: 'component-groups', only: :show do
+      resource :asset_record, only: :edit
+    end
 
     resources :services, only: :show do
       resources :cases, only: :new
