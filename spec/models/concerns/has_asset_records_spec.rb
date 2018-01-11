@@ -3,19 +3,19 @@ require 'rails_helper'
 RSpec.describe HasAssetRecords, type: :model do
   let :parent do
     create_asset(
-      fields: { 'parent_asset_field': 2, 'parent_override_field': 3 }
+      fields: { 2 => 'parent_asset_field', 3 => 'parent_override_field' }
     )
   end
 
   subject do
     create_asset(
       parent: parent,
-      fields: { 'subject_asset_field': 1, 'subject_override_field': 3 }
+      fields: { 1 => 'subject_asset_field', 3 => 'subject_override_field' }
     )
   end
 
   def create_asset(parent: nil, fields: {})
-    assets = fields.each_with_object([]) do |(msg, id), memo|
+    assets = fields.each_with_object([]) do |(id, msg), memo|
       definition = { definition: double(id: id) }
       d = double(AssetRecordField, **definition, value: msg.to_s)
       memo.push(d)
