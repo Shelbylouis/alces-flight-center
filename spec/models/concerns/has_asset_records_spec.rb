@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe HasAssetRecordFields, type: :model do
+RSpec.describe HasAssetRecords, type: :model do
   let :parent do
     make_obj('parent-asset': 2, 'idx3-parent': 3)
   end
@@ -19,7 +19,7 @@ RSpec.describe HasAssetRecordFields, type: :model do
       name: 'Component-ish',
       asset_record_fields: assets,
       parent_for_asset_record_fields: parent
-    ).tap { |x| x.extend(HasAssetRecordFields) }
+    ).tap { |x| x.extend(HasAssetRecords) }
   end
 
   def asset_values(obj = subject)
