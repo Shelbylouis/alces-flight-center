@@ -2,11 +2,11 @@ require 'rails_helper'
 
 RSpec.describe HasAssetRecords, type: :model do
   let :parent do
-    make_obj('parent-asset': 2, 'idx3-parent': 3)
+    make_obj('parent_asset_field': 2, 'parent_override_field': 3)
   end
 
   subject do
-    make_obj(parent, 'my-asset': 1, 'idx3-child': 3)
+    make_obj(parent, 'subject_asset_field': 1, 'subject_override_field': 3)
   end
 
   def make_obj(parent = nil, **fields)
@@ -27,15 +27,15 @@ RSpec.describe HasAssetRecords, type: :model do
   end
 
   it 'includes the asset_record_fields for the current layer' do
-    expect(asset_values).to include('my-asset')
+    expect(asset_values).to include('subject_asset_field')
   end
 
   it 'includes its parent assets' do
-    expect(asset_values).to include('parent-asset')
+    expect(asset_values).to include('parent_asset_field')
   end
 
-  it 'child assets override their parents' do
-    expect(asset_values).to include('idx3-child')
-    expect(asset_values).not_to include('idx3-parent')
+  it 'subject assets override their parents' do
+    expect(asset_values).to include('subject_override_field')
+    expect(asset_values).not_to include('parent_override_field')
   end
 end
