@@ -80,16 +80,20 @@ RSpec.describe Component, type: :model do
 
       subject.reload
 
-      expect(subject.asset_record).to eq('Ip' => '1.2.3.4',
-                                         'Model/manufacturer name' => 'Dell server',
+      result_hash = subject.asset_records.map do |r|
+        [r.definition.field_name, r.value]
+      end.to_h
+      expect(result_hash).to eq(
+        'Ip' => '1.2.3.4',
+        'Model/manufacturer name' => 'Dell server',
 
-                                         # Component-level field value should take precedence.
-                                         'OS deployed' => 'Windows o_O',
+        # Component-level field value should take precedence.
+        'OS deployed' => 'Windows o_O',
 
-                                         # Field definition included in definitions associated with
-                                         # ComponentType, but without an AssetRecordField associated with
-                                         # Component or ComponentGroup, should still be included.
-                                         'Comments' => '')
+        # Field definition included in definitions associated with
+        # ComponentType, but without an AssetRecordField associated with
+        # Component or ComponentGroup, should still be included.
+        'Comments' => '')
     end
   end
 

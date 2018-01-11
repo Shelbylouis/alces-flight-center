@@ -28,10 +28,10 @@
     </thead>
 
     <tbody>
-    <% model.asset_record.each do |name, value| %>
+    <% model.asset_records.each do |record| %>
       <tr>
-        <td><%= name %></td>
-        <td><%= value %></td>
+        <td><%= record.name %></td>
+        <td><%= record.value %></td>
       </tr>
     <% end %>
     </tbody>
