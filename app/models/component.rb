@@ -29,7 +29,7 @@ class Component < ApplicationRecord
     end
   end
 
-  def parent_for_asset_record_fields
+  def asset_record_parent
     component_group
   end
 end

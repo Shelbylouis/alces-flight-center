@@ -18,7 +18,7 @@ RSpec.describe HasAssetRecords, type: :model do
     OpenStruct.new(
       name: 'Component-ish',
       asset_record_fields: assets,
-      parent_for_asset_record_fields: parent
+      asset_record_parent: parent
     ).tap { |x| x.extend(HasAssetRecords) }
   end
 

@@ -30,6 +30,6 @@ module HasAssetRecords
   end
 
   def parent_asset_record_fields
-    parent_for_asset_record_fields&.combined_asset_record_fields
+    asset_record_parent&.combined_asset_record_fields
   end
 end
