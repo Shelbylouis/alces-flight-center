@@ -15,14 +15,15 @@ RSpec.describe HasAssetRecords, type: :model do
   end
 
   def create_asset(parent: nil, fields: {})
-    assets = fields.each_with_object([]) do |(id, msg), memo|
-      definition = { definition: double(id: id) }
-      d = double(AssetRecordField, **definition, value: msg.to_s)
-      memo.push(d)
+    # The asset_record_fields are merged according to the Definition id
+    asset_fields = fields.each_with_object([]) do |(id, msg), memo|
+      asset_def = { definition: double(AssetRecordFieldDefinition, id: id) }
+      memo.push(double(AssetRecordField, **asset_def, value: msg.to_s))
     end
+    # Final test object which contains the fields and the parent
     OpenStruct.new(
       name: 'Component-ish',
-      asset_record_fields: assets,
+      asset_record_fields: asset_fields,
       asset_record_parent: parent
     ).tap { |x| x.extend(HasAssetRecords) }
   end
