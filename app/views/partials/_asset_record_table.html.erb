@@ -1,13 +1,19 @@
 
 <% scope ||= 'show' #Default to show scope %>
 
-
 <div class='card'>
   <div class='card-header'>
     <ul class="nav">
       <li class="nav-item">
         <span class="navbar-brand">
-          Asset Record <%= button_to 'edit', edit_model_asset_record_path, method: 'get', form: { style: 'display:inline-block;' } %>
+          Asset Record <%=
+            if scope == 'show' && current_user.admin?
+              button_to 'edit',
+                edit_model_asset_record_path,
+                method: 'get',
+                form: { style: 'display:inline-block;' }
+            end
+          %>
         </span>
       </li>
     </ul>
