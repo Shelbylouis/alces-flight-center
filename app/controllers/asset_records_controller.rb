@@ -1,8 +1,8 @@
 class AssetRecordsController < ApplicationController
   def edit
-    @title = "Title"
-    @subtitle = "Subtitle"
-    asset
+    @asset = asset
+    @title = "Edit Asset Record"
+    @subtitle = "#{@asset.name}"
   end
 
   private
@@ -10,16 +10,14 @@ class AssetRecordsController < ApplicationController
   VALID_ASSET_IDS = [:component_id, :component_group_id]
 
   def asset
-    ensure_single_asset_only
+    id_key = id_param.keys.first
+    id_key.to_s.chomp('_id').classify.constantize.find(id_param[id_key])
   end
 
-  def ensure_single_asset_only
-    (asset_params.keys & VALID_ASSET_IDS.map(&:to_s)).tap do |ids|
-      raise 'Can not determine asset' unless ids.length == 1
+  def id_param
+    id = (params.keys & VALID_ASSET_IDS.map(&:to_s)).tap do |keys|
+      raise 'Can not determine asset' unless keys.length == 1
     end
-  end
-
-  def asset_params
-    params.permit(*VALID_ASSET_IDS)
+    params.permit(*id)
   end
 end

@@ -28,12 +28,16 @@
     </thead>
 
     <tbody>
-    <% model.asset_records.each do |record| %>
-      <tr>
-        <td><%= record.name %></td>
-        <td><%= record.value %></td>
-      </tr>
-    <% end %>
+      <%= form_tag do %>
+        <% model.asset_records.each do |record| %>
+          <tr>
+            <% definition_id = record.definition.id %>
+            <td><%= label_tag(definition_id, record.name) %></td>
+            <% input = text_field_tag(definition_id, record.value) %>
+            <td><%= scope == 'show' ? record.value : input %></td>
+          </tr>
+        <% end %>
+      <% end %>
     </tbody>
   </table>
 </div>

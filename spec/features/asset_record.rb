@@ -20,4 +20,16 @@ RSpec.feature 'Asset Record', type: :feature   do
       end.to raise_error(RuntimeError)
     end
   end
+
+  context 'with a component' do
+    subject { component }
+    let :edit_path do
+      edit_component_asset_record_path(component, as: admin)
+    end
+
+    # it 'finds the component' do
+    #   visit edit_path
+    #   expect(asset).to eq(component)
+    # end
+  end
 end
