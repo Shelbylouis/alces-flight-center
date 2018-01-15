@@ -36,7 +36,7 @@ RSpec.describe HasAssetRecord, type: :model do
   end
 
   def asset_values(obj = subject)
-    obj.asset_records.map(&:value)
+    obj.asset_record.map(&:value)
   end
 
   it 'includes the asset_record_fields for the current layer' do

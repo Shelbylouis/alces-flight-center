@@ -80,7 +80,7 @@ RSpec.describe Component, type: :model do
 
       subject.reload
 
-      result_hash = subject.asset_records.map do |r|
+      result_hash = subject.asset_record.map do |r|
         [r.definition.field_name, r.value]
       end.to_h
       expect(result_hash).to eq(

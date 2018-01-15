@@ -12,7 +12,7 @@ class ComponentType < ApplicationRecord
     true
   end
 
-  def asset_records
+  def asset_record
     asset_record_field_definitions.map do |definition|
       AssetRecordField.new(definition: definition, value: '')
     end

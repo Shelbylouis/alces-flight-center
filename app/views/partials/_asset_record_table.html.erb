@@ -29,7 +29,7 @@
       </thead>
 
       <tbody>
-        <% model.asset_records.each do |record| %>
+        <% model.asset_record.each do |record| %>
           <tr>
             <% definition_id = record.definition.id %>
             <td><%= label_tag(definition_id, record.name) %></td>
