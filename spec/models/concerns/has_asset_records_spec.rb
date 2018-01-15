@@ -43,7 +43,7 @@ RSpec.describe HasAssetRecords, type: :model do
     expect(asset_values).to include('subject_asset_field')
   end
 
-  it 'includes its parent assets' do
+  it 'includes its parent fields' do
     expect(asset_values).to include('parent_asset_field')
   end
 
@@ -51,7 +51,7 @@ RSpec.describe HasAssetRecords, type: :model do
     expect(asset_values).to include('grand_parent_field')
   end
 
-  it 'subject assets override their parents' do
+  it 'subject fields override their parents' do
     expect(asset_values).to include('subject_override_field')
     expect(asset_values).not_to include('parent_override_field')
   end
