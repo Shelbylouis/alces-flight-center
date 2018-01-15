@@ -1,5 +1,5 @@
 
-module HasAssetRecords
+module HasAssetRecord
   extend ActiveSupport::Concern
 
   # Method to be called from AdminConfig to format Component asset record for

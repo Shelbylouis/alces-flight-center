@@ -3,7 +3,7 @@ class Component < ApplicationRecord
   include AdminConfig::Shared::EditableAssetRecordFields
   include ClusterPart
 
-  include HasAssetRecords
+  include HasAssetRecord
 
   belongs_to :component_group
   has_one :component_type, through: :component_group

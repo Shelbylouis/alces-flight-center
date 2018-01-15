@@ -2,7 +2,7 @@ class ComponentGroup < ApplicationRecord
   include AdminConfig::ComponentGroup
   include AdminConfig::Shared::EditableAssetRecordFields
 
-  include HasAssetRecords
+  include HasAssetRecord
 
   belongs_to :cluster
   has_one :site, through: :cluster
