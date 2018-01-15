@@ -19,16 +19,16 @@
     </ul>
   </div>
 
-  <table class="table table-responsive">
-    <thead>
-      <tr>
-        <th>Field</th>
-        <th>Value</th>
-      </tr>
-    </thead>
+  <%= form_tag do %>
+    <table class="table table-responsive">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Value</th>
+        </tr>
+      </thead>
 
-    <tbody>
-      <%= form_tag do %>
+      <tbody>
         <% model.asset_records.each do |record| %>
           <tr>
             <% definition_id = record.definition.id %>
@@ -37,8 +37,9 @@
             <td><%= scope == 'show' ? record.value : input %></td>
           </tr>
         <% end %>
-      <% end %>
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+    <%= submit_tag("Submit") if scope == 'edit' %>
+  <% end %>
 </div>
 

@@ -67,14 +67,18 @@ Rails.application.routes.draw do
       resources :consultancy, only: :new
     end
 
+    asset_record = Proc.new do
+      resource :asset_record, only: [:edit, :update]
+    end
+
     resources :components, only: :show do
       resources :cases, only: :new
       resources :consultancy, only: :new
-      resource :asset_record, only: :edit
+      asset_record.call
     end
 
     resources :component_groups, path: 'component-groups', only: :show do
-      resource :asset_record, only: :edit
+      asset_record.call
     end
 
     resources :services, only: :show do
