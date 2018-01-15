@@ -3,6 +3,12 @@
 # just a bit of a dumping ground. At some point should pull things out to
 # better places.
 class ApplicationDecorator < Draper::Decorator
+  # Includes the AssetRecord Decorator implicitly
+  def initialize(*a)
+    super
+    extend AssetRecordDecorator if object.respond_to? :asset_record
+  end
+
   # Define methods for all decorated objects.
   # Helpers are accessed through `helpers` (aka `h`). For example:
   #

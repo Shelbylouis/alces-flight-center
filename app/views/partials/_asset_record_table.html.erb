@@ -9,7 +9,7 @@
           Asset Record <%=
             if scope == 'show' && current_user.admin?
               button_to 'edit',
-                edit_model_asset_record_path,
+                model.decorate.edit_asset_record_path,
                 method: 'get',
                 form: { style: 'display:inline-block;' }
             end
@@ -19,7 +19,7 @@
     </ul>
   </div>
 
-  <%= form_tag do %>
+  <%= form_tag model.decorate.asset_record_path, method: 'PATCH' do %>
     <table class="table table-responsive">
       <thead>
         <tr>
