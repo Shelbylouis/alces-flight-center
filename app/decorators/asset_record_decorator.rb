@@ -10,6 +10,6 @@ module AssetRecordDecorator
   private
 
   def model_id_path
-    File.join('', object.class.to_s.tableize, object.id.to_s)
+    File.join('', object.class.to_s.tableize.gsub('_', '-'), object.id.to_s)
   end
 end

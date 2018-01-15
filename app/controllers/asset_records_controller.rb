@@ -5,6 +5,10 @@ class AssetRecordsController < ApplicationController
     @subtitle = "#{@asset.name}"
   end
 
+  def update
+    redirect_to asset
+  end
+
   private
 
   VALID_ASSET_IDS = [:component_id, :component_group_id]
