@@ -1,8 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe HasAssetRecords, type: :model do
+  let :grand_parent do
+    create_asset(
+      fields: { 4 => 'grand_parent_field' }
+    )
+  end
+
   let :parent do
     create_asset(
+      parent: grand_parent,
       fields: { 2 => 'parent_asset_field', 3 => 'parent_override_field' }
     )
   end
@@ -38,6 +45,10 @@ RSpec.describe HasAssetRecords, type: :model do
 
   it 'includes its parent assets' do
     expect(asset_values).to include('parent_asset_field')
+  end
+
+  it 'allows multiple chained asset records' do
+    expect(asset_values).to include('grand_parent_field')
   end
 
   it 'subject assets override their parents' do
