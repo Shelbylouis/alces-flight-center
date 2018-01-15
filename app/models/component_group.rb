@@ -2,6 +2,8 @@ class ComponentGroup < ApplicationRecord
   include AdminConfig::ComponentGroup
   include AdminConfig::Shared::EditableAssetRecordFields
 
+  include HasAssetRecord
+
   belongs_to :cluster
   has_one :site, through: :cluster
   belongs_to :component_make
@@ -10,6 +12,7 @@ class ComponentGroup < ApplicationRecord
   has_many :asset_record_fields
 
   validates :name, presence: true
+
   validates_associated :cluster, :asset_record_fields
 
   attr_accessor :genders_host_range
@@ -18,17 +21,6 @@ class ComponentGroup < ApplicationRecord
 
   def component_names
     components.map(&:name)
-  end
-
-  def asset_record
-    # Merge asset record layers to obtain hash for this Component of all
-    # asset record fields for this ComponentType; fields set in later layers
-    # will take precedence over those in earlier layers for the same
-    # definition.
-    @asset_record ||=
-      asset_record_layers.reduce({}, :merge).values.map do |field|
-        [field.name, field.value]
-      end.to_h
   end
 
   private
@@ -55,31 +47,7 @@ class ComponentGroup < ApplicationRecord
     end
   end
 
-  def asset_record_layers
-    # Each entry is a hash of definition ID to asset record field.
-    [
-      empty_asset_record_fields,
-      group_asset_record_fields,
-    ]
-  end
-
-  def empty_asset_record_fields
-    component_type.asset_record_field_definitions.map do |definition|
-      [
-        definition.id,
-        # Placeholder empty AssetRecordField.
-        AssetRecordField.new(definition: definition, value: ''),
-      ]
-    end.to_h
-  end
-
-  def group_asset_record_fields
-    extract_asset_record_fields(self)
-  end
-
-  def extract_asset_record_fields(model)
-    model.asset_record_fields.map do |field|
-      [field.definition.id, field]
-    end.to_h
+  def asset_record_parent
+    component_type
   end
 end

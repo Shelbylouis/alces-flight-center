@@ -90,9 +90,15 @@ main_cluster = site.clusters.create!(
     end
   end
 
+  switch_make = ComponentMake.create!(
+    manufacturer: 'Dell',
+    model: 'a_switch_123',
+    knowledgebase_url: 'example.com',
+    component_type: ComponentType.find_by_name('Network switch'),
+  )
   cluster.component_groups.create!(
     name: 'Rack A1 switches',
-    component_type: ComponentType.find_by_name('Network switch')
+    component_make: switch_make
   ).tap do |group|
     group.components.create!(
       component_group: group,
@@ -187,9 +193,15 @@ main_cluster.cases.create!(
   service: main_cluster_hpc_environment,
 )
 
+virtual_server_make = ComponentMake.create!(
+  manufacturer: 'N/A',
+  model: 'Libvirt',
+  knowledgebase_url: 'example.com',
+  component_type: ComponentType.find_by_name('Virtual server'),
+)
 main_cluster.component_groups.create!(
   name: 'Appliances',
-  component_type: ComponentType.find_by_name('Virtual server')
+  component_make: virtual_server_make,
 ).tap do |group|
   group.components.create!(
     name: 'Alces Controller Appliance',
