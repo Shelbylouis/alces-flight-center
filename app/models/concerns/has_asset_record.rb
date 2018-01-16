@@ -22,7 +22,10 @@ module HasAssetRecord
     asset_record.each do |field|
       updated_value = definition_hash[field.definition.id]
       next if field.value == updated_value
-      if field.asset == self
+      if field.asset == self && (updated_value.nil? || updated_value.empty?)
+        # Delete an existing field
+        field.destroy!
+      elsif field.asset
         # When updating a field associated with the asset
         field.value = updated_value
         field.save!

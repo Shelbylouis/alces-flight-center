@@ -104,6 +104,7 @@ RSpec.describe HasAssetRecord, type: :model do
     # The comparison is done using inspect/ string comparison
     # This prevents issues with the tests sneakily changing the old_fields
     # making it hard to tell if it has changed
+    # WARNING!! It can not be used to test deleted fields
     def changed_fields
       old_fields = subject.asset_record_fields.to_ary.map(&:inspect)
       yield if block_given?
@@ -145,5 +146,19 @@ RSpec.describe HasAssetRecord, type: :model do
       expect(updated_fields.length).to eq(1)
       expect_update(set_definition, updated_fields.first, 'component')
     end
+
+    shared_examples 'delete asset field' do |input|
+      it "deletes the record when it is updated to: #{input.inspect}" do
+        delete_field = subject.asset_record_fields.first
+        subject.update_asset_record(
+          old_hash.merge(delete_field.definition.id => input)
+        )
+        subject.reload
+        expect(subject.asset_record_fields).not_to include(delete_field)
+      end
+    end
+
+    include_examples 'delete asset field', nil
+    include_examples 'delete asset field', ''
   end
 end
