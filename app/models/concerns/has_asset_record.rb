@@ -11,16 +11,20 @@ module HasAssetRecord
   end
 
   def asset_record
-    new_asset_ids = asset_record_fields.map { |m| m.definition.id }
-    parent_asset_record.inject(asset_record_fields) do |memo, r|
-      memo << r unless new_asset_ids.include? r.definition.id
-      memo
-    end
+    asset_record_hash.values
+  end
+
+  def asset_record_hash
+    parent_asset_record_hash.merge new_asset_record_hash
   end
 
   private
 
-  def parent_asset_record
-    asset_record_parent&.asset_record || []
+  def new_asset_record_hash
+    asset_record_fields.map { |f| [f.definition.id, f] }.to_h
+  end
+
+  def parent_asset_record_hash
+    asset_record_parent&.asset_record_hash || {}
   end
 end
