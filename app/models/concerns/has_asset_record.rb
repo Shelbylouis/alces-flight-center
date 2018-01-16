@@ -18,6 +18,10 @@ module HasAssetRecord
     parent_asset_record_hash.merge new_asset_record_hash
   end
 
+  def update_asset_record(definition_hash)
+    
+  end
+
   private
 
   def new_asset_record_hash
