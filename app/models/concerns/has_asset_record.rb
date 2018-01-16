@@ -18,9 +18,12 @@ module HasAssetRecord
     parent_asset_record_hash.merge new_asset_record_hash
   end
 
-  def update_asset_record(definition_hash)
+  def update_asset_record(raw_definition_hash)
+    definition_hash = raw_definition_hash.map do |key, value|
+      [key.to_s.to_sym, value]
+    end.to_h
     asset_record.each do |field|
-      updated_value = definition_hash[field.definition.id]
+      updated_value = definition_hash[field.definition.id.to_s.to_sym]
       next if field.value == updated_value
       if field.asset == self && (updated_value.nil? || updated_value.empty?)
         # Delete an existing field

@@ -5,6 +5,7 @@ class AssetRecordsController < ApplicationController
   end
 
   def update
+    asset.update_asset_record(update_param.to_h)
     redirect_to asset
   end
 
