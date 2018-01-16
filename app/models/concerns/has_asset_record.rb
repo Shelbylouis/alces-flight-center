@@ -32,7 +32,7 @@ module HasAssetRecord
         # When updating a field associated with the asset
         field.value = updated_value
         field.save!
-      elsif updated_value
+      else
         # When updating a higher level field
         create_asset_record_field(field.definition, updated_value)
       end
