@@ -28,7 +28,7 @@ module HasAssetRecord
       if field.asset == self && (updated_value.nil? || updated_value.empty?)
         # Delete an existing field
         field.destroy!
-      elsif field.asset
+      elsif field.asset == self
         # When updating a field associated with the asset
         field.value = updated_value
         field.save!

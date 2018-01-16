@@ -86,6 +86,22 @@ RSpec.describe HasAssetRecord, type: :model do
       end
     end
 
+    let! :group_definition do
+      create(
+        :asset_record_field_definition,
+        component_types: [subject.component_type]
+      ).tap do |definition|
+        create(
+          :unassociated_asset_record_field,
+          definition: definition,
+          component_group: subject.component_group,
+          value: 'group'
+        )
+        subject.reload
+        subject.component_group.reload
+      end
+    end
+
     let! :frozen_old_hash { definition_hash(subject).freeze }
 
     def old_hash
@@ -145,6 +161,20 @@ RSpec.describe HasAssetRecord, type: :model do
       end
       expect(updated_fields.length).to eq(1)
       expect_update(set_definition, updated_fields.first, 'component')
+    end
+
+    it 'does not update the higher level record' do
+      subject.update_asset_record(
+        old_hash.merge(group_definition.id => 'component')
+      )
+      subject.reload
+      subject.component_group.reload
+
+      group_record = subject.component_group.asset_record.find do |record|
+        record.definition == group_definition
+      end
+
+      expect(group_record.value).to eq('group')
     end
 
     shared_examples 'delete asset field' do |input|
