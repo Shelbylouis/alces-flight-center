@@ -71,6 +71,21 @@ RSpec.describe HasAssetRecord, type: :model do
       )
     end
 
+    let! :set_definition do
+      create(
+        :asset_record_field_definition,
+        component_types: [subject.component_type]
+      ).tap do |definition|
+        create(
+          :unassociated_asset_record_field,
+          definition: definition,
+          component: subject,
+          value: 'initial value'
+        )
+        subject.reload
+      end
+    end
+
     let! :frozen_old_hash { definition_hash(subject).freeze }
 
     def old_hash
@@ -86,28 +101,49 @@ RSpec.describe HasAssetRecord, type: :model do
       expect(updated_field.value).to eq(new_value)
     end
 
+    # The comparison is done using inspect/ string comparison
+    # This prevents issues with the tests sneakily changing the old_fields
+    # making it hard to tell if it has changed
+    def changed_fields
+      old_fields = subject.asset_record_fields.to_ary.map(&:inspect)
+      yield if block_given?
+      subject.reload.asset_record_fields.to_ary.delete_if do |field|
+        old_fields.include?(field.inspect)
+      end
+    end
+
     it 'does nothing if no values have changed' do
       subject.update_asset_record(old_hash.deep_dup)
       expect(definition_hash(subject)).to eq(old_hash)
     end
 
     it 'creates a new field when component_type definition is updated' do
-      old_fields = subject.asset_record_fields.to_ary
-      subject.update_asset_record(
-        old_hash.merge(type_only_definition.id => 'component')
-      )
-      new_fields = subject.reload.asset_record_fields - old_fields
+      new_fields = changed_fields do
+        subject.update_asset_record(
+          old_hash.merge(type_only_definition.id => 'component')
+        )
+      end
       expect(new_fields.length).to eq(1)
       expect_update(type_only_definition, new_fields.first, 'component')
     end
 
     it "doesn't create a new component_type field with an empty value" do
-      old_fields = subject.asset_record_fields.to_ary
-      subject.update_asset_record(
-        old_hash.merge(type_only_definition.id => '')
-      )
-      new_fields = subject.reload.asset_record_fields - old_fields
+      new_fields = changed_fields do
+        subject.update_asset_record(
+          old_hash.merge(type_only_definition.id => '')
+        )
+      end
       expect(new_fields.length).to eq(0)
+    end
+
+    it 'can update an existing record for the component' do
+      updated_fields = changed_fields do
+        subject.update_asset_record(
+          old_hash.merge(set_definition.id => 'component')
+        )
+      end
+      expect(updated_fields.length).to eq(1)
+      expect_update(set_definition, updated_fields.first, 'component')
     end
   end
 end

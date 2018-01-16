@@ -24,7 +24,8 @@ module HasAssetRecord
       next if field.value == updated_value
       if field.asset == self
         # When updating a field associated with the asset
-        raise NotImplementedError
+        field.value = updated_value
+        field.save!
       elsif updated_value
         # When updating a higher level field
         create_asset_record_field(field.definition, updated_value)
