@@ -10,6 +10,11 @@ class AssetRecordsController < ApplicationController
 
   private
 
+  def update_param
+    definition_ids = asset.asset_record.map { |r| r.definition.id.to_s }
+    params.permit(*definition_ids)
+  end
+
   def asset
     @cluster_part || @component_group
   end
