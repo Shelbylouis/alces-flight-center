@@ -62,30 +62,52 @@ RSpec.describe HasAssetRecord, type: :model do
   end
 
   describe '#update' do
-    let :type_only_definition { create(:asset_record_field_definition) }
-    let :component_type do
+    subject { create(:component) }
+
+    let! :type_only_definition do
       create(
-        :component_type,
-        asset_record_field_definitions: [type_only_definition]
+        :asset_record_field_definition,
+        component_types: [subject.component_type]
       )
     end
-    let :component_make do
-      create(:component_make, component_type: component_type)
-    end
-    let :component_group do
-      create(:component_group, component_make: component_make)
-    end
 
-    subject { create(:component, component_group: component_group) }
+    let! :frozen_old_hash { definition_hash(subject).freeze }
+
+    def old_hash
+      frozen_old_hash.deep_dup
+    end
 
     def definition_hash(obj)
-      obj.asset_record.map { |r| [r.definition.id, r.value] }
+      obj.asset_record.map { |r| [r.definition.id, r.value] }.to_h
+    end
+
+    def expect_update(definition, updated_field, new_value)
+      expect(updated_field.definition).to eq(definition)
+      expect(updated_field.value).to eq(new_value)
     end
 
     it 'does nothing if no values have changed' do
-      old_hash = definition_hash(subject)
       subject.update_asset_record(old_hash.deep_dup)
       expect(definition_hash(subject)).to eq(old_hash)
+    end
+
+    it 'creates a new field when component_type definition is updated' do
+      old_fields = subject.asset_record_fields.to_ary
+      subject.update_asset_record(
+        old_hash.merge(type_only_definition.id => 'component')
+      )
+      new_fields = subject.reload.asset_record_fields - old_fields
+      expect(new_fields.length).to eq(1)
+      expect_update(type_only_definition, new_fields.first, 'component')
+    end
+
+    it "doesn't create a new component_type field with an empty value" do
+      old_fields = subject.asset_record_fields.to_ary
+      subject.update_asset_record(
+        old_hash.merge(type_only_definition.id => '')
+      )
+      new_fields = subject.reload.asset_record_fields - old_fields
+      expect(new_fields.length).to eq(0)
     end
   end
 end

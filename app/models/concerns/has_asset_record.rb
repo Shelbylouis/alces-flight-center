@@ -19,7 +19,17 @@ module HasAssetRecord
   end
 
   def update_asset_record(definition_hash)
-    
+    asset_record.each do |field|
+      updated_value = definition_hash[field.definition.id]
+      next if field.value == updated_value
+      if field.asset == self
+        # When updating a field associated with the asset
+        raise NotImplementedError
+      elsif updated_value
+        # When updating a higher level field
+        create_asset_record_field(field.definition, updated_value)
+      end
+    end
   end
 
   private
@@ -30,5 +40,12 @@ module HasAssetRecord
 
   def parent_asset_record_hash
     asset_record_parent&.asset_record_hash || {}
+  end
+
+  def create_asset_record_field(definition, value)
+    asset_record_fields.create!(
+      asset_record_field_definition_id: definition.id,
+      value: value
+    )
   end
 end
