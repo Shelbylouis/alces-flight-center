@@ -28,10 +28,13 @@
               <%= label_tag(definition_id, record.name) %>
             </td>
 
+            <% placeholder = model.find_parent_asset_record(record.definition)
+                                  .value %>
             <% form_input = text_field_tag(
               definition_id,
               record.value,
-              class: 'form-control'
+              class: 'form-control',
+              placeholder: placeholder
             ) %>
             <td width="50%">
               <%= action == 'show' ? record.value : form_input %>
