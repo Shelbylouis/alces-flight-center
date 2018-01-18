@@ -68,7 +68,7 @@ Rails.application.routes.draw do
     end
 
     asset_record = Proc.new do
-      resource :asset_record, only: [:edit, :update]
+      resource :asset_record, path: 'asset-record', only: [:edit, :update]
     end
 
     resources :components, only: :show do
