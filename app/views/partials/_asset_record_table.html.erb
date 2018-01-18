@@ -28,13 +28,13 @@
               <%= label_tag(definition_id, record.name) %>
             </td>
 
-            <% input = text_field_tag(
+            <% form_input = text_field_tag(
               definition_id,
               record.value,
               class: 'form-control'
             ) %>
             <td width="50%">
-              <%= action == 'show' ? record.value : input %>
+              <%= action == 'show' ? record.value : form_input %>
             </td>
           </tr>
         <% end %>
