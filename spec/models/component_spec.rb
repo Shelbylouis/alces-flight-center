@@ -42,8 +42,7 @@ RSpec.describe Component, type: :model do
         )
       end
     end
-
-    it 'returns hash of asset record field names to values' do
+    it 'returns merged array of all applicable asset record fields' do
       ip_field_definition,
         model_field_definition,
         os_field_definition = asset_record_field_definitions
@@ -80,10 +79,10 @@ RSpec.describe Component, type: :model do
 
       subject.reload
 
-      result_hash = subject.asset_record.map do |r|
+      field_names_to_values = subject.asset_record.map do |r|
         [r.definition.field_name, r.value]
       end.to_h
-      expect(result_hash).to eq(
+      expect(field_names_to_values).to eq(
         'Ip' => '1.2.3.4',
         'Model/manufacturer name' => 'Dell server',
 
