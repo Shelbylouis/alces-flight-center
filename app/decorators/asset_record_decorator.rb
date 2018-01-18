@@ -1,15 +1,19 @@
 module AssetRecordDecorator
   def edit_asset_record_path
-    File.join(asset_record_path, 'edit')
+    h.public_send "edit_#{asset_record_path_method_string}", object
   end
 
   def asset_record_path
-    File.join(model_id_path, 'asset_record')
+    h.public_send asset_record_path_method_string, object
   end
 
   private
 
-  def model_id_path
-    File.join('', object.class.to_s.tableize.gsub('_', '-'), object.id.to_s)
+  def asset_record_path_method_string
+    "#{asset_model_name}_asset_record_path"
+  end
+
+  def asset_model_name
+    object.class.to_s.tableize.singularize
   end
 end
