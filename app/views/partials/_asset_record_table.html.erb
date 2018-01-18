@@ -6,10 +6,11 @@
         <span class="navbar-brand">
           Asset Record <%=
             if action == 'show' && current_user.admin?
-              button_to 'edit',
+              link_to 'Edit',
                 model.decorate.edit_asset_record_path,
-                method: 'get',
-                form: { style: 'display:inline-block;' }
+                style: 'display:inline-block;',
+                class: ['nav-link', 'btn', 'btn-dark'],
+                role: 'button'
             end
           %>
         </span>
@@ -37,7 +38,11 @@
         <% end %>
       </tbody>
     </table>
-    <%= submit_tag("Submit") if action == 'edit' %>
+    <%= if action == 'edit'
+          submit_tag "Submit",
+            style: 'display:inline-block;',
+            class: ['nav-link', 'btn', 'btn-dark']
+        end %>
   <% end %>
 </div>
 
