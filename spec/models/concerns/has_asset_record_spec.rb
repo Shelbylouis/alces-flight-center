@@ -193,6 +193,15 @@ RSpec.describe HasAssetRecord, type: :model do
       expect(group_record.value).to eq('group')
     end
 
+    it 'does not replace higher level assets with a blank field' do
+      updated_fields = changed_fields do
+        subject.update_asset_record(
+          old_hash.merge(group_definition.id => '')
+        )
+      end
+      expect(updated_fields.length).to eq(0)
+    end
+
     shared_examples 'delete asset field' do |input|
       it "deletes the record when it is updated to: #{input.inspect}" do
         delete_field = subject.asset_record_fields.first
