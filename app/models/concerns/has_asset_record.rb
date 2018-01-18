@@ -14,6 +14,10 @@ module HasAssetRecord
     asset_record_hash.values
   end
 
+  def find_parent_asset_record(definition)
+    parent_asset_record_hash[definition.id]
+  end
+
   def asset_record_hash
     parent_asset_record_hash.merge new_asset_record_hash
   end
