@@ -30,11 +30,15 @@
 
             <% placeholder = model.find_parent_asset_record(record.definition)
                                   .value %>
+            <% is_component_level = (record.definition.level == 'component') %>
+            <% model_is_a_component = model.is_a?(Component) %>
+            <% readonly = is_component_level && !model_is_a_component %>
             <% form_input = text_field_tag(
               definition_id,
               (record.asset == model ? record.value : ''),
               class: 'form-control',
-              placeholder: placeholder
+              placeholder: placeholder,
+              readonly: readonly
             ) %>
             <td width="50%">
               <%= action == 'show' ? record.value : form_input %>
