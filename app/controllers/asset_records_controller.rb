@@ -2,7 +2,6 @@ class AssetRecordsController < ApplicationController
   def edit
     @asset = asset
     @title = "Edit Asset Record"
-    @subtitle = "#{@asset.name}"
   end
 
   def update
