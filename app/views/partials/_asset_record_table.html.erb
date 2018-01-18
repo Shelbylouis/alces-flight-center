@@ -1,13 +1,11 @@
 
-<% scope ||= 'show' #Default to show scope %>
-
 <div class='card'>
   <div class='card-header'>
     <ul class="nav">
       <li class="nav-item">
         <span class="navbar-brand">
           Asset Record <%=
-            if scope == 'show' && current_user.admin?
+            if action == 'show' && current_user.admin?
               button_to 'edit',
                 model.decorate.edit_asset_record_path,
                 method: 'get',
@@ -34,12 +32,12 @@
             <% definition_id = record.definition.id %>
             <td><%= label_tag(definition_id, record.name) %></td>
             <% input = text_field_tag(definition_id, record.value) %>
-            <td><%= scope == 'show' ? record.value : input %></td>
+            <td><%= action == 'show' ? record.value : input %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
-    <%= submit_tag("Submit") if scope == 'edit' %>
+    <%= submit_tag("Submit") if action == 'edit' %>
   <% end %>
 </div>
 
