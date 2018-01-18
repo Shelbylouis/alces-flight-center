@@ -32,7 +32,7 @@
                                   .value %>
             <% form_input = text_field_tag(
               definition_id,
-              record.value,
+              (record.asset == model ? record.value : ''),
               class: 'form-control',
               placeholder: placeholder
             ) %>
