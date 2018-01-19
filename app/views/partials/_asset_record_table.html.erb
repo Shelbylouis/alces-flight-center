@@ -1,3 +1,4 @@
+<% decorated_model = model.decorate %>
 
 <div class='card'>
   <div class='card-header'>
@@ -7,7 +8,7 @@
           Asset Record <%=
             if action == 'show' && current_user.admin?
               link_to 'Edit',
-                model.decorate.edit_asset_record_path,
+                decorated_model.edit_asset_record_path,
                 style: 'display:inline-block;',
                 class: ['nav-link', 'btn', 'btn-dark'],
                 role: 'button'
@@ -18,7 +19,7 @@
     </ul>
   </div>
 
-  <%= form_tag model.decorate.asset_record_path, method: 'PATCH' do %>
+  <%= form_tag decorated_model.asset_record_path, method: 'PATCH' do %>
     <table class="table table-responsive">
       <thead>
         <tr>
