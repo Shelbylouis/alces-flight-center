@@ -1,0 +1,63 @@
+<% decorated_model = model.decorate %>
+
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Asset Record
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <%= form_tag decorated_model.asset_record_path, method: 'PATCH' do %>
+    <table class="table table-responsive">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% model.asset_record.each do |record| %>
+          <tr class="form-group">
+            <% definition_id = record.definition.id %>
+            <td width="50%">
+              <%= label_tag(definition_id, record.name) %>
+            </td>
+
+            <% input = text_field_tag(
+              definition_id,
+              record.value,
+              class: 'form-control'
+            ) %>
+            <td width="50%">
+              <%= action == 'show' ? record.value : input %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if current_user.admin? %>
+          <% button_class = { class: ['btn', 'btn-dark', 'btn-block'] } %>
+
+          <tr>
+            <td colspan="2">
+              <%= if action == 'edit'
+                    submit_tag "Submit", **button_class
+                  else
+                    link_to 'Edit',
+                      decorated_model.edit_asset_record_path,
+                      role: 'button',
+                      **button_class
+                  end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+  <% end %>
+</div>
+

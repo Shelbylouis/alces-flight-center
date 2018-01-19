@@ -5,31 +5,26 @@ module HasAssetRecord
   # Method to be called from AdminConfig to format Component asset record for
   # displaying to admins.
   def asset_record_view
-    asset_record.to_json
+    asset_record.map do |field|
+      [field.name, field.value]
+    end.to_h.to_json
   end
 
   def asset_record
-    @asset_record ||=
-      combined_asset_record_fields.map do |field|
-        [field.name, field.value]
-      end.to_h
+    asset_record_hash.values
   end
 
-  def combined_asset_record_fields
-    hashify_asset_record_fields(parent_asset_record_fields)
-      .merge(hashify_asset_record_fields(asset_record_fields))
-      .values
+  def asset_record_hash
+    parent_asset_record_hash.merge new_asset_record_hash
   end
 
   private
 
-  def hashify_asset_record_fields(records)
-    (records || []).map do |field|
-      [field.definition.id, field]
-    end.to_h
+  def new_asset_record_hash
+    asset_record_fields.map { |f| [f.definition.id, f] }.to_h
   end
 
-  def parent_asset_record_fields
-    asset_record_parent&.combined_asset_record_fields
+  def parent_asset_record_hash
+    asset_record_parent&.asset_record_hash || {}
   end
 end

@@ -42,8 +42,7 @@ RSpec.describe Component, type: :model do
         )
       end
     end
-
-    it 'returns hash of asset record field names to values' do
+    it 'returns merged array of all applicable asset record fields' do
       ip_field_definition,
         model_field_definition,
         os_field_definition = asset_record_field_definitions
@@ -80,16 +79,20 @@ RSpec.describe Component, type: :model do
 
       subject.reload
 
-      expect(subject.asset_record).to eq('Ip' => '1.2.3.4',
-                                         'Model/manufacturer name' => 'Dell server',
+      field_names_to_values = subject.asset_record.map do |r|
+        [r.definition.field_name, r.value]
+      end.to_h
+      expect(field_names_to_values).to eq(
+        'Ip' => '1.2.3.4',
+        'Model/manufacturer name' => 'Dell server',
 
-                                         # Component-level field value should take precedence.
-                                         'OS deployed' => 'Windows o_O',
+        # Component-level field value should take precedence.
+        'OS deployed' => 'Windows o_O',
 
-                                         # Field definition included in definitions associated with
-                                         # ComponentType, but without an AssetRecordField associated with
-                                         # Component or ComponentGroup, should still be included.
-                                         'Comments' => '')
+        # Field definition included in definitions associated with
+        # ComponentType, but without an AssetRecordField associated with
+        # Component or ComponentGroup, should still be included.
+        'Comments' => '')
     end
   end
 

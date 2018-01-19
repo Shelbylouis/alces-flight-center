@@ -12,9 +12,10 @@ class ComponentType < ApplicationRecord
     true
   end
 
-  def combined_asset_record_fields
+  def asset_record_hash
     asset_record_field_definitions.map do |definition|
-      AssetRecordField.new(definition: definition, value: '')
-    end
+      new_field = AssetRecordField.new(definition: definition, value: '')
+      [definition.id, new_field]
+    end.to_h
   end
 end

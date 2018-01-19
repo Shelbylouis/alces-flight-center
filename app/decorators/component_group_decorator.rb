@@ -1,5 +1,8 @@
 class ComponentGroupDecorator < ApplicationDecorator
+  include AssetRecordDecorator
+
   delegate_all
+
   decorates_association :components
 
   def path
