@@ -21,6 +21,19 @@
       </thead>
 
       <tbody>
+        <tr>
+          <td>Component Make</td>
+          <td><% if (model.is_a? ComponentGroup) && (action == 'edit') %>
+            <% makes = ComponentMake.where(component_type: model.component_type) %>
+            <%= collection_select :component_make,
+                                  :id,
+                                  makes,
+                                  :id,
+                                  :name %>
+          <% else %>
+            <%= model.component_make.name %>
+          <% end %></td>
+        </tr>
         <% model.asset_record.each do |record| %>
           <tr class="form-group">
             <% definition_id = record.definition.id %>

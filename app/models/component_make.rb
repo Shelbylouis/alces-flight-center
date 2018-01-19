@@ -5,6 +5,10 @@ class ComponentMake < ApplicationRecord
 
   validates :manufacturer, :model, :knowledgebase_url, presence: true
 
+  def name
+    "#{manufacturer} : #{model}"
+  end
+
   def self.globally_available?
     true
   end
