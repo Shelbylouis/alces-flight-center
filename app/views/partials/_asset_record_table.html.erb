@@ -22,24 +22,42 @@
 
       <tbody>
         <% model.asset_record.each do |record| %>
-          <tr>
+          <tr class="form-group">
             <% definition_id = record.definition.id %>
-            <td><%= label_tag(definition_id, record.name) %></td>
-            <% input = text_field_tag(definition_id, record.value) %>
-            <td><%= action == 'show' ? record.value : input %></td>
+            <td width="50%">
+              <%= label_tag(definition_id, record.name) %>
+            </td>
+
+            <% input = text_field_tag(
+              definition_id,
+              record.value,
+              class: 'form-control'
+            ) %>
+            <td width="50%">
+              <%= action == 'show' ? record.value : input %>
+            </td>
+          </tr>
+        <% end %>
+
+        <% if current_user.admin? %>
+          <% button_class = { class: ['btn', 'btn-dark', 'btn-block'] } %>
+
+          <tr>
+            <td colspan="2">
+              <%= if action == 'edit'
+                    submit_tag "Submit", **button_class
+                  else
+                    link_to 'Edit',
+                      decorated_model.edit_asset_record_path,
+                      role: 'button',
+                      **button_class
+                  end %>
+            </td>
           </tr>
         <% end %>
       </tbody>
     </table>
-    <% button_class = { class: ['btn', 'btn-dark', 'btn-block'] } %>
-    <%= if action == 'edit'
-          submit_tag "Submit", **button_class
-        elsif current_user.admin?
-          link_to 'Edit',
-                  decorated_model.edit_asset_record_path,
-                  role: 'button',
-                  **button_class
-        end %>
+
   <% end %>
 </div>
 
