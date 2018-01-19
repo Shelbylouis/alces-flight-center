@@ -1,0 +1,31 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+APP_NAME='flight-center'
+BACKUPS_S3_URL='s3://alces-flight-center/backups'
+
+main() {
+  local database_url access_key secret_key aws_region backup_file backup_url
+
+  database_url="$(dokku config:get $APP_NAME DATABASE_URL)"
+  access_key="$(dokku config:get $APP_NAME AWS_ACCESS_KEY_ID)"
+  secret_key="$(dokku config:get $APP_NAME AWS_SECRET_ACCESS_KEY)"
+  aws_region="$(dokku config:get $APP_NAME AWS_REGION)"
+
+  backup_file="$(date -Idate)"
+  backup_url="$BACKUPS_S3_URL/$backup_file"
+
+  echo 'Dumping database...'
+  dokku run "$APP_NAME" pg_dump -d "$database_url" > "$backup_file"
+
+  echo "Uploading database dump to '$backup_url'..."
+  AWS_ACCESS_KEY_ID="$access_key" \
+    AWS_SECRET_ACCESS_KEY="$secret_key" \
+    AWS_DEFAULT_REGION="$aws_region" \
+    aws s3 mv "$backup_file" "$backup_url"
+
+  echo 'Done!'
+}
+
+main
