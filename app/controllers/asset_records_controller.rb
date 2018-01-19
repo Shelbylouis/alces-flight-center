@@ -6,10 +6,27 @@ class AssetRecordsController < ApplicationController
 
   def update
     asset.update_asset_record(asset_record_param.to_h)
+    update_component_make
     redirect_to asset
   end
 
   private
+
+  def update_component_make
+    return unless asset.is_a? ComponentGroup
+    new_make = ComponentMake.find_by_id component_make_id_param
+    unless new_make.component_type == asset.component_type
+      # This error isn't expected as the form only contains valid Makes
+      # However an invalid rouge request will result in an error
+      raise 'Can not change the ComponentMake to a different ComponentType'
+    end
+    asset.component_make = new_make
+    asset.save!
+  end
+
+  def component_make_id_param
+    params.require(:component_make).require(:id)
+  end
 
   def asset_record_param
     definition_ids = asset.asset_record.map { |r| r.definition.id.to_s }
