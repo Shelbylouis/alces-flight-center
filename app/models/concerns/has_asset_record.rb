@@ -28,7 +28,6 @@ module HasAssetRecord
     end.to_h
     asset_record.each do |field|
       updated_value = definition_hash[field.definition.id.to_s.to_sym]
-      next if field.value == updated_value
       if updated_value.nil? || updated_value.empty?
         # Delete an existing field
         field.destroy! if field.asset == self

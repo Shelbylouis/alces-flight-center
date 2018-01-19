@@ -118,12 +118,6 @@ RSpec.describe HasAssetRecord, type: :model do
       end
     end
 
-    let! :frozen_old_hash { definition_hash(subject).freeze }
-
-    def old_hash
-      frozen_old_hash.deep_dup
-    end
-
     def definition_hash(obj)
       obj.asset_record.map { |r| [r.definition.id, r.value] }.to_h
     end
@@ -145,16 +139,9 @@ RSpec.describe HasAssetRecord, type: :model do
       end
     end
 
-    it 'does nothing if no values have changed' do
-      subject.update_asset_record(old_hash.deep_dup)
-      expect(definition_hash(subject)).to eq(old_hash)
-    end
-
     it 'creates a new field when component_type definition is updated' do
       new_fields = changed_fields do
-        subject.update_asset_record(
-          old_hash.merge(type_only_definition.id => 'component')
-        )
+        subject.update_asset_record(type_only_definition.id => 'component')
       end
       expect(new_fields.length).to eq(1)
       expect_update(type_only_definition, new_fields.first, 'component')
@@ -162,27 +149,21 @@ RSpec.describe HasAssetRecord, type: :model do
 
     it "doesn't create a new component_type field with an empty value" do
       new_fields = changed_fields do
-        subject.update_asset_record(
-          old_hash.merge(type_only_definition.id => '')
-        )
+        subject.update_asset_record(type_only_definition.id => '')
       end
       expect(new_fields.length).to eq(0)
     end
 
     it 'can update an existing record for the component' do
       updated_fields = changed_fields do
-        subject.update_asset_record(
-          old_hash.merge(set_definition.id => 'component')
-        )
+        subject.update_asset_record(set_definition.id => 'component')
       end
       expect(updated_fields.length).to eq(1)
       expect_update(set_definition, updated_fields.first, 'component')
     end
 
     it 'does not update the higher level record' do
-      subject.update_asset_record(
-        old_hash.merge(group_definition.id => 'component')
-      )
+      subject.update_asset_record(group_definition.id => 'component')
       subject.reload
       subject.component_group.reload
 
@@ -195,19 +176,23 @@ RSpec.describe HasAssetRecord, type: :model do
 
     it 'does not replace higher level assets with a blank field' do
       updated_fields = changed_fields do
-        subject.update_asset_record(
-          old_hash.merge(group_definition.id => '')
-        )
+        subject.update_asset_record(group_definition.id => '')
       end
       expect(updated_fields.length).to eq(0)
+    end
+
+    it 'can replace higher level assets with the same value' do
+      updated_fields = changed_fields do
+        subject.update_asset_record(group_definition.id => 'new value')
+      end
+      expect(updated_fields.length).to eq(1)
+      expect(updated_fields.first.value).to eq('new value')
     end
 
     shared_examples 'delete asset field' do |input|
       it "deletes the record when it is updated to: #{input.inspect}" do
         delete_field = subject.asset_record_fields.first
-        subject.update_asset_record(
-          old_hash.merge(delete_field.definition.id => input)
-        )
+        subject.update_asset_record(delete_field.definition.id => input)
         subject.reload
         expect(subject.asset_record_fields).not_to include(delete_field)
       end
