@@ -5,15 +5,7 @@
     <ul class="nav">
       <li class="nav-item">
         <span class="navbar-brand">
-          Asset Record <%=
-            if action == 'show' && current_user.admin?
-              link_to 'Edit',
-                decorated_model.edit_asset_record_path,
-                style: 'display:inline-block;',
-                class: ['nav-link', 'btn', 'btn-dark'],
-                role: 'button'
-            end
-          %>
+          Asset Record
         </span>
       </li>
     </ul>
@@ -39,10 +31,14 @@
         <% end %>
       </tbody>
     </table>
+    <% button_class = { class: ['btn', 'btn-dark', 'btn-block'] } %>
     <%= if action == 'edit'
-          submit_tag "Submit",
-            style: 'display:inline-block;',
-            class: ['nav-link', 'btn', 'btn-dark']
+          submit_tag "Submit", **button_class
+        elsif current_user.admin?
+          link_to 'Edit',
+                  decorated_model.edit_asset_record_path,
+                  role: 'button',
+                  **button_class
         end %>
   <% end %>
 </div>
