@@ -29,7 +29,8 @@
                                   :id,
                                   makes,
                                   :id,
-                                  :name %>
+                                  :name,
+                                  { selected: model.component_make.id } %>
           <% else %>
             <%= model.component_make.name %>
           <% end %></td>
