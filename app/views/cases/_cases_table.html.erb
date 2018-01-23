@@ -2,27 +2,23 @@
 <% manage_cases_page = current_user.admin? && archive %>
 
 <div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          <%= archive ? 'All' : 'Open ' %>
-          support cases &mdash;
-          <%= model.name %>
-        </span>
-      </li>
-      <% unless archive %>
-        <li class="nav-item">
-          <%= link_to 'View all',
-            current_user.admin? ? site_cases_path(model) : cases_path,
-            class: ['nav-link', 'btn', 'btn-dark'],
-            role: 'button'
-          %>
-        </li>
-      <% end %>
-      <%= model.case_form_buttons %>
-    </ul>
-  </div>
+  <%= render 'partials/card_header_nav',
+    list_items: ([].tap do |list|
+      unless archive
+        list.push( link_to 'View all',
+          current_user.admin? ? site_cases_path(model) : cases_path,
+          class: ['nav-link', 'btn', 'btn-dark'],
+          role: 'button'
+        )
+      end
+      list.push model.case_form_buttons
+    end),
+    title: <<-EOF.strip
+      #{archive ? 'All' : 'Open'}
+      support cases &mdash;
+      #{model.name}
+    EOF
+  %>
 
   <table class="table table-responsive">
     <thead>

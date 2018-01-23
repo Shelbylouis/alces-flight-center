@@ -6,9 +6,14 @@
       </span>
     </li>
     <% Array.wrap(list_items ||= []).flatten.each do |item| %>
-      <li class='nav-item'>
+      <% # Wrap the item in a <li> tag unless already wrapped %>
+      <% if /\A<li\s.*/.match item %>
         <%= item %>
-      </li>
+      <% else %>
+        <li class='nav-item'>
+          <%= item %>
+        </li>
+      <% end %>
     <% end %>
   </ul>
 </div>
