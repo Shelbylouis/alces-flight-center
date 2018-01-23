@@ -1,15 +1,7 @@
 <% decorated_model = model.decorate %>
 
 <div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          Asset Record
-        </span>
-      </li>
-    </ul>
-  </div>
+  <%= render('partials/card_header_nav', title: 'Asset Record') %>
 
   <%= form_tag decorated_model.asset_record_path, method: 'PATCH' do %>
     <table class="table table-responsive">
