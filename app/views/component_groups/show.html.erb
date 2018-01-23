@@ -1,6 +1,21 @@
 
 <%# <%= render 'cases/cases_table', model: component_group, archive: true %1> %>
 
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav">
+      <li class="nav-item">
+        <span class="navbar-brand">
+          Components
+        </span>
+      </li>
+    </ul>
+  </div>
+
+  <%= render 'partials/components_table', group: component_group %>
+
+</div>
+
 <%= render 'partials/asset_record_table',
   model: component_group,
   action: 'show'
