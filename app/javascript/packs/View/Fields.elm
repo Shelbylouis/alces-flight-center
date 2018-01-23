@@ -9,6 +9,7 @@ import FieldValidation exposing (FieldValidation(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
+import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
 import String.Extra
 
@@ -44,7 +45,7 @@ selectField fieldName items toId toOptionLabel validate changeMsg =
         (SelectList.selected items)
         validatedField
         select
-        [ onInput changeMsg ]
+        [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
 
 
