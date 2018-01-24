@@ -3,7 +3,7 @@
 
 <% if current_user.admin? %>
   <tr>
-    <td colspan="2">
+    <td colspan="<%= colspan ||= 2 %>">
       <%= case action
           when 'edit'; submit_tag "Submit", **button_class
           when 'show'

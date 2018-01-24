@@ -10,12 +10,16 @@
       </thead>
       <tbody>
         <% model.component_expansions.each do |expansion| %>
-          <tr>
+          <tr class="form-group">
             <td><%= expansion.expansion_type.name %></td>
             <td><%= expansion.slot %></td>
             <td><%= expansion.ports %></td>
           </tr>
         <% end %>
+        <%= render 'partials/edit_submit_button',
+                   action: action,
+                   colspan: 3,
+                   edit_path: 'tbd' %>
       </tbody>
     </table>
   </div>
