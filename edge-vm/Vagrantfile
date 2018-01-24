@@ -1,10 +1,19 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
+#
+# Vagrant File for debugging issue in Microsoft Edge and Internet Explorer
+#
+# It boots a bare knuckles version of Windows 10 with IE and Edge installed
+# The required box can be installed with:
+#
+# vagrant box add https://app.vagrantup.com/Microsoft/boxes/EdgeOnWindows10
+#
+# Once the vm has booted, start the rails server on your host machine.
+# The virtual router will alias '10.0.2.2' on the vm, to 'localhost' on the
+# host machine.
+#
+
 Vagrant.configure(2) do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
