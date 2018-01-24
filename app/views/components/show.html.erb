@@ -12,6 +12,17 @@
   </ul>
 </div>
 
+<div class='card'>
+  <%= render 'partials/card_header_nav', title: 'Expansions' %>
+  <ul>
+    <% component.component_expansions.each do |expansion| %>
+      <li class="list-group">
+        <%= expansion %>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
 <%= render 'partials/asset_record_table',
   model: component,
   action: 'show'

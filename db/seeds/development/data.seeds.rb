@@ -34,11 +34,31 @@ site.additional_contacts.create!(
   email: 'another.contact@example.com'
 )
 
+network_expansion = ExpansionType.create!(
+  name: 'Gigabit Network Adapter'
+)
+
+memory_expansion = ExpansionType.create!(
+  name: '256GB SSD'
+)
+
 dell_server = ComponentMake.create!(
   manufacturer: 'Dell',
   model: 'zippy',
   knowledgebase_url: 'http://why.did@i-write.this/in#full',
   component_type: ComponentType.find_by_name('Server')
+)
+
+dell_server.default_expansions.create!(
+  expansion_type: network_expansion,
+  slot: '1A',
+  ports: 4
+)
+
+dell_server.default_expansions.create!(
+  expansion_type: memory_expansion,
+  slot: '2B',
+  ports: 1
 )
 
 main_cluster = site.clusters.create!(
