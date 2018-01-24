@@ -1,0 +1,16 @@
+
+<% button_class = { class: ['btn', 'btn-dark', 'btn-block'] } %>
+
+<tr>
+  <td colspan="2">
+    <%= case action
+        when 'edit'; submit_tag "Submit", **button_class
+        when 'show'
+          link_to 'Edit',
+            edit_path,
+            role: 'button',
+            **button_class
+        end %>
+  </td>
+</tr>
+

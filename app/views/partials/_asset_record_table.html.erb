@@ -44,20 +44,9 @@
         <% end %>
 
         <% if current_user.admin? %>
-          <% button_class = { class: ['btn', 'btn-dark', 'btn-block'] } %>
-
-          <tr>
-            <td colspan="2">
-              <%= if action == 'edit'
-                    submit_tag "Submit", **button_class
-                  else
-                    link_to 'Edit',
-                      decorated_model.edit_asset_record_path,
-                      role: 'button',
-                      **button_class
-                  end %>
-            </td>
-          </tr>
+          <%= render 'partials/edit_submit_button',
+                     action: action,
+                     edit_path: decorated_model.edit_asset_record_path %>
         <% end %>
       </tbody>
     </table>
