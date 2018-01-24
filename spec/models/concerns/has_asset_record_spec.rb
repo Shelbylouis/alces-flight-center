@@ -189,16 +189,22 @@ RSpec.describe HasAssetRecord, type: :model do
       expect(updated_fields.first.value).to eq('new value')
     end
 
-    shared_examples 'delete asset field' do |input|
-      it "deletes the record when it is updated to: #{input.inspect}" do
-        delete_field = subject.asset_record_fields.first
-        subject.update_asset_record(delete_field.definition.id => input)
-        subject.reload
-        expect(subject.asset_record_fields).not_to include(delete_field)
-      end
+    def does_value_delete_field?(value)
+      deleted_field = subject.asset_record_fields.first
+      subject.update_asset_record(deleted_field.definition.id => value)
+      subject.reload
+      !subject.asset_record_fields.include?(deleted_field)
     end
 
-    include_examples 'delete asset field', nil
-    include_examples 'delete asset field', ''
+    it "deletes the record when it is updated to an empty string" do
+      expect(does_value_delete_field?('')).to eq(true)
+    end
+
+    # This likely means that a form hasn't submitted definition correctly
+    # otherwise it would be an empty string
+    # Thus a form error shouldn't trigger a destructive action
+    it 'does not delete the record when updated to nil' do
+      expect(does_value_delete_field?(nil)).to eq(false)
+    end
   end
 end
