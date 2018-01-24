@@ -14,11 +14,9 @@
 
 <div class='card'>
   <%= render 'partials/card_header_nav', title: 'Expansions' %>
-  <ul>
-    <%= render 'partials/expansion_table',
-                action: 'show',
-                model: component %>
-  </ul>
+  <%= render 'partials/expansion_table',
+              action: 'show',
+              model: component %>
 </div>
 
 <%= render 'partials/asset_record_table',

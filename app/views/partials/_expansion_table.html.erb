@@ -1,6 +1,23 @@
-<% model.component_expansions.each do |expansion| %>
-  <li class="list-group">
-    <%= expansion %>
-  </li>
+<%= form_tag '/tbd', method: 'PATCH' do %>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Expansion</th>
+          <th>Slot</th>
+          <th>No. Ports</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% model.component_expansions.each do |expansion| %>
+          <tr>
+            <td><%= expansion.expansion_type.name %></td>
+            <td><%= expansion.slot %></td>
+            <td><%= expansion.ports %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>
 
