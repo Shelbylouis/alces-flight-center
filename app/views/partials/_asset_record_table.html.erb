@@ -43,11 +43,9 @@
           </tr>
         <% end %>
 
-        <% if current_user.admin? %>
-          <%= render 'partials/edit_submit_button',
-                     action: action,
-                     edit_path: decorated_model.edit_asset_record_path %>
-        <% end %>
+        <%= render 'partials/edit_submit_button',
+                   action: action,
+                   edit_path: decorated_model.edit_asset_record_path %>
       </tbody>
     </table>
   <% end %>
