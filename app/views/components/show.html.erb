@@ -15,11 +15,9 @@
 <div class='card'>
   <%= render 'partials/card_header_nav', title: 'Expansions' %>
   <ul>
-    <% component.component_expansions.each do |expansion| %>
-      <li class="list-group">
-        <%= expansion %>
-      </li>
-    <% end %>
+    <%= render 'partials/expansion_table',
+                action: 'show',
+                model: component %>
   </ul>
 </div>
 
