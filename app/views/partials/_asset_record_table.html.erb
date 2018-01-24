@@ -27,32 +27,18 @@
             <%= model.component_make.name %>
           <% end %></td>
         </tr>
-        <% model.asset_record.each do |record| %>
+        <% enum = case action
+                  when 'show'; model.asset_record.map { |r| [r, r.value] }
+                  when 'edit'; decorated_model.asset_record_form_inputs
+                  end %>
+        <% enum.each do |record, value| %>
           <tr class="form-group">
-            <% definition_id = record.definition.id %>
             <td width="50%">
-              <%= label_tag(definition_id, record.name) %>
+              <%= label_tag(record.definition.id, record.name) %>
             </td>
 
-            <% placeholder = model.find_parent_asset_record(record.definition)
-                                  .value %>
-            <% is_component_level = (record.definition.level == 'component') %>
-            <% model_is_a_component = model.is_a?(Component) %>
-            <% readonly = is_component_level && !model_is_a_component %>
-            <% readonly_msg = \
-              'This field can only be set at the individual Component level'
-            %>
-            <% form_input = text_field_tag(
-              definition_id,
-              (record.asset == model ? record.value : ''),
-              class: 'form-control',
-              placeholder: placeholder,
-              readonly: readonly,
-              style: (readonly ? 'background-color:lightgray' : ''),
-              title: (readonly ? readonly_msg : '')
-            ) %>
             <td width="50%">
-              <%= action == 'show' ? record.value : form_input %>
+              <%= value %>
             </td>
           </tr>
         <% end %>
