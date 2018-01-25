@@ -18,8 +18,16 @@
               <td><%= expansion.slot %></td>
               <td><%= expansion.ports %></td>
             <% when 'edit' %>
-              <td>TDB</td>
-              <td>TDB</td>
+              <td>
+                <%= text_field_tag 'slot' + expansion.id.to_s,
+                                   expansion.slot,
+                                   class: 'form-control' %>
+              </td>
+              <td>
+                <%= text_field_tag 'ports' + expansion.id.to_s,
+                                   expansion.ports,
+                                   class: 'form-control' %>
+              </td>
             <% end %>
           </tr>
         <% end %>
