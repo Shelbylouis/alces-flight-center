@@ -13,8 +13,14 @@ class ComponentExpansionsController < ApplicationController
 
   private
 
+  def expansion_errors
+    @errors_in_component_expansion_form_data ||= []
+  end
+
   def update_expansion(expansion)
-    expansion.update!(expansion_param(expansion))
+    unless expansion.update(expansion_param(expansion))
+      expansion_errors.push expansion
+    end
   end
 
   def expansion_param(expansion)
