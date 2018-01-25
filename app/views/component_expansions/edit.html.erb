@@ -4,6 +4,7 @@
 </div>
 
 <div class="card">
-  <%= render('partials/card_header_nav', title: 'Existing Expansions') %>
+  <%= render 'partials/card_header_nav', title: 'Existing Expansions' %>
+  <%= render 'partials/expansion_table', model: @cluster_part,  action: 'edit' %>
 </div>
 
