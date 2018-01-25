@@ -7,8 +7,9 @@
         <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
           <span aria-hidden="true">&times;</span>
         </button>
-
-        <%= sanitize flash[flash_key], tags: ['code', 'strong'] %>
+        <% flash[flash_key].each_line do |flash_line| %>
+          <%= sanitize flash_line, tags: ['code', 'strong'] %><br>
+        <% end %>
       </div>
     </div>
     <div class="col"></div>

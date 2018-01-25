@@ -3,7 +3,7 @@ class ComponentExpansionsController < ApplicationController
     @cluster_part.component_expansions.each do |expansion|
       update_expansion(expansion)
     end
-    redirect_to @cluster_part
+    redirect_update
   end
 
   def edit
@@ -12,6 +12,26 @@ class ComponentExpansionsController < ApplicationController
   end
 
   private
+
+  def redirect_update
+    if expansion_errors.empty?
+      redirect_to @cluster_part
+    else
+      flash_update_error
+      redirect_to edit_component_component_expansion_path(@cluster_part)
+    end
+  end
+
+  def flash_update_error
+    header = "Errors updating expansions:\n"
+    flash[:error] = StringIO.new(header).tap do |io|
+      io.read
+      expansion_errors.each do |expansion|
+        io.puts "#{expansion.expansion_type.name}: #{expansion.errors.full_messages}"
+      end
+      io.rewind
+    end.read
+  end
 
   def expansion_errors
     @errors_in_component_expansion_form_data ||= []
