@@ -16,10 +16,11 @@
             <td><%= expansion.ports %></td>
           </tr>
         <% end %>
+        <% edit_path = edit_component_component_expansion_path model %>
         <%= render 'partials/edit_submit_button',
                    action: action,
                    colspan: 3,
-                   edit_path: 'tbd' %>
+                   edit_path: edit_path %>
       </tbody>
     </table>
   </div>
