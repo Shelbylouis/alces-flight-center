@@ -22,6 +22,10 @@ module ApplicationHelper
     )
   end
 
+  def dark_button_class
+    { class: ['btn', 'btn-dark', 'btn-block'] }
+  end
+
   private
 
   # Map function with given name over enumerable collection of objects, then
