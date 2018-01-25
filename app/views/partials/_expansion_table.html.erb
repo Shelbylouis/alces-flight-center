@@ -13,8 +13,14 @@
         <% model.component_expansions.each do |expansion| %>
           <tr class="form-group">
             <td><%= expansion.expansion_type.name %></td>
-            <td><%= expansion.slot %></td>
-            <td><%= expansion.ports %></td>
+            <% case action
+               when 'show' %>
+              <td><%= expansion.slot %></td>
+              <td><%= expansion.ports %></td>
+            <% when 'edit' %>
+              <td>TDB</td>
+              <td>TDB</td>
+            <% end %>
           </tr>
         <% end %>
         <% edit_path = edit_component_component_expansion_path model %>
