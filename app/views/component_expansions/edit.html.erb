@@ -1,6 +1,14 @@
 
 <div class="card">
   <%= render('partials/card_header_nav', title: 'New Expansion') %>
+  <div class='card-block'>
+    <% form_opts = {
+      url: component_component_expansion_path(@cluster_part)
+    } %>
+    <%= form_for :component_expansions, **form_opts do |f| %>
+      <%= f.submit 'Add Expansion', **dark_button_class %>
+    <% end %>
+  </div>
 </div>
 
 <div class="card">
