@@ -1,4 +1,15 @@
 class ComponentExpansionsController < ApplicationController
+  def create
+    new = @cluster_part.component_expansions.create create_expansion_param
+    if new.valid?
+      flash[:success] = "Successfully added the: #{new.expansion_type.name}"
+    else
+      expansion_errors.push new
+      flash_error 'Could not add the component'
+    end
+    redirect_back fallback_location: @cluster_part
+  end
+
   def update
     @cluster_part.component_expansions.each do |expansion|
       update_expansion(expansion)
@@ -17,14 +28,13 @@ class ComponentExpansionsController < ApplicationController
     if expansion_errors.empty?
       redirect_to @cluster_part
     else
-      flash_update_error
+      flash_error 'Errors updating expansions:'
       redirect_to edit_component_component_expansion_path(@cluster_part)
     end
   end
 
-  def flash_update_error
-    header = "Errors updating expansions:\n"
-    flash[:error] = StringIO.new(header).tap do |io|
+  def flash_error(header)
+    flash[:error] = StringIO.new(header + "\n").tap do |io|
       io.read
       expansion_errors.each do |expansion|
         io.puts "#{expansion.expansion_type.name}: #{expansion.errors.full_messages}"
@@ -38,12 +48,19 @@ class ComponentExpansionsController < ApplicationController
   end
 
   def update_expansion(expansion)
-    unless expansion.update(expansion_param(expansion))
+    unless expansion.update(update_expansion_param(expansion))
       expansion_errors.push expansion
     end
   end
 
-  def expansion_param(expansion)
+  def create_expansion_param
+    params.require(:component_expansion).permit([:slot, :ports]).tap do |x|
+      type_id = params.require(:expansion_type).require(:id)
+      x.merge!(expansion_type: ExpansionType.find_by_id(type_id))
+    end
+  end
+
+  def update_expansion_param(expansion)
     id = expansion.id
     raw_params = params.require([:"slot#{id}", :"ports#{id}"])
     {
