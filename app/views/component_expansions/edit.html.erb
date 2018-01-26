@@ -6,7 +6,7 @@
       url: component_component_expansion_path(@cluster_part)
     } %>
     <%= form_for :component_expansion, **form_opts do |f| %>
-      <table class="table m-0">
+      <table class="table table-responsive m-0">
         <thead>
           <tr>
             <th>Type</th>
@@ -15,12 +15,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr class='form-group'>
             <td>
-              <%= collection_select :expansion_type, :id, ExpansionType.all, :id, :name %>
+              <%= collection_select :expansion_type, :id, ExpansionType.all, :id, :name, class: 'form-control'%>
             </td>
-            <td><%= f.text_field :slot %></td>
-            <td><%= f.text_field :ports %></td>
+            <td><%= f.text_field :slot, class: 'form-control' %></td>
+            <td><%= f.text_field :ports, class: 'form-control' %></td>
           </tr>
         </tbody>
       </table>
