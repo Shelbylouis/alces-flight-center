@@ -6,6 +6,24 @@
       url: component_component_expansion_path(@cluster_part)
     } %>
     <%= form_for :component_expansions, **form_opts do |f| %>
+      <table class="table m-0">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Slot</th>
+            <th>No. Ports</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <%= collection_select :expansion_type, :id, ExpansionType.all, :id, :name %>
+            </td>
+            <td><%= f.text_field :slot %></td>
+            <td><%= f.text_field :ports %></td>
+          </tr>
+        </tbody>
+      </table>
       <div class='pb-3 px-3'>
         <%= f.submit 'Add Expansion', **dark_button_class %>
       </div>
