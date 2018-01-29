@@ -73,6 +73,7 @@ FactoryBot.define do
   factory :asset_record_field_definition do
     field_name 'Manufacturer/model name'
     level :group
+    data_type 'short_text'
   end
 
   factory :unassociated_asset_record_field, class: AssetRecordField do
