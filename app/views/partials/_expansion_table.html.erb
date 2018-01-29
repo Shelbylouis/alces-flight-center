@@ -7,6 +7,7 @@
           <th>Type</th>
           <th>Slot</th>
           <th>No. Ports</th>
+          <%== '<th>Delete</th>' if action == 'edit' %>
         </tr>
       </thead>
       <tbody>
@@ -27,6 +28,13 @@
                 <%= text_field_tag 'ports' + expansion.id.to_s,
                                    expansion.ports,
                                    class: 'form-control' %>
+              </td>
+              <td>
+                <%= link_to 'X',
+                            component_expansion_path(expansion),
+                            role: 'button',
+                            method: 'delete',
+                            **dark_button_class %>
               </td>
             <% end %>
           </tr>

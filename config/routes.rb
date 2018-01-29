@@ -41,6 +41,8 @@ Rails.application.routes.draw do
       asset_record.call
     end
 
+    resources :component_expansions, only: [:destroy]
+
     resources :component_groups, path: 'component-groups', only: [] do
       asset_record.call
     end
