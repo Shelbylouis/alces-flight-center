@@ -71,11 +71,9 @@ class ComponentExpansionsController < ApplicationController
 
   def update_expansion_param(expansion)
     id = expansion.id
-    raw_params = params.require([:"slot#{id}", :"ports#{id}"])
-    {
-      slot: raw_params[0],
-      ports: raw_params[1]
-    }
+    params.permit([:"slot#{id}", :"ports#{id}"]).to_h.map do |k, v|
+      [k.to_s.chomp(id.to_s).to_sym, v]
+    end.to_h
   end
 
   def component_expansion_param
