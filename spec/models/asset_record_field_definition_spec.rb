@@ -26,12 +26,8 @@ RSpec.describe AssetRecordFieldDefinition, type: :model do
   end
 
   describe '#data_type' do
-    before :each do
-      ActiveSupport::Deprecation.silenced = true
-    end
-
-    after :each do
-      ActiveSupport::Deprecation.silenced = false
+    around :each do |example|
+      ActiveSupport::Deprecation.silence { example.run }
     end
 
     context 'with the data_type set to "long_text"' do
