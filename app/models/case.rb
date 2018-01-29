@@ -140,7 +140,17 @@ class Case < ApplicationRecord
   end
 
   def rt_ticket_subject
-    "Alces Flight Center ticket: #{cluster.name} - #{issue.name}"
+    "Alces Flight Center ticket: #{cluster.name} - #{issue.name} [#{generate_ticket_identifier_token}]"
+  end
+
+  # We generate a short random token to identify each ticket within email
+  # clients and RT. Without this, similar but distinct tickets can be hard to
+  # distinguish in RT as they will have identical subjects, and many email
+  # clients will also collapse different tickets into the same thread due to
+  # their similar subjects (see
+  # https://github.com/alces-software/alces-flight-center/issues/41#issuecomment-361307971).
+  def generate_ticket_identifier_token
+    Utils.generate_password(length: 5).upcase
   end
 
   def rt_ticket_text
