@@ -121,6 +121,7 @@ RSpec.describe Case, type: :model do
 
         subject: 'Alces Flight Center ticket: somecluster - Crashed node',
         text: <<-EOF.strip_heredoc
+          Requestor: Some User
           Cluster: somecluster
           Category: Hardware issue
           Issue: Crashed node

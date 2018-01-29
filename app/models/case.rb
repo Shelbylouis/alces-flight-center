@@ -145,6 +145,7 @@ class Case < ApplicationRecord
 
   def rt_ticket_text
     properties = {
+      Requestor: user.name,
       Cluster: cluster.name,
       Category: category&.name,
       'Issue': issue.name,
