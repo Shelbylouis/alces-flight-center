@@ -59,7 +59,11 @@ class AssetRecordFieldDefinition < ApplicationRecord
   # and issue a deprecation warning
   #
   def data_type
-    ActiveSupport::Deprecation.warn 'HERE'
-    super
+    return super unless super.nil?
+    ActiveSupport::Deprecation.warn <<-EOF.strip_heredoc
+      #{self.class}:'#{field_name}' does not have a data_type set.
+      Defaulting to 'short_text'
+    EOF
+    'short_text'
   end
 end
