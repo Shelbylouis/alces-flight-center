@@ -35,6 +35,7 @@ class ComponentExpansionsController < ApplicationController
 
   def redirect_update
     if expansion_errors.empty?
+      flash[:success] = 'Successfully updated the expansions'
       redirect_to @cluster_part
     else
       flash_error 'Errors updating expansions:'
