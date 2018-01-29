@@ -10,6 +10,11 @@ class ComponentExpansionsController < ApplicationController
     redirect_back fallback_location: @cluster_part
   end
 
+  def edit
+    @title = "Edit Expansions"
+    @subtitle = @cluster_part.name
+  end
+
   def update
     @cluster_part.component_expansions.each do |expansion|
       update_expansion(expansion)
@@ -17,9 +22,13 @@ class ComponentExpansionsController < ApplicationController
     redirect_update
   end
 
-  def edit
-    @title = "Edit Expansions"
-    @subtitle = @cluster_part.name
+  def destroy
+    if component_expansion_param.destroy
+      flash[:success] = 'Successfully deleted expansion'
+    else
+      flash[:error] = 'Failed to delete expansion'
+    end
+    redirect_back fallback_location: '/'
   end
 
   private
@@ -67,5 +76,9 @@ class ComponentExpansionsController < ApplicationController
       slot: raw_params[0],
       ports: raw_params[1]
     }
+  end
+
+  def component_expansion_param
+    ComponentExpansion.find_by_id params.require(:id)
   end
 end
