@@ -18,7 +18,7 @@ RSpec.describe 'Cases table', type: :feature do
     it 'renders table of open Cases' do
       visit path
 
-      expect(page).to have_text("#{site.name} support cases")
+      expect(page).to have_text(/Open support cases.*#{site.name}/)
 
       cases = all('tr').map(&:text)
       expect(cases).to have_text('Open case')
