@@ -6,8 +6,9 @@
     <ul class="nav">
       <li class="nav-item">
         <span class="navbar-brand">
-          <%= (archive ? '' : 'Open ') + model.name %>
-          support cases
+          <%= archive ? 'All' : 'Open ' %>
+          support cases &mdash;
+          <%= model.name %>
         </span>
       </li>
       <% unless archive %>
