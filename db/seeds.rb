@@ -258,7 +258,8 @@ all_types = [server, disk_array, network_switch]
     AssetRecordFieldDefinition.create!(
       field_name: field_name,
       level: definition_group[:level],
-      component_types: definition_group[:component_types]
+      component_types: definition_group[:component_types],
+      data_type: 'short_text'
     )
   end
 end
