@@ -52,4 +52,14 @@ class AssetRecordFieldDefinition < ApplicationRecord
   def settable_for_group?
     level == 'group'
   end
+
+  #
+  # The production database contains nil data_types atm
+  # In the event of a nil, the data_type will default to short_text
+  # and issue a deprecation warning
+  #
+  def data_type
+    ActiveSupport::Deprecation.warn 'HERE'
+    super
+  end
 end
