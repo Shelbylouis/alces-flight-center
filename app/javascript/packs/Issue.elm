@@ -28,6 +28,7 @@ type alias IssueData =
     { id : Id
     , name : String
     , details : String
+    , subject : String
     , supportType : SupportType
     , chargeable : Bool
     }
@@ -45,22 +46,30 @@ decoder =
                 \name ->
                     \requiresComponent ->
                         \detailsTemplate ->
-                            \supportType ->
-                                \chargeable ->
-                                    let
-                                        data =
-                                            IssueData id name detailsTemplate supportType chargeable
-                                    in
-                                    if requiresComponent then
-                                        ComponentRequiredIssue data
-                                    else
-                                        StandardIssue data
+                            \defaultSubject ->
+                                \supportType ->
+                                    \chargeable ->
+                                        let
+                                            data =
+                                                IssueData
+                                                    id
+                                                    name
+                                                    detailsTemplate
+                                                    defaultSubject
+                                                    supportType
+                                                    chargeable
+                                        in
+                                        if requiresComponent then
+                                            ComponentRequiredIssue data
+                                        else
+                                            StandardIssue data
     in
-    D.map6 createIssue
+    D.map7 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
         (D.field "detailsTemplate" D.string)
+        (D.field "defaultSubject" D.string)
         (D.field "supportType" SupportType.decoder)
         (D.field "chargeable" D.bool)
 

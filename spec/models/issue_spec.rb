@@ -54,6 +54,7 @@ RSpec.describe Issue, type: :model do
         id: 1,
         name: 'New user request',
         detailsTemplate: 'Give a username',
+        defaultSubject: 'New user request',
         requiresComponent: false,
         supportType: 'managed',
         chargeable: true
