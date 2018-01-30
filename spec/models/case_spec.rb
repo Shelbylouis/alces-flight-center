@@ -55,6 +55,22 @@ RSpec.describe Case, type: :model do
     end
   end
 
+  describe 'subject generation on Case creation' do
+    it 'assigns subject to issue default if none given' do
+      issue = create(:issue, name: 'issue_name')
+      support_case = create(:case, issue: issue)
+
+      expect(support_case.subject).to eq(issue.default_subject)
+    end
+
+    it 'assigns subject to given value if given' do
+      support_case = create(:case, subject: 'some_subject')
+      support_case.reload
+
+      expect(support_case.subject).to eq('some_subject')
+    end
+  end
+
   describe 'RT ticket creation on Case creation' do
     subject do
       build(
