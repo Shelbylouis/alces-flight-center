@@ -78,13 +78,18 @@ decoder =
 
 
 detailsValid : Issue -> Bool
-detailsValid issue =
-    details issue |> String.isEmpty |> not
+detailsValid =
+    fieldFilled details
 
 
 subjectValid : Issue -> Bool
-subjectValid issue =
-    subject issue |> String.isEmpty |> not
+subjectValid =
+    fieldFilled subject
+
+
+fieldFilled : (Issue -> String) -> (Issue -> Bool)
+fieldFilled getField =
+    getField >> String.isEmpty >> not
 
 
 extractId : Issue -> Int
