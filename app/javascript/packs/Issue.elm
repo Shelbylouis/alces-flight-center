@@ -15,7 +15,6 @@ module Issue
         )
 
 import Json.Decode as D
-import SelectList exposing (SelectList)
 import SupportType exposing (SupportType(..))
 import Utils
 
