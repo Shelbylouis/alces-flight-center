@@ -238,6 +238,7 @@ caseForm state =
                 , maybeCategoriesField state
                 , issuesField state |> Just
                 , maybeComponentsField state
+                , subjectField state |> Just
                 , detailsField state |> Just
                 , submitButton state |> Just
                 ]
@@ -351,6 +352,22 @@ maybeServicesField state =
         ChangeSelectedService
 
 
+subjectField : State -> Html Msg
+subjectField state =
+    let
+        selectedIssue =
+            State.selectedIssue state
+
+        validateSubject =
+            FieldValidation.validateWithEmptyError Issue.subjectValid
+    in
+    Fields.inputField "Subject"
+        selectedIssue
+        Issue.subject
+        validateSubject
+        ChangeSubject
+
+
 detailsField : State -> Html Msg
 detailsField state =
     let
@@ -389,6 +406,7 @@ type Msg
     | ChangeSelectedIssue String
     | ChangeSelectedComponent String
     | ChangeSelectedService String
+    | ChangeSubject String
     | ChangeDetails String
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
@@ -438,6 +456,10 @@ updateState msg state =
         ChangeSelectedService id ->
             stringToId Service.Id id
                 |> Maybe.map (handleChangeSelectedService state)
+
+        ChangeSubject subject ->
+            Just
+                ( handleChangeSubject state subject, Cmd.none )
 
         ChangeDetails details ->
             Just
@@ -531,6 +553,36 @@ handleChangeSelectedService state serviceId =
       }
     , Cmd.none
     )
+
+
+handleChangeSubject : State -> String -> State
+handleChangeSubject state subject =
+    let
+        newClusters =
+            SelectList.Extra.mapSelected updateCluster state.clusters
+
+        updateCluster =
+            \cluster ->
+                SelectList.Extra.mapSelected updateService cluster.services
+                    |> Cluster.asServicesIn cluster
+
+        updateService =
+            \service ->
+                updateIssues service.issues
+                    |> Service.asIssuesIn service
+
+        updateIssues =
+            Issues.mapIssue updateIssueSubject
+
+        updateCategory =
+            \category ->
+                SelectList.Extra.mapSelected updateIssueSubject category.issues
+                    |> Category.asIssuesIn category
+
+        updateIssueSubject =
+            Issue.setSubject subject
+    in
+    { state | clusters = newClusters }
 
 
 handleChangeDetails : State -> String -> State
