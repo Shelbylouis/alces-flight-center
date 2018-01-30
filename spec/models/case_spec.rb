@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Case, type: :model do
-  let :random_token_regex { /\[([A-Z]|[0-9]){5}\]/ }
+  let :random_token_regex { /([A-Z]|[0-9]){5}/ }
 
   describe '#create' do
     it 'only raises RecordInvalid when no Cluster' do
@@ -120,7 +120,7 @@ RSpec.describe Case, type: :model do
         # CC'ed emails should be those for all the site contacts and additional
         # contacts, apart from the requestor.
         cc: [another_user.email, additional_contact.email],
-        subject: /Alces Flight Center ticket: somecluster - Crashed node #{random_token_regex}/,
+        subject: /Alces Flight Center ticket: somecluster - Crashed node \[#{random_token_regex}\]/,
         text: <<-EOF.strip_heredoc
           Requestor: Some User
           Cluster: somecluster
@@ -139,6 +139,15 @@ RSpec.describe Case, type: :model do
       ).and_return(fake_rt_ticket)
 
       subject.save!
+    end
+
+    it 'saves generated ticket token to later use in mailto_url' do
+      subject.save!
+      created_ticket_token = subject.token
+      expect(created_ticket_token).to match(random_token_regex)
+      subject.reload
+
+      expect(subject.mailto_url).to include(created_ticket_token)
     end
 
     context 'when no associated component' do
@@ -185,7 +194,7 @@ RSpec.describe Case, type: :model do
       )
 
       expected_subject =
-        /RE: \[helpdesk\.alces-software\.com #12345\] Alces Flight Center ticket: somecluster - New user request #{random_token_regex}/
+        /RE: \[helpdesk\.alces-software\.com #12345\] Alces Flight Center ticket: somecluster - New user request \[#{random_token_regex}\]/
       expected_mailto_url = /mailto:support@alces-software\.com\?subject=#{expected_subject}/
       expect(support_case.mailto_url).to match expected_mailto_url
     end
