@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe Case, type: :model do
   let :random_token_regex { /([A-Z]|[0-9]){5}/ }
 
+  let :request_tracker { described_class.send(:request_tracker) }
+
   describe '#create' do
     it 'only raises RecordInvalid when no Cluster' do
       # Previously raised DelegationError as tried to use Cluster which wasn't
@@ -125,7 +127,6 @@ RSpec.describe Case, type: :model do
     let :cluster { create(:cluster, site: site, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
     let :service { create(:service, name: 'Some service', cluster: cluster) }
-    let :request_tracker { described_class.send(:request_tracker) }
 
     let :fake_rt_ticket { OpenStruct.new(id: 1234) }
 
@@ -203,13 +204,10 @@ RSpec.describe Case, type: :model do
     it 'creates correct mailto URL' do
       cluster = create(:cluster, name: 'somecluster')
       issue = create(:issue, name: 'New user request')
-      rt_ticket_id = 12345
+      fake_ticket = OpenStruct.new(id: 12345)
+      allow(request_tracker).to receive(:create_ticket).and_return(fake_ticket)
 
-      support_case = described_class.new(
-        cluster: cluster,
-        issue: issue,
-        rt_ticket_id: rt_ticket_id
-      )
+      support_case = create(:case, cluster: cluster, issue: issue)
 
       expected_subject =
         /RE: \[helpdesk\.alces-software\.com #12345\] somecluster: New user request \[#{random_token_regex}\]/
