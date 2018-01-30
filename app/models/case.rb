@@ -28,6 +28,7 @@ class Case < ApplicationRecord
 
   validates :details, presence: true
   validates :token, presence: true
+  validates :subject, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
 
   validates :last_known_ticket_status,
@@ -38,6 +39,8 @@ class Case < ApplicationRecord
 
   after_initialize :assign_cluster_if_necessary
   after_initialize :generate_token_if_necessary
+
+  before_validation :assign_default_subject_if_unset
 
   # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
   # if this is possible but it was not explicitly passed.
@@ -112,6 +115,10 @@ class Case < ApplicationRecord
     return if cluster
     self.cluster = component.cluster if component
     self.cluster = service.cluster if service
+  end
+
+  def assign_default_subject_if_unset
+    self.subject ||= issue.default_subject
   end
 
   def ticket_completed?
