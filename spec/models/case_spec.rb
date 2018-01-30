@@ -120,8 +120,10 @@ RSpec.describe Case, type: :model do
         # CC'ed emails should be those for all the site contacts and additional
         # contacts, apart from the requestor.
         cc: [another_user.email, additional_contact.email],
-        subject: /Alces Flight Center ticket: somecluster - Crashed node \[#{random_token_regex}\]/,
+        subject: /somecluster: Crashed node \[#{random_token_regex}\]/,
         text: <<-EOF.strip_heredoc
+          This ticket was created using Alces Flight Center
+
           Requestor: Some User
           Cluster: somecluster
           Category: Hardware issue
@@ -194,7 +196,7 @@ RSpec.describe Case, type: :model do
       )
 
       expected_subject =
-        /RE: \[helpdesk\.alces-software\.com #12345\] Alces Flight Center ticket: somecluster - New user request \[#{random_token_regex}\]/
+        /RE: \[helpdesk\.alces-software\.com #12345\] somecluster: New user request \[#{random_token_regex}\]/
       expected_mailto_url = /mailto:support@alces-software\.com\?subject=#{expected_subject}/
       expect(support_case.mailto_url).to match expected_mailto_url
     end

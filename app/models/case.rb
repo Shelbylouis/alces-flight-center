@@ -142,7 +142,7 @@ class Case < ApplicationRecord
   end
 
   def rt_ticket_subject
-    "Alces Flight Center ticket: #{cluster.name} - #{issue.name} [#{token}]"
+    "#{cluster.name}: #{issue.name} [#{token}]"
   end
 
   # We generate a short random token to identify each ticket within email
@@ -158,7 +158,12 @@ class Case < ApplicationRecord
   def rt_ticket_text
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
-    Utils.rt_format(rt_ticket_properties)
+    properties = Utils.rt_format(rt_ticket_properties)
+
+    [
+      'This ticket was created using Alces Flight Center',
+      properties
+    ].join("\n\n")
   end
 
   def rt_ticket_properties
