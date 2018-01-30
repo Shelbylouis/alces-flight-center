@@ -27,6 +27,7 @@ class Case < ApplicationRecord
   delegate :site, to: :cluster, allow_nil: true
 
   validates :details, presence: true
+  validates :token, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
 
   validates :last_known_ticket_status,
@@ -36,6 +37,7 @@ class Case < ApplicationRecord
   validates_with Validator
 
   after_initialize :assign_cluster_if_necessary
+  after_initialize :generate_token_if_necessary
 
   # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
   # if this is possible but it was not explicitly passed.
@@ -140,7 +142,7 @@ class Case < ApplicationRecord
   end
 
   def rt_ticket_subject
-    "Alces Flight Center ticket: #{cluster.name} - #{issue.name} [#{generate_ticket_identifier_token}]"
+    "Alces Flight Center ticket: #{cluster.name} - #{issue.name} [#{token}]"
   end
 
   # We generate a short random token to identify each ticket within email
@@ -149,8 +151,8 @@ class Case < ApplicationRecord
   # clients will also collapse different tickets into the same thread due to
   # their similar subjects (see
   # https://github.com/alces-software/alces-flight-center/issues/41#issuecomment-361307971).
-  def generate_ticket_identifier_token
-    Utils.generate_password(length: 5).upcase
+  def generate_token_if_necessary
+    self.token ||= Utils.generate_password(length: 5).upcase
   end
 
   def rt_ticket_text
