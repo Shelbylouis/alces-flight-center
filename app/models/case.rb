@@ -38,7 +38,7 @@ class Case < ApplicationRecord
   validates_with Validator
 
   after_initialize :assign_cluster_if_necessary
-  after_initialize :generate_token_if_necessary
+  after_initialize :generate_token, on: :create
 
   before_validation :assign_default_subject_if_unset
 
@@ -158,7 +158,7 @@ class Case < ApplicationRecord
   # clients will also collapse different tickets into the same thread due to
   # their similar subjects (see
   # https://github.com/alces-software/alces-flight-center/issues/41#issuecomment-361307971).
-  def generate_token_if_necessary
+  def generate_token
     self.token ||= Utils.generate_password(length: 5).upcase
   end
 
