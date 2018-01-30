@@ -11,6 +11,9 @@ module Issue
         , requiresComponent
         , sameId
         , setDetails
+        , setSubject
+        , subject
+        , subjectValid
         , supportType
         )
 
@@ -79,6 +82,11 @@ detailsValid issue =
     details issue |> String.isEmpty |> not
 
 
+subjectValid : Issue -> Bool
+subjectValid issue =
+    subject issue |> String.isEmpty |> not
+
+
 extractId : Issue -> Int
 extractId issue =
     case data issue |> .id of
@@ -106,6 +114,11 @@ details issue =
     data issue |> .details
 
 
+subject : Issue -> String
+subject issue =
+    data issue |> .subject
+
+
 setDetails : String -> Issue -> Issue
 setDetails details issue =
     let
@@ -114,6 +127,23 @@ setDetails details issue =
 
         newData =
             { data_ | details = details }
+    in
+    case issue of
+        ComponentRequiredIssue _ ->
+            ComponentRequiredIssue newData
+
+        StandardIssue _ ->
+            StandardIssue newData
+
+
+setSubject : String -> Issue -> Issue
+setSubject subject issue =
+    let
+        data_ =
+            data issue
+
+        newData =
+            { data_ | subject = subject }
     in
     case issue of
         ComponentRequiredIssue _ ->

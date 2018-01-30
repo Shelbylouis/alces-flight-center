@@ -279,6 +279,7 @@ isInvalid state =
     in
     List.any not
         [ Issue.detailsValid issue
+        , Issue.subjectValid issue
         , issueAvailableForSelectedCluster state issue
         , partAllowedForSelectedIssue Issue.requiresComponent component
 

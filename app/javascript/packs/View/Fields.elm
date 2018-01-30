@@ -1,6 +1,7 @@
 module View.Fields
     exposing
         ( hiddenInputWithVisibleError
+        , inputField
         , selectField
         , textareaField
         )
@@ -64,6 +65,25 @@ textareaField fieldName item toContent validate inputMsg =
         textarea
         [ rows 10
         , onInput inputMsg
+        , value content
+        ]
+        []
+
+
+inputField : String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
+inputField fieldName item toContent validate inputMsg =
+    let
+        validatedField =
+            validate item
+
+        content =
+            toContent item
+    in
+    formField fieldName
+        item
+        validatedField
+        input
+        [ onInput inputMsg
         , value content
         ]
         []
