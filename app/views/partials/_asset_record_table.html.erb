@@ -27,18 +27,18 @@
             <%= model.component_make.name %>
           <% end %></td>
         </tr>
-        <% enum = case action
-                  when 'show'; model.asset_record.map { |r| [r, r.value] }
-                  when 'edit'; decorated_model.asset_record_form_inputs
-                  end %>
-        <% enum.each do |record, value| %>
+        <% model.asset_record.each do |record| %>
           <tr class="form-group">
             <td width="50%">
               <%= label_tag(record.definition.id, record.name) %>
             </td>
 
             <td width="50%">
-              <%= value %>
+              <% if action == 'edit' %>
+                <%= record.definition.decorate.form_input %>
+              <% else %>
+                <%= record.value %>
+              <% end %>
             </td>
           </tr>
         <% end %>
