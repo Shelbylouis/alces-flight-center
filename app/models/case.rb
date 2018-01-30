@@ -142,7 +142,7 @@ class Case < ApplicationRecord
   end
 
   def rt_ticket_subject
-    "#{cluster.name}: #{issue.name} [#{token}]"
+    "#{cluster.name}: #{issue.default_subject} [#{token}]"
   end
 
   # We generate a short random token to identify each ticket within email

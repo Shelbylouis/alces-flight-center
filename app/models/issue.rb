@@ -79,8 +79,6 @@ class Issue < ApplicationRecord
     }
   end
 
-  private
-
   def default_subject
     name
   end
