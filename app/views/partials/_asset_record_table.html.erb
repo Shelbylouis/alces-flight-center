@@ -35,8 +35,7 @@
 
             <td width="50%">
               <% if action == 'edit' %>
-                <% value = (model == record.asset ? record.value : '') %>
-                <%= record.definition.decorate.form_input(value, model) %>
+                <%= record.decorate.form_input(model) %>
               <% else %>
                 <%= record.value %>
               <% end %>
