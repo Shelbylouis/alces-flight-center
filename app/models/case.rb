@@ -156,7 +156,13 @@ class Case < ApplicationRecord
   end
 
   def rt_ticket_text
-    properties = {
+    # Ticket text does not need to be in this format, it is just text, but this
+    # is readable and an adequate format for now.
+    Utils.rt_format(rt_ticket_properties)
+  end
+
+  def rt_ticket_properties
+    {
       Requestor: user.name,
       Cluster: cluster.name,
       Category: category&.name,
@@ -165,9 +171,5 @@ class Case < ApplicationRecord
       'Associated service': service&.name,
       Details: details,
     }.reject { |_k, v| v.nil? }
-
-    # Ticket text does not need to be in this format, it is just text, but this
-    # is readable and an adequate format for now.
-    Utils.rt_format(properties)
   end
 end
