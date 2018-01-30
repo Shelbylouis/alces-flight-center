@@ -120,30 +120,20 @@ subject issue =
 
 
 setDetails : String -> Issue -> Issue
-setDetails details issue =
-    let
-        data_ =
-            data issue
-
-        newData =
-            { data_ | details = details }
-    in
-    case issue of
-        ComponentRequiredIssue _ ->
-            ComponentRequiredIssue newData
-
-        StandardIssue _ ->
-            StandardIssue newData
+setDetails details =
+    updateIssueData (\data -> { data | details = details })
 
 
 setSubject : String -> Issue -> Issue
-setSubject subject issue =
-    let
-        data_ =
-            data issue
+setSubject subject =
+    updateIssueData (\data -> { data | subject = subject })
 
+
+updateIssueData : (IssueData -> IssueData) -> Issue -> Issue
+updateIssueData changeData issue =
+    let
         newData =
-            { data_ | subject = subject }
+            data issue |> changeData
     in
     case issue of
         ComponentRequiredIssue _ ->
