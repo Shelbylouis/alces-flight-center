@@ -190,6 +190,7 @@ encoder state =
                 , ( "issue_id", Issue.extractId issue |> E.int )
                 , ( "component_id", componentIdValue )
                 , ( "service_id", serviceIdValue )
+                , ( "subject", Issue.subject issue |> E.string )
                 , ( "details", Issue.details issue |> E.string )
                 ]
           )
