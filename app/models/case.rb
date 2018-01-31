@@ -27,6 +27,8 @@ class Case < ApplicationRecord
   delegate :site, to: :cluster, allow_nil: true
 
   validates :details, presence: true
+  validates :token, presence: true
+  validates :subject, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
 
   validates :last_known_ticket_status,
@@ -36,6 +38,9 @@ class Case < ApplicationRecord
   validates_with Validator
 
   after_initialize :assign_cluster_if_necessary
+  after_initialize :generate_token, on: :create
+
+  before_validation :assign_default_subject_if_unset
 
   # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
   # if this is possible but it was not explicitly passed.
@@ -112,6 +117,10 @@ class Case < ApplicationRecord
     self.cluster = service.cluster if service
   end
 
+  def assign_default_subject_if_unset
+    self.subject ||= issue.default_subject
+  end
+
   def ticket_completed?
     COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
   end
@@ -140,11 +149,40 @@ class Case < ApplicationRecord
   end
 
   def rt_ticket_subject
-    "Alces Flight Center ticket: #{cluster.name} - #{issue.name}"
+    # NOTE: If the format used here ever changes then this may cause emails
+    # sent using the `mailto` links for existing Cases to not be threaded with
+    # previous emails related to that Case (see
+    # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
+    # for an explanation). If we want to change this format and avoid this
+    # consequence then a solution would be to first add a new field for this
+    # whole string, and save and use the existing format for existing Cases.
+    "#{cluster.name}: #{subject} [#{token}]"
+  end
+
+  # We generate a short random token to identify each ticket within email
+  # clients and RT. Without this, similar but distinct tickets can be hard to
+  # distinguish in RT as they will have identical subjects, and many email
+  # clients will also collapse different tickets into the same thread due to
+  # their similar subjects (see
+  # https://github.com/alces-software/alces-flight-center/issues/41#issuecomment-361307971).
+  def generate_token
+    self.token ||= Utils.generate_password(length: 5).upcase
   end
 
   def rt_ticket_text
-    properties = {
+    # Ticket text does not need to be in this format, it is just text, but this
+    # is readable and an adequate format for now.
+    properties = Utils.rt_format(rt_ticket_properties)
+
+    [
+      'This ticket was created using Alces Flight Center',
+      properties
+    ].join("\n\n")
+  end
+
+  def rt_ticket_properties
+    {
+      Requestor: user.name,
       Cluster: cluster.name,
       Category: category&.name,
       'Issue': issue.name,
@@ -152,9 +190,5 @@ class Case < ApplicationRecord
       'Associated service': service&.name,
       Details: details,
     }.reject { |_k, v| v.nil? }
-
-    # Ticket text does not need to be in this format, it is just text, but this
-    # is readable and an adequate format for now.
-    Utils.rt_format(properties)
   end
 end

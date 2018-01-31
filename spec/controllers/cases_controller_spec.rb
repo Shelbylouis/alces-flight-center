@@ -78,6 +78,7 @@ RSpec.describe CasesController, type: :controller do
           cluster_id: first_cluster.id,
           component_id: first_cluster_component.id,
           issue_id: create(:issue_requiring_component).id,
+          subject: 'subject',
           details: 'Useful info'
         }
       }

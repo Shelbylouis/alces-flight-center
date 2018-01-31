@@ -11,11 +11,13 @@ module Issue
         , requiresComponent
         , sameId
         , setDetails
+        , setSubject
+        , subject
+        , subjectValid
         , supportType
         )
 
 import Json.Decode as D
-import SelectList exposing (SelectList)
 import SupportType exposing (SupportType(..))
 import Utils
 
@@ -29,6 +31,7 @@ type alias IssueData =
     { id : Id
     , name : String
     , details : String
+    , subject : String
     , supportType : SupportType
     , chargeable : Bool
     }
@@ -46,29 +49,47 @@ decoder =
                 \name ->
                     \requiresComponent ->
                         \detailsTemplate ->
-                            \supportType ->
-                                \chargeable ->
-                                    let
-                                        data =
-                                            IssueData id name detailsTemplate supportType chargeable
-                                    in
-                                    if requiresComponent then
-                                        ComponentRequiredIssue data
-                                    else
-                                        StandardIssue data
+                            \defaultSubject ->
+                                \supportType ->
+                                    \chargeable ->
+                                        let
+                                            data =
+                                                IssueData
+                                                    id
+                                                    name
+                                                    detailsTemplate
+                                                    defaultSubject
+                                                    supportType
+                                                    chargeable
+                                        in
+                                        if requiresComponent then
+                                            ComponentRequiredIssue data
+                                        else
+                                            StandardIssue data
     in
-    D.map6 createIssue
+    D.map7 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
         (D.field "detailsTemplate" D.string)
+        (D.field "defaultSubject" D.string)
         (D.field "supportType" SupportType.decoder)
         (D.field "chargeable" D.bool)
 
 
 detailsValid : Issue -> Bool
-detailsValid issue =
-    details issue |> String.isEmpty |> not
+detailsValid =
+    fieldFilled details
+
+
+subjectValid : Issue -> Bool
+subjectValid =
+    fieldFilled subject
+
+
+fieldFilled : (Issue -> String) -> (Issue -> Bool)
+fieldFilled getField =
+    getField >> String.isEmpty >> not
 
 
 extractId : Issue -> Int
@@ -98,14 +119,26 @@ details issue =
     data issue |> .details
 
 
-setDetails : String -> Issue -> Issue
-setDetails details issue =
-    let
-        data_ =
-            data issue
+subject : Issue -> String
+subject issue =
+    data issue |> .subject
 
+
+setDetails : String -> Issue -> Issue
+setDetails details =
+    updateIssueData (\data -> { data | details = details })
+
+
+setSubject : String -> Issue -> Issue
+setSubject subject =
+    updateIssueData (\data -> { data | subject = subject })
+
+
+updateIssueData : (IssueData -> IssueData) -> Issue -> Issue
+updateIssueData changeData issue =
+    let
         newData =
-            { data_ | details = details }
+            data issue |> changeData
     in
     case issue of
         ComponentRequiredIssue _ ->
