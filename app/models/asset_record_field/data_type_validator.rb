@@ -5,7 +5,6 @@ class AssetRecordField::DataTypeValidator < ActiveModel::Validator
   def validate(record)
     @record = record
     validation_method = :"valid_#{record.definition.data_type}?"
-    puts validation_method
     if respond_to?(validation_method, 'include private')
       send validation_method
     else
