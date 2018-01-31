@@ -15,7 +15,15 @@ class AssetRecordField::DataTypeValidator < ActiveModel::Validator
 
   private
 
+  MAX_SHORT_TEXT_LENGTH = 50
+
   def valid_short_text?
+    return if record.value.length <= MAX_SHORT_TEXT_LENGTH
+    msg = <<-EOF.squish
+      '#{record.value}' exceeds the maximum length of
+      #{MAX_SHORT_TEXT_LENGTH}
+    EOF
+    record.errors.add :data_type, msg
   end
 
   def valid_long_text?

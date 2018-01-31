@@ -151,6 +151,12 @@ RSpec.describe AssetRecordField, type: :model do
     end
  
     describe 'invalid data types' do
+      def expect_data_type_error(msg)
+        expect(subject.errors.size).to be(1)
+        expect(subject.errors.keys.first).to eq(:data_type)
+        expect(subject.errors[:data_type].first).to include(msg)
+      end
+
       context 'with a short_text' do
         let :definition do
           create :asset_record_field_definition,
@@ -162,7 +168,8 @@ RSpec.describe AssetRecordField, type: :model do
         end
 
         it 'errors if the length is greater than 50 characters' do
-          pp subject
+          expect(subject.update(value: ('s' * 51))).to eq(false)
+          expect_data_type_error('maximum length')
         end
       end
     end
