@@ -151,23 +151,18 @@ RSpec.describe AssetRecordField, type: :model do
     end
  
     describe 'invalid data types' do
-      let :component { create(:component) }
-
       context 'with a short_text' do
         let :definition do
           create :asset_record_field_definition,
-                 component_types: [component.component_type],
                  data_type: 'short_text'
         end
 
         subject do
-          component.asset_record_fields
-                   .create!(definition: definition, value: 'start_value')
-                   .tap { component.reload }
+          create(:component_record, definition: definition)
         end
 
         it 'errors if the length is greater than 50 characters' do
-          puts subject.valid?
+          pp subject
         end
       end
     end
