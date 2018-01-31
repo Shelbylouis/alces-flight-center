@@ -72,9 +72,14 @@ class Issue < ApplicationRecord
       id: id,
       name: name,
       detailsTemplate: details_template,
+      defaultSubject: default_subject,
       requiresComponent: requires_component,
       supportType: support_type,
       chargeable: chargeable
     }
+  end
+
+  def default_subject
+    name
   end
 end

@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Case, type: :model do
+  let :random_token_regex { /([A-Z]|[0-9]){5}/ }
+
+  let :request_tracker { described_class.send(:request_tracker) }
+
   describe '#create' do
     it 'only raises RecordInvalid when no Cluster' do
       # Previously raised DelegationError as tried to use Cluster which wasn't
@@ -53,6 +57,22 @@ RSpec.describe Case, type: :model do
     end
   end
 
+  describe 'subject generation on Case creation' do
+    it 'assigns subject to issue default if none given' do
+      issue = create(:issue, name: 'issue_name')
+      support_case = create(:case, issue: issue)
+
+      expect(support_case.subject).to eq(issue.default_subject)
+    end
+
+    it 'assigns subject to given value if given' do
+      support_case = create(:case, subject: 'some_subject')
+      support_case.reload
+
+      expect(support_case.subject).to eq('some_subject')
+    end
+  end
+
   describe 'RT ticket creation on Case creation' do
     subject do
       build(
@@ -62,6 +82,7 @@ RSpec.describe Case, type: :model do
         component: component,
         service: service,
         user: requestor,
+        subject: 'my_subject',
         details: <<-EOF.strip_heredoc
           Oh no
           my node
@@ -107,7 +128,6 @@ RSpec.describe Case, type: :model do
     let :cluster { create(:cluster, site: site, name: 'somecluster') }
     let :component { create(:component, name: 'node01', cluster: cluster) }
     let :service { create(:service, name: 'Some service', cluster: cluster) }
-    let :request_tracker { described_class.send(:request_tracker) }
 
     let :fake_rt_ticket { OpenStruct.new(id: 1234) }
 
@@ -118,9 +138,11 @@ RSpec.describe Case, type: :model do
         # CC'ed emails should be those for all the site contacts and additional
         # contacts, apart from the requestor.
         cc: [another_user.email, additional_contact.email],
-
-        subject: 'Alces Flight Center ticket: somecluster - Crashed node',
+        subject: /somecluster: my_subject \[#{random_token_regex}\]/,
         text: <<-EOF.strip_heredoc
+          This ticket was created using Alces Flight Center
+
+          Requestor: Some User
           Cluster: somecluster
           Category: Hardware issue
           Issue: Crashed node
@@ -137,6 +159,15 @@ RSpec.describe Case, type: :model do
       ).and_return(fake_rt_ticket)
 
       subject.save!
+    end
+
+    it 'saves generated ticket token to later use in mailto_url' do
+      subject.save!
+      created_ticket_token = subject.token
+      expect(created_ticket_token).to match(random_token_regex)
+      subject.reload
+
+      expect(subject.mailto_url).to include(created_ticket_token)
     end
 
     context 'when no associated component' do
@@ -173,19 +204,15 @@ RSpec.describe Case, type: :model do
   describe '#mailto_url' do
     it 'creates correct mailto URL' do
       cluster = create(:cluster, name: 'somecluster')
-      issue = create(:issue, name: 'New user request')
-      rt_ticket_id = 12345
+      fake_ticket = OpenStruct.new(id: 12345)
+      allow(request_tracker).to receive(:create_ticket).and_return(fake_ticket)
 
-      support_case = described_class.new(
-        cluster: cluster,
-        issue: issue,
-        rt_ticket_id: rt_ticket_id
-      )
+      support_case = create(:case, cluster: cluster, subject: 'somesubject')
 
       expected_subject =
-        'RE: [helpdesk.alces-software.com #12345] Alces Flight Center ticket: somecluster - New user request'
-      expected_mailto_url = "mailto:support@alces-software.com?subject=#{expected_subject}"
-      expect(support_case.mailto_url).to eq expected_mailto_url
+        /RE: \[helpdesk\.alces-software\.com #12345\] somecluster: somesubject \[#{random_token_regex}\]/
+      expected_mailto_url = /mailto:support@alces-software\.com\?subject=#{expected_subject}/
+      expect(support_case.mailto_url).to match expected_mailto_url
     end
   end
 

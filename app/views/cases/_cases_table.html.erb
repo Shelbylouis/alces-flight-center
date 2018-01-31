@@ -6,8 +6,9 @@
     <ul class="nav">
       <li class="nav-item">
         <span class="navbar-brand">
-          <%= (archive ? '' : 'Open ') + model.name %>
-          support cases
+          <%= archive ? 'All' : 'Open ' %>
+          support cases &mdash;
+          <%= model.name %>
         </span>
       </li>
       <% unless archive %>
@@ -69,7 +70,7 @@
           <td><%= c.issue.name %></td>
           <td><%= c.association_info %></td>
           <td><%= c.rt_ticket_id %></td>
-          <td><%= c.details %></td>
+          <td><%= simple_format(c.details) %></td>
           <% if manage_cases_page %>
             <td>
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>

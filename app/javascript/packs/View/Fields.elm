@@ -1,6 +1,7 @@
 module View.Fields
     exposing
         ( hiddenInputWithVisibleError
+        , inputField
         , selectField
         , textareaField
         )
@@ -50,22 +51,48 @@ selectField fieldName items toId toOptionLabel validate changeMsg =
 
 
 textareaField : String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
-textareaField fieldName item toContent validate inputMsg =
+textareaField =
+    textField TextArea
+
+
+inputField : String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
+inputField =
+    textField Input
+
+
+type TextField
+    = Input
+    | TextArea
+
+
+textField : TextField -> String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
+textField textFieldType fieldName item toContent validate inputMsg =
     let
         validatedField =
             validate item
 
         content =
             toContent item
+
+        ( element, additionalAttributes ) =
+            case textFieldType of
+                Input ->
+                    ( input, [] )
+
+                TextArea ->
+                    ( textarea, [ rows 10 ] )
+
+        attributes =
+            [ onInput inputMsg
+            , value content
+            ]
+                ++ additionalAttributes
     in
     formField fieldName
         item
         validatedField
-        textarea
-        [ rows 10
-        , onInput inputMsg
-        , value content
-        ]
+        element
+        attributes
         []
 
 

@@ -190,6 +190,7 @@ encoder state =
                 , ( "issue_id", Issue.extractId issue |> E.int )
                 , ( "component_id", componentIdValue )
                 , ( "service_id", serviceIdValue )
+                , ( "subject", Issue.subject issue |> E.string )
                 , ( "details", Issue.details issue |> E.string )
                 ]
           )
@@ -279,6 +280,7 @@ isInvalid state =
     in
     List.any not
         [ Issue.detailsValid issue
+        , Issue.subjectValid issue
         , issueAvailableForSelectedCluster state issue
         , partAllowedForSelectedIssue Issue.requiresComponent component
 
