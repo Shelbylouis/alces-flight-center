@@ -172,6 +172,22 @@ RSpec.describe AssetRecordField, type: :model do
           expect_data_type_error('maximum length')
         end
       end
+
+      context 'with a short_text' do
+        let :definition do
+          create :asset_record_field_definition,
+                 data_type: 'long_text'
+        end
+
+        subject do
+          create(:component_record, definition: definition)
+        end
+
+        it 'errors if the length is greater than 50 characters' do
+          expect(subject.update(value: ('s' * 501))).to eq(false)
+          expect_data_type_error('maximum length')
+        end
+      end
     end
   end
 end
