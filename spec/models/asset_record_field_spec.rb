@@ -149,5 +149,9 @@ RSpec.describe AssetRecordField, type: :model do
         )
       end
     end
+ 
+    describe 'invalid data types' do
+      
+    end
   end
 end
