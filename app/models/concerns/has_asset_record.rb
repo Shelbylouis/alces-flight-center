@@ -40,8 +40,8 @@ module HasAssetRecord
         nil
       elsif field.asset == self
         # When updating a field associated with the asset
-        field.value = updated_value
-        field.save
+        field.update(value: updated_value)
+        field
       else
         # When updating a higher level field
         create_asset_record_field(field.definition, updated_value)

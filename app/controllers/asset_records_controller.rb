@@ -7,16 +7,24 @@ class AssetRecordsController < ApplicationController
   def update
     update_asset_record
     update_component_make
-    redirect_back fallback_location: @asset if error_flag
-    redirect_to asset
+    if error_objects.empty?
+      redirect_to asset
+    else
+      redirect_back fallback_location: @asset
+    end
   end
 
   private
 
-  attr_accessor :error_flag
+  def error_objects
+    @error_objects ||= []
+  end
 
   def update_asset_record
     asset.update_asset_record(asset_record_param.to_h)
+         .reject(&:nil?)
+         .reject(&:valid?)
+         .tap { |errors| error_objects.concat errors }
   end
 
   def update_component_make
