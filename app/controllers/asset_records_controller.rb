@@ -5,10 +5,16 @@ class AssetRecordsController < ApplicationController
   end
 
   def update
+    asset.update_asset_record(update_param.to_h)
     redirect_to asset
   end
 
   private
+
+  def update_param
+    definition_ids = asset.asset_record.map { |r| r.definition.id.to_s }
+    params.permit(*definition_ids)
+  end
 
   def asset
     @cluster_part || @component_group
