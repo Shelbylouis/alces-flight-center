@@ -59,7 +59,7 @@ RSpec.describe AssetRecordFieldDefinition, type: :model do
       end
 
       it 'issues a deprecation warning' do
-        expect(ActiveSupport::Deprecation).to receive(:warn)
+        expect(ActiveSupport::Deprecation).to receive(:warn).at_least(:once)
         subject.data_type
       end
 
@@ -74,7 +74,7 @@ RSpec.describe AssetRecordFieldDefinition, type: :model do
       let :type { 'forgein_data_type' }
 
       subject do
-        create(:asset_record_field_definition, data_type: type)
+        build(:asset_record_field_definition, data_type: type)
       end
 
       it 'is invalid with a "forgein_data_type"' do

@@ -17,6 +17,9 @@ class AssetRecordFieldDefinition < ApplicationRecord
   validates :field_name, presence: true
   validates :level, inclusion: { in: SETTABLE_LEVELS }, presence: true
 
+  validates :data_type,
+            inclusion: { in: AssetRecordField::VALID_DATA_TYPES }
+
   class << self
     def all_identifiers
       all_identifiers_to_definitions.keys
