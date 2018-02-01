@@ -150,11 +150,22 @@ RSpec.describe AssetRecordField, type: :model do
       end
     end
  
-    describe 'invalid data types' do
+    describe 'data type validation' do
       def expect_data_type_error(msg)
         expect(subject.errors.size).to be(1)
-        expect(subject.errors.keys.first).to eq(:data_type)
-        expect(subject.errors[:data_type].first).to include(msg)
+        expect(subject.errors.keys.first).to eq(:value)
+        expect(subject.errors[:value].first).to include(msg)
+      end
+
+      shared_examples 'data_type_length' do |max|
+        it "passes if the length is less than #{max} characters" do
+          expect(subject.update(value: 'l' * (max - 1))).to eq(true)
+        end
+
+        it "errors if the length is greater than #{max} characters" do
+          expect(subject.update(value: 'l' * (max + 1))).to eq(false)
+          expect_data_type_error('is too long')
+        end
       end
 
       context 'with a short_text' do
@@ -167,13 +178,10 @@ RSpec.describe AssetRecordField, type: :model do
           create(:component_record, definition: definition)
         end
 
-        it 'errors if the length is greater than 50 characters' do
-          expect(subject.update(value: ('s' * 51))).to eq(false)
-          expect_data_type_error('maximum length')
-        end
+        include_examples 'data_type_length', 50
       end
 
-      context 'with a short_text' do
+      context 'with a long_text' do
         let :definition do
           create :asset_record_field_definition,
                  data_type: 'long_text'
@@ -183,10 +191,7 @@ RSpec.describe AssetRecordField, type: :model do
           create(:component_record, definition: definition)
         end
 
-        it 'errors if the length is greater than 50 characters' do
-          expect(subject.update(value: ('s' * 501))).to eq(false)
-          expect_data_type_error('maximum length')
-        end
+        include_examples 'data_type_length', 500
       end
     end
   end

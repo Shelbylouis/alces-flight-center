@@ -36,6 +36,8 @@ class AssetRecordField < ApplicationRecord
 
   validates_with Validator
 
+  include HasDataTypeValue
+
   def name
     # Conditional access needed as RailsAdmin will call this method to
     # determine the name to display for an instance, but when creating a new
