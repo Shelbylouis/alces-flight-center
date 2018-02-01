@@ -21,6 +21,20 @@
       </thead>
 
       <tbody>
+        <tr>
+          <td>Component Make</td>
+          <td><% if (model.is_a? ComponentGroup) && (action == 'edit') %>
+            <% makes = ComponentMake.where(component_type: model.component_type) %>
+            <%= collection_select :component_make,
+                                  :id,
+                                  makes,
+                                  :id,
+                                  :name,
+                                  { selected: model.component_make.id } %>
+          <% else %>
+            <%= model.component_make.name %>
+          <% end %></td>
+        </tr>
         <% model.asset_record.each do |record| %>
           <tr class="form-group">
             <% definition_id = record.definition.id %>
@@ -28,13 +42,25 @@
               <%= label_tag(definition_id, record.name) %>
             </td>
 
-            <% input = text_field_tag(
+            <% placeholder = model.find_parent_asset_record(record.definition)
+                                  .value %>
+            <% is_component_level = (record.definition.level == 'component') %>
+            <% model_is_a_component = model.is_a?(Component) %>
+            <% readonly = is_component_level && !model_is_a_component %>
+            <% readonly_msg = \
+              'This field can only be set at the individual Component level'
+            %>
+            <% form_input = text_field_tag(
               definition_id,
-              record.value,
-              class: 'form-control'
+              (record.asset == model ? record.value : ''),
+              class: 'form-control',
+              placeholder: placeholder,
+              readonly: readonly,
+              style: (readonly ? 'background-color:lightgray' : ''),
+              title: (readonly ? readonly_msg : '')
             ) %>
             <td width="50%">
-              <%= action == 'show' ? record.value : input %>
+              <%= action == 'show' ? record.value : form_input %>
             </td>
           </tr>
         <% end %>
@@ -57,7 +83,6 @@
         <% end %>
       </tbody>
     </table>
-
   <% end %>
 </div>
 

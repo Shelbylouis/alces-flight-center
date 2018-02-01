@@ -1,7 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe HasAssetRecord, type: :model do
-  describe '#asset_record' do
+  context 'with a double standard for the subject' do
+    let :overriden_index { 255 }
+
     let :grand_parent do
       create_asset(
         fields: { 4 => 'grand_parent_field' }
@@ -11,7 +13,10 @@ RSpec.describe HasAssetRecord, type: :model do
     let :parent do
       create_asset(
         parent: grand_parent,
-        fields: { 2 => 'parent_asset_field', 3 => 'parent_override_field' }
+        fields: {
+          2 => 'parent_asset_field',
+          overriden_index => 'parent_override_field'
+        }
       )
     end
 
@@ -20,7 +25,7 @@ RSpec.describe HasAssetRecord, type: :model do
         parent: parent,
         fields: {
           1 => 'subject_asset_field',
-          3 => 'subject_override_field'
+          overriden_index => 'subject_override_field'
         }
       )
     end
@@ -43,21 +48,32 @@ RSpec.describe HasAssetRecord, type: :model do
       obj.asset_record.map(&:value)
     end
 
-    it 'includes the asset_record_fields for the current layer' do
-      expect(asset_values).to include('subject_asset_field')
+    describe '#asset_record' do
+      it 'includes the asset_record_fields for the current layer' do
+        expect(asset_values).to include('subject_asset_field')
+      end
+
+      it 'includes its parent fields' do
+        expect(asset_values).to include('parent_asset_field')
+      end
+
+      it 'allows multiple chained asset records' do
+        expect(asset_values).to include('grand_parent_field')
+      end
+
+      it 'subject fields override their parents' do
+        expect(asset_values).to include('subject_override_field')
+        expect(asset_values).not_to include('parent_override_field')
+      end
     end
 
-    it 'includes its parent fields' do
-      expect(asset_values).to include('parent_asset_field')
-    end
-
-    it 'allows multiple chained asset records' do
-      expect(asset_values).to include('grand_parent_field')
-    end
-
-    it 'subject fields override their parents' do
-      expect(asset_values).to include('subject_override_field')
-      expect(asset_values).not_to include('parent_override_field')
+    describe '#find_parent_asset_record' do
+      it 'finds the parents record' do
+        expected_parent_record = parent.asset_record_hash[overriden_index]
+        overriden_def = subject.asset_record_hash[overriden_index].definition
+        found_record = subject.find_parent_asset_record overriden_def
+        expect(found_record).to eq(expected_parent_record)
+      end
     end
   end
 
@@ -102,12 +118,6 @@ RSpec.describe HasAssetRecord, type: :model do
       end
     end
 
-    let! :frozen_old_hash { definition_hash(subject).freeze }
-
-    def old_hash
-      frozen_old_hash.deep_dup
-    end
-
     def definition_hash(obj)
       obj.asset_record.map { |r| [r.definition.id, r.value] }.to_h
     end
@@ -129,16 +139,9 @@ RSpec.describe HasAssetRecord, type: :model do
       end
     end
 
-    it 'does nothing if no values have changed' do
-      subject.update_asset_record(old_hash.deep_dup)
-      expect(definition_hash(subject)).to eq(old_hash)
-    end
-
     it 'creates a new field when component_type definition is updated' do
       new_fields = changed_fields do
-        subject.update_asset_record(
-          old_hash.merge(type_only_definition.id => 'component')
-        )
+        subject.update_asset_record(type_only_definition.id => 'component')
       end
       expect(new_fields.length).to eq(1)
       expect_update(type_only_definition, new_fields.first, 'component')
@@ -146,27 +149,21 @@ RSpec.describe HasAssetRecord, type: :model do
 
     it "doesn't create a new component_type field with an empty value" do
       new_fields = changed_fields do
-        subject.update_asset_record(
-          old_hash.merge(type_only_definition.id => '')
-        )
+        subject.update_asset_record(type_only_definition.id => '')
       end
       expect(new_fields.length).to eq(0)
     end
 
     it 'can update an existing record for the component' do
       updated_fields = changed_fields do
-        subject.update_asset_record(
-          old_hash.merge(set_definition.id => 'component')
-        )
+        subject.update_asset_record(set_definition.id => 'component')
       end
       expect(updated_fields.length).to eq(1)
       expect_update(set_definition, updated_fields.first, 'component')
     end
 
     it 'does not update the higher level record' do
-      subject.update_asset_record(
-        old_hash.merge(group_definition.id => 'component')
-      )
+      subject.update_asset_record(group_definition.id => 'component')
       subject.reload
       subject.component_group.reload
 
@@ -177,12 +174,25 @@ RSpec.describe HasAssetRecord, type: :model do
       expect(group_record.value).to eq('group')
     end
 
+    it 'does not replace higher level assets with a blank field' do
+      updated_fields = changed_fields do
+        subject.update_asset_record(group_definition.id => '')
+      end
+      expect(updated_fields.length).to eq(0)
+    end
+
+    it 'can replace higher level assets with the same value' do
+      updated_fields = changed_fields do
+        subject.update_asset_record(group_definition.id => 'new value')
+      end
+      expect(updated_fields.length).to eq(1)
+      expect(updated_fields.first.value).to eq('new value')
+    end
+
     shared_examples 'delete asset field' do |input|
       it "deletes the record when it is updated to: #{input.inspect}" do
         delete_field = subject.asset_record_fields.first
-        subject.update_asset_record(
-          old_hash.merge(delete_field.definition.id => input)
-        )
+        subject.update_asset_record(delete_field.definition.id => input)
         subject.reload
         expect(subject.asset_record_fields).not_to include(delete_field)
       end
