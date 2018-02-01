@@ -1,5 +1,5 @@
 
-module HasDataTypeValue
+module AssetRecordField::ValidDataTypes
   extend ActiveSupport::Concern
   include ActiveModel::Validations
 
