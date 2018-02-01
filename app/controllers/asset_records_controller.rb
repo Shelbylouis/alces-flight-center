@@ -5,12 +5,19 @@ class AssetRecordsController < ApplicationController
   end
 
   def update
-    asset.update_asset_record(asset_record_param.to_h)
+    update_asset_record
     update_component_make
+    redirect_back fallback_location: @asset if error_flag
     redirect_to asset
   end
 
   private
+
+  attr_accessor :error_flag
+
+  def update_asset_record
+    asset.update_asset_record(asset_record_param.to_h)
+  end
 
   def update_component_make
     return unless asset.is_a? ComponentGroup
