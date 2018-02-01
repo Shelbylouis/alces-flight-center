@@ -35,8 +35,7 @@ class AssetRecordField < ApplicationRecord
             }
 
   validates_with Validator
-
-  include HasDataTypeValue
+  include ValidDataTypes
 
   def name
     # Conditional access needed as RailsAdmin will call this method to
