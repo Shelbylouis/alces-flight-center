@@ -18,6 +18,7 @@
       media: 'all',
       'data-turbolinks-track': 'reload'
     %>
+    <%= stylesheet_link_tag 'development_ribbon' if Rails.env.development? %>
   </head>
 
   <body>
@@ -154,4 +155,5 @@
     <div id='brand-footer'></div>
     <script src='/flight-branding/main.b206bf4c.js'></script>
   </body>
+  <%= development_ribbon position: :left, color: :green if Rails.env.development? %>
 </html>
