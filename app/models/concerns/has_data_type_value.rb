@@ -9,7 +9,18 @@ module HasDataTypeValue
 
   included do
     validates :value,
-              length: { maximum: 50 }
+              length: { maximum: 50 },
+              if: :data_type_short_text?
+  end
+
+  private
+
+  VALID_DATA_TYPES = ['short_text', 'long_text'].tap do |types|
+    types.each do |current_valid_type|
+      define_method(:"data_type_#{current_valid_type}?") do
+        definition.data_type == current_valid_type
+      end
+    end
   end
 
   def max_length_message(value, length)
