@@ -70,3 +70,10 @@ body {
 .faded-icon {
   opacity: 0.6;
 }
+
+#development-ribbon {
+  .ribbon-holder {
+    // Ribbon to indicate development site running should always appear on top.
+    z-index: 9999
+  }
+}

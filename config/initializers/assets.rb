@@ -15,5 +15,6 @@ Rails.application.config.assets.paths << Rails.root.join('node_modules')
 
 Rails.application.config.assets.precompile += [
   'flight-branding/flight-chrome.css',
-  'flight-branding/fonts.css'
+  'flight-branding/fonts.css',
+  'development_ribbon.css'
 ]
