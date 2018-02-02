@@ -29,8 +29,17 @@ Rails.application.routes.draw do
       resources :maintenance_windows, only: :new
     end
 
+    asset_record = Proc.new do
+      resource :asset_record, path: 'asset-record', only: [:edit, :update]
+    end
+
     resources :components, only: []  do
       resources :maintenance_windows, only: :new
+      asset_record.call
+    end
+
+    resources :component_groups, path: 'component-groups', only: [] do
+      asset_record.call
     end
 
     resources :services, only: []  do
@@ -67,19 +76,12 @@ Rails.application.routes.draw do
       resources :consultancy, only: :new
     end
 
-    asset_record = Proc.new do
-      resource :asset_record, path: 'asset-record', only: [:edit, :update]
-    end
-
     resources :components, only: :show do
       resources :cases, only: :new
       resources :consultancy, only: :new
-      asset_record.call
     end
 
-    resources :component_groups, path: 'component-groups', only: :show do
-      asset_record.call
-    end
+    resources :component_groups, path: 'component-groups', only: :show
 
     resources :services, only: :show do
       resources :cases, only: :new

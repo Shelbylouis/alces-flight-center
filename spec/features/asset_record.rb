@@ -8,7 +8,8 @@ RSpec.feature 'Asset Record', type: :feature   do
   context 'with an invalid request' do
     it 'errors as a non-admin user' do
       expect do
-        visit edit_component_asset_record_path(component)
+        user = component.site.users.reject(&:admin?).first
+        visit edit_component_asset_record_path(component, as: user)
       end.to raise_error(ActionController::RoutingError)
     end
 
