@@ -32,7 +32,7 @@ class AssetRecordsController < ApplicationController
   end
 
   def update_asset_record
-    asset.update_asset_record(asset_record_param.to_h)
+    asset.update_asset_record(asset_record_field_params.to_h)
          .reject(&:nil?)
          .reject(&:valid?)
          .tap { |errors| error_objects.concat errors }
@@ -48,7 +48,7 @@ class AssetRecordsController < ApplicationController
     params.require(:component_make).require(:id)
   end
 
-  def asset_record_param
+  def asset_record_field_params
     definition_ids = asset.asset_record.map { |r| r.definition.id.to_s }
     params.permit(*definition_ids)
   end
