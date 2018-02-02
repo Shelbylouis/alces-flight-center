@@ -77,7 +77,7 @@ RSpec.describe HasAssetRecord, type: :model do
     end
   end
 
-  describe '#update' do
+  describe '#update_asset_record' do
     subject { create(:component) }
 
     let! :type_only_definition do
