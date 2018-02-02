@@ -42,7 +42,7 @@ module HasAssetRecord
         field.update(value: updated_value)
         field
       else
-        # When updating a higher level field
+        # When setting a field which is not currently set at this level
         create_asset_record_field(field.definition, updated_value)
       end
     end
