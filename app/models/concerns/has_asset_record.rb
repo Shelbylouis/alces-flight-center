@@ -28,8 +28,14 @@ module HasAssetRecord
     end.to_h
     asset_record.each do |field|
       updated_value = definition_hash[field.definition.id.to_s.to_sym]
-      if updated_value.nil? || updated_value.empty?
-        # Delete an existing field
+      if updated_value.nil?
+        # A nil likely means the definition was not submitted in the form
+        # In this case, the record shouldn't be deleted as a form error could
+        # trigger db entries to be deleted
+        next
+      elsif updated_value.empty?
+        # Explicitly delete the entry if an empty string is received and the
+        # record belongs to the current asset, otherwise do nothing
         field.destroy! if field.asset == self
       elsif field.asset == self
         # When updating a field associated with the asset

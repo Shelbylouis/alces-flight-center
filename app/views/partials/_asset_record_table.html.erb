@@ -1,15 +1,7 @@
 <% decorated_model = model.decorate %>
 
 <div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          Asset Record
-        </span>
-      </li>
-    </ul>
-  </div>
+  <%= render('partials/card_header_nav', title: 'Asset Record') %>
 
   <%= form_tag decorated_model.asset_record_path, method: 'PATCH' do %>
     <table class="table table-responsive">
@@ -35,52 +27,25 @@
             <%= model.component_make.name %>
           <% end %></td>
         </tr>
-        <% model.asset_record.each do |record| %>
-          <tr class="form-group">
-            <% definition_id = record.definition.id %>
-            <td width="50%">
-              <%= label_tag(definition_id, record.name) %>
-            </td>
-
-            <% placeholder = model.find_parent_asset_record(record.definition)
-                                  .value %>
-            <% is_component_level = (record.definition.level == 'component') %>
-            <% model_is_a_component = model.is_a?(Component) %>
-            <% readonly = is_component_level && !model_is_a_component %>
-            <% readonly_msg = \
-              'This field can only be set at the individual Component level'
-            %>
-            <% form_input = text_field_tag(
-              definition_id,
-              (record.asset == model ? record.value : ''),
-              class: 'form-control',
-              placeholder: placeholder,
-              readonly: readonly,
-              style: (readonly ? 'background-color:lightgray' : ''),
-              title: (readonly ? readonly_msg : '')
-            ) %>
-            <td width="50%">
-              <%= action == 'show' ? record.value : form_input %>
-            </td>
-          </tr>
-        <% end %>
-
-        <% if current_user.admin? %>
-          <% button_class = { class: ['btn', 'btn-dark', 'btn-block'] } %>
-
-          <tr>
-            <td colspan="2">
-              <%= if action == 'edit'
-                    submit_tag "Submit", **button_class
-                  else
-                    link_to 'Edit',
-                      decorated_model.edit_asset_record_path,
-                      role: 'button',
-                      **button_class
+        <% enum = case action
+                  when 'show'; model.asset_record.map { |r| [r, r.value] }
+                  when 'edit'; decorated_model.asset_record_form_inputs
                   end %>
+        <% enum.each do |record, value| %>
+          <tr class="form-group">
+            <td width="50%">
+              <%= label_tag(record.definition.id, record.name) %>
+            </td>
+
+            <td width="50%">
+              <%= value %>
             </td>
           </tr>
         <% end %>
+
+        <%= render 'partials/edit_submit_button',
+                   action: action,
+                   edit_path: decorated_model.edit_asset_record_path %>
       </tbody>
     </table>
   <% end %>
