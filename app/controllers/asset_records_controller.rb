@@ -6,7 +6,7 @@ class AssetRecordsController < ApplicationController
 
   def update
     update_asset_record
-    update_component_make
+    update_component_make if asset.is_a? ComponentGroup
     if error_objects.empty?
       flash[:success] = 'Successfully updated the asset record'
       redirect_to asset
@@ -39,7 +39,6 @@ class AssetRecordsController < ApplicationController
   end
 
   def update_component_make
-    return unless asset.is_a? ComponentGroup
     new_make = ComponentMake.find_by_id component_make_id_param
     asset.component_make = new_make
     asset.save!
