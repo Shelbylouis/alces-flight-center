@@ -1,18 +1,14 @@
 
-<% button_class = { class: ['btn', 'btn-dark', 'btn-block'] } %>
-
 <% if current_user.admin? %>
-  <tr>
-    <td colspan="<%= colspan ||= 2 %>">
-      <%= case action
-          when 'edit'; submit_tag "Submit", **button_class
-          when 'show'
-            link_to 'Edit',
-              edit_path,
-              role: 'button',
-              **button_class
-          end %>
-    </td>
-  </tr>
+  <div class='px-3 pb-3' >
+    <%= case action
+        when 'edit'; submit_tag "Submit", **dark_button_class
+        when 'show'
+          link_to 'Edit',
+            edit_path,
+            role: 'button',
+            **dark_button_class
+        end %>
+  </div>
 <% end %>
 

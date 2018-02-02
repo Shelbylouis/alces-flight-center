@@ -13,11 +13,7 @@
       end
       list.push model.case_form_buttons
     end),
-    title: <<-EOF.strip
-      #{archive ? 'All' : 'Open'}
-      support cases &mdash;
-      #{model.name}
-    EOF
+    title: raw("#{archive ? 'All' : 'Open'} support cases &mdash; #{model.name}")
   %>
 
   <table class="table table-responsive">

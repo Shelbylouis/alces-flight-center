@@ -4,7 +4,7 @@
   <%= render('partials/card_header_nav', title: 'Asset Record') %>
 
   <%= form_tag decorated_model.asset_record_path, method: 'PATCH' do %>
-    <table class="table table-responsive">
+    <table class="table table-responsive m-0">
       <thead>
         <tr>
           <th>Field</th>
@@ -42,12 +42,11 @@
             </td>
           </tr>
         <% end %>
-
-        <%= render 'partials/edit_submit_button',
-                   action: action,
-                   edit_path: decorated_model.edit_asset_record_path %>
       </tbody>
     </table>
+    <%= render 'partials/edit_submit_button',
+               action: action,
+               edit_path: decorated_model.edit_asset_record_path %>
   <% end %>
 </div>
 

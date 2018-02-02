@@ -1,12 +1,13 @@
 <% submit_path = component_component_expansion_path @cluster_part %>
 <%= form_tag submit_path, method: 'PATCH' do %>
-  <div class="table-responsive">
-    <table class="table">
+  <div class="card-block table-responsive">
+    <table class="table m-0">
       <thead>
         <tr>
           <th>Type</th>
           <th>Slot</th>
           <th>No. Ports</th>
+          <%== '<th>Delete</th>' if action == 'edit' %>
         </tr>
       </thead>
       <tbody>
@@ -28,16 +29,28 @@
                                    expansion.ports,
                                    class: 'form-control' %>
               </td>
+              <td>
+<% confirm_msg =\
+  "A you sure you want to delete the component? Any unsaved changes will be lost."
+%>
+                <%= link_to 'X',
+                            component_expansion_path(expansion),
+                            role: 'button',
+                            method: 'delete',
+                            **dark_button_class,
+                            data: { confirm: confirm_msg }%>
+              </td>
             <% end %>
           </tr>
         <% end %>
-        <% edit_path = edit_component_component_expansion_path model %>
-        <%= render 'partials/edit_submit_button',
-                   action: action,
-                   colspan: 3,
-                   edit_path: edit_path %>
       </tbody>
     </table>
+  </div>
+  <div class='card-block'>
+    <% edit_path = edit_component_component_expansion_path model %>
+    <%= render 'partials/edit_submit_button',
+               action: action,
+               edit_path: edit_path %>
   </div>
 <% end %>
 

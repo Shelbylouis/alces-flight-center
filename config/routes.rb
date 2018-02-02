@@ -37,9 +37,11 @@ Rails.application.routes.draw do
       resources :maintenance_windows, only: :new
       resource :component_expansion,
                path: 'expansions',
-               only: [:edit, :update]
+               only: [:edit, :update, :create]
       asset_record.call
     end
+
+    resources :component_expansions, only: [:destroy]
 
     resources :component_groups, path: 'component-groups', only: [] do
       asset_record.call
