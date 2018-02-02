@@ -1,4 +1,5 @@
-<%= form_tag '/tbd', method: 'PATCH' do %>
+<% submit_path = component_component_expansion_path @cluster_part %>
+<%= form_tag submit_path, method: 'PATCH' do %>
   <div class="table-responsive">
     <table class="table">
       <thead>
@@ -12,14 +13,29 @@
         <% model.component_expansions.each do |expansion| %>
           <tr class="form-group">
             <td><%= expansion.expansion_type.name %></td>
-            <td><%= expansion.slot %></td>
-            <td><%= expansion.ports %></td>
+            <% case action
+               when 'show' %>
+              <td><%= expansion.slot %></td>
+              <td><%= expansion.ports %></td>
+            <% when 'edit' %>
+              <td>
+                <%= text_field_tag 'slot' + expansion.id.to_s,
+                                   expansion.slot,
+                                   class: 'form-control' %>
+              </td>
+              <td>
+                <%= text_field_tag 'ports' + expansion.id.to_s,
+                                   expansion.ports,
+                                   class: 'form-control' %>
+              </td>
+            <% end %>
           </tr>
         <% end %>
+        <% edit_path = edit_component_component_expansion_path model %>
         <%= render 'partials/edit_submit_button',
                    action: action,
                    colspan: 3,
-                   edit_path: 'tbd' %>
+                   edit_path: edit_path %>
       </tbody>
     </table>
   </div>
