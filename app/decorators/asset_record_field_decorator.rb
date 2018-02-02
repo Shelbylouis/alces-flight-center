@@ -10,20 +10,15 @@ class AssetRecordFieldDecorator < ApplicationDecorator
     value = (asset == current_asset ? object.value : '')
     options = {
       class: 'form-control',
-      readonly: readonly(current_asset),
+      disabled: disabled?(current_asset),
       placeholder: placeholder(current_asset)
-    }.tap do |opt|
-      if opt[:readonly]
-        opt[:style] = 'background-color:lightgray'
-        opt[:title] = READ_ONLY_MSG
-      end
-    end
+    }
     definition.decorate.form_input(value, **options)
   end
 
   private
 
-  def readonly(current_asset)
+  def disabled?(current_asset)
     (definition.level == 'component') && !(current_asset.is_a? Component)
   end
 
