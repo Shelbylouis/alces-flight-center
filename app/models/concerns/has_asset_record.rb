@@ -23,9 +23,8 @@ module HasAssetRecord
   end
 
   def update_asset_record(raw_definition_hash)
-    definition_hash = raw_definition_hash.map do |key, value|
-      [key.to_s.to_sym, value]
-    end.to_h
+    definition_hash = raw_definition_hash.transform_keys(&:to_s)
+                                         .symbolize_keys
     asset_record.map do |field|
       updated_value = definition_hash[field.definition.id.to_s.to_sym]
       if updated_value.nil?
