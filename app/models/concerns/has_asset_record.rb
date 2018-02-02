@@ -43,7 +43,8 @@ module HasAssetRecord
         field
       else
         # When setting a field which is not currently set at this level
-        create_asset_record_field(field.definition, updated_value)
+        asset_record_fields.create definition: field.definition,
+                                   value: updated_value
       end
     end
   end
@@ -57,11 +58,5 @@ module HasAssetRecord
   def parent_asset_record_hash
     asset_record_parent&.asset_record_hash || {}
   end
-
-  def create_asset_record_field(definition, value)
-    asset_record_fields.create(
-      asset_record_field_definition_id: definition.id,
-      value: value
-    )
-  end
 end
+
