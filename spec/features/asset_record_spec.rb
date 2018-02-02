@@ -6,9 +6,9 @@ RSpec.feature 'Asset Record', type: :feature   do
   let :component_group { create(:component_group) }
 
   context 'with an invalid request' do
-    it 'errors as a non-admin user' do
+    it 'errors as a logged in non-admin user' do
       expect do
-        user = component.site.users.reject(&:admin?).first
+        user = component.site.users.first
         visit edit_component_asset_record_path(component, as: user)
       end.to raise_error(ActionController::RoutingError)
     end
