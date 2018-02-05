@@ -74,6 +74,8 @@ body {
 #development-ribbon {
   .ribbon-holder {
     // Ribbon to indicate development site running should always appear on top.
-    z-index: 9999
+    z-index: 9999;
+    position: fixed !important;
+    pointer-events: none;
   }
 }
