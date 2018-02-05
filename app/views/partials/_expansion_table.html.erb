@@ -30,15 +30,18 @@
                                    class: 'form-control' %>
               </td>
               <td>
-<% confirm_msg =\
-  "A you sure you want to delete the component? Any unsaved changes will be lost."
-%>
                 <%= link_to 'X',
                             component_expansion_path(expansion),
                             role: 'button',
                             method: 'delete',
                             class: dark_button_classes,
-                            data: { confirm: confirm_msg }%>
+                            data: { confirm: <<-EOF.squish
+                                      Are you sure you want to delete this
+                                      expansion? Any unsaved changes will
+                                      be lost.
+                                    EOF
+                                  }
+                %>
               </td>
             <% end %>
           </tr>
