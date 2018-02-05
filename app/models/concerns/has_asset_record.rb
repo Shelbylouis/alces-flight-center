@@ -26,21 +26,22 @@ module HasAssetRecord
     definition_hash = raw_definition_hash.map do |key, value|
       [key.to_s.to_sym, value]
     end.to_h
-    asset_record.each do |field|
+    asset_record.map do |field|
       updated_value = definition_hash[field.definition.id.to_s.to_sym]
       if updated_value.nil?
         # A nil likely means the definition was not submitted in the form
         # In this case, the record shouldn't be deleted as a form error could
         # trigger db entries to be deleted
-        next
+        nil
       elsif updated_value.empty?
         # Explicitly delete the entry if an empty string is received and the
         # record belongs to the current asset, otherwise do nothing
         field.destroy! if field.asset == self
+        nil
       elsif field.asset == self
         # When updating a field associated with the asset
-        field.value = updated_value
-        field.save!
+        field.update(value: updated_value)
+        field
       else
         # When updating a higher level field
         create_asset_record_field(field.definition, updated_value)
@@ -59,7 +60,7 @@ module HasAssetRecord
   end
 
   def create_asset_record_field(definition, value)
-    asset_record_fields.create!(
+    asset_record_fields.create(
       asset_record_field_definition_id: definition.id,
       value: value
     )

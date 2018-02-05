@@ -201,7 +201,7 @@ all_types = [server, disk_array, network_switch]
     level: 'group',
     field_names: [
       'Manufacturer/Model name',
-      'List all labels applied',
+      ['List all labels applied', 'long_text'],
     ],
   },
 
@@ -221,7 +221,7 @@ all_types = [server, disk_array, network_switch]
       'Firmware revision',
       'Configuration profile applied',
       'Username/Password',
-      'Non-standard settings (changes from standard base configuration listed as menu navigation links)',
+      ['Non-standard settings (changes from standard base configuration listed as menu navigation links)', 'long_text'],
     ],
   },
 
@@ -235,15 +235,15 @@ all_types = [server, disk_array, network_switch]
       'BIOS Profile Applied',
       'Non-standard settings (BMC or BIOS) (changes from standard base configuration listed as menu navigation links)',
       'Internal Disk Profile Applied',
-      'Internal Disk Configuration Notes (listed as menu navigation links where possible)',
+      ['Internal Disk Configuration Notes (listed as menu navigation links where possible)', 'long_text'],
       'Internal Disk Profile Applied',
-      'Internal Disk Configuration Notes',
+      ['Internal Disk Configuration Notes', 'long_text'],
       'OS Deployed/OS Profile',
-      'Network connections (adapter/port/network)',
+      ['Network connections (adapter/port/network)', 'long_text'],
       'Burn-in test profile',
       'Burn-in status',
       'Additional adapters installed, type and configuration notes',
-      'Comments',
+      ['Comments', 'long_text'],
     ],
   },
   {
@@ -254,11 +254,20 @@ all_types = [server, disk_array, network_switch]
     ],
   },
 ].each do |definition_group|
-  definition_group[:field_names].each do |field_name|
+  definition_group[:field_names].each do |field_data|
+    field_data_hash = {}.tap do |h|
+      if field_data.is_a? Array
+        h[:data_type] = field_data[1]
+        h[:field_name] = field_data[0]
+      else
+        h[:data_type] = 'short_text'
+        h[:field_name] = field_data
+      end
+    end
     AssetRecordFieldDefinition.create!(
-      field_name: field_name,
+      **field_data_hash,
       level: definition_group[:level],
-      component_types: definition_group[:component_types]
+      component_types: definition_group[:component_types],
     )
   end
 end

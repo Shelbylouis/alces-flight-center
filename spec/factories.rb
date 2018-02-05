@@ -70,14 +70,10 @@ FactoryBot.define do
     name 'User management'
   end
 
-  factory :asset_record_field_definition do
+  factory :asset_record_field_definition, aliases: [:definition] do
     field_name 'Manufacturer/model name'
     level :group
-  end
-
-  factory :unassociated_asset_record_field, class: AssetRecordField do
-    asset_record_field_definition
-    value ''
+    data_type 'short_text'
   end
 
   factory :service_type do

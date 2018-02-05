@@ -1,6 +1,7 @@
 class ComponentExpansionsController < ApplicationController
   def create
-    new = @cluster_part.component_expansions.create create_expansion_param
+    new = @cluster_part.component_expansions
+                       .create create_expansion_param
     if new.valid?
       flash[:success] = "Successfully added the: #{new.expansion_type.name}"
     else
@@ -17,7 +18,10 @@ class ComponentExpansionsController < ApplicationController
 
   def update
     @cluster_part.component_expansions.each do |expansion|
-      update_expansion(expansion)
+      new_params = update_expansion_param expansion
+      unless expansion.update new_params
+        expansion_errors.push expansion
+      end
     end
     redirect_update
   end
@@ -55,12 +59,6 @@ class ComponentExpansionsController < ApplicationController
 
   def expansion_errors
     @errors_in_component_expansion_form_data ||= []
-  end
-
-  def update_expansion(expansion)
-    unless expansion.update(update_expansion_param(expansion))
-      expansion_errors.push expansion
-    end
   end
 
   def create_expansion_param
