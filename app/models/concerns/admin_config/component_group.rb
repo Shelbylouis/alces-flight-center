@@ -33,6 +33,12 @@ module AdminConfig::ComponentGroup
         configure :asset_record_fields do
           hide
         end
+        configure :component_type do
+          hide
+        end
+        configure :site do
+          hide
+        end
       end
     end
   end

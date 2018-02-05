@@ -23,6 +23,21 @@ module AdminConfig::Component
         configure :cluster do
           hide
         end
+        configure :cases do
+          hide
+        end
+        configure :maintenance_windows do
+          hide
+        end
+        configure :component_expansions do
+          hide
+        end
+        configure :default_expansions do
+          hide
+        end
+        configure :component_make do
+          hide
+        end
       end
     end
   end

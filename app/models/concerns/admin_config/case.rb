@@ -18,6 +18,12 @@ module AdminConfig::Case
         configure :credit_charge do
           hide
         end
+        configure :token do
+          hide
+        end
+        configure :maintenance_windows do
+          hide
+        end
       end
     end
   end
