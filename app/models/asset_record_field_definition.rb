@@ -52,6 +52,12 @@ class AssetRecordFieldDefinition < ApplicationRecord
     SETTABLE_LEVELS
   end
 
+  # Automatically picked up by rails_admin so only these options displayed when
+  # selecting data_type.
+  def data_type_enum
+    AssetRecordField::ValidDataTypes::VALID_DATA_TYPES
+  end
+
   def settable_for_group?
     level == 'group'
   end
