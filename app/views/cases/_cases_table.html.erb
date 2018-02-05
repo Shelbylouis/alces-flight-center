@@ -67,7 +67,7 @@
             <td>
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
             </td>
-            <td><%= raw(c.chargeable ? '&check;' : '&cross;') %></td>
+            <td><%= c.chargeable_symbol %></td>
             <td>
               <%# Show icon to bring Case's associated model under maintenance
                 in relation to Case, unless this is already the case.
@@ -96,23 +96,15 @@
             <td><%= render 'cases/archive_icon', support_case: c %></td>
           <% end %>
           <td>
-            <% if c.credit_charge_allowed? %>
-              <% if manage_cases_page %>
-                <% credit_charge = c.credit_charge || CreditCharge.new(case: c) %>
-                <%= form_for credit_charge, class: 'form-inline' do |f| %>
-                  <%= f.hidden_field :case_id %>
-                  <%= f.number_field :amount, class: 'form-control', required: true %>
-                  <%= f.submit '+', class: 'btn btn-success', style: 'width: 100%' %>
-                <% end %>
-              <% elsif c.credit_charge %>
-                <%= c.credit_charge.amount %>
-              <% else %>
-                <em>Pending</em>
+            <% if c.credit_charge_allowed? && manage_cases_page %>
+              <% credit_charge = c.credit_charge || CreditCharge.new(case: c) %>
+              <%= form_for credit_charge, class: 'form-inline' do |f| %>
+                <%= f.hidden_field :case_id %>
+                <%= f.number_field :amount, class: 'form-control', required: true %>
+                <%= f.submit '+', class: 'btn btn-success', style: 'width: 100%' %>
               <% end %>
-            <% elsif !c.chargeable %>
-              <em>N/A</em>
             <% else %>
-              <em>Pending</em>
+              <%= c.credit_charge_info %>
             <% end %>
           </td>
         </tr>
