@@ -7,7 +7,7 @@
           <th>Type</th>
           <th>Slot</th>
           <th>No. Ports</th>
-          <%== '<th>Delete</th>' if action == 'edit' %>
+          <% if action == 'edit' %><th>Delete</th><% end %>
         </tr>
       </thead>
       <tbody>
