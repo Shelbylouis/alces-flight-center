@@ -1,4 +1,6 @@
 class DefaultExpansion < Expansion
+  include AdminConfig::DefaultExpansion
+
   belongs_to :component_make
 
   validates :component_make, presence: true
