@@ -5,12 +5,18 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   decorates_assigned :site
 
+  before_action :set_sentry_raven_context
   before_action :assign_current_user
   before_action :define_navigation_variables
 
   rescue_from ReadPermissionsError, with: :not_found
 
   private
+
+  def set_sentry_raven_context
+    Raven.user_context(id: current_user&.id)
+    Raven.extra_context(params: params.to_unsafe_h, url: request.url)
+  end
 
   def assign_current_user
     RequestStore.store[:current_user] = current_user
