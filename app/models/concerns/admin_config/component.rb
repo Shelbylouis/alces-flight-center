@@ -12,8 +12,6 @@ module AdminConfig::Component
       end
 
       edit do
-        AdminConfig::Shared::EditableAssetRecordFields.define_asset_record_fields(self)
-
         configure :asset_record_fields do
           hide
         end
@@ -21,6 +19,21 @@ module AdminConfig::Component
           hide
         end
         configure :cluster do
+          hide
+        end
+        configure :cases do
+          hide
+        end
+        configure :maintenance_windows do
+          hide
+        end
+        configure :component_expansions do
+          hide
+        end
+        configure :default_expansions do
+          hide
+        end
+        configure :component_make do
           hide
         end
       end

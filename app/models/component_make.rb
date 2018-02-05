@@ -1,4 +1,6 @@
 class ComponentMake < ApplicationRecord
+  include AdminConfig::ComponentMake
+
   belongs_to :component_type
   has_many :component_groups
   has_many :default_expansions

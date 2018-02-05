@@ -11,11 +11,6 @@ module AdminConfig::ComponentGroup
       end
 
       edit do
-        AdminConfig::Shared::EditableAssetRecordFields.define_asset_record_fields(
-          self,
-          field_disabled: lambda { |definition| !definition.settable_for_group? }
-        )
-
         configure :genders_host_range do
           help <<-EOF
             Specify a genders host range to have the corresponding components
@@ -31,6 +26,12 @@ module AdminConfig::ComponentGroup
           hide
         end
         configure :asset_record_fields do
+          hide
+        end
+        configure :component_type do
+          hide
+        end
+        configure :site do
           hide
         end
       end

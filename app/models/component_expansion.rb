@@ -1,4 +1,6 @@
 class ComponentExpansion < Expansion
+  include AdminConfig::ComponentExpansion
+
   belongs_to :component
   delegate :site, to: :component
 

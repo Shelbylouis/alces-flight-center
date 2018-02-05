@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Component, type: :model do
-  include_examples 'editable_asset_record_fields'
   include_examples 'inheritable_support_type'
   include_examples 'maintenance_windows'
 
