@@ -20,7 +20,7 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def chargeable_symbol
-    h.raw(chargeable ? '&check;' : '&cross;')
+    h.boolean_symbol(chargeable)
   end
 
   def credit_charge_info

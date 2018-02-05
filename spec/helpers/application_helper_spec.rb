@@ -28,4 +28,14 @@ RSpec.describe ApplicationHelper do
       ).to eq([:not_nil].to_json)
     end
   end
+
+  describe '#boolean_symbol' do
+    it 'gives check when condition is true' do
+      expect(boolean_symbol(true)).to eq(raw('&check;'))
+    end
+
+    it 'gives cross when condition is false' do
+      expect(boolean_symbol(false)).to eq(raw('&cross;'))
+    end
+  end
 end
