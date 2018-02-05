@@ -1,11 +1,12 @@
 class ComponentExpansionsController < ApplicationController
   def create
-    new = @cluster_part.component_expansions
-                       .create create_expansion_param
-    if new.valid?
-      flash[:success] = "Successfully added the: #{new.expansion_type.name}"
+    expansion = @cluster_part.component_expansions
+                             .create create_expansion_param
+    if expansion.valid?
+      msg = "Successfully added the: #{expansion.expansion_type.name}"
+      flash[:success] = msg
     else
-      expansion_errors.push new
+      expansion_errors.push expansion
       flash_error 'Could not add the component'
     end
     redirect_back fallback_location: @cluster_part
