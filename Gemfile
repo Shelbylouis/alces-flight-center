@@ -34,6 +34,7 @@ gem 'draper'
 gem 'rails-data-migrations'
 gem 'font-awesome-rails'
 gem 'request_store'
+gem 'bootsnap', require: false
 
 gem 'bootstrap', '~> 4.0.0.beta'
 gem 'jquery-rails' # Required for Bootstrap.
