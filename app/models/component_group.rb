@@ -1,6 +1,5 @@
 class ComponentGroup < ApplicationRecord
   include AdminConfig::ComponentGroup
-  include AdminConfig::Shared::EditableAssetRecordFields
 
   include HasAssetRecord
 
