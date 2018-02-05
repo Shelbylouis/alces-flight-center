@@ -12,14 +12,6 @@ RSpec.feature 'Asset Record', type: :feature   do
         visit edit_component_asset_record_path(component, as: user)
       end.to raise_error(ActionController::RoutingError)
     end
-
-    it 'errors if component_group is sent with a component request' do
-      expect do
-        visit edit_component_asset_record_path(
-          component, as: admin, component_group_id: component_group
-        )
-      end.to raise_error(RuntimeError)
-    end
   end
 
   context 'with a component' do
