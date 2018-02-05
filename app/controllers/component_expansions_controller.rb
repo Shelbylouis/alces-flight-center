@@ -48,13 +48,11 @@ class ComponentExpansionsController < ApplicationController
   end
 
   def flash_error(header)
-    flash[:error] = StringIO.new(header + "\n").tap do |io|
-      io.read
-      expansion_errors.each do |expansion|
-        io.puts "#{expansion.expansion_type.name}: #{expansion.errors.full_messages}"
-      end
-      io.rewind
-    end.read
+    expansion_errors.each_with_object([header]) do |expansion, error_array|
+      name = expansion.expansion_type.name
+      error_messages = expansion.errors.full_messages
+      error_array.push "#{name}: #{error_messages}"
+    end.join("\n").tap { |msg| flash[:error] = msg }
   end
 
   def expansion_errors
