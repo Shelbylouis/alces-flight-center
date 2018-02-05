@@ -7,7 +7,7 @@ class ComponentExpansionsController < ApplicationController
       flash[:success] = msg
     else
       expansion_errors.push expansion
-      flash_error 'Could not add the component'
+      flash_error 'Could not add the epansion'
     end
     redirect_back fallback_location: @cluster_part
   end
