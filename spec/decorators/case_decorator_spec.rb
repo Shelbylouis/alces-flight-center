@@ -69,4 +69,27 @@ RSpec.describe CaseDecorator do
       end
     end
   end
+
+  describe '#credit_charge_info' do
+    it 'gives credit charge amount when set' do
+      support_case = create(:case)
+      create(:credit_charge, case: support_case, amount: 5)
+
+      expect(support_case.decorate.credit_charge_info).to eq '5'
+    end
+
+    it "gives 'N/A' when issue is not chargeable" do
+      issue = create(:issue, chargeable: false)
+      support_case = create(:case, issue: issue)
+
+      expect(support_case.decorate.credit_charge_info).to eq 'N/A'
+    end
+
+    it "gives 'Pending' when issue is chargeable and no credit charge" do
+      issue = create(:issue, chargeable: true)
+      support_case = create(:case, issue: issue)
+
+      expect(support_case.decorate.credit_charge_info).to eq 'Pending'
+    end
+  end
 end

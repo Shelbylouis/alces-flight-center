@@ -15,7 +15,7 @@ Rails.application.routes.draw do
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      resources :cases, only: [:new, :index]
+      resources :cases, only: [:new, :index, :show]
     end
 
     resources :cases, only: [] do
@@ -69,7 +69,7 @@ Rails.application.routes.draw do
     root 'sites#show'
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
-    resources :cases, only: [:new, :index, :create] do
+    resources :cases, only: [:new, :index, :show, :create] do
       member do
         post :archive
         post :restore

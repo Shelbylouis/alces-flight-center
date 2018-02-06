@@ -14,6 +14,11 @@ class CasesController < ApplicationController
     current_site.cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
+  def show
+    @case = Case.find(params[:id]).decorate
+    @title = "Support case: #{@case.subject}"
+  end
+
   def new
     @title = "Create new support case"
 
