@@ -7,7 +7,7 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
 
   private
 
-  NETWORK_EXP = 'Network Expansion'
+  NETWORK_EXP = 'Network expansion'
 
   def add_expansion_types
     [NETWORK_EXP, 'PSU', 'SAS'].each do |expansion|
@@ -18,6 +18,8 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
   def add_component_makes
     add_server_make('1U Server')
     add_server_make('2U Server')
+    add_network_switch_make
+    add_disk_array_make
   end
 
   def add_server_make(model)
@@ -28,6 +30,30 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
         { slot: 1, ports: 4, **expansion_type(NETWORK_EXP) },
         { slot: 2, ports: 1, **expansion_type('PSU') },
         { slot: 3, ports: 1, **expansion_type('PSU') }
+      ].each { |opt| make.default_expansions.create!(**opt) }
+    end
+  end
+
+  def add_network_switch_make
+    ComponentMake.create!(
+      model: 'Network switch', **generic, **component_type('Network switch')
+    ).tap do |make|
+      [
+        { slot: 1, ports: 48, **expansion_type(NETWORK_EXP) },
+        { slot: 2, ports: 1, **expansion_type('PSU') }
+      ].each { |opt| make.default_expansions.create!(**opt) }
+    end
+  end
+
+  def add_disk_array_make
+    ComponentMake.create!(
+      model: 'Disk array', **generic, **component_type('Disk array')
+    ).tap do |make|
+      [
+        { slot: 1, ports: 1, **expansion_type('PSU') },
+        { slot: 2, ports: 1, **expansion_type('PSU') },
+        { slot: 3, ports: 4, **expansion_type('SAS') },
+        { slot: 4, ports: 4, **expansion_type('SAS') }
       ].each { |opt| make.default_expansions.create!(**opt) }
     end
   end
