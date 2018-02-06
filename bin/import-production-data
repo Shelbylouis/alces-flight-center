@@ -45,6 +45,13 @@ import_backup() {
   bin/rake db:drop
   bin/rake db:create
 
+  # This is required so the test database is left in a usable state, as the
+  # above commands drop and recreate the test database also, and there is
+  # seemingly no way to have these only run for the development database (short
+  # of monkeypatching or writing a custom Rake task). Relevant issue:
+  # https://github.com/rails/rails/issues/27299.
+  bin/rake db:schema:load RAILS_ENV='test'
+
   log_info 'Reading development database access details...'
   dev_database_username="$(load_dev_database_config_value 'username')"
   dev_database_name="$(load_dev_database_config_value 'database')"
