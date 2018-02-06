@@ -2,7 +2,7 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
   def up
     add_expansion_types
     add_component_makes
-    raise 'Exited correctly'
+    reference_make_from_group
   end
 
   private
@@ -64,6 +64,39 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
                           manufacturer: 'n/a',
                           knowledgebase_url: 'n/a',
                           **component_type('Virtual server')
+  end
+
+  # Unfortunately the existing ComponentGroup.component_type column has
+  # been lost. Therefore following contains key value pairs between the
+  # existing ComponentGroup.id and there corresponding ComponentMake
+  def reference_make_from_group
+    {
+      1 => '1U Server',
+      2 => '1U Server',
+      3 => '1U Server',
+      4 => '1U Server',
+      5 => '1U Server',
+      6 => 'Network switch',
+      7 => '1U Server',
+      8 => '1U Server',
+      9 => '1U Server',
+      10 => 'Disk array',
+      11 => 'Disk array',
+      12 => '1U Server',
+      13 => 'Network switch',
+      14 => '1U Server',
+      15 => 'libvert',
+      16 => '1U Server',
+      17 => 'libvert',
+      18 => 'Network switch',
+      19 => 'Network switch',
+      20 => '1U Server',
+      21 => '1U Server'
+    }.each do |group_id, model|
+      ComponentGroup.find_by_id!(group_id).update!(
+        component_make: ComponentMake.find_by_model!(model)
+      )
+    end
   end
 
   def expansion_type(name)
