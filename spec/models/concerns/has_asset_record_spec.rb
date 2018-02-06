@@ -67,11 +67,11 @@ RSpec.describe HasAssetRecord, type: :model do
       end
     end
 
-    describe '#find_parent_asset_record' do
+    describe '#find_ancestor_asset_record' do
       it 'finds the parents record' do
         overriden_def = subject.asset_record_hash[overriden_index]
                                .definition
-        found_record = subject.find_parent_asset_record overriden_def
+        found_record = subject.find_ancestor_asset_record overriden_def
 
         expected_parent_record = parent.asset_record_hash[overriden_index]
         expect(found_record).to eq(expected_parent_record)
