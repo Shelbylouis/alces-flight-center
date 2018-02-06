@@ -10,9 +10,18 @@ RSpec.describe Expansion, type: :model do
       expect(subject).to include(:type)
     end
 
-    it 'must have ports and slot set' do
-      expect(subject).to include(:ports)
+    it 'must have slot set' do
       expect(subject).to include(:slot)
+    end
+  end
+
+  describe 'ports' do
+    # NOTE: DefaultExpansion is used as a stand in as the type must be set
+    # However it is testing the underlining Expansion validation
+    it 'defaults to zero if not provided' do
+      expansion = create(:default_expansion, ports: '')
+      expect(expansion).to be_valid
+      expect(expansion.ports).to eq 0
     end
   end
 end
