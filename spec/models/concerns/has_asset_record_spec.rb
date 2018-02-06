@@ -169,8 +169,8 @@ RSpec.describe HasAssetRecord, type: :model do
       subject.reload
       subject.component_group.reload
 
-      group_record = subject.component_group.asset_record.find do |record|
-        record.definition == group_definition
+      group_record = subject.component_group.asset_record.find do |field|
+        field.definition == group_definition
       end
 
       expect(group_record.value).to eq('group')

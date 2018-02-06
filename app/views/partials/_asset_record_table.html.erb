@@ -27,17 +27,17 @@
             <%= model.component_make.name %>
           <% end %></td>
         </tr>
-        <% model.asset_record.each do |record| %>
+        <% model.asset_record.each do |field| %>
           <tr class="form-group">
             <td width="50%">
-              <%= label_tag(record.definition.id, record.name) %>
+              <%= label_tag(field.definition.id, field.name) %>
             </td>
 
             <td width="50%">
               <% if action == 'edit' %>
-                <%= record.decorate.form_input(model) %>
+                <%= field.decorate.form_input(model) %>
               <% else %>
-                <%= record.value %>
+                <%= field.value %>
               <% end %>
             </td>
           </tr>

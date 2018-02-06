@@ -5,9 +5,9 @@ FactoryBot.define do
     value 'default-factory-value'
 
     # Link the ComponentType to the Definition so it remains valid
-    after :build do |record|
-      type = record.component.component_type
-      record.definition.tap do |definition|
+    after :build do |field|
+      type = field.component.component_type
+      field.definition.tap do |definition|
         return if definition.component_types.include? type
         definition.component_types.push type
         definition.save!
