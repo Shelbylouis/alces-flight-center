@@ -16,12 +16,13 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
   end
 
   def add_component_makes
-    make_1u_server
+    add_server_make('1U Server')
+    add_server_make('2U Server')
   end
 
-  def make_1u_server
+  def add_server_make(model)
     ComponentMake.create!(
-      model: '1U Server', **generic, **component_type('Server')
+      model: model, **generic, **component_type('Server')
     ).tap do |make|
       [
         { slot: 1, ports: 4, **expansion_type(NETWORK_EXP) },
