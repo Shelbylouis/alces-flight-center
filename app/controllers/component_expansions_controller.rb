@@ -1,19 +1,19 @@
 class ComponentExpansionsController < ApplicationController
   def create
-    new = @cluster_part.component_expansions
-                       .create create_expansion_param
-    if new.valid?
-      flash[:success] = "Successfully added the: #{new.expansion_type.name}"
+    expansion = @cluster_part.component_expansions
+                             .create create_expansion_param
+    if expansion.valid?
+      msg = "Successfully added the: #{expansion.expansion_type.name}"
+      flash[:success] = msg
     else
-      expansion_errors.push new
-      flash_error 'Could not add the component'
+      expansion_errors.push expansion
+      flash_error 'Could not add the epansion'
     end
     redirect_back fallback_location: @cluster_part
   end
 
   def edit
     @title = "Edit Expansions"
-    @subtitle = @cluster_part.name
   end
 
   def update
@@ -48,13 +48,11 @@ class ComponentExpansionsController < ApplicationController
   end
 
   def flash_error(header)
-    flash[:error] = StringIO.new(header + "\n").tap do |io|
-      io.read
-      expansion_errors.each do |expansion|
-        io.puts "#{expansion.expansion_type.name}: #{expansion.errors.full_messages}"
-      end
-      io.rewind
-    end.read
+    expansion_errors.each_with_object([header]) do |expansion, error_array|
+      name = expansion.expansion_type.name
+      error_messages = expansion.errors.full_messages
+      error_array.push "#{name}: #{error_messages}"
+    end.join("\n").tap { |msg| flash[:error] = msg }
   end
 
   def expansion_errors

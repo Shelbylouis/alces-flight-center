@@ -7,7 +7,7 @@
           <th>Type</th>
           <th>Slot</th>
           <th>No. Ports</th>
-          <%== '<th>Delete</th>' if action == 'edit' %>
+          <% if action == 'edit' %><th>Delete</th><% end %>
         </tr>
       </thead>
       <tbody>
@@ -30,15 +30,18 @@
                                    class: 'form-control' %>
               </td>
               <td>
-<% confirm_msg =\
-  "A you sure you want to delete the component? Any unsaved changes will be lost."
-%>
                 <%= link_to 'X',
                             component_expansion_path(expansion),
                             role: 'button',
                             method: 'delete',
-                            **dark_button_class,
-                            data: { confirm: confirm_msg }%>
+                            class: dark_button_classes,
+                            data: { confirm: <<-EOF.squish
+                                      Are you sure you want to delete this
+                                      expansion? Any unsaved changes will
+                                      be lost.
+                                    EOF
+                                  }
+                %>
               </td>
             <% end %>
           </tr>

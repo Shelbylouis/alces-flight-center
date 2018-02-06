@@ -23,9 +23,8 @@ module HasAssetRecord
   end
 
   def update_asset_record(raw_definition_hash)
-    definition_hash = raw_definition_hash.map do |key, value|
-      [key.to_s.to_sym, value]
-    end.to_h
+    definition_hash = raw_definition_hash.transform_keys(&:to_s)
+                                         .symbolize_keys
     asset_record.map do |field|
       updated_value = definition_hash[field.definition.id.to_s.to_sym]
       if updated_value.nil?
@@ -43,8 +42,9 @@ module HasAssetRecord
         field.update(value: updated_value)
         field
       else
-        # When updating a higher level field
-        create_asset_record_field(field.definition, updated_value)
+        # When setting a field which is not currently set at this level
+        asset_record_fields.create definition: field.definition,
+                                   value: updated_value
       end
     end
   end
@@ -58,11 +58,5 @@ module HasAssetRecord
   def parent_asset_record_hash
     asset_record_parent&.asset_record_hash || {}
   end
-
-  def create_asset_record_field(definition, value)
-    asset_record_fields.create(
-      asset_record_field_definition_id: definition.id,
-      value: value
-    )
-  end
 end
+

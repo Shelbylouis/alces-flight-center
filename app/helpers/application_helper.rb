@@ -26,8 +26,8 @@ module ApplicationHelper
     )
   end
 
-  def dark_button_class
-    { class: ['btn', 'btn-dark', 'btn-block'] }
+  def dark_button_classes
+    ['btn', 'btn-dark', 'btn-block']
   end
 
   private

@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe HasAssetRecord, type: :model do
-  context 'with a double standard for the subject' do
+  context 'with basic mocked objects' do
     let :overriden_index { 255 }
 
     let :grand_parent do
@@ -69,15 +69,17 @@ RSpec.describe HasAssetRecord, type: :model do
 
     describe '#find_parent_asset_record' do
       it 'finds the parents record' do
-        expected_parent_record = parent.asset_record_hash[overriden_index]
-        overriden_def = subject.asset_record_hash[overriden_index].definition
+        overriden_def = subject.asset_record_hash[overriden_index]
+                               .definition
         found_record = subject.find_parent_asset_record overriden_def
+
+        expected_parent_record = parent.asset_record_hash[overriden_index]
         expect(found_record).to eq(expected_parent_record)
       end
     end
   end
 
-  describe '#update' do
+  describe '#update_asset_record' do
     subject { create(:component) }
 
     let! :type_only_definition do

@@ -6,7 +6,7 @@ class AssetRecordsController < ApplicationController
 
   def update
     update_asset_record
-    update_component_make
+    update_component_make if asset.is_a? ComponentGroup
     if error_objects.empty?
       flash[:success] = 'Successfully updated the asset record'
       redirect_to asset
@@ -32,14 +32,13 @@ class AssetRecordsController < ApplicationController
   end
 
   def update_asset_record
-    asset.update_asset_record(asset_record_param.to_h)
+    asset.update_asset_record(asset_record_field_params.to_h)
          .reject(&:nil?)
          .reject(&:valid?)
          .tap { |errors| error_objects.concat errors }
   end
 
   def update_component_make
-    return unless asset.is_a? ComponentGroup
     new_make = ComponentMake.find_by_id component_make_id_param
     asset.component_make = new_make
     asset.save!
@@ -49,7 +48,7 @@ class AssetRecordsController < ApplicationController
     params.require(:component_make).require(:id)
   end
 
-  def asset_record_param
+  def asset_record_field_params
     definition_ids = asset.asset_record.map { |r| r.definition.id.to_s }
     params.permit(*definition_ids)
   end
