@@ -20,6 +20,7 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
     add_server_make('2U Server')
     add_network_switch_make
     add_disk_array_make
+    add_virtual_server_make
   end
 
   def add_server_make(model)
@@ -56,6 +57,13 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
         { slot: 4, ports: 4, **expansion_type('SAS') }
       ].each { |opt| make.default_expansions.create!(**opt) }
     end
+  end
+
+  def add_virtual_server_make
+    ComponentMake.create! model: 'libvert',
+                          manufacturer: 'n/a',
+                          knowledgebase_url: 'n/a',
+                          **component_type('Virtual server')
   end
 
   def expansion_type(name)
