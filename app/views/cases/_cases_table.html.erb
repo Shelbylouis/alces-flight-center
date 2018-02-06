@@ -21,10 +21,9 @@
       <tr>
         <th>Date</th>
         <th>Creator</th>
-        <th>Issue</th>
+        <th>Subject</th>
         <th>Association</th>
         <th>Ticket ID</th>
-        <th>Details</th>
         <% if manage_cases_page %>
           <th>Ticket status</th>
           <th>Chargeable</th>
@@ -59,10 +58,9 @@
             <%= c.created_at.to_formatted_s(:short) %>
           </td>
           <td><%= c.user.name %></td>
-          <td><%= c.issue.name %></td>
+          <td><%= link_to c.subject, case_path(c) %></td>
           <td><%= c.association_info %></td>
           <td><%= c.rt_ticket_id %></td>
-          <td><%= simple_format(c.details) %></td>
           <% if manage_cases_page %>
             <td>
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>

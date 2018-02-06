@@ -7,11 +7,11 @@ RSpec.describe 'Cases table', type: :feature do
   let :cluster { create(:cluster, site: site) }
 
   let! :open_case do
-    create(:open_case, cluster: cluster, details: 'Open case')
+    create(:open_case, cluster: cluster, subject: 'Open case')
   end
 
   let! :archived_case do
-    create(:archived_case, cluster: cluster, details: 'Archived case')
+    create(:archived_case, cluster: cluster, subject: 'Archived case')
   end
 
   RSpec.shared_examples 'open cases table rendered' do
