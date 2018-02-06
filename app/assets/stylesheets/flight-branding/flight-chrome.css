@@ -19,10 +19,9 @@
     position: relative;
     display: -ms-flexbox;
     display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
     padding: 16px 16px;
 }
+
 .navbar-toggler {
     -ms-flex-item-align: start;
     align-self: flex-start;
@@ -96,13 +95,11 @@
 .navbar-nav {
     display: -ms-flexbox;
     display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
     padding-left: 0;
     margin-bottom: 0;
     list-style: none;
 }
-.navbar-inverse .navbar-nav .nav-link {
+.navbar-dark .navbar-nav .nav-link {
     color: white;
 }
 
@@ -180,11 +177,11 @@
 }
 }
 
-.navbar-inverse .navbar-nav .nav-link:focus, .navbar-inverse .navbar-nav .nav-link:hover {
+.navbar-dark .navbar-nav .nav-link:focus, .navbar-dark .navbar-nav .nav-link:hover {
     color: #18BC9C;
 }
 
-.navbar-inverse .navbar-nav .open > .nav-link, .navbar-inverse .navbar-nav .active > .nav-link, .navbar-inverse .navbar-nav .nav-link.open, .navbar-inverse .navbar-nav .nav-link.active {
+.navbar-dark .navbar-nav .open > .nav-link, .navbar-dark .navbar-nav .active > .nav-link, .navbar-dark .navbar-nav .nav-link.open, .navbar-dark .navbar-nav .nav-link.active {
     color: white;
 }
 
