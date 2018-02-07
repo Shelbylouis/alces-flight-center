@@ -28,8 +28,7 @@ class AssetRecordsController < ApplicationController
 
   def update_component_make
     new_make = ComponentMake.find_by_id component_make_id_param
-    asset.component_make = new_make
-    asset.save!
+    asset.update!(component_make: new_make)
   end
 
   def component_make_id_param
