@@ -5,8 +5,8 @@ class AssetRecordsController < ApplicationController
   end
 
   def update
-    update_asset_record
     update_component_make if asset.is_a? ComponentGroup
+    update_asset_record
     if error_objects.empty?
       flash[:success] = 'Successfully updated the asset record'
       redirect_to asset
@@ -20,11 +20,9 @@ class AssetRecordsController < ApplicationController
 
   def flash_errors
     header = 'The following records failed to update:'
-    error_objects.each_with_object([header]) do |model, array|
-      msg = "#{model.definition.field_name}: #{model.errors.full_messages}"
-      array.push msg
-    end.join("\n")
-       .tap { |full_msg| flash[:error] = full_msg }
+    error_flash_models(error_objects, header) do |model|
+      "#{model.definition.field_name}: #{model.errors.full_messages}"
+    end
   end
 
   def error_objects
