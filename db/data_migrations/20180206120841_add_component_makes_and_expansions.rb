@@ -60,9 +60,9 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
   end
 
   def add_virtual_server_make
-    ComponentMake.create! model: 'libvert',
-                          manufacturer: 'n/a',
-                          knowledgebase_url: 'n/a',
+    ComponentMake.create! model: 'libvirt',
+                          manufacturer: 'N/A',
+                          knowledgebase_url: 'N/A',
                           **component_type('Virtual server')
   end
 
@@ -85,9 +85,9 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
       12 => '1U Server',
       13 => 'Network switch',
       14 => '1U Server',
-      15 => 'libvert',
+      15 => 'libvirt',
       16 => '1U Server',
-      17 => 'libvert',
+      17 => 'libvirt',
       18 => 'Network switch',
       19 => 'Network switch',
       20 => '1U Server',
@@ -108,6 +108,6 @@ class AddComponentMakesAndExpansions < ActiveRecord::DataMigration
   end
 
   def generic
-    { manufacturer: 'generic', knowledgebase_url: 'n/a' }
+    { manufacturer: 'generic', knowledgebase_url: 'N/A' }
   end
 end
