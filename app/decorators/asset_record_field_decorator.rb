@@ -23,7 +23,7 @@ class AssetRecordFieldDecorator < ApplicationDecorator
   end
 
   def placeholder(current_asset)
-    current_asset.find_parent_asset_record(definition).value
+    current_asset.find_ancestor_asset_record(definition).value
   end
 end
 

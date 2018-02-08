@@ -12,8 +12,7 @@ class AssetRecordFieldDefinitionDecorator < ApplicationDecorator
   private
 
   def text_area(value, options)
-    options[:style] = "#{options[:style]} height:100px"
-    h.text_area_tag(object.id, value, **options)
+    h.text_area_tag(object.id, value, rows: 3, **options)
   end
 
   def text_field(value, options)

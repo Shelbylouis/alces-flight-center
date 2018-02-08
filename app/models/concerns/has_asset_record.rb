@@ -14,7 +14,7 @@ module HasAssetRecord
     asset_record_hash.values
   end
 
-  def find_parent_asset_record(definition)
+  def find_ancestor_asset_record(definition)
     parent_asset_record_hash[definition.id]
   end
 

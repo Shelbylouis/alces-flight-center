@@ -11,6 +11,10 @@ class ApplicationController < ActionController::Base
 
   rescue_from ReadPermissionsError, with: :not_found
 
+  def error_flash_models(models, header = 'Errors:')
+    flash[:error] = header + "\n" + (models.map { |m| yield m }).join("\n")
+  end
+
   private
 
   def set_sentry_raven_context

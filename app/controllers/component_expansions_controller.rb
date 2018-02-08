@@ -7,7 +7,7 @@ class ComponentExpansionsController < ApplicationController
       flash[:success] = msg
     else
       expansion_errors.push expansion
-      flash_error 'Could not add the epansion'
+      flash_errors 'Could not add the expansion'
     end
     redirect_back fallback_location: @cluster_part
   end
@@ -42,17 +42,15 @@ class ComponentExpansionsController < ApplicationController
       flash[:success] = 'Successfully updated the expansions'
       redirect_to @cluster_part
     else
-      flash_error 'Errors updating expansions:'
+      flash_errors 'Errors updating expansions:'
       redirect_to edit_component_component_expansion_path(@cluster_part)
     end
   end
 
-  def flash_error(header)
-    expansion_errors.each_with_object([header]) do |expansion, error_array|
-      name = expansion.expansion_type.name
-      error_messages = expansion.errors.full_messages
-      error_array.push "#{name}: #{error_messages}"
-    end.join("\n").tap { |msg| flash[:error] = msg }
+  def flash_errors(header)
+    error_flash_models(expansion_errors, header) do |expansion|
+      "#{expansion.expansion_type.name}: #{expansion.errors.full_messages}"
+    end
   end
 
   def expansion_errors

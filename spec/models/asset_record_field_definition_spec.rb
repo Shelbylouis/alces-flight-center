@@ -70,14 +70,14 @@ RSpec.describe AssetRecordFieldDefinition, type: :model do
   end
 
   describe '#valid?' do
-    context 'with a "forgein_data_type"' do
-      let :type { 'forgein_data_type' }
+    context 'with a "foreign_data_type"' do
+      let :type { 'foreign_data_type' }
 
       subject do
         build(:asset_record_field_definition, data_type: type)
       end
 
-      it 'is invalid with a "forgein_data_type"' do
+      it 'is invalid with a "foreign_data_type"' do
         expect(subject).not_to be_valid
       end
     end
