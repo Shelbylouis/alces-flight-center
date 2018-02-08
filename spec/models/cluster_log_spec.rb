@@ -39,12 +39,25 @@ RSpec.describe ClusterLog, type: :model do
     def create_case(case_subject)
       kase = create(:case, cluster: subject.cluster, subject: case_subject)
       subject.cases << kase
+      subject.reload
     end
 
     it 'can have multiple cases' do
       case_msgs = ['first', 'second', 'third']
       case_msgs.each { |m| create_case(m) }
+      expect(subject).to be_valid
       expect(subject.cases.map(&:subject)).to contain_exactly(*case_msgs)
+    end
+
+    it 'validates that all cases belong to its cluster' do
+      ['other-case1', 'other-case2', 'other-case3'].each do |case_msg|
+        create_case(case_msg)
+      end
+      other_cluster = create(:cluster, name: 'other-cluster')
+      bad_case = create(:case, cluster: other_cluster, subject: 'Bad Case')
+      subject.cases << bad_case
+      subject.reload
+      expect_single_error subject, 'different cluster'
     end
   end
 end
