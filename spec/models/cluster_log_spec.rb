@@ -32,5 +32,20 @@ RSpec.describe ClusterLog, type: :model do
       expect_single_error log, 'admin'
     end
   end
+
+  describe '#cases' do
+    subject { create(:cluster_log) }
+
+    def create_case(case_subject)
+      kase = create(:case, cluster: subject.cluster, subject: case_subject)
+      subject.cases << kase
+    end
+
+    it 'can have multiple cases' do
+      case_msgs = ['first', 'second', 'third']
+      case_msgs.each { |m| create_case(m) }
+      expect(subject.cases.map(&:subject)).to contain_exactly(*case_msgs)
+    end
+  end
 end
 
