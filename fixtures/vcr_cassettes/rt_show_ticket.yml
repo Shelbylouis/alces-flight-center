@@ -19,11 +19,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 08 Jan 2018 17:55:36 GMT
+      - Thu, 08 Feb 2018 10:38:38 GMT
       Server:
       - Apache/2.2.9 (Debian) mod_perl/2.0.4 Perl/v5.10.0
       Set-Cookie:
-      - RT_SID_<RT_API_HOST>.80=70a09b23ee7e242ef40aa4a14b640be3; path=/rt
+      - RT_SID_<RT_API_HOST>.80=2182f67a80ec9237866d0481f1dbe6a6; path=/rt
       Vary:
       - Accept-Encoding
       Connection:
@@ -65,5 +65,5 @@ http_interactions:
         CF-ClusterID: KELVIN
 
     http_version: 
-  recorded_at: Mon, 08 Jan 2018 17:56:06 GMT
+  recorded_at: Thu, 08 Feb 2018 10:39:12 GMT
 recorded_with: VCR 4.0.0
