@@ -57,7 +57,7 @@ RSpec.describe ClusterLog, type: :model do
       bad_case = create(:case, cluster: other_cluster, subject: 'Bad Case')
       subject.cases << bad_case
       subject.reload
-      expect_single_error subject, 'different cluster'
+      expect_single_error subject, "#{bad_case.rt_ticket_id}"
     end
   end
 end
