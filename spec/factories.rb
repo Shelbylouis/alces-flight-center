@@ -1,8 +1,11 @@
 
 FactoryBot.define do
   factory :cluster_log do
-    
+    details 'I am the factory default details'
+    cluster
+    engineer { create :admin }
   end
+
   sequence :email do |n|
     "a.scientist.#{n}@liverpool.ac.uk"
   end
