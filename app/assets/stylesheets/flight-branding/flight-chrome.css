@@ -23,6 +23,16 @@
     flex-direction: column;
     padding: 16px 16px;
 }
+
+@media (min-width: 768px) {
+    .navbar-expand-md {
+        -ms-flex-flow: row nowrap;
+        flex-flow: row nowrap;
+        -ms-flex-pack: start;
+        justify-content: flex-start;
+    }
+}
+
 .navbar-toggler {
     -ms-flex-item-align: start;
     align-self: flex-start;
