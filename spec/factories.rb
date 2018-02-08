@@ -1,5 +1,8 @@
 
 FactoryBot.define do
+  factory :cluster_log do
+    
+  end
   sequence :email do |n|
     "a.scientist.#{n}@liverpool.ac.uk"
   end

@@ -1,0 +1,2 @@
+class ClusterLog < ApplicationRecord
+end
