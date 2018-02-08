@@ -37,7 +37,7 @@ gem 'request_store'
 gem 'bootsnap', require: false
 gem "sentry-raven"
 
-gem 'bootstrap', '~> 4.0.0.beta'
+gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.
 
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
