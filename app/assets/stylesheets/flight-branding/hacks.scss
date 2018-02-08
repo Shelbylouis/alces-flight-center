@@ -1,3 +1,6 @@
+.navbar {
+  box-shadow: none !important;
+}
 
 .product-bar {
   position: fixed !important;
@@ -60,6 +63,9 @@
   white-space: nowrap;
   border-radius: 5px;
   cursor: pointer;
+}
+.nav-link--active {
+  background-color: #2C3E50;
 }
 
 // Wrapper around page content so shifted below header bars.
