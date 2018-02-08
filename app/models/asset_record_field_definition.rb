@@ -17,6 +17,9 @@ class AssetRecordFieldDefinition < ApplicationRecord
   validates :field_name, presence: true
   validates :level, inclusion: { in: SETTABLE_LEVELS }, presence: true
 
+  validates :data_type,
+            inclusion: { in: AssetRecordField::VALID_DATA_TYPES }
+
   class << self
     def all_identifiers
       all_identifiers_to_definitions.keys
@@ -49,7 +52,27 @@ class AssetRecordFieldDefinition < ApplicationRecord
     SETTABLE_LEVELS
   end
 
+  # Automatically picked up by rails_admin so only these options displayed when
+  # selecting data_type.
+  def data_type_enum
+    AssetRecordField::ValidDataTypes::VALID_DATA_TYPES
+  end
+
   def settable_for_group?
     level == 'group'
+  end
+
+  #
+  # The production database contains nil data_types atm
+  # In the event of a nil, the data_type will default to short_text
+  # and issue a deprecation warning
+  #
+  def data_type
+    return super unless super.nil?
+    ActiveSupport::Deprecation.warn <<-EOF.strip_heredoc
+      #{self.class}:'#{field_name}' does not have a data_type set.
+      Defaulting to 'short_text'
+    EOF
+    'short_text'
   end
 end

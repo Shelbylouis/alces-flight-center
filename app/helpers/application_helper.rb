@@ -9,6 +9,10 @@ module ApplicationHelper
     fa_icon name, class: classes, **args
   end
 
+  def boolean_symbol(condition)
+    raw(condition ? '&check;' : '&cross;')
+  end
+
   def new_case_form(clusters:, single_part: nil)
     clusters_json = json_map(clusters, :case_form_json)
     raw(
@@ -20,6 +24,10 @@ module ApplicationHelper
         ></div>
       EOF
     )
+  end
+
+  def dark_button_classes
+    ['btn', 'btn-dark', 'btn-block']
   end
 
   private

@@ -19,6 +19,20 @@ class CaseDecorator < ApplicationDecorator
     "http://helpdesk.alces-software.com/rt/Ticket/Display.html?id=#{rt_ticket_id}"
   end
 
+  def chargeable_symbol
+    h.boolean_symbol(chargeable)
+  end
+
+  def credit_charge_info
+    if credit_charge
+      credit_charge.amount.to_s
+    elsif chargeable
+      'Pending'
+    else
+      'N/A'
+    end
+  end
+
   private
 
   def issue_details

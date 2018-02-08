@@ -1,4 +1,5 @@
 class Service < ApplicationRecord
+  include AdminConfig::Service
   include ClusterPart
 
   belongs_to :service_type

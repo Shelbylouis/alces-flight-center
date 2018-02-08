@@ -34,8 +34,10 @@ gem 'draper'
 gem 'rails-data-migrations'
 gem 'font-awesome-rails'
 gem 'request_store'
+gem 'bootsnap', require: false
+gem "sentry-raven"
 
-gem 'bootstrap', '~> 4.0.0.beta'
+gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.
 
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
@@ -79,6 +81,8 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
 
   gem 'pry-rails'
+
+  gem 'development_ribbon'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

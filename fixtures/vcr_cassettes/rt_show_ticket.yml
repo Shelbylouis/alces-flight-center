@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: http://helpdesk.alces-software.com/rt/REST/1.0/ticket/10003/show?pass=<RT_PASSWORD>&user=bob.whitelock
+    uri: http://<RT_API_HOST>/rt/REST/1.0/ticket/10003/show?pass=<RT_PASSWORD>&user=<RT_USERNAME>
     body:
       encoding: UTF-8
       string: ''
@@ -10,7 +10,7 @@ http_interactions:
       Connection:
       - close
       Host:
-      - helpdesk.alces-software.com
+      - "<RT_API_HOST>"
       User-Agent:
       - http.rb/3.0.0
   response:
@@ -19,11 +19,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 23 Nov 2017 10:36:53 GMT
+      - Thu, 08 Feb 2018 10:38:38 GMT
       Server:
       - Apache/2.2.9 (Debian) mod_perl/2.0.4 Perl/v5.10.0
       Set-Cookie:
-      - RT_SID_helpdesk.alces-software.com.80=95206c57abe7293d9b43fddc841177d5; path=/rt
+      - RT_SID_<RT_API_HOST>.80=2182f67a80ec9237866d0481f1dbe6a6; path=/rt
       Vary:
       - Accept-Encoding
       Connection:
@@ -65,5 +65,5 @@ http_interactions:
         CF-ClusterID: KELVIN
 
     http_version: 
-  recorded_at: Thu, 23 Nov 2017 10:37:18 GMT
-recorded_with: VCR 3.0.3
+  recorded_at: Thu, 08 Feb 2018 10:39:12 GMT
+recorded_with: VCR 4.0.0

@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Component, type: :model do
-  include_examples 'editable_asset_record_fields'
   include_examples 'inheritable_support_type'
   include_examples 'maintenance_windows'
 
@@ -42,8 +41,7 @@ RSpec.describe Component, type: :model do
         )
       end
     end
-
-    it 'returns hash of asset record field names to values' do
+    it 'returns merged array of all applicable asset record fields' do
       ip_field_definition,
         model_field_definition,
         os_field_definition = asset_record_field_definitions
@@ -80,16 +78,45 @@ RSpec.describe Component, type: :model do
 
       subject.reload
 
-      expect(subject.asset_record).to eq('Ip' => '1.2.3.4',
-                                         'Model/manufacturer name' => 'Dell server',
+      field_names_to_values = subject.asset_record.map do |r|
+        [r.definition.field_name, r.value]
+      end.to_h
+      expect(field_names_to_values).to eq(
+        'Ip' => '1.2.3.4',
+        'Model/manufacturer name' => 'Dell server',
 
-                                         # Component-level field value should take precedence.
-                                         'OS deployed' => 'Windows o_O',
+        # Component-level field value should take precedence.
+        'OS deployed' => 'Windows o_O',
 
-                                         # Field definition included in definitions associated with
-                                         # ComponentType, but without an AssetRecordField associated with
-                                         # Component or ComponentGroup, should still be included.
-                                         'Comments' => '')
+        # Field definition included in definitions associated with
+        # ComponentType, but without an AssetRecordField associated with
+        # Component or ComponentGroup, should still be included.
+        'Comments' => '')
+    end
+  end
+
+  describe "create ComponentExpansion's from ComponentDefault's" do
+    let :expansion_names { (1..2).map { |i| "expansion#{i}" } }
+    let :default_expansions do
+      expansion_names.map { |slot| create(:default_expansion, slot: slot) }
+    end
+    let :component_make do
+      create(:component_make, default_expansions: default_expansions)
+    end
+    let :component_group do
+      create(:component_group, component_make: component_make)
+    end
+
+    subject do
+      component_group.components.create!(name: 'test').component_expansions
+    end
+
+    it 'creates the correct number of expansions' do
+      expect(subject.length).to eq(expansion_names.length)
+    end
+
+    it 'creates the component_expansions' do
+      expect(subject.map(&:slot)).to include(*expansion_names)
     end
   end
 end

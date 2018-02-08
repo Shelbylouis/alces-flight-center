@@ -5,12 +5,22 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   decorates_assigned :site
 
+  before_action :set_sentry_raven_context
   before_action :assign_current_user
   before_action :define_navigation_variables
 
   rescue_from ReadPermissionsError, with: :not_found
 
+  def error_flash_models(models, header = 'Errors:')
+    flash[:error] = header + "\n" + (models.map { |m| yield m }).join("\n")
+  end
+
   private
+
+  def set_sentry_raven_context
+    Raven.user_context(id: current_user&.id)
+    Raven.extra_context(params: params.to_unsafe_h, url: request.url)
+  end
 
   def assign_current_user
     RequestStore.store[:current_user] = current_user
@@ -40,12 +50,22 @@ class ApplicationController < ActionController::Base
     when /^\/components/
       id = params[:component_id] || params[:id]
       @cluster_part = Component.find(id)
+    when /^\/component-groups/
+      id = params[:component_group_id] || params[:id]
+      @component_group = ComponentGroup.find(id)
     when /^\/services/
       id = params[:service_id] || params[:id]
       @cluster_part = Service.find(id)
     end
 
-    @cluster = @cluster_part.cluster if @cluster_part
+    @cluster ||= if @cluster_part
+                   @cluster_part.cluster
+                 elsif @component_group
+                   @component_group.cluster
+                 end
+    if @cluster_part.respond_to?(:component_group)
+      @component_group = @cluster_part.component_group
+    end
     @site = @cluster.site if @cluster && current_user.admin?
   end
 

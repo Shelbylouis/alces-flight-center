@@ -2,32 +2,15 @@
 <%= render 'cases/cases_table', model: cluster, archive: true %>
 
 <div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          Overview
-        </span>
-      </li>
-      <li class="nav-item">
-        <%= cluster.start_maintenance_request_link %>
-      </li>
-    </ul>
-  </div>
+  <%= render 'partials/card_header_nav',
+             title: 'Overview',
+             list_items: cluster.start_maintenance_request_link %>
 
   <%= render 'clusters/details', cluster: cluster %>
 </div>
 
 <div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          Maintenance
-        </span>
-      </li>
-    </ul>
-  </div>
+  <%= render 'partials/card_header_nav', title: 'Maintenance' %>
 
   <table class="table table-responsive">
     <thead>
@@ -68,15 +51,7 @@
 </div>
 
 <div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          Documents
-        </span>
-      </li>
-    </ul>
-  </div>
+  <%= render 'partials/card_header_nav', title: 'Documents' %>
 
   <ul class="list-group list-group-flush">
     <% cluster.documents.each do |document| %>
@@ -88,15 +63,7 @@
 </div>
 
 <div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          Services
-        </span>
-      </li>
-    </ul>
-  </div>
+  <%= render 'partials/card_header_nav', title: 'Services' %>
 
   <table class="table table-responsive">
     <thead>
@@ -128,54 +95,16 @@
 
 <% cluster.component_groups_by_type.each do |type| %>
   <div class='card'>
-    <div class='card-header'>
-      <ul class="nav">
-        <li class="nav-item">
-          <span class="navbar-brand">
-            <%= type.name.pluralize %>
-          </span>
-        </li>
-      </ul>
-    </div>
+    <%= render 'partials/card_header_nav', title: type.name.pluralize %>
 
     <div class='card-body'>
       <% type.component_groups.each do |group| %>
         <h6 class="card-title">
-          <% group_size = group.components.length %>
-          <%= group.name %> &mdash; <%= pluralize(group_size, group.component_type.name) %>
+          <%= group.decorate.link %>
         </h6>
 
-        <table class="table table-responsive">
+        <%= render 'partials/components_table', group: group %>
 
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Support type</th>
-              <th></th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <% group.decorate.components.each do |component| %>
-              <tr>
-                <td width='40%'>
-                  <%= link_to component.name, component_path(component) %>
-                  <%= component.cluster_part_icons %>
-                </td>
-                <td width='30%'>
-                  <%= component.readable_support_type.capitalize %>
-                </td>
-                <td width='10%'>
-                  <%= component.start_maintenance_request_link %>
-                </td>
-                <td width='20%'>
-                  <%= component.change_support_type_button %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-
-        </table>
       <% end %>
     </div>
 

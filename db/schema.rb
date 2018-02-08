@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180130123030) do
+ActiveRecord::Schema.define(version: 20180130155112) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20180130123030) do
     t.string "level", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "data_type"
   end
 
   create_table "asset_record_field_definitions_component_types", id: false, force: :cascade do |t|
@@ -93,11 +94,19 @@ ActiveRecord::Schema.define(version: 20180130123030) do
   create_table "component_groups", force: :cascade do |t|
     t.string "name", null: false
     t.integer "cluster_id", null: false
-    t.integer "component_type_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "component_make_id"
     t.index ["cluster_id"], name: "index_component_groups_on_cluster_id"
-    t.index ["component_type_id"], name: "index_component_groups_on_component_type_id"
+    t.index ["component_make_id"], name: "index_component_groups_on_component_make_id"
+  end
+
+  create_table "component_makes", force: :cascade do |t|
+    t.string "manufacturer", null: false
+    t.string "model", null: false
+    t.string "knowledgebase_url", null: false
+    t.bigint "component_type_id", null: false
+    t.index ["component_type_id"], name: "index_component_makes_on_component_type_id"
   end
 
   create_table "component_types", force: :cascade do |t|
@@ -139,6 +148,26 @@ ActiveRecord::Schema.define(version: 20180130123030) do
   end
 
   create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
+  end
+
+  create_table "expansion_types", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "expansions", force: :cascade do |t|
+    t.string "slot", null: false
+    t.integer "ports", null: false
+    t.bigint "expansion_type_id", null: false
+    t.string "type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "component_make_id"
+    t.bigint "component_id"
+    t.index ["component_id"], name: "index_expansions_on_component_id"
+    t.index ["component_make_id"], name: "index_expansions_on_component_make_id"
+    t.index ["expansion_type_id"], name: "index_expansions_on_expansion_type_id"
   end
 
   create_table "issues", force: :cascade do |t|
@@ -220,10 +249,15 @@ ActiveRecord::Schema.define(version: 20180130123030) do
   end
 
   add_foreign_key "cases", "services"
+  add_foreign_key "component_groups", "component_makes"
+  add_foreign_key "component_makes", "component_types"
   add_foreign_key "credit_charges", "cases"
   add_foreign_key "credit_charges", "users"
   add_foreign_key "credit_deposits", "clusters"
   add_foreign_key "credit_deposits", "users"
+  add_foreign_key "expansions", "component_makes"
+  add_foreign_key "expansions", "components"
+  add_foreign_key "expansions", "expansion_types"
   add_foreign_key "issues", "service_types"
   add_foreign_key "maintenance_windows", "users", column: "confirmed_by_id"
   add_foreign_key "services", "clusters"

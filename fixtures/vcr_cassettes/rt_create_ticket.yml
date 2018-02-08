@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: http://helpdesk.alces-software.com/rt/REST/1.0/ticket/new?pass=<RT_PASSWORD>&user=bob.whitelock
+    uri: http://<RT_API_HOST>/rt/REST/1.0/ticket/new?pass=<RT_PASSWORD>&user=<RT_USERNAME>
     body:
       encoding: UTF-8
       string: content=Queue%3A+Support%0ARequestor%3A+test%40example.com%0ACc%3A+some.user%40example.com%5D%2Canother.user%40example.com%0ASubject%3A+Alces+Flight+Center+test+ticket+-+please+delete%0AText%3A+Testing%0A+multiline%0A+text%0A+with+semicolon+%3B%0A+works%0A
@@ -10,7 +10,7 @@ http_interactions:
       Connection:
       - close
       Host:
-      - helpdesk.alces-software.com
+      - "<RT_API_HOST>"
       User-Agent:
       - http.rb/3.0.0
   response:
@@ -19,11 +19,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Thu, 23 Nov 2017 10:36:52 GMT
+      - Thu, 08 Feb 2018 10:38:37 GMT
       Server:
       - Apache/2.2.9 (Debian) mod_perl/2.0.4 Perl/v5.10.0
       Set-Cookie:
-      - RT_SID_helpdesk.alces-software.com.80=482fbe9196fcae9e79e7381a6072e2f7; path=/rt
+      - RT_SID_<RT_API_HOST>.80=c00863044ff8893996bfec6fa20b68bb; path=/rt
       Vary:
       - Accept-Encoding
       Connection:
@@ -37,8 +37,8 @@ http_interactions:
       string: |+
         RT/3.6.7 200 Ok
 
-        # Ticket 11272 created.
+        # Ticket 11577 created.
 
     http_version: 
-  recorded_at: Thu, 23 Nov 2017 10:37:18 GMT
-recorded_with: VCR 3.0.3
+  recorded_at: Thu, 08 Feb 2018 10:39:11 GMT
+recorded_with: VCR 4.0.0

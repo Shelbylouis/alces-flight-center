@@ -7,11 +7,11 @@ RSpec.describe 'Cases table', type: :feature do
   let :cluster { create(:cluster, site: site) }
 
   let! :open_case do
-    create(:open_case, cluster: cluster, details: 'Open case')
+    create(:open_case, cluster: cluster, subject: 'Open case')
   end
 
   let! :archived_case do
-    create(:archived_case, cluster: cluster, details: 'Archived case')
+    create(:archived_case, cluster: cluster, subject: 'Archived case')
   end
 
   RSpec.shared_examples 'open cases table rendered' do
@@ -82,13 +82,6 @@ RSpec.describe 'Cases table', type: :feature do
     context 'when visit cases page' do
       it 'renders table of all Cases, without Contact-specific buttons/info' do
         visit site_cases_path(site, as: user)
-
-        # XXX Displaying details disabled at the moment due to space
-        # constraints - either remove these or add back after reorganizing
-        # table.
-        # cases = all('tr').map(&:text)
-        # expect(cases).to have_text('Open case')
-        # expect(cases).to have_text('Archived case')
 
         headings = all('th').map(&:text)
         expect(headings).not_to include('Contact support')

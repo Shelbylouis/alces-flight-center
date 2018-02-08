@@ -15,29 +15,29 @@ RSpec.describe ApplicationRecord, type: :model do
       allow(Request).to receive(:current_user).and_return(user)
     end
 
-    GLOBAL_MODELS = [
-      AssetRecordFieldDefinition,
-      Category,
-      ComponentType,
-      Issue,
-      ServiceType,
-    ]
+    # These tests ensures that every model is handled for permissions purposes,
+    # by either specifying how it is related to a Site (which will be used to
+    # enforce that a non-admin User is a contact for that Site in order to
+    # access it) or by specifying that it is globally available (and so will be
+    # accessible by any User).
+    describe 'models should normally be related to a Site xor explicitly globally available' do
+      # Eager load app so get all descendants of ApplicationRecord, not just
+      # those which happen to already be loaded.
+      Rails.application.eager_load!
 
-    describe 'every Site-related record defines site for permissions purposes' do
-      ActiveRecord::Base.connection.tables.each do |table|
-        begin
-          klass = table.singularize.camelize.constantize
-        rescue NameError
-          # Some tables do not have corresponding AR class; we don't care about
-          # those.
-          next
-        end
+      ApplicationRecord.descendants.each do |klass|
+        # The class is a base class for use in STI; skip it and just its
+        # subclasses will be checked.
+        next if klass.descendants.present?
 
-        globally_available_model = GLOBAL_MODELS.include?(klass)
-        next if globally_available_model
+        # Users are special, they have a relation with a Site but are also
+        # globally available, i.e. able to be read by any other User.
+        next if klass == User
 
-        it "site defined for #{klass.to_s}" do
-          expect(klass.instance_methods).to include(:site)
+        it "#{klass.to_s} has Site xor is global" do
+          related_to_site = klass.new.respond_to?(:site)
+          is_global = klass.globally_available?
+          expect([related_to_site, is_global]).to be_one
         end
       end
     end

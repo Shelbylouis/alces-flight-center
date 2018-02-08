@@ -9,11 +9,21 @@ VCR.configure do |c|
   # Log most recent debug output from VCR here.
   c.debug_logger = File.open('log/vcr.log', 'w')
 
-  # Filter sensitive data from saved cassettes.
-  c.filter_sensitive_data("<RT_PASSWORD>") do
-    ENV.fetch('RT_PASSWORD')
-  end
-  c.filter_sensitive_data("<AWS_ACCESS_KEY_ID>") do
-    ENV.fetch('AWS_ACCESS_KEY_ID')
+  # Filter sensitive data from saved cassettes, or any other data which will
+  # prevent VCR from identifying cassettes as being for the same request in
+  # different environments.
+  [
+    'RT_PASSWORD',
+
+    # These are included in the URL in requests to RT so must be filtered so
+    # VCR identifies requests as the same.
+    'RT_USERNAME',
+    'RT_API_HOST',
+
+    'AWS_ACCESS_KEY_ID',
+  ].each do |env_var|
+    c.filter_sensitive_data("<#{env_var}>") do
+      ENV.fetch(env_var)
+    end
   end
 end

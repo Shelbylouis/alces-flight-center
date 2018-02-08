@@ -42,24 +42,38 @@ FactoryBot.define do
     ordering 5
   end
 
+  factory :component_make do
+    component_type
+    manufacturer 'manufacturer'
+    model 'model'
+    knowledgebase_url 'knowledgebase_url'
+  end
+
   factory :component_group do
     cluster
-    component_type
+    component_make
     name 'nodes'
+  end
+
+  factory :expansion_type do
+    name 'switch'
+  end
+
+  factory :default_expansion do
+    expansion_type
+    component_make
+    ports 4
+    slot 'a'
   end
 
   factory :category do
     name 'User management'
   end
 
-  factory :asset_record_field_definition do
+  factory :asset_record_field_definition, aliases: [:definition] do
     field_name 'Manufacturer/model name'
     level :group
-  end
-
-  factory :unassociated_asset_record_field, class: AssetRecordField do
-    asset_record_field_definition
-    value ''
+    data_type 'short_text'
   end
 
   factory :service_type do

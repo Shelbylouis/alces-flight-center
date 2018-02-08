@@ -15,7 +15,7 @@ Rails.application.routes.draw do
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      resources :cases, only: [:new, :index]
+      resources :cases, only: [:new, :index, :show]
     end
 
     resources :cases, only: [] do
@@ -29,8 +29,22 @@ Rails.application.routes.draw do
       resources :maintenance_windows, only: :new
     end
 
+    asset_record = Proc.new do
+      resource :asset_record, path: 'asset-record', only: [:edit, :update]
+    end
+
     resources :components, only: []  do
       resources :maintenance_windows, only: :new
+      resource :component_expansion,
+               path: 'expansions',
+               only: [:edit, :update, :create]
+      asset_record.call
+    end
+
+    resources :component_expansions, only: [:destroy]
+
+    resources :component_groups, path: 'component-groups', only: [] do
+      asset_record.call
     end
 
     resources :services, only: []  do
@@ -55,7 +69,7 @@ Rails.application.routes.draw do
     root 'sites#show'
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
-    resources :cases, only: [:new, :index, :create] do
+    resources :cases, only: [:new, :index, :show, :create] do
       member do
         post :archive
         post :restore
@@ -71,6 +85,8 @@ Rails.application.routes.draw do
       resources :cases, only: :new
       resources :consultancy, only: :new
     end
+
+    resources :component_groups, path: 'component-groups', only: :show
 
     resources :services, only: :show do
       resources :cases, only: :new

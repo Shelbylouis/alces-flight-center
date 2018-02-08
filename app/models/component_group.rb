@@ -1,14 +1,17 @@
 class ComponentGroup < ApplicationRecord
   include AdminConfig::ComponentGroup
-  include AdminConfig::Shared::EditableAssetRecordFields
+
+  include HasAssetRecord
 
   belongs_to :cluster
   has_one :site, through: :cluster
-  belongs_to :component_type
+  belongs_to :component_make
+  has_one :component_type, through: :component_make
   has_many :components, dependent: :destroy
   has_many :asset_record_fields
 
   validates :name, presence: true
+
   validates_associated :cluster, :asset_record_fields
 
   attr_accessor :genders_host_range
@@ -41,5 +44,9 @@ class ComponentGroup < ApplicationRecord
       nodeattr_output = `nodeattr -f #{file.path} -c #{genders_attr}`
       nodeattr_output.strip.split(',')
     end
+  end
+
+  def asset_record_parent
+    component_type
   end
 end

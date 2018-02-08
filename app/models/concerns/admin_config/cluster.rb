@@ -41,6 +41,9 @@ module AdminConfig::Cluster
         configure :credit_deposits do
           hide
         end
+        configure :maintenance_windows do
+          hide
+        end
       end
     end
   end

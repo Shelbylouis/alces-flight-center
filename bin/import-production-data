@@ -1,0 +1,99 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+LOCAL_BACKUPS_PATH='tmp/backups/'
+BACKUPS_S3_URL='s3://alces-flight-center/backups/'
+DATABASE_CONFIG_PATH='config/database.yml'
+
+# Usage: run the script; no arguments needed. If everything works correctly it
+# should import the latest production database backup from S3 as the new
+# development database, with User passwords modified to all be `password` and
+# emails modified to all be `@example.com`.
+#
+# Dependencies: the `setup` script should already successfully have been run;
+# the `aws` CLI must be setup with access to the `alces-flight-center` S3
+# bucket.
+
+main() {
+  local most_recent_backup_file local_backup_file_path backup_file_url
+
+  log_info 'Determining most recent database backup...'
+  most_recent_backup_file="$(aws s3 ls "$BACKUPS_S3_URL" | tail -n 1 | cut -d' ' -f1)"
+  local_backup_file_path="$LOCAL_BACKUPS_PATH/$most_recent_backup_file"
+
+  # Fetch the most recent backup if we don't have it locally already (or at
+  # least if we don't have a file with the same name).
+  if [ ! -f "$local_backup_file_path" ]; then
+    log_info 'Retrieving backup...'
+    backup_file_url="${BACKUPS_S3_URL}${most_recent_backup_file}"
+    aws s3 cp "$backup_file_url" "$local_backup_file_path"
+  else
+    log_info 'Already retrieved most recent backup; using existing download.'
+  fi
+
+  import_backup "$local_backup_file_path"
+  obfuscate_imported_data
+  log_info 'Done!'
+}
+
+import_backup() {
+  local backup_file_path dev_database_username dev_database_name
+  backup_file_path="$1"
+
+  log_info 'Creating fresh development database...'
+  bin/rake db:drop
+  bin/rake db:create
+
+  # This is required so the test database is left in a usable state, as the
+  # above commands drop and recreate the test database also, and there is
+  # seemingly no way to have these only run for the development database (short
+  # of monkeypatching or writing a custom Rake task). Relevant issue:
+  # https://github.com/rails/rails/issues/27299.
+  bin/rake db:schema:load RAILS_ENV='test'
+
+  log_info 'Reading development database access details...'
+  dev_database_username="$(load_dev_database_config_value 'username')"
+  dev_database_name="$(load_dev_database_config_value 'database')"
+
+  log_info 'Importing production backup...'
+  psql -U "$dev_database_username" -d "$dev_database_name" -f "$backup_file_path"
+
+  # This is required otherwise Rails thinks we're actually using the production
+  # database, and will try to protect us from shooting ourselves.
+  log_info 'Setting new database as development database...'
+  psql -U "$dev_database_username" -d "$dev_database_name" -c "UPDATE ar_internal_metadata SET value='development' WHERE key='environment';"
+}
+
+load_dev_database_config_value() {
+  local value_name
+  value_name="$1"
+
+  cat <<-RUBY | ruby
+    require 'yaml'
+    config = YAML.load_file('$DATABASE_CONFIG_PATH')
+    puts config['development']['$value_name']
+RUBY
+}
+
+obfuscate_imported_data() {
+  log_info "Obfuscating imported data to remove real emails and passwords..."
+
+  cat <<-RUBY | ruby
+    require './config/environment'
+    User.all.each do |user|
+      email_base = user.email.split('@').first
+      user.email = "#{email_base}@example.com"
+      user.password = 'password'
+      user.save!
+    end
+RUBY
+
+}
+
+log_info() {
+  echo >&2
+  echo ">>> $1" >&2
+}
+
+main

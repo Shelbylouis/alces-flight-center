@@ -1,0 +1,14 @@
+
+<% if current_user.admin? %>
+  <div class='px-3 pb-3' >
+    <%= case action
+        when 'edit'; submit_tag "Submit", class: dark_button_classes
+        when 'show'
+          link_to 'Edit',
+            edit_path,
+            role: 'button',
+            class: dark_button_classes
+        end %>
+  </div>
+<% end %>
+

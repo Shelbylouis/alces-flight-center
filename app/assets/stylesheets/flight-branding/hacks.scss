@@ -1,3 +1,6 @@
+.navbar {
+  box-shadow: none !important;
+}
 
 .product-bar {
   position: fixed !important;
@@ -57,7 +60,6 @@
 
 // Hacked and adapted from flight-reactware/lib/elements/NavLink.js.
 .nav-link {
-  background-color: #2794d8;
   white-space: nowrap;
   border-radius: 5px;
   cursor: pointer;

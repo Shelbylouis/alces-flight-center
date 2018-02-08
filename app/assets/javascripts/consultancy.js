@@ -4,8 +4,8 @@ const initializeConsultancyForm = () => {
 
   const toggleSubmitButtonEnabled = () =>
     $consultancyDetails.val() === ''
-      ? $consultancySubmit.prop('disabled', true) && console.log('true')
-      : $consultancySubmit.prop('disabled', false) && console.log('false');
+      ? $consultancySubmit.prop('disabled', true)
+      : $consultancySubmit.prop('disabled', false);
 
   // Toggle whether submit button should be enabled on page load and then every
   // key press.
