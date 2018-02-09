@@ -45,10 +45,10 @@ RSpec.describe ClusterLog, type: :model do
     end
 
     it 'can have multiple cases' do
-      case_msgs = ['first', 'second', 'third']
-      case_msgs.each { |m| create_case(m) }
+      case_subs = ['first', 'second', 'third']
+      case_subs.each { |m| create_case(m) }
       expect(subject).to be_valid
-      expect(subject.cases.map(&:subject)).to contain_exactly(*case_msgs)
+      expect(subject.cases.map(&:subject)).to contain_exactly(*case_subs)
     end
 
     it 'validates that all cases belong to its cluster' do
