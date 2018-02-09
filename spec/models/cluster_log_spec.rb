@@ -55,9 +55,7 @@ RSpec.describe ClusterLog, type: :model do
       other_cluster = create(:cluster, name: 'other-cluster')
       bad_case = create(:case, cluster: other_cluster, subject: 'Bad Case')
 
-      ['other-case1', 'other-case2', 'other-case3'].each do |case_msg|
-        create_case(case_msg)
-      end
+      create_case('perfectly normal case')
       subject.cases << bad_case
       subject.reload
 
