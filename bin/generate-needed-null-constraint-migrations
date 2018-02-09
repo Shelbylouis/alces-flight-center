@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+
+TABLE_AND_COLUMNS_TO_SKIP = [
+  ['expansions', 'component_id'],
+  ['expansions', 'component_make_id'],
+  ['users', 'password'],
+].freeze
+
+def main
+  nullalign_output = run_and_log_output('bundle exec nullalign')
+  content = nullalign_output.strip.split(/---+/).last.strip
+
+  migration_lines = content.split("\n").flat_map do |line|
+    table_and_columns = line.split('  ').last
+    table, columns = table_and_columns.split(':').map(&:strip)
+    column_names = columns.split(',').map(&:strip)
+
+    column_names.map do |col|
+      if skippable_columns_for_table(table).include?(col)
+        nil
+      else
+        "change_column_null :#{table}, :#{col}, false"
+      end
+    end
+  end.reject(&:nil?)
+
+  if migration_lines.empty?
+    log_info 'No necessary but missing constraints found!'
+    exit
+  end
+
+  log_info 'Copy and paste the following output into a migration file',
+    'Note: you should check all lines are valid and work on real data, some',
+    'invalid constraints may be included; known models which may give invalid',
+    'lines:',
+    ' - models using STI when only one type has a `presence` validation;',
+    ' - models with a `presence` validation without corresponding DB field.',
+    'Add these invalid constraints to the columns to skip to avoid regenerating',
+    'them each time script is run.'
+
+  puts "# The following lines were generated using `#{__FILE__}`."
+  puts migration_lines.join("\n")
+end
+
+def run_and_log_output(command)
+  log_info command
+  `#{command}`.tap do |output|
+    STDERR.puts output
+  end
+end
+
+def log_info(*lines)
+  lines.each do |line|
+    STDERR.puts ">>> #{line}"
+  end
+  STDERR.puts
+end
+
+def skippable_columns_for_table(table)
+  TABLE_AND_COLUMNS_TO_SKIP.select { |t, _| t == table }.map { |_,c| c }
+end
+
+main
