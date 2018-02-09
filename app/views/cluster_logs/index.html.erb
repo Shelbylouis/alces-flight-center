@@ -1,18 +1,24 @@
 <% if current_user.admin? %>
   <div class='card'>
     <%= render 'partials/card_header_nav', title: 'Add Log' %>
-    <div class='table-responsive'>
-      <%= form_for @new_case do |f| %>
-        <table class='table'>
-          <tr><td>
-            <%= f.collection_select :id,
-                                    @cases.decorate,
-                                    :id,
-                                    :rt_long_text,
-                                    {},
-                                    { multiple: true } %>
-          </td></tr>
-        </table>
+    <div class='card-body table-responsive'>
+      <%= form_for [:cluster, @new_log] do |f| %>
+        <div class='form-group'>
+          <%= f.label :details, 'Details'%>
+          <%= f.text_area :details, class: 'form-control'%>
+        </div>
+        <div class='form-group'>
+          <%= f.label :case_ids, 'Related Ticket(s)' %>
+          <%= f.collection_select :case_ids,
+                                  @cases.decorate,
+                                  :id,
+                                  :rt_long_text,
+                                  {},
+                                  { multiple: true } %>
+        </div>
+        <div class='form-group'>
+          <%= f.submit 'Submit', class: dark_button_classes %>
+        </div>
       <% end %>
     </div>
   </div>
@@ -31,3 +37,4 @@
     </table>
   </div>
 </div>
+
