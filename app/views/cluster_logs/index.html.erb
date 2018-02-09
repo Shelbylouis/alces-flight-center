@@ -34,6 +34,12 @@
         <th>Details</th>
         <th>Tickets</th>
       </thead>
+      <% @logs.each do |log| %>
+        <tr>
+          <td><%= log.created_at %></td>
+          <td><%= log.engineer.name %></td>
+        </tr>
+      <% end %>
     </table>
   </div>
 </div>
