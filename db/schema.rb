@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180130155112) do
+ActiveRecord::Schema.define(version: 20180209120747) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -42,7 +42,7 @@ ActiveRecord::Schema.define(version: 20180130155112) do
     t.string "value", null: false
     t.integer "component_id"
     t.integer "component_group_id"
-    t.integer "asset_record_field_definition_id"
+    t.integer "asset_record_field_definition_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["asset_record_field_definition_id"], name: "index_asset_record_fields_on_asset_record_field_definition_id"
@@ -54,16 +54,16 @@ ActiveRecord::Schema.define(version: 20180130155112) do
     t.string "details", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "cluster_id"
+    t.integer "cluster_id", null: false
     t.integer "component_id"
-    t.integer "user_id"
-    t.bigint "rt_ticket_id"
+    t.integer "user_id", null: false
+    t.bigint "rt_ticket_id", null: false
     t.boolean "archived", default: false, null: false
-    t.integer "issue_id"
+    t.integer "issue_id", null: false
     t.bigint "service_id"
     t.string "last_known_ticket_status", default: "new", null: false
-    t.text "token"
-    t.text "subject"
+    t.text "token", null: false
+    t.text "subject", null: false
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
     t.index ["issue_id"], name: "index_cases_on_issue_id"
@@ -80,13 +80,13 @@ ActiveRecord::Schema.define(version: 20180130155112) do
   end
 
   create_table "clusters", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.text "description"
-    t.string "support_type"
-    t.integer "site_id"
+    t.string "support_type", null: false
+    t.integer "site_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "canonical_name"
+    t.string "canonical_name", null: false
     t.string "charging_info"
     t.index ["site_id"], name: "index_clusters_on_site_id"
   end
@@ -96,7 +96,7 @@ ActiveRecord::Schema.define(version: 20180130155112) do
     t.integer "cluster_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "component_make_id"
+    t.bigint "component_make_id", null: false
     t.index ["cluster_id"], name: "index_component_groups_on_cluster_id"
     t.index ["component_make_id"], name: "index_component_groups_on_component_make_id"
   end
@@ -114,14 +114,14 @@ ActiveRecord::Schema.define(version: 20180130155112) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "ordering"
+    t.integer "ordering", null: false
   end
 
   create_table "components", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "component_group_id"
+    t.integer "component_group_id", null: false
     t.string "support_type", default: "inherit", null: false
     t.boolean "internal", default: false
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
@@ -175,8 +175,8 @@ ActiveRecord::Schema.define(version: 20180130155112) do
     t.boolean "requires_component", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "details_template"
-    t.string "support_type"
+    t.string "details_template", null: false
+    t.string "support_type", null: false
     t.string "identifier"
     t.boolean "requires_service", default: false, null: false
     t.bigint "service_type_id"
@@ -215,8 +215,8 @@ ActiveRecord::Schema.define(version: 20180130155112) do
   create_table "services", force: :cascade do |t|
     t.string "name", null: false
     t.string "support_type", default: "inherit", null: false
-    t.bigint "service_type_id"
-    t.bigint "cluster_id"
+    t.bigint "service_type_id", null: false
+    t.bigint "cluster_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "internal", default: false
@@ -225,11 +225,11 @@ ActiveRecord::Schema.define(version: 20180130155112) do
   end
 
   create_table "sites", force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "canonical_name"
+    t.string "canonical_name", null: false
   end
 
   create_table "users", force: :cascade do |t|
