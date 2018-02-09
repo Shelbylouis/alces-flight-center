@@ -88,6 +88,10 @@ group :development do
   # validations. Run using `bin/generate-needed-null-constraint-migrations`
   # script.
   gem 'nullalign'
+
+  # Detects various problems in database. Run with `active_record_doctor:*`
+  # Rake tasks.
+  gem 'active_record_doctor'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

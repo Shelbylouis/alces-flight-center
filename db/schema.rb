@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180209120747) do
+ActiveRecord::Schema.define(version: 20180209125114) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -248,9 +248,22 @@ ActiveRecord::Schema.define(version: 20180209120747) do
     t.index ["site_id"], name: "index_users_on_site_id"
   end
 
+  add_foreign_key "additional_contacts", "sites"
+  add_foreign_key "asset_record_field_definitions_component_types", "asset_record_field_definitions"
+  add_foreign_key "asset_record_field_definitions_component_types", "component_types"
+  add_foreign_key "asset_record_fields", "asset_record_field_definitions"
+  add_foreign_key "asset_record_fields", "component_groups"
+  add_foreign_key "asset_record_fields", "components"
+  add_foreign_key "cases", "clusters"
+  add_foreign_key "cases", "components"
+  add_foreign_key "cases", "issues"
   add_foreign_key "cases", "services"
+  add_foreign_key "cases", "users"
+  add_foreign_key "clusters", "sites"
+  add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"
   add_foreign_key "component_makes", "component_types"
+  add_foreign_key "components", "component_groups"
   add_foreign_key "credit_charges", "cases"
   add_foreign_key "credit_charges", "users"
   add_foreign_key "credit_deposits", "clusters"
@@ -258,8 +271,15 @@ ActiveRecord::Schema.define(version: 20180209120747) do
   add_foreign_key "expansions", "component_makes"
   add_foreign_key "expansions", "components"
   add_foreign_key "expansions", "expansion_types"
+  add_foreign_key "issues", "categories"
   add_foreign_key "issues", "service_types"
+  add_foreign_key "maintenance_windows", "cases"
+  add_foreign_key "maintenance_windows", "clusters"
+  add_foreign_key "maintenance_windows", "components"
+  add_foreign_key "maintenance_windows", "services"
+  add_foreign_key "maintenance_windows", "users"
   add_foreign_key "maintenance_windows", "users", column: "confirmed_by_id"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
+  add_foreign_key "users", "sites"
 end
