@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+def main
+  nullalign_output = run_and_log_output('bundle exec nullalign')
+  content = nullalign_output.strip.split(/---+/).last.strip
+
+  migration_lines = content.split("\n").flat_map do |line|
+    table_and_columns = line.split('  ').last
+    table, columns = table_and_columns.split(':').map(&:strip)
+    column_names = columns.split(',').map(&:strip)
+
+    column_names.map do |col|
+      "change_column_null :#{table}, :#{col}, false"
+    end
+  end
+
+  log_info 'Copy and paste the following output into a migration file',
+    'Note: you should check all lines are valid and work on real data, some',
+    'invalid constraints may be included; known models which may give invalid',
+    'lines:',
+    ' - models using STI when only one type has a `presence` validation;',
+    ' - models with a `presence` validation without corresponding DB field.'
+
+  puts "# The following lines were generated using `#{__FILE__}`."
+  puts migration_lines.join("\n")
+end
+
+def run_and_log_output(command)
+  log_info command
+  `#{command}`.tap do |output|
+    STDERR.puts output
+  end
+end
+
+def log_info(*lines)
+  lines.each do |line|
+    STDERR.puts ">>> #{line}"
+  end
+  STDERR.puts
+end
+
+main

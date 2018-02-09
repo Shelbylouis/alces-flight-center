@@ -83,6 +83,11 @@ group :development do
   gem 'pry-rails'
 
   gem 'development_ribbon'
+
+  # Checks corresponding database constraint exists for all model presence
+  # validations. Run using `bin/generate-needed-null-constraint-migrations`
+  # script.
+  gem 'nullalign'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
