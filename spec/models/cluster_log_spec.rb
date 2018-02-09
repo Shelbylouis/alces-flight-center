@@ -20,10 +20,12 @@ RSpec.describe ClusterLog, type: :model do
   context 'with an invalid engineer' do
     it 'errors without an engineer' do
       log = build(:cluster_log, engineer: nil)
-      expect(log).not_to be_valid
 
+      log.valid? # Required otherwise the errors haven't been generated
       expected_error = 'Engineer must exist'
       actual_errors = log.errors.full_messages.join("\n")
+
+      expect(log).not_to be_valid
       expect(actual_errors).to include(expected_error)
     end
 
@@ -50,13 +52,15 @@ RSpec.describe ClusterLog, type: :model do
     end
 
     it 'validates that all cases belong to its cluster' do
+      other_cluster = create(:cluster, name: 'other-cluster')
+      bad_case = create(:case, cluster: other_cluster, subject: 'Bad Case')
+
       ['other-case1', 'other-case2', 'other-case3'].each do |case_msg|
         create_case(case_msg)
       end
-      other_cluster = create(:cluster, name: 'other-cluster')
-      bad_case = create(:case, cluster: other_cluster, subject: 'Bad Case')
       subject.cases << bad_case
       subject.reload
+
       expect_single_error subject, "#{bad_case.rt_ticket_id}"
     end
   end
