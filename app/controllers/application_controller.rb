@@ -12,7 +12,9 @@ class ApplicationController < ActionController::Base
   rescue_from ReadPermissionsError, with: :not_found
 
   def error_flash_models(models, header = 'Errors:')
-    flash[:error] = header + "\n" + (models.map { |m| yield m }).join("\n")
+    flash[:error] = header + "\n" + models.map do |model|
+      block_given? ? (yield model) : model.errors.full_messages
+    end.join("\n")
   end
 
   private
