@@ -60,4 +60,15 @@ Rails.application.configure do
 
   # Alces Flight Center custom config.
   config.rt_interface_class = FakeRequestTrackerInterface.to_s
+
+  # Set up Bullet Gem
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+    Bullet.console = true
+    Bullet.rails_logger = true
+    Bullet.add_footer = true
+    # XXX Consider adding this.
+    # Bullet.slack = { webhook_url: 'http://some.slack.url', channel: '#alces-flight-center', username: 'bob' }
+  end
 end

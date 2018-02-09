@@ -83,6 +83,7 @@ group :development do
   gem 'pry-rails'
 
   gem 'development_ribbon'
+  gem 'bullet'
 
   # Checks corresponding database constraint exists for all model presence
   # validations. Run using `bin/generate-needed-null-constraint-migrations`
