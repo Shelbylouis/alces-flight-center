@@ -10,6 +10,7 @@ class CaseDecorator < ApplicationDecorator
       "Created by #{user.name}"
     ].join(' | ')
   end
+  alias_method :rt_long_text, :maintenance_window_form_info
 
   def association_info
     associated_model.decorate.links

@@ -1,14 +1,32 @@
+<% if current_user.admin? %>
+  <div class='card'>
+    <%= render 'partials/card_header_nav', title: 'Add Log' %>
+    <div class='table-responsive'>
+      <%= form_for @new_case do |f| %>
+        <table class='table'>
+          <tr><td>
+            <%= f.collection_select :id,
+                                    @cases.decorate,
+                                    :id,
+                                    :rt_long_text,
+                                    {},
+                                    { multiple: true } %>
+          </td></tr>
+        </table>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
 <div class='card  '>
   <%= render 'partials/card_header_nav', title: 'Entries' %>
   <div class='table-responsive'>
     <table class='table'>
       <thead>
-        <tr>
-          <th>Date Created</th>
-          <th>Engineer</th>
-          <th>Details</th>
-          <th>Tickets</th>
-        </tr>
+        <th>Date Created</th>
+        <th>Engineer</th>
+        <th>Details</th>
+        <th>Tickets</th>
       </thead>
     </table>
   </div>
