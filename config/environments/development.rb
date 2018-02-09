@@ -70,5 +70,20 @@ Rails.application.configure do
     Bullet.add_footer = true
     # XXX Consider adding this.
     # Bullet.slack = { webhook_url: 'http://some.slack.url', channel: '#alces-flight-center', username: 'bob' }
+
+    [:cluster, :component, :service].each do |association|
+      Bullet.add_whitelist type: :unused_eager_loading,
+        class_name: 'Case',
+        association: association
+    end
+
+    ['Component', 'Service'].each do |model|
+      Bullet.add_whitelist type: :unused_eager_loading,
+        class_name: model,
+        association: :cluster
+      # Bullet.add_whitelist type: :unused_eager_loading,
+      #   class_name: model,
+      #   association: :maintenance_windows
+    end
   end
 end

@@ -15,6 +15,10 @@ class Case < ApplicationRecord
     ] + COMPLETED_TICKET_STATUSES
   ).freeze
 
+  default_scope do
+    includes(:user, :cluster, :component, :service, :credit_charge, :issue)
+  end
+
   belongs_to :issue
   belongs_to :cluster
   belongs_to :component, required: false

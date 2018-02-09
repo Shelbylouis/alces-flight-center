@@ -36,10 +36,19 @@ class Service < ApplicationRecord
   end
 
   def applicable_issues
-    issues_requiring_any_service = Issue.where(
+    (
+      issues_requiring_this_service + issues_requiring_any_service
+    ).reject(&:special?)
+  end
+
+  def issues_requiring_this_service
+    service_type.issues.includes(:category)
+  end
+
+  def issues_requiring_any_service
+    Issue.where(
       requires_service: true,
       service_type: nil
-    )
-    (service_type.issues + issues_requiring_any_service).reject(&:special?)
+    ).includes(:category)
   end
 end

@@ -8,6 +8,8 @@ module ClusterPart
   SUPPORT_TYPES = SupportType::VALUES + ['inherit']
 
   included do
+    default_scope { includes(:cluster) }
+
     has_many :cases
     has_many :maintenance_windows
 

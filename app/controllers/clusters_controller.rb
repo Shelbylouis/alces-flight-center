@@ -2,7 +2,11 @@ class ClustersController < ApplicationController
   decorates_assigned :cluster
 
   def show
-    @cluster = Cluster.find(params[:id])
+    @cluster = Cluster.includes(
+      components: [:maintenance_windows],
+      services: [:maintenance_windows]
+    ).find(params[:id])
+
     @title = "#{@cluster.name} Management Dashboard"
 
     support_type = case @cluster.support_type.to_sym

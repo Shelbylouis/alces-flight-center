@@ -70,7 +70,7 @@ class Cluster < ApplicationRecord
   end
 
   def component_groups_by_type
-    component_groups.group_by do |group|
+    component_groups.includes(:component_type, :components).group_by do |group|
       group.component_type
     end.map do |component_type, groups|
       {
