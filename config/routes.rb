@@ -27,6 +27,7 @@ Rails.application.routes.draw do
 
     resources :clusters, only: []  do
       resources :maintenance_windows, only: :new
+      resources :cluster_logs, path: 'logs', only: [:create]
     end
 
     asset_record = Proc.new do
