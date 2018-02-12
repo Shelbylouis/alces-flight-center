@@ -4,7 +4,15 @@
 <div class='card'>
   <%= render 'partials/card_header_nav',
              title: 'Overview',
-             list_items: cluster.start_maintenance_request_link %>
+             list_items: [
+               cluster.start_maintenance_request_link,
+               link_to(
+                 'Logs',
+                 cluster_cluster_logs_path(cluster),
+                 role: 'button',
+                 class: dark_button_classes
+               )
+             ] %>
 
   <%= render 'clusters/details', cluster: cluster %>
 </div>
