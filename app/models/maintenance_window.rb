@@ -13,8 +13,8 @@ class MaintenanceWindow < ApplicationRecord
 
   delegate :add_rt_ticket_correspondence, :site, to: :case
 
-  state_machine initial: :requested do
-    state :requested do
+  state_machine initial: :new do
+    state :new, :requested do
       validates_absence_of :confirmed_by
       validates_absence_of :ended_at
     end
@@ -27,6 +27,10 @@ class MaintenanceWindow < ApplicationRecord
     state :ended do
       validates_presence_of :confirmed_by
       validates_presence_of :ended_at
+    end
+
+    event :request do
+      transition new: :requested
     end
 
     event :confirm do

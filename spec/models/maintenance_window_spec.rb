@@ -47,10 +47,23 @@ RSpec.describe MaintenanceWindow, type: :model do
   end
 
   describe 'states' do
-    it 'is initially in requested state' do
+    it 'is initially in new state' do
       window = create(:maintenance_window)
 
-      expect(window.state).to eq 'requested'
+      expect(window.state).to eq 'new'
+    end
+
+    context 'when new' do
+      subject { create(:maintenance_window, state: :new) }
+
+      it { is_expected.to validate_absence_of(:confirmed_by) }
+      it { is_expected.to validate_absence_of(:ended_at) }
+
+      it 'can be requested' do
+        subject.request!
+
+        expect(subject).to be_requested
+      end
     end
 
     context 'when requested' do

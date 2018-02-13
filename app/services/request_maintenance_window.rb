@@ -15,7 +15,8 @@ RequestMaintenanceWindow = KeywordStruct.new(
     MaintenanceWindow.create!(
       user: user,
       case: support_case,
-      associated_model: associated_model
+      associated_model: associated_model,
+      state: 'requested'
     ).tap do |window|
       add_rt_ticket_correspondence(window)
     end
