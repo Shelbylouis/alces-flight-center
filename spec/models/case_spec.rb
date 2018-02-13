@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Case, type: :model do
-  let :random_token_regex { /([A-Z]|[0-9]){5}/ }
+  let :random_token_regex { /[A-Z][0-9][A-Z][0-9][A-Z]/ }
 
   let :request_tracker { described_class.send(:request_tracker) }
 
