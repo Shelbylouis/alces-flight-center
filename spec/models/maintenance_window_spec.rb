@@ -46,6 +46,99 @@ RSpec.describe MaintenanceWindow, type: :model do
     end
   end
 
+  describe 'states' do
+    it 'is initially in requested state' do
+      window = create(:maintenance_window)
+
+      expect(window.state).to eq 'requested'
+    end
+
+    context 'when requested' do
+      subject { create(:maintenance_window, state: :requested) }
+
+      it 'should not have confirmed_by set' do
+        expect(subject).to be_valid
+        subject.confirmed_by = create(:user)
+
+        expect(subject).not_to be_valid
+      end
+
+      it 'should not have ended_at set' do
+        expect(subject).to be_valid
+        subject.ended_at = DateTime.current
+
+        expect(subject).not_to be_valid
+      end
+
+      it 'can be confirmed by user' do
+        user = create(:user)
+        subject.confirm!(user)
+
+        expect(subject).to be_confirmed
+        expect(subject.confirmed_by).to eq(user)
+      end
+    end
+
+    context 'when confirmed' do
+      subject do
+        create(
+          :maintenance_window,
+          state: :confirmed,
+          confirmed_by: create(:user)
+        )
+      end
+
+      it 'should have confirmed_by set' do
+        expect(subject).to be_valid
+        subject.confirmed_by = nil
+
+        expect(subject).not_to be_valid
+      end
+
+      it 'should not have ended_at set' do
+        expect(subject).to be_valid
+        subject.ended_at = DateTime.current
+
+        expect(subject).not_to be_valid
+      end
+
+      it 'can be ended by admin' do
+        now = DateTime.current
+        allow(DateTime).to receive(:current).and_return(now)
+        admin = create(:admin)
+        subject.end!(admin)
+
+        expect(subject).to be_ended
+        expect(subject.ended_at).to eq now
+      end
+    end
+
+    context 'when ended' do
+      subject do
+        create(
+          :maintenance_window,
+          state: :ended,
+          confirmed_by: create(:user),
+          ended_at: DateTime.current
+        )
+      end
+
+      it 'should have confirmed_by set' do
+        expect(subject).to be_valid
+        subject.confirmed_by = nil
+
+        expect(subject).not_to be_valid
+      end
+
+      it 'should have ended_at set' do
+        expect(subject).to be_valid
+        subject.ended_at = nil
+
+        expect(subject).not_to be_valid
+      end
+    end
+  end
+
   describe '#awaiting_confirmation?' do
     context 'when unconfirmed' do
       subject { create(:unconfirmed_maintenance_window) }

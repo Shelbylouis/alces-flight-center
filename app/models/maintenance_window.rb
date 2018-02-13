@@ -13,6 +13,37 @@ class MaintenanceWindow < ApplicationRecord
 
   delegate :add_rt_ticket_correspondence, :site, to: :case
 
+  state_machine initial: :requested do
+    state :requested do
+      validates_absence_of :confirmed_by
+      validates_absence_of :ended_at
+    end
+
+    state :confirmed do
+      validates_presence_of :confirmed_by
+      validates_absence_of :ended_at
+    end
+
+    state :ended do
+      validates_presence_of :confirmed_by
+      validates_presence_of :ended_at
+    end
+
+    event :confirm do
+      transition requested: :confirmed
+    end
+    before_transition requested: :confirmed do |model, transition|
+      model.confirmed_by = transition.args.first
+    end
+
+    event :end do
+      transition confirmed: :ended
+    end
+    before_transition confirmed: :ended do |model, _transition|
+      model.ended_at = DateTime.current
+    end
+  end
+
   def associated_model
     component || service || cluster
   end

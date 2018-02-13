@@ -11,12 +11,17 @@ FactoryBot.define do
       create(:component) unless cluster || service
     end
 
-    factory :unconfirmed_maintenance_window {}
+    # XXX rename these to match states
+    factory :unconfirmed_maintenance_window do
+      state :requested
+    end
 
     factory :confirmed_maintenance_window do
+      state :confirmed
       confirmed_by { create(:contact) }
 
       factory :closed_maintenance_window do
+        state :ended
         ended_at 3.days.ago
       end
     end

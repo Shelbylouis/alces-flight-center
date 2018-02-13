@@ -18,7 +18,7 @@ class MaintenanceWindowsController < ApplicationController
 
   def confirm
     window = MaintenanceWindow.find(params[:id])
-    window.update!(confirmed_by: current_user)
+    window.confirm!(current_user)
     associated_model = window.associated_model
     confirmation_message = <<~EOF.squish
       Maintenance of #{associated_model.name} confirmed by
@@ -31,7 +31,7 @@ class MaintenanceWindowsController < ApplicationController
 
   def end
     window = MaintenanceWindow.find(params[:id])
-    window.update!(ended_at: DateTime.current)
+    window.end!
     associated_model = window.associated_model
     window.add_rt_ticket_correspondence(
       "#{associated_model.name} is no longer under maintenance."
