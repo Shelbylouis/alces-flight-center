@@ -56,14 +56,14 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   def maintenance_icon(window)
-    return if window.ended?
-
-    if window.awaiting_confirmation?
+    if window.requested?
       classNames = 'faded-icon'
       title_base = "Maintenance has been requested for #{name}"
-    elsif window.under_maintenance?
+    elsif window.in_progress?
       classNames = nil
       title_base = "#{name} currently under maintenance"
+    else
+      return
     end
 
     title = "#{title_base} for ticket #{window.case.rt_ticket_id}"

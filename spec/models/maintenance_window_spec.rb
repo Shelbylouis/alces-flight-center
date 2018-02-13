@@ -106,6 +106,14 @@ RSpec.describe MaintenanceWindow, type: :model do
     end
   end
 
+  describe '#in_progress?' do
+    it 'is currently an alias for `confirmed?`' do
+      window = create(:confirmed_maintenance_window)
+
+      expect(window).to be_in_progress
+    end
+  end
+
   describe '#awaiting_confirmation?' do
     context 'when unconfirmed' do
       subject { create(:unconfirmed_maintenance_window) }
