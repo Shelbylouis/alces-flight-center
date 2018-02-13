@@ -96,7 +96,7 @@ RSpec.describe Site, type: :model do
 
       managed_cluster_names = site.managed_clusters.map(&:name)
 
-      expect(managed_cluster_names).to eq(
+      expect(managed_cluster_names).to match_array(
         ['First managed', 'Second managed']
       )
     end
