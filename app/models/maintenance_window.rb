@@ -32,6 +32,15 @@ class MaintenanceWindow < ApplicationRecord
     event :request do
       transition new: :requested
     end
+    after_transition new: :requested do |model, _transition|
+      model.add_rt_ticket_correspondence(
+        <<-EOF.squish
+          Maintenance requested for #{model.associated_model.name} by
+          #{model.user.name}; to proceed this maintenance must be confirmed on
+          the cluster dashboard: #{model.cluster_dashboard_url}.
+        EOF
+      )
+    end
 
     event :confirm do
       transition requested: :confirmed
@@ -81,6 +90,10 @@ class MaintenanceWindow < ApplicationRecord
 
   def associated_cluster
     cluster || associated_model.cluster
+  end
+
+  def cluster_dashboard_url
+    Rails.application.routes.url_helpers.cluster_url(associated_cluster)
   end
 
   private

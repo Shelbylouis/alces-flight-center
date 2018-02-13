@@ -64,6 +64,23 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         expect(subject).to be_requested
       end
+
+      it 'has RT ticket comment added when requested' do
+        subject.component = create(:component, name: 'some_component')
+        subject.user = create(:user, name: 'some_user')
+
+        expected_cluster_url = Rails.application.routes.url_helpers.cluster_url(
+          subject.component.cluster
+        )
+        expect(Case.request_tracker).to receive(
+          :add_ticket_correspondence
+        ).with(
+          id: subject.case.rt_ticket_id,
+          text: /requested.*some_component.*by some_user.*must be confirmed.*#{expected_cluster_url}/
+        )
+
+        subject.request!
+      end
     end
 
     context 'when requested' do
