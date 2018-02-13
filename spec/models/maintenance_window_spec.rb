@@ -103,6 +103,17 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject).to be_ended
         expect(subject.ended_at).to eq now
       end
+
+      it 'has RT ticket comment added when ended' do
+        subject.component = create(:component, name: 'some_component')
+
+        expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
+          id: subject.case.rt_ticket_id,
+          text: "some_component is no longer under maintenance."
+        )
+
+        subject.end!
+      end
     end
 
     context 'when ended' do

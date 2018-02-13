@@ -51,6 +51,11 @@ class MaintenanceWindow < ApplicationRecord
     before_transition confirmed: :ended do |model, _transition|
       model.ended_at = DateTime.current
     end
+    after_transition confirmed: :ended do |model, _transition|
+      model.add_rt_ticket_correspondence(
+        "#{model.associated_model.name} is no longer under maintenance."
+      )
+    end
   end
 
   alias_method :in_progress?, :confirmed?

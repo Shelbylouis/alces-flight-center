@@ -25,10 +25,6 @@ class MaintenanceWindowsController < ApplicationController
   def end
     window = MaintenanceWindow.find(params[:id])
     window.end!
-    associated_model = window.associated_model
-    window.add_rt_ticket_correspondence(
-      "#{associated_model.name} is no longer under maintenance."
-    )
     redirect_to cluster_path(window.associated_cluster)
   end
 
