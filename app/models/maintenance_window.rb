@@ -61,7 +61,7 @@ class MaintenanceWindow < ApplicationRecord
     event :end do
       transition confirmed: :ended
     end
-    before_transition confirmed: :ended do |model, _transition|
+    before_transition confirmed: :ended do |model|
       model.ended_at = DateTime.current
     end
     after_transition confirmed: :ended do |model, _transition|
