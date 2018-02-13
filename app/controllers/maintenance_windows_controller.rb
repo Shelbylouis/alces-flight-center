@@ -20,12 +20,6 @@ class MaintenanceWindowsController < ApplicationController
     window = MaintenanceWindow.find(params[:id])
     window.confirm!(current_user)
     associated_model = window.associated_model
-    confirmation_message = <<~EOF.squish
-      Maintenance of #{associated_model.name} confirmed by
-      #{current_user.name}; this #{associated_model.readable_model_name} is now
-      under maintenance.
-    EOF
-    window.add_rt_ticket_correspondence(confirmation_message)
     redirect_to cluster_path(associated_model.cluster)
   end
 

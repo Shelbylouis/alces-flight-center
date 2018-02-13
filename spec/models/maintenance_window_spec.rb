@@ -66,6 +66,20 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject).to be_confirmed
         expect(subject.confirmed_by).to eq(user)
       end
+
+      it 'has RT ticket comment added when confirmed' do
+        subject.component = create(:component, name: 'some_component')
+        user = create(:user, name: 'some_user')
+
+        expect(Case.request_tracker).to receive(
+          :add_ticket_correspondence
+        ).with(
+          id: subject.case.rt_ticket_id,
+          text: /Maintenance.*some_component.*confirmed by some_user.*component.*now under maintenance/
+        )
+
+        subject.confirm!(user)
+      end
     end
 
     context 'when confirmed' do

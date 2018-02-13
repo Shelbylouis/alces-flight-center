@@ -35,6 +35,15 @@ class MaintenanceWindow < ApplicationRecord
     before_transition requested: :confirmed do |model, transition|
       model.confirmed_by = transition.args.first
     end
+    after_transition requested: :confirmed do |model, _transition|
+      associated_model = model.associated_model
+      confirmation_message = <<~EOF.squish
+        Maintenance of #{associated_model.name} confirmed by
+        #{model.confirmed_by.name}; this
+        #{associated_model.readable_model_name} is now under maintenance.
+      EOF
+      model.add_rt_ticket_correspondence(confirmation_message)
+    end
 
     event :end do
       transition confirmed: :ended
