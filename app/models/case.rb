@@ -166,8 +166,19 @@ class Case < ApplicationRecord
   # clients will also collapse different tickets into the same thread due to
   # their similar subjects (see
   # https://github.com/alces-software/alces-flight-center/issues/41#issuecomment-361307971).
+  #
+  # We generate this token with alternating letters and digits to minimize the
+  # possibility of recognisable, and particularly offensive, words being
+  # generated (see https://alces.slack.com/archives/C72GT476Y/p1518440238000090
+  # and https://alces.slack.com/archives/C72GT476Y/p1518529346000098)
   def generate_token
-    self.token ||= Utils.generate_password(length: 5).upcase
+    length = 5
+    letters = ('A'..'Z').to_a
+    digits = (0..9).to_a
+    self.token ||=
+      (0...length).map do |position|
+        (position.even? ? letters : digits).sample
+      end.join
   end
 
   def rt_ticket_text
