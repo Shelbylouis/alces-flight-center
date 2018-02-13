@@ -11,8 +11,6 @@ class MaintenanceWindow < ApplicationRecord
 
   validate :validate_precisely_one_associated_model
 
-  delegate :add_rt_ticket_correspondence, :site, to: :case
-
   state_machine initial: :new do
     state :new, :requested do
       validates_absence_of :confirmed_by
@@ -32,14 +30,8 @@ class MaintenanceWindow < ApplicationRecord
     event :request do
       transition new: :requested
     end
-    after_transition new: :requested do |model, _transition|
-      model.add_rt_ticket_correspondence(
-        <<-EOF.squish
-          Maintenance requested for #{model.associated_model.name} by
-          #{model.user.name}; to proceed this maintenance must be confirmed on
-          the cluster dashboard: #{model.cluster_dashboard_url}.
-        EOF
-      )
+    after_transition new: :requested do |model|
+      model.add_maintenance_requested_comment
     end
 
     event :confirm do
@@ -48,14 +40,8 @@ class MaintenanceWindow < ApplicationRecord
     before_transition requested: :confirmed do |model, transition|
       model.confirmed_by = transition.args.first
     end
-    after_transition requested: :confirmed do |model, _transition|
-      associated_model = model.associated_model
-      confirmation_message = <<~EOF.squish
-        Maintenance of #{associated_model.name} confirmed by
-        #{model.confirmed_by.name}; this
-        #{associated_model.readable_model_name} is now under maintenance.
-      EOF
-      model.add_rt_ticket_correspondence(confirmation_message)
+    after_transition requested: :confirmed do |model|
+      model.add_maintenance_confirmed_comment
     end
 
     event :end do
@@ -64,10 +50,8 @@ class MaintenanceWindow < ApplicationRecord
     before_transition confirmed: :ended do |model|
       model.ended_at = DateTime.current
     end
-    after_transition confirmed: :ended do |model, _transition|
-      model.add_rt_ticket_correspondence(
-        "#{model.associated_model.name} is no longer under maintenance."
-      )
+    after_transition confirmed: :ended do |model|
+      model.add_maintenance_ended_comment
     end
   end
 
@@ -92,11 +76,32 @@ class MaintenanceWindow < ApplicationRecord
     cluster || associated_model.cluster
   end
 
-  def cluster_dashboard_url
-    Rails.application.routes.url_helpers.cluster_url(associated_cluster)
+  def add_maintenance_requested_comment
+    comment = <<-EOF.squish
+      Maintenance requested for #{associated_model.name} by #{user.name}; to
+      proceed this maintenance must be confirmed on the cluster dashboard:
+      #{cluster_dashboard_url}.
+    EOF
+    add_rt_ticket_correspondence(comment)
+  end
+
+  def add_maintenance_confirmed_comment
+    comment = <<~EOF.squish
+      Maintenance of #{associated_model.name} confirmed by
+      #{confirmed_by.name}; this #{associated_model.readable_model_name}
+      is now under maintenance.
+    EOF
+    add_rt_ticket_correspondence(comment)
+  end
+
+  def add_maintenance_ended_comment
+    comment = "#{associated_model.name} is no longer under maintenance."
+    add_rt_ticket_correspondence(comment)
   end
 
   private
+
+  delegate :add_rt_ticket_correspondence, :site, to: :case
 
   def validate_precisely_one_associated_model
     errors.add(
@@ -106,5 +111,9 @@ class MaintenanceWindow < ApplicationRecord
 
   def number_associated_models
     [cluster, component, service].select(&:present?).length
+  end
+
+  def cluster_dashboard_url
+    Rails.application.routes.url_helpers.cluster_url(associated_cluster)
   end
 end
