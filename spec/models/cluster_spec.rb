@@ -183,20 +183,22 @@ RSpec.describe Cluster, type: :model do
       create(:cluster).tap do |cluster|
 
         # 2 groups of servers.
+        server_make = create(:component_make, component_type: server_component_type)
         cluster.component_groups.create!(
           name: 'Node group',
-          component_type: server_component_type,
+          component_make: server_make,
           genders_host_range: 'node[01-03]',
         )
         cluster.component_groups.create!(
           name: 'Other node group',
-          component_type: server_component_type,
+          component_make: server_make,
           genders_host_range: 'othernodes[01-02]',
         )
 
+        another_make = create(:component_make, component_type: another_component_type)
         cluster.component_groups.create!(
           name: 'Another group',
-          component_type: another_component_type,
+          component_make: another_make,
         ).tap do |group|
           group.components.create!(
             name: 'Single component'
