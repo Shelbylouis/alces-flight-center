@@ -43,7 +43,7 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       new_window = support_case.maintenance_windows.first
       expect(new_window.user).to eq user
-      expect(new_window).to be_awaiting_confirmation
+      expect(new_window).to be_requested
       expect(page).not_to have_link(href: request_link_path)
     end
 
