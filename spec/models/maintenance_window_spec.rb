@@ -56,19 +56,8 @@ RSpec.describe MaintenanceWindow, type: :model do
     context 'when requested' do
       subject { create(:maintenance_window, state: :requested) }
 
-      it 'should not have confirmed_by set' do
-        expect(subject).to be_valid
-        subject.confirmed_by = create(:user)
-
-        expect(subject).not_to be_valid
-      end
-
-      it 'should not have ended_at set' do
-        expect(subject).to be_valid
-        subject.ended_at = DateTime.current
-
-        expect(subject).not_to be_valid
-      end
+      it { is_expected.to validate_absence_of(:confirmed_by) }
+      it { is_expected.to validate_absence_of(:ended_at) }
 
       it 'can be confirmed by user' do
         user = create(:user)
@@ -88,19 +77,8 @@ RSpec.describe MaintenanceWindow, type: :model do
         )
       end
 
-      it 'should have confirmed_by set' do
-        expect(subject).to be_valid
-        subject.confirmed_by = nil
-
-        expect(subject).not_to be_valid
-      end
-
-      it 'should not have ended_at set' do
-        expect(subject).to be_valid
-        subject.ended_at = DateTime.current
-
-        expect(subject).not_to be_valid
-      end
+      it { is_expected.to validate_presence_of(:confirmed_by) }
+      it { is_expected.to validate_absence_of(:ended_at) }
 
       it 'can be ended by admin' do
         now = DateTime.current
@@ -123,19 +101,8 @@ RSpec.describe MaintenanceWindow, type: :model do
         )
       end
 
-      it 'should have confirmed_by set' do
-        expect(subject).to be_valid
-        subject.confirmed_by = nil
-
-        expect(subject).not_to be_valid
-      end
-
-      it 'should have ended_at set' do
-        expect(subject).to be_valid
-        subject.ended_at = nil
-
-        expect(subject).not_to be_valid
-      end
+      it { is_expected.to validate_presence_of(:confirmed_by) }
+      it { is_expected.to validate_presence_of(:ended_at) }
     end
   end
 
