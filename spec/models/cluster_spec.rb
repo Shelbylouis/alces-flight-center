@@ -257,15 +257,15 @@ RSpec.describe Cluster, type: :model do
   describe '#open_related_maintenance_windows' do
     subject { create(:cluster) }
 
-    it 'gives non-closed maintenance windows for Cluster and parts' do
-      create(:unconfirmed_maintenance_window, cluster: subject, id: 1)
+    it 'gives non-ended maintenance windows for Cluster and parts' do
+      create(:requested_maintenance_window, cluster: subject, id: 1)
       create(:confirmed_maintenance_window, cluster: subject, id: 2)
-      create(:closed_maintenance_window, cluster: subject, id: 3)
+      create(:ended_maintenance_window, cluster: subject, id: 3)
 
       component = create(:component, cluster: subject)
-      create(:unconfirmed_maintenance_window, component: component, id: 4)
+      create(:requested_maintenance_window, component: component, id: 4)
       create(:confirmed_maintenance_window, component: component, id: 5)
-      create(:closed_maintenance_window, component: component, id: 6)
+      create(:ended_maintenance_window, component: component, id: 6)
 
       resulting_window_ids = subject.open_related_maintenance_windows.map(&:id)
 
@@ -273,7 +273,7 @@ RSpec.describe Cluster, type: :model do
     end
 
     it 'gives maintenance windows with newest first' do
-      create(:unconfirmed_maintenance_window, cluster: subject, id: 1, created_at: 2.days.ago)
+      create(:requested_maintenance_window, cluster: subject, id: 1, created_at: 2.days.ago)
       create(:confirmed_maintenance_window, cluster: subject, id: 2, created_at: 1.day.ago)
 
       resulting_window_ids = subject.open_related_maintenance_windows.map(&:id)

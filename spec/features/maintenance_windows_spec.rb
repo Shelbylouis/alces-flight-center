@@ -70,9 +70,9 @@ RSpec.feature "Maintenance windows", type: :feature do
       create(:contact, name: user_name, site: site)
     end
 
-    it 'can confirm an unconfirmed maintenance window' do
+    it 'can confirm a requested maintenance window' do
       window = create(
-        :unconfirmed_maintenance_window,
+        :requested_maintenance_window,
         component: component,
         case: support_case
       )
