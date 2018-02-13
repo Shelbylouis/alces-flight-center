@@ -127,4 +127,20 @@ RSpec.describe MaintenanceWindow, type: :model do
       expect(window).to be_in_progress
     end
   end
+
+  describe '#associated_cluster' do
+    it 'gives cluster when associated model is cluster' do
+      cluster = create(:cluster)
+      window = create(:maintenance_window, cluster: cluster)
+
+      expect(window.associated_cluster).to eq(cluster)
+    end
+
+    it "gives associated model's cluster when associated model is not cluster" do
+      component = create(:component)
+      window = create(:maintenance_window, component: component)
+
+      expect(window.associated_cluster).to eq(component.cluster)
+    end
+  end
 end

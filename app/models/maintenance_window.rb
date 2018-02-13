@@ -70,6 +70,10 @@ class MaintenanceWindow < ApplicationRecord
     end
   end
 
+  def associated_cluster
+    cluster || associated_model.cluster
+  end
+
   private
 
   def validate_precisely_one_associated_model
