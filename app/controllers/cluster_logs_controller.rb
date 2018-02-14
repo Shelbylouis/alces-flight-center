@@ -23,8 +23,5 @@ class ClusterLogsController < ApplicationController
           .permit(:details, case_ids: [])
           .to_h.symbolize_keys
           .merge(engineer: current_user)
-          .tap do |h|
-            h[:case_ids] = h[:case_ids].reject(&:blank?)
-          end
   end
 end
