@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180214160140) do
+ActiveRecord::Schema.define(version: 20180214160202) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -212,10 +212,22 @@ ActiveRecord::Schema.define(version: 20180214160140) do
     t.bigint "component_id"
     t.bigint "service_id"
     t.text "state", default: "new", null: false
+    t.datetime "requested_start"
+    t.datetime "requested_end"
+    t.datetime "requested_at"
+    t.datetime "confirmed_at"
+    t.datetime "started_at"
+    t.datetime "expired_at"
+    t.bigint "rejected_by_id"
+    t.datetime "rejected_at"
+    t.bigint "cancelled_by_id"
+    t.datetime "cancelled_at"
+    t.index ["cancelled_by_id"], name: "index_maintenance_windows_on_cancelled_by_id"
     t.index ["case_id"], name: "index_maintenance_windows_on_case_id"
     t.index ["cluster_id"], name: "index_maintenance_windows_on_cluster_id"
     t.index ["component_id"], name: "index_maintenance_windows_on_component_id"
     t.index ["confirmed_by_id"], name: "index_maintenance_windows_on_confirmed_by_id"
+    t.index ["rejected_by_id"], name: "index_maintenance_windows_on_rejected_by_id"
     t.index ["requested_by_id"], name: "index_maintenance_windows_on_requested_by_id"
     t.index ["service_id"], name: "index_maintenance_windows_on_service_id"
   end
@@ -293,7 +305,9 @@ ActiveRecord::Schema.define(version: 20180214160140) do
   add_foreign_key "maintenance_windows", "clusters"
   add_foreign_key "maintenance_windows", "components"
   add_foreign_key "maintenance_windows", "services"
+  add_foreign_key "maintenance_windows", "users", column: "cancelled_by_id"
   add_foreign_key "maintenance_windows", "users", column: "confirmed_by_id"
+  add_foreign_key "maintenance_windows", "users", column: "rejected_by_id"
   add_foreign_key "maintenance_windows", "users", column: "requested_by_id"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
