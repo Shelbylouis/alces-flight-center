@@ -1,7 +1,7 @@
 class CaseDecorator < ApplicationDecorator
   delegate_all
 
-  def maintenance_window_form_info
+  def case_select_details
     [
       "RT ticket #{rt_ticket_id}",
       created_at.to_formatted_s(:long),
@@ -10,7 +10,6 @@ class CaseDecorator < ApplicationDecorator
       "Created by #{user.name}"
     ].join(' | ')
   end
-  alias_method :rt_long_text, :maintenance_window_form_info
 
   def association_info
     associated_model.decorate.links
