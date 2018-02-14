@@ -7,7 +7,7 @@ class ClusterLogsController < ApplicationController
   end
 
   def create
-    new_log = @cluster.cluster_logs.create(**log_params)
+    new_log = @cluster.cluster_logs.create(log_params)
     if new_log.valid?
       flash[:success] = 'Added new log entry'
     else
@@ -21,7 +21,6 @@ class ClusterLogsController < ApplicationController
   def log_params
     params.require(:cluster_log)
           .permit(:details, case_ids: [])
-          .to_h.symbolize_keys
           .merge(engineer: current_user)
   end
 end
