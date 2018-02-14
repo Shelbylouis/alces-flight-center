@@ -1,7 +1,7 @@
 
 RequestMaintenanceWindow = KeywordStruct.new(
   :case_id,
-  :user,
+  :requested_by,
   :cluster_id,
   :component_id,
   :service_id
@@ -13,7 +13,7 @@ RequestMaintenanceWindow = KeywordStruct.new(
 
   def run
     MaintenanceWindow.create!(
-      user: user,
+      requested_by: requested_by,
       case: support_case,
       associated_model: associated_model
     ).tap(&:request!)

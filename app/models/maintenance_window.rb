@@ -1,6 +1,7 @@
 class MaintenanceWindow < ApplicationRecord
-  belongs_to :user
   belongs_to :case
+  belongs_to :requested_by,
+    class_name: 'User'
   belongs_to :confirmed_by,
     class_name: 'User',
     required: false
@@ -78,7 +79,7 @@ class MaintenanceWindow < ApplicationRecord
 
   def add_maintenance_requested_comment
     comment = <<-EOF.squish
-      Maintenance requested for #{associated_model.name} by #{user.name}; to
+      Maintenance requested for #{associated_model.name} by #{requested_by.name}; to
       proceed this maintenance must be confirmed on the cluster dashboard:
       #{cluster_dashboard_url}.
     EOF

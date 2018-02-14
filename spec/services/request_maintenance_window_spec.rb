@@ -15,7 +15,7 @@ RSpec.describe RequestMaintenanceWindow do
   subject do
     RequestMaintenanceWindow.new(
       case_id: support_case.id,
-      user: user,
+      requested_by: user,
       cluster_id: cluster&.id,
       component_id: component&.id,
       service_id: service&.id
@@ -28,7 +28,7 @@ RSpec.describe RequestMaintenanceWindow do
     it 'creates new requested MaintenanceWindow' do
       expect(subject.state).to eq 'requested'
       expect(subject.ended_at).to be nil
-      expect(subject.user).to eq user
+      expect(subject.requested_by).to eq user
       expect(subject.case).to eq support_case
     end
   end

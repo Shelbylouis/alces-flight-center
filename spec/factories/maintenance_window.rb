@@ -2,7 +2,7 @@
 FactoryBot.define do
   factory :maintenance_window do
     add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
-    user { create(:admin) }
+    requested_by { create(:admin) }
     created_at 7.days.ago
 
     # This could also be a Cluster or Service; but one of these must be

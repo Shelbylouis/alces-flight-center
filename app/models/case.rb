@@ -82,7 +82,7 @@ class Case < ApplicationRecord
   end
 
   def request_maintenance_window!(requestor:)
-    RequestMaintenanceWindow.new(case_id: id, user: requestor).run
+    RequestMaintenanceWindow.new(case_id: id, requested_by: requestor).run
   end
 
   def add_rt_ticket_correspondence(text)

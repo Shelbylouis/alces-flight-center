@@ -67,7 +67,7 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it 'has RT ticket comment added when requested' do
         subject.component = create(:component, name: 'some_component')
-        subject.user = create(:user, name: 'some_user')
+        subject.requested_by = create(:user, name: 'some_user')
 
         expected_cluster_url = Rails.application.routes.url_helpers.cluster_url(
           subject.component.cluster

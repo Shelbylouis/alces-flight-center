@@ -268,7 +268,7 @@ RSpec.describe Case, type: :model do
 
       maintenance_window = subject.maintenance_windows.first
       expect(maintenance_window.ended_at).to be nil
-      expect(maintenance_window.user).to eq admin
+      expect(maintenance_window.requested_by).to eq admin
     end
   end
 

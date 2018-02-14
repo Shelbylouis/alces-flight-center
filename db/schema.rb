@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180213161444) do
+ActiveRecord::Schema.define(version: 20180214160140) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -205,7 +205,7 @@ ActiveRecord::Schema.define(version: 20180213161444) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "ended_at"
-    t.bigint "user_id", null: false
+    t.bigint "requested_by_id", null: false
     t.bigint "case_id", null: false
     t.bigint "confirmed_by_id"
     t.bigint "cluster_id"
@@ -216,8 +216,8 @@ ActiveRecord::Schema.define(version: 20180213161444) do
     t.index ["cluster_id"], name: "index_maintenance_windows_on_cluster_id"
     t.index ["component_id"], name: "index_maintenance_windows_on_component_id"
     t.index ["confirmed_by_id"], name: "index_maintenance_windows_on_confirmed_by_id"
+    t.index ["requested_by_id"], name: "index_maintenance_windows_on_requested_by_id"
     t.index ["service_id"], name: "index_maintenance_windows_on_service_id"
-    t.index ["user_id"], name: "index_maintenance_windows_on_user_id"
   end
 
   create_table "service_types", force: :cascade do |t|
@@ -293,8 +293,8 @@ ActiveRecord::Schema.define(version: 20180213161444) do
   add_foreign_key "maintenance_windows", "clusters"
   add_foreign_key "maintenance_windows", "components"
   add_foreign_key "maintenance_windows", "services"
-  add_foreign_key "maintenance_windows", "users"
   add_foreign_key "maintenance_windows", "users", column: "confirmed_by_id"
+  add_foreign_key "maintenance_windows", "users", column: "requested_by_id"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
   add_foreign_key "users", "sites"

@@ -34,7 +34,7 @@ class MaintenanceWindowsController < ApplicationController
     params.require(:maintenance_window).permit(
       :cluster_id, :component_id, :service_id, :case_id
     ).merge(
-      user: current_user
+      requested_by: current_user
     ).to_h.symbolize_keys
   end
 end
