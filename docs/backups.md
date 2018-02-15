@@ -3,8 +3,8 @@
 
 ## Overview
 
-- Once per day, currently at 2am, the Alces Flight Center Postgres database is
-  dumped and backed up to S3.
+- Every 3 hours the Alces Flight Center Postgres database is dumped and backed
+  up to S3.
 
 - This process is handled by the [bin/backup-database](/bin/backup-database) script.
 
