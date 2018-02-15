@@ -98,7 +98,7 @@ class ApplicationDecorator < Draper::Decorator
 
     card_header_button_link 'Create new support case',
       path,
-      buttonClass: 'btn-dark',
+      buttonClass: 'btn-primary',
       disabled: disabled,
       title: title
   end
