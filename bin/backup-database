@@ -11,7 +11,7 @@ IFS=$'\n\t'
 # `scp bin/backup-database ubuntu@apps.alces-flight.com:/home/ubuntu/flight-center-backup-database`;
 #
 # 2. on server: ensure crontab contains the following line:
-# `0 2 * * * /home/ubuntu/flight-center-backup-database`.
+# `* */3 * * * /home/ubuntu/flight-center-backup-database`.
 
 APP_NAME='flight-center'
 BACKUPS_S3_URL='s3://alces-flight-center/backups'
@@ -24,7 +24,7 @@ main() {
   secret_key="$(dokku config:get $APP_NAME AWS_SECRET_ACCESS_KEY)"
   aws_region="$(dokku config:get $APP_NAME AWS_REGION)"
 
-  backup_file="$(date -Idate)"
+  backup_file="$(date --iso-8601=minutes)"
   backup_url="$BACKUPS_S3_URL/$backup_file"
 
   echo 'Dumping database...'
