@@ -1,0 +1,34 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+ALCES_FLIGHT_WWW_PATH='../alces-flight-www'
+FLIGHT_CENTER_JS_PATH='public/flight-branding/flight-chrome.js'
+FLIGHT_CENTER_CSS_PATH='app/assets/stylesheets/flight-branding/flight-chrome.css'
+
+main() {
+  local flight_chrome_path js_path css_path
+  flight_chrome_path="$ALCES_FLIGHT_WWW_PATH/flight-chrome"
+  js_path="$flight_chrome_path/build/static/js"
+  css_path="$flight_chrome_path/build/static/css"
+
+  rm "$js_path"/* "$css_path"/* -f
+
+  cd "$ALCES_FLIGHT_WWW_PATH"
+  git pull
+  yarn install
+  cd -
+
+  cd "$flight_chrome_path"
+  yarn install
+  yarn build:center
+  cd -
+
+  mv "$js_path"/main.*.js "$FLIGHT_CENTER_JS_PATH"
+  mv "$css_path"/main.*.css "$FLIGHT_CENTER_CSS_PATH"
+
+  git add "$FLIGHT_CENTER_JS_PATH" "$FLIGHT_CENTER_CSS_PATH"
+  git commit -m "Update Flight Chrome"
+}
+
+main

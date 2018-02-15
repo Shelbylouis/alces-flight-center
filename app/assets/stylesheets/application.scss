@@ -14,8 +14,15 @@
  *= require_self
  */
 
-// Custom bootstrap variables must be set or imported *before* bootstrap.
-@import "bootstrap";
+
+.page-content {
+  // Style visited normal links in the main page content the same colour as set
+  // by Flight Chrome theme, but slightly darker (to avoid breaking a default
+  // web UI convention).
+  a:visited:not([role="button"]) {
+    color: darken(#18BC9C, 10%);
+  }
+}
 
 .page-container {
   margin-top: 1rem;
