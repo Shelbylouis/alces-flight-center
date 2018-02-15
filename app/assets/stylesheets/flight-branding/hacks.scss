@@ -1,3 +1,17 @@
+
+// Show empty black bar rather than a flash of page content where the
+// brand-header should be, prior to the brand-header app loading.
+.initial-brand-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  height: 102.375px;
+  width: 100%;
+
+  background-color: black;
+}
+
 .navbar {
   box-shadow: none !important;
 }
