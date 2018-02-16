@@ -1,10 +1,10 @@
 
 <%= form_for @maintenance_window do |f| %>
-  <div class="form-group">
-    <%= f.hidden_field :cluster_id %>
-    <%= f.hidden_field :component_id %>
-    <%= f.hidden_field :service_id %>
+  <%= f.hidden_field :cluster_id %>
+  <%= f.hidden_field :component_id %>
+  <%= f.hidden_field :service_id %>
 
+  <div class="form-group">
     <%= f.label :case_id, 'Select Case to associate this maintenance with' %>
     <%= f.collection_select(
       :case_id,
