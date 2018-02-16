@@ -21,7 +21,6 @@ Rails.application.routes.draw do
     resources :cases, only: [] do
       member do
         post :request_maintenance_window
-        post :end_maintenance_window
       end
     end
 
