@@ -10,8 +10,10 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def create
-    @maintenance_window =
-      RequestMaintenanceWindow.new(**maintenance_window_params).run
+    ActiveRecord::Base.transaction do
+      @maintenance_window = MaintenanceWindow.create!(maintenance_window_params)
+      @maintenance_window.request!
+    end
     flash[:success] = 'Maintenance requested.'
     redirect_to @maintenance_window.associated_cluster
   end

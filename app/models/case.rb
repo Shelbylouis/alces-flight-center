@@ -82,7 +82,12 @@ class Case < ApplicationRecord
   end
 
   def request_maintenance_window!(requestor:)
-    RequestMaintenanceWindow.new(case_id: id, requested_by: requestor).run
+    ActiveRecord::Base.transaction do
+      maintenance_windows.create!(
+        requested_by: requestor,
+        associated_model: associated_model
+      ).request!
+    end
   end
 
   def add_rt_ticket_correspondence(text)
