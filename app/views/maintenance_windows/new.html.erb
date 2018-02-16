@@ -8,7 +8,7 @@
     <%= f.label :case_id, 'Case to associate this maintenance with' %>
     <%= f.collection_select(
       :case_id,
-      @cluster.cases.order(created_at: :desc).decorate,
+      @maintenance_window.associated_cluster.cases.order(created_at: :desc).decorate,
       :id,
       :case_select_details,
       {},
