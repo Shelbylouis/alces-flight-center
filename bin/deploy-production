@@ -18,6 +18,7 @@ main() {
   ssh ubuntu@apps.alces-flight.com -- 'dokku run flight-center rake data:migrate'
 
   today="$(date -I)"
+  # today="$(date -I)-hotfix" # Uncomment for hotfix release.
 
   git tag production master -f
   git tag "$today" master
