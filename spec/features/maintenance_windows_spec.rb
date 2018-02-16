@@ -27,7 +27,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       end_maintenance_window_case_path(support_case.id)
     end
 
-    it 'can request maintenance for a Case' do
+    it 'can directly request maintenance for associated model for a Case' do
       visit site_cases_path(site, as: user)
 
       expect(Case.request_tracker).to receive(
@@ -45,6 +45,27 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(new_window.requested_by).to eq user
       expect(new_window).to be_requested
       expect(page).not_to have_link(href: request_link_path)
+    end
+
+    it 'can request maintenance in association with different Case for Cluster' do
+      cluster = create(:cluster)
+      component = create(:component, cluster: cluster)
+      case_subject = 'Unrelated case'
+      unrelated_case = create(:case, cluster: cluster, subject: case_subject)
+
+      visit cluster_path(cluster, as: user)
+      component_maintenance_link = page.find_link(
+        href: new_component_maintenance_window_path(component)
+      )
+      component_maintenance_link.click
+
+      select case_subject
+      click_button 'Request Maintenance'
+
+      new_window = unrelated_case.maintenance_windows.first
+      expect(new_window.requested_by).to eq user
+      expect(new_window).to be_requested
+      expect(current_path).to eq(cluster_path(cluster))
     end
 
     it 'can end a confirmed maintenance window' do
