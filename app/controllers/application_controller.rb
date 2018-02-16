@@ -13,7 +13,8 @@ class ApplicationController < ActionController::Base
 
   def error_flash_models(models, header)
     flash[:error] = header + "\n" + models.map do |model|
-      block_given? ? (yield model) : model.errors.full_messages
+      prefix = block_given? ? ((yield model).to_s + ': ') : ''
+      prefix + model.errors.full_messages.to_s
     end.join("\n")
   end
 
