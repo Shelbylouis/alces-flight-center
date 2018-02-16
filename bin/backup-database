@@ -11,7 +11,7 @@ IFS=$'\n\t'
 # `scp bin/backup-database ubuntu@apps.alces-flight.com:/home/ubuntu/flight-center-backup-database`;
 #
 # 2. on server: ensure crontab contains the following line:
-# `* */3 * * * /home/ubuntu/flight-center-backup-database`.
+# `0 */3 * * * /home/ubuntu/flight-center-backup-database`.
 
 APP_NAME='flight-center'
 BACKUPS_S3_URL='s3://alces-flight-center/backups'
