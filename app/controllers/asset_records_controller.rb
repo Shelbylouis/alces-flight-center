@@ -14,7 +14,7 @@ class AssetRecordsController < ApplicationController
     else
       header = 'The following records failed to update:'
       error_flash_models(failed_updates, header) do |model|
-        "#{model.definition.field_name}: #{model.errors.full_messages}"
+        model.definition.field_name
       end
       redirect_back fallback_location: @asset
     end

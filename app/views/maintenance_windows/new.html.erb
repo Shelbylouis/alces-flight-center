@@ -10,11 +10,11 @@
       :case_id,
       @cluster.cases.order(created_at: :desc).decorate,
       :id,
-      :maintenance_window_form_info,
+      :case_select_details,
       {},
       {class: ['form-control']}
     ) %>
   </div>
 
-  <%= f.submit "Request Maintenance", class: 'btn btn-dark btn-block' %>
+  <%= f.submit "Request Maintenance", class: 'btn btn-primary btn-block' %>
 <% end %>
