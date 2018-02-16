@@ -13,30 +13,19 @@ class MaintenanceWindowsController < ApplicationController
     @maintenance_window =
       RequestMaintenanceWindow.new(**maintenance_window_params).run
     flash[:success] = 'Maintenance requested.'
-    redirect_to @maintenance_window.associated_model.cluster
+    redirect_to @maintenance_window.associated_cluster
   end
 
   def confirm
     window = MaintenanceWindow.find(params[:id])
-    window.update!(confirmed_by: current_user)
-    associated_model = window.associated_model
-    confirmation_message = <<~EOF.squish
-      Maintenance of #{associated_model.name} confirmed by
-      #{current_user.name}; this #{associated_model.readable_model_name} is now
-      under maintenance.
-    EOF
-    window.add_rt_ticket_correspondence(confirmation_message)
-    redirect_to cluster_path(associated_model.cluster)
+    window.confirm!(current_user)
+    redirect_to cluster_path(window.associated_cluster)
   end
 
   def end
     window = MaintenanceWindow.find(params[:id])
-    window.update!(ended_at: DateTime.current)
-    associated_model = window.associated_model
-    window.add_rt_ticket_correspondence(
-      "#{associated_model.name} is no longer under maintenance."
-    )
-    redirect_to cluster_path(window.associated_model.cluster)
+    window.end!
+    redirect_to cluster_path(window.associated_cluster)
   end
 
   private

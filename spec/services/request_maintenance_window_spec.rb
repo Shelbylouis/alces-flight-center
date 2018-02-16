@@ -25,16 +25,8 @@ RSpec.describe RequestMaintenanceWindow do
   describe 'main behaviour' do
     let :component { create(:component) }
 
-    it 'creates new MaintenanceWindow and adds RT correspondence' do
-      cluster = component.cluster
-
-      expect(Case.request_tracker).to receive(
-        :add_ticket_correspondence
-      ).with(
-        id: support_case.rt_ticket_id,
-        text: /requested.*#{component.name}.*by #{user_name}.*must be confirmed.*#{cluster_url(cluster)}/
-      )
-
+    it 'creates new requested MaintenanceWindow' do
+      expect(subject.state).to eq 'requested'
       expect(subject.ended_at).to be nil
       expect(subject.user).to eq user
       expect(subject.case).to eq support_case

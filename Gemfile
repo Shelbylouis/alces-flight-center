@@ -36,6 +36,7 @@ gem 'font-awesome-rails'
 gem 'request_store'
 gem 'bootsnap', require: false
 gem "sentry-raven"
+gem 'state_machines-activerecord'
 
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.
@@ -69,6 +70,7 @@ end
 group :test do
   gem 'email_spec'
   gem 'rails-controller-testing'
+  gem 'shoulda-matchers'
 end
 
 group :development do
