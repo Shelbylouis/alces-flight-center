@@ -10,7 +10,7 @@
       :case_id,
       @cluster.cases.order(created_at: :desc).decorate,
       :id,
-      :maintenance_window_form_info,
+      :case_select_details,
       {},
       {class: ['form-control']}
     ) %>

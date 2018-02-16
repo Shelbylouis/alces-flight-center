@@ -49,7 +49,7 @@ class ComponentExpansionsController < ApplicationController
 
   def flash_errors(header)
     error_flash_models(expansion_errors, header) do |expansion|
-      "#{expansion.expansion_type.name}: #{expansion.errors.full_messages}"
+      expansion.expansion_type.name
     end
   end
 

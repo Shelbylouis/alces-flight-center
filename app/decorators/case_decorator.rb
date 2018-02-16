@@ -1,7 +1,7 @@
 class CaseDecorator < ApplicationDecorator
   delegate_all
 
-  def maintenance_window_form_info
+  def case_select_details
     [
       "RT ticket #{rt_ticket_id}",
       created_at.to_formatted_s(:long),
