@@ -5,7 +5,7 @@
   <%= f.hidden_field :service_id %>
 
   <div class="form-group">
-    <%= f.label :case_id, 'Select Case to associate this maintenance with' %>
+    <%= f.label :case_id, 'Case to associate this maintenance with' %>
     <%= f.collection_select(
       :case_id,
       @cluster.cases.order(created_at: :desc).decorate,
