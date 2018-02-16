@@ -19,7 +19,7 @@ main() {
   local most_recent_backup_file local_backup_file_path backup_file_url
 
   log_info 'Determining most recent database backup...'
-  most_recent_backup_file="$(aws s3 ls "$BACKUPS_S3_URL" | tail -n 1 | cut -d' ' -f1)"
+  most_recent_backup_file="$(aws s3 ls "$BACKUPS_S3_URL" | tail -n 1 | sed 's/ \+/ /g' | cut -d' ' -f4)"
   local_backup_file_path="$LOCAL_BACKUPS_PATH/$most_recent_backup_file"
 
   # Fetch the most recent backup if we don't have it locally already (or at
