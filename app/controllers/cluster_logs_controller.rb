@@ -7,8 +7,8 @@ class ClusterLogsController < ApplicationController
   end
 
   def create
-    new_log = @cluster.cluster_logs.create(log_params)
-    if new_log.valid?
+    new_log = @cluster.cluster_logs.build(log_params)
+    if new_log.save
       flash[:success] = 'Added new log entry'
     else
       error_flash_models [new_log], 'Could not add log entry'
