@@ -105,6 +105,10 @@ RSpec.feature Log, type: :feature do
     end
 
     include_examples 'shared log features'
+
+    it 'does not have the select component input' do
+      expect(page).not_to have_select component_select_id
+    end
   end
 end
 
