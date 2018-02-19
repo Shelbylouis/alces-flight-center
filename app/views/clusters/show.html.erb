@@ -45,12 +45,6 @@
               class: ['btn', 'btn-success', 'btn-block']
             %>
           <% end %>
-          <% if current_user.admin? %>
-            <%= button_to raw('End Maintenance'),
-              end_maintenance_window_path(window),
-              class: ['btn', 'btn-warning', 'btn-block']
-            %>
-          <% end %>
         </td>
       </tr>
     <% end %>

@@ -26,12 +26,6 @@ class MaintenanceWindowsController < ApplicationController
     redirect_to cluster_path(window.associated_cluster)
   end
 
-  def end
-    window = MaintenanceWindow.find(params[:id])
-    window.end!
-    redirect_to cluster_path(window.associated_cluster)
-  end
-
   private
 
   PARAM_NAMES = [
