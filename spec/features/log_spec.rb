@@ -3,38 +3,51 @@ require 'rails_helper'
 RSpec.feature 'Add Log', type: :feature do
   let :engineer { create(:admin) }
   let :cluster { create(:cluster) }
-  let :case_details { ['details1', 'details2', 'details3'] }
-  let! :cases do
+
+  # The following are ids for the view elements NOT the models
+  let :case_select_id { 'log_case_ids' }
+  let :details_input_id { 'log_details' }
+  let :component_select_id { 'log_component_id' }
+
+  # Create the components and cases for each spec
+  before :each do
     create(:case, details: 'Random other case')
-    case_details.map { |d| create(:case, cluster: cluster, details: d) }
-  end
-  let! :components do
+    ['details1', 'details2', 'details3'].each do |details|
+      create(:case, cluster: cluster, details: details)
+    end
+
     create(:component, name: 'Random other component')
-    ['component1', 'component2', 'component3'].map do |name|
+    ['component1', 'component2', 'component3'].each do |name|
       create(:component, cluster: cluster, name: name)
     end
   end
-  let :case_select_details do
-    cases.map { |c| c.decorate.case_select_details }
-  end
-  let :case_select_id { 'log_case_ids' }
-  let :case_details_id { 'log_details' }
-  let :component_select_id { 'log_component_id' }
 
+  # NOTE: This method is currently kinda flaky. It only returns the correct
+  # log if it is created successfully and there is only one log. Consider
+  # making it more robust at some point.
   def submit_log
     click_button 'Submit'
     Log.first
   end
 
+  def fill_details_input
+    'I am the details for the log'.tap do |details|
+      fill_in details_input_id, with: details
+    end
+  end
+
+  def select_details_for(input_cases)
+    input_cases.map(&:decorate).map(&:case_select_details)
+  end
+
   shared_examples 'shared log features' do
     it 'has the case select box' do
       expect(page).to have_select case_select_id,
-                                  options: case_select_details
+                                  options: select_details_for(cluster.cases)
     end
 
     it 'adds a log by the currently logged in engineer' do
-      log_details = 'New log details to make sure the match is correct'
-      fill_in case_details_id, with: log_details
+      log_details = fill_details_input
       log = submit_log
 
       expect(log).not_to be_nil
@@ -44,8 +57,8 @@ RSpec.feature 'Add Log', type: :feature do
     end
 
     it 'can add multiple tickets/cases to the view' do
-      fill_in case_details_id, with: 'The details need to be filled'
-      log_cases = [cases.first, cases.last].each do |kase|
+      fill_details_input
+      log_cases = [cluster.cases.first, cluster.cases.last].each do |kase|
         select kase.decorate.case_select_details, from: case_select_id
       end
 
@@ -62,7 +75,7 @@ RSpec.feature 'Add Log', type: :feature do
 
     it 'has the select component input' do
       expect(page).to have_select component_select_id,
-                                  options: components.map(&:name)
+                                  options: cluster.components.map(&:name)
     end
   end
 end
