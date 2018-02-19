@@ -94,6 +94,10 @@ group :development do
   # Detects various problems in database. Run with `active_record_doctor:*`
   # Rake tasks.
   gem 'active_record_doctor'
+
+  # Regenerate state machine graphs using `rake state_machines:draw
+  # CLASS=MaintenanceWindow TARGET=docs/state-machines`.
+  gem 'state_machines-graphviz'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
