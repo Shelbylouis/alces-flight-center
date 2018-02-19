@@ -59,7 +59,9 @@ RSpec.describe MaintenanceWindow, type: :model do
     context 'when new' do
       subject { create(:maintenance_window, state: :new) }
 
+      it { is_expected.to validate_absence_of(:confirmed_at) }
       it { is_expected.to validate_absence_of(:confirmed_by) }
+
       it { is_expected.to validate_absence_of(:ended_at) }
 
       it { is_expected.to validate_absence_of(:rejected_at) }
@@ -97,7 +99,9 @@ RSpec.describe MaintenanceWindow, type: :model do
     context 'when requested' do
       subject { create(:maintenance_window, state: :requested) }
 
+      it { is_expected.to validate_absence_of(:confirmed_at) }
       it { is_expected.to validate_absence_of(:confirmed_by) }
+
       it { is_expected.to validate_absence_of(:ended_at) }
 
       it { is_expected.to validate_absence_of(:rejected_at) }
@@ -136,11 +140,14 @@ RSpec.describe MaintenanceWindow, type: :model do
         create(
           :maintenance_window,
           state: :confirmed,
-          confirmed_by: create(:user)
+          confirmed_at: DateTime.current,
+          confirmed_by: create(:user),
         )
       end
 
+      it { is_expected.to validate_presence_of(:confirmed_at) }
       it { is_expected.to validate_presence_of(:confirmed_by) }
+
       it { is_expected.to validate_absence_of(:ended_at) }
 
       it { is_expected.to validate_absence_of(:rejected_at) }
@@ -178,12 +185,15 @@ RSpec.describe MaintenanceWindow, type: :model do
         create(
           :maintenance_window,
           state: :ended,
+          confirmed_at: DateTime.current,
           confirmed_by: create(:user),
           ended_at: DateTime.current
         )
       end
 
+      it { is_expected.to validate_presence_of(:confirmed_at) }
       it { is_expected.to validate_presence_of(:confirmed_by) }
+
       it { is_expected.to validate_presence_of(:ended_at) }
 
       it { is_expected.to validate_absence_of(:rejected_at) }
@@ -205,7 +215,9 @@ RSpec.describe MaintenanceWindow, type: :model do
         )
       end
 
+      it { is_expected.to validate_absence_of(:confirmed_at) }
       it { is_expected.to validate_absence_of(:confirmed_by) }
+
       it { is_expected.to validate_absence_of(:ended_at) }
 
       it { is_expected.to validate_presence_of(:rejected_at) }
@@ -247,7 +259,9 @@ RSpec.describe MaintenanceWindow, type: :model do
         )
       end
 
+      it { is_expected.to validate_absence_of(:confirmed_at) }
       it { is_expected.to validate_absence_of(:confirmed_by) }
+
       it { is_expected.to validate_absence_of(:ended_at) }
 
       it { is_expected.to validate_absence_of(:rejected_at) }

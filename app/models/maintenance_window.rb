@@ -22,7 +22,9 @@ class MaintenanceWindow < ApplicationRecord
 
   state_machine initial: :new do
     state :new, :requested do
+      validates_absence_of :confirmed_at
       validates_absence_of :confirmed_by
+
       validates_absence_of :ended_at
 
       validates_absence_of :rejected_at
@@ -35,7 +37,9 @@ class MaintenanceWindow < ApplicationRecord
     end
 
     state :confirmed do
+      validates_presence_of :confirmed_at
       validates_presence_of :confirmed_by
+
       validates_absence_of :ended_at
 
       validates_absence_of :rejected_at
@@ -48,7 +52,9 @@ class MaintenanceWindow < ApplicationRecord
     end
 
     state :ended do
+      validates_presence_of :confirmed_at
       validates_presence_of :confirmed_by
+
       validates_presence_of :ended_at
 
       validates_absence_of :rejected_at
@@ -61,7 +67,9 @@ class MaintenanceWindow < ApplicationRecord
     end
 
     state :rejected do
+      validates_absence_of :confirmed_at
       validates_absence_of :confirmed_by
+
       validates_absence_of :ended_at
 
       validates_presence_of :rejected_at
@@ -86,7 +94,9 @@ class MaintenanceWindow < ApplicationRecord
     end
 
     state :expired do
+      validates_absence_of :confirmed_at
       validates_absence_of :confirmed_by
+
       validates_absence_of :ended_at
 
       validates_absence_of :rejected_at
@@ -109,6 +119,7 @@ class MaintenanceWindow < ApplicationRecord
       transition requested: :confirmed
     end
     before_transition requested: :confirmed do |model, transition|
+      model.confirmed_at = DateTime.current
       model.confirmed_by = transition.args.first
     end
     after_transition requested: :confirmed do |model|

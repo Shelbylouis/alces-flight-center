@@ -19,6 +19,7 @@ FactoryBot.define do
 
     factory :confirmed_maintenance_window do
       state :confirmed
+      confirmed_at 2.days.ago
       confirmed_by { create(:contact) }
 
       factory :ended_maintenance_window do
