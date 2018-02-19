@@ -90,5 +90,12 @@ RSpec.feature Log, type: :feature do
       expect(submit_log.component).to eq(component)
     end
   end
+
+  context 'when visiting the component log' do
+    subject { create(:component) } # TODO: Define this higher up
+    before :each { visit component_logs_path subject, as: engineer }
+
+    include_examples 'shared log features'
+  end
 end
 
