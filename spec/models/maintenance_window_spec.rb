@@ -1,6 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe MaintenanceWindow, type: :model do
+  it { is_expected.to validate_presence_of(:requested_start) }
+  it { is_expected.to validate_presence_of(:requested_end) }
+
   describe '#valid?' do
     subject do
       build(

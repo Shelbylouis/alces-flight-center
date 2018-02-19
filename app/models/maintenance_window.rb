@@ -11,6 +11,8 @@ class MaintenanceWindow < ApplicationRecord
   belongs_to :service, required: false
 
   validate :validate_precisely_one_associated_model
+  validates_presence_of :requested_start
+  validates_presence_of :requested_end
 
   state_machine initial: :new do
     state :new, :requested do
