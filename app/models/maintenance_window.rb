@@ -51,6 +51,21 @@ class MaintenanceWindow < ApplicationRecord
       validates_absence_of :expired_at
     end
 
+    state :started do
+      validates_presence_of :confirmed_at
+      validates_presence_of :confirmed_by
+
+      validates_absence_of :ended_at
+
+      validates_absence_of :rejected_at
+      validates_absence_of :rejected_by
+
+      validates_absence_of :cancelled_at
+      validates_absence_of :cancelled_by
+
+      validates_absence_of :expired_at
+    end
+
     state :ended do
       validates_presence_of :confirmed_at
       validates_presence_of :confirmed_by

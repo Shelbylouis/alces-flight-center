@@ -180,6 +180,31 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
+    context 'when started' do
+      subject do
+        create(
+          :maintenance_window,
+          state: :started,
+          confirmed_at: DateTime.current,
+          confirmed_by: create(:user),
+          started_at: DateTime.current,
+        )
+      end
+
+      it { is_expected.to validate_presence_of(:confirmed_at) }
+      it { is_expected.to validate_presence_of(:confirmed_by) }
+
+      it { is_expected.to validate_absence_of(:ended_at) }
+
+      it { is_expected.to validate_absence_of(:rejected_at) }
+      it { is_expected.to validate_absence_of(:rejected_by) }
+
+      it { is_expected.to validate_absence_of(:cancelled_at) }
+      it { is_expected.to validate_absence_of(:cancelled_by) }
+
+      it { is_expected.to validate_absence_of(:expired_at) }
+    end
+
     context 'when ended' do
       subject do
         create(
