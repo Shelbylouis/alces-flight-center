@@ -94,13 +94,14 @@ RSpec.feature Log, type: :feature do
 
   context 'when visiting the component log' do
     subject { cluster.components.first }
+
     before :each do
-      visit component_logs_path subject, as: engineer
       ['component_case1', 'component_case2'].each do |details|
         create :case_requiring_component,
                component: subject,
                details: details
       end
+      visit component_logs_path subject, as: engineer
     end
 
     include_examples 'shared log features'
