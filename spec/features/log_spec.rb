@@ -109,6 +109,11 @@ RSpec.feature Log, type: :feature do
     it 'does not have the select component input' do
       expect(page).not_to have_select component_select_id
     end
+
+    it 'creates a log for the current component' do
+      fill_details_input
+      expect(submit_log.component).to eq(subject)
+    end
   end
 end
 

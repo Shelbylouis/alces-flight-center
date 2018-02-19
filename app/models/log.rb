@@ -11,6 +11,8 @@ class Log < ApplicationRecord
   validate :cases_belong_to_cluster
   validate :component_belongs_to_cluster
 
+  after_initialize :assign_cluster_if_necessary
+
   private
 
   def engineer_is_a_admin
@@ -33,6 +35,11 @@ class Log < ApplicationRecord
     return if component.nil?
     correct_cluster = (component.cluster == cluster)
     errors.add :component, COMPONENT_CLUSTER_ERROR unless correct_cluster
+  end
+
+  def assign_cluster_if_necessary
+    return if cluster
+    self.cluster = component.cluster if component
   end
 end
 

@@ -70,10 +70,13 @@ RSpec.describe Log, type: :model do
   context 'with a component' do
     let :cluster { create(:cluster) }
 
-    it 'can have a component from within the cluster' do
+    # This spec can not use a factory for creating a new component log
+    # as it will implicitly set the cluster and cause the test to fail
+    it 'can have a component which sets the cluster' do
       component = create(:component, cluster: cluster)
-      log = create(:log, cluster: cluster, component: component)
+      log = Log.create(component: component, engineer: create(:admin))
       expect(log.component).to eq(component)
+      expect(log.cluster).to eq(cluster)
     end
 
     it 'errors if the component is in a different cluster' do
