@@ -5,6 +5,12 @@ class MaintenanceWindow < ApplicationRecord
   belongs_to :confirmed_by,
     class_name: 'User',
     required: false
+  belongs_to :rejected_by,
+    class_name: 'User',
+    required: false
+  belongs_to :cancelled_by,
+    class_name: 'User',
+    required: false
 
   belongs_to :cluster, required: false
   belongs_to :component, required: false
@@ -18,16 +24,78 @@ class MaintenanceWindow < ApplicationRecord
     state :new, :requested do
       validates_absence_of :confirmed_by
       validates_absence_of :ended_at
+
+      validates_absence_of :rejected_at
+      validates_absence_of :rejected_by
+
+      validates_absence_of :cancelled_at
+      validates_absence_of :cancelled_by
+
+      validates_absence_of :expired_at
     end
 
     state :confirmed do
       validates_presence_of :confirmed_by
       validates_absence_of :ended_at
+
+      validates_absence_of :rejected_at
+      validates_absence_of :rejected_by
+
+      validates_absence_of :cancelled_at
+      validates_absence_of :cancelled_by
+
+      validates_absence_of :expired_at
     end
 
     state :ended do
       validates_presence_of :confirmed_by
       validates_presence_of :ended_at
+
+      validates_absence_of :rejected_at
+      validates_absence_of :rejected_by
+
+      validates_absence_of :cancelled_at
+      validates_absence_of :cancelled_by
+
+      validates_absence_of :expired_at
+    end
+
+    state :rejected do
+      validates_absence_of :confirmed_by
+      validates_absence_of :ended_at
+
+      validates_presence_of :rejected_at
+      validates_presence_of :rejected_by
+
+      validates_absence_of :cancelled_at
+      validates_absence_of :cancelled_by
+
+      validates_absence_of :expired_at
+    end
+
+    state :cancelled do
+      validates_absence_of :ended_at
+
+      validates_absence_of :rejected_at
+      validates_absence_of :rejected_by
+
+      validates_presence_of :cancelled_at
+      validates_presence_of :cancelled_by
+
+      validates_absence_of :expired_at
+    end
+
+    state :expired do
+      validates_absence_of :confirmed_by
+      validates_absence_of :ended_at
+
+      validates_absence_of :rejected_at
+      validates_absence_of :rejected_by
+
+      validates_absence_of :cancelled_at
+      validates_absence_of :cancelled_by
+
+      validates_presence_of :expired_at
     end
 
     event :request do

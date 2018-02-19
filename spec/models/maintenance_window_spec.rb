@@ -62,6 +62,14 @@ RSpec.describe MaintenanceWindow, type: :model do
       it { is_expected.to validate_absence_of(:confirmed_by) }
       it { is_expected.to validate_absence_of(:ended_at) }
 
+      it { is_expected.to validate_absence_of(:rejected_at) }
+      it { is_expected.to validate_absence_of(:rejected_by) }
+
+      it { is_expected.to validate_absence_of(:cancelled_at) }
+      it { is_expected.to validate_absence_of(:cancelled_by) }
+
+      it { is_expected.to validate_absence_of(:expired_at) }
+
       it 'can be requested' do
         subject.request!
 
@@ -91,6 +99,14 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it { is_expected.to validate_absence_of(:confirmed_by) }
       it { is_expected.to validate_absence_of(:ended_at) }
+
+      it { is_expected.to validate_absence_of(:rejected_at) }
+      it { is_expected.to validate_absence_of(:rejected_by) }
+
+      it { is_expected.to validate_absence_of(:cancelled_at) }
+      it { is_expected.to validate_absence_of(:cancelled_by) }
+
+      it { is_expected.to validate_absence_of(:expired_at) }
 
       it 'can be confirmed by user' do
         user = create(:user)
@@ -127,6 +143,14 @@ RSpec.describe MaintenanceWindow, type: :model do
       it { is_expected.to validate_presence_of(:confirmed_by) }
       it { is_expected.to validate_absence_of(:ended_at) }
 
+      it { is_expected.to validate_absence_of(:rejected_at) }
+      it { is_expected.to validate_absence_of(:rejected_by) }
+
+      it { is_expected.to validate_absence_of(:cancelled_at) }
+      it { is_expected.to validate_absence_of(:cancelled_by) }
+
+      it { is_expected.to validate_absence_of(:expired_at) }
+
       it 'can be ended by admin' do
         now = DateTime.current
         allow(DateTime).to receive(:current).and_return(now)
@@ -161,6 +185,78 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it { is_expected.to validate_presence_of(:confirmed_by) }
       it { is_expected.to validate_presence_of(:ended_at) }
+
+      it { is_expected.to validate_absence_of(:rejected_at) }
+      it { is_expected.to validate_absence_of(:rejected_by) }
+
+      it { is_expected.to validate_absence_of(:cancelled_at) }
+      it { is_expected.to validate_absence_of(:cancelled_by) }
+
+      it { is_expected.to validate_absence_of(:expired_at) }
+    end
+
+    context 'when rejected' do
+      subject do
+        create(
+          :maintenance_window,
+          state: :rejected,
+          rejected_by: create(:user),
+          rejected_at: DateTime.current
+        )
+      end
+
+      it { is_expected.to validate_absence_of(:confirmed_by) }
+      it { is_expected.to validate_absence_of(:ended_at) }
+
+      it { is_expected.to validate_presence_of(:rejected_at) }
+      it { is_expected.to validate_presence_of(:rejected_by) }
+
+      it { is_expected.to validate_absence_of(:cancelled_at) }
+      it { is_expected.to validate_absence_of(:cancelled_by) }
+
+      it { is_expected.to validate_absence_of(:expired_at) }
+    end
+
+    context 'when cancelled' do
+      subject do
+        create(
+          :maintenance_window,
+          state: :cancelled,
+          cancelled_by: create(:user),
+          cancelled_at: DateTime.current
+        )
+      end
+
+      it { is_expected.to validate_absence_of(:ended_at) }
+
+      it { is_expected.to validate_absence_of(:rejected_at) }
+      it { is_expected.to validate_absence_of(:rejected_by) }
+
+      it { is_expected.to validate_presence_of(:cancelled_at) }
+      it { is_expected.to validate_presence_of(:cancelled_by) }
+
+      it { is_expected.to validate_absence_of(:expired_at) }
+    end
+
+    context 'when expired' do
+      subject do
+        create(
+          :maintenance_window,
+          state: :expired,
+          expired_at: DateTime.current
+        )
+      end
+
+      it { is_expected.to validate_absence_of(:confirmed_by) }
+      it { is_expected.to validate_absence_of(:ended_at) }
+
+      it { is_expected.to validate_absence_of(:rejected_at) }
+      it { is_expected.to validate_absence_of(:rejected_by) }
+
+      it { is_expected.to validate_absence_of(:cancelled_at) }
+      it { is_expected.to validate_absence_of(:cancelled_by) }
+
+      it { is_expected.to validate_presence_of(:expired_at) }
     end
   end
 
