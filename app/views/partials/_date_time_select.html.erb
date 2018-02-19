@@ -1,0 +1,19 @@
+
+<% helper = DateTimeSelectHelper::DateTimeSelect.new(model, datetime, identifier) %>
+
+<%#
+  This label is not very semantic since it just refers to the day field (as
+  that is normally the main one we will want to change), and the other fields
+  are unlabelled, but I'm not too bothered as this partial is only used for
+  admin-only forms.
+%>
+<label for="<%= helper.id(:day) %>"><%= helper.label %></label>
+<div class="form-group row datetime-select">
+  <%= helper.select(:year) %>
+  <%= helper.select(:month) %>
+  <%= helper.select(:day) %>
+  <div class="col-md-1">&mdash;</div>
+  <%= helper.select(:hour) %>
+  <div>:</div>
+  <%= helper.select(:minute) %>
+</div>

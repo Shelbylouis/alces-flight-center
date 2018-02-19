@@ -16,5 +16,16 @@
     ) %>
   </div>
 
+  <%= render 'partials/date_time_select',
+    model: 'maintenance_window',
+    datetime: @maintenance_window.requested_start,
+    identifier: 'requested-start'
+  %>
+  <%= render 'partials/date_time_select',
+    model: 'maintenance_window',
+    datetime: @maintenance_window.requested_end,
+    identifier: 'requested-end'
+  %>
+
   <%= f.submit "Request Maintenance", class: 'btn btn-primary btn-block' %>
 <% end %>

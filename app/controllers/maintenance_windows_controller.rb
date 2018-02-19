@@ -5,7 +5,9 @@ class MaintenanceWindowsController < ApplicationController
     @maintenance_window = MaintenanceWindow.new(
       cluster_id: params[:cluster_id],
       component_id: params[:component_id],
-      service_id: params[:service_id]
+      service_id: params[:service_id],
+      requested_start: suggested_requested_start,
+      requested_end: suggested_requested_end,
     )
   end
 
@@ -32,11 +34,26 @@ class MaintenanceWindowsController < ApplicationController
 
   private
 
+  PARAM_NAMES = [
+    :cluster_id,
+    :component_id,
+    :service_id,
+    :case_id,
+    :requested_start,
+    :requested_end,
+  ].freeze
+
   def maintenance_window_params
-    params.require(:maintenance_window).permit(
-      :cluster_id, :component_id, :service_id, :case_id
-    ).merge(
+    params.require(:maintenance_window).permit(PARAM_NAMES).merge(
       requested_by: current_user
     ).to_h.symbolize_keys
+  end
+
+  def suggested_requested_start
+    1.day.from_now.at_midnight
+  end
+
+  def suggested_requested_end
+    suggested_requested_start.advance(days: 1)
   end
 end

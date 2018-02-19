@@ -40,11 +40,24 @@ RSpec.feature "Maintenance windows", type: :feature do
       component_maintenance_link.click
 
       select case_subject
+
+      select '2022', from: 'requested-start-datetime-select-year'
+      select 'September', from: 'requested-start-datetime-select-month'
+      select '10', from: 'requested-start-datetime-select-day'
+      select '13', from: 'requested-start-datetime-select-hour'
+
+      select '2023', from: 'requested-end-datetime-select-year'
+      select 'September', from: 'requested-end-datetime-select-month'
+      select '20', from: 'requested-end-datetime-select-day'
+      select '13', from: 'requested-end-datetime-select-hour'
+
       click_button 'Request Maintenance'
 
       new_window = unrelated_case.maintenance_windows.first
       expect(new_window.requested_by).to eq user
       expect(new_window).to be_requested
+      expect(new_window.requested_start).to eq DateTime.new(2022, 9, 10, 13, 0)
+      expect(new_window.requested_end).to eq DateTime.new(2023, 9, 20, 13, 0)
       expect(current_path).to eq(cluster_path(cluster))
     end
 
