@@ -42,8 +42,8 @@ RSpec.feature Log, type: :feature do
 
   shared_examples 'shared log features' do
     it 'has the case select box' do
-      expect(page).to have_select case_select_id,
-                                  options: select_details_for(cluster.cases)
+      options = select_details_for subject.cases
+      expect(page).to have_select case_select_id, options: options
     end
 
     it 'adds a log by the currently logged in engineer' do
@@ -58,7 +58,7 @@ RSpec.feature Log, type: :feature do
 
     it 'can add multiple tickets/cases to the view' do
       fill_details_input
-      log_cases = [cluster.cases.first, cluster.cases.last].each do |kase|
+      log_cases = [subject.cases.first, subject.cases.last].each do |kase|
         select kase.decorate.case_select_details, from: case_select_id
       end
 
@@ -67,14 +67,15 @@ RSpec.feature Log, type: :feature do
   end
 
   context 'when visiting the cluster log' do
+    subject { cluster }
     before :each do
-      visit cluster_logs_path cluster, as: engineer
+      visit cluster_logs_path subject, as: engineer
     end
 
     include_examples 'shared log features'
 
     it 'has the select component input with a blank option' do
-      options = [""].concat cluster.components.map(&:name)
+      options = [""].concat subject.components.map(&:name)
       expect(page).to have_select component_select_id, options: options
     end
 
@@ -85,7 +86,7 @@ RSpec.feature Log, type: :feature do
 
     it 'can create a log with a component' do
       fill_details_input
-      component = cluster.components.last
+      component = subject.components.last
       select component.name, from: component_select_id
       expect(submit_log.component).to eq(component)
     end
