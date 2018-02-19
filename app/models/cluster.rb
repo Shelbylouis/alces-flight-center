@@ -14,7 +14,7 @@ class Cluster < ApplicationRecord
   has_many :credit_deposits
   has_many :credit_charges, through: :cases
   has_many :maintenance_windows
-  has_many :cluster_logs, dependent: :destroy
+  has_many :logs, dependent: :destroy
 
   validates_associated :site
   validates :name, presence: true

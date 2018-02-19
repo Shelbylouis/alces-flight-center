@@ -22,7 +22,7 @@ class Case < ApplicationRecord
   belongs_to :user
   has_one :credit_charge, required: false
   has_many :maintenance_windows
-  has_and_belongs_to_many :cluster_log
+  has_and_belongs_to_many :log
 
   delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true

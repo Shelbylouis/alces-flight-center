@@ -1,13 +1,13 @@
-class ClusterLogsController < ApplicationController
+class LogsController < ApplicationController
   def index
     @title = 'Logs'
-    @new_log = ClusterLog.new
-    @logs = @cluster.cluster_logs
+    @new_log = Log.new
+    @logs = @cluster.logs
     @cases = @cluster.cases.order(created_at: :desc)
   end
 
   def create
-    new_log = @cluster.cluster_logs.build(log_params)
+    new_log = @cluster.logs.build(log_params)
     if new_log.save
       flash[:success] = 'Added new log entry'
     else
@@ -19,7 +19,7 @@ class ClusterLogsController < ApplicationController
   private
 
   def log_params
-    params.require(:cluster_log)
+    params.require(:log)
           .permit(:details, case_ids: [])
           .merge(engineer: current_user)
   end

@@ -1,5 +1,5 @@
 
-class ClusterLog < ApplicationRecord
+class Log < ApplicationRecord
   belongs_to :cluster
   has_one :site, through: :cluster
   belongs_to :engineer, class_name: 'User', foreign_key: "user_id"

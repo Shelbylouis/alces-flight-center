@@ -10,16 +10,16 @@ RSpec.feature 'Add Log', type: :feature do
   let :case_select_details do
     cases.map { |c| c.decorate.case_select_details }
   end
-  let :case_select_id { 'cluster_log_case_ids' }
-  let :case_details_id { 'cluster_log_details' }
+  let :case_select_id { 'log_case_ids' }
+  let :case_details_id { 'log_details' }
 
   before :each do
-    visit cluster_cluster_logs_path cluster, as: engineer
+    visit cluster_logs_path cluster, as: engineer
   end
 
   def submit_log
     click_button 'Submit'
-    ClusterLog.first
+    Log.first
   end
 
   it 'has the case select box' do

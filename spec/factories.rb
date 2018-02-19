@@ -1,6 +1,6 @@
 
 FactoryBot.define do
-  factory :cluster_log do
+  factory :log do
     details 'I am the factory default details'
     cluster
     engineer { create :admin }
