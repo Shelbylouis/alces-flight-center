@@ -62,5 +62,25 @@ RSpec.describe Log, type: :model do
       expect_single_error subject, "#{bad_case.rt_ticket_id}"
     end
   end
+
+  it 'does not require a component' do
+    expect(create(:log).component).to be_nil
+  end
+
+  context 'with a component' do
+    let :cluster { create(:cluster) }
+
+    it 'can have a component from within the cluster' do
+      component = create(:component, cluster: cluster)
+      log = create(:log, cluster: cluster, component: component)
+      expect(log.component).to eq(component)
+    end
+
+    it 'errors if the component is in a different cluster' do
+      component = create(:component, cluster: create(:cluster))
+      log = build(:log, cluster: cluster, component: component)
+      expect_single_error log, 'cluster'
+    end
+  end
 end
 
