@@ -258,20 +258,6 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe '#request_maintenance_window!' do
-    let :admin { create(:admin) }
-
-    subject { create(:case_with_component) }
-
-    it 'creates new maintenance window' do
-      subject.request_maintenance_window!(requestor: admin)
-
-      maintenance_window = subject.maintenance_windows.first
-      expect(maintenance_window.ended_at).to be nil
-      expect(maintenance_window.requested_by).to eq admin
-    end
-  end
-
   describe '#associated_model' do
     context 'when Case with Component' do
       subject { create(:case_with_component) }

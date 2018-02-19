@@ -27,7 +27,6 @@
         <% if manage_cases_page %>
           <th>Ticket status</th>
           <th>Chargeable</th>
-          <th>Actions</th>
         <% else %>
           <th>Contact support</th>
           <th>Archive<%= archive ? '/Restore' : '' %></th>
@@ -66,29 +65,6 @@
               <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
             </td>
             <td><%= c.chargeable_symbol %></td>
-            <td>
-              <%# Show icon to bring Case's associated model under maintenance
-                in relation to Case, unless this is already the case.
-                XXX extract this if we keep this logic.
-              %>
-              <% unless c.associated_model.open_maintenance_windows.select { |window| window.case == c }.present? %>
-                <%= link_to raw(icon 'wrench', interactive: true),
-                  request_maintenance_window_case_path(c.id),
-                  method: :post,
-                  title: <<~EOF,
-                    Request #{c.associated_model_type} be brought under
-                    maintenance in relation to this case
-                  EOF
-                  data: {
-                    confirm: <<~EOF
-                      Are you sure you want to request
-                      #{c.associated_model_type} be brought under maintenance
-                      in relation to this case?
-                    EOF
-                  }
-                %>
-              <% end %>
-            </td>
           <% else %>
             <td><%= render 'cases/email_support_icon', support_case: c %></td>
             <td><%= render 'cases/archive_icon', support_case: c %></td>

@@ -81,12 +81,6 @@ class CasesController < ApplicationController
     )
   end
 
-  def request_maintenance_window
-    support_case = Case.find(params[:id])
-    support_case.request_maintenance_window!(requestor: current_user)
-    redirect_to site_cases_path(support_case.site)
-  end
-
   private
 
   def case_params

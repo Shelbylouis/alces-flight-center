@@ -81,15 +81,6 @@ class Case < ApplicationRecord
     ticket_completed? && chargeable
   end
 
-  def request_maintenance_window!(requestor:)
-    ActiveRecord::Base.transaction do
-      maintenance_windows.create!(
-        requested_by: requestor,
-        associated_model: associated_model
-      ).request!
-    end
-  end
-
   def add_rt_ticket_correspondence(text)
     rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
   end
