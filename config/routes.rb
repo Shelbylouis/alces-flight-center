@@ -20,9 +20,11 @@ Rails.application.routes.draw do
 
     resources :cases, only: []
 
+    admin_logs = Proc.new { resources :logs, only: :create }
+
     resources :clusters, only: []  do
       resources :maintenance_windows, only: :new
-      resources :logs, only: [:create]
+      admin_logs.call
     end
 
     asset_record = Proc.new do
@@ -35,6 +37,7 @@ Rails.application.routes.draw do
                path: 'expansions',
                only: [:edit, :update, :create]
       asset_record.call
+      admin_logs.call
     end
 
     resources :component_expansions, only: [:destroy]
@@ -68,15 +71,18 @@ Rails.application.routes.draw do
       end
     end
 
+    logs = Proc.new { resources :logs, only: :index }
+
     resources :clusters, only: :show do
       resources :cases, only: :new
       resources :consultancy, only: :new
-      resources :logs, only: :index
+      logs.call
     end
 
     resources :components, only: :show do
       resources :cases, only: :new
       resources :consultancy, only: :new
+      logs.call
     end
 
     resources :component_groups, path: 'component-groups', only: :show
