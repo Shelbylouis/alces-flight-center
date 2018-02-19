@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.feature 'Add Log', type: :feature do
+RSpec.feature Log, type: :feature do
   let :engineer { create(:admin) }
   let :cluster { create(:cluster) }
 
@@ -73,9 +73,21 @@ RSpec.feature 'Add Log', type: :feature do
 
     include_examples 'shared log features'
 
-    it 'has the select component input' do
-      expect(page).to have_select component_select_id,
-                                  options: cluster.components.map(&:name)
+    it 'has the select component input with a blank option' do
+      options = [""].concat cluster.components.map(&:name)
+      expect(page).to have_select component_select_id, options: options
+    end
+
+    it 'can create a log without a component' do
+      fill_details_input
+      expect(submit_log.component).to be_nil
+    end
+
+    it 'can create a log with a component' do
+      fill_details_input
+      component = cluster.components.last
+      select component.name, from: component_select_id
+      expect(submit_log.component).to eq(component)
     end
   end
 end

@@ -21,7 +21,8 @@ class LogsController < ApplicationController
 
   def log_params
     params.require(:log)
-          .permit(:details, case_ids: [])
+          .permit(:details, :component_id, case_ids: [])
           .merge(engineer: current_user)
   end
 end
+
