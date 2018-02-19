@@ -9,6 +9,7 @@ class Component < ApplicationRecord
   has_one :cluster, through: :component_group
   has_many :asset_record_fields
   has_many :component_expansions
+  has_many :logs
 
   has_one :component_make, through: :component_group
   has_many :default_expansions, through: :component_make
