@@ -4,6 +4,7 @@ class LogsController < ApplicationController
     @new_log = Log.new
     @logs = @cluster.logs
     @cases = @cluster.cases.order(created_at: :desc)
+    @components = @cluster.components
   end
 
   def create

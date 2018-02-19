@@ -19,6 +19,7 @@ RSpec.feature 'Add Log', type: :feature do
   end
   let :case_select_id { 'log_case_ids' }
   let :case_details_id { 'log_details' }
+  let :component_select_id { 'log_component_id' }
 
   def submit_log
     click_button 'Submit'
@@ -60,7 +61,7 @@ RSpec.feature 'Add Log', type: :feature do
     include_examples 'shared log features'
 
     it 'has the select component input' do
-      expect(page).to have_select :component_id,
+      expect(page).to have_select component_select_id,
                                   options: components.map(&:name)
     end
   end

@@ -7,6 +7,17 @@
           <%= f.label :details, 'Details'%>
           <%= f.text_area :details, class: 'form-control'%>
         </div>
+        <% if @components %>
+          <div class='form-group'>
+            <%= f.label :component, 'Component (optional)' %>
+            <%= f.collection_select :component_id,
+                                    @components,
+                                    :id,
+                                    :name,
+                                    {},
+                                    { class: 'form-control' } %>
+          </div>
+        <% end %>
         <div class='form-group'>
           <%= f.label :case_ids, 'Related Ticket(s)' %>
           <%= f.collection_select :case_ids,
@@ -16,7 +27,7 @@
                                   {},
                                   {
                                     multiple: true,
-                                    class: "form-control",
+                                    class: 'form-control',
                                     style: 'overflow:scroll',
                                     size: 10
                                   } %>
