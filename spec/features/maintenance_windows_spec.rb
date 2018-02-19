@@ -60,22 +60,6 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(new_window.requested_end).to eq DateTime.new(2023, 9, 20, 13, 0)
       expect(current_path).to eq(cluster_path(cluster))
     end
-
-    it 'can end a confirmed maintenance window' do
-      end_time = DateTime.new(2018)
-      allow(DateTime).to receive(:current).and_return(end_time)
-      window = create(:confirmed_maintenance_window, component: component)
-      expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
-        id: window.case.rt_ticket_id,
-        text: "#{component.name} is no longer under maintenance."
-      )
-
-      visit cluster_path(component.cluster, as: user)
-      click_button('End Maintenance')
-
-      expect(window.reload.ended_at).to eq(end_time)
-      expect(current_path).to eq(cluster_path(component.cluster))
-    end
   end
 
   context 'when user is contact' do

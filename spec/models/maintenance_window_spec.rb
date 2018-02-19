@@ -158,25 +158,24 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it { is_expected.to validate_absence_of(:expired_at) }
 
-      it 'can be ended by admin' do
+      it 'can be started' do
         now = DateTime.current
         allow(DateTime).to receive(:current).and_return(now)
-        admin = create(:admin)
-        subject.end!(admin)
 
-        expect(subject).to be_ended
-        expect(subject.ended_at).to eq now
+        subject.start!
+
+        expect(subject.started_at).to eq now
       end
 
-      it 'has RT ticket comment added when ended' do
+      it 'has RT ticket comment added when started' do
         subject.component = create(:component, name: 'some_component')
 
         expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
           id: subject.case.rt_ticket_id,
-          text: "some_component is no longer under maintenance."
+          text: "confirmed maintenance of some_component started."
         )
 
-        subject.end!
+        subject.start!
       end
     end
 
@@ -203,6 +202,27 @@ RSpec.describe MaintenanceWindow, type: :model do
       it { is_expected.to validate_absence_of(:cancelled_by) }
 
       it { is_expected.to validate_absence_of(:expired_at) }
+
+      it 'can be ended' do
+        now = DateTime.current
+        allow(DateTime).to receive(:current).and_return(now)
+
+        subject.end!
+
+        expect(subject).to be_ended
+        expect(subject.ended_at).to eq now
+      end
+
+      it 'has RT ticket comment added when ended' do
+        subject.component = create(:component, name: 'some_component')
+
+        expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
+          id: subject.case.rt_ticket_id,
+          text: "some_component is no longer under maintenance."
+        )
+
+        subject.end!
+      end
     end
 
     context 'when ended' do

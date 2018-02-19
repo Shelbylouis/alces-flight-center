@@ -141,13 +141,23 @@ class MaintenanceWindow < ApplicationRecord
       model.add_maintenance_confirmed_comment
     end
 
-    event :end do
-      transition confirmed: :ended
+    event :start do
+      transition confirmed: :started
     end
-    before_transition confirmed: :ended do |model|
+    before_transition confirmed: :started do |model|
+      model.started_at = DateTime.current
+    end
+    after_transition confirmed: :started do |model|
+      model.add_maintenance_started_comment
+    end
+
+    event :end do
+      transition started: :ended
+    end
+    before_transition started: :ended do |model|
       model.ended_at = DateTime.current
     end
-    after_transition confirmed: :ended do |model|
+    after_transition started: :ended do |model|
       model.add_maintenance_ended_comment
     end
   end
@@ -188,6 +198,11 @@ class MaintenanceWindow < ApplicationRecord
       #{confirmed_by.name}; this #{associated_model.readable_model_name}
       is now under maintenance.
     EOF
+    add_rt_ticket_correspondence(comment)
+  end
+
+  def add_maintenance_started_comment
+    comment = "confirmed maintenance of #{associated_model.name} started."
     add_rt_ticket_correspondence(comment)
   end
 
