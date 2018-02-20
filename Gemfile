@@ -37,6 +37,7 @@ gem 'request_store'
 gem 'bootsnap', require: false
 gem "sentry-raven"
 gem 'state_machines-activerecord'
+gem 'state_machines-audit_trail'
 
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.

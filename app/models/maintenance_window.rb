@@ -21,6 +21,8 @@ class MaintenanceWindow < ApplicationRecord
   validates_presence_of :requested_end
 
   state_machine initial: :new do
+    audit_trail
+
     state :new, :requested do
       validates_absence_of :confirmed_at
       validates_absence_of :confirmed_by

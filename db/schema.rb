@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180214160202) do
+ActiveRecord::Schema.define(version: 20180219175418) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -201,6 +201,18 @@ ActiveRecord::Schema.define(version: 20180214160202) do
     t.index ["service_type_id"], name: "index_issues_on_service_type_id"
   end
 
+  create_table "maintenance_window_state_transitions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "maintenance_window_id", null: false
+    t.string "namespace"
+    t.string "event"
+    t.string "from"
+    t.string "to", null: false
+    t.bigint "user_id"
+    t.index ["maintenance_window_id"], name: "index_mwst_on_mw_id"
+    t.index ["user_id"], name: "index_maintenance_window_state_transitions_on_user_id"
+  end
+
   create_table "maintenance_windows", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -301,6 +313,8 @@ ActiveRecord::Schema.define(version: 20180214160202) do
   add_foreign_key "expansions", "expansion_types"
   add_foreign_key "issues", "categories"
   add_foreign_key "issues", "service_types"
+  add_foreign_key "maintenance_window_state_transitions", "maintenance_windows"
+  add_foreign_key "maintenance_window_state_transitions", "users"
   add_foreign_key "maintenance_windows", "cases"
   add_foreign_key "maintenance_windows", "clusters"
   add_foreign_key "maintenance_windows", "components"

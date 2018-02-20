@@ -337,6 +337,8 @@ GEM
     state_machines-activerecord (0.5.0)
       activerecord (>= 4.1, < 5.2)
       state_machines-activemodel (>= 0.5.0)
+    state_machines-audit_trail (2.0.1)
+      state_machines
     state_machines-graphviz (0.0.2)
       ruby-graphviz
       state_machines
@@ -419,6 +421,7 @@ DEPENDENCIES
   spring
   spring-watcher-listen (~> 2.0.0)
   state_machines-activerecord
+  state_machines-audit_trail
   state_machines-graphviz
   turbolinks (~> 5)
   tzinfo-data
