@@ -51,6 +51,13 @@ class MaintenanceWindow < ApplicationRecord
       model.add_maintenance_rejected_comment
     end
 
+    event :expire do
+      transition [:new, :requested] => :expired
+    end
+    after_transition any => :expired do |model|
+      model.add_maintenance_expired_comment
+    end
+
     event :start do
       transition confirmed: :started
     end
@@ -116,6 +123,15 @@ class MaintenanceWindow < ApplicationRecord
   def add_maintenance_rejected_comment
     comment =
       "Maintenance of #{associated_model.name} rejected by #{rejected_by.name}"
+    add_rt_ticket_correspondence(comment)
+  end
+
+  def add_maintenance_expired_comment
+    comment = <<~EOF.squish
+      Request for maintenance of #{associated_model.name} was not confirmed
+      before requested start; this maintenance has been automatically
+      cancelled.
+    EOF
     add_rt_ticket_correspondence(comment)
   end
 

@@ -79,10 +79,32 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
+    RSpec.shared_examples 'can be expired' do
+      it 'can be expired' do
+        subject.expire!
+
+        expect(subject).to be_expired
+      end
+
+      it 'has RT ticket comment added when expired' do
+        subject.component = create(:component, name: 'some_component')
+
+        expect(Case.request_tracker).to receive(
+          :add_ticket_correspondence
+        ).with(
+          id: subject.case.rt_ticket_id,
+          text: /maintenance of some_component was not confirmed before requested start.*automatically cancelled/
+        )
+
+        subject.expire!
+      end
+    end
+
     context 'when new' do
       subject { create(:maintenance_window, state: :new) }
 
       include_examples 'can be cancelled'
+      include_examples 'can be expired'
 
       it 'can be requested' do
         user = create(:user)
@@ -113,6 +135,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       subject { create(:maintenance_window, state: :requested) }
 
       include_examples 'can be cancelled'
+      include_examples 'can be expired'
 
       it 'can be confirmed by user' do
         user = create(:user)
