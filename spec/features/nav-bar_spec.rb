@@ -15,6 +15,13 @@ RSpec.feature Log, type: :feature do
       # Admins have an extract 'all sites' button
       expect(site_nav_items.length).to eq(subject.length + 1)
     end
+
+    # TODO: Make this work for regular users
+    it 'has the correct links' do
+      subject.each_with_index do |link, index|
+        expect(site_nav_items[index + 1]).to have_link(href: link)
+      end
+    end
   end
 
   context 'with an admin logged in' do
