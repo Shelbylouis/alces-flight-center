@@ -44,6 +44,13 @@ class MaintenanceWindow < ApplicationRecord
       model.add_maintenance_cancelled_comment
     end
 
+    event :reject do
+      transition requested: :rejected
+    end
+    after_transition requested: :rejected do |model|
+      model.add_maintenance_rejected_comment
+    end
+
     event :start do
       transition confirmed: :started
     end
@@ -103,6 +110,12 @@ class MaintenanceWindow < ApplicationRecord
       Request for maintenance of #{associated_model.name} cancelled by
       #{cancelled_by.name}.
     EOF
+    add_rt_ticket_correspondence(comment)
+  end
+
+  def add_maintenance_rejected_comment
+    comment =
+      "Maintenance of #{associated_model.name} rejected by #{rejected_by.name}"
     add_rt_ticket_correspondence(comment)
   end
 

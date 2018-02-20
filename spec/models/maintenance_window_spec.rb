@@ -135,6 +135,27 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         subject.confirm!(user)
       end
+
+      it 'can be rejected' do
+        user = create(:user)
+        subject.reject!(user)
+
+        expect(subject).to be_rejected
+      end
+
+      it 'has RT ticket comment added when rejected' do
+        subject.component = create(:component, name: 'some_component')
+        user = create(:user, name: 'some_user')
+
+        expect(Case.request_tracker).to receive(
+          :add_ticket_correspondence
+        ).with(
+          id: subject.case.rt_ticket_id,
+          text: /Maintenance.*some_component.*rejected by some_user/
+        )
+
+        subject.reject!(user)
+      end
     end
 
     context 'when confirmed' do
