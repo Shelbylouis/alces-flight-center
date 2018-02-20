@@ -54,8 +54,8 @@ RSpec.feature "Maintenance windows", type: :feature do
       click_button 'Request Maintenance'
 
       new_window = unrelated_case.maintenance_windows.first
-      expect(new_window.requested_by).to eq user
       expect(new_window).to be_requested
+      expect(new_window.requested_by).to eq user
       expect(new_window.requested_start).to eq DateTime.new(2022, 9, 10, 13, 0)
       expect(new_window.requested_end).to eq DateTime.new(2023, 9, 20, 13, 0)
       expect(current_path).to eq(cluster_path(cluster))
