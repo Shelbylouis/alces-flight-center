@@ -56,8 +56,33 @@ RSpec.describe MaintenanceWindow, type: :model do
       expect(window.state).to eq 'new'
     end
 
+    RSpec.shared_examples 'can be cancelled' do
+      it 'can be cancelled' do
+        user = create(:user)
+        subject.cancel!(user)
+
+        expect(subject).to be_cancelled
+      end
+
+      it 'has RT ticket comment added when cancelled' do
+        subject.component = create(:component, name: 'some_component')
+        user = create(:user, name: 'some_user')
+
+        expect(Case.request_tracker).to receive(
+          :add_ticket_correspondence
+        ).with(
+          id: subject.case.rt_ticket_id,
+          text: /Request for maintenance of some_component cancelled by some_user/
+        )
+
+        subject.cancel!(user)
+      end
+    end
+
     context 'when new' do
       subject { create(:maintenance_window, state: :new) }
+
+      include_examples 'can be cancelled'
 
       it 'can be requested' do
         user = create(:user)
@@ -86,6 +111,8 @@ RSpec.describe MaintenanceWindow, type: :model do
 
     context 'when requested' do
       subject { create(:maintenance_window, state: :requested) }
+
+      include_examples 'can be cancelled'
 
       it 'can be confirmed by user' do
         user = create(:user)

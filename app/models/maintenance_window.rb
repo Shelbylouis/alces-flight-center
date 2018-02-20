@@ -37,6 +37,13 @@ class MaintenanceWindow < ApplicationRecord
       model.add_maintenance_confirmed_comment
     end
 
+    event :cancel do
+      transition [:new, :requested] => :cancelled
+    end
+    after_transition any => :cancelled do |model|
+      model.add_maintenance_cancelled_comment
+    end
+
     event :start do
       transition confirmed: :started
     end
@@ -87,6 +94,14 @@ class MaintenanceWindow < ApplicationRecord
       Maintenance of #{associated_model.name} confirmed by
       #{confirmed_by.name}; this #{associated_model.readable_model_name}
       is now under maintenance.
+    EOF
+    add_rt_ticket_correspondence(comment)
+  end
+
+  def add_maintenance_cancelled_comment
+    comment = <<~EOF.squish
+      Request for maintenance of #{associated_model.name} cancelled by
+      #{cancelled_by.name}.
     EOF
     add_rt_ticket_correspondence(comment)
   end
