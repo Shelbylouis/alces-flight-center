@@ -88,7 +88,7 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       expect(page).not_to have_button(button_text)
       expect(page.all('table')[1]).to have_text(user_name)
-      expect(window.reload.confirmed_by).to eq(user)
+      expect(window.confirmed_by).to eq(user)
     end
   end
 end
