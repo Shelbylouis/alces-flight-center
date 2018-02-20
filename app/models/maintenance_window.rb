@@ -155,6 +155,8 @@ class MaintenanceWindow < ApplicationRecord
 
   private
 
+  delegate :add_rt_ticket_correspondence, :site, to: :case
+
   # Picked up by state_machines-audit_trail due to `context` setting above, and
   # used to automatically set user who instigated the transition in created
   # MaintenanceWindowStateTransition (for transitions instigated by user).
@@ -163,8 +165,6 @@ class MaintenanceWindow < ApplicationRecord
   def user(transition)
     transition.args&.first
   end
-
-  delegate :add_rt_ticket_correspondence, :site, to: :case
 
   def validate_precisely_one_associated_model
     errors.add(
