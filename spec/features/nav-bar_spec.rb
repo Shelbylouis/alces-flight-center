@@ -2,18 +2,24 @@
 require 'rails_helper'
 
 RSpec.feature Log, type: :feature do
-  shared_examples 'has navigation link' do |link, position|
+  let :nav_bar { find_by_id('top-level-navigation-bar') }
+
+  shared_examples 'a navigation bar' do
+    it 'has the navigation bar' do
+      expect(nav_bar.tag_name).to eq('nav')
+    end
   end
 
-  context 'with a user logged in' do
-    def vist_as_user(path)
-      visit path, as: create(:user)
+  context 'with an admin logged in' do
+    def visit_as_admin(path_helper)
+      visit send(path_helper, scope, as: create(:admin))
     end
 
     context 'when visiting the site page' do
-      subject { create(:site) }
-      before :each { vist_as_user site_path(subject) }
-      include_examples 'has navigation link', site_path(subject), 0
+      let :scope { create(:site) }
+      before :each { visit_as_admin :site_path }
+
+      include_examples 'a navigation bar'
     end
   end
 end
