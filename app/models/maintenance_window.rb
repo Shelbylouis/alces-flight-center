@@ -23,53 +23,18 @@ class MaintenanceWindow < ApplicationRecord
     state :cancelled
     state :expired
 
-    event :request do
-      transition new: :requested
-    end
-    after_transition new: :requested do |model|
-      model.add_maintenance_requested_comment
-    end
+    event :request { transition new: :requested }
+    event :confirm { transition requested: :confirmed }
+    event :cancel { transition [:new, :requested] => :cancelled }
+    event :reject { transition requested: :rejected }
+    event :expire { transition [:new, :requested] => :expired }
+    event :start { transition confirmed: :started }
+    event :end { transition started: :ended }
 
-    event :confirm do
-      transition requested: :confirmed
-    end
-    after_transition requested: :confirmed do |model|
-      model.add_maintenance_confirmed_comment
-    end
-
-    event :cancel do
-      transition [:new, :requested] => :cancelled
-    end
-    after_transition any => :cancelled do |model|
-      model.add_maintenance_cancelled_comment
-    end
-
-    event :reject do
-      transition requested: :rejected
-    end
-    after_transition requested: :rejected do |model|
-      model.add_maintenance_rejected_comment
-    end
-
-    event :expire do
-      transition [:new, :requested] => :expired
-    end
-    after_transition any => :expired do |model|
-      model.add_maintenance_expired_comment
-    end
-
-    event :start do
-      transition confirmed: :started
-    end
-    after_transition confirmed: :started do |model|
-      model.add_maintenance_started_comment
-    end
-
-    event :end do
-      transition started: :ended
-    end
-    after_transition started: :ended do |model|
-      model.add_maintenance_ended_comment
+    after_transition any => any do |model, transition|
+      new_state = transition.to_name
+      # Use send so can keep method private.
+      model.send(:add_transition_comment, new_state)
     end
   end
 
@@ -94,57 +59,6 @@ class MaintenanceWindow < ApplicationRecord
     cluster || associated_model.cluster
   end
 
-  def add_maintenance_requested_comment
-    comment = <<-EOF.squish
-      Maintenance requested for #{associated_model.name} by #{requested_by.name}; to
-      proceed this maintenance must be confirmed on the cluster dashboard:
-      #{cluster_dashboard_url}.
-    EOF
-    add_rt_ticket_correspondence(comment)
-  end
-
-  def add_maintenance_confirmed_comment
-    comment = <<~EOF.squish
-      Maintenance of #{associated_model.name} confirmed by
-      #{confirmed_by.name}; this #{associated_model.readable_model_name}
-      is now under maintenance.
-    EOF
-    add_rt_ticket_correspondence(comment)
-  end
-
-  def add_maintenance_cancelled_comment
-    comment = <<~EOF.squish
-      Request for maintenance of #{associated_model.name} cancelled by
-      #{cancelled_by.name}.
-    EOF
-    add_rt_ticket_correspondence(comment)
-  end
-
-  def add_maintenance_rejected_comment
-    comment =
-      "Maintenance of #{associated_model.name} rejected by #{rejected_by.name}"
-    add_rt_ticket_correspondence(comment)
-  end
-
-  def add_maintenance_expired_comment
-    comment = <<~EOF.squish
-      Request for maintenance of #{associated_model.name} was not confirmed
-      before requested start; this maintenance has been automatically
-      cancelled.
-    EOF
-    add_rt_ticket_correspondence(comment)
-  end
-
-  def add_maintenance_started_comment
-    comment = "confirmed maintenance of #{associated_model.name} started."
-    add_rt_ticket_correspondence(comment)
-  end
-
-  def add_maintenance_ended_comment
-    comment = "#{associated_model.name} is no longer under maintenance."
-    add_rt_ticket_correspondence(comment)
-  end
-
   def method_missing(symbol, *args)
     super unless symbol =~ /^([a-z]+)_(at|by)$/
     state = $1.to_sym
@@ -155,7 +69,8 @@ class MaintenanceWindow < ApplicationRecord
 
   private
 
-  delegate :add_rt_ticket_correspondence, :site, to: :case
+  delegate :site, to: :case
+  delegate :add_transition_comment, to: :maintenance_notifier
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
   # used to automatically set user who instigated the transition in created
@@ -166,6 +81,10 @@ class MaintenanceWindow < ApplicationRecord
     transition.args&.first
   end
 
+  def maintenance_notifier
+    @maintenance_notifier ||= MaintenanceNotifier.new(self)
+  end
+
   def validate_precisely_one_associated_model
     errors.add(
       :base, 'precisely one Cluster, Component, or Service can be under maintenance'
@@ -174,10 +93,6 @@ class MaintenanceWindow < ApplicationRecord
 
   def number_associated_models
     [cluster, component, service].select(&:present?).length
-  end
-
-  def cluster_dashboard_url
-    Rails.application.routes.url_helpers.cluster_url(associated_cluster)
   end
 
   def possible_states
