@@ -59,28 +59,16 @@ RSpec.describe MaintenanceWindow, type: :model do
     context 'when new' do
       subject { create(:maintenance_window, state: :new) }
 
-      it { is_expected.to validate_absence_of(:confirmed_at) }
-      it { is_expected.to validate_absence_of(:confirmed_by) }
-
-      it { is_expected.to validate_absence_of(:ended_at) }
-
-      it { is_expected.to validate_absence_of(:rejected_at) }
-      it { is_expected.to validate_absence_of(:rejected_by) }
-
-      it { is_expected.to validate_absence_of(:cancelled_at) }
-      it { is_expected.to validate_absence_of(:cancelled_by) }
-
-      it { is_expected.to validate_absence_of(:expired_at) }
-
       it 'can be requested' do
-        subject.request!
+        user = create(:user)
+        subject.request!(user)
 
         expect(subject).to be_requested
       end
 
       it 'has RT ticket comment added when requested' do
         subject.component = create(:component, name: 'some_component')
-        subject.requested_by = create(:user, name: 'some_user')
+        requestor = create(:user, name: 'some_user')
 
         expected_cluster_url = Rails.application.routes.url_helpers.cluster_url(
           subject.component.cluster
@@ -92,25 +80,12 @@ RSpec.describe MaintenanceWindow, type: :model do
           text: /requested.*some_component.*by some_user.*must be confirmed.*#{expected_cluster_url}/
         )
 
-        subject.request!
+        subject.request!(requestor)
       end
     end
 
     context 'when requested' do
       subject { create(:maintenance_window, state: :requested) }
-
-      it { is_expected.to validate_absence_of(:confirmed_at) }
-      it { is_expected.to validate_absence_of(:confirmed_by) }
-
-      it { is_expected.to validate_absence_of(:ended_at) }
-
-      it { is_expected.to validate_absence_of(:rejected_at) }
-      it { is_expected.to validate_absence_of(:rejected_by) }
-
-      it { is_expected.to validate_absence_of(:cancelled_at) }
-      it { is_expected.to validate_absence_of(:cancelled_by) }
-
-      it { is_expected.to validate_absence_of(:expired_at) }
 
       it 'can be confirmed by user' do
         user = create(:user)
@@ -137,34 +112,13 @@ RSpec.describe MaintenanceWindow, type: :model do
 
     context 'when confirmed' do
       subject do
-        create(
-          :maintenance_window,
-          state: :confirmed,
-          confirmed_at: DateTime.current,
-          confirmed_by: create(:user),
-        )
+        create(:maintenance_window, state: :confirmed)
       end
 
-      it { is_expected.to validate_presence_of(:confirmed_at) }
-      it { is_expected.to validate_presence_of(:confirmed_by) }
-
-      it { is_expected.to validate_absence_of(:ended_at) }
-
-      it { is_expected.to validate_absence_of(:rejected_at) }
-      it { is_expected.to validate_absence_of(:rejected_by) }
-
-      it { is_expected.to validate_absence_of(:cancelled_at) }
-      it { is_expected.to validate_absence_of(:cancelled_by) }
-
-      it { is_expected.to validate_absence_of(:expired_at) }
-
       it 'can be started' do
-        now = DateTime.current
-        allow(DateTime).to receive(:current).and_return(now)
-
         subject.start!
 
-        expect(subject.started_at).to eq now
+        expect(subject).to be_started
       end
 
       it 'has RT ticket comment added when started' do
@@ -181,36 +135,13 @@ RSpec.describe MaintenanceWindow, type: :model do
 
     context 'when started' do
       subject do
-        create(
-          :maintenance_window,
-          state: :started,
-          confirmed_at: DateTime.current,
-          confirmed_by: create(:user),
-          started_at: DateTime.current,
-        )
+        create(:maintenance_window, state: :started)
       end
 
-      it { is_expected.to validate_presence_of(:confirmed_at) }
-      it { is_expected.to validate_presence_of(:confirmed_by) }
-
-      it { is_expected.to validate_absence_of(:ended_at) }
-
-      it { is_expected.to validate_absence_of(:rejected_at) }
-      it { is_expected.to validate_absence_of(:rejected_by) }
-
-      it { is_expected.to validate_absence_of(:cancelled_at) }
-      it { is_expected.to validate_absence_of(:cancelled_by) }
-
-      it { is_expected.to validate_absence_of(:expired_at) }
-
       it 'can be ended' do
-        now = DateTime.current
-        allow(DateTime).to receive(:current).and_return(now)
-
         subject.end!
 
         expect(subject).to be_ended
-        expect(subject.ended_at).to eq now
       end
 
       it 'has RT ticket comment added when ended' do
@@ -223,99 +154,6 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         subject.end!
       end
-    end
-
-    context 'when ended' do
-      subject do
-        create(
-          :maintenance_window,
-          state: :ended,
-          confirmed_at: DateTime.current,
-          confirmed_by: create(:user),
-          ended_at: DateTime.current
-        )
-      end
-
-      it { is_expected.to validate_presence_of(:confirmed_at) }
-      it { is_expected.to validate_presence_of(:confirmed_by) }
-
-      it { is_expected.to validate_presence_of(:ended_at) }
-
-      it { is_expected.to validate_absence_of(:rejected_at) }
-      it { is_expected.to validate_absence_of(:rejected_by) }
-
-      it { is_expected.to validate_absence_of(:cancelled_at) }
-      it { is_expected.to validate_absence_of(:cancelled_by) }
-
-      it { is_expected.to validate_absence_of(:expired_at) }
-    end
-
-    context 'when rejected' do
-      subject do
-        create(
-          :maintenance_window,
-          state: :rejected,
-          rejected_by: create(:user),
-          rejected_at: DateTime.current
-        )
-      end
-
-      it { is_expected.to validate_absence_of(:confirmed_at) }
-      it { is_expected.to validate_absence_of(:confirmed_by) }
-
-      it { is_expected.to validate_absence_of(:ended_at) }
-
-      it { is_expected.to validate_presence_of(:rejected_at) }
-      it { is_expected.to validate_presence_of(:rejected_by) }
-
-      it { is_expected.to validate_absence_of(:cancelled_at) }
-      it { is_expected.to validate_absence_of(:cancelled_by) }
-
-      it { is_expected.to validate_absence_of(:expired_at) }
-    end
-
-    context 'when cancelled' do
-      subject do
-        create(
-          :maintenance_window,
-          state: :cancelled,
-          cancelled_by: create(:user),
-          cancelled_at: DateTime.current
-        )
-      end
-
-      it { is_expected.to validate_absence_of(:ended_at) }
-
-      it { is_expected.to validate_absence_of(:rejected_at) }
-      it { is_expected.to validate_absence_of(:rejected_by) }
-
-      it { is_expected.to validate_presence_of(:cancelled_at) }
-      it { is_expected.to validate_presence_of(:cancelled_by) }
-
-      it { is_expected.to validate_absence_of(:expired_at) }
-    end
-
-    context 'when expired' do
-      subject do
-        create(
-          :maintenance_window,
-          state: :expired,
-          expired_at: DateTime.current
-        )
-      end
-
-      it { is_expected.to validate_absence_of(:confirmed_at) }
-      it { is_expected.to validate_absence_of(:confirmed_by) }
-
-      it { is_expected.to validate_absence_of(:ended_at) }
-
-      it { is_expected.to validate_absence_of(:rejected_at) }
-      it { is_expected.to validate_absence_of(:rejected_by) }
-
-      it { is_expected.to validate_absence_of(:cancelled_at) }
-      it { is_expected.to validate_absence_of(:cancelled_by) }
-
-      it { is_expected.to validate_presence_of(:expired_at) }
     end
   end
 
@@ -340,6 +178,71 @@ RSpec.describe MaintenanceWindow, type: :model do
       window = create(:maintenance_window, component: component)
 
       expect(window.associated_cluster).to eq(component.cluster)
+    end
+  end
+
+  describe '#method_missing' do
+    describe '#*_at' do
+      it 'returns time transition occurred for valid state' do
+        maintenance_window = create(:maintenance_window)
+        user = create(:user)
+        maintenance_window.request!(user)
+        transition_time = 3.days.ago.at_midnight
+        maintenance_window
+          .transitions
+          .where(to: :requested)
+          .first
+          .update!(created_at: transition_time)
+
+        expect(maintenance_window.requested_at).to eq(transition_time)
+      end
+
+      it 'returns nil for valid state which has not occurred' do
+        maintenance_window = create(:maintenance_window)
+
+        expect(maintenance_window.expired_at).to be nil
+      end
+
+      it 'raises for invalid state' do
+        maintenance_window = create(:maintenance_window)
+
+        expect { maintenance_window.exploded_at }.to raise_error(NoMethodError)
+      end
+    end
+
+    describe '#*_by' do
+      it 'returns the user associated with transition for valid state' do
+        user = create(:user, name: 'some_user')
+        maintenance_window = create(:maintenance_window)
+        maintenance_window.request!(user)
+
+        expect(maintenance_window.requested_by).to eq user
+      end
+
+      it 'returns nil for valid state which has not occurred' do
+        maintenance_window = create(:maintenance_window)
+
+        expect(maintenance_window.rejected_by).to be nil
+      end
+
+      it 'returns nil for transition with no associated user saved' do
+        maintenance_window = create(:maintenance_window, state: :confirmed)
+        maintenance_window.start!
+
+        expect(maintenance_window.started_by).to be nil
+      end
+
+      it 'raises for invalid state' do
+        maintenance_window = create(:maintenance_window)
+
+        expect { maintenance_window.exploded_by }.to raise_error(NoMethodError)
+      end
+    end
+
+    it 'raises for unhandled methods' do
+      maintenance_window = create(:maintenance_window)
+
+      expect { maintenance_window.requested_foo }.to raise_error(NoMethodError)
     end
   end
 end

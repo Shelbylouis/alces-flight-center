@@ -14,7 +14,7 @@ class MaintenanceWindowsController < ApplicationController
   def create
     ActiveRecord::Base.transaction do
       @maintenance_window = MaintenanceWindow.create!(maintenance_window_params)
-      @maintenance_window.request!
+      @maintenance_window.request!(current_user)
     end
     flash[:success] = 'Maintenance requested.'
     redirect_to @maintenance_window.associated_cluster
@@ -38,9 +38,7 @@ class MaintenanceWindowsController < ApplicationController
   ].freeze
 
   def maintenance_window_params
-    params.require(:maintenance_window).permit(PARAM_NAMES).merge(
-      requested_by: current_user
-    ).to_h.symbolize_keys
+    params.require(:maintenance_window).permit(PARAM_NAMES)
   end
 
   def suggested_requested_start

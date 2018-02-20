@@ -1,129 +1,27 @@
 class MaintenanceWindow < ApplicationRecord
   belongs_to :case
-  belongs_to :requested_by,
-    class_name: 'User'
-  belongs_to :confirmed_by,
-    class_name: 'User',
-    required: false
-  belongs_to :rejected_by,
-    class_name: 'User',
-    required: false
-  belongs_to :cancelled_by,
-    class_name: 'User',
-    required: false
-
   belongs_to :cluster, required: false
   belongs_to :component, required: false
   belongs_to :service, required: false
+
+  has_many :maintenance_window_state_transitions
+  alias_attribute :transitions, :maintenance_window_state_transitions
 
   validate :validate_precisely_one_associated_model
   validates_presence_of :requested_start
   validates_presence_of :requested_end
 
   state_machine initial: :new do
-    audit_trail
+    audit_trail context: :user
 
-    state :new, :requested do
-      validates_absence_of :confirmed_at
-      validates_absence_of :confirmed_by
-
-      validates_absence_of :ended_at
-
-      validates_absence_of :rejected_at
-      validates_absence_of :rejected_by
-
-      validates_absence_of :cancelled_at
-      validates_absence_of :cancelled_by
-
-      validates_absence_of :expired_at
-    end
-
-    state :confirmed do
-      validates_presence_of :confirmed_at
-      validates_presence_of :confirmed_by
-
-      validates_absence_of :ended_at
-
-      validates_absence_of :rejected_at
-      validates_absence_of :rejected_by
-
-      validates_absence_of :cancelled_at
-      validates_absence_of :cancelled_by
-
-      validates_absence_of :expired_at
-    end
-
-    state :started do
-      validates_presence_of :confirmed_at
-      validates_presence_of :confirmed_by
-
-      validates_absence_of :ended_at
-
-      validates_absence_of :rejected_at
-      validates_absence_of :rejected_by
-
-      validates_absence_of :cancelled_at
-      validates_absence_of :cancelled_by
-
-      validates_absence_of :expired_at
-    end
-
-    state :ended do
-      validates_presence_of :confirmed_at
-      validates_presence_of :confirmed_by
-
-      validates_presence_of :ended_at
-
-      validates_absence_of :rejected_at
-      validates_absence_of :rejected_by
-
-      validates_absence_of :cancelled_at
-      validates_absence_of :cancelled_by
-
-      validates_absence_of :expired_at
-    end
-
-    state :rejected do
-      validates_absence_of :confirmed_at
-      validates_absence_of :confirmed_by
-
-      validates_absence_of :ended_at
-
-      validates_presence_of :rejected_at
-      validates_presence_of :rejected_by
-
-      validates_absence_of :cancelled_at
-      validates_absence_of :cancelled_by
-
-      validates_absence_of :expired_at
-    end
-
-    state :cancelled do
-      validates_absence_of :ended_at
-
-      validates_absence_of :rejected_at
-      validates_absence_of :rejected_by
-
-      validates_presence_of :cancelled_at
-      validates_presence_of :cancelled_by
-
-      validates_absence_of :expired_at
-    end
-
-    state :expired do
-      validates_absence_of :confirmed_at
-      validates_absence_of :confirmed_by
-
-      validates_absence_of :ended_at
-
-      validates_absence_of :rejected_at
-      validates_absence_of :rejected_by
-
-      validates_absence_of :cancelled_at
-      validates_absence_of :cancelled_by
-
-      validates_presence_of :expired_at
-    end
+    state :new
+    state :requested
+    state :confirmed
+    state :started
+    state :ended
+    state :rejected
+    state :cancelled
+    state :expired
 
     event :request do
       transition new: :requested
@@ -135,10 +33,6 @@ class MaintenanceWindow < ApplicationRecord
     event :confirm do
       transition requested: :confirmed
     end
-    before_transition requested: :confirmed do |model, transition|
-      model.confirmed_at = DateTime.current
-      model.confirmed_by = transition.args.first
-    end
     after_transition requested: :confirmed do |model|
       model.add_maintenance_confirmed_comment
     end
@@ -146,18 +40,12 @@ class MaintenanceWindow < ApplicationRecord
     event :start do
       transition confirmed: :started
     end
-    before_transition confirmed: :started do |model|
-      model.started_at = DateTime.current
-    end
     after_transition confirmed: :started do |model|
       model.add_maintenance_started_comment
     end
 
     event :end do
       transition started: :ended
-    end
-    before_transition started: :ended do |model|
-      model.ended_at = DateTime.current
     end
     after_transition started: :ended do |model|
       model.add_maintenance_ended_comment
@@ -213,7 +101,24 @@ class MaintenanceWindow < ApplicationRecord
     add_rt_ticket_correspondence(comment)
   end
 
+  def method_missing(symbol, *args)
+    super unless symbol =~ /^([a-z]+)_(at|by)$/
+    state = $1.to_sym
+    property = $2.to_sym
+    super unless possible_states.include?(state)
+    last_transition_property(state: state, property: property)
+  end
+
   private
+
+  # Picked up by state_machines-audit_trail due to `context` setting above, and
+  # used to automatically set user who instigated the transition in created
+  # MaintenanceWindowStateTransition (for transitions instigated by user).
+  # Refer to
+  # https://github.com/state-machines/state_machines-audit_trail#example-5---store-advanced-method-results.
+  def user(transition)
+    transition.args&.first
+  end
 
   delegate :add_rt_ticket_correspondence, :site, to: :case
 
@@ -229,5 +134,23 @@ class MaintenanceWindow < ApplicationRecord
 
   def cluster_dashboard_url
     Rails.application.routes.url_helpers.cluster_url(associated_cluster)
+  end
+
+  def possible_states
+    self.class.state_machine.states.keys
+  end
+
+  def last_transition_property(state:, property:)
+    transition = last_transition_to_state(state)
+    case property
+    when :at
+      transition&.created_at
+    when :by
+      transition&.user
+    end
+  end
+
+  def last_transition_to_state(state)
+    transitions.where(to: state).last
   end
 end

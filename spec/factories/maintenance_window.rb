@@ -2,7 +2,6 @@
 FactoryBot.define do
   factory :maintenance_window do
     add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
-    requested_by { create(:admin) }
     created_at 7.days.ago
     requested_start 1.days.from_now
     requested_end 2.days.from_now
@@ -13,19 +12,38 @@ FactoryBot.define do
       create(:component) unless cluster || service
     end
 
+    # For these factories to create a MaintenanceWindow in a particular state,
+    # we create the window in a preceding state and then transition it to the
+    # required state in a callback; this is done so the appropriate
+    # MaintenanceWindowStateTransition is also created, which is sometimes
+    # needed in tests.
     factory :requested_maintenance_window do
-      state :requested
+      state :new
+
+      after(:create) do |window|
+        window.request!(create(:admin))
+      end
     end
 
     factory :confirmed_maintenance_window do
-      state :confirmed
-      confirmed_at 2.days.ago
-      confirmed_by { create(:contact) }
+      state :requested
 
-      factory :ended_maintenance_window do
-        state :ended
-        ended_at 3.days.ago
+      after(:create) do |window|
+        window.confirm!(create(:contact))
       end
     end
+
+    factory :ended_maintenance_window do
+      state :started
+
+      after(:create) do |window|
+        window.end!
+      end
+    end
+  end
+
+  factory :maintenance_window_state_transition do
+    maintenance_window
+    to :requested
   end
 end
