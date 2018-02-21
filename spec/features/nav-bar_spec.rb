@@ -16,6 +16,10 @@ RSpec.feature Log, type: :feature do
       expect(nav_bar.tag_name).to eq('nav')
     end
 
+    it 'has a link to the root site in the first location' do
+      expect(site_nav_items[0]).to have_link(href: '/')
+    end
+
     xit 'has the correct number of site links' do
       # Admins have an extract 'all sites' button
       expect(site_nav_items.length).to eq(user_nav_links.length + 1)
