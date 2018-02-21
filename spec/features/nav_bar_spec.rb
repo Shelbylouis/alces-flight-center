@@ -46,11 +46,9 @@ RSpec.feature 'Navigation Bar', type: :feature do
       expect(cluster_nav_items.length).to eq(number_cluster_links)
     end
 
-    # TODO: Make this work for regular users
-    xit 'has the correct links' do
-      # TODO: DO NOT USE SUBJECT HERE
-      subject.each_with_index do |link, index|
-        expect(site_nav_items[index + 1]).to have_link(href: link)
+    it 'has the correct links' do
+      expected_cluster_links.each_with_index do |link, index|
+        expect(cluster_nav_items[index]).to have_link(href: link)
       end
     end
   end
