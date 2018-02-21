@@ -20,7 +20,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
     visit send(path_helper, subject, as: user)
   end
 
-  shared_examples 'a navigation bar' do
+  shared_examples 'a cluster navigation bar' do
     it 'has the navigation bar' do
       expect(nav_bar.tag_name).to eq('nav')
     end
@@ -57,14 +57,14 @@ RSpec.feature 'Navigation Bar', type: :feature do
     context 'when visiting the root site' do
       let :expected_cluster_links { [] }
       before :each { visit (root_path as: user) }
-      it_behaves_like 'a navigation bar'
+      it_behaves_like 'a cluster navigation bar'
     end
 
     context 'when visiting a cluster page' do
       subject { cluster }
       let :expected_cluster_links { [cluster_path(subject)] }
       before :each { visit_subject :cluster_path }
-      it_behaves_like 'a navigation bar'
+      it_behaves_like 'a cluster navigation bar'
     end
 
     context 'when visiting a component_group' do
@@ -73,7 +73,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
         [cluster_path(subject.cluster), component_group_path(subject)]
       end
       before :each { visit_subject :component_group_path }
-      it_behaves_like 'a navigation bar'
+      it_behaves_like 'a cluster navigation bar'
     end
 
     context 'when visiting a component' do
@@ -84,7 +84,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
           component_path(subject) ]
       end
       before :each { visit_subject :component_path }
-      it_behaves_like 'a navigation bar'
+      it_behaves_like 'a cluster navigation bar'
     end
 
     context 'when visiting a service' do
@@ -93,7 +93,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
         [ cluster_path(subject.cluster), service_path(subject) ]
       end
       before :each { visit_subject :service_path }
-      it_behaves_like 'a navigation bar'
+      it_behaves_like 'a cluster navigation bar'
     end
   end
 
