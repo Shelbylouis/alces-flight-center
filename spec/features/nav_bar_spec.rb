@@ -110,6 +110,13 @@ RSpec.feature 'Navigation Bar', type: :feature do
       site_nav_items[2..-1]
     end
     include_examples 'navigate to sites'
+
+    context 'when visiting the site page' do
+      subject { site }
+      let :expected_cluster_links { [] }
+      before :each { visit_subject :site_path }
+      it_behaves_like 'a cluster navigation bar'
+    end
   end
 
   context 'with a regular user logged in' do
