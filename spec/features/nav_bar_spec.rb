@@ -41,8 +41,9 @@ RSpec.feature 'Navigation Bar', type: :feature do
       end
     end
 
-    xit 'has the correct number of site links' do
-      expect(site_nav_items.length).to eq(user_nav_links.length + 1)
+    it 'has the correct number of cluster links' do
+      number_cluster_links = expected_cluster_links.length
+      expect(cluster_nav_items.length).to eq(number_cluster_links)
     end
 
     # TODO: Make this work for regular users
@@ -63,6 +64,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
 
     context 'when visiting a cluster page' do
       subject { cluster }
+      let :expected_cluster_links { [cluster_path(subject)] }
       before :each { visit_subject :cluster_path }
       it_behaves_like 'a navigation bar'
     end
