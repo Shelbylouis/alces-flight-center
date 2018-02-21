@@ -10,9 +10,8 @@ RSpec.feature Log, type: :feature do
   let :contact { create(:primary_contact, site: site) }
   let :cluster { create(:cluster, site: site) }
 
-  def visit_site(path_helper, scope = nil)
-    options = [as: user].tap { |opt| opt.unshift(scope) if scope }
-    visit send(path_helper, *options)
+  def visit_subject(path_helper)
+    visit send(path_helper, subject, as: user)
   end
 
   shared_examples 'a navigation bar' do
@@ -40,7 +39,13 @@ RSpec.feature Log, type: :feature do
   shared_examples 'navigate to sites' do
     context 'when visiting the root site' do
       let :expected_cluster_links { [] }
-      before :each { visit_site :root_path }
+      before :each { visit (root_path as: user) }
+      it_behaves_like 'a navigation bar'
+    end
+
+    context 'when visiting a cluster site' do
+      subject { cluster }
+      before :each { visit_subject :cluster_path }
       it_behaves_like 'a navigation bar'
     end
   end
