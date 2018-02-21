@@ -21,11 +21,9 @@ RSpec.feature 'Navigation Bar', type: :feature do
   end
 
   shared_examples 'a common navigation bar' do
-    it 'has the navigation bar' do
+    # Condensed tests to save on setup time
+    it 'has a nav bar with the root link in the first location' do
       expect(nav_bar.tag_name).to eq('nav')
-    end
-
-    it 'has a link to the root site in the first location' do
       expect(site_nav_items[0]).to have_link(href: '/')
     end
   end
@@ -43,12 +41,11 @@ RSpec.feature 'Navigation Bar', type: :feature do
       end
     end
 
-    it 'has the correct number of cluster links' do
+    # Condensed tests to save on setup time
+    it 'has the correct links (and number)' do
       number_cluster_links = expected_cluster_links.length
       expect(cluster_nav_items.length).to eq(number_cluster_links)
-    end
 
-    it 'has the correct links' do
       expected_cluster_links.each_with_index do |link, index|
         expect(cluster_nav_items[index]).to have_link(href: link)
       end
