@@ -2,30 +2,23 @@ require 'rails_helper'
 
 RSpec.describe ProgressMaintenanceWindow do
   describe '#progress' do
+    RSpec.shared_examples 'progresses' do |args|
+      from = args[:from]
+      to = args[:to]
+
+      it "progresses #{from} window to #{to}" do
+        window = create_window(state: from)
+
+        described_class.new(window).progress
+
+        expect(window.state.to_sym).to eq(to)
+      end
+    end
+
     RSpec.shared_examples 'progresses unstarted windows' do
-      it 'progresses confirmed window to started' do
-        window = create_window(state: :confirmed)
-
-        described_class.new(window).progress
-
-        expect(window).to be_started
-      end
-
-      it 'progresses new window to expired' do
-        window = create_window(state: :new)
-
-        described_class.new(window).progress
-
-        expect(window).to be_expired
-      end
-
-      it 'progresses requested window to expired' do
-        window = create_window(state: :requested)
-
-        described_class.new(window).progress
-
-        expect(window).to be_expired
-      end
+      include_examples 'progresses', from: :confirmed, to: :started
+      include_examples 'progresses', from: :new, to: :expired
+      include_examples 'progresses', from: :requested, to: :expired
     end
 
     context 'when requested_start and requested_end in future' do
@@ -90,13 +83,7 @@ RSpec.describe ProgressMaintenanceWindow do
       # we next progress MaintenanceWindows.
       include_examples 'progresses unstarted windows'
 
-      it 'progresses started window to ended' do
-        window = create_window(state: :started)
-
-        described_class.new(window).progress
-
-        expect(window).to be_ended
-      end
+      include_examples 'progresses', from: :started, to: :ended
 
       it 'does not progress window in other states' do
         other_states = MaintenanceWindow.possible_states - [:started, :confirmed, :new, :requested]
