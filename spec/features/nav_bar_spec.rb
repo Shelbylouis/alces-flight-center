@@ -20,7 +20,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
     visit send(path_helper, subject, as: user)
   end
 
-  shared_examples 'a cluster navigation bar' do
+  shared_examples 'a common navigation bar' do
     it 'has the navigation bar' do
       expect(nav_bar.tag_name).to eq('nav')
     end
@@ -28,15 +28,17 @@ RSpec.feature 'Navigation Bar', type: :feature do
     it 'has a link to the root site in the first location' do
       expect(site_nav_items[0]).to have_link(href: '/')
     end
+  end
 
-    # TODO: Make this spec cleaner
+  shared_examples 'a cluster navigation bar' do
+    it_behaves_like 'a common navigation bar'
+
     it 'sets the site link (in 2nd position) if user is an admin' do
-      not_root_path = (page.current_path != '/')
       expect_link = expect(site_nav_items[1])
       have_link_condition = have_link(href: site_path(site))
-      if user.admin? && not_root_path
+      if user.admin?
         expect_link.to have_link_condition
-      elsif not_root_path
+      else
         expect_link.not_to have_link_condition
       end
     end
@@ -57,7 +59,11 @@ RSpec.feature 'Navigation Bar', type: :feature do
     context 'when visiting the root site' do
       let :expected_cluster_links { [] }
       before :each { visit (root_path as: user) }
-      it_behaves_like 'a cluster navigation bar'
+      it_behaves_like 'a common navigation bar'
+
+      it 'only has the root navigation link' do
+        expect(site_nav_items.length).to eq(1)
+      end
     end
 
     context 'when visiting a cluster page' do
