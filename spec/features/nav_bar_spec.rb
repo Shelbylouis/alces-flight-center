@@ -29,6 +29,18 @@ RSpec.feature 'Navigation Bar', type: :feature do
       expect(site_nav_items[0]).to have_link(href: '/')
     end
 
+    # TODO: Make this spec cleaner
+    it 'sets the site link (in 2nd position) if user is an admin' do
+      not_root_path = (page.current_path != '/')
+      expect_link = expect(site_nav_items[1])
+      have_link_condition = have_link(href: site_path(site))
+      if user.admin? && not_root_path
+        expect_link.to have_link_condition
+      elsif not_root_path
+        expect_link.not_to have_link_condition
+      end
+    end
+
     xit 'has the correct number of site links' do
       expect(site_nav_items.length).to eq(user_nav_links.length + 1)
     end
