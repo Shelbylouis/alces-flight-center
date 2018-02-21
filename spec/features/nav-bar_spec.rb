@@ -6,6 +6,10 @@ RSpec.feature Log, type: :feature do
   let :site_nav_bar { nav_bar.all('ul').first }
   let :site_nav_items { site_nav_bar.all('li') }
 
+  let :site { create(:site) }
+  let :contact { create(:primary_contact, site: site) }
+  let :cluster { create(:cluster, site: site) }
+
   def visit_site(path_helper, scope = nil)
     options = [as: user].tap { |opt| opt.unshift(scope) if scope }
     visit send(path_helper, *options)
@@ -21,12 +25,12 @@ RSpec.feature Log, type: :feature do
     end
 
     xit 'has the correct number of site links' do
-      # Admins have an extract 'all sites' button
       expect(site_nav_items.length).to eq(user_nav_links.length + 1)
     end
 
     # TODO: Make this work for regular users
     xit 'has the correct links' do
+      # TODO: DO NOT USE SUBJECT HERE
       subject.each_with_index do |link, index|
         expect(site_nav_items[index + 1]).to have_link(href: link)
       end
@@ -51,7 +55,7 @@ RSpec.feature Log, type: :feature do
   end
 
   context 'with a regular user logged in' do
-    let :user { create(:user, admin: false) }
+    let :user { contact }
     let :cluster_nav_items do
       return [] if site_nav_items.length < 1
       site_nav_items[1..-1]
