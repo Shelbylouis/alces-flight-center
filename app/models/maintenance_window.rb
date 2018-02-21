@@ -63,7 +63,7 @@ class MaintenanceWindow < ApplicationRecord
     super unless symbol =~ /^([a-z]+)_(at|by)$/
     state = $1.to_sym
     property = $2.to_sym
-    super unless possible_states.include?(state)
+    super unless self.class.possible_states.include?(state)
     last_transition_property(state: state, property: property)
   end
 
@@ -95,8 +95,8 @@ class MaintenanceWindow < ApplicationRecord
     [cluster, component, service].select(&:present?).length
   end
 
-  def possible_states
-    self.class.state_machine.states.keys
+  def self.possible_states
+    state_machine.states.keys
   end
 
   def last_transition_property(state:, property:)
