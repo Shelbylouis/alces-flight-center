@@ -316,4 +316,23 @@ RSpec.describe MaintenanceWindow, type: :model do
       expect { maintenance_window.requested_foo }.to raise_error(NoMethodError)
     end
   end
+
+  describe 'class' do
+    subject { described_class }
+
+    describe '#possible_states' do
+      it 'gives all possible states' do
+        expect(subject.possible_states).to match_array([
+          :cancelled,
+          :confirmed,
+          :ended,
+          :expired,
+          :new,
+          :rejected,
+          :requested,
+          :started,
+        ])
+      end
+    end
+  end
 end

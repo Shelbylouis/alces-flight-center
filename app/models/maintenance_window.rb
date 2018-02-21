@@ -38,6 +38,10 @@ class MaintenanceWindow < ApplicationRecord
     end
   end
 
+  def self.possible_states
+    state_machine.states.keys
+  end
+
   alias_method :in_progress?, :confirmed?
 
   def associated_model
@@ -93,10 +97,6 @@ class MaintenanceWindow < ApplicationRecord
 
   def number_associated_models
     [cluster, component, service].select(&:present?).length
-  end
-
-  def self.possible_states
-    state_machine.states.keys
   end
 
   def last_transition_property(state:, property:)
