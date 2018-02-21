@@ -38,8 +38,19 @@ class MaintenanceWindow < ApplicationRecord
     end
   end
 
-  def self.possible_states
-    state_machine.states.keys
+  class << self
+    def possible_states
+      state_machine.states.keys
+    end
+
+    def finished_states
+      [
+        :cancelled,
+        :ended,
+        :expired,
+        :rejected,
+      ]
+    end
   end
 
   alias_method :in_progress?, :confirmed?

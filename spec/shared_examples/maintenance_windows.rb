@@ -7,14 +7,20 @@ RSpec.shared_examples 'maintenance_windows' do
   describe '#open_maintenance_windows' do
     subject { create(factory) }
 
-    it 'returns non-ended associated maintenance windows' do
-      create(:requested_maintenance_window, factory => subject, id: 1)
-      create(:confirmed_maintenance_window, factory => subject, id: 2)
-      create(:ended_maintenance_window, factory => subject, id: 3)
+    it 'returns non-finished associated maintenance windows' do
+      MaintenanceWindow.possible_states.map do |state|
+        create(:maintenance_window, factory => subject, state: state)
+      end
 
-      resulting_window_ids = subject.open_maintenance_windows.map(&:id)
+      open_windows = subject.open_maintenance_windows
+      open_window_states = open_windows.map(&:state).map(&:to_sym)
 
-      expect(resulting_window_ids).to match_array([1, 2])
+      expect(open_window_states).to match_array([
+        :confirmed,
+        :new,
+        :requested,
+        :started,
+      ])
     end
   end
 end
