@@ -9,9 +9,14 @@ RSpec.describe ProgressMaintenanceWindow do
       it "progresses #{from} window to #{to}" do
         window = create_window(state: from)
 
-        described_class.new(window).progress
+        result = described_class.new(window).progress
 
         expect(window.state.to_sym).to eq(to)
+        test_progression_message(
+          message: result,
+          window: window,
+          expected: "#{from} -> #{to}"
+        )
       end
     end
 
@@ -20,9 +25,14 @@ RSpec.describe ProgressMaintenanceWindow do
         states.each do |state|
           window = create_window(state: state)
 
-          described_class.new(window).progress
+          result = described_class.new(window).progress
 
           expect(window.state.to_sym).to eq state
+          test_progression_message(
+            message: result,
+            window: window,
+            expected: "remains #{state}"
+          )
         end
       end
     end
@@ -33,6 +43,20 @@ RSpec.describe ProgressMaintenanceWindow do
       include_examples 'progresses', from: :requested, to: :expired
     end
 
+    def test_progression_message(message:, window:, expected:)
+      start_date = window.requested_start.to_formatted_s(:short)
+      end_date = window.requested_end.to_formatted_s(:short)
+      full_expected_message = <<~EOF.squish
+        Maintenance window #{window.id} (#{component.name} | #{start_date} -
+        #{end_date}): #{expected}
+      EOF
+      expect(message).to eq full_expected_message
+    end
+
+    let :component do
+      create(:component, name: 'somenode')
+    end
+
     context 'when requested_start and requested_end in future' do
       def create_window(state:)
         create(
@@ -40,6 +64,7 @@ RSpec.describe ProgressMaintenanceWindow do
           state: state,
           requested_start: DateTime.current.advance(days: 1),
           requested_end: DateTime.current.advance(days: 2),
+          component: component,
         )
       end
 
@@ -52,7 +77,8 @@ RSpec.describe ProgressMaintenanceWindow do
           :maintenance_window,
           state: state,
           requested_start: 1.hours.ago,
-          requested_end: DateTime.current.advance(days: 1)
+          requested_end: DateTime.current.advance(days: 1),
+          component: component,
         )
       end
 
@@ -68,7 +94,8 @@ RSpec.describe ProgressMaintenanceWindow do
           :maintenance_window,
           state: state,
           requested_start: 2.hours.ago,
-          requested_end: 1.hours.ago
+          requested_end: 1.hours.ago,
+          component: component,
         )
       end
 
