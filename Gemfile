@@ -96,8 +96,8 @@ group :development do
   # Rake tasks.
   gem 'active_record_doctor'
 
-  # Regenerate state machine graphs using `rake state_machines:draw
-  # CLASS=MaintenanceWindow TARGET=docs/state-machines`.
+  # Regenerate state machine graphs using `rake
+  # alces:generate:state_machine_diagrams`.
   gem 'state_machines-graphviz'
 end
 
