@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 require 'pathname'
 require 'fileutils'
+require 'action_view'
+
 include FileUtils
+include ActionView::Helpers::TextHelper
 
 APP_ROOT = Pathname.new File.expand_path('../../', __FILE__)
 
@@ -37,6 +40,23 @@ chdir APP_ROOT do
   system! 'bin/rails restart'
 
   puts "\n== Next steps! =="
-  puts '1. In development you may want to run `bin/rails db:seed` to create some useful seed data.'
-  puts '2. Update this script to document or fix anything which broke or you had trouble with.'
+  next_steps = [
+    <<~EOF,
+      You will probably want to run the `bin/import-production-data` script to
+      import modified real data for development.
+    EOF
+    <<~EOF,
+      You may then need to run `bin/rake db:migrate` and `bin/rake
+      data:migrate` to update this data to account for development changes
+      since the last production deploy.
+    EOF
+    <<~EOF,
+      Update this script to document or fix anything which broke or you had
+      trouble with.
+    EOF
+  ]
+  next_steps.each_with_index do |step, index|
+    formatted_step = word_wrap("#{index + 1}. #{step.squish}")
+    puts formatted_step
+  end
 end
