@@ -1,20 +1,31 @@
 
 <%= form_for @maintenance_window do |f| %>
-  <div class="form-group">
-    <%= f.hidden_field :cluster_id %>
-    <%= f.hidden_field :component_id %>
-    <%= f.hidden_field :service_id %>
+  <%= f.hidden_field :cluster_id %>
+  <%= f.hidden_field :component_id %>
+  <%= f.hidden_field :service_id %>
 
-    <%= f.label :case_id, 'Select Case to associate this maintenance with' %>
+  <div class="form-group">
+    <%= f.label :case_id, 'Case to associate this maintenance with' %>
     <%= f.collection_select(
       :case_id,
-      @cluster.cases.order(created_at: :desc).decorate,
+      @maintenance_window.associated_cluster.cases.order(created_at: :desc).decorate,
       :id,
       :case_select_details,
       {},
       {class: ['form-control']}
     ) %>
   </div>
+
+  <%= render 'partials/date_time_select',
+    model: 'maintenance_window',
+    datetime: @maintenance_window.requested_start,
+    identifier: 'requested-start'
+  %>
+  <%= render 'partials/date_time_select',
+    model: 'maintenance_window',
+    datetime: @maintenance_window.requested_end,
+    identifier: 'requested-end'
+  %>
 
   <%= f.submit "Request Maintenance", class: 'btn btn-primary btn-block' %>
 <% end %>

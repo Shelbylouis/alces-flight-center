@@ -37,6 +37,7 @@ gem 'request_store'
 gem 'bootsnap', require: false
 gem "sentry-raven"
 gem 'state_machines-activerecord'
+gem 'state_machines-audit_trail'
 
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.
@@ -94,6 +95,10 @@ group :development do
   # Detects various problems in database. Run with `active_record_doctor:*`
   # Rake tasks.
   gem 'active_record_doctor'
+
+  # Regenerate state machine graphs using `rake state_machines:draw
+  # CLASS=MaintenanceWindow TARGET=docs/state-machines`.
+  gem 'state_machines-graphviz'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

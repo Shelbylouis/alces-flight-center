@@ -5,7 +5,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
   let :admin { create(:admin) }
   let :site { create(:site) }
   let! :cluster { create(:cluster, site: site) }
-  let! :component_group { create(:component_group) } 
+  let! :component_group { create(:component_group) }
   let! :component do
     create(:component, component_group: component_group, cluster: cluster)
   end

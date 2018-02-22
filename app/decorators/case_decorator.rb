@@ -5,7 +5,7 @@ class CaseDecorator < ApplicationDecorator
     [
       "RT ticket #{rt_ticket_id}",
       created_at.to_formatted_s(:long),
-      issue_details,
+      subject,
       associated_model.name,
       "Created by #{user.name}"
     ].join(' | ')
@@ -31,12 +31,5 @@ class CaseDecorator < ApplicationDecorator
     else
       'N/A'
     end
-  end
-
-  private
-
-  def issue_details
-    category_prefix = category ? "#{category.name} - " : ''
-    category_prefix + issue.name
   end
 end

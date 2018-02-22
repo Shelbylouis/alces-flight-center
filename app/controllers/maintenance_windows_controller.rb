@@ -5,13 +5,17 @@ class MaintenanceWindowsController < ApplicationController
     @maintenance_window = MaintenanceWindow.new(
       cluster_id: params[:cluster_id],
       component_id: params[:component_id],
-      service_id: params[:service_id]
+      service_id: params[:service_id],
+      requested_start: suggested_requested_start,
+      requested_end: suggested_requested_end,
     )
   end
 
   def create
-    @maintenance_window =
-      RequestMaintenanceWindow.new(**maintenance_window_params).run
+    ActiveRecord::Base.transaction do
+      @maintenance_window = MaintenanceWindow.create!(maintenance_window_params)
+      @maintenance_window.request!(current_user)
+    end
     flash[:success] = 'Maintenance requested.'
     redirect_to @maintenance_window.associated_cluster
   end
@@ -22,19 +26,26 @@ class MaintenanceWindowsController < ApplicationController
     redirect_to cluster_path(window.associated_cluster)
   end
 
-  def end
-    window = MaintenanceWindow.find(params[:id])
-    window.end!
-    redirect_to cluster_path(window.associated_cluster)
-  end
-
   private
 
+  PARAM_NAMES = [
+    :cluster_id,
+    :component_id,
+    :service_id,
+    :case_id,
+    :requested_start,
+    :requested_end,
+  ].freeze
+
   def maintenance_window_params
-    params.require(:maintenance_window).permit(
-      :cluster_id, :component_id, :service_id, :case_id
-    ).merge(
-      user: current_user
-    ).to_h.symbolize_keys
+    params.require(:maintenance_window).permit(PARAM_NAMES)
+  end
+
+  def suggested_requested_start
+    1.day.from_now.at_midnight
+  end
+
+  def suggested_requested_end
+    suggested_requested_start.advance(days: 1)
   end
 end

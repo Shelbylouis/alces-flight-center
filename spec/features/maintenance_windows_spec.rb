@@ -27,40 +27,38 @@ RSpec.feature "Maintenance windows", type: :feature do
       end_maintenance_window_case_path(support_case.id)
     end
 
-    it 'can request maintenance for a Case' do
-      visit site_cases_path(site, as: user)
+    it 'can request maintenance in association with different Case for Cluster' do
+      cluster = create(:cluster)
+      component = create(:component, cluster: cluster)
+      case_subject = 'Unrelated case'
+      unrelated_case = create(:case, cluster: cluster, subject: case_subject)
 
-      expect(Case.request_tracker).to receive(
-        :add_ticket_correspondence
-      ).with(
-        id: support_case.rt_ticket_id,
-        text: /requested.*#{component.name}.*by #{user_name}.*must be confirmed.*#{cluster_url(cluster)}/
+      visit cluster_path(cluster, as: user)
+      component_maintenance_link = page.find_link(
+        href: new_component_maintenance_window_path(component)
       )
-      request_link = page.find_link(href: request_link_path)
-      expect(request_link).to have_css('.fa-wrench.interactive-icon')
+      component_maintenance_link.click
 
-      request_link.click
+      select case_subject
 
-      new_window = support_case.maintenance_windows.first
-      expect(new_window.user).to eq user
+      select '2022', from: 'requested-start-datetime-select-year'
+      select 'September', from: 'requested-start-datetime-select-month'
+      select '10', from: 'requested-start-datetime-select-day'
+      select '13', from: 'requested-start-datetime-select-hour'
+
+      select '2023', from: 'requested-end-datetime-select-year'
+      select 'September', from: 'requested-end-datetime-select-month'
+      select '20', from: 'requested-end-datetime-select-day'
+      select '13', from: 'requested-end-datetime-select-hour'
+
+      click_button 'Request Maintenance'
+
+      new_window = unrelated_case.maintenance_windows.first
       expect(new_window).to be_requested
-      expect(page).not_to have_link(href: request_link_path)
-    end
-
-    it 'can end a confirmed maintenance window' do
-      end_time = DateTime.new(2018)
-      allow(DateTime).to receive(:current).and_return(end_time)
-      window = create(:confirmed_maintenance_window, component: component)
-      expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
-        id: window.case.rt_ticket_id,
-        text: "#{component.name} is no longer under maintenance."
-      )
-
-      visit cluster_path(component.cluster, as: user)
-      click_button('End Maintenance')
-
-      expect(window.reload.ended_at).to eq(end_time)
-      expect(current_path).to eq(cluster_path(component.cluster))
+      expect(new_window.requested_by).to eq user
+      expect(new_window.requested_start).to eq DateTime.new(2022, 9, 10, 13, 0)
+      expect(new_window.requested_end).to eq DateTime.new(2023, 9, 20, 13, 0)
+      expect(current_path).to eq(cluster_path(cluster))
     end
   end
 
@@ -90,7 +88,7 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       expect(page).not_to have_button(button_text)
       expect(page.all('table')[1]).to have_text(user_name)
-      expect(window.reload.confirmed_by).to eq(user)
+      expect(window.confirmed_by).to eq(user)
     end
   end
 end

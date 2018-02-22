@@ -81,10 +81,6 @@ class Case < ApplicationRecord
     ticket_completed? && chargeable
   end
 
-  def request_maintenance_window!(requestor:)
-    RequestMaintenanceWindow.new(case_id: id, user: requestor).run
-  end
-
   def add_rt_ticket_correspondence(text)
     rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
   end
