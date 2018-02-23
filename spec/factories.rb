@@ -1,11 +1,5 @@
 
 FactoryBot.define do
-  factory :log do
-    details 'I am the factory default details'
-    cluster
-    engineer { create :admin }
-  end
-
   sequence :email do |n|
     "a.scientist.#{n}@liverpool.ac.uk"
   end
@@ -100,5 +94,11 @@ FactoryBot.define do
     add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
     user { create(:admin) }
     amount 2
+  end
+
+  factory :log do
+    details 'I am the factory default details'
+    cluster
+    engineer { create :admin }
   end
 end
