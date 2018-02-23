@@ -64,7 +64,7 @@ RSpec.describe Log, type: :model do
   end
 
   it 'does not require a component' do
-    expect(create(:log).component).to be_nil
+    expect(build(:log, component: nil)).to be_valid
   end
 
   context 'with a component' do
