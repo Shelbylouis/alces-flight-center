@@ -41,8 +41,6 @@ class ApplicationController < ActionController::Base
   def define_navigation_variables
     return unless current_user
 
-    @site = current_user.site
-
     case request.path
     when /^\/sites/
       id = params[:site_id] || params[:id]
@@ -61,16 +59,6 @@ class ApplicationController < ActionController::Base
       id = params[:service_id] || params[:id]
       @cluster_part = Service.find(id)
     end
-
-    @cluster ||= if @cluster_part
-                   @cluster_part.cluster
-                 elsif @component_group
-                   @component_group.cluster
-                 end
-    if @cluster_part.respond_to?(:component_group)
-      @component_group = @cluster_part.component_group
-    end
-    @site = @cluster.site if @cluster && current_user.admin?
   end
 
   def format_errors(model)
