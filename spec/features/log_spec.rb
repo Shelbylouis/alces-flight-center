@@ -56,7 +56,7 @@ RSpec.feature Log, type: :feature do
       expect(log.cases).to be_blank
     end
 
-    it 'can add multiple tickets/cases to the view' do
+    it 'can associate multiple tickets/cases with a log' do
       fill_details_input
       log_cases = [subject.cases.first, subject.cases.last].each do |kase|
         select kase.decorate.case_select_details, from: case_select_id
