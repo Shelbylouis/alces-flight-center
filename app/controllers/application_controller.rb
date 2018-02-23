@@ -41,6 +41,10 @@ class ApplicationController < ActionController::Base
   def define_navigation_variables
     return unless current_user
 
+    if request.path == '/' && !current_user.admin?
+      return @scope = @site = current_user.site
+    end
+
     case request.path
     when /^\/sites/
       id = params[:site_id] || params[:id]
