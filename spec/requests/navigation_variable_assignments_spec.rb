@@ -24,6 +24,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       component: nil,
       cluster_part: nil,
       component_group: nil,
+      service: nil,
     }
   end
 
@@ -75,7 +76,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(:cluster_part)
+        assigns_navigation_variables(:cluster_part, :service)
       end
     end
   end
