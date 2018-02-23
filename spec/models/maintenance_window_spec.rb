@@ -226,6 +226,17 @@ RSpec.describe MaintenanceWindow, type: :model do
         subject.end!
       end
     end
+
+    it 'does not have transition comment added when `skip_comments` flag set on model' do
+      # This test tests this behaviour for the started -> ended transition, but
+      # any valid transition could be used.
+      window = create(:maintenance_window, state: :started)
+      window.skip_comments = true
+
+      expect(Case.request_tracker).not_to receive(:add_ticket_correspondence)
+
+      window.end!
+    end
   end
 
   describe '#in_progress?' do
