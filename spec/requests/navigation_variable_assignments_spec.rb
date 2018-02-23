@@ -82,6 +82,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
 
   context 'when no user' do
     describe "get '/'" do
+      subject { nil }
       before :each do
         get root_path
       end
@@ -98,12 +99,13 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     include_examples 'cluster and part variable assignment'
 
     describe "get '/'" do
+      subject { nil }
       before :each do
         get root_path(as: user)
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(:site)
+        assigns_navigation_variables
       end
     end
   end
@@ -114,6 +116,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     include_examples 'cluster and part variable assignment'
 
     describe "get '/'" do
+      subject { nil }
       before :each do
         get root_path(as: user)
       end
