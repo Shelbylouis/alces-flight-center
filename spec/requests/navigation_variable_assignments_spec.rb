@@ -16,8 +16,19 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     allow_any_instance_of(Cluster).to receive(:documents).and_return []
   end
 
+  let :default_nav_variables do
+    {
+      scope: subject,
+      site: nil,
+      cluster: nil,
+      component: nil,
+      cluster_part: nil,
+      component_group: nil,
+    }
+  end
+
   def assigns_navigation_variables(vars)
-    vars.each do |var, value|
+    default_nav_variables.merge(vars).each do |var, value|
       expect(assigns(var)).to eq value
     end
   end
@@ -30,10 +41,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          cluster: cluster,
-          scope: cluster
-        )
+        assigns_navigation_variables(cluster: subject)
       end
     end
 
@@ -47,7 +55,6 @@ RSpec.describe 'Navigation variable assignments', type: :request do
         assigns_navigation_variables(
           cluster_part: subject,
           component: subject,
-          scope: subject
         )
       end
     end
@@ -60,7 +67,6 @@ RSpec.describe 'Navigation variable assignments', type: :request do
 
       it 'assigns the correct navigation variables' do
         assigns_navigation_variables(
-          cluster_part: nil,
           component_group: subject
         )
       end
@@ -87,12 +93,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: nil,
-          cluster: nil,
-          cluster_part: nil,
-          component_group: nil
-        )
+        assigns_navigation_variables({})
       end
     end
   end
@@ -109,10 +110,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
 
       it 'assigns correct navigation variables' do
         assigns_navigation_variables(
-          site: site,
-          cluster: nil,
-          cluster_part: nil,
-          component_group: nil
+          site: site
         )
       end
     end
@@ -129,12 +127,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: nil,
-          cluster: nil,
-          cluster_part: nil,
-          component_group: nil
-        )
+        assigns_navigation_variables({})
       end
     end
 
@@ -145,12 +138,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: subject,
-          cluster: nil,
-          cluster_part: nil,
-          component_group: nil
-        )
+        assigns_navigation_variables(site: subject)
       end
     end
   end
