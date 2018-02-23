@@ -33,10 +33,9 @@ class MaintenanceWindow < ApplicationRecord
     event :start { transition confirmed: :started }
     event :end { transition started: :ended }
 
-    after_transition any => any do |model, transition|
-      new_state = transition.to_name
+    after_transition any => any do |model|
       # Use send so can keep method private.
-      model.send(:add_transition_comment, new_state)
+      model.send(:add_transition_comment)
     end
   end
 
@@ -88,8 +87,8 @@ class MaintenanceWindow < ApplicationRecord
 
   delegate :site, to: :case
 
-  def add_transition_comment(new_state)
-    maintenance_notifier.add_transition_comment(new_state) unless skip_comments
+  def add_transition_comment
+    maintenance_notifier.add_transition_comment(state) unless skip_comments
   end
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
