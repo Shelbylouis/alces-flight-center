@@ -29,6 +29,9 @@ class ApplicationController < ActionController::Base
     RequestStore.store[:current_user] = current_user
   end
 
+  # NOTE: The switch to using @scope has not caused any tests to fail
+  # on this method. It might be worth changing it or removing it
+  # completely
   def current_site
     @site
   end
