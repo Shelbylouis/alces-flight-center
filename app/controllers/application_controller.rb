@@ -54,13 +54,13 @@ class ApplicationController < ActionController::Base
                @cluster = Cluster.find(id)
              when /^\/components/
                id = params[:component_id] || params[:id]
-               @cluster_part = @component = Component.find(id)
+               @component = @cluster_part = Component.find(id)
              when /^\/component-groups/
                id = params[:component_group_id] || params[:id]
                @component_group = ComponentGroup.find(id)
              when /^\/services/
                id = params[:service_id] || params[:id]
-               @cluster_part = @service = Service.find(id)
+               @service = @cluster_part = Service.find(id)
              end
   end
 
