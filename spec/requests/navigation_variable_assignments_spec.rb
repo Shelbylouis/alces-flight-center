@@ -27,8 +27,9 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     }
   end
 
-  def assigns_navigation_variables(vars)
-    default_nav_variables.merge(vars).each do |var, value|
+  def assigns_navigation_variables(*subject_keys)
+    subject_hash = (subject_keys.map { |k| [k, subject] }).to_h
+    default_nav_variables.merge(subject_hash).each do |var, value|
       expect(assigns(var)).to eq value
     end
   end
@@ -41,7 +42,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(cluster: subject)
+        assigns_navigation_variables(:cluster)
       end
     end
 
@@ -52,10 +53,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          cluster_part: subject,
-          component: subject,
-        )
+        assigns_navigation_variables(:cluster_part, :component)
       end
     end
 
@@ -66,9 +64,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns the correct navigation variables' do
-        assigns_navigation_variables(
-          component_group: subject
-        )
+        assigns_navigation_variables(:component_group)
       end
     end
 
@@ -79,9 +75,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          cluster_part: subject,
-        )
+        assigns_navigation_variables(:cluster_part)
       end
     end
   end
@@ -93,7 +87,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables({})
+        assigns_navigation_variables
       end
     end
   end
@@ -109,9 +103,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: site
-        )
+        assigns_navigation_variables(:site)
       end
     end
   end
@@ -127,7 +119,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables({})
+        assigns_navigation_variables
       end
     end
 
@@ -138,7 +130,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(site: subject)
+        assigns_navigation_variables(:site)
       end
     end
   end
