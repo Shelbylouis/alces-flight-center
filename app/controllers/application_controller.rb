@@ -45,23 +45,23 @@ class ApplicationController < ActionController::Base
       return @scope = @site = current_user.site
     end
 
-    case request.path
-    when /^\/sites/
-      id = params[:site_id] || params[:id]
-      @scope = @site = Site.find(id) if current_user.admin?
-    when /^\/clusters/
-      id = params[:cluster_id] || params[:id]
-      @scope = @cluster = Cluster.find(id)
-    when /^\/components/
-      id = params[:component_id] || params[:id]
-      @scope = @cluster_part = @component = Component.find(id)
-    when /^\/component-groups/
-      id = params[:component_group_id] || params[:id]
-      @scope = @component_group = ComponentGroup.find(id)
-    when /^\/services/
-      id = params[:service_id] || params[:id]
-      @scope = @cluster_part = Service.find(id)
-    end
+    @scope = case request.path
+             when /^\/sites/
+               id = params[:site_id] || params[:id]
+               @site = Site.find(id) if current_user.admin?
+             when /^\/clusters/
+               id = params[:cluster_id] || params[:id]
+               @cluster = Cluster.find(id)
+             when /^\/components/
+               id = params[:component_id] || params[:id]
+               @cluster_part = @component = Component.find(id)
+             when /^\/component-groups/
+               id = params[:component_group_id] || params[:id]
+               @component_group = ComponentGroup.find(id)
+             when /^\/services/
+               id = params[:service_id] || params[:id]
+               @cluster_part = Service.find(id)
+             end
   end
 
   def format_errors(model)
