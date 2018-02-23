@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.feature 'Navigation Bar', type: :feature do
-  let :nav_bar { find_by_id('top-level-navigation-bar') }
+  let :nav_bar { first('nav.product-bar') }
   let :site_nav_bar { nav_bar.all('ul').first }
   let :site_nav_items { site_nav_bar.all('li') }
 
