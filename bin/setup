@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
 require 'pathname'
 require 'fileutils'
-require 'action_view'
 
 include FileUtils
-include ActionView::Helpers::TextHelper
 
 APP_ROOT = Pathname.new File.expand_path('../../', __FILE__)
 
@@ -38,6 +36,11 @@ chdir APP_ROOT do
 
   puts "\n== Restarting application server =="
   system! 'bin/rails restart'
+
+  # This is required for `word_wrap` below, but must occur after the `bundle
+  # install` above otherwise it will fail the first time this script it run.
+  require 'action_view'
+  include ActionView::Helpers::TextHelper
 
   puts "\n== Next steps! =="
   next_steps = [
