@@ -1,5 +1,4 @@
 
-
 namespace :alces do
   namespace :generate do
     STATE_MACHINE_DIAGRAMS_DIR = 'docs/state-machines'
