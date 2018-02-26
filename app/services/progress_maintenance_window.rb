@@ -1,19 +1,26 @@
 
 ProgressMaintenanceWindow = Struct.new(:window) do
   def progress
-    progress_if_needed || unprogressed_message
+    if required_transition_event
+      transition_state(required_transition_event)
+    else
+      unprogressed_message
+    end
   end
 
   private
 
   delegate :confirmed?, :started?, to: :window
 
-  def progress_if_needed
-    if end_time_passed? && started?
-      transition_state(:end)
-    elsif start_time_passed?
-      start_or_expire_if_unstarted
-    end
+  def required_transition_event
+    @required_transition_event ||=
+      if end_time_passed? && started?
+        :end
+      elsif start_time_passed? && confirmed?
+        :start
+      elsif start_time_passed? && not_yet_confirmed?
+        :expire
+      end
   end
 
   def end_time_passed?
@@ -24,15 +31,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
     window.requested_start.past?
   end
 
-  def start_or_expire_if_unstarted
-    if confirmed?
-      transition_state(:start)
-    elsif unconfirmed?
-      transition_state(:expire)
-    end
-  end
-
-  def unconfirmed?
+  def not_yet_confirmed?
     window.new? || window.requested?
   end
 
