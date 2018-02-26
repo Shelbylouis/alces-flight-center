@@ -7,15 +7,10 @@ RSpec.describe ProgressMaintenanceWindow do
       to = args[:to]
 
       it "progresses #{from} window to #{to}" do
-        window = create_window(state: from)
-
-        result = described_class.new(window).progress
-
-        expect(window.state.to_sym).to eq(to)
-        test_progression_message(
-          message: result,
-          window: window,
-          expected: "#{from} -> #{to}"
+        window = test_progression(
+          initial_state: from,
+          expected_state: to,
+          expected_message: "#{from} -> #{to}"
         )
 
         # Need to check that the transition model is created when the window is
@@ -31,15 +26,10 @@ RSpec.describe ProgressMaintenanceWindow do
     RSpec.shared_examples 'does not progress' do |states|
       it "does not progress window in states: #{states.join(', ').strip}" do
         states.each do |state|
-          window = create_window(state: state)
-
-          result = described_class.new(window).progress
-
-          expect(window.state.to_sym).to eq state
-          test_progression_message(
-            message: result,
-            window: window,
-            expected: "remains #{state}"
+          test_progression(
+            initial_state: state,
+            expected_state: state,
+            expected_message: "remains #{state}"
           )
         end
       end
@@ -49,6 +39,22 @@ RSpec.describe ProgressMaintenanceWindow do
       include_examples 'progresses', from: :confirmed, to: :started
       include_examples 'progresses', from: :new, to: :expired
       include_examples 'progresses', from: :requested, to: :expired
+    end
+
+    def test_progression(initial_state:, expected_state:, expected_message:)
+      window = create_window(state: initial_state)
+
+      result = described_class.new(window).progress
+
+      expect(window.state.to_sym).to eq expected_state
+      test_progression_message(
+        message: result,
+        window: window,
+        expected: expected_message
+      )
+
+      # Return window so any other needed assertions can be made on it.
+      window
     end
 
     def test_progression_message(message:, window:, expected:)
