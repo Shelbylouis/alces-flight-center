@@ -11,8 +11,10 @@ ProgressMaintenanceWindow = Struct.new(:window) do
   def progress_if_needed
     if end_time_passed? && started?
       transition_state(:end)
-    elsif start_time_passed?
-      start_or_expire_if_unstarted
+    elsif start_time_passed? && confirmed?
+      transition_state(:start)
+    elsif start_time_passed? && unconfirmed?
+      transition_state(:expire)
     end
   end
 
@@ -22,14 +24,6 @@ ProgressMaintenanceWindow = Struct.new(:window) do
 
   def start_time_passed?
     window.requested_start.past?
-  end
-
-  def start_or_expire_if_unstarted
-    if confirmed?
-      transition_state(:start)
-    elsif unconfirmed?
-      transition_state(:expire)
-    end
   end
 
   def unconfirmed?
