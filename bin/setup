@@ -45,13 +45,9 @@ chdir APP_ROOT do
   puts "\n== Next steps! =="
   next_steps = [
     <<~EOF,
-      You will probably want to run the `bin/import-production-data` script to
-      import modified real data for development.
-    EOF
-    <<~EOF,
-      You may then need to run `bin/rake db:migrate` and `bin/rake
-      data:migrate` to update this data to account for development changes
-      since the last production deploy.
+      You will probably want to run `rails
+      alces:data:import_and_migrate_production` to give you a local development
+      database as close to production as possible.
     EOF
     <<~EOF,
       Update this script to document or fix anything which broke or you had
