@@ -32,14 +32,15 @@
                      text: site_obj.name,
                      path: path_for_site,
                      icon: 'fa-institution' %>
-        <% end %>
 
-        <%#   <% if @cluster %>
-        <%#     <li class="nav-item">%>
-        <%#       <%= link_to (raw('<span class="fa fa-server"></span> ') + @cluster.name),%>
-        <%#         @cluster.decorate.path,%>
-        <%#         class: "nav-link #{(@cluster_part || @component_group) ? '' : 'nav-link--active'}"%>
-        <%#       %>
+          <% cluster_obj = model_from_scope :cluster %>
+          <% if cluster_obj %>
+            <%= render 'partials/nav_link',
+                      text: cluster_obj.name,
+                      path: cluster_obj.decorate.path,
+                      icon: 'fa-server' %>
+          <% end %>
+        <% end %>
 
         <%#       <% if @component_group %>
         <%#         <li class="nav-item">%>
