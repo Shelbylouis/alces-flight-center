@@ -55,7 +55,7 @@
       <% nav_link_procs[0..-2].each do |nav_proc| %>
         <%= nav_proc.call %>
       <% end %>
-      <%= nav_link_procs.last.call(active: true) %>
+      <%= nav_link_procs.last&.call(active: true) %>
     </ul>
 
     <% if signed_in? %>
