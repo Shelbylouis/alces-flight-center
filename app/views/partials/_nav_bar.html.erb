@@ -58,12 +58,10 @@
     <% if signed_in? %>
       <% if current_user.admin? %>
         <ul class="navbar-nav justify-content-end">
-          <li class="nav-item">
-            <%= link_to (raw('<span class="fa fa-database"></span> ') + 'Admin Interface'),
-              rails_admin_path,
-              class: "nav-link"
-            %>
-          </li>
+          <%= render 'partials/nav_link',
+                     text: 'Admin Interface',
+                     path: rails_admin_path,
+                     icon: 'fa-database' %>
         </ul>
       <% end %>
 
