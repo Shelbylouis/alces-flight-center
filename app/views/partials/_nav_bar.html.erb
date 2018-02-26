@@ -13,7 +13,6 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-
       <% if signed_in? %>
         <% if current_user.admin? %>
           <%= render 'partials/nav_link',
@@ -23,7 +22,7 @@
         <% end %>
 
         <% if @scope %>
-          <% site_obj = (@scope.is_a?(Site) ? @scope : @scope.site) %>
+          <% site_obj = model_from_scope :site %>
           <% path_for_site = if current_user.admin?
                                site_path site_obj
                              else

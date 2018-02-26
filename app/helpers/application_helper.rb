@@ -26,6 +26,17 @@ module ApplicationHelper
     )
   end
 
+  def model_from_scope(type)
+    klass = type.to_s.classify.constantize
+    if @scope.is_a? klass
+      @scope
+    elsif @scope.respond_to? type
+      @scope.public_send type
+    else
+      nil
+    end
+  end
+
   def dark_button_classes
     ['btn', 'btn-primary', 'btn-block']
   end
