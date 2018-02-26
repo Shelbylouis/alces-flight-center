@@ -1,18 +1,16 @@
 
 ProgressMaintenanceWindow = Struct.new(:window) do
   def progress
-    progress_if_needed || unprogressed_message
+    if required_transition_event
+      transition_state(required_transition_event)
+    else
+      unprogressed_message
+    end
   end
 
   private
 
   delegate :confirmed?, :started?, to: :window
-
-  def progress_if_needed
-    if required_transition_event
-      transition_state(required_transition_event)
-    end
-  end
 
   def required_transition_event
     @required_transition_event ||=
