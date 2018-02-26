@@ -24,7 +24,7 @@
         <% if @scope %>
           <% site_obj = model_from_scope :site %>
           <% path_for_site = if current_user.admin?
-                               site_path site_obj
+                               site_obj
                              else
                                root_path
                              end %>
@@ -37,7 +37,7 @@
           <% if cluster_obj %>
             <%= render 'partials/nav_link',
                       text: cluster_obj.name,
-                      path: cluster_obj.decorate.path,
+                      path: cluster_obj,
                       icon: 'fa-server' %>
           <% end %>
 
@@ -45,19 +45,18 @@
           <% if component_group_obj %>
             <%= render 'partials/nav_link',
                        text: component_group_obj.name,
-                       path: component_group_obj.decorate.path,
+                       path: component_group_obj,
                        icon: 'fa-cubes' %>
           <% end %>
 
           <% if @cluster_part %>
             <%= render 'partials/nav_link',
                        text: @cluster_part.name,
-                       path: @cluster_part.decorate.path,
+                       path: @cluster_part,
                        icon: 'fa-cube' %>
           <% end %>
         <% end %>
       <% end %>
-
     </ul>
 
     <% if signed_in? %>
