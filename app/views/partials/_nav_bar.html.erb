@@ -48,21 +48,14 @@
                        path: component_group_obj.decorate.path,
                        icon: 'fa-cubes' %>
           <% end %>
+
+          <% if @cluster_part %>
+            <%= render 'partials/nav_link',
+                       text: @cluster_part.name,
+                       path: @cluster_part.decorate.path,
+                       icon: 'fa-cube' %>
+          <% end %>
         <% end %>
-
-        <%#       <% if @cluster_part %>
-        <%#         <li class="nav-item">%>
-        <%#           <%= link_to (raw('<span class="fa fa-cube"></span> ') + @cluster_part.name),%>
-        <%#             @cluster_part.decorate.path,%>
-        <%#             class: 'nav-link nav-link--active'%>
-        <%#           %>
-        <%#         </li>%>
-        <%#       <% end %>
-
-        <%#     </li>%>
-        <%#   <% end %>
-        <%# <% end %>
-
       <% end %>
 
     </ul>
