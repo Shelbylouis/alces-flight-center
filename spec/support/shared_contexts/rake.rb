@@ -23,3 +23,9 @@ RSpec.shared_context "rake" do
     Rake::Task.define_task(:environment)
   end
 end
+
+RSpec.shared_examples 'it has prerequisite' do |name|
+  it "has #{name} prerequisite" do
+    expect(subject.prerequisites).to include(name.to_s)
+  end
+end

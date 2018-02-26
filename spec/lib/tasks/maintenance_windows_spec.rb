@@ -18,10 +18,7 @@ RSpec.describe 'alces:maintenance_windows:progress' do
     end
   end
 
-  it 'has environment prerequisite' do
-    # Required to load Rails environment so can access models etc.
-    expect(subject.prerequisites).to include('environment')
-  end
+  it_behaves_like 'it has prerequisite', :environment
 
   it 'attempts to progress all unfinished maintenance windows' do
     progressed_windows = []
