@@ -11,6 +11,8 @@ class MaintenanceWindow < ApplicationRecord
   validates_presence_of :requested_start
   validates_presence_of :requested_end
 
+  attr_accessor :skip_comments
+
   state_machine initial: :new do
     audit_trail context: :user
 
@@ -31,10 +33,9 @@ class MaintenanceWindow < ApplicationRecord
     event :start { transition confirmed: :started }
     event :end { transition started: :ended }
 
-    after_transition any => any do |model, transition|
-      new_state = transition.to_name
+    after_transition any => any do |model|
       # Use send so can keep method private.
-      model.send(:add_transition_comment, new_state)
+      model.send(:add_transition_comment)
     end
   end
 
@@ -85,7 +86,10 @@ class MaintenanceWindow < ApplicationRecord
   private
 
   delegate :site, to: :case
-  delegate :add_transition_comment, to: :maintenance_notifier
+
+  def add_transition_comment
+    maintenance_notifier.add_transition_comment(state) unless skip_comments
+  end
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
   # used to automatically set user who instigated the transition in created
