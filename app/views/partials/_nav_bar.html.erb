@@ -22,13 +22,18 @@
                      icon: 'fa-globe' %>
         <% end %>
 
-        <%# <% if @site %>
-        <%#   <li class="nav-item">%>
-        <%#     <%= link_to (raw('<span class="fa fa-institution"></span> ') + @site.name),%>
-        <%#       (current_user.admin? ? site_path(@site) : root_path),%>
-        <%#       class: "nav-link #{@cluster ? '' : 'nav-link--active'}"%>
-        <%#     %>
-        <%#   </li>%>
+        <% if @scope %>
+          <% site_obj = (@scope.is_a?(Site) ? @scope : @scope.site) %>
+          <% path_for_site = if current_user.admin?
+                               site_path site_obj
+                             else
+                               root_path
+                             end %>
+          <%= render 'partials/nav_link',
+                     text: site_obj.name,
+                     path: path_for_site,
+                     icon: 'fa-institution' %>
+        <% end %>
 
         <%#   <% if @cluster %>
         <%#     <li class="nav-item">%>
