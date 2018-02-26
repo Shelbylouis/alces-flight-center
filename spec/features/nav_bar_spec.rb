@@ -26,6 +26,14 @@ RSpec.feature 'Navigation Bar', type: :feature do
       expect(nav_bar.tag_name).to eq('nav')
       expect(site_nav_items[0]).to have_link(href: '/')
     end
+
+    it 'only has the last link active' do
+      active_css = '.nav-link--active'
+      site_nav_items[0..-2].each do |item|
+        expect(item).not_to have_css active_css
+      end
+      expect(site_nav_items.last).to have_css active_css
+    end
   end
 
   shared_examples 'a cluster navigation bar' do
