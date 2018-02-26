@@ -27,27 +27,24 @@
                              else
                                root_path
                              end %>
-          <% add_nav_link_proc text: site_obj.name,
+          <% add_nav_link_proc model: site_obj,
                                path: path_for_site,
                                icon: 'fa-institution' %>
 
           <% cluster_obj = model_from_scope :cluster %>
           <% if cluster_obj %>
-            <% add_nav_link_proc text: cluster_obj.name,
-                                 path: cluster_obj,
+            <% add_nav_link_proc model: cluster_obj,
                                  icon: 'fa-server' %>
           <% end %>
 
           <% component_group_obj = model_from_scope :component_group %>
           <% if component_group_obj %>
-            <% add_nav_link_proc text: component_group_obj.name,
-                                 path: component_group_obj,
+            <% add_nav_link_proc model: component_group_obj,
                                  icon: 'fa-cubes' %>
           <% end %>
 
           <% if @cluster_part %>
-            <% add_nav_link_proc text: @cluster_part.name,
-                                 path: @cluster_part,
+            <% add_nav_link_proc model: @cluster_part,
                                  icon: 'fa-cube' %>
           <% end %>
         <% end %>
