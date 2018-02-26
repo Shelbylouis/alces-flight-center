@@ -11,6 +11,8 @@ class MaintenanceWindow < ApplicationRecord
   validates_presence_of :requested_start
   validates_presence_of :requested_end
 
+  scope :unfinished, -> { where.not(state: finished_states) }
+
   attr_accessor :skip_comments
 
   state_machine initial: :new do

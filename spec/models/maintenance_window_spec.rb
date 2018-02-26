@@ -345,5 +345,23 @@ RSpec.describe MaintenanceWindow, type: :model do
         ])
       end
     end
+
+    describe '#unfinished' do
+      it 'returns all windows which have not reached a finished state' do
+        subject.possible_states.each do |state|
+          create(:maintenance_window, state: state)
+        end
+
+        unfinished_windows = described_class.unfinished
+
+        unfinished_window_states = unfinished_windows.map(&:state).map(&:to_sym)
+        expect(unfinished_window_states).to match_array([
+          :confirmed,
+          :new,
+          :requested,
+          :started,
+        ])
+      end
+    end
   end
 end
