@@ -13,9 +13,18 @@
 
 5. Debug things if the script fails for some reason.
 
-6. Rename the `Done` column at
+6. Ensure shared production server `crontab` for user log in as (currently
+   `ubuntu`) includes the following:
+
+   ```crontab
+   # Flight Center tasks.
+   * * * * * dokku --rm run flight-center rake alces:cron:every_minute
+   0 */3 * * * /home/ubuntu/flight-center-backup-database
+   ```
+
+7. Rename the `Done` column at
    https://trello.com/b/EYQnm3F9/alces-flight-center appropriately and create a
    new `Done` column.
 
-7. Announce the release at https://alces.slack.com/messages/C72GT476Y/,
+8. Announce the release at https://alces.slack.com/messages/C72GT476Y/,
    mentioning where to see what's in this release (the renamed column).
