@@ -16,12 +16,10 @@
 
       <% if signed_in? %>
         <% if current_user.admin? %>
-          <li class="nav-item">
-            <%= link_to (raw('<span class="fa fa-globe"></span> ') + 'All Sites'),
-              root_path,
-              class: "nav-link #{@site ? '' : 'nav-link--active'}"
-            %>
-          </li>
+          <%= render 'partials/nav_link',
+                     text: 'All Sites',
+                     path: root_path,
+                     icon: 'fa-globe' %>
         <% end %>
 
         <%# <% if @site %>
