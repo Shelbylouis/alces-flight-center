@@ -20,7 +20,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
         :end
       elsif start_time_passed? && confirmed?
         :start
-      elsif start_time_passed? && unconfirmed?
+      elsif start_time_passed? && not_yet_confirmed?
         :expire
       end
   end
@@ -33,7 +33,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
     window.requested_start.past?
   end
 
-  def unconfirmed?
+  def not_yet_confirmed?
     window.new? || window.requested?
   end
 
