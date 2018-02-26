@@ -38,8 +38,8 @@ module ApplicationHelper
   end
 
   def add_nav_link_proc(**inputs_to_partial)
-    nav_link_procs << Proc.new do |active|
-      render 'partials/nav_link', active: active, **inputs_to_partial
+    nav_link_procs << Proc.new do |**additional_inputs|
+      render 'partials/nav_link', **additional_inputs, **inputs_to_partial
     end
   end
 

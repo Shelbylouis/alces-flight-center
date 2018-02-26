@@ -52,9 +52,10 @@
           <% end %>
         <% end %>
       <% end %>
-      <% nav_link_procs.each do |nav_proc| %>
-        <%= nav_proc.call false %>
+      <% nav_link_procs[0..-2].each do |nav_proc| %>
+        <%= nav_proc.call %>
       <% end %>
+      <%= nav_link_procs.last.call(active: true) %>
     </ul>
 
     <% if signed_in? %>
