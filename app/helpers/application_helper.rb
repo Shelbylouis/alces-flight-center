@@ -37,6 +37,16 @@ module ApplicationHelper
     end
   end
 
+  def add_nav_link_proc(**inputs_to_partial)
+    nav_link_procs << Proc.new do |active|
+      render 'partials/nav_link', active: active, **inputs_to_partial
+    end
+  end
+
+  def nav_link_procs
+    @nav_link_procs ||= []
+  end
+
   def dark_button_classes
     ['btn', 'btn-primary', 'btn-block']
   end

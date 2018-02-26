@@ -27,7 +27,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
       expect(site_nav_items[0]).to have_link(href: '/')
     end
 
-    it 'only has the last link active' do
+    it 'only the last link is active' do
       active_css = '.nav-link--active'
       site_nav_items[0..-2].each do |item|
         expect(item).not_to have_css active_css

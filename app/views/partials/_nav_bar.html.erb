@@ -15,10 +15,9 @@
     <ul class="navbar-nav mr-auto">
       <% if signed_in? %>
         <% if current_user.admin? %>
-          <%= render 'partials/nav_link',
-                     text: 'All Sites',
-                     path: root_path,
-                     icon: 'fa-globe' %>
+          <% add_nav_link_proc text: 'All Sites',
+                               path: root_path,
+                               icon: 'fa-globe' %>
         <% end %>
 
         <% if @scope %>
@@ -28,34 +27,33 @@
                              else
                                root_path
                              end %>
-          <%= render 'partials/nav_link',
-                     text: site_obj.name,
-                     path: path_for_site,
-                     icon: 'fa-institution' %>
+          <% add_nav_link_proc text: site_obj.name,
+                               path: path_for_site,
+                               icon: 'fa-institution' %>
 
           <% cluster_obj = model_from_scope :cluster %>
           <% if cluster_obj %>
-            <%= render 'partials/nav_link',
-                      text: cluster_obj.name,
-                      path: cluster_obj,
-                      icon: 'fa-server' %>
+            <% add_nav_link_proc text: cluster_obj.name,
+                                 path: cluster_obj,
+                                 icon: 'fa-server' %>
           <% end %>
 
           <% component_group_obj = model_from_scope :component_group %>
           <% if component_group_obj %>
-            <%= render 'partials/nav_link',
-                       text: component_group_obj.name,
-                       path: component_group_obj,
-                       icon: 'fa-cubes' %>
+            <% add_nav_link_proc text: component_group_obj.name,
+                                 path: component_group_obj,
+                                 icon: 'fa-cubes' %>
           <% end %>
 
           <% if @cluster_part %>
-            <%= render 'partials/nav_link',
-                       text: @cluster_part.name,
-                       path: @cluster_part,
-                       icon: 'fa-cube' %>
+            <% add_nav_link_proc text: @cluster_part.name,
+                                 path: @cluster_part,
+                                 icon: 'fa-cube' %>
           <% end %>
         <% end %>
+      <% end %>
+      <% nav_link_procs.each do |nav_proc| %>
+        <%= nav_proc.call false %>
       <% end %>
     </ul>
 
