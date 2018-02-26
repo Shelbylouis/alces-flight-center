@@ -41,6 +41,16 @@ RSpec.describe ProgressMaintenanceWindow do
       include_examples 'progresses', from: :requested, to: :expired
     end
 
+    def create_window(state:)
+      create(
+        :maintenance_window,
+        state: state,
+        requested_start: requested_start,
+        requested_end: requested_end,
+        component: component,
+      )
+    end
+
     def test_progression(initial_state:, expected_state:, expected_message:)
       window = create_window(state: initial_state)
 
@@ -72,29 +82,15 @@ RSpec.describe ProgressMaintenanceWindow do
     end
 
     context 'when requested_start and requested_end in future' do
-      def create_window(state:)
-        create(
-          :maintenance_window,
-          state: state,
-          requested_start: DateTime.current.advance(days: 1),
-          requested_end: DateTime.current.advance(days: 2),
-          component: component,
-        )
-      end
+      let :requested_start { DateTime.current.advance(days: 1) }
+      let :requested_end { DateTime.current.advance(days: 2) }
 
       include_examples 'does not progress', MaintenanceWindow.possible_states
     end
 
     context 'when just requested_start passed' do
-      def create_window(state:)
-        create(
-          :maintenance_window,
-          state: state,
-          requested_start: 1.hours.ago,
-          requested_end: DateTime.current.advance(days: 1),
-          component: component,
-        )
-      end
+      let :requested_start { 1.hours.ago }
+      let :requested_end { DateTime.current.advance(days: 1) }
 
       include_examples 'progresses unstarted windows'
 
@@ -103,15 +99,8 @@ RSpec.describe ProgressMaintenanceWindow do
     end
 
     context 'when requested_start and requested_end passed' do
-      def create_window(state:)
-        create(
-          :maintenance_window,
-          state: state,
-          requested_start: 2.hours.ago,
-          requested_end: 1.hours.ago,
-          component: component,
-        )
-      end
+      let :requested_start { 2.hours.ago }
+      let :requested_end { 1.hours.ago }
 
       # If both `requested_start` and `requested_end` have passed and a window
       # has still not transitioned from an unstarted state (e.g. if the
