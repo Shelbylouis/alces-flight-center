@@ -29,11 +29,8 @@ class ApplicationController < ActionController::Base
     RequestStore.store[:current_user] = current_user
   end
 
-  # NOTE: The switch to using @scope has not caused any tests to fail
-  # on this method. It might be worth changing it or removing it
-  # completely
   def current_site
-    @site
+    @site || @scope.site
   end
 
   # From https://stackoverflow.com/a/4983354/2620402.
@@ -48,14 +45,10 @@ class ApplicationController < ActionController::Base
   def define_navigation_variables
     return unless current_user
 
-    if request.path == '/' && !current_user.admin?
-      return @scope = @site = current_user.site
-    end
-
     @scope = case request.path
              when /^\/sites/
                id = scope_id_params(:site_id)
-               @site = Site.find(id) if current_user.admin?
+               @site = Site.find(id)
              when /^\/clusters/
                id = scope_id_params(:cluster_id)
                @cluster = Cluster.find(id)
@@ -68,6 +61,8 @@ class ApplicationController < ActionController::Base
              when /^\/services/
                id = scope_id_params(:service_id)
                @service = @cluster_part = Service.find(id)
+             else
+               @site = current_user.site unless current_user.admin?
              end
   end
 
