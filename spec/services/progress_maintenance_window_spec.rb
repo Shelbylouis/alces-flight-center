@@ -17,6 +17,14 @@ RSpec.describe ProgressMaintenanceWindow do
           window: window,
           expected: "#{from} -> #{to}"
         )
+
+        # Need to check that the transition model is created when the window is
+        # created to avoid gotcha with `state_machines` Gem where implicit
+        # transitions do not fire callbacks (see
+        # https://github.com/state-machines/state_machines-activerecord/issues/47).
+        corresponding_transitions =
+          window.transitions.where(from: from, to: to)
+        expect(corresponding_transitions.length).to eq 1
       end
     end
 
