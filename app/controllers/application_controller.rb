@@ -38,7 +38,7 @@ class ApplicationController < ActionController::Base
     raise ActionController::RoutingError.new('Not Found')
   end
 
-  def scope_id_params(id_method)
+  def scope_id_param(id_method)
     params[id_method] || params[:id]
   end
 
@@ -47,19 +47,19 @@ class ApplicationController < ActionController::Base
 
     @scope = case request.path
              when /^\/sites/
-               id = scope_id_params(:site_id)
+               id = scope_id_param(:site_id)
                @site = Site.find(id)
              when /^\/clusters/
-               id = scope_id_params(:cluster_id)
+               id = scope_id_param(:cluster_id)
                @cluster = Cluster.find(id)
              when /^\/components/
-               id = scope_id_params(:component_id)
+               id = scope_id_param(:component_id)
                @component = @cluster_part = Component.find(id)
              when /^\/component-groups/
-               id = scope_id_params(:component_group_id)
+               id = scope_id_param(:component_group_id)
                @component_group = ComponentGroup.find(id)
              when /^\/services/
-               id = scope_id_params(:service_id)
+               id = scope_id_param(:service_id)
                @service = @cluster_part = Service.find(id)
              else
                @site = current_user.site unless current_user.admin?
