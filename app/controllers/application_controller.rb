@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
   end
 
   def current_site
-    @site || @scope.site
+    @scope.site
   end
 
   # From https://stackoverflow.com/a/4983354/2620402.
