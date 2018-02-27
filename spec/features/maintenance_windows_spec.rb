@@ -59,6 +59,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(new_window.requested_start).to eq DateTime.new(2022, 9, 10, 13, 0)
       expect(new_window.requested_end).to eq DateTime.new(2023, 9, 20, 13, 0)
       expect(current_path).to eq(cluster_path(cluster))
+      expect(find('.alert')).to have_text(/Maintenance requested/)
     end
   end
 
@@ -89,6 +90,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(page).not_to have_button(button_text)
       expect(page.all('table')[1]).to have_text(user_name)
       expect(window.confirmed_by).to eq(user)
+      expect(find('.alert')).to have_text(/maintenance confirmed/)
     end
   end
 end

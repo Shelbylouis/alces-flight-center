@@ -23,6 +23,7 @@ class MaintenanceWindowsController < ApplicationController
   def confirm
     window = MaintenanceWindow.find(params[:id])
     window.confirm!(current_user)
+    flash[:success] = 'Requested maintenance confirmed.'
     redirect_to cluster_path(window.associated_cluster)
   end
 
