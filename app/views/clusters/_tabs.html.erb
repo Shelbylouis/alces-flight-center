@@ -1,13 +1,14 @@
 <%
   tabs = [
-    { text: 'Cases', path: cluster_cases_path(@cluster) }
+    { id: :cases, text: 'Cases', path: cluster_cases_path(@cluster) }
   ]
 %>
 <div class='card'>
   <div class='card-header'>
     <ul class="nav nav-tabs">
       <% tabs.each do |tab| %>
-        <%= render 'partials/nav_link', **tab %>
+        <% active = (tab[:id] == activate) %>
+        <%= render 'partials/nav_link', **tab, active: active %>
       <% end %>
     </ul>
   </div>

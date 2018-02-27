@@ -1,6 +1,6 @@
 
 <% if @scope.is_a? Cluster %>
-    <%= render 'clusters/tabs' %>
+  <%= render 'clusters/tabs', activate: :cases %>
 <% end %>
 
 <%= render 'cases_table', model: @scope, archive: true %>
