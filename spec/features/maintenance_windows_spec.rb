@@ -27,7 +27,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       end_maintenance_window_case_path(support_case.id)
     end
 
-    it 'can request maintenance in association with different Case for Cluster' do
+    it 'can request maintenance in association with any Case for Cluster' do
       cluster = create(:cluster)
       component = create(:component, cluster: cluster)
       case_subject = 'Unrelated case'
