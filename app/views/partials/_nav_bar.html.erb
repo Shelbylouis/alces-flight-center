@@ -47,10 +47,10 @@
                             nav_icon: 'fa-cube'
         end
       end %>
-      <% nav_link_procs[0..-2].each do |nav_proc| %>
-        <%= nav_proc.call %>
+      <% nav_link_procs.each do |nav_proc| %>
+        <% active = (nav_proc == nav_link_procs.last) %>
+        <%= nav_proc.call active: active %>
       <% end %>
-      <%= nav_link_procs.last&.call(active: true) %>
     </ul>
 
     <% if signed_in? %>
