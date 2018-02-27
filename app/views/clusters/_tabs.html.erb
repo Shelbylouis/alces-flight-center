@@ -1,13 +1,16 @@
 <%
   tabs = [
-    { text: 'Cases', path: '/placeholder' }
+    { text: 'Cases', path: cluster_cases_path(@cluster) }
   ]
 %>
-<div class='card-header'>
-  <ul class="nav nav-tabs">
-    <% tabs.each do |tab| %>
-      <%= render 'partials/nav_link', **tab %>
-    <% end %>
-  </ul>
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav nav-tabs">
+      <% tabs.each do |tab| %>
+        <%= render 'partials/nav_link', **tab %>
+      <% end %>
+    </ul>
+  </div>
+  <% # NOTE: Add a yield here for the card body, maybe? %>
 </div>
 

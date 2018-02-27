@@ -1,2 +1,6 @@
 
-<%= render 'cases_table', model: site, archive: true %>
+<% if @scope.is_a? Cluster %>
+    <%= render 'clusters/tabs' %>
+<% end %>
+
+<%= render 'cases_table', model: @scope, archive: true %>
