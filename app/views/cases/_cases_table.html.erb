@@ -11,8 +11,7 @@
           role: 'button'
         )
       end
-      # TODO: This does not work for cluster objects
-      # list.push model.case_form_buttons
+      list.push model.decorate.case_form_buttons
     end),
     title: raw("#{archive ? 'All' : 'Open'} support cases &mdash; #{model.name}")
   %>
