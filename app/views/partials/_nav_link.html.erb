@@ -1,7 +1,7 @@
 <% path ||= model %>
 <% text ||= model.name %>
 <li class='nav-item'>
-  <%= link_to (raw("<span class='fa #{icon}'></span> ") + text),
+  <%= link_to (raw("<span class='fa #{nav_icon}'></span> ") + text),
               path,
               class: "nav-link #{ 'nav-link--active' if (active ||= false) }"
   %>
