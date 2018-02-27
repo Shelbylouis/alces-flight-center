@@ -1,0 +1,13 @@
+<%
+  tabs = [
+    { text: 'Cases', path: '/placeholder' }
+  ]
+%>
+<div class='card-header'>
+  <ul class="nav nav-tabs">
+    <% tabs.each do |tab| %>
+      <%= render 'partials/nav_link', **tab %>
+    <% end %>
+  </ul>
+</div>
+
