@@ -61,6 +61,20 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(current_path).to eq(cluster_path(cluster))
       expect(find('.alert')).to have_text(/Maintenance requested/)
     end
+
+    it 'can cancel requested maintenance' do
+      window = create(:requested_maintenance_window, cluster: cluster)
+
+      visit cluster_path(cluster, as: user)
+      button_text = 'Cancel'
+      click_button(button_text)
+
+      window.reload
+      expect(window).to be_cancelled
+      expect(window.cancelled_by).to eq user
+      expect(current_path).to eq(cluster_path(cluster))
+      expect(find('.alert')).to have_text(/maintenance cancelled/)
+    end
   end
 
   context 'when user is contact' do
