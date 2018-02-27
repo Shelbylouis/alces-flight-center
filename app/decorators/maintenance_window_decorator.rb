@@ -1,5 +1,6 @@
 class MaintenanceWindowDecorator < ApplicationDecorator
   delegate_all
+  decorates_association :associated_model
 
   def transition_info(state)
     user = public_send("#{state}_by")

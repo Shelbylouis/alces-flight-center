@@ -23,28 +23,23 @@
   <table class="table table-responsive">
     <thead>
       <tr>
-        <th>Date</th>
         <th>For</th>
-        <th>Requested By</th>
-        <th>Confirmed By</th>
+        <th>Requested</th>
+        <th>Confirmed</th>
       </tr>
     </thead>
 
     <tbody>
-    <% cluster.open_related_maintenance_windows.each do |window| %>
+    <% cluster.open_related_maintenance_windows.map(&:decorate).each do |window| %>
       <tr>
-        <td><%= window.created_at.to_formatted_s(:short) %></td>
-        <td><%= window.associated_model.decorate.links %></td>
-        <td><%= window.requested_by.name %></td>
+        <td><%= window.associated_model.links %></td>
+        <td><%= window.transition_info(:requested) %></td>
         <td>
-          <% if window.confirmed_by %>
-            <%= window.confirmed_by.name %>
-          <% else %>
-            <%= button_to raw('Unconfirmed &mdash; click to confirm'),
-              confirm_maintenance_window_path(window),
-              class: ['btn', 'btn-success', 'btn-block']
-            %>
-          <% end %>
+          <%= window.transition_info(:confirmed) || button_to(
+            raw('Unconfirmed &mdash; click to confirm'),
+            confirm_maintenance_window_path(window),
+            class: ['btn', 'btn-success', 'btn-block'])
+          %>
         </td>
       </tr>
     <% end %>
