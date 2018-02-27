@@ -13,42 +13,42 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <% if signed_in? %>
-        <% if current_user.admin? %>
-          <% add_nav_link_proc text: 'All Sites',
-                               path: root_path,
-                               nav_icon: 'fa-globe' %>
-        <% end %>
+      <% if signed_in?
+        if current_user.admin?
+          add_nav_link_proc text: 'All Sites',
+                            path: root_path,
+                            nav_icon: 'fa-globe'
+        end
 
-        <% if @scope %>
-          <% site_obj = model_from_scope :site %>
-          <% path_for_site = if current_user.admin?
-                               site_obj
-                             else
-                               root_path
-                             end %>
-          <% add_nav_link_proc model: site_obj,
-                               path: path_for_site,
-                               nav_icon: 'fa-institution' %>
+        if @scope
+          site_obj = model_from_scope :site
+          path_for_site = if current_user.admin?
+                            site_obj
+                          else
+                            root_path
+                          end
+          add_nav_link_proc model: site_obj,
+                            path: path_for_site,
+                            nav_icon: 'fa-institution'
 
-          <% cluster_obj = model_from_scope :cluster %>
-          <% if cluster_obj %>
-            <% add_nav_link_proc model: cluster_obj,
-                                 nav_icon: 'fa-server' %>
-          <% end %>
+          cluster_obj = model_from_scope :cluster
+          if cluster_obj
+            add_nav_link_proc model: cluster_obj,
+                              nav_icon: 'fa-server'
+          end
 
-          <% component_group_obj = model_from_scope :component_group %>
-          <% if component_group_obj %>
-            <% add_nav_link_proc model: component_group_obj,
-                                 nav_icon: 'fa-cubes' %>
-          <% end %>
+          component_group_obj = model_from_scope :component_group
+          if component_group_obj
+            add_nav_link_proc model: component_group_obj,
+                              nav_icon: 'fa-cubes'
+          end
 
-          <% if @cluster_part %>
-            <% add_nav_link_proc model: @cluster_part,
-                                 nav_icon: 'fa-cube' %>
-          <% end %>
-        <% end %>
-      <% end %>
+          if @cluster_part
+            add_nav_link_proc model: @cluster_part,
+                              nav_icon: 'fa-cube'
+          end
+        end
+      end %>
       <% nav_link_procs[0..-2].each do |nav_proc| %>
         <%= nav_proc.call %>
       <% end %>
