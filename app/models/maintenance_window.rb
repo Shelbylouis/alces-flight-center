@@ -78,19 +78,12 @@ class MaintenanceWindow < ApplicationRecord
   end
 
   def method_missing(symbol, *args)
-    super unless symbol =~ /^([a-z]+)_(at|by)$/
-    state = $1.to_sym
-    property = $2.to_sym
-    super unless self.class.possible_states.include?(state)
-    last_transition_property(state: state, property: property)
+    query = TransitionQuery.parse(symbol)
+    query ? query.value_for(self) : super
   end
 
   def respond_to?(symbol, include_all=false)
-    super || (
-      return false unless symbol =~ /^([a-z]+)_(at|by)$/
-      state = $1.to_sym
-      self.class.possible_states.include?(state)
-    )
+    super || TransitionQuery.parse(symbol)
   end
 
   private
@@ -124,17 +117,33 @@ class MaintenanceWindow < ApplicationRecord
     [cluster, component, service].select(&:present?).length
   end
 
-  def last_transition_property(state:, property:)
-    transition = last_transition_to_state(state)
-    case property
-    when :at
-      transition&.created_at
-    when :by
-      transition&.user
-    end
-  end
+  # Represents a query for the value of a particular property of a
+  # MaintenanceWindow when it last transitioned to a particular state.
+  TransitionQuery = Struct.new(:state, :property) do
+    REGEX = /^([a-z]+)_(at|by)$/
 
-  def last_transition_to_state(state)
-    transitions.where(to: state).last
+    def self.parse(symbol)
+      return false unless symbol =~ REGEX
+      state = $1.to_sym
+      property = $2.to_sym
+      return false unless MaintenanceWindow.possible_states.include?(state)
+      new(state, property)
+    end
+
+    def value_for(window)
+      transition = last_transition_to_state(window)
+      case property
+      when :at
+        transition&.created_at
+      when :by
+        transition&.user
+      end
+    end
+
+    private
+
+    def last_transition_to_state(window)
+      window.transitions.where(to: state).last
+    end
   end
 end
