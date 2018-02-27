@@ -45,6 +45,11 @@
               'Cancel request for maintenance',
               cancel_maintenance_window_path(window),
               class: ['btn', 'btn-warning', 'btn-block']
+            ),
+            button_to(
+              'Reject request for maintenance',
+              reject_maintenance_window_path(window),
+              class: ['btn', 'btn-danger', 'btn-block']
             )
           ].join)
           %>

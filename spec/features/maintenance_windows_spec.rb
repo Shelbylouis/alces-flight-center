@@ -106,5 +106,24 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(window.confirmed_by).to eq(user)
       expect(find('.alert')).to have_text(/maintenance confirmed/)
     end
+
+    it 'can reject requested maintenance' do
+      window = create(
+        :requested_maintenance_window,
+        component: component,
+        case: support_case
+      )
+
+      visit cluster_path(cluster, as: user)
+      button_text = 'Reject'
+
+      click_button(button_text)
+
+      window.reload
+      expect(window).to be_rejected
+      expect(window.rejected_by).to eq user
+      expect(current_path).to eq(cluster_path(cluster))
+      expect(find('.alert')).to have_text(/maintenance rejected/)
+    end
   end
 end

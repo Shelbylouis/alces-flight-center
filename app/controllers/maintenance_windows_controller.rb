@@ -27,6 +27,13 @@ class MaintenanceWindowsController < ApplicationController
     redirect_to cluster_path(window.associated_cluster)
   end
 
+  def reject
+    window = MaintenanceWindow.find(params[:id])
+    window.reject!(current_user)
+    flash[:success] = 'Requested maintenance rejected.'
+    redirect_to cluster_path(window.associated_cluster)
+  end
+
   def cancel
     window = MaintenanceWindow.find(params[:id])
     window.cancel!(current_user)

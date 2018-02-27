@@ -99,6 +99,7 @@ Rails.application.routes.draw do
     resources :maintenance_windows, only: [] do
       member do
         post :confirm
+        post :reject
       end
     end
   end
