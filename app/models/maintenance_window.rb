@@ -85,6 +85,14 @@ class MaintenanceWindow < ApplicationRecord
     last_transition_property(state: state, property: property)
   end
 
+  def respond_to?(symbol, include_all=false)
+    super || (
+      return false unless symbol =~ /^([a-z]+)_(at|by)$/
+      state = $1.to_sym
+      self.class.possible_states.include?(state)
+    )
+  end
+
   private
 
   delegate :site, to: :case
