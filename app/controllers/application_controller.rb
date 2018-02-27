@@ -46,9 +46,6 @@ class ApplicationController < ActionController::Base
     return unless current_user
 
     @scope = case request.path
-             when /^\/sites/
-               id = scope_id_param(:site_id)
-               @site = Site.find(id)
              when /^\/clusters/
                id = scope_id_param(:cluster_id)
                @cluster = Cluster.find(id)
@@ -62,7 +59,12 @@ class ApplicationController < ActionController::Base
                id = scope_id_param(:service_id)
                @service = @cluster_part = Service.find(id)
              else
-               @site = current_user.site unless current_user.admin?
+               @site = if request.path =~ /^\/sites/
+                         id = scope_id_param(:site_id)
+                         Site.find(id)
+                       elsif current_user.contact?
+                         current_user.site
+                       end
              end
   end
 
