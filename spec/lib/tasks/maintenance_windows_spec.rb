@@ -43,7 +43,8 @@ RSpec.describe 'alces:maintenance_windows:progress' do
 
     before :each do
       expect(ActiveSupport::Logger).to receive(:new).with(
-        'log/tasks/maintenance_windows/progress.log'
+        'log/tasks/maintenance_windows/progress.log',
+        'weekly',
       ).and_return(logger)
       allow(logger).to receive(:info)
     end

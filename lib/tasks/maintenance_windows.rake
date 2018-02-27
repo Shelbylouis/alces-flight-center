@@ -16,7 +16,8 @@ namespace :alces do
 
     def create_logger(log_path)
       FileUtils.mkdir_p(File.dirname(log_path))
-      ActiveSupport::Logger.new(log_path)
+      shift_age = 'weekly'
+      ActiveSupport::Logger.new(log_path, shift_age)
     end
   end
 end
