@@ -43,15 +43,17 @@
               confirm_maintenance_window_path(window),
               class: ['btn', 'btn-success', 'btn-block']
             ),
-            button_to(
-              'Cancel request for maintenance',
-              cancel_maintenance_window_path(window),
-              class: ['btn', 'btn-warning', 'btn-block']
-            ),
-            button_to(
-              'Reject request for maintenance',
-              reject_maintenance_window_path(window),
-              class: ['btn', 'btn-danger', 'btn-block']
+            (current_user.contact? ?
+              button_to(
+                'Reject request for maintenance',
+                reject_maintenance_window_path(window),
+                class: ['btn', 'btn-danger', 'btn-block']
+              )
+            : button_to(
+                'Cancel request for maintenance',
+                cancel_maintenance_window_path(window),
+                class: ['btn', 'btn-warning', 'btn-block']
+              )
             )
           ].join)
           %>

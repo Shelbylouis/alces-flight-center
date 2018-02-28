@@ -75,6 +75,14 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(current_path).to eq(cluster_path(cluster))
       expect(find('.alert')).to have_text(/maintenance cancelled/)
     end
+
+    it 'cannot see reject button' do
+      create(:requested_maintenance_window, cluster: cluster)
+
+      visit cluster_path(cluster, as: user)
+
+      expect(page).not_to have_button('Reject')
+    end
   end
 
   context 'when user is contact' do
@@ -124,6 +132,18 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(window.rejected_by).to eq user
       expect(current_path).to eq(cluster_path(cluster))
       expect(find('.alert')).to have_text(/maintenance rejected/)
+    end
+
+    it 'cannot see cancel button' do
+      create(
+        :requested_maintenance_window,
+        component: component,
+        case: support_case
+      )
+
+      visit cluster_path(cluster, as: user)
+
+      expect(page).not_to have_button('Cancel')
     end
   end
 end
