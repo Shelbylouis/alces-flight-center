@@ -75,7 +75,7 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it 'has RT ticket comment added when cancelled' do
         subject.component = create(:component, name: 'some_component')
-        user = create(:user, name: 'some_user')
+        user = create(:admin, name: 'some_user')
 
         expect(Case.request_tracker).to receive(
           :add_ticket_correspondence
@@ -124,7 +124,7 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it 'has RT ticket comment added when requested' do
         subject.component = create(:component, name: 'some_component')
-        requestor = create(:user, name: 'some_user')
+        requestor = create(:admin, name: 'some_user')
 
         expected_cluster_url = Rails.application.routes.url_helpers.cluster_url(
           subject.component.cluster
@@ -276,7 +276,7 @@ RSpec.describe MaintenanceWindow, type: :model do
     describe '#*_at' do
       it 'returns time transition occurred for valid state' do
         maintenance_window = create(:maintenance_window)
-        user = create(:user)
+        user = create(:admin)
         maintenance_window.request!(user)
         transition_time = 3.days.ago.at_midnight
         maintenance_window
@@ -303,7 +303,7 @@ RSpec.describe MaintenanceWindow, type: :model do
 
     describe '#*_by' do
       it 'returns the user associated with transition for valid state' do
-        user = create(:user, name: 'some_user')
+        user = create(:admin, name: 'some_user')
         maintenance_window = create(:maintenance_window)
         maintenance_window.request!(user)
 

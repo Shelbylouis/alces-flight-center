@@ -26,5 +26,64 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
         end
       end
     end
+
+    describe 'user type' do
+      context 'when `request` event' do
+        subject do
+          build(:maintenance_window_state_transition, event: :request)
+        end
+
+        it 'can be initiated by admin' do
+          subject.user = create(:admin)
+
+          expect(subject).to be_valid
+        end
+
+        it 'cannot be initiated by contact' do
+          subject.user = create(:contact)
+
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to include user: [/must be an admin/]
+        end
+      end
+
+      context 'when `cancel` event' do
+        subject do
+          build(:maintenance_window_state_transition, event: :cancel)
+        end
+
+        it 'can be initiated by admin' do
+          subject.user = create(:admin)
+
+          expect(subject).to be_valid
+        end
+
+        it 'cannot be initiated by contact' do
+          subject.user = create(:contact)
+
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to include user: [/must be an admin/]
+        end
+      end
+
+      context 'when `reject` event' do
+        subject do
+          build(:maintenance_window_state_transition, event: :reject)
+        end
+
+        it 'cannot be initiated by admin' do
+          subject.user = create(:admin)
+
+          expect(subject).not_to be_valid
+          expect(subject.errors.messages).to include user: [/must be a site contact/]
+        end
+
+        it 'can be initiated by contact' do
+          subject.user = create(:contact)
+
+          expect(subject).to be_valid
+        end
+      end
+    end
   end
 end

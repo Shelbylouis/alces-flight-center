@@ -8,7 +8,7 @@ RSpec.describe MaintenanceWindowDecorator do
         .decorate
     end
 
-    let :requestor { create(:user, name: 'Some User') }
+    let :requestor { create(:admin, name: 'Some User') }
 
     it 'gives string with info on transition to this state' do
       info = subject.transition_info(:requested)
