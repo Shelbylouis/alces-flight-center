@@ -1,0 +1,19 @@
+
+<%= button_to(
+  raw('Unconfirmed &mdash; click to confirm'),
+  confirm_maintenance_window_path(window),
+  class: ['btn', 'btn-success', 'btn-block']
+)
+%>
+
+<% if current_user.admin? %>
+  <%= button_to 'Cancel request for maintenance',
+    cancel_maintenance_window_path(window),
+    class: ['btn', 'btn-warning', 'btn-block']
+  %>
+<% else %>
+  <%= button_to 'Reject request for maintenance',
+    reject_maintenance_window_path(window),
+    class: ['btn', 'btn-danger', 'btn-block']
+  %>
+<% end %>

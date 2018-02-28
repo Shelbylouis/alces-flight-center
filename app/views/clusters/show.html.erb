@@ -37,26 +37,8 @@
         <td><%= window.scheduled_period %></td>
         <td><%= window.transition_info(:requested) %></td>
         <td>
-          <%= window.transition_info(:confirmed) || raw([
-            button_to(
-              raw('Unconfirmed &mdash; click to confirm'),
-              confirm_maintenance_window_path(window),
-              class: ['btn', 'btn-success', 'btn-block']
-            ),
-            (current_user.contact? ?
-              button_to(
-                'Reject request for maintenance',
-                reject_maintenance_window_path(window),
-                class: ['btn', 'btn-danger', 'btn-block']
-              )
-            : button_to(
-                'Cancel request for maintenance',
-                cancel_maintenance_window_path(window),
-                class: ['btn', 'btn-warning', 'btn-block']
-              )
-            )
-          ].join)
-          %>
+          <%= window.transition_info(:confirmed) ||
+            render('maintenance_windows/unconfirmed_buttons', window: window) %>
         </td>
       </tr>
     <% end %>
