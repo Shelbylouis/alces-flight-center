@@ -1,6 +1,11 @@
 <%
   tabs = [
-    { id: :cases, text: 'Cases', path: cluster_cases_path(@cluster) }
+    { id: :cases, text: 'Cases', path: cluster_cases_path(@cluster) },
+    {
+      id: :services,
+      text: 'Services',
+      path: cluster_services_path(@cluster)
+    },
   ]
 %>
 <div class='card'>

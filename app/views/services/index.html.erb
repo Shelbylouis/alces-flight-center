@@ -1,0 +1,36 @@
+
+<% if @scope.is_a? Cluster %>
+  <%= render 'clusters/tabs', activate: :services %>
+<% end %>
+
+<div class='card'>
+  <%= render 'partials/card_header_nav', title: 'Services' %>
+
+  <table class="table table-responsive">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Support type</th>
+      </tr>
+    </thead>
+
+    <tbody>
+    <% @scope.services.map(&:decorate).each do |service| %>
+      <tr>
+        <td width='40%'>
+          <%= link_to service.name, service_path(service) %>
+          <%= service.cluster_part_icons %>
+        </td>
+        <td width='30%'><%= service.readable_support_type.capitalize %></td>
+        <td width='10%'>
+          <%= service.start_maintenance_request_link %>
+        </td>
+        <td width='20%'>
+          <%= service.change_support_type_button %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+

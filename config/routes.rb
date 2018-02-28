@@ -88,6 +88,7 @@ Rails.application.routes.draw do
 
     resources :clusters, only: :show do
       resources :cases, only: [:index, :new]
+      resources :services, only: :index
       resources :consultancy, only: :new
       logs.call
     end
