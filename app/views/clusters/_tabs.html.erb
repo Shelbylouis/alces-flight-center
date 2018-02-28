@@ -14,7 +14,12 @@
     {
       id: :components,
       text: 'Components',
-      path: cluster_components_path(@cluster)
+      path: cluster_components_path(@cluster),
+      dropdown: [
+        { text: 'item1', path: '/' },
+        { text: 'item2', path: '/' },
+        { text: 'item3', path: '/' }
+      ]
     }
   ]
 %>
