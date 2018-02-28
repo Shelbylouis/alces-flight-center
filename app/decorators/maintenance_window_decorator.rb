@@ -2,6 +2,17 @@ class MaintenanceWindowDecorator < ApplicationDecorator
   delegate_all
   decorates_association :associated_model
 
+  def scheduled_period
+    h.raw(
+      [
+        format(requested_start),
+        '&mdash;',
+        format(requested_end),
+        started? ? '<strong>(in progress)</strong>' : ''
+      ].join(' ').strip
+    )
+  end
+
   def transition_info(state)
     user = public_send("#{state}_by")
     date = public_send("#{state}_at")
@@ -12,7 +23,10 @@ class MaintenanceWindowDecorator < ApplicationDecorator
 
   def transition_info_text(user, date)
     return false unless user && date
-    formatted_date = date.to_formatted_s(:short)
-    h.raw("By <em>#{user.name}</em> on <em>#{formatted_date}</em>")
+    h.raw("By <em>#{user.name}</em> on <em>#{format(date)}</em>")
+  end
+
+  def format(date_time)
+    date_time.to_formatted_s(:short)
   end
 end
