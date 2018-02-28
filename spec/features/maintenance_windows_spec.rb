@@ -155,7 +155,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(window).to be_confirmed
       expect(window.confirmed_by).to eq(user)
       expect(page).not_to have_button(button_text)
-      expect(page.all('table')[1]).to have_text(user_name)
+      expect(page.first('table.maintenance')).to have_text(user_name)
       expect(find('.alert')).to have_text(/maintenance confirmed/)
     end
 
