@@ -91,7 +91,9 @@ class MaintenanceWindow < ApplicationRecord
   delegate :site, to: :case
 
   def add_transition_comment
-    maintenance_notifier.add_transition_comment(state) unless skip_comments
+    unless invalid? || skip_comments
+      maintenance_notifier.add_transition_comment(state)
+    end
   end
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and

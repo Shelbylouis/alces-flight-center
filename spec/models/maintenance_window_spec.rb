@@ -47,6 +47,15 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it { is_expected.to be_invalid }
     end
+
+    context 'after invalid transition' do
+      before :each do
+        subject.cluster = create(:cluster)
+        subject.request!
+      end
+
+      it { is_expected.to be_invalid }
+    end
   end
 
   describe 'states' do
