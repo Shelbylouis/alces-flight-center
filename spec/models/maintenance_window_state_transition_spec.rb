@@ -6,7 +6,7 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
     automatic_states = [:new, :started, :ended, :expired]
 
     user_initiated_states.each do |state|
-      describe "when transition to `#{state}`" do
+      context "when transition to `#{state}`" do
         subject do
           build(:maintenance_window_state_transition, to: state)
         end
@@ -16,7 +16,7 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
     end
 
     automatic_states.each do |state|
-      describe "when transition to `#{state}`" do
+      context "when transition to `#{state}`" do
         subject do
           build(:maintenance_window_state_transition, to: state)
         end
