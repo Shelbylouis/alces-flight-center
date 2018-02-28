@@ -10,7 +10,8 @@
     </thead>
 
     <tbody>
-      <% group.decorate.components.each do |component| %>
+      <% @components ||= group.components %>
+      <% @components.map(&:decorate).each do |component| %>
         <tr>
           <td width='40%'>
             <%= link_to component.name, component_path(component) %>
