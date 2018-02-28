@@ -46,6 +46,12 @@ module ApplicationHelper
     @nav_link_procs ||= []
   end
 
+  def render_tab_bar(**render_args)
+    if @scope.is_a? Cluster
+      render('clusters/tabs', **render_args)
+    end
+  end
+
   def dark_button_classes
     ['btn', 'btn-primary', 'btn-block']
   end

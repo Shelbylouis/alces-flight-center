@@ -1,7 +1,5 @@
 
-<% if @scope.is_a? Cluster %>
-  <%= render 'clusters/tabs', activate: :services %>
-<% end %>
+<%= render_tab_bar activate: :services %>
 
 <div class='card'>
   <%= render 'partials/card_header_nav', title: 'Services' %>

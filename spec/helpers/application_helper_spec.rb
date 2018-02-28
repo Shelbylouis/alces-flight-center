@@ -38,4 +38,35 @@ RSpec.describe ApplicationHelper do
       expect(boolean_symbol(false)).to eq(raw('&cross;'))
     end
   end
+
+  describe '#render_tab_bar' do
+    subject { render_tab_bar }
+
+    # It has to return a string. Returning nil breaks the render
+    def expect_render_tabs(template)
+      expect(helper).to \
+        receive(:render).with(template, instance_of(Hash))
+                        .once.and_return('')
+    end
+
+    context 'without a scope set' do
+      before :each { @scope = nil }
+
+      it 'nothing is rendered' do
+        expect(helper).not_to receive(:render)
+        subject
+      end
+    end
+
+    context 'within a cluster scope' do
+      let :cluster { create(:cluster) }
+      before :each { @scope = cluster }
+
+      it 'renders the cluster nav bar' do
+        expect_render_tabs('clusters/tabs')
+        subject
+      end
+    end
+  end
 end
+
