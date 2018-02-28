@@ -16,87 +16,80 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     allow_any_instance_of(Cluster).to receive(:documents).and_return []
   end
 
-  def assigns_navigation_variables(vars)
-    vars.each do |var, value|
+  let :default_nav_variables do
+    {
+      scope: subject,
+      site: nil,
+      cluster: nil,
+      component: nil,
+      cluster_part: nil,
+      component_group: nil,
+      service: nil,
+    }
+  end
+
+  def assigns_navigation_variables(*subject_keys)
+    subject_hash = (subject_keys.map { |k| [k, subject] }).to_h
+    default_nav_variables.merge(subject_hash).each do |var, value|
       expect(assigns(var)).to eq value
     end
   end
 
   RSpec.shared_examples 'cluster and part variable assignment' do
     describe "get '/cluster/*'" do
+      subject { cluster }
       before :each do
         get cluster_path(cluster.id, as: user)
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: site,
-          cluster: cluster,
-          cluster_part: nil,
-          component_group: nil
-        )
+        assigns_navigation_variables(:cluster)
       end
     end
 
     describe "get /components/*" do
+      subject { component }
       before :each do
         get component_path(component.id, as: user)
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: site,
-          cluster: cluster,
-          cluster_part: component,
-          component_group: component_group
-        )
+        assigns_navigation_variables(:cluster_part, :component)
       end
     end
 
     describe "get /component_group/*" do
+      subject { component_group }
       before :each do
         get component_group_path(component_group.id, as: user)
       end
 
       it 'assigns the correct navigation variables' do
-        assigns_navigation_variables(
-          site: site,
-          cluster: cluster,
-          cluster_part: nil,
-          component_group: component_group
-        )
+        assigns_navigation_variables(:component_group)
       end
     end
 
     describe "get /services/*" do
+      subject { service }
       before :each do
         get service_path(service.id, as: user)
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: site,
-          cluster: cluster,
-          cluster_part: service,
-          component_group: nil
-        )
+        assigns_navigation_variables(:cluster_part, :service)
       end
     end
   end
 
   context 'when no user' do
     describe "get '/'" do
+      subject { nil }
       before :each do
         get root_path
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: nil,
-          cluster: nil,
-          cluster_part: nil,
-          component_group: nil
-        )
+        assigns_navigation_variables
       end
     end
   end
@@ -107,17 +100,13 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     include_examples 'cluster and part variable assignment'
 
     describe "get '/'" do
+      subject { site }
       before :each do
         get root_path(as: user)
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: site,
-          cluster: nil,
-          cluster_part: nil,
-          component_group: nil
-        )
+        assigns_navigation_variables(:site)
       end
     end
   end
@@ -128,32 +117,24 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     include_examples 'cluster and part variable assignment'
 
     describe "get '/'" do
+      subject { nil }
       before :each do
         get root_path(as: user)
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: nil,
-          cluster: nil,
-          cluster_part: nil,
-          component_group: nil
-        )
+        assigns_navigation_variables
       end
     end
 
     describe "get '/sites/*'" do
+      subject { site }
       before :each do
         get site_path(site.id, as: user)
       end
 
       it 'assigns correct navigation variables' do
-        assigns_navigation_variables(
-          site: site,
-          cluster: nil,
-          cluster_part: nil,
-          component_group: nil
-        )
+        assigns_navigation_variables(:site)
       end
     end
   end

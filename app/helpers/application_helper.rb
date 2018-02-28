@@ -26,6 +26,26 @@ module ApplicationHelper
     )
   end
 
+  def model_from_scope(type)
+    if @scope.respond_to? type
+      @scope.public_send type
+    elsif @scope.is_a?(type.to_s.classify.constantize)
+      @scope
+    else
+      nil
+    end
+  end
+
+  def add_nav_link_proc(**inputs_to_partial)
+    nav_link_procs << Proc.new do |**additional_inputs|
+      render 'partials/nav_link', **additional_inputs, **inputs_to_partial
+    end
+  end
+
+  def nav_link_procs
+    @nav_link_procs ||= []
+  end
+
   def dark_button_classes
     ['btn', 'btn-primary', 'btn-block']
   end
