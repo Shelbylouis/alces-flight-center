@@ -15,11 +15,9 @@
       id: :components,
       text: 'Components',
       path: cluster_components_path(@cluster),
-      dropdown: [
-        { text: 'item1', path: '/' },
-        { text: 'item2', path: '/' },
-        { text: 'item3', path: '/' }
-      ]
+      dropdown: @cluster.component_groups_by_type.map(&:name).map do |t|
+        { text: t, path: cluster_components_path(@cluster, type: t) }
+      end.push(text: 'All', path: cluster_components_path(@cluster))
     }
   ]
 %>
