@@ -1,3 +1,4 @@
+require 'rails_helper'
 
 RSpec.describe SpecUtils do
   describe '#class_factory_identifier' do
