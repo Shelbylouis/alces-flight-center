@@ -1,4 +1,6 @@
 
+<%= render_tab_bar activate: :maintenance %>
+
 <%= form_for @maintenance_window,
   url: request.original_fullpath,
   html: { novalidate: true, } do |f| %>
