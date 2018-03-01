@@ -249,8 +249,8 @@ RSpec.describe MaintenanceWindow, type: :model do
   end
 
   describe '#in_progress?' do
-    it 'is currently an alias for `confirmed?`' do
-      window = create(:confirmed_maintenance_window)
+    it 'is currently an alias for `started?`' do
+      window = create(:maintenance_window, state: :started)
 
       expect(window).to be_in_progress
     end

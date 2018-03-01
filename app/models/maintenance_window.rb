@@ -56,7 +56,7 @@ class MaintenanceWindow < ApplicationRecord
     end
   end
 
-  alias_method :in_progress?, :confirmed?
+  alias_method :in_progress?, :started?
 
   def associated_model
     component || service || cluster
