@@ -11,9 +11,6 @@ require 'webmock/rspec'
 require 'email_spec'
 require 'email_spec/rspec'
 
-# Load all shared examples.
-Dir[Rails.root.join('spec/shared_examples/**/*.rb')].each {|f| require f}
-
 # Load spec support files.
 Dir[Rails.root.join('spec/support/**/*.rb')].each {|f| require f}
 
