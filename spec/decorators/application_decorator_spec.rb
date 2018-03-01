@@ -78,12 +78,12 @@ RSpec.describe ApplicationDecorator do
         expect(subject).to be_empty
       end
 
-      it 'gives nothing when only has ended maintenance window' do
+      it 'gives nothing when only has finished maintenance window' do
         create(:ended_maintenance_window, component: component)
         expect(subject).to be_empty
       end
 
-      it 'includes icon for every open maintenance window' do
+      it 'includes icon for every unfinished maintenance window' do
         create(:requested_maintenance_window, component: component)
         create(:maintenance_window, state: :started, component: component)
         create(:ended_maintenance_window, component: component)

@@ -31,7 +31,7 @@
     </thead>
 
     <tbody>
-    <% cluster.open_related_maintenance_windows.map(&:decorate).each do |window| %>
+    <% cluster.unfinished_related_maintenance_windows.map(&:decorate).each do |window| %>
       <tr>
         <td><%= window.associated_model.links %></td>
         <td><%= window.scheduled_period %></td>

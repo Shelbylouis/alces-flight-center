@@ -46,6 +46,8 @@ class MaintenanceWindow < ApplicationRecord
       state_machine.states.keys
     end
 
+    # A maintenance window is 'finished' once it has reached a state which it
+    # cannot transition out of.
     def finished_states
       [
         :cancelled,

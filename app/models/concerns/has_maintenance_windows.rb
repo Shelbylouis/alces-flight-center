@@ -6,7 +6,7 @@ module HasMaintenanceWindows
     has_many :maintenance_windows
   end
 
-  def open_maintenance_windows
+  def unfinished_maintenance_windows
     maintenance_windows.where.not(state: MaintenanceWindow.finished_states)
   end
 end
