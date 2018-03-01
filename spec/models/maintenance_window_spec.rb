@@ -248,14 +248,6 @@ RSpec.describe MaintenanceWindow, type: :model do
     end
   end
 
-  describe '#in_progress?' do
-    it 'is currently an alias for `started?`' do
-      window = create(:maintenance_window, state: :started)
-
-      expect(window).to be_in_progress
-    end
-  end
-
   describe '#associated_cluster' do
     it 'gives cluster when associated model is cluster' do
       cluster = create(:cluster)
