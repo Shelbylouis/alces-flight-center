@@ -3,7 +3,6 @@ require 'rails_helper'
 RSpec.describe Cluster, type: :model do
   include_examples 'canonical_name'
   include_examples 'markdown_description'
-  include_examples 'maintenance_windows'
 
   describe '#valid?' do
     context 'when managed cluster' do

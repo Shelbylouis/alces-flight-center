@@ -2,7 +2,6 @@ class Cluster < ApplicationRecord
   include AdminConfig::Cluster
   include HasSupportType
   include MarkdownDescription
-  include HasMaintenanceWindows
 
   SUPPORT_TYPES = SupportType::VALUES
 
@@ -11,6 +10,7 @@ class Cluster < ApplicationRecord
   has_many :components, through: :component_groups, dependent: :destroy
   has_many :services, dependent: :destroy
   has_many :cases
+  has_many :maintenance_windows
   has_many :credit_deposits
   has_many :credit_charges, through: :cases
   has_many :logs, dependent: :destroy
