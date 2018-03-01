@@ -34,6 +34,24 @@ RSpec.describe 'cluster tabs', type: :feature do
         expect(maintenance_tab).to have_link(href: path)
       end
     end
+
+    context 'with an contact user' do
+      let :user { create(:contact, site: cluster.site) }
+
+      it 'does not have dropdown menu for maintenance tab' do
+        expect(maintenance_tab).not_to match_css('.dropdown')
+      end
+
+      it 'has a link to the existing maintenance' do
+        path = cluster_maintenance_windows_path(cluster)
+        expect(maintenance_tab).to have_link(href: path)
+      end
+
+      it 'does not have a link to request maintenance' do
+        path = new_cluster_maintenance_window_path(cluster)
+        expect(maintenance_tab).not_to have_link(href: path)
+      end
+    end
   end
 end
 
