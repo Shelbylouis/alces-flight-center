@@ -1,6 +1,7 @@
 <%
   tabs = [
     { id: :overview, text: 'Overview', path: cluster_path(@cluster) },
+    { id: :logs, text: 'Logs', path: cluster_logs_path(@cluster) },
     { id: :cases, text: 'Cases', path: cluster_cases_path(@cluster) },
     {
       id: :maintenance,
@@ -15,7 +16,7 @@
     {
       id: :components,
       text: 'Components',
-      path: cluster_components_path(@cluster),
+      path: '', # This path is ignored because of the dropdown
       dropdown: @cluster.component_groups_by_type.map(&:name).map do |t|
         { text: t, path: cluster_components_path(@cluster, type: t) }
       end.push(text: 'All', path: cluster_components_path(@cluster))
