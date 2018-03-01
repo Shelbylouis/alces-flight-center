@@ -4,6 +4,9 @@
 <div class='card'>
   <%= render 'partials/card_header_nav', title: @table_tile %>
   <div class='card-body'>
-    <%= render 'partials/components_table' %>
+    <% @component_groups.each do |group| %>
+      <h6><%= group.decorate.link %></h6>
+      <%= render 'partials/components_table', group: group %>
+    <% end %>
   </div>
 </div>

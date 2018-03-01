@@ -29,20 +29,3 @@
   </ul>
 </div>
 
-<% cluster.component_groups_by_type.each do |type| %>
-  <div class='card'>
-    <%= render 'partials/card_header_nav', title: type.name.pluralize %>
-
-    <div class='card-body'>
-      <% type.component_groups.each do |group| %>
-        <h6 class="card-title">
-          <%= group.decorate.link %>
-        </h6>
-
-        <%= render 'partials/components_table', group: group %>
-
-      <% end %>
-    </div>
-
-  </div>
-<% end %>
