@@ -1,15 +1,16 @@
 <%
   tabs = [
+    { id: :overview, text: 'Overview', path: cluster_path(@cluster) },
     { id: :cases, text: 'Cases', path: cluster_cases_path(@cluster) },
-    {
-      id: :services,
-      text: 'Services',
-      path: cluster_services_path(@cluster)
-    },
     {
       id: :maintenance,
       text: 'Maintenance',
       path: cluster_maintenance_windows_path(@cluster)
+    },
+    {
+      id: :services,
+      text: 'Services',
+      path: cluster_services_path(@cluster)
     },
     {
       id: :components,
