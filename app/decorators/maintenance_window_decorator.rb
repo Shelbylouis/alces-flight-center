@@ -1,6 +1,7 @@
 class MaintenanceWindowDecorator < ApplicationDecorator
   delegate_all
   decorates_association :associated_model
+  decorates_association :case
 
   def scheduled_period
     h.raw(

@@ -27,6 +27,7 @@
         <th>Maintenance period</th>
         <th>Requested</th>
         <th>Confirmed</th>
+        <th>Associated case</th>
       </tr>
     </thead>
 
@@ -40,6 +41,7 @@
           <%= window.transition_info(:confirmed) ||
             render('maintenance_windows/unconfirmed_buttons', window: window) %>
         </td>
+        <td><%= window.case.ticket_link %></td>
       </tr>
     <% end %>
     </tbody>
