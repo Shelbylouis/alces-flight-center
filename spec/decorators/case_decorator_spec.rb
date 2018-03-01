@@ -92,4 +92,15 @@ RSpec.describe CaseDecorator do
       expect(support_case.decorate.credit_charge_info).to eq 'Pending'
     end
   end
+
+  describe '#ticket_link' do
+    it 'returns link to Case page with ticket id as text' do
+      kase = create(:case)
+      kase.rt_ticket_id = 12345
+
+      link = kase.decorate.ticket_link
+
+      expect(link).to eq h.link_to('12345', h.case_path(kase))
+    end
+  end
 end
