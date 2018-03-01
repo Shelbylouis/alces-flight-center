@@ -59,6 +59,9 @@ class ApplicationDecorator < Draper::Decorator
     if window.requested?
       classNames = 'faded-icon'
       title_base = "Maintenance has been requested for #{name}"
+    elsif window.confirmed?
+      classNames = 'faded-icon'
+      title_base = "Maintenance is scheduled for #{name}"
     elsif window.in_progress?
       classNames = nil
       title_base = "#{name} currently under maintenance"
