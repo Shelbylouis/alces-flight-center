@@ -7,6 +7,6 @@ module HasMaintenanceWindows
   end
 
   def unfinished_maintenance_windows
-    maintenance_windows.where.not(state: MaintenanceWindow.finished_states)
+    maintenance_windows.unfinished
   end
 end
