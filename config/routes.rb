@@ -90,7 +90,7 @@ Rails.application.routes.draw do
       resources :cases, only: [:index, :new]
       resources :services, only: :index
       resources :consultancy, only: :new
-      resources :maintenance_windows, path: 'maintenance', only: :index
+      resources :maintenance_windows, only: :index
       resources :components, only: :index
       logs.call
     end

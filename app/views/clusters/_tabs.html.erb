@@ -6,7 +6,17 @@
     {
       id: :maintenance,
       text: 'Maintenance',
-      path: cluster_maintenance_windows_path(@cluster)
+      path: '', # Dropdown menu
+      dropdown: [
+        {
+          text: 'Existing',
+          path: cluster_maintenance_windows_path(@cluster)
+        },
+        {
+          text: 'Request',
+          path: new_cluster_maintenance_window_path(@cluster)
+        }
+      ]
     },
     {
       id: :services,
