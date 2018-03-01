@@ -53,7 +53,7 @@ RSpec.describe ApplicationHelper do
       before :each { @scope = nil }
 
       it 'nothing is rendered' do
-        expect(helper).not_to receive(:render)
+        expect_render_tabs('partials/card')
         subject
       end
     end

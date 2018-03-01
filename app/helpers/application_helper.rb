@@ -49,6 +49,8 @@ module ApplicationHelper
   def render_tab_bar(**render_args, &b)
     if @scope.is_a? Cluster
       render('clusters/tabs', **render_args, &b)
+    else
+      render('partials/card', **render_args, &b)
     end
   end
 

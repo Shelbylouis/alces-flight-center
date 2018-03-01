@@ -1,9 +1,5 @@
 
-<%= render_tab_bar activate: :maintenance %>
-
-<div class='card'>
-  <%= render 'partials/card_header_nav', title: 'Maintenance' %>
-
+<%= render_tab_bar activate: :maintenance do %>
   <div class='table-responsive'>
     <table class="maintenance table">
       <thead>
@@ -32,5 +28,5 @@
       </tbody>
     </table>
   </div>
-</div>
+<% end %>
 

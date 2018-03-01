@@ -1,13 +1,7 @@
 
-<%= render 'clusters/tabs', activate: :overview %>
-
-<div class='card'>
-  <%= render 'partials/card_header_nav',
-             title: 'Overview',
-             list_items: cluster.start_maintenance_request_link %>
-
+<%= render 'clusters/tabs', activate: :overview do %>
   <%= render 'clusters/details', cluster: cluster %>
-</div>
+<% end %>
 
 <div class='card'>
   <%= render 'partials/card_header_nav', title: 'Documents' %>
