@@ -46,9 +46,9 @@ module ApplicationHelper
     @nav_link_procs ||= []
   end
 
-  def render_tab_bar(**render_args)
+  def render_tab_bar(**render_args, &b)
     if @scope.is_a? Cluster
-      render('clusters/tabs', **render_args)
+      render('clusters/tabs', **render_args, &b)
     end
   end
 

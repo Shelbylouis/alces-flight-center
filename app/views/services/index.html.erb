@@ -1,9 +1,5 @@
 
-<%= render_tab_bar activate: :services %>
-
-<div class='card'>
-  <%= render 'partials/card_header_nav', title: 'Services' %>
-
+<%= render_tab_bar activate: :services do %>
   <table class="table table-responsive">
     <thead>
       <tr>
@@ -30,5 +26,4 @@
     <% end %>
     </tbody>
   </table>
-</div>
-
+<% end %>
