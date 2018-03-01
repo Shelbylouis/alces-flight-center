@@ -58,13 +58,13 @@ class ApplicationDecorator < Draper::Decorator
   def maintenance_icon(window)
     case window.state.to_sym
     when :requested
-      classNames = 'faded-icon'
+      class_names = 'faded-icon'
       title_base = "Maintenance has been requested for #{name}"
     when :confirmed
-      classNames = 'faded-icon'
+      class_names = 'faded-icon'
       title_base = "Maintenance is scheduled for #{name}"
     when :started
-      classNames = nil
+      class_names = nil
       title_base = "#{name} currently under maintenance"
     else
       return
@@ -72,7 +72,7 @@ class ApplicationDecorator < Draper::Decorator
 
     title = "#{title_base} for ticket #{window.case.rt_ticket_id}"
 
-    h.icon('wrench', inline: true, class: classNames, title: title)
+    h.icon('wrench', inline: true, class: class_names, title: title)
   end
 
   def new_maintenance_window_path
