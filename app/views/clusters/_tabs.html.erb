@@ -7,19 +7,17 @@
     {
       id: :maintenance,
       text: 'Maintenance',
-      path: cluster_maintenance_windows_path(@cluster)
-    }.tap do |hash|
-      if current_user.admin?
-        hash[:dropdown] = [
-          { text: 'Existing', path: hash[:path] },
-          {
-            text: 'Request',
-            path: new_cluster_maintenance_window_path(@cluster)
-          }
-        ]
-      end
-    end,
-
+      path: cluster_maintenance_windows_path(@cluster),
+      admin_dropdown: [
+        {
+          text: 'Existing', path:
+          cluster_maintenance_windows_path(@cluster)
+        },{
+          text: 'Request',
+          path: new_cluster_maintenance_window_path(@cluster)
+        }
+      ]
+    },
     {
       id: :services,
       text: 'Services',
