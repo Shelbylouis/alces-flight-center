@@ -44,7 +44,7 @@ class Case < ApplicationRecord
   # created.
   validates_with IssueValidator, on: :create
 
-  validates_with Validator
+  validates_with AssociatedModelValidator
 
   after_initialize :assign_cluster_if_necessary
   after_initialize :generate_token, on: :create
