@@ -82,8 +82,8 @@ class MaintenanceWindow < ApplicationRecord
     query ? query.value_for(self) : super
   end
 
-  def respond_to?(symbol, include_all=false)
-    super || TransitionQuery.parse(symbol)
+  def respond_to_missing?(symbol, include_all=false)
+    TransitionQuery.parse(symbol)
   end
 
   private
