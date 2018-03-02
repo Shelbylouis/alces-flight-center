@@ -3,50 +3,52 @@
   <%= render 'partials/card_header_nav',
     title: 'Overview'
   %>
-  <table class="table table-responsive">
-    <tr style="width: 100%;">
-      <th>Date</th>
-      <td><%= @case.created_at.to_formatted_s(:long) %></td>
-    </tr>
-    <tr>
-      <th>Creator</th>
-      <td><%= @case.user.name %></td>
-    </tr>
-    <tr>
-      <th>Association</th>
-      <td><%= @case.association_info %></td>
-    </tr>
-    <tr>
-      <th>Ticket ID</th>
-      <td><%= @case.rt_ticket_id %></td>
-    </tr>
-    <tr>
-      <th>Category</th>
-      <td><%= @case.category&.name || 'None' %></td>
-    </tr>
-    <tr>
-      <th>Issue</th>
-      <td><%= @case.issue.name %></td>
-    </tr>
-    <tr>
-      <th>Chargeable</th>
-      <td><%= @case.chargeable_symbol %></td>
-    </tr>
-    <tr>
-      <th>Credit charge</th>
-      <td><%= @case.credit_charge_info %></td>
-    </tr>
-    <tr>
-      <th>Archived</th>
-      <td><%= boolean_symbol(@case.archived) %></td>
-    </tr>
-    <tr>
-      <th>Subject</th>
-      <td><%= @case.subject %></td>
-    </tr>
-    <tr>
-      <th>Details</th>
-      <td><%= simple_format(@case.details) %></td>
-    </tr>
-  </table>
+  <div class='table-responsive'>
+    <table class="table">
+      <tr style="width: 100%;">
+        <th>Date</th>
+        <td><%= @case.created_at.to_formatted_s(:long) %></td>
+      </tr>
+      <tr>
+        <th>Creator</th>
+        <td><%= @case.user.name %></td>
+      </tr>
+      <tr>
+        <th>Association</th>
+        <td><%= @case.association_info %></td>
+      </tr>
+      <tr>
+        <th>Ticket ID</th>
+        <td><%= @case.rt_ticket_id %></td>
+      </tr>
+      <tr>
+        <th>Category</th>
+        <td><%= @case.category&.name || 'None' %></td>
+      </tr>
+      <tr>
+        <th>Issue</th>
+        <td><%= @case.issue.name %></td>
+      </tr>
+      <tr>
+        <th>Chargeable</th>
+        <td><%= @case.chargeable_symbol %></td>
+      </tr>
+      <tr>
+        <th>Credit charge</th>
+        <td><%= @case.credit_charge_info %></td>
+      </tr>
+      <tr>
+        <th>Archived</th>
+        <td><%= boolean_symbol(@case.archived) %></td>
+      </tr>
+      <tr>
+        <th>Subject</th>
+        <td><%= @case.subject %></td>
+      </tr>
+      <tr>
+        <th>Details</th>
+        <td><%= simple_format(@case.details) %></td>
+      </tr>
+    </table>
+  </div>
 </div>
