@@ -10,8 +10,6 @@ class Case::IssueValidator < ActiveModel::Validator
 
   private
 
-  PART_NAMES = [:component, :service].freeze
-
   def validate_issue_allowed_for_cluster_or_part
     issue_errors_with_conditions.map do |error, condition|
       record.errors.add(:issue, error) if condition
@@ -32,7 +30,7 @@ class Case::IssueValidator < ActiveModel::Validator
   end
 
   def all_conditional_cluster_part_issue_errors
-    PART_NAMES.map do |part_name|
+    Cluster::PART_NAMES.map do |part_name|
       conditional_cluster_part_issue_errors(part_name)
     end.reduce(:merge)
   end
@@ -81,7 +79,7 @@ class Case::IssueValidator < ActiveModel::Validator
   end
 
   def no_parts_required?
-    !PART_NAMES.map { |part_name| part_required?(part_name) }.any?
+    !Cluster::PART_NAMES.map { |part_name| part_required?(part_name) }.any?
   end
 
   def part_required?(part_name)
