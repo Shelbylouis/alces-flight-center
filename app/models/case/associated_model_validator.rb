@@ -5,15 +5,13 @@ class Case::AssociatedModelValidator < ActiveModel::Validator
   def validate(record)
     @record = record
 
-    PART_NAMES.each do |part_name|
+    Cluster::PART_NAMES.each do |part_name|
       validate_correct_cluster_part_relationship(part_name)
     end
     validate_service_correct_type
   end
 
   private
-
-  PART_NAMES = [:component, :service].freeze
 
   def validate_correct_cluster_part_relationship(part_name)
     part = part(part_name)

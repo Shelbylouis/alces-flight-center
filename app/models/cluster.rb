@@ -5,6 +5,7 @@ class Cluster < ApplicationRecord
   include HasMaintenanceWindows
 
   SUPPORT_TYPES = SupportType::VALUES
+  PART_NAMES = [:component, :service].freeze
 
   belongs_to :site
   has_many :component_groups, dependent: :destroy
