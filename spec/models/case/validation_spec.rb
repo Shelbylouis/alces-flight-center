@@ -59,6 +59,21 @@ RSpec.shared_examples 'associated Cluster part validation' do |part_name|
           )
         end
       end
+
+      context "with `managed` #{part_name} which is later switched to `advice`" do
+        let :part { create(managed_part_name, cluster: cluster) }
+
+        before :each do
+          # Create Case which is initially valid.
+          subject.save!
+
+          # Update the part to one which would no longer be compatible with
+          # given issue.
+          part.update!(support_type: :advice)
+        end
+
+        it { is_expected.to be_valid }
+      end
     end
 
     context 'when `advice` issue' do
@@ -94,6 +109,21 @@ RSpec.shared_examples 'associated Cluster part validation' do |part_name|
 
       context "with `advice` #{part_name}" do
         let :part { create(advice_part_name, cluster: cluster) }
+        it { is_expected.to be_valid }
+      end
+
+      context "with `advice` #{part_name} which is later switched to `managed`" do
+        let :part { create(advice_part_name, cluster: cluster) }
+
+        before :each do
+          # Create Case which is initially valid.
+          subject.save!
+
+          # Update the part to one which would no longer be compatible with
+          # given issue.
+          part.update!(support_type: :managed)
+        end
+
         it { is_expected.to be_valid }
       end
     end
@@ -189,6 +219,21 @@ RSpec.describe Case, type: :model do
             )
           end
         end
+
+        context "with `managed` cluster which is later switched to `advice`" do
+          let :cluster { create(:managed_cluster) }
+
+          before :each do
+            # Create Case which is initially valid.
+            subject.save!
+
+            # Update the cluster to one which would no longer be compatible
+            # with given issue.
+            cluster.update!(support_type: :advice)
+          end
+
+          it { is_expected.to be_valid }
+        end
       end
 
       context 'when `advice` issue' do
@@ -224,6 +269,21 @@ RSpec.describe Case, type: :model do
 
         context 'with `advice` cluster' do
           let :cluster { create(:advice_cluster) }
+          it { is_expected.to be_valid }
+        end
+
+        context "with `advice` cluster which is later switched to `managed`" do
+          let :cluster { create(:advice_cluster) }
+
+          before :each do
+            # Create Case which is initially valid.
+            subject.save!
+
+            # Update the cluster to one which would no longer be compatible with
+            # given issue.
+            cluster.update!(support_type: :managed)
+          end
+
           it { is_expected.to be_valid }
         end
       end
