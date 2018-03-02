@@ -36,6 +36,14 @@ class Case < ApplicationRecord
     presence: true,
     inclusion: {in: TICKET_STATUSES}
 
+  # Only validate Issue relationship on create, as the Issue must be allowed
+  # given the associated model for this Case at the point when the Case is
+  # created, but the associated model's `support_type` (or less commonly the
+  # Issue's) may later change and become incompatible with this Issue, but this
+  # should not invalidate a Case which was allowed at the point when it was
+  # created.
+  validates_with IssueValidator, on: :create
+
   validates_with Validator
 
   after_initialize :assign_cluster_if_necessary
