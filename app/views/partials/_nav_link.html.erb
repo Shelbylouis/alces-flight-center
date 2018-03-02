@@ -5,10 +5,12 @@
   <% dropdown = admin_dropdown %>
 <% end %>
 <% dropdown ||= false # Defines the variable %>
+<% classes ||= false %>
 <%= raw "<li class='nav-item #{'dropdown' if dropdown}'>" %>
   <% class_string = "nav-link".tap do |str|
     str << ' nav-link--active' if active
     str << ' dropdown-toggle' if dropdown
+    str << ' ' + classes if classes
   end %>
   <% options = { class: class_string }.tap do |opt|
     opt[:'data-toggle'] = 'dropdown' if dropdown
