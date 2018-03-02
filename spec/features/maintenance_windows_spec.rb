@@ -98,20 +98,15 @@ RSpec.feature "Maintenance windows", type: :feature do
         case: support_case
       )
 
-      expect(Case.request_tracker).to receive(
-        :add_ticket_correspondence
-      ).with(
-        id: window.case.rt_ticket_id,
-        text: /Maintenance.*#{component.name}.*confirmed by #{user_name}.*component.*now under maintenance/
-      )
-
       visit cluster_path(component.cluster, as: user)
       button_text = "Unconfirmed"
       click_button(button_text)
 
+      window.reload
+      expect(window).to be_confirmed
+      expect(window.confirmed_by).to eq(user)
       expect(page).not_to have_button(button_text)
       expect(page.all('table')[1]).to have_text(user_name)
-      expect(window.confirmed_by).to eq(user)
       expect(find('.alert')).to have_text(/maintenance confirmed/)
     end
 
