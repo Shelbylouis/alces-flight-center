@@ -1,5 +1,5 @@
 
-class Case::Validator < ActiveModel::Validator
+class Case::AssociatedModelValidator < ActiveModel::Validator
   attr_reader :record
 
   def validate(record)
