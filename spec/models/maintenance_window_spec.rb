@@ -328,6 +328,23 @@ RSpec.describe MaintenanceWindow, type: :model do
     end
   end
 
+  describe '#respond_to?' do
+    subject { create(:maintenance_window) }
+
+    # Examples of new methods it should respond to.
+    it { is_expected.to respond_to(:requested_by) }
+    it { is_expected.to respond_to(:confirmed_at) }
+
+    # Methods from parents it should still respond to.
+    it { is_expected.to respond_to(:created_at) }
+    it { is_expected.to respond_to(:updated_at) }
+
+    # Other examples of methods it shouldn't respond to.
+    it { is_expected.not_to respond_to(:exploded_at) }
+    it { is_expected.not_to respond_to(:exploded_by) }
+    it { is_expected.not_to respond_to(:some_other_method) }
+  end
+
   describe 'class' do
     subject { described_class }
 
