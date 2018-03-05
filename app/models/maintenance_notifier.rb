@@ -12,17 +12,25 @@ MaintenanceNotifier = Struct.new(:window) do
 
   def requested_comment
     <<-EOF
-      Maintenance requested for #{associated_model.name} by
-      #{window.requested_by.name}; to proceed this maintenance must be
-      confirmed on the cluster dashboard: #{cluster_dashboard_url}.
+      Maintenance requested for #{associated_model.name} from
+      #{requested_start} until #{requested_end} by #{window.requested_by.name};
+      to proceed this maintenance must be confirmed on the cluster dashboard:
+      #{cluster_dashboard_url}.
     EOF
+  end
+
+  def requested_start
+    window.requested_start.to_formatted_s(:short)
+  end
+
+  def requested_end
+    window.requested_end.to_formatted_s(:short)
   end
 
   def confirmed_comment
     <<~EOF
-      Maintenance of #{associated_model.name} confirmed by
-      #{window.confirmed_by.name}; this #{associated_model.readable_model_name}
-      is now under maintenance.
+      Request for maintenance of #{associated_model.name} confirmed by
+      #{window.confirmed_by.name}; this maintenance has been scheduled.
     EOF
   end
 
@@ -35,25 +43,31 @@ MaintenanceNotifier = Struct.new(:window) do
 
   def rejected_comment
     <<~EOF
-      Maintenance of #{associated_model.name} rejected by
-      #{window.rejected_by.name}
+      Request for maintenance of #{associated_model.name} rejected by
+      #{window.rejected_by.name}.
     EOF
   end
 
   def expired_comment
     <<~EOF
       Request for maintenance of #{associated_model.name} was not confirmed
-      before requested start; this maintenance has been automatically
+      before requested start date; this maintenance has been automatically
       cancelled.
     EOF
   end
 
   def started_comment
-    "confirmed maintenance of #{associated_model.name} started."
+    <<~EOF
+      Scheduled maintenance of #{associated_model.name} has automatically
+      started.
+    EOF
   end
 
   def ended_comment
-    "#{associated_model.name} is no longer under maintenance."
+    <<~EOF
+      Scheduled maintenance of #{associated_model.name} has automatically
+      ended.
+    EOF
   end
 
   def add_rt_ticket_correspondence(text)

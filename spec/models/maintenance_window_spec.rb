@@ -124,8 +124,12 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it 'has RT ticket comment added when requested' do
         subject.component = create(:component, name: 'some_component')
+        subject.requested_start = 1.days.since
+        subject.requested_end = 2.days.since
         requestor = create(:admin, name: 'some_user')
 
+        expected_start = subject.requested_start.to_formatted_s(:short)
+        expected_end = subject.requested_end.to_formatted_s(:short)
         expected_cluster_url = Rails.application.routes.url_helpers.cluster_url(
           subject.component.cluster
         )
@@ -133,7 +137,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           :add_ticket_correspondence
         ).with(
           id: subject.case.rt_ticket_id,
-          text: /requested.*some_component.*by some_user.*must be confirmed.*#{expected_cluster_url}/
+          text: /requested.*some_component.*#{expected_start}.*#{expected_end}.*by some_user.*must be confirmed.*#{expected_cluster_url}/
         )
 
         subject.request!(requestor)
@@ -162,7 +166,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           :add_ticket_correspondence
         ).with(
           id: subject.case.rt_ticket_id,
-          text: /Maintenance.*some_component.*confirmed by some_user.*component.*now under maintenance/
+          text: /maintenance.*some_component.*confirmed by some_user.*scheduled/
         )
 
         subject.confirm!(user)
@@ -183,7 +187,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           :add_ticket_correspondence
         ).with(
           id: subject.case.rt_ticket_id,
-          text: /Maintenance.*some_component.*rejected by some_user/
+          text: /maintenance.*some_component.*rejected by some_user/
         )
 
         subject.reject!(user)
@@ -206,7 +210,7 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
           id: subject.case.rt_ticket_id,
-          text: "confirmed maintenance of some_component started."
+          text: /maintenance of some_component .* started/
         )
 
         subject.start!
@@ -229,7 +233,7 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
           id: subject.case.rt_ticket_id,
-          text: "some_component is no longer under maintenance."
+          text: /maintenance of some_component .* ended/
         )
 
         subject.end!
@@ -245,14 +249,6 @@ RSpec.describe MaintenanceWindow, type: :model do
       expect(Case.request_tracker).not_to receive(:add_ticket_correspondence)
 
       window.end!
-    end
-  end
-
-  describe '#in_progress?' do
-    it 'is currently an alias for `confirmed?`' do
-      window = create(:confirmed_maintenance_window)
-
-      expect(window).to be_in_progress
     end
   end
 

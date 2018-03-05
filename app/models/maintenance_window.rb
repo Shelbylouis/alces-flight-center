@@ -46,6 +46,8 @@ class MaintenanceWindow < ApplicationRecord
       state_machine.states.keys
     end
 
+    # A maintenance window is 'finished' once it has reached a state which it
+    # cannot transition out of.
     def finished_states
       [
         :cancelled,
@@ -55,8 +57,6 @@ class MaintenanceWindow < ApplicationRecord
       ]
     end
   end
-
-  alias_method :in_progress?, :confirmed?
 
   def associated_model
     component || service || cluster
@@ -82,8 +82,8 @@ class MaintenanceWindow < ApplicationRecord
     query ? query.value_for(self) : super
   end
 
-  def respond_to?(symbol, include_all=false)
-    super || TransitionQuery.parse(symbol)
+  def respond_to_missing?(symbol, include_all=false)
+    TransitionQuery.parse(symbol)
   end
 
   private

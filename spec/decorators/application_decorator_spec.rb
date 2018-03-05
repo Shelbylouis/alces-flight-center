@@ -55,6 +55,20 @@ RSpec.describe ApplicationDecorator do
           h.icon(
             'wrench',
             inline: true,
+            class: 'faded-icon',
+            title: "Maintenance is scheduled for #{component.name} for ticket #{ticket_id}"
+          )
+        )
+      end
+
+      it 'includes correct icon when has in progress maintenance window' do
+        window = create(:maintenance_window, state: :started, component: component)
+        ticket_id = window.case.rt_ticket_id
+
+        expect(subject).to include(
+          h.icon(
+            'wrench',
+            inline: true,
             title: "#{component.name} currently under maintenance for ticket #{ticket_id}"
           )
         )
@@ -64,14 +78,14 @@ RSpec.describe ApplicationDecorator do
         expect(subject).to be_empty
       end
 
-      it 'gives nothing when only has ended maintenance window' do
+      it 'gives nothing when only has finished maintenance window' do
         create(:ended_maintenance_window, component: component)
         expect(subject).to be_empty
       end
 
-      it 'includes icon for every open maintenance window' do
+      it 'includes icon for every unfinished maintenance window' do
         create(:requested_maintenance_window, component: component)
-        create(:confirmed_maintenance_window, component: component)
+        create(:maintenance_window, state: :started, component: component)
         create(:ended_maintenance_window, component: component)
 
         expect(subject).to match(/<i .*<i /)

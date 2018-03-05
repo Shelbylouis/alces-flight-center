@@ -27,11 +27,12 @@
         <th>Maintenance period</th>
         <th>Requested</th>
         <th>Confirmed</th>
+        <th>Associated case</th>
       </tr>
     </thead>
 
     <tbody>
-    <% cluster.open_related_maintenance_windows.map(&:decorate).each do |window| %>
+    <% cluster.unfinished_related_maintenance_windows.map(&:decorate).each do |window| %>
       <tr>
         <td><%= window.associated_model.links %></td>
         <td><%= window.scheduled_period %></td>
@@ -40,6 +41,7 @@
           <%= window.transition_info(:confirmed) ||
             render('maintenance_windows/unconfirmed_buttons', window: window) %>
         </td>
+        <td><%= window.case.ticket_link %></td>
       </tr>
     <% end %>
     </tbody>
