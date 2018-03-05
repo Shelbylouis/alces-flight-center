@@ -12,6 +12,7 @@ class CasesController < ApplicationController
              end
 
     current_site.cases.map(&:update_ticket_status!) if current_user.admin?
+    @archive = true
   end
 
   def show
