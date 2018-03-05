@@ -1,8 +1,6 @@
 
 class Case
-  class IssueValidator < ActiveModel::Validator
-    attr_reader :record
-
+  class IssueValidator < Validator
     def validate(record)
       @record = record
 
@@ -81,14 +79,6 @@ class Case
 
     def no_parts_required?
       !Cluster::PART_NAMES.map { |part_name| part_required?(part_name) }.any?
-    end
-
-    def part_required?(part_name)
-      record.issue.send("requires_#{part_name}")
-    end
-
-    def part(part_name)
-      record.send(part_name)
     end
   end
 end

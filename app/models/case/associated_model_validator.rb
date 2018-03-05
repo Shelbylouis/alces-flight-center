@@ -1,8 +1,6 @@
 
 class Case
-  class AssociatedModelValidator < ActiveModel::Validator
-    attr_reader :record
-
+  class AssociatedModelValidator < Validator
     def validate(record)
       @record = record
 
@@ -41,14 +39,6 @@ class Case
           record.errors.add(:service, error)
         end
       end
-    end
-
-    def part_required?(part_name)
-      record.issue.send("requires_#{part_name}")
-    end
-
-    def part(part_name)
-      record.send(part_name)
     end
   end
 end
