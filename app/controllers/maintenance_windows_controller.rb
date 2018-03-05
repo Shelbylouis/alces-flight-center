@@ -21,9 +21,15 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def confirm
-    window = MaintenanceWindow.find(params[:id])
-    window.confirm!(current_user)
-    redirect_to cluster_path(window.associated_cluster)
+    transition_window(:confirm)
+  end
+
+  def reject
+    transition_window(:reject)
+  end
+
+  def cancel
+    transition_window(:cancel)
   end
 
   private
@@ -47,5 +53,12 @@ class MaintenanceWindowsController < ApplicationController
 
   def suggested_requested_end
     suggested_requested_start.advance(days: 1)
+  end
+
+  def transition_window(event)
+    window = MaintenanceWindow.find(params[:id])
+    window.public_send("#{event}!", current_user)
+    flash[:success] = "Requested maintenance #{window.state}."
+    redirect_to cluster_path(window.associated_cluster)
   end
 end

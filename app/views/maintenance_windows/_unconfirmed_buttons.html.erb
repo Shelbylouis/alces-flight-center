@@ -1,0 +1,29 @@
+
+<%= button_to(
+  raw('Unconfirmed &mdash; click to confirm'),
+  confirm_maintenance_window_path(window),
+  class: ['btn', 'btn-success', 'btn-block']
+)
+%>
+
+<% if current_user.admin? %>
+  <%= button_to 'Cancel request for maintenance',
+    cancel_maintenance_window_path(window),
+    class: ['btn', 'btn-warning', 'btn-block'],
+    data: {
+      confirm: 'Are you sure you want to cancel this requested maintenance?'
+    }
+  %>
+<% else %>
+  <%= button_to 'Reject request for maintenance',
+    reject_maintenance_window_path(window),
+    class: ['btn', 'btn-danger', 'btn-block'],
+    data: {
+      confirm: <<~EOF.squish
+        Are you sure you want to reject this requested maintenance? Alces
+        Software engineers will not be able to perform this maintenance until
+        you have confirmed it.
+      EOF
+    }
+  %>
+<% end %>

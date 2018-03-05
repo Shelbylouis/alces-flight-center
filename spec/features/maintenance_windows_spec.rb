@@ -27,7 +27,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       end_maintenance_window_case_path(support_case.id)
     end
 
-    it 'can request maintenance in association with different Case for Cluster' do
+    it 'can request maintenance in association with any Case for Cluster' do
       cluster = create(:cluster)
       component = create(:component, cluster: cluster)
       case_subject = 'Unrelated case'
@@ -59,6 +59,29 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(new_window.requested_start).to eq DateTime.new(2022, 9, 10, 13, 0)
       expect(new_window.requested_end).to eq DateTime.new(2023, 9, 20, 13, 0)
       expect(current_path).to eq(cluster_path(cluster))
+      expect(find('.alert')).to have_text(/Maintenance requested/)
+    end
+
+    it 'can cancel requested maintenance' do
+      window = create(:requested_maintenance_window, cluster: cluster)
+
+      visit cluster_path(cluster, as: user)
+      button_text = 'Cancel'
+      click_button(button_text)
+
+      window.reload
+      expect(window).to be_cancelled
+      expect(window.cancelled_by).to eq user
+      expect(current_path).to eq(cluster_path(cluster))
+      expect(find('.alert')).to have_text(/maintenance cancelled/)
+    end
+
+    it 'cannot see reject button' do
+      create(:requested_maintenance_window, cluster: cluster)
+
+      visit cluster_path(cluster, as: user)
+
+      expect(page).not_to have_button('Reject')
     end
   end
 
@@ -89,6 +112,38 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(page).not_to have_button(button_text)
       expect(page.all('table')[1]).to have_text(user_name)
       expect(window.confirmed_by).to eq(user)
+      expect(find('.alert')).to have_text(/maintenance confirmed/)
+    end
+
+    it 'can reject requested maintenance' do
+      window = create(
+        :requested_maintenance_window,
+        component: component,
+        case: support_case
+      )
+
+      visit cluster_path(cluster, as: user)
+      button_text = 'Reject'
+
+      click_button(button_text)
+
+      window.reload
+      expect(window).to be_rejected
+      expect(window.rejected_by).to eq user
+      expect(current_path).to eq(cluster_path(cluster))
+      expect(find('.alert')).to have_text(/maintenance rejected/)
+    end
+
+    it 'cannot see cancel button' do
+      create(
+        :requested_maintenance_window,
+        component: component,
+        case: support_case
+      )
+
+      visit cluster_path(cluster, as: user)
+
+      expect(page).not_to have_button('Cancel')
     end
   end
 end
