@@ -1,17 +1,15 @@
 <%
   tabs = [
-    { id: :overview, text: 'Overview', path: cluster_path(@cluster) },
-    { id: :logs, text: 'Logs', path: cluster_logs_path(@cluster) },
-    { id: :cases, text: 'Cases', path: cluster_cases_path(@cluster) },
-
+    { id: :overview, path: cluster_path(@cluster) },
+    { id: :logs, path: cluster_logs_path(@cluster) },
+    { id: :cases, path: cluster_cases_path(@cluster) },
     {
       id: :maintenance,
-      text: 'Maintenance',
       path: cluster_maintenance_windows_path(@cluster),
       admin_dropdown: [
         {
-          text: 'Existing', path:
-          cluster_maintenance_windows_path(@cluster)
+          text: 'Existing',
+          path: cluster_maintenance_windows_path(@cluster)
         },{
           text: 'Request',
           path: new_cluster_maintenance_window_path(@cluster)
@@ -19,14 +17,10 @@
       ]
     },
     {
-      id: :services,
-      text: 'Services',
-      path: cluster_services_path(@cluster)
+      id: :services, path: cluster_services_path(@cluster)
     },
     {
-      id: :components,
-      text: 'Components',
-      path: '', # This path is ignored because of the dropdown
+      id: :components, path: '', # Path is ignored b/c dropdown
       dropdown: @cluster.component_groups_by_type.map(&:name).map do |t|
         { text: t, path: cluster_components_path(@cluster, type: t) }
       end.push(text: 'All', path: cluster_components_path(@cluster))
@@ -38,6 +32,7 @@
     <ul class="nav nav-tabs nav-justified">
       <% tabs.each do |tab| %>
         <% active = (tab[:id] == activate) %>
+        <% tab[:text] = tab[:id].to_s.capitalize unless tab[:text] %>
         <%= render 'partials/nav_link', **tab, active: active, classes: 'px-3' %>
       <% end %>
     </ul>
