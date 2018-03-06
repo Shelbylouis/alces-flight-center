@@ -20,12 +20,12 @@
   end
 %>
 
-<%= raw "<li class='nav-item #{'dropdown' if dropdown}'>" %>
+<li class='nav-item<%= ' dropdown' if dropdown %>'>
   <%= link_to icon_span(text, nav_icon), path, link_options %>
   <% if dropdown %>
     <div class='dropdown-menu'>
       <% dropdown.each do |dropitem| %>
-        <%= link_to icon_span(dropitem[:text]),
+        <%= link_to dropitem[:text],
                     dropitem[:path],
                     class: 'dropdown-item' %>
       <% end %>
