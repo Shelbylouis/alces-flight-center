@@ -1,11 +1,15 @@
-<% path ||= model %>
-<% text ||= model.name %>
-<% nav_icon ||= '' %>
-<% if current_user.admin? && (admin_dropdown ||= false) %>
-  <% dropdown = admin_dropdown %>
-<% end %>
-<% dropdown ||= false # Defines the variable %>
-<% classes ||= false %>
+<%
+  # Variable definitions for the template
+  path ||= model
+  text ||= model.name
+  nav_icon ||= ''
+  if current_user.admin? && (admin_dropdown ||= false)
+    dropdown = admin_dropdown
+  end
+  dropdown ||= false
+  classes ||= false
+%>
+
 <%= raw "<li class='nav-item #{'dropdown' if dropdown}'>" %>
   <% class_string = "nav-link".tap do |str|
     str << ' nav-link--active' if active
