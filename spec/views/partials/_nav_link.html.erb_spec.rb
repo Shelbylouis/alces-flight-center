@@ -88,6 +88,7 @@ RSpec.describe 'renders the nav link', type: :view do
         it 'sets the first link to be the dropdown toggle' do
           first = rendered.first('a')
           expect(first[:class]).to include('dropdown-toggle')
+          expect(first[:'data-toggle']).to eq('dropdown')
         end
 
         it 'has the dropdown menu' do
