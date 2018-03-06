@@ -2,8 +2,18 @@
 require 'rails_helper'
 
 RSpec.describe 'renders the nav link', type: :view do
+  # Defines the `current_user` helper method
+  before :each do
+    allow(view).to receive(:current_user).and_return(user)
+  end
+
+  # Allows the capybara finders to be used on the rendered html
+  def rendered
+    Capybara::Node::Simple.new(super)
+  end
+
   def render_link(**inputs)
-    render 'partials/nav_link', **inputs, current_user: user
+    render 'partials/nav_link', **inputs
   end
 
   context 'with a contact user' do
@@ -55,6 +65,46 @@ RSpec.describe 'renders the nav link', type: :view do
         additional_class = 'random-class'
         render_model_link(classes: additional_class)
         expect(rendered).to have_css("a.#{additional_class}")
+      end
+
+      context 'with a dropdown menu' do
+        let :dropdown_items do
+          [
+            { path: '/path1', text: 'text1' },
+            { path: '/path2', text: 'text2' },
+            { path: '/path3', text: 'text3' }
+          ]
+        end
+        let :menu { rendered.find('div.dropdown-menu') }
+
+        before :each do
+          render_model_link(dropdown: dropdown_items)
+        end
+
+        it 'sets the list tag to be a dropdown' do
+          expect(rendered).to have_css('li.dropdown')
+        end
+
+        it 'sets the first link to be the dropdown toggle' do
+          first = rendered.first('a')
+          expect(first[:class]).to include('dropdown-toggle')
+        end
+
+        it 'has the dropdown menu' do
+          expect(rendered).to have_css('div.dropdown-menu')
+        end
+
+        it 'has the correct number of dropdown items' do
+          num_items = dropdown_items.length
+          expect(menu.all('a').length).to eq(num_items)
+          expect(menu.all('a.dropdown-item').length).to eq(num_items)
+        end
+
+        it 'contains dropdown links to the models' do
+          dropdown_items.each do |item|
+            expect(menu).to have_link(href: item[:path])
+          end
+        end
       end
     end
   end
