@@ -14,6 +14,7 @@ RSpec.describe 'renders the nav link', type: :view do
       let :model_path { component_path(model) }
 
       def render_model_link(**options)
+        options.merge!(active: nil) unless options.key?(:active)
         render_link(model: model, active: nil, **options)
       end
 
@@ -37,6 +38,23 @@ RSpec.describe 'renders the nav link', type: :view do
         text = 'random-text'
         render_model_link(text: text)
         expect(rendered).to have_text(text)
+      end
+
+      it 'it activates the link with the active flag' do
+        render_model_link(active: true)
+        expect(rendered).to have_css('a.nav-link--active')
+      end
+
+      it 'has creates a icon with the nav_icon input' do
+        nav_icon = 'fa-cube'
+        render_model_link(nav_icon: nav_icon)
+        expect(rendered).to have_css("span.#{nav_icon}")
+      end
+
+      it 'can add arbitrary classes to the link with the classes input' do
+        additional_class = 'random-class'
+        render_model_link(classes: additional_class)
+        expect(rendered).to have_css("a.#{additional_class}")
       end
     end
   end
