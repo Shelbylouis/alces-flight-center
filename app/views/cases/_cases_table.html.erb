@@ -2,11 +2,16 @@
   <%= render 'partials/card_header_nav',
     list_items: ([].tap do |list|
       unless archive
-        list.push( link_to 'View all',
-          current_user.admin? ? site_cases_path(model) : cases_path,
-          class: ['nav-link', 'btn', 'btn-primary'],
-          role: 'button'
-        )
+        archive_param = { archive: true }
+        path = if current_user.admin?
+                 site_cases_path(model, **archive_param)
+               else
+                 cases_path(**archive_param)
+               end
+        list.push(link_to 'View all',
+                          path,
+                          class: ['nav-link', 'btn', 'btn-primary'],
+                          role: 'button')
       end
       list.push model.decorate.case_form_buttons
     end),

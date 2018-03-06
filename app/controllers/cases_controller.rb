@@ -5,14 +5,9 @@ class CasesController < ApplicationController
 
   def index
     @site = current_site
-    @title = if current_user.admin?
-               'Manage support cases'
-             else
-               'Support case archive'
-             end
-
+    @title = 'Manage support cases'
+    @archive = archive?
     current_site.cases.map(&:update_ticket_status!) if current_user.admin?
-    @archive = true
   end
 
   def show
@@ -83,6 +78,10 @@ class CasesController < ApplicationController
   end
 
   private
+
+  def archive?
+    params.permit(:archive)[:archive] == 'true'
+  end
 
   def case_params
     params.require(:case).permit(
