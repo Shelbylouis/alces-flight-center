@@ -1,60 +1,65 @@
 require 'rails_helper'
 
 RSpec.describe MaintenanceWindow, type: :model do
-  it { is_expected.to validate_presence_of(:requested_start) }
-  it { is_expected.to validate_presence_of(:requested_end) }
-
   describe '#valid?' do
-    subject do
-      build(
-        :maintenance_window,
-        cluster: cluster,
-        component: component,
-        service: service
-      )
-    end
-    let :cluster { nil }
-    let :component { nil }
-    let :service { nil }
+    describe 'associated_model validations' do
+      subject do
+        build(
+          :maintenance_window,
+          cluster: cluster,
+          component: component,
+          service: service
+        )
+      end
+      let :cluster { nil }
+      let :component { nil }
+      let :service { nil }
 
-    context 'when single associated model given' do
-      let :cluster { create(:cluster) }
+      context 'when single associated model given' do
+        let :cluster { create(:cluster) }
 
-      it { is_expected.to be_valid }
-    end
+        it { is_expected.to be_valid }
+      end
 
-    context 'when no associated model given' do
-      it { is_expected.to be_invalid }
-    end
+      context 'when no associated model given' do
+        it { is_expected.to be_invalid }
+      end
 
-    context 'when both Cluster and Component associated' do
-      let :cluster { create(:cluster) }
-      let :component { create(:component) }
+      context 'when both Cluster and Component associated' do
+        let :cluster { create(:cluster) }
+        let :component { create(:component) }
 
-      it { is_expected.to be_invalid }
-    end
+        it { is_expected.to be_invalid }
+      end
 
-    context 'when both Cluster and Service associated' do
-      let :cluster { create(:cluster) }
-      let :service { create(:service) }
+      context 'when both Cluster and Service associated' do
+        let :cluster { create(:cluster) }
+        let :service { create(:service) }
 
-      it { is_expected.to be_invalid }
-    end
+        it { is_expected.to be_invalid }
+      end
 
-    context 'when both Component and Service associated' do
-      let :component { create(:component) }
-      let :service { create(:service) }
+      context 'when both Component and Service associated' do
+        let :component { create(:component) }
+        let :service { create(:service) }
 
-      it { is_expected.to be_invalid }
+        it { is_expected.to be_invalid }
+      end
     end
 
     context 'after invalid transition' do
+      subject { create(:maintenance_window) }
+
       before :each do
-        subject.cluster = create(:cluster)
         subject.request!
       end
 
       it { is_expected.to be_invalid }
+    end
+
+    describe 'requested_start and requested_end validations' do
+      it { is_expected.to validate_presence_of(:requested_start) }
+      it { is_expected.to validate_presence_of(:requested_end) }
     end
   end
 
