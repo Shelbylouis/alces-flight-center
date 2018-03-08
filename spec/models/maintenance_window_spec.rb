@@ -268,6 +268,30 @@ RSpec.describe MaintenanceWindow, type: :model do
     end
   end
 
+  describe 'values tracked in transitions' do
+    it 'tracks requested_start in transitions' do
+      window = create(:maintenance_window, requested_start: 1.days.from_now)
+
+      new_requested_start = 2.days.from_now.at_midnight
+      window.requested_start = new_requested_start
+      window.request!(create(:admin))
+
+      request_transition = window.transitions.where(event: :request).first
+      expect(request_transition.requested_start).to eq(new_requested_start)
+    end
+
+    it 'tracks requested_end in transitions' do
+      window = create(:maintenance_window, requested_end: 1.days.from_now)
+
+      new_requested_end = 2.days.from_now.at_midnight
+      window.requested_end = new_requested_end
+      window.request!(create(:admin))
+
+      request_transition = window.transitions.where(event: :request).first
+      expect(request_transition.requested_end).to eq(new_requested_end)
+    end
+  end
+
   describe '#method_missing' do
     describe '#*_at' do
       it 'returns time transition occurred for valid state' do

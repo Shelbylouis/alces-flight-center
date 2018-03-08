@@ -16,7 +16,7 @@ class MaintenanceWindow < ApplicationRecord
   attr_accessor :skip_comments
 
   state_machine initial: :new do
-    audit_trail context: :user
+    audit_trail context: [:user, :requested_start, :requested_end]
 
     state :new
     state :requested
