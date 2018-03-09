@@ -41,18 +41,23 @@ RSpec.describe ProgressMaintenanceWindow do
       include_examples 'progresses', from: :requested, to: :expired
     end
 
-    def create_window(state:)
-      create(
+    def build_window(state:)
+      # Use `build` rather than `create` as many of the windows will be invalid
+      # at the time they are created, as they are ready to be transitioned to a
+      # different state and would now be invalid if they were saved in their
+      # current state.
+      build(
         :maintenance_window,
         state: state,
         requested_start: requested_start,
         requested_end: requested_end,
         component: component,
+        id: 123
       )
     end
 
     def test_progression(initial_state:, expected_state:, expected_message:)
-      window = create_window(state: initial_state)
+      window = build_window(state: initial_state)
 
       result = described_class.new(window).progress
 

@@ -72,7 +72,80 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         it 'should be invalid' do
           expect(subject).to be_invalid
-          expect(subject.errors.messages).to include(requested_end: ['must be after start'])
+          expect(subject.errors.messages).to match(requested_end: ['must be after start'])
+        end
+      end
+
+      context 'when requested_start and requested_end in past' do
+        subject do
+          build(
+            :maintenance_window,
+            state: state,
+            requested_start: 2.days.ago,
+            requested_end: 1.days.ago,
+          )
+        end
+
+        valid_states = [:cancelled, :ended, :expired, :rejected, :started]
+
+        valid_states.each do |state|
+          context "when #{state}" do
+            let :state { state }
+
+            it { is_expected.to be_valid }
+          end
+        end
+
+        other_states = MaintenanceWindow.possible_states - valid_states
+
+        other_states.each do |state|
+          context "when #{state}" do
+            let :state { state }
+
+            it 'should be invalid' do
+              expect(subject).to be_invalid
+              expect(subject.errors.messages).to match(
+                requested_start: ['cannot be in the past'],
+                requested_end: ['cannot be in the past'],
+              )
+            end
+          end
+        end
+      end
+
+      context 'when just requested_start in past' do
+        subject do
+          build(
+            :maintenance_window,
+            state: state,
+            requested_start: 1.days.ago,
+            requested_end: 1.days.from_now,
+          )
+        end
+
+        valid_states = [:cancelled, :ended, :expired, :rejected, :started]
+
+        valid_states.each do |state|
+          context "when #{state}" do
+            let :state { state }
+
+            it { is_expected.to be_valid }
+          end
+        end
+
+        other_states = MaintenanceWindow.possible_states - valid_states
+
+        other_states.each do |state|
+          context "when #{state}" do
+            let :state { state }
+
+            it 'should be invalid' do
+              expect(subject).to be_invalid
+              expect(subject.errors.messages).to match(
+                requested_start: ['cannot be in the past'],
+              )
+            end
+          end
         end
       end
     end
