@@ -10,6 +10,7 @@ class MaintenanceWindow < ApplicationRecord
   validate :validate_precisely_one_associated_model
   validates_presence_of :requested_start
   validates_presence_of :requested_end
+  validate :validate_requested_period
 
   scope :unfinished, -> { where.not(state: finished_states) }
 
@@ -117,6 +118,13 @@ class MaintenanceWindow < ApplicationRecord
 
   def number_associated_models
     [cluster, component, service].select(&:present?).length
+  end
+
+  def validate_requested_period
+    return unless requested_start && requested_end
+    if requested_start > requested_end
+      errors.add(:requested_end, 'must be after start')
+    end
   end
 
   # Represents a query for the value of a particular property of a

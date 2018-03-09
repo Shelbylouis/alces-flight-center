@@ -60,6 +60,21 @@ RSpec.describe MaintenanceWindow, type: :model do
     describe 'requested_start and requested_end validations' do
       it { is_expected.to validate_presence_of(:requested_start) }
       it { is_expected.to validate_presence_of(:requested_end) }
+
+      context 'when requested_start after requested_end' do
+        subject do
+          build(
+            :maintenance_window,
+            requested_start: 2.days.from_now,
+            requested_end: 1.days.from_now,
+          )
+        end
+
+        it 'should be invalid' do
+          expect(subject).to be_invalid
+          expect(subject.errors.messages).to include(requested_end: ['must be after start'])
+        end
+      end
     end
   end
 
