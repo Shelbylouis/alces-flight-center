@@ -1,5 +1,39 @@
 require 'rails_helper'
 
+RSpec.shared_examples 'it validates dates cannot be in the past' do |date_fields|
+  # Fields which should otherwise be in the future can be in the past when in
+  # these states, otherwise existing saved MaintenanceWindows would become
+  # invalidated.
+  valid_states = [:cancelled, :ended, :expired, :rejected, :started]
+
+  valid_states.each do |state|
+    context "when #{state}" do
+      let :state { state }
+
+      it { is_expected.to be_valid }
+    end
+  end
+
+  other_states = MaintenanceWindow.possible_states - valid_states
+
+  other_states.each do |state|
+    context "when #{state}" do
+      let :state { state }
+
+      let :expected_errors do
+        date_fields.map do |field|
+          [field, ['cannot be in the past']]
+        end.to_h
+      end
+
+      it 'should be invalid' do
+        expect(subject).to be_invalid
+        expect(subject.errors.messages).to match(expected_errors)
+      end
+    end
+  end
+end
+
 RSpec.describe MaintenanceWindow, type: :model do
   describe '#valid?' do
     describe 'associated_model validations' do
@@ -86,31 +120,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           )
         end
 
-        valid_states = [:cancelled, :ended, :expired, :rejected, :started]
-
-        valid_states.each do |state|
-          context "when #{state}" do
-            let :state { state }
-
-            it { is_expected.to be_valid }
-          end
-        end
-
-        other_states = MaintenanceWindow.possible_states - valid_states
-
-        other_states.each do |state|
-          context "when #{state}" do
-            let :state { state }
-
-            it 'should be invalid' do
-              expect(subject).to be_invalid
-              expect(subject.errors.messages).to match(
-                requested_start: ['cannot be in the past'],
-                requested_end: ['cannot be in the past'],
-              )
-            end
-          end
-        end
+        it_behaves_like 'it validates dates cannot be in the past' , [:requested_start, :requested_end]
       end
 
       context 'when just requested_start in past' do
@@ -123,30 +133,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           )
         end
 
-        valid_states = [:cancelled, :ended, :expired, :rejected, :started]
-
-        valid_states.each do |state|
-          context "when #{state}" do
-            let :state { state }
-
-            it { is_expected.to be_valid }
-          end
-        end
-
-        other_states = MaintenanceWindow.possible_states - valid_states
-
-        other_states.each do |state|
-          context "when #{state}" do
-            let :state { state }
-
-            it 'should be invalid' do
-              expect(subject).to be_invalid
-              expect(subject.errors.messages).to match(
-                requested_start: ['cannot be in the past'],
-              )
-            end
-          end
-        end
+        it_behaves_like 'it validates dates cannot be in the past' , [:requested_start]
       end
     end
   end
