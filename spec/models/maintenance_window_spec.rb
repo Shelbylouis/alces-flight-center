@@ -8,7 +8,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       expect(window.state).to eq 'new'
     end
 
-    RSpec.shared_examples 'can be cancelled' do
+    RSpec.shared_examples 'it can be cancelled' do
       it 'can be cancelled' do
         user = create(:user)
         subject.cancel!(user)
@@ -31,7 +31,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
-    RSpec.shared_examples 'can be expired' do
+    RSpec.shared_examples 'it can be expired' do
       it 'can be expired' do
         subject.expire!
 
@@ -55,8 +55,8 @@ RSpec.describe MaintenanceWindow, type: :model do
     context 'when new' do
       subject { create(:maintenance_window, state: :new) }
 
-      include_examples 'can be cancelled'
-      include_examples 'can be expired'
+      it_behaves_like 'it can be cancelled'
+      it_behaves_like 'it can be expired'
 
       it 'can be requested' do
         user = create(:user)
@@ -90,8 +90,8 @@ RSpec.describe MaintenanceWindow, type: :model do
     context 'when requested' do
       subject { create(:maintenance_window, state: :requested) }
 
-      include_examples 'can be cancelled'
-      include_examples 'can be expired'
+      it_behaves_like 'it can be cancelled'
+      it_behaves_like 'it can be expired'
 
       it 'can be confirmed by user' do
         user = create(:user)
