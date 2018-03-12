@@ -52,12 +52,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
-    context 'when new' do
-      subject { create(:maintenance_window, state: :new) }
-
-      it_behaves_like 'it can be cancelled'
-      it_behaves_like 'it can be expired'
-
+    RSpec.shared_examples 'it can be requested' do
       it 'can be requested' do
         user = create(:user)
         subject.request!(user)
@@ -87,12 +82,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
-    context 'when requested' do
-      subject { create(:maintenance_window, state: :requested) }
-
-      it_behaves_like 'it can be cancelled'
-      it_behaves_like 'it can be expired'
-
+    RSpec.shared_examples 'it can be confirmed' do
       it 'can be confirmed by user' do
         user = create(:user)
         subject.confirm!(user)
@@ -114,7 +104,9 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         subject.confirm!(user)
       end
+    end
 
+    RSpec.shared_examples 'it can be rejected' do
       it 'can be rejected' do
         user = create(:user)
         subject.reject!(user)
@@ -137,11 +129,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
-    context 'when confirmed' do
-      subject do
-        create(:maintenance_window, state: :confirmed)
-      end
-
+    RSpec.shared_examples 'it can be started' do
       it 'can be started' do
         subject.start!
 
@@ -160,11 +148,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
-    context 'when started' do
-      subject do
-        create(:maintenance_window, state: :started)
-      end
-
+    RSpec.shared_examples 'it can be ended' do
       it 'can be ended' do
         subject.end!
 
@@ -181,6 +165,39 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         subject.end!
       end
+    end
+
+    context 'when new' do
+      subject { create(:maintenance_window, state: :new) }
+
+      it_behaves_like 'it can be cancelled'
+      it_behaves_like 'it can be expired'
+      it_behaves_like 'it can be requested'
+    end
+
+    context 'when requested' do
+      subject { create(:maintenance_window, state: :requested) }
+
+      it_behaves_like 'it can be cancelled'
+      it_behaves_like 'it can be expired'
+      it_behaves_like 'it can be confirmed'
+      it_behaves_like 'it can be rejected'
+    end
+
+    context 'when confirmed' do
+      subject do
+        create(:maintenance_window, state: :confirmed)
+      end
+
+      it_behaves_like 'it can be started'
+    end
+
+    context 'when started' do
+      subject do
+        create(:maintenance_window, state: :started)
+      end
+
+      it_behaves_like 'it can be ended'
     end
 
     it 'does not have transition comment added when `legacy_migration_mode` flag set on model' do
