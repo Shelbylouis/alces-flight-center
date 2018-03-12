@@ -9,6 +9,7 @@ RSpec.describe 'alces:maintenance_windows:progress' do
       :new,
       :requested,
       :started,
+      :expired,
     ]
   end
 
@@ -24,7 +25,7 @@ RSpec.describe 'alces:maintenance_windows:progress' do
     progressed_windows = []
     expect(
       ProgressMaintenanceWindow
-    ).to receive(:new).exactly(4).times.and_wrap_original do |method, *args|
+    ).to receive(:new).exactly(5).times.and_wrap_original do |method, *args|
       method.call(*args).tap do |progress_mw|
         allow(progress_mw).to receive(:progress) do
           progressed_windows << progress_mw.window

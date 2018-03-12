@@ -376,6 +376,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           :new,
           :requested,
           :started,
+          :expired,
         ])
       end
     end

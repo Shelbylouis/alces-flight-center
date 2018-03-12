@@ -52,7 +52,6 @@ class MaintenanceWindow < ApplicationRecord
       [
         :cancelled,
         :ended,
-        :expired,
         :rejected,
       ]
     end
