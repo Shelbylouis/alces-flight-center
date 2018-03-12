@@ -49,11 +49,13 @@ class MaintenanceWindow < ApplicationRecord
     # A maintenance window is 'finished' once it has reached a state which it
     # cannot transition out of.
     def finished_states
-      [
-        :cancelled,
-        :ended,
-        :rejected,
-      ]
+      possible_states.select { |state| cannot_leave_state?(state) }
+    end
+
+    private
+
+    def cannot_leave_state?(state)
+      MaintenanceWindow.new(state: state).state_paths.empty?
     end
   end
 
