@@ -183,11 +183,11 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
-    it 'does not have transition comment added when `skip_comments` flag set on model' do
+    it 'does not have transition comment added when `legacy_migration_mode` flag set on model' do
       # This test tests this behaviour for the started -> ended transition, but
       # any valid transition could be used.
       window = create(:maintenance_window, state: :started)
-      window.skip_comments = true
+      window.legacy_migration_mode = true
 
       expect(Case.request_tracker).not_to receive(:add_ticket_correspondence)
 

@@ -13,7 +13,7 @@ class MaintenanceWindow < ApplicationRecord
 
   scope :unfinished, -> { where.not(state: finished_states) }
 
-  attr_accessor :skip_comments
+  attr_accessor :legacy_migration_mode
 
   state_machine initial: :new do
     audit_trail context: [:user, :requested_start, :requested_end]
@@ -91,7 +91,7 @@ class MaintenanceWindow < ApplicationRecord
   delegate :site, to: :case
 
   def add_transition_comment
-    unless invalid? || skip_comments
+    unless invalid? || legacy_migration_mode
       maintenance_notifier.add_transition_comment(state)
     end
   end
