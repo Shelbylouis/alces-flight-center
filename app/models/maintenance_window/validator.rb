@@ -56,12 +56,12 @@ class MaintenanceWindow
       # would be invalid when the `confirmed` -> `started` transition happened,
       # as it should already be `ended`.
       [
-        record.cancelled?,
-        record.ended?,
-        record.expired?,
-        record.rejected?,
-        record.started?
-      ].any?
+        :cancelled,
+        :ended,
+        :expired,
+        :rejected,
+        :started,
+      ].include?(record.state.to_sym)
     end
 
     def validate_field_in_future(field_name)
