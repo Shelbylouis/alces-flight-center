@@ -200,6 +200,16 @@ RSpec.describe MaintenanceWindow, type: :model do
       it_behaves_like 'it can be ended'
     end
 
+    context 'when expired' do
+      subject do
+        create(:maintenance_window, state: :expired)
+      end
+
+      it_behaves_like 'it can be cancelled'
+      it_behaves_like 'it can be confirmed'
+      it_behaves_like 'it can be rejected'
+    end
+
     it 'does not have transition comment added when `legacy_migration_mode` flag set on model' do
       # This test tests this behaviour for the started -> ended transition, but
       # any valid transition could be used.
