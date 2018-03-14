@@ -1,8 +1,7 @@
 class UpdateExistingMaintenanceWindows < ActiveRecord::DataMigration
   def up
     MaintenanceWindow.all.each do |window|
-      # Don't want any comments left on RT tickets as we make changes.
-      window.skip_comments = true
+      window.legacy_migration_mode = true
 
       # Change the state to `new` (from `requested`, what the default was set
       # to when this column was created) so we can simulate the new maintenance

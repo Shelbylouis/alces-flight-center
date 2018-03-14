@@ -30,7 +30,7 @@ class MaintenanceWindow
     def validate_requested_period
       return unless requested_start && requested_end
       validate_start_before_end
-      validate_start_or_end_in_future_if_needed
+      validate_start_or_end_in_future_if_needed unless record.legacy_migration_mode
     end
 
     def validate_start_before_end
