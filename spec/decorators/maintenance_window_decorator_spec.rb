@@ -46,12 +46,16 @@ RSpec.describe MaintenanceWindowDecorator do
       h.raw("#{from} &mdash; #{to}")
     end
 
-    context 'when started' do
-      let :state { :started }
-
+    RSpec.shared_examples 'includes time range' do
       it 'returns formatted time range for maintenance' do
         expect(subject.scheduled_period).to include expected_time_range
       end
+    end
+
+    context 'when started' do
+      let :state { :started }
+
+      include_examples 'includes time range'
 
       it 'indicates that the maintenance is in progress' do
         expect(subject.scheduled_period).to include '<strong>(in progress)</strong>'
@@ -61,9 +65,7 @@ RSpec.describe MaintenanceWindowDecorator do
     context 'when expired' do
       let :state { :expired }
 
-      it 'returns formatted time range for maintenance' do
-        expect(subject.scheduled_period).to include expected_time_range
-      end
+      include_examples 'includes time range'
 
       it 'indicates that the maintenance was not confirmed and has now expired' do
         expect(subject.scheduled_period).to match(
