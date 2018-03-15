@@ -28,24 +28,45 @@ RSpec.describe MaintenanceWindowDecorator do
   end
 
   describe '#scheduled_period' do
-    it 'returns formatted time range for maintenance' do
-      requested_start = DateTime.current.advance(days: 1)
-      requested_end = DateTime.current.advance(days: 2)
-      window = create(
+    subject do
+      create(
         :maintenance_window,
         requested_start: requested_start,
         requested_end: requested_end,
+        state: state,
       ).decorate
-
-      from = requested_start.to_formatted_s(:short)
-      to = requested_end.to_formatted_s(:short)
-      expect(window.scheduled_period).to include h.raw("#{from} &mdash; #{to}")
     end
 
-    it 'indicates if the maintenance is in progress' do
-      window = create(:maintenance_window, state: :started).decorate
+    let :requested_start { 1.days.from_now }
+    let :requested_end { 2.days.from_now }
 
-      expect(window.scheduled_period).to include '(in progress)'
+    let :expected_time_range do
+      from = requested_start.to_formatted_s(:short)
+      to = requested_end.to_formatted_s(:short)
+      h.raw("#{from} &mdash; #{to}")
+    end
+
+    context 'when started' do
+      let :state { :started }
+
+      it 'returns formatted time range for maintenance' do
+        expect(subject.scheduled_period).to include expected_time_range
+      end
+
+      it 'indicates that the maintenance is in progress' do
+        expect(subject.scheduled_period).to include '(in progress)'
+      end
+    end
+
+    other_states = MaintenanceWindow.possible_states - [:started]
+    other_states.each do |state|
+      context "when #{state}" do
+        let :state { state }
+
+        it 'just returns formatted time range for maintenance' do
+          expect(subject.scheduled_period).to eq expected_time_range
+        end
+      end
     end
   end
 end
