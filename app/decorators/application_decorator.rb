@@ -122,4 +122,9 @@ class ApplicationDecorator < Draper::Decorator
 
     h.raw("<li class=\"nav-item\" title=\"#{title}\">#{link}</li>")
   end
+
+  # Override this method to generate the tab bars
+  def tabs
+    []
+  end
 end
