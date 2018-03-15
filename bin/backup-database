@@ -28,7 +28,7 @@ main() {
   backup_url="$BACKUPS_S3_URL/$backup_file"
 
   echo 'Dumping database...'
-  dokku run "$APP_NAME" pg_dump -d "$database_url" > "$backup_file"
+  dokku --rm run "$APP_NAME" pg_dump -d "$database_url" > "$backup_file"
 
   echo "Uploading database dump to '$backup_url'..."
   AWS_ACCESS_KEY_ID="$access_key" \
