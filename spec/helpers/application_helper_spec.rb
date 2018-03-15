@@ -63,7 +63,7 @@ RSpec.describe ApplicationHelper do
       before :each { @scope = cluster }
 
       it 'renders the cluster nav bar' do
-        expect_render_tabs('clusters/tabs')
+        expect_render_tabs('partials/tabs')
         subject
       end
     end
