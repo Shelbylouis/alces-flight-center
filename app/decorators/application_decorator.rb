@@ -38,6 +38,10 @@ class ApplicationDecorator < Draper::Decorator
     h.raw(buttons)
   end
 
+  # Override this method to generate the tab bars
+  def tabs
+    []
+  end
   private
 
   def internal_icon
@@ -121,10 +125,5 @@ class ApplicationDecorator < Draper::Decorator
       title: title
 
     h.raw("<li class=\"nav-item\" title=\"#{title}\">#{link}</li>")
-  end
-
-  # Override this method to generate the tab bars
-  def tabs
-    []
   end
 end

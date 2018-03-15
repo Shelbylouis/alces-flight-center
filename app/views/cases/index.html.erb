@@ -1,6 +1,9 @@
 <% manage_cases_page = current_user.admin? && @archive %>
 
-<%= render_tab_bar activate: :cases do %>
+<%= render 'partials/tabs', activate: :cases do %>
+  <ul class='nav nav-tabs nav-justified' >
+    <%= @scope.decorate.case_form_buttons %>
+  </ul>
   <div class='table-responsive'>
     <table class="table">
       <thead>

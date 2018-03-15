@@ -1,5 +1,5 @@
 
-<%= render_tab_bar activate: :cases do %>
+<%= render 'partials/tabs', activate: :cases do %>
   <div class='card-body'>
     <%= new_case_form(clusters: @clusters, single_part: @single_part) %>
   </div>

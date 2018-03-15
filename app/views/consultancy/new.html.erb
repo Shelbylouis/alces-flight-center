@@ -7,7 +7,7 @@
   </div>
 <% end %>
 
-<%= render_tab_bar activate: :cases do %>
+<%= render 'partials/tabs', activate: :cases do %>
   <%= form_for @case, html: { class: 'card-body' } do |f| %>
     <%= f.hidden_field(:cluster_id) %>
     <%= f.hidden_field(:component_id) %>

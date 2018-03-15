@@ -1,5 +1,5 @@
 
-<%= render_tab_bar activate: :maintenance do %>
+<%= render 'partials/tabs', activate: :maintenance do %>
   <%= form_for @maintenance_window,
     url: request.original_fullpath,
     html: { novalidate: true, class: 'card-body' } do |f| %>
