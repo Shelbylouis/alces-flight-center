@@ -59,11 +59,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       cluster = create(:cluster)
       component = create(:component, cluster: cluster)
 
-      visit cluster_path(cluster, as: user)
-      component_maintenance_link = page.find_link(
-        href: new_component_maintenance_window_path(component)
-      )
-      component_maintenance_link.click
+      visit new_component_maintenance_window_path(component, as: user)
 
       requested_end_group = find(:test_element, :requested_end)
       expect(requested_end_group).not_to have_selector('select', class: 'is-invalid')
