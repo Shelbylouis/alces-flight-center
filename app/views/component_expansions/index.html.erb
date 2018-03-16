@@ -1,3 +1,9 @@
 <%= render 'partials/tabs', activate: :expansions do %>
   <%= render 'partials/expansion_table', model: @scope, action: 'show' %>
+  <%= render 'partials/card_table_footer' do %>
+    <%= link_to 'Edit',
+                edit_component_component_expansion_path(@scope),
+                role: 'button',
+                class: dark_button_classes %>
+  <% end %>
 <% end %>
