@@ -1,26 +1,8 @@
-
-<%= render 'cases/cases_table', model: component, archive: true %>
-
-<div class='card'>
-  <%= render('partials/card_header_nav', title: 'Overview' ) %>
-
+<%= render 'partials/tabs', activate: :overview do %>
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
       <%= component.readable_support_type.capitalize %> component
       <%= component.cluster_part_icons %>
     </li>
   </ul>
-</div>
-
-<div class='card'>
-  <%= render 'partials/card_header_nav', title: 'Expansions' %>
-  <%= render 'partials/expansion_table',
-              action: 'show',
-              model: component %>
-</div>
-
-<%= render 'partials/asset_record_table',
-  model: component,
-  action: 'show'
-%>
-
+<% end %>
