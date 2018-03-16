@@ -22,7 +22,11 @@ Rails.application.routes.draw do
     resources :logs, only: :create
   end
   maintenance_form = Proc.new do
-    resources :maintenance_windows, only: :new
+    resources :maintenance_windows, only: :new do
+      collection do
+        post 'new', action: :create
+      end
+    end
   end
 
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
@@ -57,7 +61,7 @@ Rails.application.routes.draw do
       maintenance_form.call
     end
 
-    resources :maintenance_windows, only: :create do
+    resources :maintenance_windows, only: [] do
       member do
         post :cancel
       end

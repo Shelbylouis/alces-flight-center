@@ -1,5 +1,5 @@
 
-<%= form_for @maintenance_window do |f| %>
+<%= form_for @maintenance_window, url: request.original_fullpath do |f| %>
   <%= f.hidden_field :cluster_id %>
   <%= f.hidden_field :component_id %>
   <%= f.hidden_field :service_id %>
