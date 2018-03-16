@@ -20,13 +20,6 @@ RSpec.feature "Maintenance windows", type: :feature do
     let :user_name { 'Steve User' }
     let :user { create(:admin, name: user_name) }
 
-    let :request_link_path do
-      request_maintenance_window_case_path(support_case.id)
-    end
-    let :end_link_path do
-      end_maintenance_window_case_path(support_case.id)
-    end
-
     it 'can request maintenance in association with any Case for Cluster' do
       cluster = create(:cluster)
       component = create(:component, cluster: cluster)
