@@ -17,18 +17,8 @@ class ClusterDecorator < ApplicationDecorator
     [
       { id: :overview, path: h.cluster_path(self) },
       { id: :logs, path: h.cluster_logs_path(self) },
+      tabs_builder.cases,
       {
-        id: :cases, path: h.cluster_cases_path(self),
-        dropdown: [
-          {
-            text: 'Current',
-            path: h.cluster_cases_path(self)
-          }, {
-            text: 'Archive',
-            path: h.cluster_cases_path(self, archive: true)
-          }
-        ]
-      }, {
         id: :maintenance,
         path: h.cluster_maintenance_windows_path(self),
         admin_dropdown: [
