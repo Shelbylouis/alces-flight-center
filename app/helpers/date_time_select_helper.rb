@@ -56,10 +56,14 @@ module DateTimeSelectHelper
 
     def select_html_options(select_name)
       {
-        class: 'form-control',
+        class: "form-control #{valid_class}",
         title: "Select #{select_name}",
         id: id(select_name)
       }
+    end
+
+    def valid_class
+      model.errors[datetime_field_name].any? ? 'is-invalid' : 'is-valid'
     end
 
     def model_prefix

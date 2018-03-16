@@ -1,6 +1,6 @@
 class MaintenanceWindowsController < ApplicationController
   def new
-    @title = "Request Maintenance"
+    assign_new_maintenance_title
 
     @maintenance_window = MaintenanceWindow.new(
       cluster_id: params[:cluster_id],
@@ -13,11 +13,17 @@ class MaintenanceWindowsController < ApplicationController
 
   def create
     ActiveRecord::Base.transaction do
-      @maintenance_window = MaintenanceWindow.create!(maintenance_window_params)
-      @maintenance_window.request!(current_user)
+      @maintenance_window = MaintenanceWindow.create(maintenance_window_params)
+      @maintenance_window.request(current_user)
     end
-    flash[:success] = 'Maintenance requested.'
-    redirect_to @maintenance_window.associated_cluster
+    if @maintenance_window.errors.full_messages.any?
+      assign_new_maintenance_title
+      flash.now[:error] = 'Unable to request this maintenance.'
+      render :new
+    else
+      flash[:success] = 'Maintenance requested.'
+      redirect_to @maintenance_window.associated_cluster
+    end
   end
 
   def confirm
@@ -45,6 +51,10 @@ class MaintenanceWindowsController < ApplicationController
 
   def maintenance_window_params
     params.require(:maintenance_window).permit(PARAM_NAMES)
+  end
+
+  def assign_new_maintenance_title
+    @title = 'Request Maintenance'
   end
 
   def suggested_requested_start

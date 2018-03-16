@@ -1,5 +1,16 @@
 require 'rails_helper'
 
+# Custom Capybara selector to find element with given `data-test` attribute;
+# useful for finding elements in tests without needing to look for parts of UI
+# which are more likely to change, or needing to add classes/ids etc. which are
+# only for use in tests. Relevant:
+# https://blog.kentcdodds.com/making-your-ui-tests-resilient-to-change-d37a6ee37269.
+Capybara.add_selector(:test_element) do
+  xpath do |element|
+    XPath.descendant[XPath.attr(:'data-test') == element.to_s]
+  end
+end
+
 RSpec.feature "Maintenance windows", type: :feature do
   let :support_case { create(:case_with_component) }
   let :component { support_case.component }
@@ -60,6 +71,47 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(new_window.requested_end).to eq DateTime.new(2023, 9, 20, 13, 0)
       expect(current_path).to eq(cluster_path(cluster))
       expect(find('.alert')).to have_text(/Maintenance requested/)
+    end
+
+    it 're-renders form with error when invalid date entered' do
+      cluster = create(:cluster)
+      component = create(:component, cluster: cluster)
+
+      visit cluster_path(cluster, as: user)
+      component_maintenance_link = page.find_link(
+        href: new_component_maintenance_window_path(component)
+      )
+      component_maintenance_link.click
+
+      requested_end_group = find(:test_element, :requested_end)
+      expect(requested_end_group).not_to have_selector('select', class: 'is-invalid')
+
+      select '2022', from: 'requested-start-datetime-select-year'
+      select 'September', from: 'requested-start-datetime-select-month'
+      select '10', from: 'requested-start-datetime-select-day'
+      select '13', from: 'requested-start-datetime-select-hour'
+
+      select '2016', from: 'requested-end-datetime-select-year'
+      select 'September', from: 'requested-end-datetime-select-month'
+      select '20', from: 'requested-end-datetime-select-day'
+      select '13', from: 'requested-end-datetime-select-hour'
+
+      expect do
+        click_button 'Request Maintenance'
+      end.not_to change(MaintenanceWindow, :count)
+      expect(current_path).to eq(new_component_maintenance_window_path(component))
+      expect(find('.alert')).to have_text(/Unable to request this maintenance/)
+
+      requested_end_group = find(:test_element, :requested_end)
+      invalidated_selects = requested_end_group.all('select', class: 'is-invalid')
+      expect(invalidated_selects.length).to eq(5)
+
+      expect(requested_end_group.find('.invalid-feedback')).to have_text(
+        'Must be after start; cannot be in the past'
+      )
+
+      requested_start_group = find(:test_element, :requested_start)
+      expect(requested_start_group).not_to have_selector('select', class: 'is-invalid')
     end
 
     it 'can cancel requested maintenance' do
