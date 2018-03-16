@@ -38,6 +38,9 @@
   <% submit_path = component_component_expansion_path @cluster_part %>
   <%= form_tag submit_path, method: 'PATCH' do %>
     <%= render 'partials/expansion_table', model: @cluster_part,  action: 'edit' %>
+    <%= render 'partials/card_table_footer' do %>
+      <%= submit_tag 'Submit', class: dark_button_classes %>
+    <% end %>
   <% end %>
 </div>
 
