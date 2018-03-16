@@ -1,9 +1,11 @@
 <%= render 'partials/tabs', activate: :expansions do %>
-  <%= render 'partials/expansion_table', model: @scope, action: 'show' %>
-  <%= render 'partials/card_table_footer' do %>
-    <%= link_to 'Edit',
-                edit_component_component_expansion_path(@scope),
-                role: 'button',
-                class: dark_button_classes %>
+  <% if current_user.admin? %>
+    <div class='nav nav-tabs nav-justified'>
+      <%= link_to 'Add, Update, or Delete Expansions',
+                  edit_component_component_expansion_path(@scope),
+                  role: 'button',
+                  class: dark_button_classes %>
+    </div>
   <% end %>
+  <%= render 'partials/expansion_table', model: @scope, action: 'show' %>
 <% end %>
