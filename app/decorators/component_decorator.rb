@@ -14,4 +14,8 @@ class ComponentDecorator < ClusterPartDecorator
   def path
     h.component_path(self)
   end
+
+  def tabs
+    [ tabs_builder.overview ]
+  end
 end
