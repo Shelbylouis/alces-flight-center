@@ -13,4 +13,11 @@ class ComponentGroupDecorator < ApplicationDecorator
     component_name = h.pluralize(components.length, component_type.name)
     h.link_to "#{name} — #{component_name}", path
   end
+
+  def tabs
+    [
+      tabs_builder.asset_record,
+      { id: :components, path: h.component_group_components_path(self) }
+    ]
+  end
 end
