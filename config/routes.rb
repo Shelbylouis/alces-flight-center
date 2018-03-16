@@ -12,6 +12,16 @@ Rails.application.routes.draw do
   # be reached from an email.
   get '/reset-password/complete' => 'passwords#reset_complete'
 
+  asset_record = Proc.new do
+    resource :asset_record, path: 'asset-record', only: [:edit, :update]
+  end
+  logs = Proc.new do
+    resources :logs, only: :index
+  end
+  admin_logs = Proc.new do
+    resources :logs, only: :create
+  end
+
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'sites#index'
     resources :sites, only: [:show, :index] do
@@ -20,15 +30,9 @@ Rails.application.routes.draw do
 
     resources :cases, only: []
 
-    admin_logs = Proc.new { resources :logs, only: :create }
-
     resources :clusters, only: []  do
       resources :maintenance_windows, only: :new
       admin_logs.call
-    end
-
-    asset_record = Proc.new do
-      resource :asset_record, path: 'asset-record', only: [:edit, :update]
     end
 
     resources :components, only: []  do
@@ -74,8 +78,6 @@ Rails.application.routes.draw do
         post :restore
       end
     end
-
-    logs = Proc.new { resources :logs, only: :index }
 
     resources :clusters, only: :show do
       resources :cases, only: :new
