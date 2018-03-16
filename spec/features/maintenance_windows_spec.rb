@@ -1,16 +1,5 @@
 require 'rails_helper'
 
-# Custom Capybara selector to find element with given `data-test` attribute;
-# useful for finding elements in tests without needing to look for parts of UI
-# which are more likely to change, or needing to add classes/ids etc. which are
-# only for use in tests. Relevant:
-# https://blog.kentcdodds.com/making-your-ui-tests-resilient-to-change-d37a6ee37269.
-Capybara.add_selector(:test_element) do
-  xpath do |element|
-    XPath.descendant[XPath.attr(:'data-test') == element.to_s]
-  end
-end
-
 RSpec.feature "Maintenance windows", type: :feature do
   let :support_case { create(:case_with_component) }
   let :component { support_case.component }
