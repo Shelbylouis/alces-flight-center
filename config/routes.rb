@@ -106,7 +106,9 @@ Rails.application.routes.draw do
       logs.call
     end
 
-    resources :component_groups, path: 'component-groups', only: :show
+    resources :component_groups, path: 'component-groups', only: :show do
+      resources :components, only: :index
+    end
 
     resources :services, only: :show do
       resources :cases, only: :new
