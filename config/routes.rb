@@ -21,6 +21,9 @@ Rails.application.routes.draw do
   admin_logs = Proc.new do
     resources :logs, only: :create
   end
+  maintenance_form = Proc.new do
+    resources :maintenance_windows, only: :new
+  end
 
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'sites#index'
@@ -31,12 +34,12 @@ Rails.application.routes.draw do
     resources :cases, only: []
 
     resources :clusters, only: []  do
-      resources :maintenance_windows, only: :new
+      maintenance_form.call
       admin_logs.call
     end
 
     resources :components, only: []  do
-      resources :maintenance_windows, only: :new
+      maintenance_form.call
       resource :component_expansion,
                path: 'expansions',
                only: [:edit, :update, :create]
@@ -51,7 +54,7 @@ Rails.application.routes.draw do
     end
 
     resources :services, only: []  do
-      resources :maintenance_windows, only: :new
+      maintenance_form.call
     end
 
     resources :maintenance_windows, only: :create do
