@@ -1,5 +1,5 @@
 
-<div class="card">
+<%= render 'partials/tabs', activate: :expansions do %>
   <%= render('partials/card_header_nav', title: 'New Expansion') %>
   <div class='card-block'>
     <% form_opts = {
@@ -31,9 +31,7 @@
       </div>
     <% end %>
   </div>
-</div>
 
-<div class="card">
   <%= render 'partials/card_header_nav', title: 'Existing Expansions' %>
   <% submit_path = component_component_expansion_path @cluster_part %>
   <%= form_tag submit_path, method: 'PATCH' do %>
@@ -42,5 +40,4 @@
       <%= submit_tag 'Submit', class: dark_button_classes %>
     <% end %>
   <% end %>
-</div>
-
+<% end %>
