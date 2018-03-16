@@ -108,6 +108,7 @@ Rails.application.routes.draw do
     resources :components, only: :show do
       resources :cases, only: [:index, :new]
       resources :consultancy, only: :new
+      asset_record_view.call
       logs.call
     end
 
