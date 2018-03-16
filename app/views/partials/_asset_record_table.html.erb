@@ -1,50 +1,43 @@
-<% decorated_model = model.decorate %>
+<div class='table-responsive'>
+  <table class="table m-0">
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Value</th>
+      </tr>
+    </thead>
 
-<%= form_tag decorated_model.asset_record_path, method: 'PATCH' do %>
-  <div class='table-responsive'>
-    <table class="table m-0">
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Value</th>
+    <tbody>
+      <tr>
+        <td>Component Make</td>
+        <td><% if (model.is_a? ComponentGroup) && (action == 'edit') %>
+          <% makes = ComponentMake.where(component_type: model.component_type) %>
+          <%= collection_select :component_make,
+                                :id,
+                                makes,
+                                :id,
+                                :name,
+                                { selected: model.component_make.id } %>
+        <% else %>
+          <%= model.component_make.name %>
+        <% end %></td>
+      </tr>
+      <% model.asset_record.each do |field| %>
+        <tr class="form-group">
+          <td width="50%">
+            <%= label_tag(field.definition.id, field.name) %>
+          </td>
+
+          <td width="50%">
+            <% if action == 'edit' %>
+              <%= field.decorate.form_input(model) %>
+            <% else %>
+              <%= field.value %>
+            <% end %>
+          </td>
         </tr>
-      </thead>
-
-      <tbody>
-        <tr>
-          <td>Component Make</td>
-          <td><% if (model.is_a? ComponentGroup) && (action == 'edit') %>
-            <% makes = ComponentMake.where(component_type: model.component_type) %>
-            <%= collection_select :component_make,
-                                  :id,
-                                  makes,
-                                  :id,
-                                  :name,
-                                  { selected: model.component_make.id } %>
-          <% else %>
-            <%= model.component_make.name %>
-          <% end %></td>
-        </tr>
-        <% model.asset_record.each do |field| %>
-          <tr class="form-group">
-            <td width="50%">
-              <%= label_tag(field.definition.id, field.name) %>
-            </td>
-
-            <td width="50%">
-              <% if action == 'edit' %>
-                <%= field.decorate.form_input(model) %>
-              <% else %>
-                <%= field.value %>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
-  <%= render 'partials/edit_submit_button',
-             action: action,
-             edit_path: decorated_model.edit_asset_record_path %>
-<% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
 
