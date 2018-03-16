@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   asset_record_alias = 'asset-record'
+  component_expansions_alias = 'expansions'
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
@@ -55,7 +56,7 @@ Rails.application.routes.draw do
     resources :components, only: []  do
       maintenance_form.call
       resource :component_expansion,
-               path: 'expansions',
+               path: component_expansions_alias,
                only: [:edit, :update, :create]
       asset_record_form.call
       admin_logs.call
@@ -108,6 +109,9 @@ Rails.application.routes.draw do
     resources :components, only: :show do
       resources :cases, only: [:index, :new]
       resources :consultancy, only: :new
+      resources :component_expansions,
+                path: component_expansions_alias,
+                only: :index
       asset_record_view.call
       logs.call
     end
