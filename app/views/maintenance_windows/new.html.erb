@@ -17,14 +17,12 @@
   </div>
 
   <%= render 'partials/date_time_select',
-    model: 'maintenance_window',
-    datetime: @maintenance_window.requested_start,
-    identifier: 'requested-start'
+    model: @maintenance_window,
+    datetime_field_name: 'requested_start'
   %>
   <%= render 'partials/date_time_select',
-    model: 'maintenance_window',
-    datetime: @maintenance_window.requested_end,
-    identifier: 'requested-end'
+    model: @maintenance_window,
+    datetime_field_name: 'requested_end'
   %>
 
   <%= f.submit "Request Maintenance", class: 'btn btn-primary btn-block' %>
