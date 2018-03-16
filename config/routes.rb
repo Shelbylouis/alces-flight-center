@@ -106,7 +106,7 @@ Rails.application.routes.draw do
     end
 
     resources :components, only: :show do
-      resources :cases, only: :new
+      resources :cases, only: [:index, :new]
       resources :consultancy, only: :new
       logs.call
     end
