@@ -14,8 +14,8 @@ main() {
   git push origin
   git push production
 
-  ssh ubuntu@apps.alces-flight.com -- 'dokku run flight-center rake db:migrate'
-  ssh ubuntu@apps.alces-flight.com -- 'dokku run flight-center rake data:migrate'
+  ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run flight-center rake db:migrate'
+  ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run flight-center rake data:migrate'
 
   today="$(date -I)"
   # today="$(date -I)-hotfix" # Uncomment for hotfix release.
