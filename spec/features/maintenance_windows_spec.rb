@@ -21,72 +21,75 @@ RSpec.feature "Maintenance windows", type: :feature do
     let :user { create(:admin, name: user_name) }
 
     let :cluster { create(:cluster) }
-    let! :component { create(:component, cluster: cluster) }
-    let! :cluster_case do
-      create(:case, cluster: cluster, subject: 'Some case')
-    end
 
-    let :component_maintenance_path do
-      new_component_maintenance_window_path(component)
-    end
+    describe 'maintenance request form' do
+      let! :component { create(:component, cluster: cluster) }
+      let! :cluster_case do
+        create(:case, cluster: cluster, subject: 'Some case')
+      end
 
-    def fill_in_datetime_selects(identifier, with:)
-      select with.year.to_s, from: "#{identifier}-datetime-select-year"
-      month_name = with.strftime('%B')
-      select month_name, from: "#{identifier}-datetime-select-month"
-      select with.day.to_s, from: "#{identifier}-datetime-select-day"
-      select with.hour.to_s, from: "#{identifier}-datetime-select-hour"
-    end
+      let :component_maintenance_path do
+        new_component_maintenance_window_path(component)
+      end
 
-    it 'can request maintenance in association with any Case for Cluster' do
-      visit cluster_path(cluster, as: user)
-      component_maintenance_link = page.find_link(
-        href: component_maintenance_path
-      )
-      component_maintenance_link.click
+      def fill_in_datetime_selects(identifier, with:)
+        select with.year.to_s, from: "#{identifier}-datetime-select-year"
+        month_name = with.strftime('%B')
+        select month_name, from: "#{identifier}-datetime-select-month"
+        select with.day.to_s, from: "#{identifier}-datetime-select-day"
+        select with.hour.to_s, from: "#{identifier}-datetime-select-hour"
+      end
 
-      requested_start = DateTime.new(2022, 9, 10, 13, 0)
-      requested_end = DateTime.new(2023, 9, 20, 13, 0)
+      it 'can request maintenance in association with any Case for Cluster' do
+        visit cluster_path(cluster, as: user)
+        component_maintenance_link = page.find_link(
+          href: component_maintenance_path
+        )
+        component_maintenance_link.click
 
-      select cluster_case.subject
-      fill_in_datetime_selects 'requested-start', with: requested_start
-      fill_in_datetime_selects 'requested-end', with: requested_end
-      click_button 'Request Maintenance'
+        requested_start = DateTime.new(2022, 9, 10, 13, 0)
+        requested_end = DateTime.new(2023, 9, 20, 13, 0)
 
-      new_window = cluster_case.maintenance_windows.first
-      expect(new_window).to be_requested
-      expect(new_window.requested_by).to eq user
-      expect(new_window.requested_start).to eq requested_start
-      expect(new_window.requested_end).to eq requested_end
-      expect(current_path).to eq(cluster_path(cluster))
-      expect(find('.alert')).to have_text(/Maintenance requested/)
-    end
-
-    it 're-renders form with error when invalid date entered' do
-      visit new_component_maintenance_window_path(component, as: user)
-
-      requested_end_group = find(:test_element, :requested_end)
-      expect(requested_end_group).not_to have_selector('select', class: 'is-invalid')
-
-      requested_end_in_past = DateTime.new(2016, 9, 20, 13)
-      fill_in_datetime_selects 'requested-end', with: requested_end_in_past
-
-      expect do
+        select cluster_case.subject
+        fill_in_datetime_selects 'requested-start', with: requested_start
+        fill_in_datetime_selects 'requested-end', with: requested_end
         click_button 'Request Maintenance'
-      end.not_to change(MaintenanceWindow, :count)
-      expect(current_path).to eq(component_maintenance_path)
-      expect(find('.alert')).to have_text(/Unable to request this maintenance/)
 
-      requested_end_group.reload
-      invalidated_selects = requested_end_group.all('select', class: 'is-invalid')
-      expect(invalidated_selects.length).to eq(5)
+        new_window = cluster_case.maintenance_windows.first
+        expect(new_window).to be_requested
+        expect(new_window.requested_by).to eq user
+        expect(new_window.requested_start).to eq requested_start
+        expect(new_window.requested_end).to eq requested_end
+        expect(current_path).to eq(cluster_path(cluster))
+        expect(find('.alert')).to have_text(/Maintenance requested/)
+      end
 
-      expect(requested_end_group.find('.invalid-feedback')).to have_text(
-        'Must be after start; cannot be in the past'
-      )
+      it 're-renders form with error when invalid date entered' do
+        visit new_component_maintenance_window_path(component, as: user)
 
-      requested_start_group = find(:test_element, :requested_start)
-      expect(requested_start_group).not_to have_selector('select', class: 'is-invalid')
+        requested_end_group = find(:test_element, :requested_end)
+        expect(requested_end_group).not_to have_selector('select', class: 'is-invalid')
+
+        requested_end_in_past = DateTime.new(2016, 9, 20, 13)
+        fill_in_datetime_selects 'requested-end', with: requested_end_in_past
+
+        expect do
+          click_button 'Request Maintenance'
+        end.not_to change(MaintenanceWindow, :count)
+        expect(current_path).to eq(component_maintenance_path)
+        expect(find('.alert')).to have_text(/Unable to request this maintenance/)
+
+        requested_end_group.reload
+        invalidated_selects = requested_end_group.all('select', class: 'is-invalid')
+        expect(invalidated_selects.length).to eq(5)
+
+        expect(requested_end_group.find('.invalid-feedback')).to have_text(
+          'Must be after start; cannot be in the past'
+        )
+
+        requested_start_group = find(:test_element, :requested_start)
+        expect(requested_start_group).not_to have_selector('select', class: 'is-invalid')
+      end
     end
 
     it 'can cancel requested maintenance' do
