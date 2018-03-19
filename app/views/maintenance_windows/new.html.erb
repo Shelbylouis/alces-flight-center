@@ -1,5 +1,7 @@
 
-<%= form_for @maintenance_window do |f| %>
+<%= form_for @maintenance_window,
+  url: request.original_fullpath,
+  html: { novalidate: true, } do |f| %>
   <%= f.hidden_field :cluster_id %>
   <%= f.hidden_field :component_id %>
   <%= f.hidden_field :service_id %>
@@ -12,19 +14,17 @@
       :id,
       :case_select_details,
       {},
-      {class: ['form-control']}
+      {class: ['form-control is-valid']}
     ) %>
   </div>
 
   <%= render 'partials/date_time_select',
-    model: 'maintenance_window',
-    datetime: @maintenance_window.requested_start,
-    identifier: 'requested-start'
+    model: @maintenance_window,
+    datetime_field_name: 'requested_start'
   %>
   <%= render 'partials/date_time_select',
-    model: 'maintenance_window',
-    datetime: @maintenance_window.requested_end,
-    identifier: 'requested-end'
+    model: @maintenance_window,
+    datetime_field_name: 'requested_end'
   %>
 
   <%= f.submit "Request Maintenance", class: 'btn btn-primary btn-block' %>

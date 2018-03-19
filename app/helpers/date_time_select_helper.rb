@@ -1,5 +1,5 @@
 module DateTimeSelectHelper
-  DateTimeSelect = Struct.new(:model, :datetime, :identifier) do
+  DateTimeSelect = Struct.new(:model, :datetime_field_name) do
     include ActionView::Helpers
 
     def select(select_name)
@@ -8,11 +8,11 @@ module DateTimeSelectHelper
     end
 
     def id(select_name)
-      "#{identifier}-datetime-select-#{select_name}"
+      "#{datetime_field_name.dasherize}-datetime-select-#{select_name}"
     end
 
     def label
-      identifier.underscore.humanize
+      datetime_field_name.humanize
     end
 
     private
@@ -43,23 +43,35 @@ module DateTimeSelectHelper
       )
     end
 
+    def datetime
+      model.send(datetime_field_name)
+    end
+
     def select_options(select_name)
       {
-        prefix: model,
+        prefix: model_prefix,
         field_name: field_name(select_name)
       }
     end
 
     def select_html_options(select_name)
       {
-        class: 'form-control',
+        class: "form-control #{valid_class}",
         title: "Select #{select_name}",
         id: id(select_name)
       }
     end
 
+    def valid_class
+      model.errors[datetime_field_name].any? ? 'is-invalid' : 'is-valid'
+    end
+
+    def model_prefix
+      model.class.to_s.tableize.singularize
+    end
+
     def field_name(select_name)
-      "#{identifier.underscore}(#{fragment_name(select_name)})"
+      "#{datetime_field_name}(#{fragment_name(select_name)})"
     end
 
     def fragment_name(select_name)

@@ -1,5 +1,5 @@
 
-<% helper = DateTimeSelectHelper::DateTimeSelect.new(model, datetime, identifier) %>
+<% helper = DateTimeSelectHelper::DateTimeSelect.new(model, datetime_field_name) %>
 
 <%#
   This label is not very semantic since it just refers to the day field (as
@@ -8,12 +8,28 @@
   admin-only forms.
 %>
 <label for="<%= helper.id(:day) %>"><%= helper.label %></label>
-<div class="form-group row datetime-select">
-  <%= helper.select(:year) %>
-  <%= helper.select(:month) %>
-  <%= helper.select(:day) %>
-  <div class="col-md-1">&mdash;</div>
-  <%= helper.select(:hour) %>
-  <div>:</div>
-  <%= helper.select(:minute) %>
+<div class="form-group" data-test="<%= datetime_field_name %>">
+  <div class="row datetime-select">
+    <%= helper.select(:year) %>
+    <%= helper.select(:month) %>
+    <%= helper.select(:day) %>
+    <div class="col-md-1">&mdash;</div>
+    <%= helper.select(:hour) %>
+    <div>:</div>
+    <%= helper.select(:minute) %>
+  </div>
+
+  <div class="row col-md-12">
+    <%#
+      This row, and this input within it, only exist so any errors for the
+      datetime field are correctly displayed, which does not seem to be easily
+      otherwise possible with Bootstrap in our situation as we want to display
+      a single error for the several related selects above (related issue:
+      https://github.com/twbs/bootstrap/issues/23454).
+    %>
+    <input class="form-control is-invalid" type="hidden"/>
+    <div class="invalid-feedback">
+      <%= model.errors[datetime_field_name].join('; ').capitalize %>
+    </div>
+  </div>
 </div>
