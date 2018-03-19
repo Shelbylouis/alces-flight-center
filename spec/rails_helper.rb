@@ -47,6 +47,17 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
+# Custom Capybara selector to find element with given `data-test` attribute;
+# useful for finding elements in tests without needing to look for parts of UI
+# which are more likely to change, or needing to add classes/ids etc. which are
+# only for use in tests. Relevant:
+# https://blog.kentcdodds.com/making-your-ui-tests-resilient-to-change-d37a6ee37269.
+Capybara.add_selector(:test_element) do
+  xpath do |element|
+    XPath.descendant[XPath.attr(:'data-test') == element.to_s]
+  end
+end
+
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
