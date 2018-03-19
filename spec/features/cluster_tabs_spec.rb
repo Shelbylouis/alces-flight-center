@@ -35,7 +35,7 @@ RSpec.describe 'cluster tabs', type: :feature do
       end
     end
 
-    context 'with an contact user' do
+    context 'with a contact user' do
       let :user { create(:contact, site: cluster.site) }
 
       it 'does not have dropdown menu for maintenance tab' do
@@ -54,4 +54,3 @@ RSpec.describe 'cluster tabs', type: :feature do
     end
   end
 end
-
