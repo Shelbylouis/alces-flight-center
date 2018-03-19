@@ -24,7 +24,12 @@ Rails.application.routes.draw do
   maintenance_form = Proc.new do
     resources :maintenance_windows, only: :new do
       collection do
-        post 'new', action: :create
+        # Do not define route helper (by passing `as: nil`) as otherwise this
+        # will overwrite the `${model}_maintenance_windows_path` helper, as by
+        # default `resources` expects `new` and `index` to use the same route.
+        # However we do not want this, and this route can be accessed using the
+        # `new_${model}_maintenance_windows_path` helper.
+        post 'new', action: :create, as: nil
       end
     end
   end

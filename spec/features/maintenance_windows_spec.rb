@@ -27,8 +27,8 @@ RSpec.feature "Maintenance windows", type: :feature do
       new_component_maintenance_window_path(component)
     end
 
-    it 'can navigate to maintenance request form from Cluster dashboard' do
-      visit cluster_path(cluster, as: user)
+    it 'can navigate to maintenance request form from Cluster dashboard Components tab' do
+      visit cluster_components_path(cluster, as: user)
 
       component_maintenance_link = page.find_link(
         href: component_maintenance_path
