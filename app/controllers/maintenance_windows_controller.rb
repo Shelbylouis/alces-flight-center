@@ -1,4 +1,8 @@
 class MaintenanceWindowsController < ApplicationController
+  def index
+    @title = 'Maintenance'
+  end
+
   def new
     assign_new_maintenance_title
 

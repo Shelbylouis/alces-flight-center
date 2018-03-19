@@ -1,2 +1,4 @@
 
-<%= render 'cases_table', model: site, archive: true %>
+<%= render_tab_bar activate: :cases %>
+<%= render 'cases_table', model: @scope, archive: true %>
+

@@ -1,9 +1,27 @@
 <% path ||= model %>
 <% text ||= model.name %>
-<% active ||= false %>
-<li class='nav-item'>
+<% nav_icon ||= '' %>
+<% if current_user.admin? && (admin_dropdown ||= false) %>
+  <% dropdown = admin_dropdown %>
+<% end %>
+<% dropdown ||= false # Defines the variable %>
+<% classes ||= false %>
+<%= raw "<li class='nav-item #{'dropdown' if dropdown}'>" %>
+  <% class_string = "nav-link".tap do |str|
+    str << ' nav-link--active' if active
+    str << ' dropdown-toggle' if dropdown
+    str << ' ' + classes if classes
+  end %>
+  <% options = { class: class_string }.tap do |opt|
+    opt[:'data-toggle'] = 'dropdown' if dropdown
+  end %>
   <%= link_to (raw("<span class='fa #{nav_icon}'></span> ") + text),
-              path,
-              class: "nav-link #{ 'nav-link--active' if active }"
-  %>
+              path, options %>
+  <% if dropdown %>
+    <div class='dropdown-menu'>
+      <% dropdown.each do |dropitem| %>
+        <%= link_to dropitem[:text], dropitem[:path], class: 'dropdown-item' %>
+      <% end %>
+    </div>
+  <% end %>
 </li>
