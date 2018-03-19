@@ -28,9 +28,9 @@ class MaintenanceWindow < ApplicationRecord
     state :expired
 
     event :request { transition new: :requested }
-    event :confirm { transition requested: :confirmed }
-    event :cancel { transition [:new, :requested] => :cancelled }
-    event :reject { transition requested: :rejected }
+    event :confirm { transition [:requested, :expired] => :confirmed }
+    event :cancel { transition [:new, :requested, :expired] => :cancelled }
+    event :reject { transition [:requested, :expired] => :rejected }
     event :expire { transition [:new, :requested] => :expired }
     event :start { transition confirmed: :started }
     event :end { transition started: :ended }
@@ -52,7 +52,6 @@ class MaintenanceWindow < ApplicationRecord
       [
         :cancelled,
         :ended,
-        :expired,
         :rejected,
       ]
     end
