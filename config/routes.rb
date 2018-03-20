@@ -14,6 +14,9 @@ Rails.application.routes.draw do
   # be reached from an email.
   get '/reset-password/complete' => 'passwords#reset_complete'
 
+  asset_record_view = Proc.new {
+    resource :asset_record, path: asset_record_alias, only: :show
+  }
   asset_record_form = Proc.new do
     resource :asset_record, path: asset_record_alias, only: [:edit, :update]
   end
@@ -92,10 +95,6 @@ Rails.application.routes.draw do
         post :restore
       end
     end
-
-    asset_record_view = Proc.new {
-      resource :asset_record, path: asset_record_alias, only: :show
-    }
 
     resources :clusters, only: :show do
       resources :cases, only: [:index, :new]
