@@ -1,7 +1,4 @@
 class ComponentExpansionsController < ApplicationController
-  def index
-  end
-
   def create
     expansion = @cluster_part.component_expansions
                              .create create_expansion_param
