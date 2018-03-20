@@ -46,6 +46,10 @@ module ApplicationHelper
     @nav_link_procs ||= []
   end
 
+  def icon_span(text, icon = '')
+    raw("<span class='fa #{icon}'></span> ") + text
+  end
+
   def render_tab_bar(**render_args, &b)
     template = if @scope.is_a? Cluster
                  'clusters/tabs'

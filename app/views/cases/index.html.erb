@@ -1,4 +1,77 @@
+<% manage_cases_page = current_user.admin? && @archive %>
 
-<%= render_tab_bar activate: :cases %>
-<%= render 'cases_table', model: @scope, archive: true %>
+<%= render_tab_bar activate: :cases do %>
+  <div class='table-responsive'>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Creator</th>
+          <th>Subject</th>
+          <th>Association</th>
+          <th>Ticket ID</th>
+          <% if manage_cases_page %>
+            <th>Ticket status</th>
+            <th>Chargeable</th>
+          <% else %>
+            <th>Contact support</th>
+            <th>Archive<%= @archive ? '/Restore' : '' %></th>
+          <% end %>
+          <th>Credit charge</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @scope.cases.order(created_at: :desc).decorate.each do |c| %>
+          <% if @archive || c.open %>
+            <% if c.archived && !manage_cases_page %>
+              <tr
+                class="archived-case-row"
+                title="This support case has been archived; you should open a new support case if you wish to contact Alces Flight Support"
+              >
+            <% elsif manage_cases_page && c.requires_credit_charge? %>
+              <tr
+                class="credit-charge-required-case-row"
+                title="This support case is chargeable and has been completed, and needs some credits associated with it."
+              >
+            <% else %>
+              <tr>
+            <% end %>
+              <td
+                title="Support case created on <%= c.created_at.to_formatted_s(:long) %>"
+              >
+                <%= c.created_at.to_formatted_s(:short) %>
+              </td>
+              <td><%= c.user.name %></td>
+              <td><%= link_to c.subject, case_path(c) %></td>
+              <td><%= c.association_info %></td>
+              <td><%= c.rt_ticket_id %></td>
+              <% if manage_cases_page %>
+                <td>
+                  <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
+                </td>
+                <td><%= c.chargeable_symbol %></td>
+              <% else %>
+                <td><%= render 'cases/email_support_icon', support_case: c %></td>
+                <td><%= render 'cases/archive_icon', support_case: c %></td>
+              <% end %>
+              <td>
+                <% if c.credit_charge_allowed? && manage_cases_page %>
+                  <% credit_charge = c.credit_charge || CreditCharge.new(case: c) %>
+                  <%= form_for credit_charge, class: 'form-inline' do |f| %>
+                    <%= f.hidden_field :case_id %>
+                    <%= f.number_field :amount, class: 'form-control', required: true %>
+                    <%= f.submit '+', class: 'btn btn-success', style: 'width: 100%' %>
+                  <% end %>
+                <% else %>
+                  <%= c.credit_charge_info %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
 

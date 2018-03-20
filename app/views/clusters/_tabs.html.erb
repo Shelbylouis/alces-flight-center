@@ -2,23 +2,37 @@
   tabs = [
     { id: :overview, path: cluster_path(@cluster) },
     { id: :logs, path: cluster_logs_path(@cluster) },
-    { id: :cases, path: cluster_cases_path(@cluster) },
     {
+      id: :cases, path: cluster_cases_path(@cluster),
+      dropdown: [
+        {
+          text: 'New Case',
+          path: new_cluster_case_path(@cluster)
+        }, {
+          text: 'Consultancy',
+          path: new_cluster_consultancy_path(@cluster)
+        }, {
+          text: 'Current',
+          path: cluster_cases_path(@cluster)
+        }, {
+          text: 'Archive',
+          path: cluster_cases_path(@cluster, archive: true)
+        }
+      ]
+    }, {
       id: :maintenance,
       path: cluster_maintenance_windows_path(@cluster),
       admin_dropdown: [
         {
           text: 'Existing',
           path: cluster_maintenance_windows_path(@cluster)
-        },{
+        }, {
           text: 'Request',
           path: new_cluster_maintenance_window_path(@cluster)
         }
       ]
     },
-    {
-      id: :services, path: cluster_services_path(@cluster)
-    },
+    { id: :services, path: cluster_services_path(@cluster) },
     {
       id: :components, path: '', # Path is ignored b/c dropdown
       dropdown: @cluster.component_groups_by_type.map(&:name).map do |t|

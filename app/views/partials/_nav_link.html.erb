@@ -1,27 +1,35 @@
-<% path ||= model %>
-<% text ||= model.name %>
-<% nav_icon ||= '' %>
-<% if current_user.admin? && (admin_dropdown ||= false) %>
-  <% dropdown = admin_dropdown %>
-<% end %>
-<% dropdown ||= false # Defines the variable %>
-<% classes ||= false %>
-<%= raw "<li class='nav-item #{'dropdown' if dropdown}'>" %>
-  <% class_string = "nav-link".tap do |str|
-    str << ' nav-link--active' if active
-    str << ' dropdown-toggle' if dropdown
-    str << ' ' + classes if classes
-  end %>
-  <% options = { class: class_string }.tap do |opt|
+<%
+  # Variable definitions for the template
+  path ||= model
+  text ||= model.name
+  nav_icon ||= ''
+  dropdown ||= false
+  classes ||= false
+  # TODO: Remove this and replace dropdown with buttons
+  if current_user.admin? && (admin_dropdown ||= false)
+    dropdown = admin_dropdown
+  end
+
+  link_options = {}.tap do |opt|
     opt[:'data-toggle'] = 'dropdown' if dropdown
-  end %>
-  <%= link_to (raw("<span class='fa #{nav_icon}'></span> ") + text),
-              path, options %>
+    opt[:class] = ['nav-link'].tap do |class_arr|
+      class_arr << 'nav-link--active' if active
+      class_arr << 'dropdown-toggle' if dropdown
+      class_arr << classes if classes
+    end.flatten.join(' ')
+  end
+%>
+
+<li class='nav-item<%= ' dropdown' if dropdown %>'>
+  <%= link_to icon_span(text, nav_icon), path, link_options %>
   <% if dropdown %>
     <div class='dropdown-menu'>
       <% dropdown.each do |dropitem| %>
-        <%= link_to dropitem[:text], dropitem[:path], class: 'dropdown-item' %>
+        <%= link_to dropitem[:text],
+                    dropitem[:path],
+                    class: 'dropdown-item' %>
       <% end %>
     </div>
   <% end %>
 </li>
+
