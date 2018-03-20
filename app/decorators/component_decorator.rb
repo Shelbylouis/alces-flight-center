@@ -14,4 +14,13 @@ class ComponentDecorator < ClusterPartDecorator
   def path
     h.component_path(self)
   end
+
+  def tabs
+    [
+      tabs_builder.overview,
+      tabs_builder.asset_record,
+      tabs_builder.cases,
+      { id: :expansions, path: h.component_component_expansions_path(self) },
+    ]
+  end
 end

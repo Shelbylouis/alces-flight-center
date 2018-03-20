@@ -5,6 +5,10 @@ module TabsHelper
       @h = h
     end
 
+    def overview
+      { id: :overview, path: scope_path }
+    end
+
     def cases
       {
         id: :cases, path: scope_path('cases'),
@@ -23,8 +27,10 @@ module TabsHelper
 
     attr_reader :scope, :h
 
-    def scope_path(method)
-      method_string = "#{scope.class.name.underscore}_#{method}_path"
+    def scope_path(method = nil)
+      method_string = [
+        scope.class.name.underscore, method, 'path'
+      ].reject(&:nil?).join('_')
       h.send(method_string, scope)
     end
   end
