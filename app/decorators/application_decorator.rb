@@ -42,6 +42,7 @@ class ApplicationDecorator < Draper::Decorator
   def tabs
     []
   end
+
   private
 
   def internal_icon
@@ -125,5 +126,9 @@ class ApplicationDecorator < Draper::Decorator
       title: title
 
     h.raw("<li class=\"nav-item\" title=\"#{title}\">#{link}</li>")
+  end
+
+  def tabs_builder
+    @tabs_builder ||= TabsHelper::TabsBuilder.new(object, h)
   end
 end

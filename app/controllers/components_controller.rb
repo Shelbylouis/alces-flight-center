@@ -15,7 +15,9 @@ class ComponentsController < ApplicationController
   private
 
   def component_groups_from_type
-    if type_param.blank?
+    if @scope.is_a? ComponentGroup
+      [@scope]
+    elsif type_param.blank?
       @scope.component_groups
     else
       @scope.component_groups_by_type.find do |group_type|

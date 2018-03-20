@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  asset_record_alias = 'asset-record'
+
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
@@ -12,8 +14,11 @@ Rails.application.routes.draw do
   # be reached from an email.
   get '/reset-password/complete' => 'passwords#reset_complete'
 
-  asset_record = Proc.new do
-    resource :asset_record, path: 'asset-record', only: [:edit, :update]
+  asset_record_view = Proc.new {
+    resource :asset_record, path: asset_record_alias, only: :show
+  }
+  asset_record_form = Proc.new do
+    resource :asset_record, path: asset_record_alias, only: [:edit, :update]
   end
   logs = Proc.new do
     resources :logs, only: :index
@@ -52,14 +57,14 @@ Rails.application.routes.draw do
       resource :component_expansion,
                path: 'expansions',
                only: [:edit, :update, :create]
-      asset_record.call
+      asset_record_form.call
       admin_logs.call
     end
 
     resources :component_expansions, only: [:destroy]
 
     resources :component_groups, path: 'component-groups', only: [] do
-      asset_record.call
+      asset_record_form.call
     end
 
     resources :services, only: []  do
@@ -106,7 +111,10 @@ Rails.application.routes.draw do
       logs.call
     end
 
-    resources :component_groups, path: 'component-groups', only: :show
+    resources :component_groups, path: 'component-groups', only: :show do
+      resources :components, only: :index
+      asset_record_view.call
+    end
 
     resources :services, only: :show do
       resources :cases, only: :new
