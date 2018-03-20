@@ -28,10 +28,9 @@ module TabsHelper
     attr_reader :scope, :h
 
     def scope_path(method = nil)
-      method_string = scope.class.name.underscore.tap do |str|
-        str << "_#{method}" unless method.blank?
-        str << '_path'
-      end
+      method_string = [
+        scope.class.name.underscore, method, 'path'
+      ].reject(&:nil?).join('_')
       h.send(method_string, scope)
     end
   end
