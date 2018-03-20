@@ -1,7 +1,4 @@
 class AssetRecordsController < ApplicationController
-  def show
-  end
-
   def edit
     @asset = asset
     @title = "Edit Asset Record"
