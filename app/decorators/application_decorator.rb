@@ -38,6 +38,10 @@ class ApplicationDecorator < Draper::Decorator
     h.raw(buttons)
   end
 
+  # Override this method to generate the tab bars
+  def tabs
+    []
+  end
   private
 
   def internal_icon

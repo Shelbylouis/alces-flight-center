@@ -12,4 +12,42 @@ class ClusterDecorator < ApplicationDecorator
   def links
     h.link_to name, path
   end
+
+  def tabs
+    [
+      { id: :overview, path: h.cluster_path(self) },
+      { id: :logs, path: h.cluster_logs_path(self) },
+      {
+        id: :cases, path: h.cluster_cases_path(self),
+        dropdown: [
+          {
+            text: 'Current',
+            path: h.cluster_cases_path(self)
+          }, {
+            text: 'Archive',
+            path: h.cluster_cases_path(self, archive: true)
+          }
+        ]
+      }, {
+        id: :maintenance,
+        path: h.cluster_maintenance_windows_path(self),
+        admin_dropdown: [
+          {
+            text: 'Existing',
+            path: h.cluster_maintenance_windows_path(self)
+          }, {
+            text: 'Request',
+            path: h.new_cluster_maintenance_window_path(self)
+          }
+        ]
+      },
+      { id: :services, path: h.cluster_services_path(self) },
+      {
+        id: :components, path: '', # Path is ignored b/c dropdown
+        dropdown: self.component_groups_by_type.map(&:name).map do |t|
+          { text: t, path: h.cluster_components_path(self, type: t) }
+        end.push(text: 'All', path: h.cluster_components_path(self))
+      }
+    ]
+  end
 end

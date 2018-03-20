@@ -1,5 +1,5 @@
 
-<%= render_tab_bar activate: :components do %>
+<%= render 'partials/tabs', activate: :components do %>
   <div class='card-body'>
     <% @component_groups.each do |group| %>
       <h6><%= group.decorate.link %></h6>

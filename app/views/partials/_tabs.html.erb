@@ -1,0 +1,13 @@
+<div class='card'>
+  <div class='card-header'>
+    <ul class="nav nav-tabs nav-justified">
+      <% @scope.decorate.tabs.each do |tab| %>
+        <% active = (tab[:id] == activate) %>
+        <% tab[:text] = tab[:id].to_s.capitalize unless tab[:text] %>
+        <%= render 'partials/nav_link', **tab, active: active, classes: 'px-3' %>
+      <% end %>
+    </ul>
+  </div>
+  <%= yield if block_given? %>
+</div>
+
