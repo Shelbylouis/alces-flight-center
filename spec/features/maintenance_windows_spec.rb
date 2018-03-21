@@ -1,10 +1,46 @@
 require 'rails_helper'
 
+RSpec.shared_examples 'maintenance form error handling' do |form_action|
+  it 'does not initially have invalid elements' do
+    [requested_start_element, requested_end_element].each do |element|
+      expect(element).not_to have_selector('select', class: 'is-invalid')
+    end
+  end
+
+  it 're-renders form with error when invalid date entered' do
+    original_path = current_path
+    requested_end_in_past = DateTime.new(2016, 9, 20, 13)
+
+    expect do
+      fill_in_datetime_selects 'requested-end', with: requested_end_in_past
+      submit_button_text = "#{form_action.titlecase} Maintenance"
+      click_button submit_button_text
+    end.not_to change(MaintenanceWindow, :all)
+
+    expect(current_path).to eq(original_path)
+    expect(
+      find('.alert')
+    ).to have_text(/Unable to #{form_action} this maintenance/)
+    invalidated_selects =
+      requested_end_element.all('select', class: 'is-invalid')
+    expect(invalidated_selects.length).to eq(5)
+    expect(requested_end_element.find('.invalid-feedback')).to have_text(
+      'Must be after start; cannot be in the past'
+    )
+    expect(
+      requested_start_element
+    ).not_to have_selector('select', class: 'is-invalid')
+  end
+end
+
 RSpec.feature "Maintenance windows", type: :feature do
   let :support_case { create(:case_with_component) }
   let :component { support_case.component }
   let :cluster { support_case.cluster }
   let :site { support_case.site }
+
+  let :valid_requested_end { DateTime.new(2023, 9, 20, 13, 0) }
+  let :valid_requested_start { DateTime.new(2022, 9, 10, 13, 0) }
 
   before :each do
     # The only way I can get Capybara to use the correct URL; may be a better
@@ -14,6 +50,22 @@ RSpec.feature "Maintenance windows", type: :feature do
     # Prevent attempting to retrieve documents from S3 when Cluster page
     # visited.
     allow_any_instance_of(Cluster).to receive(:documents).and_return([])
+  end
+
+  def fill_in_datetime_selects(identifier, with:)
+    select with.year.to_s, from: "#{identifier}-datetime-select-year"
+    month_name = with.strftime('%B')
+    select month_name, from: "#{identifier}-datetime-select-month"
+    select with.day.to_s, from: "#{identifier}-datetime-select-day"
+    select with.hour.to_s, from: "#{identifier}-datetime-select-hour"
+  end
+
+  def requested_start_element
+    find(:test_element, :requested_start)
+  end
+
+  def requested_end_element
+    find(:test_element, :requested_end)
   end
 
   context 'when user is an admin' do
@@ -43,71 +95,25 @@ RSpec.feature "Maintenance windows", type: :feature do
         create(:case, cluster: cluster, subject: 'Some case')
       end
 
-      def fill_in_datetime_selects(identifier, with:)
-        select with.year.to_s, from: "#{identifier}-datetime-select-year"
-        month_name = with.strftime('%B')
-        select month_name, from: "#{identifier}-datetime-select-month"
-        select with.day.to_s, from: "#{identifier}-datetime-select-day"
-        select with.hour.to_s, from: "#{identifier}-datetime-select-hour"
-      end
-
-      def requested_start_element
-        find(:test_element, :requested_start)
-      end
-
-      def requested_end_element
-        find(:test_element, :requested_end)
-      end
-
       before :each do
         visit new_component_maintenance_window_path(component, as: user)
       end
 
-      it 'can request maintenance in association with any Case for Cluster' do
-        requested_start = DateTime.new(2022, 9, 10, 13, 0)
-        requested_end = DateTime.new(2023, 9, 20, 13, 0)
+      include_examples 'maintenance form error handling', 'request'
 
+      it 'can request maintenance in association with any Case for Cluster' do
         select cluster_case.subject
-        fill_in_datetime_selects 'requested-start', with: requested_start
-        fill_in_datetime_selects 'requested-end', with: requested_end
+        fill_in_datetime_selects 'requested-start', with: valid_requested_start
+        fill_in_datetime_selects 'requested-end', with: valid_requested_end
         click_button 'Request Maintenance'
 
         new_window = cluster_case.maintenance_windows.first
         expect(new_window).to be_requested
         expect(new_window.requested_by).to eq user
-        expect(new_window.requested_start).to eq requested_start
-        expect(new_window.requested_end).to eq requested_end
+        expect(new_window.requested_start).to eq valid_requested_start
+        expect(new_window.requested_end).to eq valid_requested_end
         expect(current_path).to eq(cluster_path(cluster))
         expect(find('.alert')).to have_text(/Maintenance requested/)
-      end
-
-      it 'does not initially have invalid elements' do
-        [requested_start_element, requested_end_element].each do |element|
-          expect(element).not_to have_selector('select', class: 'is-invalid')
-        end
-      end
-
-      it 're-renders form with error when invalid date entered' do
-        requested_end_in_past = DateTime.new(2016, 9, 20, 13)
-
-        expect do
-          fill_in_datetime_selects 'requested-end', with: requested_end_in_past
-          click_button 'Request Maintenance'
-        end.not_to change(MaintenanceWindow, :count)
-
-        expect(current_path).to eq(component_maintenance_path)
-        expect(
-          find('.alert')
-        ).to have_text(/Unable to request this maintenance/)
-        invalidated_selects =
-          requested_end_element.all('select', class: 'is-invalid')
-        expect(invalidated_selects.length).to eq(5)
-        expect(requested_end_element.find('.invalid-feedback')).to have_text(
-          'Must be after start; cannot be in the past'
-        )
-        expect(
-          requested_start_element
-        ).not_to have_selector('select', class: 'is-invalid')
       end
     end
 
@@ -167,22 +173,6 @@ RSpec.feature "Maintenance windows", type: :feature do
       end
       let :service { create(:service, cluster: cluster) }
 
-      def fill_in_datetime_selects(identifier, with:)
-        select with.year.to_s, from: "#{identifier}-datetime-select-year"
-        month_name = with.strftime('%B')
-        select month_name, from: "#{identifier}-datetime-select-month"
-        select with.day.to_s, from: "#{identifier}-datetime-select-day"
-        select with.hour.to_s, from: "#{identifier}-datetime-select-hour"
-      end
-
-      def requested_start_element
-        find(:test_element, :requested_start)
-      end
-
-      def requested_end_element
-        find(:test_element, :requested_end)
-      end
-
       before :each do
         visit confirm_service_maintenance_window_path(
           window,
@@ -191,54 +181,23 @@ RSpec.feature "Maintenance windows", type: :feature do
         )
       end
 
-      it 'can confirm requested maintenance' do
-        requested_start = DateTime.new(2022, 9, 10, 13, 0)
-        requested_end = DateTime.new(2023, 9, 20, 13, 0)
+      include_examples 'maintenance form error handling', 'confirm'
 
-        fill_in_datetime_selects 'requested-start', with: requested_start
-        fill_in_datetime_selects 'requested-end', with: requested_end
+      it 'can confirm requested maintenance' do
+        fill_in_datetime_selects 'requested-start', with: valid_requested_start
+        fill_in_datetime_selects 'requested-end', with: valid_requested_end
         click_button 'Confirm Maintenance'
 
         window.reload
         expect(window).to be_confirmed
         expect(window.confirmed_by).to eq user
-        expect(window.requested_start).to eq requested_start
-        expect(window.requested_end).to eq requested_end
+        expect(window.requested_start).to eq valid_requested_start
+        expect(window.requested_end).to eq valid_requested_end
         confirmed_transition = window.transitions.find_by_to(:confirmed)
-        expect(confirmed_transition.requested_start).to eq requested_start
-        expect(confirmed_transition.requested_end).to eq requested_end
+        expect(confirmed_transition.requested_start).to eq valid_requested_start
+        expect(confirmed_transition.requested_end).to eq valid_requested_end
         expect(current_path).to eq(cluster_path(cluster))
         expect(find('.alert')).to have_text(/Maintenance confirmed/)
-      end
-
-      it 'does not initially have invalid elements' do
-        [requested_start_element, requested_end_element].each do |element|
-          expect(element).not_to have_selector('select', class: 'is-invalid')
-        end
-      end
-
-      it 're-renders form with error when invalid date entered' do
-        original_path = current_path
-        requested_end_in_past = DateTime.new(2016, 9, 20, 13)
-
-        expect do
-          fill_in_datetime_selects 'requested-end', with: requested_end_in_past
-          click_button 'Confirm Maintenance'
-        end.not_to change(MaintenanceWindow, :all)
-
-        expect(current_path).to eq(original_path)
-        expect(
-          find('.alert')
-        ).to have_text(/Unable to confirm this maintenance/)
-        invalidated_selects =
-          requested_end_element.all('select', class: 'is-invalid')
-        expect(invalidated_selects.length).to eq(5)
-        expect(requested_end_element.find('.invalid-feedback')).to have_text(
-          'Must be after start; cannot be in the past'
-        )
-        expect(
-          requested_start_element
-        ).not_to have_selector('select', class: 'is-invalid')
       end
     end
 
