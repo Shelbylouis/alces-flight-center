@@ -140,7 +140,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       create(:contact, name: user_name, site: site)
     end
 
-    it 'can confirm a requested maintenance window' do
+    it 'can navigate to confirmation form for requested maintenance' do
       window = create(
         :requested_maintenance_window,
         component: component,
@@ -148,17 +148,13 @@ RSpec.feature "Maintenance windows", type: :feature do
       )
 
       visit cluster_maintenance_windows_path(component.cluster, as: user)
-      button_text = "Unconfirmed"
-      click_button(button_text)
-      expect(find('.alert')).to have_text(/maintenance confirmed/)
+      button_link_text = 'Unconfirmed'
+      click_link(button_link_text)
 
-      window.reload
-      expect(window).to be_confirmed
-      expect(window.confirmed_by).to eq(user)
-
-      visit cluster_maintenance_windows_path(component.cluster, as: user)
-      expect(page).not_to have_button(button_text)
-      expect(page.first('table.maintenance')).to have_text(user_name)
+      expected_path = confirm_component_maintenance_window_path(
+        window, component_id: component
+      )
+      expect(current_path).to eq expected_path
     end
 
     it 'can reject requested maintenance' do

@@ -31,7 +31,6 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def confirm
-    transition_window(:confirm)
   end
 
   def reject

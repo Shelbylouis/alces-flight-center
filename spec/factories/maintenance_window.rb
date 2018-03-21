@@ -9,7 +9,7 @@ FactoryBot.define do
     # This could also be a Cluster or Service; but one of these must be
     # associated and is the item under maintenance.
     component do
-      create(:component) unless cluster || service
+      create(:component) unless cluster || service || associated_model
     end
 
     # For these factories to create a MaintenanceWindow in a particular state,

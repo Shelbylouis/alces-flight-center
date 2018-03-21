@@ -39,6 +39,13 @@ Rails.application.routes.draw do
       end
     end
   end
+  confirm_maintenance_form = Proc.new do
+    resources :maintenance_windows, only: [] do
+      member do
+        get :confirm
+      end
+    end
+  end
 
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'sites#index'
@@ -104,6 +111,7 @@ Rails.application.routes.draw do
       resources :maintenance_windows, only: :index
       resources :components, only: :index
       logs.call
+      confirm_maintenance_form.call
     end
 
     resources :components, only: :show do
@@ -114,6 +122,7 @@ Rails.application.routes.draw do
                 only: :index
       asset_record_view.call
       logs.call
+      confirm_maintenance_form.call
     end
 
     resources :component_groups, path: 'component-groups', only: :show do
@@ -124,11 +133,11 @@ Rails.application.routes.draw do
     resources :services, only: :show do
       resources :cases, only: [:index, :new]
       resources :consultancy, only: :new
+      confirm_maintenance_form.call
     end
 
     resources :maintenance_windows, only: [] do
       member do
-        post :confirm
         post :reject
       end
     end

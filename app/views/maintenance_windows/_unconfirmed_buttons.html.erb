@@ -1,7 +1,7 @@
 
-<%= button_to(
+<%= link_to(
   raw('Unconfirmed &mdash; click to confirm'),
-  confirm_maintenance_window_path(window),
+  window.confirm_path,
   class: ['btn', 'btn-success', 'btn-block']
 )
 %>
