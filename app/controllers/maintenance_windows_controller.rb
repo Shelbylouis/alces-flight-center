@@ -16,18 +16,17 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def create
+    @maintenance_window = MaintenanceWindow.new(maintenance_window_params)
     ActiveRecord::Base.transaction do
-      @maintenance_window = MaintenanceWindow.create(maintenance_window_params)
-      @maintenance_window.request(current_user)
+      @maintenance_window.save!
+      @maintenance_window.request!(current_user)
     end
-    if @maintenance_window.errors.full_messages.any?
-      assign_new_maintenance_title
-      flash.now[:error] = 'Unable to request this maintenance.'
-      render :new
-    else
-      flash[:success] = 'Maintenance requested.'
-      redirect_to @maintenance_window.associated_cluster
-    end
+    flash[:success] = 'Maintenance requested.'
+    redirect_to @maintenance_window.associated_cluster
+  rescue ActiveRecord::RecordInvalid
+    assign_new_maintenance_title
+    flash.now[:error] = 'Unable to request this maintenance.'
+    render :new
   end
 
   def confirm
