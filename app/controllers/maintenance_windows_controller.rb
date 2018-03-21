@@ -32,6 +32,20 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def confirm
+    @maintenance_window = MaintenanceWindow.find(params[:id])
+  end
+
+  def confirm_submit
+    @maintenance_window = MaintenanceWindow.find(params[:id])
+    ActiveRecord::Base.transaction do
+      @maintenance_window.update!(confirm_maintenance_window_params)
+      @maintenance_window.confirm!(current_user)
+    end
+    flash[:success] = 'Maintenance confirmed.'
+    redirect_to @maintenance_window.associated_cluster
+  rescue ActiveRecord::RecordInvalid
+    flash.now[:error] = 'Unable to confirm this maintenance.'
+    render :confirm
   end
 
   def reject
@@ -53,8 +67,17 @@ class MaintenanceWindowsController < ApplicationController
     :requested_end,
   ].freeze
 
+  CONFIRM_PARAM_NAMES = [
+    :requested_start,
+    :requested_end,
+  ].freeze
+
   def request_maintenance_window_params
     params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES)
+  end
+
+  def confirm_maintenance_window_params
+    params.require(:maintenance_window).permit(CONFIRM_PARAM_NAMES)
   end
 
   def assign_new_maintenance_title

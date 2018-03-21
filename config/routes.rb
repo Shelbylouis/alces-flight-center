@@ -43,6 +43,7 @@ Rails.application.routes.draw do
     resources :maintenance_windows, only: [] do
       member do
         get :confirm
+        patch :confirm, to: 'maintenance_windows#confirm_submit'
       end
     end
   end

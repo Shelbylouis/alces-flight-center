@@ -28,6 +28,7 @@
       datetime_field_name: 'requested_end'
     %>
 
-    <%= f.submit "Request Maintenance", class: 'btn btn-primary btn-block' %>
+    <% submit_action = maintenance_window.requested? ? 'Confirm' : 'Request' %>
+    <%= f.submit "#{submit_action} Maintenance", class: 'btn btn-primary btn-block' %>
   <% end %>
 <% end %>
