@@ -33,6 +33,35 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
   end
 end
 
+RSpec.shared_examples 'confirmation form' do
+  before :each do
+    visit confirm_service_maintenance_window_path(
+      window,
+      service_id: service.id,
+      as: user
+    )
+  end
+
+  include_examples 'maintenance form error handling', 'confirm'
+
+  it 'can confirm requested maintenance' do
+    fill_in_datetime_selects 'requested-start', with: valid_requested_start
+    fill_in_datetime_selects 'requested-end', with: valid_requested_end
+    click_button 'Confirm Maintenance'
+
+    window.reload
+    expect(window).to be_confirmed
+    expect(window.confirmed_by).to eq user
+    expect(window.requested_start).to eq valid_requested_start
+    expect(window.requested_end).to eq valid_requested_end
+    confirmed_transition = window.transitions.find_by_to(:confirmed)
+    expect(confirmed_transition.requested_start).to eq valid_requested_start
+    expect(confirmed_transition.requested_end).to eq valid_requested_end
+    expect(current_path).to eq(cluster_path(cluster))
+    expect(find('.alert')).to have_text(/Maintenance confirmed/)
+  end
+end
+
 RSpec.feature "Maintenance windows", type: :feature do
   let :support_case { create(:case_with_component) }
   let :component { support_case.component }
@@ -173,32 +202,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       end
       let :service { create(:service, cluster: cluster) }
 
-      before :each do
-        visit confirm_service_maintenance_window_path(
-          window,
-          service_id: service.id,
-          as: user
-        )
-      end
-
-      include_examples 'maintenance form error handling', 'confirm'
-
-      it 'can confirm requested maintenance' do
-        fill_in_datetime_selects 'requested-start', with: valid_requested_start
-        fill_in_datetime_selects 'requested-end', with: valid_requested_end
-        click_button 'Confirm Maintenance'
-
-        window.reload
-        expect(window).to be_confirmed
-        expect(window.confirmed_by).to eq user
-        expect(window.requested_start).to eq valid_requested_start
-        expect(window.requested_end).to eq valid_requested_end
-        confirmed_transition = window.transitions.find_by_to(:confirmed)
-        expect(confirmed_transition.requested_start).to eq valid_requested_start
-        expect(confirmed_transition.requested_end).to eq valid_requested_end
-        expect(current_path).to eq(cluster_path(cluster))
-        expect(find('.alert')).to have_text(/Maintenance confirmed/)
-      end
+      include_examples 'confirmation form'
     end
 
     it 'can reject requested maintenance' do
