@@ -27,7 +27,7 @@ Rails.application.routes.draw do
   admin_logs = Proc.new do
     resources :logs, only: :create
   end
-  maintenance_form = Proc.new do
+  request_maintenance_form = Proc.new do
     resources :maintenance_windows, only: :new do
       collection do
         # Do not define route helper (by passing `as: nil`) as otherwise this
@@ -49,12 +49,12 @@ Rails.application.routes.draw do
     resources :cases, only: []
 
     resources :clusters, only: []  do
-      maintenance_form.call
+      request_maintenance_form.call
       admin_logs.call
     end
 
     resources :components, only: []  do
-      maintenance_form.call
+      request_maintenance_form.call
       resource :component_expansion,
                path: component_expansions_alias,
                only: [:edit, :update, :create]
@@ -69,7 +69,7 @@ Rails.application.routes.draw do
     end
 
     resources :services, only: []  do
-      maintenance_form.call
+      request_maintenance_form.call
     end
 
     resources :maintenance_windows, only: [] do
