@@ -16,7 +16,9 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def create
-    @maintenance_window = MaintenanceWindow.new(maintenance_window_params)
+    @maintenance_window = MaintenanceWindow.new(
+      request_maintenance_window_params
+    )
     ActiveRecord::Base.transaction do
       @maintenance_window.save!
       @maintenance_window.request!(current_user)
@@ -42,7 +44,7 @@ class MaintenanceWindowsController < ApplicationController
 
   private
 
-  PARAM_NAMES = [
+  REQUEST_PARAM_NAMES = [
     :cluster_id,
     :component_id,
     :service_id,
@@ -51,8 +53,8 @@ class MaintenanceWindowsController < ApplicationController
     :requested_end,
   ].freeze
 
-  def maintenance_window_params
-    params.require(:maintenance_window).permit(PARAM_NAMES)
+  def request_maintenance_window_params
+    params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES)
   end
 
   def assign_new_maintenance_title
