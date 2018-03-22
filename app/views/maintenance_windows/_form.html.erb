@@ -1,5 +1,6 @@
 
 <%
+  raise "Unknown action: #{action}" unless [:request, :confirm].include?(action)
   action = action.to_s.inquiry
 
   conditional_case_attributes =
