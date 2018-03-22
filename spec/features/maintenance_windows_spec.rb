@@ -182,7 +182,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     it 'cannot see reject button' do
       create(:requested_maintenance_window, cluster: cluster)
 
-      visit cluster_path(cluster, as: user)
+      visit cluster_maintenance_windows_path(cluster, as: user)
 
       expect(page).not_to have_button('Reject')
     end
@@ -274,7 +274,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         case: support_case
       )
 
-      visit cluster_path(cluster, as: user)
+      visit cluster_maintenance_windows_path(cluster, as: user)
 
       expect(page).not_to have_button('Cancel')
     end
