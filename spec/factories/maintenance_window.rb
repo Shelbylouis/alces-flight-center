@@ -40,6 +40,16 @@ FactoryBot.define do
         window.end!
       end
     end
+
+    factory :expired_maintenance_window do
+      state :requested
+
+      after(:create) do |window|
+        window.requested_start = 2.days.ago.at_midnight
+        window.requested_end = 1.days.ago.at_midnight
+        window.expire!
+      end
+    end
   end
 
   factory :maintenance_window_state_transition do

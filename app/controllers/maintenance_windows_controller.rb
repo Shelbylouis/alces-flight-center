@@ -37,13 +37,11 @@ class MaintenanceWindowsController < ApplicationController
 
   def confirm_submit
     @maintenance_window = MaintenanceWindow.find(params[:id])
-    ActiveRecord::Base.transaction do
-      @maintenance_window.update!(confirm_maintenance_window_params)
-      @maintenance_window.confirm!(current_user)
-    end
+    @maintenance_window.assign_attributes(confirm_maintenance_window_params)
+    @maintenance_window.confirm!(current_user)
     flash[:success] = 'Maintenance confirmed.'
     redirect_to @maintenance_window.associated_cluster
-  rescue ActiveRecord::RecordInvalid
+  rescue StateMachines::InvalidTransition
     flash.now[:error] = 'Unable to confirm this maintenance.'
     render :confirm
   end

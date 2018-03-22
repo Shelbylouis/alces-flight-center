@@ -190,16 +190,31 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     describe 'maintenance confirmation form' do
-      let :window do
-        create(
-          :requested_maintenance_window,
-          service: service,
-          case: support_case,
-        )
-      end
-      let :service { create(:service, cluster: cluster) }
+      context 'when maintenance is requested' do
+        let :window do
+          create(
+            :requested_maintenance_window,
+            service: service,
+            case: support_case,
+          )
+        end
+        let :service { create(:service, cluster: cluster) }
 
-      include_examples 'confirmation form'
+        include_examples 'confirmation form'
+      end
+
+      context 'when maintenance is expired' do
+        let :window do
+          create(
+            :expired_maintenance_window,
+            service: service,
+            case: support_case,
+          )
+        end
+        let :service { create(:service, cluster: cluster) }
+
+        include_examples 'confirmation form'
+      end
     end
 
     it 'can reject requested maintenance' do
