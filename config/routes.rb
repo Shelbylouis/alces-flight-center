@@ -27,7 +27,7 @@ Rails.application.routes.draw do
   admin_logs = Proc.new do
     resources :logs, only: :create
   end
-  maintenance_form = Proc.new do
+  request_maintenance_form = Proc.new do
     resources :maintenance_windows, only: :new do
       collection do
         # Do not define route helper (by passing `as: nil`) as otherwise this
@@ -36,6 +36,14 @@ Rails.application.routes.draw do
         # However we do not want this, and this route can be accessed using the
         # `new_${model}_maintenance_windows_path` helper.
         post 'new', action: :create, as: nil
+      end
+    end
+  end
+  confirm_maintenance_form = Proc.new do
+    resources :maintenance_windows, only: [] do
+      member do
+        get :confirm
+        patch :confirm, to: 'maintenance_windows#confirm_submit'
       end
     end
   end
@@ -49,12 +57,12 @@ Rails.application.routes.draw do
     resources :cases, only: []
 
     resources :clusters, only: []  do
-      maintenance_form.call
+      request_maintenance_form.call
       admin_logs.call
     end
 
     resources :components, only: []  do
-      maintenance_form.call
+      request_maintenance_form.call
       resource :component_expansion,
                path: component_expansions_alias,
                only: [:edit, :update, :create]
@@ -69,7 +77,7 @@ Rails.application.routes.draw do
     end
 
     resources :services, only: []  do
-      maintenance_form.call
+      request_maintenance_form.call
     end
 
     resources :maintenance_windows, only: [] do
@@ -104,6 +112,7 @@ Rails.application.routes.draw do
       resources :maintenance_windows, only: :index
       resources :components, only: :index
       logs.call
+      confirm_maintenance_form.call
     end
 
     resources :components, only: :show do
@@ -114,6 +123,7 @@ Rails.application.routes.draw do
                 only: :index
       asset_record_view.call
       logs.call
+      confirm_maintenance_form.call
     end
 
     resources :component_groups, path: 'component-groups', only: :show do
@@ -124,11 +134,11 @@ Rails.application.routes.draw do
     resources :services, only: :show do
       resources :cases, only: [:index, :new]
       resources :consultancy, only: :new
+      confirm_maintenance_form.call
     end
 
     resources :maintenance_windows, only: [] do
       member do
-        post :confirm
         post :reject
       end
     end

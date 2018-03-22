@@ -58,6 +58,11 @@ Capybara.add_selector(:test_element) do
   end
 end
 
+# Convenience function to use above.
+def test_element(data_test_value)
+  find(:test_element, data_test_value)
+end
+
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"

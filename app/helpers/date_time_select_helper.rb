@@ -49,7 +49,7 @@ module DateTimeSelectHelper
 
     def select_options(select_name)
       {
-        prefix: model_prefix,
+        prefix: model.underscored_model_name,
         field_name: field_name(select_name)
       }
     end
@@ -64,10 +64,6 @@ module DateTimeSelectHelper
 
     def valid_class
       model.errors[datetime_field_name].any? ? 'is-invalid' : 'is-valid'
-    end
-
-    def model_prefix
-      model.class.to_s.tableize.singularize
     end
 
     def field_name(select_name)

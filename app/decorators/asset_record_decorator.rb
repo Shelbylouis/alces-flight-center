@@ -10,11 +10,7 @@ module AssetRecordDecorator
   private
 
   def asset_record_path_method_string
-    "#{asset_model_name}_asset_record_path"
-  end
-
-  def asset_model_name
-    object.class.to_s.tableize.singularize
+    "#{underscored_model_name}_asset_record_path"
   end
 end
 

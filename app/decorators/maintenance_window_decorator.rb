@@ -20,6 +20,13 @@ class MaintenanceWindowDecorator < ApplicationDecorator
     transition_info_text(user, date)
   end
 
+  def confirm_path
+    associated_model_name = associated_model.underscored_model_name
+    path_method = "confirm_#{associated_model_name}_maintenance_window_path"
+    associated_model_id_param = associated_model_name.foreign_key.to_sym
+    h.send(path_method, self, associated_model_id_param => associated_model.id)
+  end
+
   private
 
   def scheduled_period_state_indicator

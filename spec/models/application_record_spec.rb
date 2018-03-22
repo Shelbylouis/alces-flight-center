@@ -10,6 +10,14 @@ RSpec.describe ApplicationRecord, type: :model do
     end
   end
 
+  describe '#underscored_model_name' do
+    subject { create(:component_group) }
+
+    it 'returns underscored name of model' do
+      expect(subject.underscored_model_name).to eq 'component_group'
+    end
+  end
+
   describe 'permissions' do
     def mock_request_user
       allow(Request).to receive(:current_user).and_return(user)

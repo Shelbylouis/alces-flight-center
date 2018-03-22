@@ -1,0 +1,56 @@
+
+<%
+  raise "Unknown action: #{action}" unless [:request, :confirm].include?(action)
+  action = action.to_s.inquiry
+
+  case_label, conditional_case_attributes =
+    if action.confirm?
+      [
+        'Associated Case',
+        {
+          disabled: true,
+          title: 'The Case this maintenance has been requested for cannot be changed'
+        },
+      ]
+    else
+      ['Case to associate this maintenance with', {}]
+    end
+%>
+
+<%= render 'partials/tabs', activate: :maintenance do %>
+  <%= form_for maintenance_window,
+    url: request.original_fullpath,
+    html: { novalidate: true, class: 'card-body' } do |f| %>
+    <%= f.hidden_field :cluster_id %>
+    <%= f.hidden_field :component_id %>
+    <%= f.hidden_field :service_id %>
+
+    <div class="form-group">
+      <%= f.label :case_id, case_label, 'data-test': 'case-select-label' %>
+      <%= f.collection_select(
+        :case_id,
+        maintenance_window.associated_cluster.cases.order(created_at: :desc).decorate,
+        :id,
+        :case_select_details,
+        {},
+        {
+          class: ['form-control is-valid'],
+          'data-test': 'case-select',
+        }.merge(conditional_case_attributes)
+      ) %>
+    </div>
+
+    <%= render 'partials/date_time_select',
+      model: maintenance_window,
+      datetime_field_name: 'requested_start'
+    %>
+    <%= render 'partials/date_time_select',
+      model: maintenance_window,
+      datetime_field_name: 'requested_end'
+    %>
+
+    <%= f.submit "#{action.titlecase} Maintenance",
+      class: 'btn btn-primary btn-block'
+    %>
+  <% end %>
+<% end %>

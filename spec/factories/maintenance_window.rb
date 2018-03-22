@@ -3,13 +3,13 @@ FactoryBot.define do
   factory :maintenance_window do
     add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
     created_at 7.days.ago
-    requested_start 1.days.from_now
-    requested_end 2.days.from_now
+    requested_start 1.days.from_now.at_midnight
+    requested_end 2.days.from_now.at_midnight
 
     # This could also be a Cluster or Service; but one of these must be
     # associated and is the item under maintenance.
     component do
-      create(:component) unless cluster || service
+      create(:component) unless cluster || service || associated_model
     end
 
     # For these factories to create a MaintenanceWindow in a particular state,
@@ -38,6 +38,16 @@ FactoryBot.define do
 
       after(:create) do |window|
         window.end!
+      end
+    end
+
+    factory :expired_maintenance_window do
+      state :requested
+
+      after(:create) do |window|
+        window.requested_start = 2.days.ago.at_midnight
+        window.requested_end = 1.days.ago.at_midnight
+        window.expire!
       end
     end
   end

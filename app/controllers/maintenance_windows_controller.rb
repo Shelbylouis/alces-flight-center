@@ -16,22 +16,39 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def create
+    @maintenance_window = MaintenanceWindow.new(
+      request_maintenance_window_params
+    )
     ActiveRecord::Base.transaction do
-      @maintenance_window = MaintenanceWindow.create(maintenance_window_params)
-      @maintenance_window.request(current_user)
+      @maintenance_window.save!
+      @maintenance_window.request!(current_user)
     end
-    if @maintenance_window.errors.full_messages.any?
-      assign_new_maintenance_title
-      flash.now[:error] = 'Unable to request this maintenance.'
-      render :new
-    else
-      flash[:success] = 'Maintenance requested.'
-      redirect_to @maintenance_window.associated_cluster
-    end
+    flash[:success] = 'Maintenance requested.'
+    redirect_to @maintenance_window.associated_cluster
+  rescue ActiveRecord::RecordInvalid
+    assign_new_maintenance_title
+    flash.now[:error] = 'Unable to request this maintenance.'
+    render :new
   end
 
   def confirm
-    transition_window(:confirm)
+    @maintenance_window = MaintenanceWindow.find(params[:id])
+
+    # Validate window as if it was confirmed without changes up front, so can
+    # display any invalid fields which will require changing on initial page
+    # load.
+    validate_as_if_confirmed(@maintenance_window)
+  end
+
+  def confirm_submit
+    @maintenance_window = MaintenanceWindow.find(params[:id])
+    @maintenance_window.assign_attributes(confirm_maintenance_window_params)
+    @maintenance_window.confirm!(current_user)
+    flash[:success] = 'Maintenance confirmed.'
+    redirect_to @maintenance_window.associated_cluster
+  rescue StateMachines::InvalidTransition
+    flash.now[:error] = 'Unable to confirm this maintenance.'
+    render :confirm
   end
 
   def reject
@@ -44,7 +61,7 @@ class MaintenanceWindowsController < ApplicationController
 
   private
 
-  PARAM_NAMES = [
+  REQUEST_PARAM_NAMES = [
     :cluster_id,
     :component_id,
     :service_id,
@@ -53,8 +70,17 @@ class MaintenanceWindowsController < ApplicationController
     :requested_end,
   ].freeze
 
-  def maintenance_window_params
-    params.require(:maintenance_window).permit(PARAM_NAMES)
+  CONFIRM_PARAM_NAMES = [
+    :requested_start,
+    :requested_end,
+  ].freeze
+
+  def request_maintenance_window_params
+    params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES)
+  end
+
+  def confirm_maintenance_window_params
+    params.require(:maintenance_window).permit(CONFIRM_PARAM_NAMES)
   end
 
   def assign_new_maintenance_title
@@ -74,5 +100,12 @@ class MaintenanceWindowsController < ApplicationController
     window.public_send("#{event}!", current_user)
     flash[:success] = "Requested maintenance #{window.state}."
     redirect_to cluster_path(window.associated_cluster)
+  end
+
+  def validate_as_if_confirmed(window)
+    original_state = @maintenance_window.state
+    @maintenance_window.state = :confirm
+    @maintenance_window.validate
+    @maintenance_window.state = original_state
   end
 end

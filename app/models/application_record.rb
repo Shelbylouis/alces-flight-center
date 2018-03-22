@@ -8,7 +8,11 @@ class ApplicationRecord < ActiveRecord::Base
   delegate :current_user, to: Request
 
   def readable_model_name
-    self.class.to_s.tableize.humanize(capitalize: false).singularize
+    model_name.human.downcase
+  end
+
+  def underscored_model_name
+    model_name.param_key
   end
 
   class << self
