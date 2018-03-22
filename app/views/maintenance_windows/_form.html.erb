@@ -1,4 +1,18 @@
 
+<%
+  action = action.to_s.inquiry
+
+  conditional_case_attributes =
+    if action.confirm?
+      {
+        disabled: true,
+        title: 'The Case this maintenance has been requested for cannot be changed'
+      }
+    else
+      {}
+    end
+%>
+
 <%= render 'partials/tabs', activate: :maintenance do %>
   <%= form_for maintenance_window,
     url: request.original_fullpath,
@@ -15,7 +29,10 @@
         :id,
         :case_select_details,
         {},
-        {class: ['form-control is-valid']}
+        {
+          class: ['form-control is-valid'],
+          'data-test': 'case-select',
+        }.merge(conditional_case_attributes)
       ) %>
     </div>
 
@@ -28,7 +45,7 @@
       datetime_field_name: 'requested_end'
     %>
 
-    <%= f.submit "#{action.to_s.titlecase} Maintenance",
+    <%= f.submit "#{action.titlecase} Maintenance",
       class: 'btn btn-primary btn-block'
     %>
   <% end %>

@@ -41,6 +41,13 @@ RSpec.shared_examples 'confirmation form' do
 
   include_examples 'maintenance form error handling', 'confirm'
 
+  it 'cannot change Case for requested maintenance' do
+    case_select = find(:test_element, 'case-select')
+
+    expect(case_select).to be_disabled
+    expect(case_select[:title]).to match(/cannot be changed/)
+  end
+
   it 'can confirm requested maintenance' do
     fill_in_datetime_selects 'requested-start', with: valid_requested_start
     fill_in_datetime_selects 'requested-end', with: valid_requested_end
