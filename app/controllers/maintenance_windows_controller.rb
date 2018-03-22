@@ -33,6 +33,11 @@ class MaintenanceWindowsController < ApplicationController
 
   def confirm
     @maintenance_window = MaintenanceWindow.find(params[:id])
+
+    # Validate window as if it was confirmed without changes up front, so can
+    # display any invalid fields which will require changing on initial page
+    # load.
+    validate_as_if_confirmed(@maintenance_window)
   end
 
   def confirm_submit
@@ -95,5 +100,12 @@ class MaintenanceWindowsController < ApplicationController
     window.public_send("#{event}!", current_user)
     flash[:success] = "Requested maintenance #{window.state}."
     redirect_to cluster_path(window.associated_cluster)
+  end
+
+  def validate_as_if_confirmed(window)
+    original_state = @maintenance_window.state
+    @maintenance_window.state = :confirm
+    @maintenance_window.validate
+    @maintenance_window.state = original_state
   end
 end

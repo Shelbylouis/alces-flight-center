@@ -1,12 +1,6 @@
 require 'rails_helper'
 
 RSpec.shared_examples 'maintenance form error handling' do |form_action|
-  it 'does not initially have invalid elements' do
-    [requested_start_element, requested_end_element].each do |element|
-      expect(element).not_to have_selector('select', class: 'is-invalid')
-    end
-  end
-
   it 're-renders form with error when invalid date entered' do
     original_path = current_path
     requested_end_in_past = DateTime.new(2016, 9, 20, 13)
@@ -27,6 +21,14 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
     expect(requested_end_element.find('.invalid-feedback')).to have_text(
       'Must be after start; cannot be in the past'
     )
+  end
+end
+
+RSpec.shared_examples 'maintenance form initially valid' do
+  it 'does not initially have invalid elements' do
+    [requested_start_element, requested_end_element].each do |element|
+      expect(element).not_to have_selector('select', class: 'is-invalid')
+    end
   end
 end
 
@@ -133,6 +135,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       end
 
       include_examples 'maintenance form error handling', 'request'
+      include_examples 'maintenance form initially valid'
 
       it 'can request maintenance in association with any Case for Cluster' do
         select cluster_case.subject
@@ -208,6 +211,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         let :service { create(:service, cluster: cluster) }
 
         include_examples 'confirmation form'
+        include_examples 'maintenance form initially valid'
       end
 
       context 'when maintenance is expired' do
@@ -221,6 +225,14 @@ RSpec.feature "Maintenance windows", type: :feature do
         let :service { create(:service, cluster: cluster) }
 
         include_examples 'confirmation form'
+
+        it 'displays errors if confirmed with existing dates on form load' do
+          [requested_start_element, requested_end_element].each do |element|
+            expect(element.find('.invalid-feedback')).to have_text(
+              'Cannot be in the past'
+            )
+          end
+        end
       end
     end
 
