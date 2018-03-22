@@ -1,0 +1,9 @@
+
+<%= render 'partials/tabs', activate: :components do %>
+  <div class='card-body'>
+    <% @component_groups.each do |group| %>
+      <h6><%= group.decorate.link %></h6>
+      <%= render 'partials/components_table', group: group %>
+    <% end %>
+  </div>
+<% end %>

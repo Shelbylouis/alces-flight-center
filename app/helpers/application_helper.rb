@@ -46,6 +46,10 @@ module ApplicationHelper
     @nav_link_procs ||= []
   end
 
+  def icon_span(text, icon = '')
+    raw("<span class='fa #{icon}'></span> ") + text
+  end
+
   def dark_button_classes
     ['btn', 'btn-primary', 'btn-block']
   end

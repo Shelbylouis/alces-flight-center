@@ -1,3 +1,29 @@
+
+<%= render 'partials/tabs', activate: :logs do %>
+  <div class='table-responsive'>
+    <table class='table'>
+      <thead>
+        <th>Date Created</th>
+        <th>Engineer</th>
+        <th>Details</th>
+        <th>Related Ticket(s)</th>
+      </thead>
+      <% @logs.each do |log| %>
+        <tr>
+          <td><%= log.created_at.to_formatted_s(:long) %></td>
+          <td><%= log.engineer.name %></td>
+          <td><%= log.details %></td>
+          <td>
+            <% log.cases.map(&:decorate).each do |kase| %>
+              <%= kase.ticket_link %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+<% end %>
+
 <% if current_user.admin? %>
   <div class='card'>
     <%= render 'partials/card_header_nav', title: 'Add Log' %>
@@ -40,30 +66,4 @@
     </div>
   </div>
 <% end %>
-
-<div class='card'>
-  <%= render 'partials/card_header_nav', title: 'Entries' %>
-  <div class='table-responsive'>
-    <table class='table'>
-      <thead>
-        <th>Date Created</th>
-        <th>Engineer</th>
-        <th>Details</th>
-        <th>Related Ticket(s)</th>
-      </thead>
-      <% @logs.each do |log| %>
-        <tr>
-          <td><%= log.created_at.to_formatted_s(:long) %></td>
-          <td><%= log.engineer.name %></td>
-          <td><%= log.details %></td>
-          <td>
-            <% log.cases.map(&:decorate).each do |kase| %>
-              <%= kase.ticket_link %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </table>
-  </div>
-</div>
 

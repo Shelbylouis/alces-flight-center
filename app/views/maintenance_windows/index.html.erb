@@ -1,0 +1,32 @@
+
+<%= render 'partials/tabs', activate: :maintenance do %>
+  <div class='table-responsive'>
+    <table class="maintenance table">
+      <thead>
+        <tr>
+          <th>For</th>
+          <th>Maintenance period</th>
+          <th>Requested</th>
+          <th>Confirmed</th>
+          <th>Associated case</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <% @scope.unfinished_related_maintenance_windows.map(&:decorate).each do |window| %>
+        <tr>
+          <td><%= window.associated_model.links %></td>
+          <td><%= window.scheduled_period %></td>
+          <td><%= window.transition_info(:requested) %></td>
+          <td>
+            <%= window.transition_info(:confirmed) ||
+              render('maintenance_windows/unconfirmed_buttons', window: window) %>
+          </td>
+          <td><%= window.case.ticket_link %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+

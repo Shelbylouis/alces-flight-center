@@ -7,36 +7,38 @@
   </div>
 <% end %>
 
-<%= form_for @case do |f| %>
-  <%= f.hidden_field(:cluster_id) %>
-  <%= f.hidden_field(:component_id) %>
-  <%= f.hidden_field(:service_id) %>
-  <%= f.hidden_field(:issue_id) %>
+<%= render 'partials/tabs', activate: :cases do %>
+  <%= form_for @case, html: { class: 'card-body' } do |f| %>
+    <%= f.hidden_field(:cluster_id) %>
+    <%= f.hidden_field(:component_id) %>
+    <%= f.hidden_field(:service_id) %>
+    <%= f.hidden_field(:issue_id) %>
 
-  <div class="form-group">
-    <%= f.label :details,
-      raw(
-        <<~EOF
-          Please enter as much information as possible about the consultancy
-          you would like to request from Alces Software.<br><strong>Note that
-          all custom consultancy will be billed at your usual site
-          rates.</strong>
+    <div class="form-group">
+      <%= f.label :details,
+        raw(
+          <<~EOF
+            Please enter as much information as possible about the consultancy
+            you would like to request from Alces Software.<br><strong>Note that
+            all custom consultancy will be billed at your usual site
+            rates.</strong>
+          EOF
+        )
+      %>
+      <%= f.text_area :details,
+        class: ['form-control', 'consultancy-details'],
+        rows: 10
+      %>
+    </div>
+
+    <%= f.submit(
+      class: ['btn', 'btn-primary', 'btn-block', 'consultancy-submit'],
+      data: {
+        confirm: <<~EOF
+          Are you sure you would like to request consultancy from Alces Software?
+          By proceeding you acknowledge that this may incur charges.
         EOF
-      )
-    %>
-    <%= f.text_area :details,
-      class: ['form-control', 'consultancy-details'],
-      rows: 10
-    %>
-  </div>
-
-  <%= f.submit(
-    class: ['btn', 'btn-primary', 'btn-block', 'consultancy-submit'],
-    data: {
-      confirm: <<~EOF
-        Are you sure you would like to request consultancy from Alces Software?
-        By proceeding you acknowledge that this may incur charges.
-      EOF
-    }
-  ) %>
+      }
+    ) %>
+  <% end %>
 <% end %>

@@ -1,6 +1,10 @@
 class ServicesController < ApplicationController
   decorates_assigned :service
 
+  def index
+    @title = 'Services'
+  end
+
   def show
     @service = Service.find(params[:id])
     @title = "#{@service.name} Dashboard"

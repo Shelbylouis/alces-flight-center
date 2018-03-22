@@ -57,6 +57,7 @@
       <% if current_user.admin? %>
         <ul class="navbar-nav justify-content-end">
           <%= render 'partials/nav_link',
+                     active: false,
                      text: 'Admin Interface',
                      path: rails_admin_path,
                      nav_icon: 'fa-database' %>

@@ -1,52 +1,7 @@
 
-<%= render 'cases/cases_table', model: cluster, archive: true %>
-
-<div class='card'>
-  <%= render 'partials/card_header_nav',
-             title: 'Overview',
-             list_items: [
-               cluster.start_maintenance_request_link,
-               link_to(
-                 'Logs',
-                 cluster_logs_path(cluster),
-                 role: 'button',
-                 class: dark_button_classes
-               )
-             ] %>
-
+<%= render 'partials/tabs', activate: :overview do %>
   <%= render 'clusters/details', cluster: cluster %>
-</div>
-
-<div class='card'>
-  <%= render 'partials/card_header_nav', title: 'Maintenance' %>
-
-  <table class="table table-responsive">
-    <thead>
-      <tr>
-        <th>For</th>
-        <th>Maintenance period</th>
-        <th>Requested</th>
-        <th>Confirmed</th>
-        <th>Associated case</th>
-      </tr>
-    </thead>
-
-    <tbody>
-    <% cluster.unfinished_related_maintenance_windows.map(&:decorate).each do |window| %>
-      <tr>
-        <td><%= window.associated_model.links %></td>
-        <td><%= window.scheduled_period %></td>
-        <td><%= window.transition_info(:requested) %></td>
-        <td>
-          <%= window.transition_info(:confirmed) ||
-            render('maintenance_windows/unconfirmed_buttons', window: window) %>
-        </td>
-        <td><%= window.case.ticket_link %></td>
-      </tr>
-    <% end %>
-    </tbody>
-  </table>
-</div>
+<% end %>
 
 <div class='card'>
   <%= render 'partials/card_header_nav', title: 'Documents' %>
@@ -60,51 +15,3 @@
   </ul>
 </div>
 
-<div class='card'>
-  <%= render 'partials/card_header_nav', title: 'Services' %>
-
-  <table class="table table-responsive">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Support type</th>
-      </tr>
-    </thead>
-
-    <tbody>
-    <% cluster.services.each do |service| %>
-      <tr>
-        <td width='40%'>
-          <%= link_to service.name, service_path(service) %>
-          <%= service.cluster_part_icons %>
-        </td>
-        <td width='30%'><%= service.readable_support_type.capitalize %></td>
-        <td width='10%'>
-          <%= service.start_maintenance_request_link %>
-        </td>
-        <td width='20%'>
-          <%= service.change_support_type_button %>
-        </td>
-      </tr>
-    <% end %>
-    </tbody>
-  </table>
-</div>
-
-<% cluster.component_groups_by_type.each do |type| %>
-  <div class='card'>
-    <%= render 'partials/card_header_nav', title: type.name.pluralize %>
-
-    <div class='card-body'>
-      <% type.component_groups.each do |group| %>
-        <h6 class="card-title">
-          <%= group.decorate.link %>
-        </h6>
-
-        <%= render 'partials/components_table', group: group %>
-
-      <% end %>
-    </div>
-
-  </div>
-<% end %>

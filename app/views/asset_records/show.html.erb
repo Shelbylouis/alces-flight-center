@@ -1,0 +1,11 @@
+<%= render 'partials/tabs', activate: :asset_record do %>
+  <% if current_user.admin? %>
+    <div class='nav nav-tabs nav-justified'>
+      <%= link_to 'Edit',
+                  @scope.decorate.edit_asset_record_path,
+                  role: 'button',
+                  class: dark_button_classes %>
+    </div>
+  <% end %>
+  <%= render 'partials/asset_record_table', model: @scope, action: :show %>
+<% end %>

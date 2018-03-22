@@ -27,8 +27,8 @@ RSpec.feature "Maintenance windows", type: :feature do
       new_component_maintenance_window_path(component)
     end
 
-    it 'can navigate to maintenance request form from Cluster dashboard' do
-      visit cluster_path(cluster, as: user)
+    it 'can navigate to maintenance request form from Cluster dashboard Components tab' do
+      visit cluster_components_path(cluster, as: user)
 
       component_maintenance_link = page.find_link(
         href: component_maintenance_path
@@ -114,7 +114,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     it 'can cancel requested maintenance' do
       window = create(:requested_maintenance_window, cluster: cluster)
 
-      visit cluster_path(cluster, as: user)
+      visit cluster_maintenance_windows_path(cluster, as: user)
       button_text = 'Cancel'
       click_button(button_text)
 
@@ -147,16 +147,18 @@ RSpec.feature "Maintenance windows", type: :feature do
         case: support_case
       )
 
-      visit cluster_path(component.cluster, as: user)
+      visit cluster_maintenance_windows_path(component.cluster, as: user)
       button_text = "Unconfirmed"
       click_button(button_text)
+      expect(find('.alert')).to have_text(/maintenance confirmed/)
 
       window.reload
       expect(window).to be_confirmed
       expect(window.confirmed_by).to eq(user)
+
+      visit cluster_maintenance_windows_path(component.cluster, as: user)
       expect(page).not_to have_button(button_text)
-      expect(page.all('table')[1]).to have_text(user_name)
-      expect(find('.alert')).to have_text(/maintenance confirmed/)
+      expect(page.first('table.maintenance')).to have_text(user_name)
     end
 
     it 'can reject requested maintenance' do
@@ -166,7 +168,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         case: support_case
       )
 
-      visit cluster_path(cluster, as: user)
+      visit cluster_maintenance_windows_path(cluster, as: user)
       button_text = 'Reject'
 
       click_button(button_text)
