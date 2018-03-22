@@ -24,7 +24,8 @@ class MaintenanceWindowsController < ApplicationController
       @maintenance_window.request!(current_user)
     end
     flash[:success] = 'Maintenance requested.'
-    redirect_to @maintenance_window.associated_cluster
+    cluster = @maintenance_window.associated_cluster
+    redirect_to cluster_maintenance_windows_path(cluster)
   rescue ActiveRecord::RecordInvalid
     assign_new_maintenance_title
     flash.now[:error] = 'Unable to request this maintenance.'
@@ -45,7 +46,8 @@ class MaintenanceWindowsController < ApplicationController
     @maintenance_window.assign_attributes(confirm_maintenance_window_params)
     @maintenance_window.confirm!(current_user)
     flash[:success] = 'Maintenance confirmed.'
-    redirect_to @maintenance_window.associated_cluster
+    cluster = @maintenance_window.associated_cluster
+    redirect_to cluster_maintenance_windows_path(cluster)
   rescue StateMachines::InvalidTransition
     flash.now[:error] = 'Unable to confirm this maintenance.'
     render :confirm
@@ -97,9 +99,10 @@ class MaintenanceWindowsController < ApplicationController
 
   def transition_window(event)
     window = MaintenanceWindow.find(params[:id])
+    cluster = window.associated_cluster
     window.public_send("#{event}!", current_user)
     flash[:success] = "Requested maintenance #{window.state}."
-    redirect_to cluster_path(window.associated_cluster)
+    redirect_back fallback_location: cluster_maintenance_windows_path(cluster)
   end
 
   def validate_as_if_confirmed(window)

@@ -69,7 +69,7 @@ RSpec.shared_examples 'confirmation form' do
     confirmed_transition = window.transitions.find_by_to(:confirmed)
     expect(confirmed_transition.requested_start).to eq valid_requested_start
     expect(confirmed_transition.requested_end).to eq valid_requested_end
-    expect(current_path).to eq(cluster_path(cluster))
+    expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
     expect(find('.alert')).to have_text(/Maintenance confirmed/)
   end
 end
@@ -160,7 +160,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(new_window.requested_by).to eq user
         expect(new_window.requested_start).to eq valid_requested_start
         expect(new_window.requested_end).to eq valid_requested_end
-        expect(current_path).to eq(cluster_path(cluster))
+        expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
         expect(find('.alert')).to have_text(/Maintenance requested/)
       end
     end
@@ -175,7 +175,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       window.reload
       expect(window).to be_cancelled
       expect(window.cancelled_by).to eq user
-      expect(current_path).to eq(cluster_path(cluster))
+      expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
       expect(find('.alert')).to have_text(/maintenance cancelled/)
     end
 
@@ -263,7 +263,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       window.reload
       expect(window).to be_rejected
       expect(window.rejected_by).to eq user
-      expect(current_path).to eq(cluster_path(cluster))
+      expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
       expect(find('.alert')).to have_text(/maintenance rejected/)
     end
 
