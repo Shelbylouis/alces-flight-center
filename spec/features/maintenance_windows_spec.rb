@@ -44,7 +44,7 @@ RSpec.shared_examples 'confirmation form' do
   include_examples 'maintenance form error handling', 'confirm'
 
   it 'cannot change Case for requested maintenance' do
-    case_select = find(:test_element, 'case-select')
+    case_select = test_element('case-select')
 
     expect(case_select).to be_disabled
     expect(case_select[:title]).to match(/cannot be changed/)
@@ -96,11 +96,11 @@ RSpec.feature "Maintenance windows", type: :feature do
   end
 
   def requested_start_element
-    find(:test_element, :requested_start)
+    test_element(:requested_start)
   end
 
   def requested_end_element
-    find(:test_element, :requested_end)
+    test_element(:requested_end)
   end
 
   context 'when user is an admin' do
