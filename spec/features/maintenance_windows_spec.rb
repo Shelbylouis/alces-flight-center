@@ -50,6 +50,12 @@ RSpec.shared_examples 'confirmation form' do
     expect(case_select[:title]).to match(/cannot be changed/)
   end
 
+  it 'includes correct Case select label' do
+    case_select_label = test_element('case-select-label')
+
+    expect(case_select_label).to have_text(/Associated Case/)
+  end
+
   it 'can confirm requested maintenance' do
     fill_in_datetime_selects 'requested-start', with: valid_requested_start
     fill_in_datetime_selects 'requested-end', with: valid_requested_end
@@ -136,6 +142,12 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       include_examples 'maintenance form error handling', 'request'
       include_examples 'maintenance form initially valid'
+
+      it 'includes correct Case select label' do
+        case_select_label = test_element('case-select-label')
+
+        expect(case_select_label).to have_text(/Case to associate/)
+      end
 
       it 'can request maintenance in association with any Case for Cluster' do
         select cluster_case.subject
