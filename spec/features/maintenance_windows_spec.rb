@@ -27,9 +27,6 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
     expect(requested_end_element.find('.invalid-feedback')).to have_text(
       'Must be after start; cannot be in the past'
     )
-    expect(
-      requested_start_element
-    ).not_to have_selector('select', class: 'is-invalid')
   end
 end
 
