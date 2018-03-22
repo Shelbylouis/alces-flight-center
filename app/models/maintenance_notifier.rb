@@ -30,7 +30,8 @@ MaintenanceNotifier = Struct.new(:window) do
   def confirmed_comment
     <<~EOF
       Request for maintenance of #{associated_model.name} confirmed by
-      #{window.confirmed_by.name}; this maintenance has been scheduled.
+      #{window.confirmed_by.name}; this maintenance has been scheduled from
+      #{requested_start} until #{requested_end}.
     EOF
   end
 
@@ -51,15 +52,17 @@ MaintenanceNotifier = Struct.new(:window) do
   def expired_comment
     <<~EOF
       Request for maintenance of #{associated_model.name} was not confirmed
-      before requested start date; this maintenance has been automatically
-      cancelled.
+      before requested start date of #{requested_start}; this maintenance can
+      no longer occur as requested and must be rescheduled and confirmed on the
+      cluster dashboard: #{cluster_dashboard_url}.
     EOF
   end
 
   def started_comment
     <<~EOF
       Scheduled maintenance of #{associated_model.name} has automatically
-      started.
+      started; this #{associated_model.readable_model_name} is now under
+      maintenance until #{requested_end}.
     EOF
   end
 

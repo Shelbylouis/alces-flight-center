@@ -41,11 +41,15 @@ RSpec.describe MaintenanceWindow, type: :model do
       it 'has RT ticket comment added when expired' do
         subject.component = create(:component, name: 'some_component')
 
+        expected_start = subject.requested_start.to_formatted_s(:short)
+        expected_cluster_url = Rails.application.routes.url_helpers.cluster_url(
+          subject.component.cluster
+        )
         expect(Case.request_tracker).to receive(
           :add_ticket_correspondence
         ).with(
           id: subject.case.rt_ticket_id,
-          text: /maintenance of some_component was not confirmed before requested start.*automatically cancelled/
+          text: /maintenance of some_component was not confirmed before requested start.*#{expected_start}.*rescheduled.*confirmed.*#{expected_cluster_url}/
         )
 
         subject.expire!
@@ -95,11 +99,13 @@ RSpec.describe MaintenanceWindow, type: :model do
         subject.component = create(:component, name: 'some_component')
         user = create(:user, name: 'some_user')
 
+        expected_start = subject.requested_start.to_formatted_s(:short)
+        expected_end = subject.requested_end.to_formatted_s(:short)
         expect(Case.request_tracker).to receive(
           :add_ticket_correspondence
         ).with(
           id: subject.case.rt_ticket_id,
-          text: /maintenance.*some_component.*confirmed by some_user.*scheduled/
+          text: /maintenance.*some_component.*confirmed by some_user.*scheduled.*#{expected_start}.*#{expected_end}/
         )
 
         subject.confirm!(user)
@@ -139,9 +145,10 @@ RSpec.describe MaintenanceWindow, type: :model do
       it 'has RT ticket comment added when started' do
         subject.component = create(:component, name: 'some_component')
 
+        expected_end = subject.requested_end.to_formatted_s(:short)
         expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
           id: subject.case.rt_ticket_id,
-          text: /maintenance of some_component .* started/
+          text: /maintenance of some_component .* started.*this component.*under maintenance until #{expected_end}/
         )
 
         subject.start!
