@@ -19,14 +19,6 @@ MaintenanceNotifier = Struct.new(:window) do
     EOF
   end
 
-  def requested_start
-    window.requested_start.to_formatted_s(:short)
-  end
-
-  def requested_end
-    window.requested_end.to_formatted_s(:short)
-  end
-
   def confirmed_comment
     <<~EOF
       Request for maintenance of #{associated_model.name} confirmed by
@@ -79,5 +71,13 @@ MaintenanceNotifier = Struct.new(:window) do
 
   def cluster_dashboard_url
     Rails.application.routes.url_helpers.cluster_url(window.associated_cluster)
+  end
+
+  def requested_start
+    window.requested_start.to_formatted_s(:short)
+  end
+
+  def requested_end
+    window.requested_end.to_formatted_s(:short)
   end
 end
