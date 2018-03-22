@@ -9,6 +9,8 @@ MaintenanceNotifier = Struct.new(:window) do
   private
 
   delegate :associated_model, to: :window
+  delegate :cluster_maintenance_windows_url,
+    to: 'Rails.application.routes.url_helpers'
 
   def requested_comment
     <<-EOF
@@ -70,7 +72,7 @@ MaintenanceNotifier = Struct.new(:window) do
   end
 
   def cluster_dashboard_url
-    Rails.application.routes.url_helpers.cluster_url(window.associated_cluster)
+    cluster_maintenance_windows_url(window.associated_cluster)
   end
 
   def requested_start

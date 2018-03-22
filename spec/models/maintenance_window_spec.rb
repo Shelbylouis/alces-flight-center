@@ -42,14 +42,15 @@ RSpec.describe MaintenanceWindow, type: :model do
         subject.component = create(:component, name: 'some_component')
 
         expected_start = subject.requested_start.to_formatted_s(:short)
-        expected_cluster_url = Rails.application.routes.url_helpers.cluster_url(
-          subject.component.cluster
+        expected_cluster_dashboard_url =
+          Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
+            subject.component.cluster
         )
         expect(Case.request_tracker).to receive(
           :add_ticket_correspondence
         ).with(
           id: subject.case.rt_ticket_id,
-          text: /maintenance of some_component was not confirmed before requested start.*#{expected_start}.*rescheduled.*confirmed.*#{expected_cluster_url}/
+          text: /maintenance of some_component was not confirmed before requested start.*#{expected_start}.*rescheduled.*confirmed.*#{expected_cluster_dashboard_url}/
         )
 
         subject.expire!
@@ -72,14 +73,15 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         expected_start = subject.requested_start.to_formatted_s(:short)
         expected_end = subject.requested_end.to_formatted_s(:short)
-        expected_cluster_url = Rails.application.routes.url_helpers.cluster_url(
-          subject.component.cluster
+        expected_cluster_dashboard_url =
+          Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
+            subject.component.cluster
         )
         expect(Case.request_tracker).to receive(
           :add_ticket_correspondence
         ).with(
           id: subject.case.rt_ticket_id,
-          text: /requested.*some_component.*#{expected_start}.*#{expected_end}.*by some_user.*must be confirmed.*#{expected_cluster_url}/
+          text: /requested.*some_component.*#{expected_start}.*#{expected_end}.*by some_user.*must be confirmed.*#{expected_cluster_dashboard_url}/
         )
 
         subject.request!(requestor)
