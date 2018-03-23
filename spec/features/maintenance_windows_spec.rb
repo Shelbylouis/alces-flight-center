@@ -26,7 +26,7 @@ end
 
 RSpec.shared_examples 'maintenance form initially valid' do
   it 'does not initially have invalid elements' do
-    [requested_start_element, requested_end_element].each do |element|
+    [requested_start_element].each do |element|
       expect(element).not_to have_selector('select', class: 'is-invalid')
     end
   end
@@ -58,14 +58,12 @@ RSpec.shared_examples 'confirmation form' do
 
   it 'can confirm requested maintenance' do
     fill_in_datetime_selects 'requested-start', with: valid_requested_start
-    fill_in_datetime_selects 'requested-end', with: valid_requested_end
     click_button 'Confirm Maintenance'
 
     window.reload
     expect(window).to be_confirmed
     expect(window.confirmed_by).to eq user
     expect(window.requested_start).to eq valid_requested_start
-    expect(window.requested_end).to eq valid_requested_end
     confirmed_transition = window.transitions.find_by_to(:confirmed)
     expect(confirmed_transition.requested_start).to eq valid_requested_start
     expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
@@ -79,7 +77,6 @@ RSpec.feature "Maintenance windows", type: :feature do
   let :cluster { support_case.cluster }
   let :site { support_case.site }
 
-  let :valid_requested_end { DateTime.new(2023, 9, 20, 13, 0) }
   let :valid_requested_start { DateTime.new(2022, 9, 10, 13, 0) }
 
   before :each do
@@ -102,10 +99,6 @@ RSpec.feature "Maintenance windows", type: :feature do
 
   def requested_start_element
     test_element(:requested_start)
-  end
-
-  def requested_end_element
-    test_element(:requested_end)
   end
 
   context 'when user is an admin' do
@@ -152,7 +145,6 @@ RSpec.feature "Maintenance windows", type: :feature do
         select cluster_case.subject
         fill_in 'Duration', with: 2
         fill_in_datetime_selects 'requested-start', with: valid_requested_start
-        fill_in_datetime_selects 'requested-end', with: valid_requested_end
         click_button 'Request Maintenance'
 
         new_window = cluster_case.maintenance_windows.first
@@ -160,7 +152,6 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(new_window.requested_by).to eq user
         expect(new_window.duration).to eq 2
         expect(new_window.requested_start).to eq valid_requested_start
-        expect(new_window.requested_end).to eq valid_requested_end
         expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
         expect(find('.alert')).to have_text(/Maintenance requested/)
       end

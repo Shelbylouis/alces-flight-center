@@ -5,7 +5,6 @@ class MaintenanceWindowsController < ApplicationController
       component_id: params[:component_id],
       service_id: params[:service_id],
       requested_start: suggested_requested_start,
-      requested_end: suggested_requested_end,
     )
   end
 
@@ -52,13 +51,11 @@ class MaintenanceWindowsController < ApplicationController
     :service_id,
     :case_id,
     :requested_start,
-    :requested_end,
     :duration,
   ].freeze
 
   CONFIRM_PARAM_NAMES = [
     :requested_start,
-    :requested_end,
   ].freeze
 
   def request_maintenance_window_params
@@ -71,10 +68,6 @@ class MaintenanceWindowsController < ApplicationController
 
   def suggested_requested_start
     1.day.from_now.at_midnight
-  end
-
-  def suggested_requested_end
-    suggested_requested_start.advance(days: 1)
   end
 
   # XXX if we changed `request` to be accessed at `/request` (rather than
