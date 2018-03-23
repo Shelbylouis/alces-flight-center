@@ -106,9 +106,12 @@ RSpec.describe MaintenanceWindow, type: :model do
       it { is_expected.to be_invalid }
     end
 
-    describe 'requested_start and requested_end validations' do
+    describe 'maintenance period validations' do
       it { is_expected.to validate_presence_of(:requested_start) }
       it { is_expected.to validate_presence_of(:requested_end) }
+
+      it { is_expected.to validate_presence_of(:duration) }
+      it { is_expected.to validate_numericality_of(:duration).is_greater_than(0) }
 
       context 'when requested_start after requested_end' do
         subject do

@@ -9,6 +9,7 @@ class MaintenanceWindow < ApplicationRecord
 
   validates_presence_of :requested_start
   validates_presence_of :requested_end
+  validates :duration, presence: true, numericality: { greater_than: 0 }
   validates_with Validator
 
   scope :unfinished, -> { where.not(state: finished_states) }

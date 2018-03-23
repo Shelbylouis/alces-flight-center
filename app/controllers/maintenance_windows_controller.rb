@@ -69,7 +69,8 @@ class MaintenanceWindowsController < ApplicationController
   ].freeze
 
   def request_maintenance_window_params
-    params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES)
+    # XXX Get duration from request.
+    params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES).merge(duration: 1)
   end
 
   def confirm_maintenance_window_params
