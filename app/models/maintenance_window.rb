@@ -8,7 +8,6 @@ class MaintenanceWindow < ApplicationRecord
   alias_attribute :transitions, :maintenance_window_state_transitions
 
   validates_presence_of :requested_start
-  validates_presence_of :requested_end
   validates :duration, presence: true, numericality: { greater_than: 0 }
   validates_with Validator
 
