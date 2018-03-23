@@ -28,7 +28,7 @@ Rails.application.routes.draw do
     resources :logs, only: :create
   end
   request_maintenance_form = Proc.new do
-    resources :maintenance_windows, only: :new do
+    resources :maintenance_windows, path: :maintenance, only: :new do
       collection do
         # Do not define route helper (by passing `as: nil`) as otherwise this
         # will overwrite the `${model}_maintenance_windows_path` helper, as by
@@ -40,7 +40,7 @@ Rails.application.routes.draw do
     end
   end
   confirm_maintenance_form = Proc.new do
-    resources :maintenance_windows, only: [] do
+    resources :maintenance_windows, path: :maintenance, only: [] do
       member do
         get :confirm
         patch :confirm, to: 'maintenance_windows#confirm_submit'
@@ -80,7 +80,7 @@ Rails.application.routes.draw do
       request_maintenance_form.call
     end
 
-    resources :maintenance_windows, only: [] do
+    resources :maintenance_windows, path: :maintenance, only: [] do
       member do
         post :cancel
       end
@@ -109,7 +109,7 @@ Rails.application.routes.draw do
       resources :cases, only: [:index, :new]
       resources :services, only: :index
       resources :consultancy, only: :new
-      resources :maintenance_windows, only: :index
+      resources :maintenance_windows, path: :maintenance, only: :index
       resources :components, only: :index
       logs.call
       confirm_maintenance_form.call
@@ -137,7 +137,7 @@ Rails.application.routes.draw do
       confirm_maintenance_form.call
     end
 
-    resources :maintenance_windows, only: [] do
+    resources :maintenance_windows, path: :maintenance, only: [] do
       member do
         post :reject
       end

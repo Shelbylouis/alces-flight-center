@@ -41,12 +41,18 @@ RSpec.describe MaintenanceWindow, type: :model do
       it 'has RT ticket comment added when expired' do
         subject.component = create(:component, name: 'some_component')
 
+        expected_start = subject.requested_start.to_formatted_s(:short)
+        expected_cluster_dashboard_url =
+          Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
+            subject.component.cluster
+        )
+        text_regex = Regexp.new <<~REGEX.squish
+          maintenance of some_component was not confirmed before requested
+          start.*#{expected_start}.*rescheduled.*confirmed.*#{expected_cluster_dashboard_url}
+        REGEX
         expect(Case.request_tracker).to receive(
           :add_ticket_correspondence
-        ).with(
-          id: subject.case.rt_ticket_id,
-          text: /maintenance of some_component was not confirmed before requested start.*automatically cancelled/
-        )
+        ).with(id: subject.case.rt_ticket_id, text: text_regex)
 
         subject.expire!
       end
@@ -68,15 +74,17 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         expected_start = subject.requested_start.to_formatted_s(:short)
         expected_end = subject.requested_end.to_formatted_s(:short)
-        expected_cluster_url = Rails.application.routes.url_helpers.cluster_url(
-          subject.component.cluster
+        expected_cluster_dashboard_url =
+          Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
+            subject.component.cluster
         )
+        text_regex = Regexp.new <<~REGEX.squish
+          requested.*some_component.*#{expected_start}.*#{expected_end}.*by
+          some_user.*must be confirmed.*#{expected_cluster_dashboard_url}
+        REGEX
         expect(Case.request_tracker).to receive(
           :add_ticket_correspondence
-        ).with(
-          id: subject.case.rt_ticket_id,
-          text: /requested.*some_component.*#{expected_start}.*#{expected_end}.*by some_user.*must be confirmed.*#{expected_cluster_url}/
-        )
+        ).with( id: subject.case.rt_ticket_id, text: text_regex)
 
         subject.request!(requestor)
       end
@@ -95,12 +103,15 @@ RSpec.describe MaintenanceWindow, type: :model do
         subject.component = create(:component, name: 'some_component')
         user = create(:user, name: 'some_user')
 
+        expected_start = subject.requested_start.to_formatted_s(:short)
+        expected_end = subject.requested_end.to_formatted_s(:short)
+        text_regex = Regexp.new <<~REGEX.squish
+          maintenance.*some_component.*confirmed by
+          some_user.*scheduled.*#{expected_start}.*#{expected_end}
+        REGEX
         expect(Case.request_tracker).to receive(
           :add_ticket_correspondence
-        ).with(
-          id: subject.case.rt_ticket_id,
-          text: /maintenance.*some_component.*confirmed by some_user.*scheduled/
-        )
+        ).with(id: subject.case.rt_ticket_id, text: text_regex)
 
         subject.confirm!(user)
       end
@@ -139,10 +150,14 @@ RSpec.describe MaintenanceWindow, type: :model do
       it 'has RT ticket comment added when started' do
         subject.component = create(:component, name: 'some_component')
 
-        expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
-          id: subject.case.rt_ticket_id,
-          text: /maintenance of some_component .* started/
-        )
+        expected_end = subject.requested_end.to_formatted_s(:short)
+        text_regex = Regexp.new <<~REGEX.squish
+          maintenance of some_component .* started.*this component.*under
+          maintenance until #{expected_end}
+        REGEX
+        expect(Case.request_tracker).to receive(
+          :add_ticket_correspondence
+        ).with(id: subject.case.rt_ticket_id, text: text_regex)
 
         subject.start!
       end

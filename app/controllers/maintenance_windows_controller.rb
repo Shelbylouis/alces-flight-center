@@ -16,19 +16,15 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def create
-    @maintenance_window = MaintenanceWindow.new(
-      request_maintenance_window_params
-    )
-    ActiveRecord::Base.transaction do
-      @maintenance_window.save!
-      @maintenance_window.request!(current_user)
-    end
-    flash[:success] = 'Maintenance requested.'
-    redirect_to @maintenance_window.associated_cluster
-  rescue ActiveRecord::RecordInvalid
     assign_new_maintenance_title
-    flash.now[:error] = 'Unable to request this maintenance.'
-    render :new
+
+    handle_form_submission(action: :request, template: :new) do
+      @maintenance_window = MaintenanceWindow.new(request_maintenance_window_params)
+      ActiveRecord::Base.transaction do
+        @maintenance_window.save!
+        @maintenance_window.request!(current_user)
+      end
+    end
   end
 
   def confirm
@@ -41,14 +37,11 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def confirm_submit
-    @maintenance_window = MaintenanceWindow.find(params[:id])
-    @maintenance_window.assign_attributes(confirm_maintenance_window_params)
-    @maintenance_window.confirm!(current_user)
-    flash[:success] = 'Maintenance confirmed.'
-    redirect_to @maintenance_window.associated_cluster
-  rescue StateMachines::InvalidTransition
-    flash.now[:error] = 'Unable to confirm this maintenance.'
-    render :confirm
+    handle_form_submission(action: :confirm, template: :confirm) do
+      @maintenance_window = MaintenanceWindow.find(params[:id])
+      @maintenance_window.assign_attributes(confirm_maintenance_window_params)
+      @maintenance_window.confirm!(current_user)
+    end
   end
 
   def reject
@@ -95,17 +88,32 @@ class MaintenanceWindowsController < ApplicationController
     suggested_requested_start.advance(days: 1)
   end
 
+  # XXX if we changed `request` to be accessed at `/request` (rather than
+  # `/new`) then we wouldn't need to pass `template` here as it would be the
+  # same as `action`.
+  def handle_form_submission(action:, template:)
+    yield
+
+    flash[:success] = "Maintenance #{action}ed."
+    cluster = @maintenance_window.associated_cluster
+    redirect_to cluster_maintenance_windows_path(cluster)
+  rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
+    flash.now[:error] = "Unable to #{action} this maintenance."
+    render template
+  end
+
   def transition_window(event)
     window = MaintenanceWindow.find(params[:id])
+    cluster = window.associated_cluster
     window.public_send("#{event}!", current_user)
     flash[:success] = "Requested maintenance #{window.state}."
-    redirect_to cluster_path(window.associated_cluster)
+    redirect_back fallback_location: cluster_maintenance_windows_path(cluster)
   end
 
   def validate_as_if_confirmed(window)
-    original_state = @maintenance_window.state
-    @maintenance_window.state = :confirm
-    @maintenance_window.validate
-    @maintenance_window.state = original_state
+    original_state = window.state
+    window.state = :confirm
+    window.validate
+    window.state = original_state
   end
 end
