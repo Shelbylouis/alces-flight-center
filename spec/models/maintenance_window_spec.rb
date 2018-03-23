@@ -263,17 +263,6 @@ RSpec.describe MaintenanceWindow, type: :model do
       request_transition = window.transitions.where(event: :request).first
       expect(request_transition.requested_start).to eq(new_requested_start)
     end
-
-    it 'tracks requested_end in transitions' do
-      window = create(:maintenance_window, requested_end: 1.days.from_now)
-
-      new_requested_end = 2.days.from_now.at_midnight
-      window.requested_end = new_requested_end
-      window.request!(create(:admin))
-
-      request_transition = window.transitions.where(event: :request).first
-      expect(request_transition.requested_end).to eq(new_requested_end)
-    end
   end
 
   describe '#expected_end' do

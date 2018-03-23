@@ -68,7 +68,6 @@ RSpec.shared_examples 'confirmation form' do
     expect(window.requested_end).to eq valid_requested_end
     confirmed_transition = window.transitions.find_by_to(:confirmed)
     expect(confirmed_transition.requested_start).to eq valid_requested_start
-    expect(confirmed_transition.requested_end).to eq valid_requested_end
     expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
     expect(find('.alert')).to have_text(/Maintenance confirmed/)
   end

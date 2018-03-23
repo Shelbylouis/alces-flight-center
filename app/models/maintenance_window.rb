@@ -17,7 +17,7 @@ class MaintenanceWindow < ApplicationRecord
   attr_accessor :legacy_migration_mode
 
   state_machine initial: :new do
-    audit_trail context: [:user, :requested_start, :requested_end]
+    audit_trail context: [:user, :requested_start]
 
     state :new
     state :requested
