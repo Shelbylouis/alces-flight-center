@@ -69,11 +69,10 @@ RSpec.describe MaintenanceWindow, type: :model do
       it 'has RT ticket comment added when requested' do
         subject.component = create(:component, name: 'some_component')
         subject.requested_start = 1.days.since
-        subject.requested_end = 2.days.since
         requestor = create(:admin, name: 'some_user')
 
         expected_start = subject.requested_start.to_formatted_s(:short)
-        expected_end = subject.requested_end.to_formatted_s(:short)
+        expected_end = subject.expected_end.to_formatted_s(:short)
         expected_cluster_dashboard_url =
           Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
             subject.component.cluster
@@ -104,7 +103,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         user = create(:user, name: 'some_user')
 
         expected_start = subject.requested_start.to_formatted_s(:short)
-        expected_end = subject.requested_end.to_formatted_s(:short)
+        expected_end = subject.expected_end.to_formatted_s(:short)
         text_regex = Regexp.new <<~REGEX.squish
           maintenance.*some_component.*confirmed by
           some_user.*scheduled.*#{expected_start}.*#{expected_end}
@@ -150,7 +149,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       it 'has RT ticket comment added when started' do
         subject.component = create(:component, name: 'some_component')
 
-        expected_end = subject.requested_end.to_formatted_s(:short)
+        expected_end = subject.expected_end.to_formatted_s(:short)
         text_regex = Regexp.new <<~REGEX.squish
           maintenance of some_component .* started.*this component.*under
           maintenance until #{expected_end}
