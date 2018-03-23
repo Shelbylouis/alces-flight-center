@@ -79,6 +79,10 @@ class MaintenanceWindow < ApplicationRecord
     cluster || associated_model.cluster
   end
 
+  def expected_end
+    duration.business_days.after(requested_start)
+  end
+
   def method_missing(symbol, *args)
     query = TransitionQuery.parse(symbol)
     query ? query.value_for(self) : super

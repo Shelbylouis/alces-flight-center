@@ -277,6 +277,32 @@ RSpec.describe MaintenanceWindow, type: :model do
     end
   end
 
+  describe '#expected_end' do
+    let :monday { DateTime.new(2025, 3, 24, 9, 0) }
+    let :wednesday { monday.advance(days: 2) }
+    let :following_monday { monday.advance(weeks: 1) }
+
+    it 'gives expected end date calculated from requested_start and duration' do
+      window = create(
+        :maintenance_window,
+        requested_start: monday,
+        duration: 2
+      )
+
+      expect(window.expected_end).to eq(wednesday)
+    end
+
+    it 'only includes business days in calculation' do
+      window = create(
+        :maintenance_window,
+        requested_start: monday,
+        duration: 5
+      )
+
+      expect(window.expected_end).to eq(following_monday)
+    end
+  end
+
   describe '#method_missing' do
     describe '#*_at' do
       it 'returns time transition occurred for valid state' do
