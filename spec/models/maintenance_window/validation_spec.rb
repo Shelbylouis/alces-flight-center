@@ -113,36 +113,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       it { is_expected.to validate_presence_of(:duration) }
       it { is_expected.to validate_numericality_of(:duration).is_greater_than(0) }
 
-      context 'when requested_start after requested_end' do
-        subject do
-          build(
-            :maintenance_window,
-            requested_start: 2.days.from_now,
-            requested_end: 1.days.from_now,
-          )
-        end
-
-        it 'should be invalid' do
-          expect(subject).to be_invalid
-          expect(subject.errors.messages).to match(requested_end: ['must be after start'])
-        end
-      end
-
-      context 'when requested_start and requested_end in past' do
-        subject do
-          build(
-            :maintenance_window,
-            state: state,
-            requested_start: 2.days.ago,
-            requested_end: 1.days.ago,
-            legacy_migration_mode: legacy_migration_mode,
-          )
-        end
-
-        it_behaves_like 'it validates dates cannot be in the past' , [:requested_start, :requested_end]
-      end
-
-      context 'when just requested_start in past' do
+      context 'when requested_start in past' do
         subject do
           build(
             :maintenance_window,

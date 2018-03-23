@@ -3,10 +3,10 @@ require 'rails_helper'
 RSpec.shared_examples 'maintenance form error handling' do |form_action|
   it 're-renders form with error when invalid date entered' do
     original_path = current_path
-    requested_end_in_past = DateTime.new(2016, 9, 20, 13)
+    requested_start_in_past = DateTime.new(2016, 9, 20, 13)
 
     expect do
-      fill_in_datetime_selects 'requested-end', with: requested_end_in_past
+      fill_in_datetime_selects 'requested-start', with: requested_start_in_past
       submit_button_text = "#{form_action.titlecase} Maintenance"
       click_button submit_button_text
     end.not_to change(MaintenanceWindow, :all)
@@ -16,10 +16,10 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
       find('.alert')
     ).to have_text(/Unable to #{form_action} this maintenance/)
     invalidated_selects =
-      requested_end_element.all('select', class: 'is-invalid')
+      requested_start_element.all('select', class: 'is-invalid')
     expect(invalidated_selects.length).to eq(5)
-    expect(requested_end_element.find('.invalid-feedback')).to have_text(
-      'Must be after start; cannot be in the past'
+    expect(requested_start_element.find('.invalid-feedback')).to have_text(
+      'Cannot be in the past'
     )
   end
 end
@@ -238,12 +238,12 @@ RSpec.feature "Maintenance windows", type: :feature do
 
         include_examples 'confirmation form'
 
-        it 'displays errors if confirmed with existing dates on form load' do
-          [requested_start_element, requested_end_element].each do |element|
-            expect(element.find('.invalid-feedback')).to have_text(
-              'Cannot be in the past'
-            )
-          end
+        it 'displays error if date in past on form load' do
+          expect(
+            requested_start_element.find('.invalid-feedback')
+          ).to have_text(
+            'Cannot be in the past'
+          )
         end
       end
     end
