@@ -8,7 +8,7 @@ class MaintenanceWindowDecorator < ApplicationDecorator
       [
         format(requested_start),
         '&mdash;',
-        format(requested_end),
+        format(expected_end),
         scheduled_period_state_indicator,
       ].join(' ').strip
     )
