@@ -4,7 +4,6 @@ FactoryBot.define do
     add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
     created_at 7.days.ago
     requested_start 1.days.from_now.at_midnight
-    requested_end 2.days.from_now.at_midnight
     duration 1
 
     # This could also be a Cluster or Service; but one of these must be
@@ -47,7 +46,6 @@ FactoryBot.define do
 
       after(:create) do |window|
         window.requested_start = 2.days.ago.at_midnight
-        window.requested_end = 1.days.ago.at_midnight
         window.expire!
       end
     end
