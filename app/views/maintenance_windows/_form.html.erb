@@ -3,7 +3,7 @@
   raise "Unknown action: #{action}" unless [:request, :confirm].include?(action)
   action = action.to_s.inquiry
 
-  case_label, conditional_case_attributes =
+  case_label, conditional_case_attributes, conditional_duration_attributes =
     if action.confirm?
       [
         'Associated Case',
@@ -11,9 +11,13 @@
           disabled: true,
           title: 'The Case this maintenance has been requested for cannot be changed'
         },
+        {
+          disabled: true,
+          title: 'The duration this maintenance has been requested for cannot be changed'
+        },
       ]
     else
-      ['Case to associate this maintenance with', {}]
+      ['Case to associate this maintenance with', {}, {}]
     end
 %>
 
@@ -40,13 +44,15 @@
       ) %>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" data-test="duration-input-group">
       <%= f.label(:duration, 'Duration (in business days)') %>
       <%= f.number_field(
         :duration,
-        min: 1,
-        class: ['form-control'],
-        required: true
+        {
+          min: 1,
+          class: ['form-control'],
+          required: true,
+        }.merge(conditional_duration_attributes)
       ) %>
     </div>
 

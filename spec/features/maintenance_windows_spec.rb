@@ -47,13 +47,20 @@ RSpec.shared_examples 'confirmation form' do
     case_select = test_element('case-select')
 
     expect(case_select).to be_disabled
-    expect(case_select[:title]).to match(/cannot be changed/)
+    expect(case_select[:title]).to match(/Case.*cannot be changed/)
   end
 
   it 'includes correct Case select label' do
     case_select_label = test_element('case-select-label')
 
     expect(case_select_label).to have_text(/Associated Case/)
+  end
+
+  it 'cannot change duration for requested maintenance' do
+    duration_input = test_element('duration-input-group').find('input')
+
+    expect(duration_input).to be_disabled
+    expect(duration_input[:title]).to match(/duration.*cannot be changed/)
   end
 
   it 'can confirm requested maintenance' do
