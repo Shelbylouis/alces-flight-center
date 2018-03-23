@@ -106,9 +106,9 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def validate_as_if_confirmed(window)
-    original_state = @maintenance_window.state
-    @maintenance_window.state = :confirm
-    @maintenance_window.validate
-    @maintenance_window.state = original_state
+    original_state = window.state
+    window.state = :confirm
+    window.validate
+    window.state = original_state
   end
 end
