@@ -3,22 +3,11 @@
   raise "Unknown action: #{action}" unless [:request, :confirm].include?(action)
   action = action.to_s.inquiry
 
-  case_label, conditional_case_attributes, conditional_duration_attributes =
-    if action.confirm?
-      [
-        'Associated Case',
-        {
-          disabled: true,
-          title: 'The Case this maintenance has been requested for cannot be changed'
-        },
-        {
-          disabled: true,
-          title: 'The duration this maintenance has been requested for cannot be changed'
-        },
-      ]
-    else
-      ['Case to associate this maintenance with', {}, {}]
-    end
+  case_label = if action.confirm?
+                 'Associated Case'
+               else
+                 'Case to associate this maintenance with'
+               end
 %>
 
 <%= render 'partials/tabs', activate: :maintenance do %>
@@ -37,10 +26,7 @@
         :id,
         :case_select_details,
         {},
-        {
-          class: ['form-control is-valid'],
-          'data-test': 'case-select',
-        }.merge(conditional_case_attributes)
+        maintenance_window.case_attributes(action)
       ) %>
     </div>
 
@@ -48,11 +34,7 @@
       <%= f.label(:duration, 'Duration (in business days)') %>
       <%= f.number_field(
         :duration,
-        {
-          min: 1,
-          class: ['form-control'],
-          required: true,
-        }.merge(conditional_duration_attributes)
+        maintenance_window.duration_attributes(action)
       ) %>
     </div>
 

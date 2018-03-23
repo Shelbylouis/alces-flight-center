@@ -1,4 +1,6 @@
 class MaintenanceWindowsController < ApplicationController
+  decorates_assigned :maintenance_window
+
   def new
     @maintenance_window = MaintenanceWindow.new(
       cluster_id: params[:cluster_id],
