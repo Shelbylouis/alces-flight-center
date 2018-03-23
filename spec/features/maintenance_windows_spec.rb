@@ -150,6 +150,7 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       it 'can request maintenance in association with any Case for Cluster' do
         select cluster_case.subject
+        fill_in 'Duration', with: 2
         fill_in_datetime_selects 'requested-start', with: valid_requested_start
         fill_in_datetime_selects 'requested-end', with: valid_requested_end
         click_button 'Request Maintenance'
@@ -157,6 +158,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         new_window = cluster_case.maintenance_windows.first
         expect(new_window).to be_requested
         expect(new_window.requested_by).to eq user
+        expect(new_window.duration).to eq 2
         expect(new_window.requested_start).to eq valid_requested_start
         expect(new_window.requested_end).to eq valid_requested_end
         expect(current_path).to eq(cluster_maintenance_windows_path(cluster))

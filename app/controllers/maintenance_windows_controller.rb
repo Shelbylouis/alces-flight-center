@@ -53,6 +53,7 @@ class MaintenanceWindowsController < ApplicationController
     :case_id,
     :requested_start,
     :requested_end,
+    :duration,
   ].freeze
 
   CONFIRM_PARAM_NAMES = [
@@ -61,8 +62,7 @@ class MaintenanceWindowsController < ApplicationController
   ].freeze
 
   def request_maintenance_window_params
-    # XXX Get duration from request.
-    params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES).merge(duration: 1)
+    params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES)
   end
 
   def confirm_maintenance_window_params

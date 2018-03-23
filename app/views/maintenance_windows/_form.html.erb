@@ -40,6 +40,16 @@
       ) %>
     </div>
 
+    <div class="form-group">
+      <%= f.label(:duration, 'Duration (in business days)') %>
+      <%= f.number_field(
+        :duration,
+        min: 1,
+        class: ['form-control'],
+        required: true
+      ) %>
+    </div>
+
     <%= render 'partials/date_time_select',
       model: maintenance_window,
       datetime_field_name: 'requested_start'
