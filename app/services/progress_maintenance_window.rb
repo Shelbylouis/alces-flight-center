@@ -24,7 +24,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
   end
 
   def end_time_passed?
-    window.requested_end.past?
+    window.expected_end.past?
   end
 
   def start_time_passed?
@@ -59,7 +59,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
   end
 
   def end_date
-    format_datetime(window.requested_end)
+    format_datetime(window.expected_end)
   end
 
   def format_datetime(datetime)

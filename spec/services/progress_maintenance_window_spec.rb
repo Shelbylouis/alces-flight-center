@@ -50,7 +50,7 @@ RSpec.describe ProgressMaintenanceWindow do
         :maintenance_window,
         state: state,
         requested_start: requested_start,
-        requested_end: requested_end,
+        duration: 1,
         component: component,
         id: 123
       )
@@ -74,7 +74,7 @@ RSpec.describe ProgressMaintenanceWindow do
 
     def test_progression_message(message:, window:, expected:)
       start_date = window.requested_start.to_formatted_s(:short)
-      end_date = window.requested_end.to_formatted_s(:short)
+      end_date = window.expected_end.to_formatted_s(:short)
       full_expected_message = <<~EOF.squish
         Maintenance window #{window.id} (#{component.name} | #{start_date} -
         #{end_date}): #{expected}
@@ -86,16 +86,14 @@ RSpec.describe ProgressMaintenanceWindow do
       create(:component, name: 'somenode')
     end
 
-    context 'when requested_start and requested_end in future' do
+    context 'when requested_start and expected_end in future' do
       let :requested_start { DateTime.current.advance(days: 1) }
-      let :requested_end { DateTime.current.advance(days: 2) }
 
       include_examples 'does not progress', MaintenanceWindow.possible_states
     end
 
     context 'when just requested_start passed' do
       let :requested_start { 1.hours.ago }
-      let :requested_end { DateTime.current.advance(days: 1) }
 
       include_examples 'progresses unstarted windows'
 
@@ -103,11 +101,10 @@ RSpec.describe ProgressMaintenanceWindow do
       include_examples 'does not progress', other_states
     end
 
-    context 'when requested_start and requested_end passed' do
-      let :requested_start { 2.hours.ago }
-      let :requested_end { 1.hours.ago }
+    context 'when requested_start and expected_end passed' do
+      let :requested_start { 2.days.ago }
 
-      # If both `requested_start` and `requested_end` have passed and a window
+      # If both `requested_start` and `expected_end` have passed and a window
       # has still not transitioned from an unstarted state (e.g. if the
       # maintenance period is very short or we have not progressed
       # MaintenanceWindows for a while for some reason), then we still want to
