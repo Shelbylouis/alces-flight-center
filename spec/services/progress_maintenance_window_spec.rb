@@ -102,7 +102,7 @@ RSpec.describe ProgressMaintenanceWindow do
     end
 
     context 'when requested_start and expected_end passed' do
-      let :requested_start { 2.days.ago }
+      let :requested_start { 7.days.ago }
 
       # If both `requested_start` and `expected_end` have passed and a window
       # has still not transitioned from an unstarted state (e.g. if the
