@@ -8,7 +8,7 @@ class MaintenanceWindow < ApplicationRecord
   alias_attribute :transitions, :maintenance_window_state_transitions
 
   validates_presence_of :requested_start
-  validates_presence_of :requested_end
+  validates :duration, presence: true, numericality: { greater_than: 0 }
   validates_with Validator
 
   scope :unfinished, -> { where.not(state: finished_states) }
@@ -16,7 +16,7 @@ class MaintenanceWindow < ApplicationRecord
   attr_accessor :legacy_migration_mode
 
   state_machine initial: :new do
-    audit_trail context: [:user, :requested_start, :requested_end]
+    audit_trail context: [:user, :requested_start]
 
     state :new
     state :requested
@@ -76,6 +76,10 @@ class MaintenanceWindow < ApplicationRecord
 
   def associated_cluster
     cluster || associated_model.cluster
+  end
+
+  def expected_end
+    duration.business_days.after(requested_start)
   end
 
   def method_missing(symbol, *args)

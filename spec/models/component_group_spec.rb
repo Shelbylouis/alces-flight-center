@@ -17,7 +17,7 @@ RSpec.describe ComponentGroup, type: :model do
       group.save!
 
       group.reload
-      expect(group.component_names).to eq(['node01', 'node02', 'node03'])
+      expect(group.component_names).to match_array(['node01', 'node02', 'node03'])
     end
 
     it 'does not cause any nodes to be created when unset' do

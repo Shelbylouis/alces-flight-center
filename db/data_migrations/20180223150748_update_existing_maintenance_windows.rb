@@ -8,14 +8,24 @@ class UpdateExistingMaintenanceWindows < ActiveRecord::DataMigration
       # request process.
       window.state = :new
 
-      # Set `requested_start` and `requested_end` to plausible values; do this
-      # now so model is valid.
+      # Set `requested_start` and `duration` to plausible values; do this now
+      # so model is valid.
       # Requested start can be considered to be whenever we requested the
       # maintenance, since it would have started immediately in the past.
       window.requested_start = window.created_at
-      # Requested end can be considered whenever the maintenance actually
-      # ended, or just in two weeks time if this hasn't happened yet.
-      window.requested_end = window.ended_at_legacy || DateTime.current.advance(weeks: 2)
+
+      # Approximate `duration` as the number of business days between the
+      # actual start and either the actual end or 2 weeks from now (if
+      # maintenance has not yet ended). This will not be absolutely exact for
+      # what really happened, as maintenance used to be able to be any length
+      # but now must be an exact number of days, but is probably/hopefully more
+      # than sufficient for our purposes.
+      end_date_to_use =
+        window.ended_at_legacy || DateTime.current.advance(weeks: 2)
+      approximate_duration =
+        window.requested_start.to_date.business_days_until(end_date_to_use)
+      window.duration = approximate_duration
+
       window.save!
 
       # Simulate requesting maintenance.

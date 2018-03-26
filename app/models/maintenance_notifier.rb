@@ -15,7 +15,7 @@ MaintenanceNotifier = Struct.new(:window) do
   def requested_comment
     <<-EOF
       Maintenance requested for #{associated_model.name} from
-      #{requested_start} until #{requested_end} by #{window.requested_by.name};
+      #{requested_start} until #{expected_end} by #{window.requested_by.name};
       to proceed this maintenance must be confirmed on the cluster dashboard:
       #{cluster_dashboard_url}.
     EOF
@@ -25,7 +25,7 @@ MaintenanceNotifier = Struct.new(:window) do
     <<~EOF
       Request for maintenance of #{associated_model.name} confirmed by
       #{window.confirmed_by.name}; this maintenance has been scheduled from
-      #{requested_start} until #{requested_end}.
+      #{requested_start} until #{expected_end}.
     EOF
   end
 
@@ -56,7 +56,7 @@ MaintenanceNotifier = Struct.new(:window) do
     <<~EOF
       Scheduled maintenance of #{associated_model.name} has automatically
       started; this #{associated_model.readable_model_name} is now under
-      maintenance until #{requested_end}.
+      maintenance until #{expected_end}.
     EOF
   end
 
@@ -79,7 +79,7 @@ MaintenanceNotifier = Struct.new(:window) do
     window.requested_start.to_formatted_s(:short)
   end
 
-  def requested_end
-    window.requested_end.to_formatted_s(:short)
+  def expected_end
+    window.expected_end.to_formatted_s(:short)
   end
 end

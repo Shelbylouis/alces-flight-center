@@ -5,6 +5,7 @@ FactoryBot.define do
     created_at 7.days.ago
     requested_start 1.days.from_now.at_midnight
     requested_end 2.days.from_now.at_midnight
+    duration 1
 
     # This could also be a Cluster or Service; but one of these must be
     # associated and is the item under maintenance.

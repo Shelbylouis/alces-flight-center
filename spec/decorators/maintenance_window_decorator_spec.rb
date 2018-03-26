@@ -31,19 +31,16 @@ RSpec.describe MaintenanceWindowDecorator do
     subject do
       create(
         :maintenance_window,
-        requested_start: requested_start,
-        requested_end: requested_end,
+        requested_start: 1.days.from_now,
+        duration: 3,
         state: state,
       ).decorate
     end
 
-    let :requested_start { 1.days.from_now }
-    let :requested_end { 2.days.from_now }
-
     let :expected_time_range do
-      from = requested_start.to_formatted_s(:short)
-      to = requested_end.to_formatted_s(:short)
-      h.raw("#{from} &mdash; #{to}")
+      start_date = subject.requested_start.to_formatted_s(:short)
+      end_date = subject.expected_end.to_formatted_s(:short)
+      h.raw("#{start_date} &mdash; #{end_date}")
     end
 
     RSpec.shared_examples 'includes time range' do

@@ -37,6 +37,7 @@ gem 'bootsnap', require: false
 gem "sentry-raven"
 gem 'state_machines-activerecord'
 gem 'state_machines-audit_trail'
+gem 'business_time'
 
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.

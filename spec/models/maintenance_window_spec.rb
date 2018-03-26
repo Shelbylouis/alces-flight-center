@@ -69,11 +69,10 @@ RSpec.describe MaintenanceWindow, type: :model do
       it 'has RT ticket comment added when requested' do
         subject.component = create(:component, name: 'some_component')
         subject.requested_start = 1.days.since
-        subject.requested_end = 2.days.since
         requestor = create(:admin, name: 'some_user')
 
         expected_start = subject.requested_start.to_formatted_s(:short)
-        expected_end = subject.requested_end.to_formatted_s(:short)
+        expected_end = subject.expected_end.to_formatted_s(:short)
         expected_cluster_dashboard_url =
           Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
             subject.component.cluster
@@ -104,7 +103,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         user = create(:user, name: 'some_user')
 
         expected_start = subject.requested_start.to_formatted_s(:short)
-        expected_end = subject.requested_end.to_formatted_s(:short)
+        expected_end = subject.expected_end.to_formatted_s(:short)
         text_regex = Regexp.new <<~REGEX.squish
           maintenance.*some_component.*confirmed by
           some_user.*scheduled.*#{expected_start}.*#{expected_end}
@@ -150,7 +149,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       it 'has RT ticket comment added when started' do
         subject.component = create(:component, name: 'some_component')
 
-        expected_end = subject.requested_end.to_formatted_s(:short)
+        expected_end = subject.expected_end.to_formatted_s(:short)
         text_regex = Regexp.new <<~REGEX.squish
           maintenance of some_component .* started.*this component.*under
           maintenance until #{expected_end}
@@ -264,16 +263,31 @@ RSpec.describe MaintenanceWindow, type: :model do
       request_transition = window.transitions.where(event: :request).first
       expect(request_transition.requested_start).to eq(new_requested_start)
     end
+  end
 
-    it 'tracks requested_end in transitions' do
-      window = create(:maintenance_window, requested_end: 1.days.from_now)
+  describe '#expected_end' do
+    let :monday { DateTime.new(2025, 3, 24, 9, 0) }
+    let :wednesday { monday.advance(days: 2) }
+    let :following_monday { monday.advance(weeks: 1) }
 
-      new_requested_end = 2.days.from_now.at_midnight
-      window.requested_end = new_requested_end
-      window.request!(create(:admin))
+    it 'gives expected end date calculated from requested_start and duration' do
+      window = create(
+        :maintenance_window,
+        requested_start: monday,
+        duration: 2
+      )
 
-      request_transition = window.transitions.where(event: :request).first
-      expect(request_transition.requested_end).to eq(new_requested_end)
+      expect(window.expected_end).to eq(wednesday)
+    end
+
+    it 'only includes business days in calculation' do
+      window = create(
+        :maintenance_window,
+        requested_start: monday,
+        duration: 5
+      )
+
+      expect(window.expected_end).to eq(following_monday)
     end
   end
 

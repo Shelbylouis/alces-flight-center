@@ -11,7 +11,7 @@ class MaintenanceWindow
     private
 
     attr_reader :record
-    delegate :requested_start, :requested_end, to: :record
+    delegate :requested_start, to: :record
 
     def validate_precisely_one_associated_model
       record.errors.add(
@@ -28,21 +28,13 @@ class MaintenanceWindow
     end
 
     def validate_requested_period
-      return unless requested_start && requested_end
-      validate_start_before_end
-      validate_start_or_end_in_future_if_needed unless record.legacy_migration_mode
+      return unless requested_start
+      validate_start_in_future_if_needed unless record.legacy_migration_mode
     end
 
-    def validate_start_before_end
-      if requested_start > requested_end
-        record.errors.add(:requested_end, 'must be after start')
-      end
-    end
-
-    def validate_start_or_end_in_future_if_needed
+    def validate_start_in_future_if_needed
       return if maintenance_period_can_be_passed?
       validate_field_in_future(:requested_start)
-      validate_field_in_future(:requested_end)
     end
 
     def maintenance_period_can_be_passed?
