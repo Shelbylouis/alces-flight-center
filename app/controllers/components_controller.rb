@@ -6,9 +6,7 @@ class ComponentsController < ApplicationController
     @component_groups = component_groups_from_type
   end
 
-  def show
-    @subtitle = @component.component_type.name
-  end
+  def show; end
 
   private
 

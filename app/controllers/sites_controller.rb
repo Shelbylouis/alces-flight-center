@@ -4,7 +4,5 @@ class SitesController < ApplicationController
     @sites = Site.all
   end
 
-  def show
-    @subtitle = "Welcome #{current_user.name}"
-  end
+  def show; end
 end
