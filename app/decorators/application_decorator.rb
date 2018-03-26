@@ -43,6 +43,20 @@ class ApplicationDecorator < Draper::Decorator
     []
   end
 
+  def bootstrap_valid_class(field_name)
+    errors[field_name].any? ? 'is-invalid' : 'is-valid'
+  end
+
+  def invalid_feedback_div(field_name)
+    h.raw(
+      [
+        '<div class="invalid-feedback">',
+        errors[field_name].join('; ').capitalize,
+        '</div>',
+      ].join
+    )
+  end
+
   private
 
   def internal_icon

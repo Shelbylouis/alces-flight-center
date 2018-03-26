@@ -36,9 +36,7 @@
         :duration,
         maintenance_window.duration_attributes(action)
       ) %>
-      <div class="invalid-feedback">
-        <%= maintenance_window.errors[:duration].join('; ').capitalize %>
-      </div>
+      <%= maintenance_window.invalid_feedback_div(:duration) %>
     </div>
 
     <%= render 'partials/date_time_select',

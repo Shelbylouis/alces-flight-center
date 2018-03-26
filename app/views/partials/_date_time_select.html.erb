@@ -28,8 +28,6 @@
       https://github.com/twbs/bootstrap/issues/23454).
     %>
     <input class="form-control is-invalid" type="hidden"/>
-    <div class="invalid-feedback">
-      <%= model.errors[datetime_field_name].join('; ').capitalize %>
-    </div>
+    <%= model.invalid_feedback_div(datetime_field_name) %>
   </div>
 </div>
