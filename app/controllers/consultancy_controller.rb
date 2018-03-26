@@ -1,7 +1,5 @@
 class ConsultancyController < ApplicationController
   def new
-    @title = 'Request custom consultancy'
-
     @case = Case.new(
       cluster_id: params[:cluster_id],
       component_id: params[:component_id],

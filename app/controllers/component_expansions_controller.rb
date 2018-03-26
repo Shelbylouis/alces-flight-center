@@ -12,9 +12,7 @@ class ComponentExpansionsController < ApplicationController
     redirect_back fallback_location: @cluster_part
   end
 
-  def edit
-    @title = "Edit Expansions"
-  end
+  def edit; end
 
   def update
     @cluster_part.component_expansions.each do |expansion|

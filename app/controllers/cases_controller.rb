@@ -5,19 +5,15 @@ class CasesController < ApplicationController
 
   def index
     @site = current_site
-    @title = 'Manage support cases'
     @archive = archive?
     current_site.cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
   def show
     @case = Case.find(params[:id]).decorate
-    @title = "Support case: #{@case.subject}"
   end
 
   def new
-    @title = "Create new support case"
-
     cluster_id = params[:cluster_id]
     component_id = params[:component_id]
     service_id = params[:service_id]

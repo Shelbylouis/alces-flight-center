@@ -2,13 +2,11 @@ class ComponentsController < ApplicationController
   decorates_assigned :component
 
   def index
-    @title = 'Components'
     @table_tile = 'All Components' # Consider removing
     @component_groups = component_groups_from_type
   end
 
   def show
-    @title = "#{@component.name} Management Dashboard"
     @subtitle = @component.component_type.name
   end
 
