@@ -37,9 +37,10 @@ class MaintenanceWindowDecorator < ApplicationDecorator
   end
 
   def duration_attributes(form_action)
+    valid_class = model.errors[:duration].any? ? 'is-invalid' : 'is-valid'
     {
       min: 1,
-      class: ['form-control'],
+      class: ["form-control #{valid_class}"],
       required: true,
     }.merge(
       conditional_attributes(action: form_action, field: 'duration')

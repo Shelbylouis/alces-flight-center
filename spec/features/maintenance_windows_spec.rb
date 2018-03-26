@@ -26,8 +26,8 @@ end
 
 RSpec.shared_examples 'maintenance form initially valid' do
   it 'does not initially have invalid elements' do
-    [requested_start_element].each do |element|
-      expect(element).not_to have_selector('select', class: 'is-invalid')
+    [requested_start_element, duration_input_group].each do |element|
+      expect(element).not_to have_selector('.is-invalid')
     end
   end
 end
@@ -108,6 +108,10 @@ RSpec.feature "Maintenance windows", type: :feature do
     test_element(:requested_start)
   end
 
+  def duration_input_group
+    test_element('duration-input-group')
+  end
+
   context 'when user is an admin' do
     let :user_name { 'Steve User' }
     let :user { create(:admin, name: user_name) }
@@ -161,6 +165,23 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(new_window.requested_start).to eq valid_requested_start
         expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
         expect(find('.alert')).to have_text(/Maintenance requested/)
+      end
+
+      it 're-renders form with error when invalid duration entered' do
+        original_path = current_path
+
+        expect do
+          fill_in 'Duration', with: -1
+          click_button 'Request Maintenance'
+        end.not_to change(MaintenanceWindow, :all)
+
+        expect(current_path).to eq(original_path)
+        expect(
+          find('.alert')
+        ).to have_text(/Unable to request this maintenance/)
+        expect(duration_input_group).to have_css('input.is-invalid')
+        invalid_feedback = duration_input_group.find('.invalid-feedback')
+        expect(invalid_feedback).to have_text('Must be greater than 0')
       end
     end
 
