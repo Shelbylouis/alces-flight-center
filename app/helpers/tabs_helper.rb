@@ -14,7 +14,7 @@ module TabsHelper
         id: :cases, path: scope_path('cases'),
         dropdown: [
           { text: 'Current', path: scope_path('cases') },
-          { text: 'Archive', path: scope_path('cases') }
+          { text: 'Archive', path: scope_path('cases', archive: true) }
         ]
       }
     end
@@ -27,11 +27,11 @@ module TabsHelper
 
     attr_reader :scope, :h
 
-    def scope_path(method = nil)
+    def scope_path(method = nil, **hash_params)
       method_string = [
         scope.class.name.underscore, method, 'path'
       ].reject(&:nil?).join('_')
-      h.send(method_string, scope)
+      h.send(method_string, scope, **hash_params)
     end
   end
 end
