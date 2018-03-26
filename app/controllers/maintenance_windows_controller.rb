@@ -3,10 +3,7 @@ class MaintenanceWindowsController < ApplicationController
 
   def new
     @maintenance_window = MaintenanceWindow.new(
-      cluster_id: params[:cluster_id],
-      component_id: params[:component_id],
-      service_id: params[:service_id],
-      requested_start: suggested_requested_start,
+      default_maintenance_window_params
     )
   end
 
@@ -60,6 +57,16 @@ class MaintenanceWindowsController < ApplicationController
     :requested_start,
   ].freeze
 
+  def default_maintenance_window_params
+    {
+      cluster_id: params[:cluster_id],
+      component_id: params[:component_id],
+      service_id: params[:service_id],
+      requested_start: default_requested_start,
+      duration: 1,
+    }
+  end
+
   def request_maintenance_window_params
     params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES)
   end
@@ -68,8 +75,9 @@ class MaintenanceWindowsController < ApplicationController
     params.require(:maintenance_window).permit(CONFIRM_PARAM_NAMES)
   end
 
-  def suggested_requested_start
-    1.day.from_now.at_midnight
+  def default_requested_start
+    # Default is 9am on next business day.
+    1.business_day.from_now.at_beginning_of_day.advance(hours: 9)
   end
 
   # XXX if we changed `request` to be accessed at `/request` (rather than

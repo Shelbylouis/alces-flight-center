@@ -134,6 +134,8 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     describe 'maintenance request form' do
+      include ActiveSupport::Testing::TimeHelpers
+
       let! :cluster_case do
         create(:case, cluster: cluster, subject: 'Some case')
       end
@@ -144,6 +146,24 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       include_examples 'maintenance form error handling', 'request'
       include_examples 'maintenance form initially valid'
+
+      it 'uses correct default values' do
+        a_distant_friday = DateTime.new(2025, 3, 7, 0, 0)
+        following_monday_at_9 = a_distant_friday.advance(days: 3, hours: 9)
+
+        travel_to a_distant_friday do
+          # Visit page again now we have mocked the time so correct default
+          # `requested_start` based on current time is used.
+          visit new_component_maintenance_window_path(component, as: user)
+
+          select cluster_case.subject
+          click_button 'Request Maintenance'
+
+          new_window = cluster_case.maintenance_windows.first
+          expect(new_window.requested_start).to eq following_monday_at_9
+          expect(new_window.duration).to eq 1
+        end
+      end
 
       it 'includes correct Case select label' do
         case_select_label = test_element('case-select-label')
