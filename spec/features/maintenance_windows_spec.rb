@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.shared_examples 'maintenance form error handling' do |form_action|
-  it 're-renders form with error when invalid date entered' do
+  it 're-renders form with error when invalid requested_start entered' do
     original_path = current_path
     requested_start_in_past = DateTime.new(2016, 9, 20, 13)
 
@@ -18,9 +18,8 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
     invalidated_selects =
       requested_start_element.all('select', class: 'is-invalid')
     expect(invalidated_selects.length).to eq(5)
-    expect(requested_start_element.find('.invalid-feedback')).to have_text(
-      'Cannot be in the past'
-    )
+    invalid_feedback = requested_start_element.find('.invalid-feedback')
+    expect(invalid_feedback).to have_text('Cannot be in the past')
   end
 end
 
