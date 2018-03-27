@@ -1,0 +1,35 @@
+require 'rails_helper'
+
+RSpec.describe TabsHelper::TabsBuilder do
+  # Sets up a TabsBuilder with mocked user
+  let :mocked_helper { helper }
+  before :each do
+    allow(mocked_helper).to receive(:current_user).and_return(user)
+  end
+  let :tab_builder { TabsHelper::TabsBuilder.new(scope, mocked_helper) }
+
+  describe '#cases' do
+    subject { tab_builder.cases[:dropdown].map { |h| h[:path] } }
+
+    context 'when within the site scope' do
+      let :scope { create(:site) }
+
+      context 'with an admin user' do
+        let :user { create(:admin) }
+
+        it 'contains a link to the site cases' do
+          expect(subject).to include(site_cases_path(scope))
+        end
+      end
+
+      context 'with an contact user' do
+        let :user { create(:contact) }
+
+        it 'contains a link to the cases page' do
+          expect(subject).to include(cases_path)
+        end
+      end
+    end
+  end
+end
+
