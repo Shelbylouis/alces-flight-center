@@ -404,6 +404,21 @@ RSpec.describe MaintenanceWindow, type: :model do
   describe 'class' do
     subject { described_class }
 
+    describe '#events' do
+      it 'gives all possible events' do
+        expect(subject.events).to match_array([
+          :cancel,
+          :confirm,
+          :end,
+          :expire,
+          :mandate,
+          :reject,
+          :request,
+          :start,
+        ])
+      end
+    end
+
     describe '#possible_states' do
       it 'gives all possible states' do
         expect(subject.possible_states).to match_array([

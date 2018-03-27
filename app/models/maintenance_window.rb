@@ -43,6 +43,10 @@ class MaintenanceWindow < ApplicationRecord
   end
 
   class << self
+    def events
+      state_machine.events.keys
+    end
+
     def possible_states
       state_machine.states.keys
     end
