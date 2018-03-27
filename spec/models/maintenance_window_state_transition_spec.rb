@@ -66,6 +66,14 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
         it_behaves_like 'it must be initiated by an admin'
       end
 
+      context'when `mandate` event' do
+        subject do
+          build(:maintenance_window_state_transition, event: :mandate)
+        end
+
+        it_behaves_like 'it must be initiated by an admin'
+      end
+
       context 'when `cancel` event' do
         subject do
           build(:maintenance_window_state_transition, event: :cancel)
