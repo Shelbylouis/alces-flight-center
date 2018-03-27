@@ -6,8 +6,6 @@ class ComponentsController < ApplicationController
     @component_groups = component_groups_from_type
   end
 
-  def show; end
-
   private
 
   def component_groups_from_type

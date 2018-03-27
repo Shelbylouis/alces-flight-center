@@ -3,6 +3,4 @@ class SitesController < ApplicationController
     @title = 'Alces Admin Sites Dashboard'
     @sites = Site.all
   end
-
-  def show; end
 end

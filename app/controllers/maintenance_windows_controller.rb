@@ -1,6 +1,4 @@
 class MaintenanceWindowsController < ApplicationController
-  def index; end
-
   def new
     @maintenance_window = MaintenanceWindow.new(
       cluster_id: params[:cluster_id],
