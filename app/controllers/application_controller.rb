@@ -70,7 +70,12 @@ class ApplicationController < ActionController::Base
   end
 
   def assign_title
-    @title = "Management Dashboard - #{@scope.name}" if @scope
+    if @scope
+      @title = <<~EOF.squish
+        #{@scope.readable_model_name.split.map(&:capitalize).join(' ')}
+        Dashboard - #{@scope.name}
+      EOF
+    end
   end
 
   def format_errors(model)
