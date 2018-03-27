@@ -54,8 +54,6 @@ Rails.application.routes.draw do
       resources :cases, only: [:new, :index, :show]
     end
 
-    resources :cases, only: []
-
     resources :clusters, only: []  do
       request_maintenance_form.call
       admin_logs.call
