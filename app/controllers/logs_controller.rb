@@ -1,6 +1,5 @@
 class LogsController < ApplicationController
   def index
-    @title = 'Logs'
     @new_log = Log.new
     @scope = @component || @cluster
     @logs = @scope.logs

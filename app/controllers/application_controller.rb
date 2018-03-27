@@ -7,7 +7,8 @@ class ApplicationController < ActionController::Base
 
   before_action :set_sentry_raven_context
   before_action :assign_current_user
-  before_action :define_navigation_variables
+  before_action :assign_scope
+  before_action :assign_title
 
   rescue_from ReadPermissionsError, with: :not_found
 
@@ -42,7 +43,7 @@ class ApplicationController < ActionController::Base
     params[id_method] || params[:id]
   end
 
-  def define_navigation_variables
+  def assign_scope
     return unless current_user
 
     @scope = case request.path
@@ -66,6 +67,15 @@ class ApplicationController < ActionController::Base
                          current_user.site
                        end
              end
+  end
+
+  def assign_title
+    if @scope
+      @title = <<~EOF.squish
+        #{@scope.readable_model_name.split.map(&:capitalize).join(' ')}
+        Dashboard - #{@scope.name}
+      EOF
+    end
   end
 
   def format_errors(model)

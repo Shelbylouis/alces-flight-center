@@ -1,11 +1,5 @@
 class MaintenanceWindowsController < ApplicationController
-  def index
-    @title = 'Maintenance'
-  end
-
   def new
-    assign_new_maintenance_title
-
     @maintenance_window = MaintenanceWindow.new(
       cluster_id: params[:cluster_id],
       component_id: params[:component_id],
@@ -16,8 +10,6 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def create
-    assign_new_maintenance_title
-
     handle_form_submission(action: :request, template: :new) do
       @maintenance_window = MaintenanceWindow.new(request_maintenance_window_params)
       ActiveRecord::Base.transaction do
@@ -75,10 +67,6 @@ class MaintenanceWindowsController < ApplicationController
 
   def confirm_maintenance_window_params
     params.require(:maintenance_window).permit(CONFIRM_PARAM_NAMES)
-  end
-
-  def assign_new_maintenance_title
-    @title = 'Request Maintenance'
   end
 
   def suggested_requested_start

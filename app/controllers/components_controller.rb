@@ -2,17 +2,21 @@ class ComponentsController < ApplicationController
   decorates_assigned :component
 
   def index
-    @title = 'Components'
     @table_tile = 'All Components' # Consider removing
-    @component_groups = component_groups_from_type
-  end
-
-  def show
-    @title = "#{@component.name} Management Dashboard"
-    @subtitle = @component.component_type.name
+    define_variables_from_type
   end
 
   private
+
+  def define_variables_from_type
+    @component_groups = component_groups_from_type
+    @type = parse_type
+  end
+
+  def parse_type
+    raw = type_param[:type]
+    raw.present? ? raw : 'All'
+  end
 
   def component_groups_from_type
     if @scope.is_a? ComponentGroup

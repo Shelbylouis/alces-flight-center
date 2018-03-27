@@ -1,5 +1,7 @@
 <% manage_cases_page = current_user.admin? && @archive %>
-
+<%= content_for :subtitle do
+  "#{@archive ? 'Archived' : 'Current'} Cases"
+end %>
 <%= render 'partials/tabs', activate: :cases do %>
   <ul class='nav nav-tabs nav-justified' >
     <%= @scope.decorate.case_form_buttons %>

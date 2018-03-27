@@ -1,4 +1,6 @@
-
+<% content_for :subtitle do
+     'Components'.tap { |s| s << " - #{@type}" if @type.present? }
+   end %>
 <%= render 'partials/tabs', activate: :components do %>
   <div class='card-body'>
     <% @component_groups.each do |group| %>
