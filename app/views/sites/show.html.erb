@@ -12,9 +12,11 @@
       Secondary site <%= 'contact'.pluralize(site.secondary_contacts.length) %>:
       <%= site.secondary_contacts.present? ? site.secondary_contacts_info : raw('<em>None</em>') %>
     </li>
-    <li class="list-group-item">
-      Additional site contacts: <%= site.additional_contacts_info %>
-    </li>
+    <% if site.additional_contacts_info.present? %>
+      <li class="list-group-item">
+        Additional site contacts: <%= site.additional_contacts_info %>
+      </li>
+    <% end %>
   </ul>
 <% end %>
 <% site.clusters.each do |cluster| %>
