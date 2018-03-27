@@ -18,26 +18,10 @@
       </li>
     <% end %>
   </ul>
-<% end %>
-<% site.clusters.each do |cluster| %>
-  <div class='card'>
-    <div class='card-header'>
-      <ul class="nav">
-        <li class="nav-item">
-          <span class="navbar-brand">
-            <%= cluster.name %> overview
-          </span>
-        </li>
-        <li class="nav-item">
-          <%= link_to 'Manage this cluster',
-            cluster_path(cluster),
-            class: ['nav-link', 'btn', 'btn-primary'],
-            role: 'button'
-          %>
-        </li>
-      </ul>
-    </div>
-
-    <%= render 'clusters/details', cluster: cluster %>
-  </div>
+  <% site.clusters.each do |cluster| %>
+    <li class='list-group-item list-group-item-action text-center'>
+      <%= link_to "#{cluster.name} - Manage this cluster",
+                  cluster_path(cluster) %>
+    </li>
+  <% end %>
 <% end %>
