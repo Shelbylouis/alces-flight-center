@@ -44,6 +44,15 @@
       datetime_field_name: 'requested_start'
     %>
 
+    <div class="form-group">
+      <%= check_box_tag 'mandatory'%>
+      <%= label_tag 'mandatory', 'Mark this maintenance as mandatory'%>
+      <small class="form-text text-muted">
+        Mandatory maintenance is automatically scheduled and bypasses the usual
+        user confirmation process.
+      </small>
+    </div>
+
     <%= f.submit "#{action.titlecase} Maintenance",
       class: 'btn btn-primary btn-block'
     %>

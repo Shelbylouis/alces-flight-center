@@ -186,6 +186,22 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(find('.alert')).to have_text(/Maintenance requested/)
       end
 
+      it 'can mandate maintenance' do
+        select cluster_case.subject
+        fill_in 'Duration', with: 2
+        fill_in_datetime_selects 'requested-start', with: valid_requested_start
+        check 'mandatory'
+        click_button 'Request Maintenance'
+
+        new_window = cluster_case.maintenance_windows.first
+        expect(new_window).to be_confirmed
+        expect(new_window.confirmed_by).to eq user
+        expect(new_window.duration).to eq 2
+        expect(new_window.requested_start).to eq valid_requested_start
+        expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
+        expect(find('.alert')).to have_text(/Maintenance scheduled/)
+      end
+
       it 're-renders form with error when invalid duration entered' do
         original_path = current_path
 

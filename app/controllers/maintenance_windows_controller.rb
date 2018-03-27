@@ -8,11 +8,13 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def create
-    handle_form_submission(action: :request, template: :new) do
+    event, action =
+      params[:mandatory] ? [:mandate, :schedule] : [:request] * 2
+    handle_form_submission(action: action, template: :new) do
       @maintenance_window = MaintenanceWindow.new(request_maintenance_window_params)
       ActiveRecord::Base.transaction do
         @maintenance_window.save!
-        @maintenance_window.request!(current_user)
+        @maintenance_window.send("#{event}!", current_user)
       end
     end
   end
@@ -86,12 +88,16 @@ class MaintenanceWindowsController < ApplicationController
   def handle_form_submission(action:, template:)
     yield
 
-    flash[:success] = "Maintenance #{action}ed."
+    flash[:success] = "Maintenance #{past_tense_of(action)}."
     cluster = @maintenance_window.associated_cluster
     redirect_to cluster_maintenance_windows_path(cluster)
   rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
     flash.now[:error] = "Unable to #{action} this maintenance."
     render template
+  end
+
+  def past_tense_of(action)
+    action.to_s.gsub(/e$/, '') + 'ed'
   end
 
   def transition_window(event)
