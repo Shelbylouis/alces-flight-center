@@ -206,6 +206,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(new_window.requested_start).to eq valid_requested_start
         expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
         expect(find('.alert')).to have_text(/Maintenance scheduled/)
+        expect(page).to have_text(/N\/A.*mandatory maintenance/)
       end
 
       it 're-renders form with error when invalid duration entered' do
