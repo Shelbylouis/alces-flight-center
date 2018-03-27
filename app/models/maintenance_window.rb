@@ -29,6 +29,7 @@ class MaintenanceWindow < ApplicationRecord
 
     event :request { transition new: :requested }
     event :confirm { transition [:requested, :expired] => :confirmed }
+    event :mandate { transition new: :confirmed }
     event :cancel { transition [:new, :requested, :expired] => :cancelled }
     event :reject { transition [:requested, :expired] => :rejected }
     event :expire { transition [:new, :requested] => :expired }

@@ -29,6 +29,14 @@ MaintenanceNotifier = Struct.new(:window) do
     EOF
   end
 
+  def mandate_comment
+    <<~EOF
+      Maintenance for #{associated_model.name} has been scheduled from
+      #{requested_start} until #{expected_end} by #{window.confirmed_by.name};
+      this maintenance is mandatory.
+    EOF
+  end
+
   def cancel_comment
     <<~EOF
       Request for maintenance of #{associated_model.name} cancelled by
