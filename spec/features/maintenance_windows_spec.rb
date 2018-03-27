@@ -62,6 +62,12 @@ RSpec.shared_examples 'confirmation form' do
     expect(duration_input[:title]).to match(/duration.*cannot be changed/)
   end
 
+  it 'does not show mandatory maintenance check box' do
+    expect do
+      check 'mandatory'
+    end.to raise_error Capybara::ElementNotFound
+  end
+
   it 'can confirm requested maintenance' do
     fill_in_datetime_selects 'requested-start', with: valid_requested_start
     click_button 'Confirm Maintenance'
