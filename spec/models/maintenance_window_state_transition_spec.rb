@@ -58,28 +58,14 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
         end
       end
 
-      context 'when `request` event' do
-        subject do
-          build(:maintenance_window_state_transition, event: :request)
+      [:request, :mandate, :cancel].each do |event|
+        context "when `#{event}` event" do
+          subject do
+            build(:maintenance_window_state_transition, event: event)
+          end
+
+          it_behaves_like 'it must be initiated by an admin'
         end
-
-        it_behaves_like 'it must be initiated by an admin'
-      end
-
-      context'when `mandate` event' do
-        subject do
-          build(:maintenance_window_state_transition, event: :mandate)
-        end
-
-        it_behaves_like 'it must be initiated by an admin'
-      end
-
-      context 'when `cancel` event' do
-        subject do
-          build(:maintenance_window_state_transition, event: :cancel)
-        end
-
-        it_behaves_like 'it must be initiated by an admin'
       end
 
       context 'when `reject` event' do
