@@ -208,6 +208,28 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
+    RSpec.shared_examples 'it can be ended' do
+      it 'can be ended' do
+        admin = create(:admin)
+        subject.end!(admin)
+
+        expect(subject).to be_ended
+        expect(subject.ended_by).to eq admin
+      end
+
+      it 'has RT ticket comment added when ended' do
+        admin = create(:admin, name: 'some_admin')
+        subject.component = create(:component, name: 'some_component')
+
+        expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
+          id: subject.case.rt_ticket_id,
+          text: /maintenance of some_component ended by some_admin/i
+        )
+
+        subject.end!(admin)
+      end
+    end
+
     context 'when new' do
       subject { create(:maintenance_window, state: :new) }
 
@@ -239,6 +261,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         create(:maintenance_window, state: :started)
       end
 
+      it_behaves_like 'it can be ended'
       it_behaves_like 'it can be auto-ended'
     end
 
@@ -412,6 +435,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           :auto_start,
           :cancel,
           :confirm,
+          :end,
           :mandate,
           :reject,
           :request,

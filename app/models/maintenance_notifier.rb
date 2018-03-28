@@ -51,6 +51,10 @@ MaintenanceNotifier = Struct.new(:window) do
     EOF
   end
 
+  def end_comment
+    "Maintenance of #{associated_model.name} ended by #{window.ended_by.name}."
+  end
+
   def auto_expire_comment
     <<~EOF
       Request for maintenance of #{associated_model.name} was not confirmed
