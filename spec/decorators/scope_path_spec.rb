@@ -15,6 +15,17 @@ RSpec.describe 'scope_path decorator methods' do
     end
   end
 
+  describe '#scope_cases_path' do
+    context 'when in a cluster scope' do
+      let :scope { create(:cluster) }
+
+      it 'finds_the path' do
+        dynamic_path = scope.decorate.scope_cases_path
+        expect(dynamic_path).to eq(helper.cluster_cases_path(scope))
+      end
+    end
+  end
+
   describe '#scope_path' do
     subject { scope.decorate.scope_path }
 
