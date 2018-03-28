@@ -2,7 +2,6 @@ class ComponentsController < ApplicationController
   decorates_assigned :component
 
   def index
-    @table_tile = 'All Components' # Consider removing
     define_variables_from_type
   end
 
