@@ -23,7 +23,7 @@ class ClusterDecorator < ApplicationDecorator
         path: h.cluster_maintenance_windows_path(self),
         admin_dropdown: [
           {
-            text: 'Existing',
+            text: 'Pending',
             path: h.cluster_maintenance_windows_path(self)
           }, {
             text: 'Request',
