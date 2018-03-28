@@ -1,7 +1,7 @@
+require 'json_web_token'
 require 'validates_email_format_of'
 
 class User < ApplicationRecord
-  include Clearance::User
   include AdminConfig::User
 
   ROLES = %w{admin primary_contact secondary_contact viewer}
@@ -13,7 +13,6 @@ class User < ApplicationRecord
   validates :email,
             presence: true,
             email_format: { message: Constants::EMAIL_FORMAT_MESSAGE }
-  validates :password, length: { minimum: 5 }, if: :password
   validates :role, presence: true, inclusion: ROLES
 
   validates :site, {
@@ -42,6 +41,17 @@ class User < ApplicationRecord
 
   def self.globally_available?
     true
+  end
+
+  def self.from_jwt_token(token)
+    claims = ::JsonWebToken.decode(token)  # handles signature verification too
+    user = find_by_email(claims.fetch('email'))
+
+    user.tap do |u|
+      # If we want to update local values with those given in the token, do the following:
+      #  u.name = claims.fetch('username')
+      #  u.save
+    end
   end
 
   private

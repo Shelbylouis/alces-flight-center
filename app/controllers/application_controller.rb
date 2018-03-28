@@ -1,9 +1,11 @@
 require 'exceptions'
 
 class ApplicationController < ActionController::Base
-  include Clearance::Controller
+  include Clearance::Authorization
   protect_from_forgery with: :exception
   decorates_assigned :site
+
+  helper_method :current_user, :signed_in?, :signed_out?
 
   before_action :set_sentry_raven_context
   before_action :assign_current_user
@@ -11,12 +13,29 @@ class ApplicationController < ActionController::Base
   before_action :assign_title
 
   rescue_from ReadPermissionsError, with: :not_found
+  rescue_from JWT::DecodeError, with: :not_found
 
   def error_flash_models(models, header)
     flash[:error] = header + "\n" + models.map do |model|
       prefix = block_given? ? ((yield model).to_s + ': ') : ''
       prefix + model.errors.full_messages.to_s
     end.join("\n")
+  end
+
+  def current_user
+    auth_cookie = cookies['flight_sso']
+
+    return nil unless auth_cookie.present?
+
+    User.from_jwt_token(auth_cookie)
+  end
+
+  def signed_in?
+    !current_user.nil?
+  end
+
+  def signed_out?
+    current_user.nil?
   end
 
   private
