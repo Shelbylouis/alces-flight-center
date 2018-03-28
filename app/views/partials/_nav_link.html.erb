@@ -23,7 +23,7 @@
 <li class='nav-item<%= ' dropdown' if dropdown %>'>
   <%= link_to icon_span(text, nav_icon), path, link_options %>
   <% if dropdown %>
-    <div class='dropdown-menu'>
+    <div class='dropdown-menu' style="width:100%">
       <% dropdown.each do |dropitem| %>
         <%= link_to dropitem[:text],
                     dropitem[:path],
