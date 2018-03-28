@@ -72,20 +72,16 @@ class ApplicationDecorator < Draper::Decorator
   private
 
   def convert_scope_path(s)
-    class_name = if is_a_contact_site_path?(model)
-                   '_'
-                 else
-                   "_#{model.class.to_s.underscore}_"
-                 end
-    (s.match(/\Ascope_.*/) ? "_#{s}" : s.to_s).sub(/_scope_/, class_name)
-                                              .sub(/\A_/, '')
-                                              .sub(/\Apath\Z/, 'root_path')
-                                              .to_sym
+    (s.match(/\Ascope_.*/) ? "_#{s}" : s.to_s)
+      .sub(/_scope_/, scope_name_for_paths)
+      .sub(/\A_/, '')
+      .sub(/\Apath\Z/, 'root_path')
+      .to_sym
   end
 
-  # TODO: Extract this to scope decorator
-  def is_a_contact_site_path?(scope)
-    scope.is_a?(Site) && h.current_user.contact?
+  # This method is overridden in the Site decorator
+  def scope_name_for_paths
+    '_' + model.underscored_model_name + '_'
   end
 
   def internal_icon

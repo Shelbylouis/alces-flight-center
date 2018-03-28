@@ -17,4 +17,11 @@ class SiteDecorator < ApplicationDecorator
   def tabs
     [tabs_builder.overview, tabs_builder.cases]
   end
+
+  private
+
+  # Handles the dynamic naming of paths when a contact is logged in
+  def scope_name_for_paths
+    h.current_user.contact? ? '_' : super
+  end
 end
