@@ -1,8 +1,7 @@
 module TabsHelper
   class TabsBuilder
-    def initialize(scope, h)
+    def initialize(scope)
       @scope = scope.decorate
-      @h = h
     end
 
     def overview
@@ -25,7 +24,7 @@ module TabsHelper
 
     private
 
-    attr_reader :scope, :h
+    attr_reader :scope
   end
 end
 
