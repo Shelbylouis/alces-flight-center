@@ -50,6 +50,9 @@
     </div>
 
     <div id='brand-footer'></div>
+    <script>
+      window.__SSO_BASE_URL__ = '<%= Rails.application.config.sso_base_url %>';
+    </script>
     <script src='/flight-branding/main.38bd27ee.js'></script>
   </body>
   <%= development_ribbon position: :left, color: :green if Rails.env.development? %>

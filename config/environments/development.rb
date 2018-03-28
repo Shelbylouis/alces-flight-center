@@ -64,4 +64,6 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  config.sso_base_url = ENV['SSO_BASE_URL'] || 'http://accounts.alces-flight.lvh.me:4000'
 end

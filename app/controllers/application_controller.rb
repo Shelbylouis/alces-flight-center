@@ -27,7 +27,15 @@ class ApplicationController < ActionController::Base
 
     return nil unless auth_cookie.present?
 
-    User.from_jwt_token(auth_cookie)
+    User.from_jwt_token(auth_cookie).tap do |u|
+
+      if u
+        clearance_session.sign_in(u)
+      else
+        clearance_session.sign_out
+      end
+
+    end
   end
 
   def signed_in?
@@ -38,7 +46,16 @@ class ApplicationController < ActionController::Base
     current_user.nil?
   end
 
+  def sign_out
+    clearance_session.sign_out
+    cookies.delete('flight_sso', domain: request.host[request.host.index('alces')..-1])
+  end
+
   private
+
+  def clearance_session
+    request.env[:clearance]
+  end
 
   def set_sentry_raven_context
     if current_user

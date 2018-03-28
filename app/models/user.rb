@@ -2,6 +2,7 @@ require 'json_web_token'
 require 'validates_email_format_of'
 
 class User < ApplicationRecord
+  include Clearance::User
   include AdminConfig::User
 
   ROLES = %w{admin primary_contact secondary_contact viewer}
