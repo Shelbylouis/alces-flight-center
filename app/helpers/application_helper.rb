@@ -1,6 +1,4 @@
 module ApplicationHelper
-  include ScopePathHelper
-
   def icon(name, interactive: false, inline: false, **args)
     classes = [
       (inline ? 'inline-icon' : 'fa-2x'),

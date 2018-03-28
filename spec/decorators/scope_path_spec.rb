@@ -1,25 +1,29 @@
 require 'rails_helper'
 
-RSpec.describe ScopePathHelper do
+RSpec.describe 'scope_path decorator methods' do
   before :each do
-    allow(helper).to receive(:current_user).and_return(user)
+    allow(h).to receive(:current_user).and_return(user)
   end
 
   context 'with a contact logged in' do
     let :user { create(:contact) }
 
-    describe '#respond_to' do
-      it 'responds to #scope_path' do
-        expect(helper.respond_to? :scope_path).to eq(true)
-      end
+    context 'in a cluster scope' do
+      let :scope { create(:cluster).decorate }
 
-      it 'does not respond to #_scope_path' do
-        expect(helper.respond_to? :_scope_path).to eq(false)
+      describe '#respond_to' do
+        it 'responds to #scope_path' do
+          expect(scope.respond_to? :scope_path).to eq(true)
+        end
+
+        it 'does not respond to #_scope_path' do
+          expect(scope.respond_to? :_scope_path).to eq(false)
+        end
       end
     end
 
     describe '#scope_path' do
-      subject { helper.scope_path(scope) }
+      subject { scope.decorate.scope_path }
 
       context 'when in a cluster scope' do
         let :scope { create(:cluster) }
@@ -43,13 +47,13 @@ RSpec.describe ScopePathHelper do
     let :user { create(:admin) }
 
     describe '#scope_path' do
-      subject { helper.scope_path(scope) }
+      subject { scope.decorate.scope_path }
 
       context 'when in a site scope' do
         let :scope { create(:site) }
 
         it 'returns the site path' do
-          expect(subject).to eq(site_path(scope))
+          expect(subject).to eq(h.site_path(scope))
         end
       end
     end

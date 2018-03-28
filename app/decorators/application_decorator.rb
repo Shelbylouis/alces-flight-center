@@ -57,7 +57,36 @@ class ApplicationDecorator < Draper::Decorator
     )
   end
 
+  def method_missing(s, *a, &b)
+    if respond_to_missing?(s, *a) == :scope_path
+      h.send(convert_scope_path(s), model, *a, &b)
+    else
+      super
+    end
+  end
+
+  def respond_to_missing?(s, *_a)
+    s.match?(/\A(.+_)?scope_(.+_)?path\Z/) ? :scope_path : super
+  end
+
   private
+
+  def convert_scope_path(s)
+    class_name = if is_a_contact_site_path?(model)
+                   '_'
+                 else
+                   "_#{model.class.to_s.underscore}_"
+                 end
+    (s.match(/\Ascope_.*/) ? "_#{s}" : s.to_s).sub(/_scope_/, class_name)
+                                              .sub(/\A_/, '')
+                                              .sub(/\Apath\Z/, 'root_path')
+                                              .to_sym
+  end
+
+  # TODO: Extract this to scope decorator
+  def is_a_contact_site_path?(scope)
+    scope.is_a?(Site) && h.current_user.contact?
+  end
 
   def internal_icon
     internal_text = "#{readable_model_name.capitalize} for internal Alces usage"
