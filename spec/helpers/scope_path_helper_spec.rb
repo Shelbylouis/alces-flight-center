@@ -28,6 +28,14 @@ RSpec.describe ScopePathHelper do
           expect(subject).to eq(helper.cluster_path(scope))
         end
       end
+
+      context 'when in a site scope' do
+        let :scope { create(:site) }
+
+        it 'returns the root path instead' do
+          expect(subject).to eq(helper.root_path)
+        end
+      end
     end
   end
 
