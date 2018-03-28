@@ -33,7 +33,7 @@ class ClusterDecorator < ApplicationDecorator
       },
       { id: :services, path: h.cluster_services_path(self) },
       {
-        id: :components, path: '', # Path is ignored b/c dropdown
+        id: :components,
         dropdown: self.component_groups_by_type.map(&:name).map do |t|
           {
             text: t.pluralize,

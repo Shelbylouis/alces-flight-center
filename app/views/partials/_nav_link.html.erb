@@ -1,9 +1,9 @@
 <%
   # Variable definitions for the template
-  path ||= model
+  dropdown ||= false
+  path ||= (dropdown ? '' : model)
   text ||= model.name
   nav_icon ||= ''
-  dropdown ||= false
   classes ||= false
   # TODO: Remove this and replace dropdown with buttons
   if current_user.admin? && (admin_dropdown ||= false)
