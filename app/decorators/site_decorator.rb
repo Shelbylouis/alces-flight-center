@@ -4,14 +4,7 @@ class SiteDecorator < ApplicationDecorator
 
   def case_form_buttons
     return unless managed_clusters.present?
-
-    path = if h.current_user.admin?
-             h.new_site_case_path(self)
-           else
-             h.new_case_path
-           end
-
-    case_form_button(path)
+    case_form_button(new_scope_case_path)
   end
 
   def tabs
