@@ -3,10 +3,15 @@ class CasesController < ApplicationController
 
   decorates_assigned :site
 
-  def index
+  def index(archive: false)
     @site = current_site
-    @archive = archive?
+    @archive = archive? || archive
     current_site.cases.map(&:update_ticket_status!) if current_user.admin?
+  end
+
+  def archives
+    index(archive: true)
+    render :index
   end
 
   def show
@@ -27,7 +32,7 @@ class CasesController < ApplicationController
                   [@single_part.cluster]
                 else
                   current_site.clusters
-    end
+                end
   end
 
   def create
