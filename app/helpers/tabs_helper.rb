@@ -14,7 +14,7 @@ module TabsHelper
         id: :cases, path: scope.scope_cases_path,
         dropdown: [
           { text: 'Current', path: scope.scope_cases_path },
-          { text: 'Archive', path: scope.scope_cases_path(archive: true) }
+          { text: 'Archive', path: scope.archives_scope_cases_path }
         ]
       }
     end

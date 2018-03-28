@@ -5,7 +5,7 @@ class CasesController < ApplicationController
 
   def index(archive: false)
     @site = current_site
-    @archive = archive? || archive
+    @archive = archive
     current_site.cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
@@ -79,10 +79,6 @@ class CasesController < ApplicationController
   end
 
   private
-
-  def archive?
-    params.permit(:archive)[:archive] == 'true'
-  end
 
   def case_params
     params.require(:case).permit(
