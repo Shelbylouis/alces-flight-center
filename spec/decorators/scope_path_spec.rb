@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe 'scope_path decorator methods' do
+  # Allow a user to be logged in only when required
+  let :user { nil }
+  before :each do
+    allow(h).to receive(:current_user).and_return(user) if user
+  end
+
   context 'in a cluster scope' do
     let :scope { create(:cluster).decorate }
 
@@ -16,12 +22,22 @@ RSpec.describe 'scope_path decorator methods' do
   end
 
   describe '#scope_cases_path' do
+    subject { scope.decorate.scope_cases_path }
+
     context 'when in a cluster scope' do
       let :scope { create(:cluster) }
 
       it 'finds_the path' do
-        dynamic_path = scope.decorate.scope_cases_path
-        expect(dynamic_path).to eq(helper.cluster_cases_path(scope))
+        expect(subject).to eq(helper.cluster_cases_path(scope))
+      end
+    end
+
+    context 'when in site scope and a contact is signed in' do
+      let :user { create(:contact) }
+      let :scope { create(:site) }
+
+      it 'returns the cases path' do
+        expect(subject).to eq(helper.cases_path)
       end
     end
   end
@@ -39,10 +55,6 @@ RSpec.describe 'scope_path decorator methods' do
 
     context 'when in a site scope' do
       let :scope { create(:site) }
-
-      before :each do
-        allow(h).to receive(:current_user).and_return(user)
-      end
 
       context 'when a contact is signed in' do
         let :user { create(:contact) }

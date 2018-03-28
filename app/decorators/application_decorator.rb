@@ -59,7 +59,7 @@ class ApplicationDecorator < Draper::Decorator
 
   def method_missing(s, *a, &b)
     if respond_to_missing?(s, *a) == :scope_path
-      h.send(convert_scope_path(s), model, *a, &b)
+      h.send(convert_scope_path(s), *arguments_for_scope_path(a), &b)
     else
       super
     end
@@ -82,6 +82,11 @@ class ApplicationDecorator < Draper::Decorator
   # This method is overridden in the Site decorator
   def scope_name_for_paths
     '_' + model.underscored_model_name + '_'
+  end
+
+  # This method is overridden in the Site decorator
+  def arguments_for_scope_path(*a)
+    a.unshift(model)
   end
 
   def internal_icon
