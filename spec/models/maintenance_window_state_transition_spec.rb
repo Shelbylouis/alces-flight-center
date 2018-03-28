@@ -38,6 +38,20 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
       any_user_initiated_events = [:confirm]
       automatic_events = [:start, :end, :expire, nil]
 
+      it 'tests cover all possible events' do
+        covered_events = [
+          admin_only_events,
+          contact_only_events,
+          any_user_initiated_events,
+          automatic_events
+        ].flatten
+
+        # `nil` must be handled as a `nil` event will occur for the initial
+        # transition (from `nil` to `:new`) automatically created when a
+        # MaintenanceWindow is created.
+        expect(covered_events).to match_array MaintenanceWindow.events + [nil]
+      end
+
       admin_only_events.each do |event|
         context "when `#{event}` event" do
           subject do
