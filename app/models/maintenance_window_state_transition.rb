@@ -10,15 +10,14 @@ class MaintenanceWindowStateTransition < ApplicationRecord
 
   private
 
-  AUTOMATIC_EVENTS = [
-    :auto_end,
-    :auto_expire,
-    :auto_start,
-    nil,
-  ]
-
   def automatic_transition?
-    AUTOMATIC_EVENTS.include?(event&.to_sym)
+    initial_transition? || event.start_with?('auto_')
+  end
+
+  def initial_transition?
+    # A `nil` event <=> this is the initial transition to `new` automatically
+    # created when a MaintenanceWindow is created.
+    event.nil?
   end
 
   def validate_user_can_initiate
