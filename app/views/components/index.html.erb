@@ -5,7 +5,39 @@
   <div class='card-body'>
     <% @component_groups.each do |group| %>
       <h6><%= group.decorate.link %></h6>
-      <%= render 'partials/components_table', group: group %>
+      <div class='table-responsive'>
+        <table class="table">
+
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Support type</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% group.decorate.components.each do |component| %>
+              <tr>
+                <td width='40%'>
+                  <%= link_to component.name, component_path(component) %>
+                  <%= component.cluster_part_icons %>
+                </td>
+                <td width='30%'>
+                  <%= component.readable_support_type.capitalize %>
+                </td>
+                <td width='10%'>
+                  <%= component.start_maintenance_request_link %>
+                </td>
+                <td width='20%'>
+                  <%= component.change_support_type_button %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% end %>
   </div>
 <% end %>
