@@ -73,5 +73,15 @@ RSpec.describe 'scope_path decorator methods' do
       end
     end
   end
+
+  context 'with key word inputs arguments' do
+    let :input { { key: 'value' } }
+    let :scope { create(:cluster) }
+    subject { scope.decorate.scope_path(**input) }
+
+    it 'uses them as path parameters' do
+      expect(subject).to eq(h.cluster_path(scope, **input))
+    end
+  end
 end
 

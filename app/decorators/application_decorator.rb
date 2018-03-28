@@ -57,9 +57,9 @@ class ApplicationDecorator < Draper::Decorator
     )
   end
 
-  def method_missing(s, *a, &b)
+  def method_missing(s, *a, **hash, &b)
     if respond_to_missing?(s, *a) == :scope_path
-      h.send(convert_scope_path(s), *arguments_for_scope_path(a), &b)
+      h.send(convert_scope_path(s), *arguments_for_scope_path(a), **hash, &b)
     else
       super
     end
