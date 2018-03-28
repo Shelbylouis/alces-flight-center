@@ -35,7 +35,10 @@ class ClusterDecorator < ApplicationDecorator
       {
         id: :components, path: '', # Path is ignored b/c dropdown
         dropdown: self.component_groups_by_type.map(&:name).map do |t|
-          { text: t, path: h.cluster_components_path(self, type: t) }
+          {
+            text: t.pluralize,
+            path: h.cluster_components_path(self, type: t)
+          }
         end.push(text: 'All', path: h.cluster_components_path(self))
       }
     ]
