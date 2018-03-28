@@ -4,21 +4,21 @@ class MaintenanceWindowStateTransition < ApplicationRecord
 
   delegate :site, to: :maintenance_window
 
-  validates_presence_of :user, if: :user_initiated_transition?
-  validates_absence_of :user, unless: :user_initiated_transition?
+  validates_presence_of :user, unless: :automatic_transition?
+  validates_absence_of :user, if: :automatic_transition?
   validate :validate_user_can_initiate
 
   private
 
-  USER_INITIATED_STATES = [
-    :cancelled,
-    :confirmed,
-    :rejected,
-    :requested,
-  ].freeze
+  AUTOMATIC_EVENTS = [
+    :end,
+    :expire,
+    :start,
+    nil,
+  ]
 
-  def user_initiated_transition?
-    USER_INITIATED_STATES.include?(to.to_sym)
+  def automatic_transition?
+    AUTOMATIC_EVENTS.include?(event&.to_sym)
   end
 
   def validate_user_can_initiate
