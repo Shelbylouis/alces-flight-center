@@ -40,7 +40,7 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
       admin_only_events = [:request, :mandate, :cancel]
       contact_only_events = [:reject]
       any_user_initiated_events = [:confirm]
-      automatic_events = [:start, :end, :expire, nil]
+      automatic_events = [:auto_start, :auto_end, :auto_expire, nil]
 
       it 'tests cover all possible events' do
         covered_events = [

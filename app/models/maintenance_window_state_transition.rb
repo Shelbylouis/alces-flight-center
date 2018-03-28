@@ -11,9 +11,9 @@ class MaintenanceWindowStateTransition < ApplicationRecord
   private
 
   AUTOMATIC_EVENTS = [
-    :end,
-    :expire,
-    :start,
+    :auto_end,
+    :auto_expire,
+    :auto_start,
     nil,
   ]
 

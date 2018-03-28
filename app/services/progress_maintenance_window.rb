@@ -15,11 +15,11 @@ ProgressMaintenanceWindow = Struct.new(:window) do
   def required_transition_event
     @required_transition_event ||=
       if end_time_passed? && started?
-        :end
+        :auto_end
       elsif start_time_passed? && confirmed?
-        :start
+        :auto_start
       elsif start_time_passed? && not_yet_confirmed?
-        :expire
+        :auto_expire
       end
   end
 

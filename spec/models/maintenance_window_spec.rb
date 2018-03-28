@@ -31,14 +31,14 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
-    RSpec.shared_examples 'it can be expired' do
-      it 'can be expired' do
-        subject.expire!
+    RSpec.shared_examples 'it can be auto-expired' do
+      it 'can be auto-expired' do
+        subject.auto_expire!
 
         expect(subject).to be_expired
       end
 
-      it 'has RT ticket comment added when expired' do
+      it 'has RT ticket comment added when auto-expired' do
         subject.component = create(:component, name: 'some_component')
 
         expected_start = subject.requested_start.to_formatted_s(:short)
@@ -54,7 +54,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           :add_ticket_correspondence
         ).with(id: subject.case.rt_ticket_id, text: text_regex)
 
-        subject.expire!
+        subject.auto_expire!
       end
     end
 
@@ -166,14 +166,14 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
-    RSpec.shared_examples 'it can be started' do
-      it 'can be started' do
-        subject.start!
+    RSpec.shared_examples 'it can be auto-started' do
+      it 'can be auto-started' do
+        subject.auto_start!
 
         expect(subject).to be_started
       end
 
-      it 'has RT ticket comment added when started' do
+      it 'has RT ticket comment added when auto-started' do
         subject.component = create(:component, name: 'some_component')
 
         expected_end = subject.expected_end.to_formatted_s(:short)
@@ -185,18 +185,18 @@ RSpec.describe MaintenanceWindow, type: :model do
           :add_ticket_correspondence
         ).with(id: subject.case.rt_ticket_id, text: text_regex)
 
-        subject.start!
+        subject.auto_start!
       end
     end
 
-    RSpec.shared_examples 'it can be ended' do
-      it 'can be ended' do
-        subject.end!
+    RSpec.shared_examples 'it can be auto-ended' do
+      it 'can be auto-ended' do
+        subject.auto_end!
 
         expect(subject).to be_ended
       end
 
-      it 'has RT ticket comment added when ended' do
+      it 'has RT ticket comment added when auto-ended' do
         subject.component = create(:component, name: 'some_component')
 
         expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
@@ -204,7 +204,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           text: /maintenance of some_component .* ended/
         )
 
-        subject.end!
+        subject.auto_end!
       end
     end
 
@@ -212,7 +212,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       subject { create(:maintenance_window, state: :new) }
 
       it_behaves_like 'it can be cancelled'
-      it_behaves_like 'it can be expired'
+      it_behaves_like 'it can be auto-expired'
       it_behaves_like 'it can be requested'
       it_behaves_like 'it can be mandated'
     end
@@ -221,7 +221,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       subject { create(:maintenance_window, state: :requested) }
 
       it_behaves_like 'it can be cancelled'
-      it_behaves_like 'it can be expired'
+      it_behaves_like 'it can be auto-expired'
       it_behaves_like 'it can be confirmed'
       it_behaves_like 'it can be rejected'
     end
@@ -231,7 +231,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         create(:maintenance_window, state: :confirmed)
       end
 
-      it_behaves_like 'it can be started'
+      it_behaves_like 'it can be auto-started'
     end
 
     context 'when started' do
@@ -239,7 +239,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         create(:maintenance_window, state: :started)
       end
 
-      it_behaves_like 'it can be ended'
+      it_behaves_like 'it can be auto-ended'
     end
 
     context 'when expired' do
@@ -260,7 +260,7 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       expect(Case.request_tracker).not_to receive(:add_ticket_correspondence)
 
-      window.end!
+      window.auto_end!
     end
   end
 
@@ -365,7 +365,7 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it 'returns nil for transition with no associated user saved' do
         maintenance_window = create(:maintenance_window, state: :confirmed)
-        maintenance_window.start!
+        maintenance_window.auto_start!
 
         expect(maintenance_window.started_by).to be nil
       end
@@ -407,14 +407,14 @@ RSpec.describe MaintenanceWindow, type: :model do
     describe '#events' do
       it 'gives all possible events' do
         expect(subject.events).to match_array([
+          :auto_end,
+          :auto_expire,
+          :auto_start,
           :cancel,
           :confirm,
-          :end,
-          :expire,
           :mandate,
           :reject,
           :request,
-          :start,
         ])
       end
     end

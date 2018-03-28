@@ -51,7 +51,7 @@ MaintenanceNotifier = Struct.new(:window) do
     EOF
   end
 
-  def expire_comment
+  def auto_expire_comment
     <<~EOF
       Request for maintenance of #{associated_model.name} was not confirmed
       before requested start date of #{requested_start}; this maintenance can
@@ -60,7 +60,7 @@ MaintenanceNotifier = Struct.new(:window) do
     EOF
   end
 
-  def start_comment
+  def auto_start_comment
     <<~EOF
       Scheduled maintenance of #{associated_model.name} has automatically
       started; this #{associated_model.readable_model_name} is now under
@@ -68,7 +68,7 @@ MaintenanceNotifier = Struct.new(:window) do
     EOF
   end
 
-  def end_comment
+  def auto_end_comment
     <<~EOF
       Scheduled maintenance of #{associated_model.name} has automatically
       ended.
