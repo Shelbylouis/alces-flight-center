@@ -241,7 +241,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(window).to be_cancelled
       expect(window.cancelled_by).to eq user
       expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
-      expect(find('.alert')).to have_text('maintenance cancelled')
+      expect(find('.alert')).to have_text('Requested maintenance cancelled')
     end
 
     it 'can end started maintenance' do
@@ -254,7 +254,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(window).to be_ended
       expect(window.ended_by).to eq user
       expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
-      expect(find('.alert')).to have_text('maintenance ended')
+      expect(find('.alert')).to have_text('Ongoing maintenance ended')
     end
 
     it 'cannot see end button for non-started maintenance' do
@@ -349,7 +349,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(window).to be_rejected
       expect(window.rejected_by).to eq user
       expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
-      expect(find('.alert')).to have_text('maintenance rejected')
+      expect(find('.alert')).to have_text('Requested maintenance rejected')
     end
 
     it 'cannot see cancel button' do
