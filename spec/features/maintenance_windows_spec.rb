@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.shared_examples 'maintenance form error handling' do |form_action|
-  it 're-renders form with error when invalid date entered' do
+  it 're-renders form with error when invalid requested_start entered' do
     original_path = current_path
     requested_start_in_past = DateTime.new(2016, 9, 20, 13)
 
@@ -18,16 +18,15 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
     invalidated_selects =
       requested_start_element.all('select', class: 'is-invalid')
     expect(invalidated_selects.length).to eq(5)
-    expect(requested_start_element.find('.invalid-feedback')).to have_text(
-      'Cannot be in the past'
-    )
+    invalid_feedback = requested_start_element.find('.invalid-feedback')
+    expect(invalid_feedback).to have_text('Cannot be in the past')
   end
 end
 
 RSpec.shared_examples 'maintenance form initially valid' do
   it 'does not initially have invalid elements' do
-    [requested_start_element, requested_end_element].each do |element|
-      expect(element).not_to have_selector('select', class: 'is-invalid')
+    [requested_start_element, duration_input_group].each do |element|
+      expect(element).not_to have_selector('.is-invalid')
     end
   end
 end
@@ -47,7 +46,7 @@ RSpec.shared_examples 'confirmation form' do
     case_select = test_element('case-select')
 
     expect(case_select).to be_disabled
-    expect(case_select[:title]).to match(/cannot be changed/)
+    expect(case_select[:title]).to match(/Case.*cannot be changed/)
   end
 
   it 'includes correct Case select label' do
@@ -56,16 +55,21 @@ RSpec.shared_examples 'confirmation form' do
     expect(case_select_label).to have_text(/Associated Case/)
   end
 
+  it 'cannot change duration for requested maintenance' do
+    duration_input = test_element('duration-input-group').find('input')
+
+    expect(duration_input).to be_disabled
+    expect(duration_input[:title]).to match(/duration.*cannot be changed/)
+  end
+
   it 'can confirm requested maintenance' do
     fill_in_datetime_selects 'requested-start', with: valid_requested_start
-    fill_in_datetime_selects 'requested-end', with: valid_requested_end
     click_button 'Confirm Maintenance'
 
     window.reload
     expect(window).to be_confirmed
     expect(window.confirmed_by).to eq user
     expect(window.requested_start).to eq valid_requested_start
-    expect(window.requested_end).to eq valid_requested_end
     confirmed_transition = window.transitions.find_by_to(:confirmed)
     expect(confirmed_transition.requested_start).to eq valid_requested_start
     expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
@@ -79,7 +83,6 @@ RSpec.feature "Maintenance windows", type: :feature do
   let :cluster { support_case.cluster }
   let :site { support_case.site }
 
-  let :valid_requested_end { DateTime.new(2023, 9, 20, 13, 0) }
   let :valid_requested_start { DateTime.new(2022, 9, 10, 13, 0) }
 
   before :each do
@@ -104,8 +107,8 @@ RSpec.feature "Maintenance windows", type: :feature do
     test_element(:requested_start)
   end
 
-  def requested_end_element
-    test_element(:requested_end)
+  def duration_input_group
+    test_element('duration-input-group')
   end
 
   context 'when user is an admin' do
@@ -131,6 +134,8 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     describe 'maintenance request form' do
+      include ActiveSupport::Testing::TimeHelpers
+
       let! :cluster_case do
         create(:case, cluster: cluster, subject: 'Some case')
       end
@@ -142,6 +147,24 @@ RSpec.feature "Maintenance windows", type: :feature do
       include_examples 'maintenance form error handling', 'request'
       include_examples 'maintenance form initially valid'
 
+      it 'uses correct default values' do
+        a_distant_friday = DateTime.new(2025, 3, 7, 0, 0)
+        following_monday_at_9 = a_distant_friday.advance(days: 3, hours: 9)
+
+        travel_to a_distant_friday do
+          # Visit page again now we have mocked the time so correct default
+          # `requested_start` based on current time is used.
+          visit new_component_maintenance_window_path(component, as: user)
+
+          select cluster_case.subject
+          click_button 'Request Maintenance'
+
+          new_window = cluster_case.maintenance_windows.first
+          expect(new_window.requested_start).to eq following_monday_at_9
+          expect(new_window.duration).to eq 1
+        end
+      end
+
       it 'includes correct Case select label' do
         case_select_label = test_element('case-select-label')
 
@@ -150,17 +173,34 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       it 'can request maintenance in association with any Case for Cluster' do
         select cluster_case.subject
+        fill_in 'Duration', with: 2
         fill_in_datetime_selects 'requested-start', with: valid_requested_start
-        fill_in_datetime_selects 'requested-end', with: valid_requested_end
         click_button 'Request Maintenance'
 
         new_window = cluster_case.maintenance_windows.first
         expect(new_window).to be_requested
         expect(new_window.requested_by).to eq user
+        expect(new_window.duration).to eq 2
         expect(new_window.requested_start).to eq valid_requested_start
-        expect(new_window.requested_end).to eq valid_requested_end
         expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
         expect(find('.alert')).to have_text(/Maintenance requested/)
+      end
+
+      it 're-renders form with error when invalid duration entered' do
+        original_path = current_path
+
+        expect do
+          fill_in 'Duration', with: -1
+          click_button 'Request Maintenance'
+        end.not_to change(MaintenanceWindow, :all)
+
+        expect(current_path).to eq(original_path)
+        expect(
+          find('.alert')
+        ).to have_text(/Unable to request this maintenance/)
+        expect(duration_input_group).to have_css('input.is-invalid')
+        invalid_feedback = duration_input_group.find('.invalid-feedback')
+        expect(invalid_feedback).to have_text('Must be greater than 0')
       end
     end
 

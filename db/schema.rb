@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180323140700) do
+ActiveRecord::Schema.define(version: 20180323182505) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -212,7 +212,6 @@ ActiveRecord::Schema.define(version: 20180323140700) do
     t.string "to", null: false
     t.bigint "user_id"
     t.datetime "requested_start"
-    t.datetime "requested_end"
     t.index ["maintenance_window_id"], name: "index_mwst_on_mw_id"
     t.index ["user_id"], name: "index_maintenance_window_state_transitions_on_user_id"
   end
@@ -229,7 +228,6 @@ ActiveRecord::Schema.define(version: 20180323140700) do
     t.bigint "service_id"
     t.text "state", default: "new", null: false
     t.datetime "requested_start"
-    t.datetime "requested_end"
     t.integer "duration"
     t.index ["case_id"], name: "index_maintenance_windows_on_case_id"
     t.index ["cluster_id"], name: "index_maintenance_windows_on_cluster_id"

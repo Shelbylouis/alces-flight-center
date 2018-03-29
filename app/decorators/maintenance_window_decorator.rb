@@ -27,6 +27,25 @@ class MaintenanceWindowDecorator < ApplicationDecorator
     h.send(path_method, self, associated_model_id_param => associated_model.id)
   end
 
+  def case_attributes(form_action)
+    {
+      class: ['form-control is-valid'],
+      'data-test': 'case-select',
+    }.merge(
+      conditional_attributes(action: form_action, field: 'Case')
+    )
+  end
+
+  def duration_attributes(form_action)
+    {
+      min: 1,
+      class: ["form-control #{bootstrap_valid_class(:duration)}"],
+      required: true,
+    }.merge(
+      conditional_attributes(action: form_action, field: 'duration')
+    )
+  end
+
   private
 
   def scheduled_period_state_indicator
@@ -51,5 +70,16 @@ class MaintenanceWindowDecorator < ApplicationDecorator
 
   def format(date_time)
     date_time.to_formatted_s(:short)
+  end
+
+  def conditional_attributes(action:, field:)
+    if action.confirm?
+      {
+        disabled: true,
+        title: "The #{field} this maintenance has been requested for cannot be changed"
+      }
+    else
+      {}
+    end
   end
 end

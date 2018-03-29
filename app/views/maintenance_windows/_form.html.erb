@@ -3,24 +3,17 @@
   raise "Unknown action: #{action}" unless [:request, :confirm].include?(action)
   action = action.to_s.inquiry
 
-  case_label, conditional_case_attributes =
-    if action.confirm?
-      [
-        'Associated Case',
-        {
-          disabled: true,
-          title: 'The Case this maintenance has been requested for cannot be changed'
-        },
-      ]
-    else
-      ['Case to associate this maintenance with', {}]
-    end
+  case_label = if action.confirm?
+                 'Associated Case'
+               else
+                 'Case to associate this maintenance with'
+               end
 %>
 
 <%= render 'partials/tabs', activate: :maintenance do %>
   <%= form_for maintenance_window,
     url: request.original_fullpath,
-    html: { novalidate: true, class: 'card-body' } do |f| %>
+    html: { class: 'card-body' } do |f| %>
     <%= f.hidden_field :cluster_id %>
     <%= f.hidden_field :component_id %>
     <%= f.hidden_field :service_id %>
@@ -33,20 +26,22 @@
         :id,
         :case_select_details,
         {},
-        {
-          class: ['form-control is-valid'],
-          'data-test': 'case-select',
-        }.merge(conditional_case_attributes)
+        maintenance_window.case_attributes(action)
       ) %>
+    </div>
+
+    <div class="form-group" data-test="duration-input-group">
+      <%= f.label(:duration, 'Duration (in business days)') %>
+      <%= f.number_field(
+        :duration,
+        maintenance_window.duration_attributes(action)
+      ) %>
+      <%= maintenance_window.invalid_feedback_div(:duration) %>
     </div>
 
     <%= render 'partials/date_time_select',
       model: maintenance_window,
       datetime_field_name: 'requested_start'
-    %>
-    <%= render 'partials/date_time_select',
-      model: maintenance_window,
-      datetime_field_name: 'requested_end'
     %>
 
     <%= f.submit "#{action.titlecase} Maintenance",

@@ -1,11 +1,9 @@
 class MaintenanceWindowsController < ApplicationController
+  decorates_assigned :maintenance_window
+
   def new
     @maintenance_window = MaintenanceWindow.new(
-      cluster_id: params[:cluster_id],
-      component_id: params[:component_id],
-      service_id: params[:service_id],
-      requested_start: suggested_requested_start,
-      requested_end: suggested_requested_end,
+      default_maintenance_window_params
     )
   end
 
@@ -52,29 +50,34 @@ class MaintenanceWindowsController < ApplicationController
     :service_id,
     :case_id,
     :requested_start,
-    :requested_end,
+    :duration,
   ].freeze
 
   CONFIRM_PARAM_NAMES = [
     :requested_start,
-    :requested_end,
   ].freeze
 
+  def default_maintenance_window_params
+    {
+      cluster_id: params[:cluster_id],
+      component_id: params[:component_id],
+      service_id: params[:service_id],
+      requested_start: default_requested_start,
+      duration: 1,
+    }
+  end
+
   def request_maintenance_window_params
-    # XXX Get duration from request.
-    params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES).merge(duration: 1)
+    params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES)
   end
 
   def confirm_maintenance_window_params
     params.require(:maintenance_window).permit(CONFIRM_PARAM_NAMES)
   end
 
-  def suggested_requested_start
-    1.day.from_now.at_midnight
-  end
-
-  def suggested_requested_end
-    suggested_requested_start.advance(days: 1)
+  def default_requested_start
+    # Default is 9am on next business day.
+    1.business_day.from_now.at_beginning_of_day.advance(hours: 9)
   end
 
   # XXX if we changed `request` to be accessed at `/request` (rather than

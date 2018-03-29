@@ -63,7 +63,7 @@ module DateTimeSelectHelper
     end
 
     def valid_class
-      model.errors[datetime_field_name].any? ? 'is-invalid' : 'is-valid'
+      model.bootstrap_valid_class(datetime_field_name)
     end
 
     def field_name(select_name)
