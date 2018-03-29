@@ -49,4 +49,6 @@ Rails.application.configure do
 
   # Enable Clearance back door in feature and request specs.
   config.middleware.use Clearance::BackDoor
+
+  config.sso_base_url = 'http://example.com/sso_base_url'
 end
