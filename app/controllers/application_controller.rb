@@ -23,6 +23,34 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
+    clearance_session.current_user || user_from_cookie
+  end
+
+  def signed_in?
+    !current_user.nil?
+  end
+
+  def signed_out?
+    current_user.nil?
+  end
+
+  def sign_in(user, &block)
+    clearance_session.sign_in(user, &block)
+
+    if signed_in? && Clearance.configuration.rotate_csrf_on_sign_in?
+      session.delete(:_csrf_token)
+      form_authenticity_token
+    end
+  end
+
+  def sign_out
+    clearance_session.sign_out
+    cookies.delete('flight_sso', domain: request.host[request.host.index('alces')..-1])
+  end
+
+  private
+
+  def user_from_cookie
     auth_cookie = cookies['flight_sso']
 
     return nil unless auth_cookie.present?
@@ -37,21 +65,6 @@ class ApplicationController < ActionController::Base
 
     end
   end
-
-  def signed_in?
-    !current_user.nil?
-  end
-
-  def signed_out?
-    current_user.nil?
-  end
-
-  def sign_out
-    clearance_session.sign_out
-    cookies.delete('flight_sso', domain: request.host[request.host.index('alces')..-1])
-  end
-
-  private
 
   def clearance_session
     request.env[:clearance]
