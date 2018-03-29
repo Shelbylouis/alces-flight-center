@@ -29,15 +29,16 @@ class MaintenanceWindow < ApplicationRecord
 
     event :request { transition new: :requested }
     event :confirm { transition [:requested, :expired] => :confirmed }
+    event :mandate { transition new: :confirmed }
     event :cancel { transition [:new, :requested, :expired] => :cancelled }
     event :reject { transition [:requested, :expired] => :rejected }
     event :expire { transition [:new, :requested] => :expired }
     event :start { transition confirmed: :started }
     event :end { transition started: :ended }
 
-    after_transition any => any do |model|
+    after_transition any => any do |model, transition|
       # Use send so can keep method private.
-      model.send(:add_transition_comment)
+      model.send(:add_transition_comment, transition.event)
     end
   end
 
@@ -95,9 +96,9 @@ class MaintenanceWindow < ApplicationRecord
 
   delegate :site, to: :case
 
-  def add_transition_comment
+  def add_transition_comment(event)
     unless invalid? || legacy_migration_mode
-      maintenance_notifier.add_transition_comment(state)
+      maintenance_notifier.add_transition_comment(event)
     end
   end
 

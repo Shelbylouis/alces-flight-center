@@ -116,6 +116,33 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
+    RSpec.shared_examples 'it can be mandated' do
+      it 'can be mandated' do
+        user = create(:admin)
+        subject.mandate!(user)
+
+        expect(subject).to be_confirmed
+        expect(subject.confirmed_by).to eq user
+      end
+
+      it 'has RT ticket added when mandated' do
+        subject.component = create(:component, name: 'some_component')
+        user = create(:admin, name: 'some_admin')
+
+        expected_start = subject.requested_start.to_formatted_s(:short)
+        expected_end = subject.expected_end.to_formatted_s(:short)
+        text_regex = Regexp.new <<~EOF.squish
+          Maintenance.*some_component.*scheduled.*from #{expected_start} until
+          #{expected_end} by.*some_admin.*mandatory
+        EOF
+        expect(Case.request_tracker).to receive(
+          :add_ticket_correspondence
+        ).with(id: subject.case.rt_ticket_id, text: text_regex)
+
+        subject.mandate!(user)
+      end
+    end
+
     RSpec.shared_examples 'it can be rejected' do
       it 'can be rejected' do
         user = create(:user)
@@ -187,6 +214,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       it_behaves_like 'it can be cancelled'
       it_behaves_like 'it can be expired'
       it_behaves_like 'it can be requested'
+      it_behaves_like 'it can be mandated'
     end
 
     context 'when requested' do

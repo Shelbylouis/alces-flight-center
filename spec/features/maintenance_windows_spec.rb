@@ -14,7 +14,7 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
     expect(current_path).to eq(original_path)
     expect(
       find('.alert')
-    ).to have_text(/Unable to #{form_action} this maintenance/)
+    ).to have_text("Unable to #{form_action} this maintenance")
     invalidated_selects =
       requested_start_element.all('select', class: 'is-invalid')
     expect(invalidated_selects.length).to eq(5)
@@ -52,7 +52,7 @@ RSpec.shared_examples 'confirmation form' do
   it 'includes correct Case select label' do
     case_select_label = test_element('case-select-label')
 
-    expect(case_select_label).to have_text(/Associated Case/)
+    expect(case_select_label).to have_text('Associated Case')
   end
 
   it 'cannot change duration for requested maintenance' do
@@ -60,6 +60,12 @@ RSpec.shared_examples 'confirmation form' do
 
     expect(duration_input).to be_disabled
     expect(duration_input[:title]).to match(/duration.*cannot be changed/)
+  end
+
+  it 'does not show mandatory maintenance check box' do
+    expect do
+      check 'mandatory'
+    end.to raise_error Capybara::ElementNotFound
   end
 
   it 'can confirm requested maintenance' do
@@ -73,7 +79,7 @@ RSpec.shared_examples 'confirmation form' do
     confirmed_transition = window.transitions.find_by_to(:confirmed)
     expect(confirmed_transition.requested_start).to eq valid_requested_start
     expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
-    expect(find('.alert')).to have_text(/Maintenance confirmed/)
+    expect(find('.alert')).to have_text('Maintenance confirmed')
   end
 end
 
@@ -168,7 +174,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       it 'includes correct Case select label' do
         case_select_label = test_element('case-select-label')
 
-        expect(case_select_label).to have_text(/Case to associate/)
+        expect(case_select_label).to have_text('Case to associate')
       end
 
       it 'can request maintenance in association with any Case for Cluster' do
@@ -183,7 +189,24 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(new_window.duration).to eq 2
         expect(new_window.requested_start).to eq valid_requested_start
         expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
-        expect(find('.alert')).to have_text(/Maintenance requested/)
+        expect(find('.alert')).to have_text('Maintenance requested')
+      end
+
+      it 'can mandate maintenance' do
+        select cluster_case.subject
+        fill_in 'Duration', with: 2
+        fill_in_datetime_selects 'requested-start', with: valid_requested_start
+        check 'mandatory'
+        click_button 'Request Maintenance'
+
+        new_window = cluster_case.maintenance_windows.first
+        expect(new_window).to be_confirmed
+        expect(new_window.confirmed_by).to eq user
+        expect(new_window.duration).to eq 2
+        expect(new_window.requested_start).to eq valid_requested_start
+        expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
+        expect(find('.alert')).to have_text('Maintenance scheduled')
+        expect(page).to have_text(/N\/A.*mandatory maintenance/)
       end
 
       it 're-renders form with error when invalid duration entered' do
@@ -197,7 +220,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(current_path).to eq(original_path)
         expect(
           find('.alert')
-        ).to have_text(/Unable to request this maintenance/)
+        ).to have_text('Unable to request this maintenance')
         expect(duration_input_group).to have_css('input.is-invalid')
         invalid_feedback = duration_input_group.find('.invalid-feedback')
         expect(invalid_feedback).to have_text('Must be greater than 0')
@@ -215,7 +238,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(window).to be_cancelled
       expect(window.cancelled_by).to eq user
       expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
-      expect(find('.alert')).to have_text(/maintenance cancelled/)
+      expect(find('.alert')).to have_text('maintenance cancelled')
     end
 
     it 'cannot see reject button' do
@@ -303,7 +326,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       expect(window).to be_rejected
       expect(window.rejected_by).to eq user
       expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
-      expect(find('.alert')).to have_text(/maintenance rejected/)
+      expect(find('.alert')).to have_text('maintenance rejected')
     end
 
     it 'cannot see cancel button' do
