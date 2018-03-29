@@ -1,7 +1,7 @@
 require 'exceptions'
 
 class ApplicationController < ActionController::Base
-  include Clearance::Authorization
+  include Clearance::Controller
   protect_from_forgery with: :exception
   decorates_assigned :site
 
@@ -22,53 +22,12 @@ class ApplicationController < ActionController::Base
     end.join("\n")
   end
 
-  def current_user
-    clearance_session.current_user || user_from_cookie
-  end
-
-  def signed_in?
-    !current_user.nil?
-  end
-
-  def signed_out?
-    current_user.nil?
-  end
-
-  def sign_in(user, &block)
-    clearance_session.sign_in(user, &block)
-
-    if signed_in? && Clearance.configuration.rotate_csrf_on_sign_in?
-      session.delete(:_csrf_token)
-      form_authenticity_token
-    end
-  end
-
   def sign_out
     clearance_session.sign_out
     cookies.delete('flight_sso', domain: request.host[request.host.index('alces')..-1])
   end
 
   private
-
-  def user_from_cookie
-    auth_cookie = cookies['flight_sso']
-
-    return nil unless auth_cookie.present?
-
-    User.from_jwt_token(auth_cookie).tap do |u|
-
-      if u
-        clearance_session.sign_in(u)
-      else
-        clearance_session.sign_out
-      end
-
-    end
-  end
-
-  def clearance_session
-    request.env[:clearance]
-  end
 
   def set_sentry_raven_context
     if current_user

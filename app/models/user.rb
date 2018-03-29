@@ -55,6 +55,13 @@ class User < ApplicationRecord
     end
   end
 
+  def remember_token
+    # This is only here for testing purposes
+    ::JsonWebToken.encode(
+      { 'email' => email }
+    )
+  end
+
   private
 
   def role_inquiry
