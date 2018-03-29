@@ -44,6 +44,10 @@ class MaintenanceWindowsController < ApplicationController
     transition_window(:cancel)
   end
 
+  def end
+    transition_window(:end)
+  end
+
   private
 
   REQUEST_PARAM_NAMES = [
@@ -102,9 +106,10 @@ class MaintenanceWindowsController < ApplicationController
 
   def transition_window(event)
     window = MaintenanceWindow.find(params[:id])
+    previous_user_facing_state = window.started? ? 'ongoing' : 'requested'
     cluster = window.associated_cluster
     window.public_send("#{event}!", current_user)
-    flash[:success] = "Requested maintenance #{window.state}."
+    flash[:success] = "#{previous_user_facing_state} maintenance #{window.state}.".capitalize
     redirect_back fallback_location: cluster_maintenance_windows_path(cluster)
   end
 

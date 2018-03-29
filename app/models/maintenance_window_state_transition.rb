@@ -22,7 +22,7 @@ class MaintenanceWindowStateTransition < ApplicationRecord
 
   def validate_user_can_initiate
     case event&.to_sym
-    when :request, :mandate, :cancel
+    when :request, :mandate, :cancel, :end
       errors.add(:user, 'must be an admin') unless user&.admin?
     when :reject
       errors.add(:user, 'must be a site contact') unless user&.contact?

@@ -37,7 +37,7 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
         build(:maintenance_window_state_transition, event: event, user: user)
       end
 
-      admin_only_events = [:request, :mandate, :cancel]
+      admin_only_events = [:request, :mandate, :cancel, :end]
       contact_only_events = [:reject]
       any_user_initiated_events = [:confirm]
       automatic_events = [:auto_start, :auto_end, :auto_expire, nil]

@@ -27,14 +27,17 @@ class MaintenanceWindow < ApplicationRecord
     state :cancelled
     state :expired
 
+    end_transition = Proc.new { transition started: :ended }
+
     event :request { transition new: :requested }
     event :confirm { transition [:requested, :expired] => :confirmed }
     event :mandate { transition new: :confirmed }
     event :cancel { transition [:new, :requested, :expired] => :cancelled }
     event :reject { transition [:requested, :expired] => :rejected }
+    event :end, &end_transition
     event :auto_expire { transition [:new, :requested] => :expired }
     event :auto_start { transition confirmed: :started }
-    event :auto_end { transition started: :ended }
+    event :auto_end, &end_transition
 
     after_transition any => any do |model, transition|
       # Use send so can keep method private.
