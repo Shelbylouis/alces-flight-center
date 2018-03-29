@@ -189,6 +189,37 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
 
+    RSpec.shared_examples 'it can be extended' do |current_state|
+      it 'can be extended' do
+        original_state = subject.state
+        admin = create(:admin)
+
+        # Note: this event cannot just be called `extend` as this would clash
+        # with `Object#extend`.
+        subject.extend_duration!(admin)
+
+        expect(subject.state).to eq(original_state)
+      end
+
+      it 'has RT ticket comment added when auto-started' do
+        subject.component = create(:component, name: 'some_component')
+        subject.duration = 5
+
+        expected_start = subject.requested_start.to_formatted_s(:short)
+        expected_end = subject.expected_end.to_formatted_s(:short)
+        text_regex = Regexp.new <<~REGEX.squish
+          #{current_state.capitalize} maintenance of some_component .*
+          extended.*this component.*under maintenance from #{expected_start}
+          until #{expected_end}
+        REGEX
+        expect(Case.request_tracker).to receive(
+          :add_ticket_correspondence
+        ).with(id: subject.case.rt_ticket_id, text: text_regex)
+
+        subject.extend_duration!(create(:admin))
+      end
+    end
+
     RSpec.shared_examples 'it can be auto-ended' do
       it 'can be auto-ended' do
         subject.auto_end!
@@ -254,6 +285,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it_behaves_like 'it can be auto-started'
+      it_behaves_like 'it can be extended', 'scheduled'
     end
 
     context 'when started' do
@@ -263,6 +295,7 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it_behaves_like 'it can be ended'
       it_behaves_like 'it can be auto-ended'
+      it_behaves_like 'it can be extended', 'ongoing'
     end
 
     context 'when expired' do
@@ -436,6 +469,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           :cancel,
           :confirm,
           :end,
+          :extend_duration,
           :mandate,
           :reject,
           :request,

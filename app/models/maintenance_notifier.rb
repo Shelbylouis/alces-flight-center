@@ -51,6 +51,15 @@ MaintenanceNotifier = Struct.new(:window) do
     EOF
   end
 
+  def extend_duration_comment
+    current_state = window.started? ? 'Ongoing' : 'Scheduled'
+    <<~EOF
+      #{current_state} maintenance of #{associated_model.name} has been
+      extended, this #{associated_model.readable_model_name} will now be under
+      maintenance from #{requested_start} until #{expected_end}.
+    EOF
+  end
+
   def end_comment
     "Maintenance of #{associated_model.name} ended by #{window.ended_by.name}."
   end

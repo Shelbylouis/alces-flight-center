@@ -35,6 +35,7 @@ class MaintenanceWindow < ApplicationRecord
     event :cancel { transition [:new, :requested, :expired] => :cancelled }
     event :reject { transition [:requested, :expired] => :rejected }
     event :end, &end_transition
+    event :extend_duration { transition confirmed: :confirmed, started: :started }
     event :auto_expire { transition [:new, :requested] => :expired }
     event :auto_start { transition confirmed: :started }
     event :auto_end, &end_transition
