@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180323182505) do
+ActiveRecord::Schema.define(version: 20180329164959) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -212,6 +212,7 @@ ActiveRecord::Schema.define(version: 20180323182505) do
     t.string "to", null: false
     t.bigint "user_id"
     t.datetime "requested_start"
+    t.integer "duration"
     t.index ["maintenance_window_id"], name: "index_mwst_on_mw_id"
     t.index ["user_id"], name: "index_maintenance_window_state_transitions_on_user_id"
   end

@@ -347,6 +347,17 @@ RSpec.describe MaintenanceWindow, type: :model do
       request_transition = window.transitions.where(event: :request).first
       expect(request_transition.requested_start).to eq(new_requested_start)
     end
+
+    it 'tracks duration in transitions' do
+      window = create(:maintenance_window, duration: 1)
+
+      new_duration = 2
+      window.duration = new_duration
+      window.request!(create(:admin))
+
+      request_transition = window.transitions.where(event: :request).first
+      expect(request_transition.duration).to eq(new_duration)
+    end
   end
 
   describe '#expected_end' do
