@@ -106,7 +106,7 @@ class MaintenanceWindowsController < ApplicationController
 
   def transition_window(event)
     window = MaintenanceWindow.find(params[:id])
-    previous_user_facing_state = window.started? ? 'ongoing' : 'requested'
+    previous_user_facing_state = window.user_facing_state
     cluster = window.associated_cluster
     window.public_send("#{event}!", current_user)
     flash[:success] = "#{previous_user_facing_state} maintenance #{window.state}.".capitalize

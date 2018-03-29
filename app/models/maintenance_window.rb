@@ -91,6 +91,19 @@ class MaintenanceWindow < ApplicationRecord
     duration.business_days.after(requested_start)
   end
 
+  def user_facing_state
+    case state.to_sym
+    when :new, :requested, :expired
+      'requested'
+    when :confirmed
+      'scheduled'
+    when :started
+      'ongoing'
+    when *MaintenanceWindow.finished_states
+      'finished'
+    end
+  end
+
   def method_missing(symbol, *args)
     query = TransitionQuery.parse(symbol)
     query ? query.value_for(self) : super

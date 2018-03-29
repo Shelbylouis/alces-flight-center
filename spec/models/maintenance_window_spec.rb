@@ -375,6 +375,44 @@ RSpec.describe MaintenanceWindow, type: :model do
     end
   end
 
+  describe '#user_facing_state' do
+    it 'handles all possible states' do
+      MaintenanceWindow.possible_states.each do |state|
+        window = create(:maintenance_window, state: state)
+
+        expect(window.user_facing_state).to be_a(String)
+      end
+    end
+
+    [:new, :requested, :expired].each do |state|
+      it "gives 'requested' for `#{state}` maintenance" do
+        window = create(:maintenance_window, state: state)
+
+        expect(window.user_facing_state).to eq('requested')
+      end
+    end
+
+    it "gives 'scheduled' for `confirmed` maintenance" do
+      window = create(:maintenance_window, state: :confirmed)
+
+      expect(window.user_facing_state).to eq('scheduled')
+    end
+
+    it "gives 'ongoing' for `started` maintenance" do
+      window = create(:maintenance_window, state: 'started')
+
+      expect(window.user_facing_state).to eq('ongoing')
+    end
+
+    [:ended, :rejected, :cancelled].each do |state|
+      it "gives 'finished' for `#{state}` maintenance" do
+        window = create(:maintenance_window, state: state)
+
+        expect(window.user_facing_state).to eq('finished')
+      end
+    end
+  end
+
   describe '#method_missing' do
     describe '#*_at' do
       it 'returns time transition occurred for valid state' do
