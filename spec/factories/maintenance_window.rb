@@ -37,7 +37,7 @@ FactoryBot.define do
       state :started
 
       after(:create) do |window|
-        window.end!
+        window.auto_end!
       end
     end
 
@@ -46,7 +46,7 @@ FactoryBot.define do
 
       after(:create) do |window|
         window.requested_start = 2.days.ago.at_midnight
-        window.expire!
+        window.auto_expire!
       end
     end
   end
