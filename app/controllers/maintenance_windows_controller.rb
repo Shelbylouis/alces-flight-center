@@ -44,6 +44,10 @@ class MaintenanceWindowsController < ApplicationController
     transition_window(:cancel)
   end
 
+  def end
+    transition_window(:end)
+  end
+
   private
 
   REQUEST_PARAM_NAMES = [

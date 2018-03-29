@@ -83,6 +83,7 @@ Rails.application.routes.draw do
     resources :maintenance_windows, path: :maintenance, only: [] do
       member do
         post :cancel
+        post :end
       end
     end
 

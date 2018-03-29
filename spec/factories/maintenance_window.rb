@@ -33,6 +33,12 @@ FactoryBot.define do
       end
     end
 
+    factory :started_maintenance_window do
+      state :confirmed
+
+      after(:create, &:auto_start!)
+    end
+
     factory :ended_maintenance_window do
       state :started
 

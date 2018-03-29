@@ -23,6 +23,18 @@
           <td>
             <%= window.transition_info(:confirmed) ||
               render('maintenance_windows/unconfirmed_buttons', window: window) %>
+
+            <% if window.can_end? && current_user.admin? %>
+              <%= button_to 'End ongoing maintenance',
+                end_maintenance_window_path(window),
+                class: ['btn', 'btn-danger', 'btn-block'],
+                data: {
+                  confirm: <<~EOF.squish
+                    Are you sure you want to end this ongoing maintenance?
+                  EOF
+                }
+              %>
+            <% end %>
           </td>
           <td><%= window.case.ticket_link %></td>
         </tr>
