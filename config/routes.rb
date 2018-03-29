@@ -10,14 +10,6 @@ Rails.application.routes.draw do
 
   mount RailsEmailPreview::Engine, at: 'emails' if Rails.env.development?
 
-  get '/reset-password' => 'passwords#new', as: 'passwords'
-  post '/reset-password' => 'passwords#create'
-
-  # URL to complete password reset process. This will cause a user's password
-  # to be changed (given the correct params), but `get` must be used as it will
-  # be reached from an email.
-  get '/reset-password/complete' => 'passwords#reset_complete'
-
   asset_record_view = Proc.new {
     resource :asset_record, path: asset_record_alias, only: :show
   }
@@ -126,12 +118,12 @@ Rails.application.routes.draw do
     # To display a working link to sign users out of the admin dashboard,
     # rails-admin expects a `logout_path` route helper to exist which will sign
     # them out; this declaration defines this.
-    delete :logout, to: 'clearance/sessions#destroy'
+    delete :logout, to: 'sso_sessions#destroy'
   end
 
   constraints Clearance::Constraints::SignedIn.new do
     root 'sites#show'
-    delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
+    delete '/sign_out' => 'sso_sessions#destroy', as: 'sign_out'  # Keeping this one around as it's correctly coupled to SSO
 
     resolved_cases.call(only: [:show, :create]) do
       resources :case_comments, only: :create
@@ -181,8 +173,7 @@ Rails.application.routes.draw do
   end
 
   constraints Clearance::Constraints::SignedOut.new do
-    root 'clearance/sessions#new', as: 'sign_in'
-    post '/' => 'clearance/sessions#create', as: 'session'
+    root 'sso_sessions#new', as: 'sign_in'
   end
 
   # Routes defined here are only defined/used in certain tests which need
