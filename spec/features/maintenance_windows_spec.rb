@@ -91,6 +91,10 @@ RSpec.feature "Maintenance windows", type: :feature do
 
   let :valid_requested_start { DateTime.new(2022, 9, 10, 13, 0) }
 
+  let :reject_button_text { 'Reject' }
+  let :end_button_text { 'End' }
+  let :cancel_button_text { 'Cancel' }
+
   before :each do
     # The only way I can get Capybara to use the correct URL; may be a better
     # way though.
@@ -231,8 +235,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       window = create(:requested_maintenance_window, cluster: cluster)
 
       visit cluster_maintenance_windows_path(cluster, as: user)
-      button_text = 'Cancel'
-      click_button(button_text)
+      click_button(cancel_button_text)
 
       window.reload
       expect(window).to be_cancelled
@@ -245,8 +248,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       window = create(:started_maintenance_window, cluster: cluster)
 
       visit cluster_maintenance_windows_path(cluster, as: user)
-      button_text = 'End'
-      click_button(button_text)
+      click_button(end_button_text)
 
       window.reload
       expect(window).to be_ended
@@ -260,7 +262,7 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       visit cluster_maintenance_windows_path(cluster, as: user)
 
-      expect(page).not_to have_button('End')
+      expect(page).not_to have_button(end_button_text)
     end
 
     it 'cannot see reject button' do
@@ -268,7 +270,7 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       visit cluster_maintenance_windows_path(cluster, as: user)
 
-      expect(page).not_to have_button('Reject')
+      expect(page).not_to have_button(reject_button_text)
     end
   end
 
@@ -340,9 +342,8 @@ RSpec.feature "Maintenance windows", type: :feature do
       )
 
       visit cluster_maintenance_windows_path(cluster, as: user)
-      button_text = 'Reject'
 
-      click_button(button_text)
+      click_button(reject_button_text)
 
       window.reload
       expect(window).to be_rejected
@@ -360,7 +361,7 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       visit cluster_maintenance_windows_path(cluster, as: user)
 
-      expect(page).not_to have_button('Cancel')
+      expect(page).not_to have_button(cancel_button_text)
     end
 
     it 'cannot see end button' do
@@ -372,7 +373,7 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       visit cluster_maintenance_windows_path(cluster, as: user)
 
-      expect(page).not_to have_button('End')
+      expect(page).not_to have_button(end_button_text)
     end
   end
 end
