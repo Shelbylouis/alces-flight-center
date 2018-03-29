@@ -16,8 +16,8 @@ class ComponentGroupDecorator < ApplicationDecorator
 
   def tabs
     [
-      tabs_builder.asset_record,
-      { id: :components, path: h.component_group_components_path(self) }
+      { id: :components, path: h.component_group_components_path(self) },
+      tabs_builder.asset_record
     ]
   end
 end

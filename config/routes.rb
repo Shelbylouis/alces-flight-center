@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   asset_record_alias = 'asset-record'
   component_expansions_alias = 'expansions'
+  component_groups_alias = 'component-groups'
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
@@ -82,7 +83,7 @@ Rails.application.routes.draw do
 
     resources :component_expansions, only: [:destroy]
 
-    resources :component_groups, path: 'component-groups', only: [] do
+    resources :component_groups, path: component_groups_alias, only: [] do
       asset_record_form.call
     end
 
@@ -137,7 +138,8 @@ Rails.application.routes.draw do
       confirm_maintenance_form.call
     end
 
-    resources :component_groups, path: 'component-groups', only: :show do
+    resources :component_groups, path: component_groups_alias, only: [] do
+      get '/', controller: :components, action: :index
       resources :components, only: :index
       asset_record_view.call
     end
