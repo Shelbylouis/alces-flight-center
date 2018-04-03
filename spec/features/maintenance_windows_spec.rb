@@ -300,6 +300,14 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(find('.alert')).to have_text('maintenance duration extended')
       end
     end
+
+    it 'cannot see extend form for non-confirmed/started maintenance' do
+      create(:requested_maintenance_window, cluster: cluster)
+
+      visit cluster_maintenance_windows_path(cluster, as: user)
+
+      expect(page).not_to have_button(extend_button_text)
+    end
   end
 
   context 'when user is contact' do
@@ -402,6 +410,18 @@ RSpec.feature "Maintenance windows", type: :feature do
       visit cluster_maintenance_windows_path(cluster, as: user)
 
       expect(page).not_to have_button(end_button_text)
+    end
+
+    it 'cannot see extend form' do
+      create(
+        :started_maintenance_window,
+        component: component,
+        case: support_case
+      )
+
+      visit cluster_maintenance_windows_path(cluster, as: user)
+
+      expect(page).not_to have_button(extend_button_text)
     end
   end
 end

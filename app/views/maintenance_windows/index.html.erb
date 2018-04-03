@@ -36,20 +36,22 @@
               %>
             <% end %>
 
-            <%= form_tag(
-              extend_maintenance_window_path(window),
-              class: 'form-inline'
-            ) do %>
-              <%= number_field_tag(
-                :additional_days,
-                nil,
-                class: 'form-control',
-                placeholder: 'Additional business days',
-                min: 1,
-                required: true
-              ) %>
+            <% if window.can_extend_duration? && current_user.admin? %>
+              <%= form_tag(
+                extend_maintenance_window_path(window),
+                class: 'form-inline'
+              ) do %>
+                <%= number_field_tag(
+                  :additional_days,
+                  nil,
+                  class: 'form-control',
+                  placeholder: 'Additional business days',
+                  min: 1,
+                  required: true
+                ) %>
 
-              <%= submit_tag('Extend', class: 'btn btn-primary') %>
+                <%= submit_tag('Extend', class: 'btn btn-primary') %>
+              <% end %>
             <% end %>
           </td>
           <td><%= window.case.ticket_link %></td>
