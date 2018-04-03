@@ -23,7 +23,7 @@ class ClusterDecorator < ApplicationDecorator
         path: h.cluster_maintenance_windows_path(self),
         admin_dropdown: [
           {
-            text: 'Existing',
+            text: 'Pending',
             path: h.cluster_maintenance_windows_path(self)
           }, {
             text: 'Request',
@@ -33,9 +33,12 @@ class ClusterDecorator < ApplicationDecorator
       },
       { id: :services, path: h.cluster_services_path(self) },
       {
-        id: :components, path: '', # Path is ignored b/c dropdown
+        id: :components,
         dropdown: self.component_groups_by_type.map(&:name).map do |t|
-          { text: t, path: h.cluster_components_path(self, type: t) }
+          {
+            text: t.pluralize,
+            path: h.cluster_components_path(self, type: t)
+          }
         end.push(text: 'All', path: h.cluster_components_path(self))
       }
     ]

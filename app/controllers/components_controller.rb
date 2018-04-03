@@ -2,7 +2,6 @@ class ComponentsController < ApplicationController
   decorates_assigned :component
 
   def index
-    @table_tile = 'All Components' # Consider removing
     define_variables_from_type
   end
 
@@ -26,7 +25,8 @@ class ComponentsController < ApplicationController
     else
       @scope.component_groups_by_type.find do |group_type|
         group_type.name == type_param[:type]
-      end.component_groups
+      end.tap { |found_group| not_found unless found_group }
+         .component_groups
     end
   end
 

@@ -19,9 +19,15 @@
     <% end %>
   </ul>
   <% site.clusters.each do |cluster| %>
-    <li class='list-group-item list-group-item-action text-center'>
-      <%= link_to "#{cluster.name} - Manage this cluster",
-                  cluster_path(cluster) %>
-    </li>
+    <%= link_to "#{cluster.name}: Manage this cluster",
+                cluster_path(cluster),
+                type: "button",
+                class: [
+                  'list-group-item',
+                  'list-group-item-action',
+                  'text-center',
+                  'text-primary'
+                ]
+    %>
   <% end %>
 <% end %>
