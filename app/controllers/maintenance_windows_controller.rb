@@ -48,6 +48,17 @@ class MaintenanceWindowsController < ApplicationController
     transition_window(:end)
   end
 
+  def extend
+    # XXX duplicated/tweaked from `transition_window`
+    window = MaintenanceWindow.find(params[:id])
+    previous_user_facing_state = window.user_facing_state
+    cluster = window.associated_cluster
+    window.duration += params[:additional_days].to_i
+    window.extend_duration!(current_user)
+    flash[:success] = "#{previous_user_facing_state} maintenance duration extended.".capitalize
+    redirect_back fallback_location: cluster_maintenance_windows_path(cluster)
+  end
+
   private
 
   REQUEST_PARAM_NAMES = [

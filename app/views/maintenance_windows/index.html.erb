@@ -35,6 +35,22 @@
                 }
               %>
             <% end %>
+
+            <%= form_tag(
+              extend_maintenance_window_path(window),
+              class: 'form-inline'
+            ) do %>
+              <%= number_field_tag(
+                :additional_days,
+                nil,
+                class: 'form-control',
+                placeholder: 'Additional business days',
+                min: 1,
+                required: true
+              ) %>
+
+              <%= submit_tag('Extend', class: 'btn btn-primary') %>
+            <% end %>
           </td>
           <td><%= window.case.ticket_link %></td>
         </tr>

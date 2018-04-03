@@ -94,6 +94,7 @@ RSpec.feature "Maintenance windows", type: :feature do
   let :reject_button_text { 'Reject' }
   let :end_button_text { 'End' }
   let :cancel_button_text { 'Cancel' }
+  let :extend_button_text { 'Extend' }
 
   before :each do
     # The only way I can get Capybara to use the correct URL; may be a better
@@ -271,6 +272,33 @@ RSpec.feature "Maintenance windows", type: :feature do
       visit cluster_maintenance_windows_path(cluster, as: user)
 
       expect(page).not_to have_button(reject_button_text)
+    end
+
+    [:confirmed, :started].each do |state|
+      it "can extend #{state} maintenance" do
+        window = create(
+          :maintenance_window,
+          state: state,
+          cluster: cluster,
+          duration: 1
+        )
+        original_duration = window.duration
+
+        visit cluster_maintenance_windows_path(cluster, as: user)
+        fill_in placeholder: 'Additional business days', with: 2
+        click_button extend_button_text
+
+        window.reload
+        expect(window.state.to_sym).to eq state
+        duration_extended_transition =
+          window.transitions.where(event: :extend_duration).last
+        expect(duration_extended_transition.user).to eq user
+        new_duration = window.duration
+        expect(new_duration).to eq(original_duration + 2)
+        expect(duration_extended_transition.duration).to eq(new_duration)
+        expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
+        expect(find('.alert')).to have_text('maintenance duration extended')
+      end
     end
   end
 
