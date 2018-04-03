@@ -95,6 +95,7 @@ Rails.application.routes.draw do
       member do
         post :cancel
         post :end
+        post :extend
       end
     end
 

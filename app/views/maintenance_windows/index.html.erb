@@ -35,6 +35,26 @@
                 }
               %>
             <% end %>
+
+            <% if window.can_extend_duration? && current_user.admin? %>
+              <%= form_tag(
+                extend_maintenance_window_path(window),
+                class: 'form-inline'
+              ) do %>
+                <div class="extend-maintenance-form">
+                  <%= number_field_tag(
+                    :additional_days,
+                    nil,
+                    class: 'form-control extend-maintenance-form__duration-input',
+                    placeholder: 'Additional business days',
+                    min: 1,
+                    required: true
+                  ) %>
+
+                  <%= submit_tag('Extend', class: 'btn btn-success') %>
+                </div>
+              <% end %>
+            <% end %>
           </td>
           <td><%= window.case.ticket_link %></td>
         </tr>

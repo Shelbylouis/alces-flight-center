@@ -16,7 +16,7 @@ class MaintenanceWindow < ApplicationRecord
   attr_accessor :legacy_migration_mode
 
   state_machine initial: :new do
-    audit_trail context: [:user, :requested_start]
+    audit_trail context: [:user, :requested_start, :duration]
 
     state :new
     state :requested
@@ -35,6 +35,7 @@ class MaintenanceWindow < ApplicationRecord
     event :cancel { transition [:new, :requested, :expired] => :cancelled }
     event :reject { transition [:requested, :expired] => :rejected }
     event :end, &end_transition
+    event :extend_duration { transition confirmed: :confirmed, started: :started }
     event :auto_expire { transition [:new, :requested] => :expired }
     event :auto_start { transition confirmed: :started }
     event :auto_end, &end_transition
@@ -88,6 +89,19 @@ class MaintenanceWindow < ApplicationRecord
 
   def expected_end
     duration.business_days.after(requested_start)
+  end
+
+  def user_facing_state
+    case state.to_sym
+    when :new, :requested, :expired
+      'requested'
+    when :confirmed
+      'scheduled'
+    when :started
+      'ongoing'
+    when *MaintenanceWindow.finished_states
+      'finished'
+    end
   end
 
   def method_missing(symbol, *args)

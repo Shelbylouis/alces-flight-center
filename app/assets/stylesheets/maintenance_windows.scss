@@ -1,0 +1,21 @@
+
+.extend-maintenance-form {
+  width: 100%;
+  display: flex;
+
+  input {
+    &:first-child {
+      border-top-right-radius: 0px;
+      border-bottom-right-radius: 0px;
+    }
+
+    &:last-child {
+      border-top-left-radius: 0px;
+      border-bottom-left-radius: 0px;
+    }
+  }
+}
+
+.extend-maintenance-form__duration-input {
+  flex: 1;
+}
