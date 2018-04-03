@@ -18,8 +18,6 @@ RSpec.describe 'Cases table', type: :feature do
     it 'renders table of open Cases' do
       visit path
 
-      expect(page).to have_text(/Open support cases.*#{site.name}/)
-
       cases = all('tr').map(&:text)
       expect(cases).to have_text('Open case')
       expect(cases).not_to have_text('Archived case')
@@ -37,8 +35,8 @@ RSpec.describe 'Cases table', type: :feature do
   context 'when user is contact' do
     let :user { contact }
 
-    context 'when visit site dashboard' do
-      let :path { root_path(as: user) }
+    context 'when visit site cases dashboard' do
+      let :path { cases_path(as: user) }
 
       include_examples 'open cases table rendered'
     end
@@ -71,8 +69,8 @@ RSpec.describe 'Cases table', type: :feature do
   context 'when user is admin' do
     let :user { admin }
 
-    context 'when visit site dashboard' do
-      let :path { site_path(site, as: user) }
+    context 'when visit site cases dashboard' do
+      let :path { site_cases_path(site, as: user) }
 
       # At least for now, want to render open Cases table on Site dashboard the
       # same for both admins as contacts.
@@ -87,7 +85,8 @@ RSpec.describe 'Cases table', type: :feature do
         expect(headings).not_to include('Contact support')
         expect(headings).not_to include('Archive/Restore')
 
-        links = all('a')
+        # Only include links in the table NOT the tab bar
+        links = first('table').all('a')
 
         mailto_links = links.select { |a| a[:href]&.match?('mailto') }
         expect(mailto_links).to eq []

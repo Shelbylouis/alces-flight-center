@@ -13,4 +13,8 @@ class SiteDecorator < ApplicationDecorator
 
     case_form_button(path)
   end
+
+  def tabs
+    [tabs_builder.overview, tabs_builder.cases]
+  end
 end
