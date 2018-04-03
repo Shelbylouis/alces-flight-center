@@ -32,7 +32,7 @@ class ApplicationDecorator < Draper::Decorator
   # entire Cluster, but I don't have a better name for that yet.
   def cluster_part_case_form_buttons
     buttons = [
-      case_form_button(case_form_path, disabled: advice?),
+      case_form_button(new_scope_case_path, disabled: advice?),
       consultancy_form_button(consultancy_form_path)
     ].join
     h.raw(buttons)
@@ -57,7 +57,37 @@ class ApplicationDecorator < Draper::Decorator
     )
   end
 
+  def method_missing(s, *a, **hash, &b)
+    if respond_to_missing?(s, *a) == :scope_path
+      h.send(convert_scope_path(s), *arguments_for_scope_path(a), **hash, &b)
+    else
+      super
+    end
+  end
+
+  def respond_to_missing?(s, *_a)
+    s.match?(/\A(.+_)?scope_(.+_)?path\Z/) ? :scope_path : super
+  end
+
   private
+
+  def convert_scope_path(s)
+    (s.match(/\Ascope_.*/) ? "_#{s}" : s.to_s)
+      .sub(/_scope_/, scope_name_for_paths)
+      .sub(/\A_/, '')
+      .sub(/\Apath\Z/, 'root_path')
+      .to_sym
+  end
+
+  # This method is overridden in the Site decorator
+  def scope_name_for_paths
+    '_' + model.underscored_model_name + '_'
+  end
+
+  # This method is overridden in the Site decorator
+  def arguments_for_scope_path(*a)
+    a.unshift(model)
+  end
 
   def internal_icon
     internal_text = "#{readable_model_name.capitalize} for internal Alces usage"
@@ -99,11 +129,6 @@ class ApplicationDecorator < Draper::Decorator
     h.send(link_helper, self)
   end
 
-  def case_form_path
-    helper = "new_#{readable_model_name}_case_path"
-    h.send(helper, id_key => self.id)
-  end
-
   def consultancy_form_path
     helper = "new_#{readable_model_name}_consultancy_path"
     h.send(helper, id_key => self.id)
@@ -143,6 +168,6 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   def tabs_builder
-    @tabs_builder ||= TabsHelper::TabsBuilder.new(object, h)
+    @tabs_builder ||= TabsHelper::TabsBuilder.new(object)
   end
 end

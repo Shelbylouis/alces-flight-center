@@ -21,12 +21,14 @@ Rails.application.routes.draw do
   asset_record_form = Proc.new do
     resource :asset_record, path: asset_record_alias, only: [:edit, :update]
   end
+
   logs = Proc.new do
     resources :logs, only: :index
   end
   admin_logs = Proc.new do
     resources :logs, only: :create
   end
+
   request_maintenance_form = Proc.new do
     resources :maintenance_windows, path: :maintenance, only: :new do
       collection do
@@ -48,13 +50,21 @@ Rails.application.routes.draw do
     end
   end
 
+  archive_cases = Proc.new do |**params, &block|
+    params[:only] = Array.wrap(params[:only]).concat [:new, :index]
+    resources :cases, **params do
+      collection do
+        get :archives
+      end
+      block.call if block
+    end
+  end
+
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      resources :cases, only: [:new, :index, :show]
+      archive_cases.call(only: :show)
     end
-
-    resources :cases, only: []
 
     resources :clusters, only: []  do
       request_maintenance_form.call
@@ -99,7 +109,7 @@ Rails.application.routes.draw do
     root 'sites#show'
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
-    resources :cases, only: [:new, :index, :show, :create] do
+    archive_cases.call(only: [:show, :create]) do
       member do
         post :archive
         post :restore
@@ -107,7 +117,7 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: :show do
-      resources :cases, only: [:index, :new]
+      archive_cases.call
       resources :services, only: :index
       resources :consultancy, only: :new
       resources :maintenance_windows, path: :maintenance, only: :index
@@ -117,7 +127,7 @@ Rails.application.routes.draw do
     end
 
     resources :components, only: :show do
-      resources :cases, only: [:index, :new]
+      archive_cases.call
       resources :consultancy, only: :new
       resources :component_expansions,
                 path: component_expansions_alias,
@@ -133,7 +143,7 @@ Rails.application.routes.draw do
     end
 
     resources :services, only: :show do
-      resources :cases, only: [:index, :new]
+      archive_cases.call
       resources :consultancy, only: :new
       confirm_maintenance_form.call
     end

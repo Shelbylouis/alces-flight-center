@@ -1,12 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe TabsHelper::TabsBuilder do
-  # Sets up a TabsBuilder with mocked user
-  let :mocked_helper { helper }
   before :each do
-    allow(mocked_helper).to receive(:current_user).and_return(user)
+    allow(helper).to receive(:current_user).and_return(user)
   end
-  let :tab_builder { TabsHelper::TabsBuilder.new(scope, mocked_helper) }
+  let :tab_builder { TabsHelper::TabsBuilder.new(scope) }
 
   describe '#cases' do
     subject { tab_builder.cases[:dropdown].map { |h| h[:path] } }

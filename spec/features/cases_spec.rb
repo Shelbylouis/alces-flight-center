@@ -43,7 +43,7 @@ RSpec.describe 'Cases table', type: :feature do
 
     context 'when visit archive cases page' do
       it 'renders table of all Cases' do
-        visit cases_path(archive: true, as: user)
+        visit archives_cases_path(as: user)
 
         cases = all('tr').map(&:text)
         expect(cases).to have_text('Open case')
@@ -79,7 +79,7 @@ RSpec.describe 'Cases table', type: :feature do
 
     context 'when visit archive cases page' do
       it 'renders table of all Cases, without Contact-specific buttons/info' do
-        visit site_cases_path(site, archive: true, as: user)
+        visit archives_site_cases_path(site, as: user)
 
         headings = all('th').map(&:text)
         expect(headings).not_to include('Contact support')
@@ -120,7 +120,7 @@ RSpec.describe 'Cases table', type: :feature do
 
           # Neither Case's ticket has reached completion status yet so both
           # should have reloaded RT ticket status.
-          visit site_cases_path(site, archive: true, as: user)
+          visit archives_site_cases_path(site, as: user)
           expect(open_case.reload.last_known_ticket_status).to eq 'open'
           expect(archived_case.reload.last_known_ticket_status).to eq completion_status
 
@@ -130,7 +130,7 @@ RSpec.describe 'Cases table', type: :feature do
 
           # Archived Case has reached completion status so ticket status is not
           # reloaded.
-          visit site_cases_path(site, archive: true, as: user)
+          visit archives_site_cases_path(site, as: user)
           expect(open_case.reload.last_known_ticket_status).to eq 'open'
           expect(archived_case.reload.last_known_ticket_status).to eq completion_status
 
