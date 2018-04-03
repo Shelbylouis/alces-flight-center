@@ -11,6 +11,15 @@ module AlcesFlightCenter
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
 
+    # Use our local time zone whenever we work with/display times in app; no
+    # matter where users are we want to use and for them to see the schedule
+    # that we operate on.
+    config.time_zone = 'London'
+
+    # Still save everything in UTC; should make things more straightforward if
+    # we ever want to handle times in other time zones in future.
+    config.active_record.default_timezone = :utc
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
