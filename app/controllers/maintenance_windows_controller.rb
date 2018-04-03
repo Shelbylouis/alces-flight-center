@@ -49,14 +49,12 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def extend
-    # XXX duplicated/tweaked from `transition_window`
-    window = MaintenanceWindow.find(params[:id])
-    previous_user_facing_state = window.user_facing_state
-    cluster = window.associated_cluster
-    window.duration += params[:additional_days].to_i
-    window.extend_duration!(current_user)
-    flash[:success] = "#{previous_user_facing_state} maintenance duration extended.".capitalize
-    redirect_back fallback_location: cluster_maintenance_windows_path(cluster)
+    transition_window(
+      :extend_duration,
+      new_state_message: 'duration extended'
+    ) do |window|
+      window.duration += params[:additional_days].to_i
+    end
   end
 
   private
@@ -115,12 +113,19 @@ class MaintenanceWindowsController < ApplicationController
     action.to_s.gsub(/e$/, '') + 'ed'
   end
 
-  def transition_window(event)
+  def transition_window(event, new_state_message: nil)
     window = MaintenanceWindow.find(params[:id])
     previous_user_facing_state = window.user_facing_state
     cluster = window.associated_cluster
+
+    yield window if block_given?
     window.public_send("#{event}!", current_user)
-    flash[:success] = "#{previous_user_facing_state} maintenance #{window.state}.".capitalize
+
+    flash[:success] = [
+      previous_user_facing_state,
+      'maintenance',
+      new_state_message || window.state,
+    ].join(' ').capitalize
     redirect_back fallback_location: cluster_maintenance_windows_path(cluster)
   end
 
