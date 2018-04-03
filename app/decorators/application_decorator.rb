@@ -79,12 +79,12 @@ class ApplicationDecorator < Draper::Decorator
       .to_sym
   end
 
-  # This method is overridden in the Site decorator
+  # Override this method for non-standard scope names/ paths
   def scope_name_for_paths
     '_' + model.underscored_model_name + '_'
   end
 
-  # This method is overridden in the Site decorator
+  # Override this method for non-standard scope names/ paths
   def arguments_for_scope_path(*a)
     a.unshift(model)
   end
