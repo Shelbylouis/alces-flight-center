@@ -48,7 +48,7 @@
         <div class='form-group'>
           <%= f.label :case_ids, 'Related Ticket(s)' %>
           <%= f.collection_select :case_ids,
-                                  @cases.decorate,
+                                  @cases.active.decorate,
                                   :id,
                                   :case_select_details,
                                   {},

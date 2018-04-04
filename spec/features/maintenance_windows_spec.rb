@@ -230,6 +230,23 @@ RSpec.feature "Maintenance windows", type: :feature do
         invalid_feedback = duration_input_group.find('.invalid-feedback')
         expect(invalid_feedback).to have_text('Must be greater than 0')
       end
+
+      it 'cannot select archived Case for Cluster to associate' do
+        archived_case = create(
+          :case,
+          cluster: cluster,
+          subject: 'archived_case',
+          archived: true
+        )
+
+        # Revisit the page so given Case would be shown, if we do not
+        # successfully filter it out, to avoid false positive.
+        visit current_path
+
+        expect do
+          select archived_case.subject
+        end.to raise_error(Capybara::ElementNotFound)
+      end
     end
 
     it 'can cancel requested maintenance' do

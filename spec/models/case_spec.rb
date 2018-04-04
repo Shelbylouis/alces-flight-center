@@ -201,6 +201,18 @@ RSpec.describe Case, type: :model do
     end
   end
 
+  describe '#active' do
+    it 'returns all non-archived Cases' do
+      create(:case, details: 'one', archived: false)
+      create(:case, details: 'two', archived: true)
+      create(:case, details: 'three', archived: false)
+
+      active_cases = Case.active
+
+      expect(active_cases.map(&:details)).to match_array(['one', 'three'])
+    end
+  end
+
   describe '#mailto_url' do
     it 'creates correct mailto URL' do
       cluster = create(:cluster, name: 'somecluster')
