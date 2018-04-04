@@ -55,6 +55,8 @@ class Case < ApplicationRecord
   # if this is possible but it was not explicitly passed.
   before_validation :create_rt_ticket, on: :create
 
+  scope :active, -> { where(archived: false) }
+
   def self.request_tracker
     # Note: `rt_interface_class` is a string which we `constantize`, rather
     # than a constant directly, otherwise Rails autoloading in development
