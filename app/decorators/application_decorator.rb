@@ -35,7 +35,7 @@ class ApplicationDecorator < Draper::Decorator
       case_form_button(new_scope_case_path, disabled: advice?),
       consultancy_form_button(consultancy_form_path)
     ].join
-    h.raw(buttons)
+    h.raw("<div class='btn-group d-flex w-100' role='group'>#{buttons}</div>")
   end
 
   # Override this method to generate the tab bars
@@ -146,7 +146,7 @@ class ApplicationDecorator < Draper::Decorator
       may only request consultancy support from Alces Software.
     EOF
 
-    card_header_button_link 'Create new support case',
+    tab_top_button_link 'Create new support case',
       path,
       buttonClass: 'btn-primary',
       disabled: disabled,
@@ -154,19 +154,17 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   def consultancy_form_button(path)
-    card_header_button_link 'Request consultancy',
+    tab_top_button_link 'Request consultancy',
       path,
       buttonClass: 'btn-danger'
   end
 
-  def card_header_button_link(text, path, buttonClass:, disabled: false, title: nil)
-    link = h.link_to text,
+  def tab_top_button_link(text, path, buttonClass:, disabled: false, title: nil)
+    h.link_to text,
       path,
-      class: ['nav-link', 'btn', buttonClass, disabled ? 'disabled' : nil],
+      class: ['btn w-100', buttonClass, disabled ? 'disabled' : nil],
       role: 'button',
       title: title
-
-    h.raw("<li class=\"nav-item\" title=\"#{title}\">#{link}</li>")
   end
 
   def tabs_builder
