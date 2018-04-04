@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.describe Component, type: :model do
   include_examples 'inheritable_support_type'
-  include_examples 'maintenance_windows'
 
   describe '#case_form_json' do
     subject do

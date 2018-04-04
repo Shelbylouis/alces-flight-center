@@ -1,0 +1,69 @@
+<% content_for :subtitle { 'Logs' } %>
+<%= render 'partials/tabs', activate: :logs do %>
+  <div class='table-responsive'>
+    <table class='table'>
+      <thead>
+        <th>Date Created</th>
+        <th>Engineer</th>
+        <th>Details</th>
+        <th>Related Ticket(s)</th>
+      </thead>
+      <% @logs.each do |log| %>
+        <tr>
+          <td><%= log.created_at.to_formatted_s(:long) %></td>
+          <td><%= log.engineer.name %></td>
+          <td><%= log.details %></td>
+          <td>
+            <% log.cases.map(&:decorate).each do |kase| %>
+              <%= kase.ticket_link %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+<% end %>
+
+<% if current_user.admin? %>
+  <div class='card'>
+    <%= render 'partials/card_header_nav', title: 'Add Log' %>
+    <div class='card-body table-responsive'>
+      <% log_type = (@component ? :component : :cluster) %>
+      <%= form_for [log_type, @new_log] do |f| %>
+        <div class='form-group'>
+          <%= f.label :details, 'Details'%>
+          <%= f.text_area :details, class: 'form-control'%>
+        </div>
+        <% if @components %>
+          <div class='form-group'>
+            <%= f.label :component, 'Component (optional)' %>
+            <%= f.collection_select :component_id,
+                                    @components,
+                                    :id,
+                                    :name,
+                                    { include_blank: true },
+                                    { class: 'form-control' } %>
+          </div>
+        <% end %>
+        <div class='form-group'>
+          <%= f.label :case_ids, 'Related Ticket(s)' %>
+          <%= f.collection_select :case_ids,
+                                  @cases.active.decorate,
+                                  :id,
+                                  :case_select_details,
+                                  {},
+                                  {
+                                    multiple: true,
+                                    class: 'form-control',
+                                    style: 'overflow:scroll',
+                                    size: 10
+                                  } %>
+        </div>
+        <div class='form-group'>
+          <%= f.submit 'Submit', class: dark_button_classes %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+

@@ -10,8 +10,8 @@ IFS=$'\n\t'
 # 1. locally: run
 # `scp bin/backup-database ubuntu@apps.alces-flight.com:/home/ubuntu/flight-center-backup-database`;
 #
-# 2. on server: ensure crontab contains the following line:
-# `0 */3 * * * /home/ubuntu/flight-center-backup-database`.
+# 2. on server: ensure crontab contains a line to run this script, as specified
+# in docs/release-process.md.
 
 APP_NAME='flight-center'
 BACKUPS_S3_URL='s3://alces-flight-center/backups'
@@ -28,7 +28,7 @@ main() {
   backup_url="$BACKUPS_S3_URL/$backup_file"
 
   echo 'Dumping database...'
-  dokku run "$APP_NAME" pg_dump -d "$database_url" > "$backup_file"
+  dokku --rm run "$APP_NAME" pg_dump -d "$database_url" > "$backup_file"
 
   echo "Uploading database dump to '$backup_url'..."
   AWS_ACCESS_KEY_ID="$access_key" \

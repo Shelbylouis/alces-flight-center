@@ -1,0 +1,62 @@
+
+<%
+  raise "Unknown action: #{action}" unless [:request, :confirm].include?(action)
+  action = action.to_s.inquiry
+
+  case_label = if action.confirm?
+                 'Associated Case'
+               else
+                 'Case to associate this maintenance with'
+               end
+%>
+
+<%= render 'partials/tabs', activate: :maintenance do %>
+  <%= form_for maintenance_window,
+    url: request.original_fullpath,
+    html: { class: 'card-body' } do |f| %>
+    <%= f.hidden_field :cluster_id %>
+    <%= f.hidden_field :component_id %>
+    <%= f.hidden_field :service_id %>
+
+    <div class="form-group">
+      <%= f.label :case_id, case_label, 'data-test': 'case-select-label' %>
+      <%= f.collection_select(
+        :case_id,
+        maintenance_window.associated_cluster.cases.active.order(created_at: :desc).decorate,
+        :id,
+        :case_select_details,
+        {},
+        maintenance_window.case_attributes(action)
+      ) %>
+    </div>
+
+    <div class="form-group" data-test="duration-input-group">
+      <%= f.label(:duration, 'Duration (in business days)') %>
+      <%= f.number_field(
+        :duration,
+        maintenance_window.duration_attributes(action)
+      ) %>
+      <%= maintenance_window.invalid_feedback_div(:duration) %>
+    </div>
+
+    <%= render 'partials/date_time_select',
+      model: maintenance_window,
+      datetime_field_name: 'requested_start'
+    %>
+
+    <% if action.request? %>
+      <div class="form-group">
+        <%= check_box_tag 'mandatory'%>
+        <%= label_tag 'mandatory', 'Mark this maintenance as mandatory'%>
+        <small class="form-text text-muted">
+          Mandatory maintenance is automatically scheduled and bypasses the usual
+          user confirmation process.
+        </small>
+      </div>
+    <% end %>
+
+    <%= f.submit "#{action.titlecase} Maintenance",
+      class: 'btn btn-primary btn-block'
+    %>
+  <% end %>
+<% end %>

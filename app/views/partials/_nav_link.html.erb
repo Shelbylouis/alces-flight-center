@@ -1,0 +1,35 @@
+<%
+  # Variable definitions for the template
+  dropdown ||= false
+  path ||= (dropdown ? '' : model)
+  text ||= model.name
+  nav_icon ||= ''
+  classes ||= false
+  # TODO: Remove this and replace dropdown with buttons
+  if current_user.admin? && (admin_dropdown ||= false)
+    dropdown = admin_dropdown
+  end
+
+  link_options = {}.tap do |opt|
+    opt[:'data-toggle'] = 'dropdown' if dropdown
+    opt[:class] = ['nav-link'].tap do |class_arr|
+      class_arr << 'nav-link--active' if active
+      class_arr << 'dropdown-toggle' if dropdown
+      class_arr << classes if classes
+    end.flatten.join(' ')
+  end
+%>
+
+<li class='nav-item<%= ' dropdown' if dropdown %>'>
+  <%= link_to icon_span(text, nav_icon), path, link_options %>
+  <% if dropdown %>
+    <div class='dropdown-menu'>
+      <% dropdown.each do |dropitem| %>
+        <%= link_to dropitem[:text],
+                    dropitem[:path],
+                    class: 'dropdown-item' %>
+      <% end %>
+    </div>
+  <% end %>
+</li>
+

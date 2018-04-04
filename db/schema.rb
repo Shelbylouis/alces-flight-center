@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180209125114) do
+ActiveRecord::Schema.define(version: 20180329164959) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,9 +72,9 @@ ActiveRecord::Schema.define(version: 20180209125114) do
     t.index ["user_id"], name: "index_cases_on_user_id"
   end
 
-  create_table "cases_cluster_logs", id: false, force: :cascade do |t|
+  create_table "cases_logs", id: false, force: :cascade do |t|
     t.bigint "case_id", null: false
-    t.bigint "cluster_log_id", null: false
+    t.bigint "log_id", null: false
   end
 
   create_table "categories", force: :cascade do |t|
@@ -82,16 +82,6 @@ ActiveRecord::Schema.define(version: 20180209125114) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "cluster_logs", force: :cascade do |t|
-    t.text "details", null: false
-    t.bigint "cluster_id", null: false
-    t.bigint "user_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["cluster_id"], name: "index_cluster_logs_on_cluster_id"
-    t.index ["user_id"], name: "index_cluster_logs_on_user_id"
   end
 
   create_table "clusters", force: :cascade do |t|
@@ -201,22 +191,51 @@ ActiveRecord::Schema.define(version: 20180209125114) do
     t.index ["service_type_id"], name: "index_issues_on_service_type_id"
   end
 
+  create_table "logs", force: :cascade do |t|
+    t.text "details", null: false
+    t.bigint "cluster_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "component_id"
+    t.index ["cluster_id"], name: "index_logs_on_cluster_id"
+    t.index ["component_id"], name: "index_logs_on_component_id"
+    t.index ["user_id"], name: "index_logs_on_user_id"
+  end
+
+  create_table "maintenance_window_state_transitions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "maintenance_window_id", null: false
+    t.string "namespace"
+    t.string "event"
+    t.string "from"
+    t.string "to", null: false
+    t.bigint "user_id"
+    t.datetime "requested_start"
+    t.integer "duration"
+    t.index ["maintenance_window_id"], name: "index_mwst_on_mw_id"
+    t.index ["user_id"], name: "index_maintenance_window_state_transitions_on_user_id"
+  end
+
   create_table "maintenance_windows", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "ended_at"
-    t.bigint "user_id", null: false
+    t.datetime "ended_at_legacy"
+    t.bigint "requested_by_id_legacy"
     t.bigint "case_id", null: false
-    t.bigint "confirmed_by_id"
+    t.bigint "confirmed_by_id_legacy"
     t.bigint "cluster_id"
     t.bigint "component_id"
     t.bigint "service_id"
+    t.text "state", default: "new", null: false
+    t.datetime "requested_start"
+    t.integer "duration"
     t.index ["case_id"], name: "index_maintenance_windows_on_case_id"
     t.index ["cluster_id"], name: "index_maintenance_windows_on_cluster_id"
     t.index ["component_id"], name: "index_maintenance_windows_on_component_id"
-    t.index ["confirmed_by_id"], name: "index_maintenance_windows_on_confirmed_by_id"
+    t.index ["confirmed_by_id_legacy"], name: "index_maintenance_windows_on_confirmed_by_id_legacy"
+    t.index ["requested_by_id_legacy"], name: "index_maintenance_windows_on_requested_by_id_legacy"
     t.index ["service_id"], name: "index_maintenance_windows_on_service_id"
-    t.index ["user_id"], name: "index_maintenance_windows_on_user_id"
   end
 
   create_table "service_types", force: :cascade do |t|
@@ -288,12 +307,15 @@ ActiveRecord::Schema.define(version: 20180209125114) do
   add_foreign_key "expansions", "expansion_types"
   add_foreign_key "issues", "categories"
   add_foreign_key "issues", "service_types"
+  add_foreign_key "logs", "components"
+  add_foreign_key "maintenance_window_state_transitions", "maintenance_windows"
+  add_foreign_key "maintenance_window_state_transitions", "users"
   add_foreign_key "maintenance_windows", "cases"
   add_foreign_key "maintenance_windows", "clusters"
   add_foreign_key "maintenance_windows", "components"
   add_foreign_key "maintenance_windows", "services"
-  add_foreign_key "maintenance_windows", "users"
-  add_foreign_key "maintenance_windows", "users", column: "confirmed_by_id"
+  add_foreign_key "maintenance_windows", "users", column: "confirmed_by_id_legacy"
+  add_foreign_key "maintenance_windows", "users", column: "requested_by_id_legacy"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
   add_foreign_key "users", "sites"

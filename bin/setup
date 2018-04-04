@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'pathname'
 require 'fileutils'
+
 include FileUtils
 
 APP_ROOT = Pathname.new File.expand_path('../../', __FILE__)
@@ -36,7 +37,25 @@ chdir APP_ROOT do
   puts "\n== Restarting application server =="
   system! 'bin/rails restart'
 
+  # This is required for `word_wrap` below, but must occur after the `bundle
+  # install` above otherwise it will fail the first time this script it run.
+  require 'action_view'
+  include ActionView::Helpers::TextHelper
+
   puts "\n== Next steps! =="
-  puts '1. In development you may want to run `bin/rails db:seed` to create some useful seed data.'
-  puts '2. Update this script to document or fix anything which broke or you had trouble with.'
+  next_steps = [
+    <<~EOF,
+      You will probably want to run `rails
+      alces:data:import_and_migrate_production` to give you a local development
+      database as close to production as possible.
+    EOF
+    <<~EOF,
+      Update this script to document or fix anything which broke or you had
+      trouble with.
+    EOF
+  ]
+  next_steps.each_with_index do |step, index|
+    formatted_step = word_wrap("#{index + 1}. #{step.squish}")
+    puts formatted_step
+  end
 end

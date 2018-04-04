@@ -32,13 +32,64 @@ class ApplicationDecorator < Draper::Decorator
   # entire Cluster, but I don't have a better name for that yet.
   def cluster_part_case_form_buttons
     buttons = [
-      case_form_button(case_form_path, disabled: advice?),
+      case_form_button(new_scope_case_path, disabled: advice?),
       consultancy_form_button(consultancy_form_path)
     ].join
-    h.raw(buttons)
+    h.raw("<div class='btn-group d-flex w-100' role='group'>#{buttons}</div>")
+  end
+
+  # Override this method to generate the tab bars
+  def tabs
+    []
+  end
+
+  def bootstrap_valid_class(field_name)
+    errors[field_name].any? ? 'is-invalid' : 'is-valid'
+  end
+
+  def invalid_feedback_div(field_name)
+    h.raw(
+      [
+        '<div class="invalid-feedback">',
+        errors[field_name].join('; ').capitalize,
+        '</div>',
+      ].join
+    )
+  end
+
+  def method_missing(s, *a, **hash, &b)
+    if respond_to_missing?(s, *a) == :scope_path
+      h.send(convert_scope_path(s), *arguments_for_scope_path(a), **hash, &b)
+    else
+      super
+    end
+  end
+
+  def respond_to_missing?(s, *_a)
+    s.match?(/\A(.+_)?scope_(.+_)?path\Z/) ? :scope_path : super
   end
 
   private
+
+  def convert_scope_path(s)
+    name_for_path = scope_name_for_paths.dup.tap do |name|
+      name << '_' if name.present?
+    end
+    s.to_s
+     .sub(/((.+_)?)scope_/, '\1' + name_for_path)
+     .sub(/\Apath\Z/, 'root_path')
+     .to_sym
+  end
+
+  # Override this method for non-standard scope names/ paths
+  def scope_name_for_paths
+    model.underscored_model_name
+  end
+
+  # Override this method for non-standard scope names/ paths
+  def arguments_for_scope_path(*a)
+    a.unshift(model)
+  end
 
   def internal_icon
     internal_text = "#{readable_model_name.capitalize} for internal Alces usage"
@@ -56,29 +107,28 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   def maintenance_icon(window)
-    return if window.ended?
-
-    if window.awaiting_confirmation?
-      classNames = 'faded-icon'
+    case window.state.to_sym
+    when :requested
+      class_names = 'faded-icon'
       title_base = "Maintenance has been requested for #{name}"
-    elsif window.under_maintenance?
-      classNames = nil
+    when :confirmed
+      class_names = 'faded-icon'
+      title_base = "Maintenance is scheduled for #{name}"
+    when :started
+      class_names = nil
       title_base = "#{name} currently under maintenance"
+    else
+      return
     end
 
     title = "#{title_base} for ticket #{window.case.rt_ticket_id}"
 
-    h.icon('wrench', inline: true, class: classNames, title: title)
+    h.icon('wrench', inline: true, class: class_names, title: title)
   end
 
   def new_maintenance_window_path
     link_helper = "new_#{readable_model_name}_maintenance_window_path"
     h.send(link_helper, self)
-  end
-
-  def case_form_path
-    helper = "new_#{readable_model_name}_case_path"
-    h.send(helper, id_key => self.id)
   end
 
   def consultancy_form_path
@@ -96,7 +146,7 @@ class ApplicationDecorator < Draper::Decorator
       may only request consultancy support from Alces Software.
     EOF
 
-    card_header_button_link 'Create new support case',
+    tab_top_button_link 'Create new support case',
       path,
       buttonClass: 'btn-primary',
       disabled: disabled,
@@ -104,18 +154,20 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   def consultancy_form_button(path)
-    card_header_button_link 'Request consultancy',
+    tab_top_button_link 'Request consultancy',
       path,
       buttonClass: 'btn-danger'
   end
 
-  def card_header_button_link(text, path, buttonClass:, disabled: false, title: nil)
-    link = h.link_to text,
+  def tab_top_button_link(text, path, buttonClass:, disabled: false, title: nil)
+    h.link_to text,
       path,
-      class: ['nav-link', 'btn', buttonClass, disabled ? 'disabled' : nil],
+      class: ['btn w-100', buttonClass, disabled ? 'disabled' : nil],
       role: 'button',
       title: title
+  end
 
-    h.raw("<li class=\"nav-item\" title=\"#{title}\">#{link}</li>")
+  def tabs_builder
+    @tabs_builder ||= TabsHelper::TabsBuilder.new(object)
   end
 end

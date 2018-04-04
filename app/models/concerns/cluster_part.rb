@@ -2,7 +2,6 @@
 module ClusterPart
   extend ActiveSupport::Concern
 
-  include HasMaintenanceWindows
   include HasSupportType
 
   SUPPORT_TYPES = SupportType::VALUES + ['inherit']

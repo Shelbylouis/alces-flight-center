@@ -1,5 +1,5 @@
-
-<div class="card">
+<% content_for :subtitle { 'Edit/Update/Delete Expansions' } %>
+<%= render 'partials/tabs', activate: :expansions do %>
   <%= render('partials/card_header_nav', title: 'New Expansion') %>
   <div class='card-block'>
     <% form_opts = {
@@ -31,10 +31,13 @@
       </div>
     <% end %>
   </div>
-</div>
 
-<div class="card">
   <%= render 'partials/card_header_nav', title: 'Existing Expansions' %>
-  <%= render 'partials/expansion_table', model: @cluster_part,  action: 'edit' %>
-</div>
-
+  <% submit_path = component_component_expansion_path @cluster_part %>
+  <%= form_tag submit_path, method: 'PATCH' do %>
+    <%= render 'partials/expansion_table', model: @cluster_part,  action: 'edit' %>
+    <%= render 'partials/card_table_footer' do %>
+      <%= submit_tag 'Submit', class: dark_button_classes %>
+    <% end %>
+  <% end %>
+<% end %>

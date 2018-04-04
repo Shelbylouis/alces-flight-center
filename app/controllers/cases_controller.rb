@@ -3,25 +3,22 @@ class CasesController < ApplicationController
 
   decorates_assigned :site
 
-  def index
+  def index(archive: false)
     @site = current_site
-    @title = if current_user.admin?
-               'Manage support cases'
-             else
-               'Support case archive'
-             end
-
+    @archive = archive
     current_site.cases.map(&:update_ticket_status!) if current_user.admin?
+  end
+
+  def archives
+    index(archive: true)
+    render :index
   end
 
   def show
     @case = Case.find(params[:id]).decorate
-    @title = "Support case: #{@case.subject}"
   end
 
   def new
-    @title = "Create new support case"
-
     cluster_id = params[:cluster_id]
     component_id = params[:component_id]
     service_id = params[:service_id]
@@ -35,7 +32,7 @@ class CasesController < ApplicationController
                   [@single_part.cluster]
                 else
                   current_site.clusters
-    end
+                end
   end
 
   def create
@@ -79,18 +76,6 @@ class CasesController < ApplicationController
       archived: false,
       success_flash: 'Support case restored from archive.'
     )
-  end
-
-  def request_maintenance_window
-    support_case = Case.find(params[:id])
-    support_case.request_maintenance_window!(requestor: current_user)
-    redirect_to site_cases_path(support_case.site)
-  end
-
-  def end_maintenance_window
-    support_case = Case.find(params[:id])
-    support_case.end_maintenance_window!
-    redirect_to site_cases_path(support_case.site)
   end
 
   private

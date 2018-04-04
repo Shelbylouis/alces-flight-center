@@ -5,7 +5,7 @@ class CaseDecorator < ApplicationDecorator
     [
       "RT ticket #{rt_ticket_id}",
       created_at.to_formatted_s(:long),
-      issue_details,
+      subject,
       associated_model.name,
       "Created by #{user.name}"
     ].join(' | ')
@@ -17,6 +17,10 @@ class CaseDecorator < ApplicationDecorator
 
   def rt_ticket_url
     "http://helpdesk.alces-software.com/rt/Ticket/Display.html?id=#{rt_ticket_id}"
+  end
+
+  def ticket_link
+    h.link_to(rt_ticket_id, h.case_path(self))
   end
 
   def chargeable_symbol
@@ -31,12 +35,5 @@ class CaseDecorator < ApplicationDecorator
     else
       'N/A'
     end
-  end
-
-  private
-
-  def issue_details
-    category_prefix = category ? "#{category.name} - " : ''
-    category_prefix + issue.name
   end
 end

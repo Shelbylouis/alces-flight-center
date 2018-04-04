@@ -11,9 +11,6 @@ require 'webmock/rspec'
 require 'email_spec'
 require 'email_spec/rspec'
 
-# Load all shared examples.
-Dir[Rails.root.join('spec/shared_examples/**/*.rb')].each {|f| require f}
-
 # Load spec support files.
 Dir[Rails.root.join('spec/support/**/*.rb')].each {|f| require f}
 
@@ -41,6 +38,29 @@ ActiveRecord::Migration.maintain_test_schema!
 VCR.configure do |config|
   config.cassette_library_dir = 'fixtures/vcr_cassettes'
   config.hook_into :webmock
+end
+
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :rails
+  end
+end
+
+# Custom Capybara selector to find element with given `data-test` attribute;
+# useful for finding elements in tests without needing to look for parts of UI
+# which are more likely to change, or needing to add classes/ids etc. which are
+# only for use in tests. Relevant:
+# https://blog.kentcdodds.com/making-your-ui-tests-resilient-to-change-d37a6ee37269.
+Capybara.add_selector(:test_element) do
+  xpath do |element|
+    XPath.descendant[XPath.attr(:'data-test') == element.to_s]
+  end
+end
+
+# Convenience function to use above.
+def test_element(data_test_value)
+  find(:test_element, data_test_value)
 end
 
 RSpec.configure do |config|

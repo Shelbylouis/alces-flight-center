@@ -1,17 +1,6 @@
+<% content_for :subtitle { 'Overview' } %>
 
-<%= render 'cases/cases_table', model: site, archive: false %>
-
-<div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          <%= site.name %> overview
-        </span>
-      </li>
-    </ul>
-  </div>
-
+<%= render 'partials/tabs', activate: :overview do %>
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
       <%= site.rendered_description.html_safe %>
@@ -23,31 +12,22 @@
       Secondary site <%= 'contact'.pluralize(site.secondary_contacts.length) %>:
       <%= site.secondary_contacts.present? ? site.secondary_contacts_info : raw('<em>None</em>') %>
     </li>
-    <li class="list-group-item">
-      Additional site contacts: <%= site.additional_contacts_info %>
-    </li>
+    <% if site.additional_contacts_info.present? %>
+      <li class="list-group-item">
+        Additional site contacts: <%= site.additional_contacts_info %>
+      </li>
+    <% end %>
   </ul>
-</div>
-
-<% site.clusters.each do |cluster| %>
-  <div class='card'>
-    <div class='card-header'>
-      <ul class="nav">
-        <li class="nav-item">
-          <span class="navbar-brand">
-            <%= cluster.name %> overview
-          </span>
-        </li>
-        <li class="nav-item">
-          <%= link_to 'Manage this cluster',
-            cluster_path(cluster),
-            class: ['nav-link', 'btn', 'btn-primary'],
-            role: 'button'
-          %>
-        </li>
-      </ul>
-    </div>
-
-    <%= render 'clusters/details', cluster: cluster %>
-  </div>
+  <% site.clusters.each do |cluster| %>
+    <%= link_to "#{cluster.name}: Manage this cluster",
+                cluster_path(cluster),
+                type: "button",
+                class: [
+                  'list-group-item',
+                  'list-group-item-action',
+                  'text-center',
+                  'text-primary'
+                ]
+    %>
+  <% end %>
 <% end %>

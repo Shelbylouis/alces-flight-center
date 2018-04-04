@@ -1,0 +1,66 @@
+<% content_for :subtitle { 'Pending Maintenance' } %>
+<%= render 'partials/tabs', activate: :maintenance do %>
+  <div class='table-responsive'>
+    <table class="maintenance table">
+      <thead>
+        <tr>
+          <th>For</th>
+          <th>Maintenance period</th>
+          <th>Requested</th>
+          <th>Confirmed</th>
+          <th>Associated case</th>
+        </tr>
+      </thead>
+
+      <tbody>
+      <% @scope.unfinished_related_maintenance_windows.map(&:decorate).each do |window| %>
+        <tr>
+          <td><%= window.associated_model.links %></td>
+          <td><%= window.scheduled_period %></td>
+          <td><%= window.transition_info(:requested) ||
+            raw('<em>N/A &mdash; mandatory maintenance</em>')
+          %></td>
+          <td>
+            <%= window.transition_info(:confirmed) ||
+              render('maintenance_windows/unconfirmed_buttons', window: window) %>
+
+            <% if window.can_end? && current_user.admin? %>
+              <%= button_to 'End ongoing maintenance',
+                end_maintenance_window_path(window),
+                class: ['btn', 'btn-danger', 'btn-block'],
+                data: {
+                  confirm: <<~EOF.squish
+                    Are you sure you want to end this ongoing maintenance?
+                  EOF
+                }
+              %>
+            <% end %>
+
+            <% if window.can_extend_duration? && current_user.admin? %>
+              <%= form_tag(
+                extend_maintenance_window_path(window),
+                class: 'form-inline'
+              ) do %>
+                <div class="extend-maintenance-form">
+                  <%= number_field_tag(
+                    :additional_days,
+                    nil,
+                    class: 'form-control extend-maintenance-form__duration-input',
+                    placeholder: 'Additional business days',
+                    min: 1,
+                    required: true
+                  ) %>
+
+                  <%= submit_tag('Extend', class: 'btn btn-success') %>
+                </div>
+              <% end %>
+            <% end %>
+          </td>
+          <td><%= window.case.ticket_link %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
+

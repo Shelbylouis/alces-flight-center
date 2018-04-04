@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  asset_record_alias = 'asset-record'
+  component_expansions_alias = 'expansions'
+  component_groups_alias = 'component-groups'
+
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
@@ -12,49 +16,86 @@ Rails.application.routes.draw do
   # be reached from an email.
   get '/reset-password/complete' => 'passwords#reset_complete'
 
+  asset_record_view = Proc.new {
+    resource :asset_record, path: asset_record_alias, only: :show
+  }
+  asset_record_form = Proc.new do
+    resource :asset_record, path: asset_record_alias, only: [:edit, :update]
+  end
+
+  logs = Proc.new do
+    resources :logs, only: :index
+  end
+  admin_logs = Proc.new do
+    resources :logs, only: :create
+  end
+
+  request_maintenance_form = Proc.new do
+    resources :maintenance_windows, path: :maintenance, only: :new do
+      collection do
+        # Do not define route helper (by passing `as: nil`) as otherwise this
+        # will overwrite the `${model}_maintenance_windows_path` helper, as by
+        # default `resources` expects `new` and `index` to use the same route.
+        # However we do not want this, and this route can be accessed using the
+        # `new_${model}_maintenance_windows_path` helper.
+        post 'new', action: :create, as: nil
+      end
+    end
+  end
+  confirm_maintenance_form = Proc.new do
+    resources :maintenance_windows, path: :maintenance, only: [] do
+      member do
+        get :confirm
+        patch :confirm, to: 'maintenance_windows#confirm_submit'
+      end
+    end
+  end
+
+  archive_cases = Proc.new do |**params, &block|
+    params[:only] = Array.wrap(params[:only]).concat [:new, :index]
+    resources :cases, **params do
+      collection do
+        get :archives
+      end
+      block.call if block
+    end
+  end
+
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      resources :cases, only: [:new, :index, :show]
-    end
-
-    resources :cases, only: [] do
-      member do
-        post :request_maintenance_window
-        post :end_maintenance_window
-      end
+      archive_cases.call(only: :show)
     end
 
     resources :clusters, only: []  do
-      resources :maintenance_windows, only: :new
-      resources :cluster_logs, path: 'logs', only: [:create]
-    end
-
-    asset_record = Proc.new do
-      resource :asset_record, path: 'asset-record', only: [:edit, :update]
+      request_maintenance_form.call
+      admin_logs.call
     end
 
     resources :components, only: []  do
-      resources :maintenance_windows, only: :new
+      request_maintenance_form.call
       resource :component_expansion,
-               path: 'expansions',
+               path: component_expansions_alias,
                only: [:edit, :update, :create]
-      asset_record.call
+      asset_record_form.call
+      admin_logs.call
     end
 
     resources :component_expansions, only: [:destroy]
 
-    resources :component_groups, path: 'component-groups', only: [] do
-      asset_record.call
+    resources :component_groups, path: component_groups_alias, only: [] do
+      asset_record_form.call
     end
 
     resources :services, only: []  do
-      resources :maintenance_windows, only: :new
+      request_maintenance_form.call
     end
 
-    resources :maintenance_windows, only: :create do
+    resources :maintenance_windows, path: :maintenance, only: [] do
       member do
+        post :cancel
         post :end
+        post :extend
       end
     end
 
@@ -70,7 +111,7 @@ Rails.application.routes.draw do
     root 'sites#show'
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
-    resources :cases, only: [:new, :index, :show, :create] do
+    archive_cases.call(only: [:show, :create]) do
       member do
         post :archive
         post :restore
@@ -78,26 +119,41 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: :show do
-      resources :cases, only: :new
+      archive_cases.call
+      resources :services, only: :index
       resources :consultancy, only: :new
-      resources :cluster_logs, path: 'logs', only: :index
+      resources :maintenance_windows, path: :maintenance, only: :index
+      resources :components, only: :index
+      logs.call
+      confirm_maintenance_form.call
     end
 
     resources :components, only: :show do
-      resources :cases, only: :new
+      archive_cases.call
       resources :consultancy, only: :new
+      resources :component_expansions,
+                path: component_expansions_alias,
+                only: :index
+      asset_record_view.call
+      logs.call
+      confirm_maintenance_form.call
     end
 
-    resources :component_groups, path: 'component-groups', only: :show
+    resources :component_groups, path: component_groups_alias, only: [] do
+      get '/', controller: :components, action: :index
+      resources :components, only: :index
+      asset_record_view.call
+    end
 
     resources :services, only: :show do
-      resources :cases, only: :new
+      archive_cases.call
       resources :consultancy, only: :new
+      confirm_maintenance_form.call
     end
 
-    resources :maintenance_windows, only: [] do
+    resources :maintenance_windows, path: :maintenance, only: [] do
       member do
-        post :confirm
+        post :reject
       end
     end
   end

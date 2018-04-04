@@ -22,7 +22,7 @@ class Case < ApplicationRecord
   belongs_to :user
   has_one :credit_charge, required: false
   has_many :maintenance_windows
-  has_and_belongs_to_many :cluster_log
+  has_and_belongs_to_many :log
 
   delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true
@@ -54,6 +54,8 @@ class Case < ApplicationRecord
   # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
   # if this is possible but it was not explicitly passed.
   before_validation :create_rt_ticket, on: :create
+
+  scope :active, -> { where(archived: false) }
 
   def self.request_tracker
     # Note: `rt_interface_class` is a string which we `constantize`, rather
@@ -87,10 +89,6 @@ class Case < ApplicationRecord
 
   def credit_charge_allowed?
     ticket_completed? && chargeable
-  end
-
-  def request_maintenance_window!(requestor:)
-    RequestMaintenanceWindow.new(case_id: id, user: requestor).run
   end
 
   def add_rt_ticket_correspondence(text)

@@ -1,51 +1,138 @@
 class MaintenanceWindowsController < ApplicationController
-  def new
-    @title = "Request Maintenance"
+  decorates_assigned :maintenance_window
 
+  def new
     @maintenance_window = MaintenanceWindow.new(
-      cluster_id: params[:cluster_id],
-      component_id: params[:component_id],
-      service_id: params[:service_id]
+      default_maintenance_window_params
     )
   end
 
   def create
-    @maintenance_window =
-      RequestMaintenanceWindow.new(**maintenance_window_params).run
-    flash[:success] = 'Maintenance requested.'
-    redirect_to @maintenance_window.associated_model.cluster
+    event, action =
+      params[:mandatory] ? [:mandate, :schedule] : [:request] * 2
+    handle_form_submission(action: action, template: :new) do
+      @maintenance_window = MaintenanceWindow.new(request_maintenance_window_params)
+      ActiveRecord::Base.transaction do
+        @maintenance_window.save!
+        @maintenance_window.send("#{event}!", current_user)
+      end
+    end
   end
 
   def confirm
-    window = MaintenanceWindow.find(params[:id])
-    window.update!(confirmed_by: current_user)
-    associated_model = window.associated_model
-    confirmation_message = <<~EOF.squish
-      Maintenance of #{associated_model.name} confirmed by
-      #{current_user.name}; this #{associated_model.readable_model_name} is now
-      under maintenance.
-    EOF
-    window.add_rt_ticket_correspondence(confirmation_message)
-    redirect_to cluster_path(associated_model.cluster)
+    @maintenance_window = MaintenanceWindow.find(params[:id])
+
+    # Validate window as if it was confirmed without changes up front, so can
+    # display any invalid fields which will require changing on initial page
+    # load.
+    validate_as_if_confirmed(@maintenance_window)
+  end
+
+  def confirm_submit
+    handle_form_submission(action: :confirm, template: :confirm) do
+      @maintenance_window = MaintenanceWindow.find(params[:id])
+      @maintenance_window.assign_attributes(confirm_maintenance_window_params)
+      @maintenance_window.confirm!(current_user)
+    end
+  end
+
+  def reject
+    transition_window(:reject)
+  end
+
+  def cancel
+    transition_window(:cancel)
   end
 
   def end
-    window = MaintenanceWindow.find(params[:id])
-    window.update!(ended_at: DateTime.current)
-    associated_model = window.associated_model
-    window.add_rt_ticket_correspondence(
-      "#{associated_model.name} is no longer under maintenance."
-    )
-    redirect_to cluster_path(window.associated_model.cluster)
+    transition_window(:end)
+  end
+
+  def extend
+    transition_window(
+      :extend_duration,
+      new_state_message: 'duration extended'
+    ) do |window|
+      window.duration += params[:additional_days].to_i
+    end
   end
 
   private
 
-  def maintenance_window_params
-    params.require(:maintenance_window).permit(
-      :cluster_id, :component_id, :service_id, :case_id
-    ).merge(
-      user: current_user
-    ).to_h.symbolize_keys
+  REQUEST_PARAM_NAMES = [
+    :cluster_id,
+    :component_id,
+    :service_id,
+    :case_id,
+    :requested_start,
+    :duration,
+  ].freeze
+
+  CONFIRM_PARAM_NAMES = [
+    :requested_start,
+  ].freeze
+
+  def default_maintenance_window_params
+    {
+      cluster_id: params[:cluster_id],
+      component_id: params[:component_id],
+      service_id: params[:service_id],
+      requested_start: default_requested_start,
+      duration: 1,
+    }
+  end
+
+  def request_maintenance_window_params
+    params.require(:maintenance_window).permit(REQUEST_PARAM_NAMES)
+  end
+
+  def confirm_maintenance_window_params
+    params.require(:maintenance_window).permit(CONFIRM_PARAM_NAMES)
+  end
+
+  def default_requested_start
+    # Default is 9am on next business day.
+    1.business_day.from_now.at_beginning_of_day.advance(hours: 9)
+  end
+
+  # XXX if we changed `request` to be accessed at `/request` (rather than
+  # `/new`) then we wouldn't need to pass `template` here as it would be the
+  # same as `action`.
+  def handle_form_submission(action:, template:)
+    yield
+
+    flash[:success] = "Maintenance #{past_tense_of(action)}."
+    cluster = @maintenance_window.associated_cluster
+    redirect_to cluster_maintenance_windows_path(cluster)
+  rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
+    flash.now[:error] = "Unable to #{action} this maintenance."
+    render template
+  end
+
+  def past_tense_of(action)
+    action.to_s.gsub(/e$/, '') + 'ed'
+  end
+
+  def transition_window(event, new_state_message: nil)
+    window = MaintenanceWindow.find(params[:id])
+    previous_user_facing_state = window.user_facing_state
+    cluster = window.associated_cluster
+
+    yield window if block_given?
+    window.public_send("#{event}!", current_user)
+
+    flash[:success] = [
+      previous_user_facing_state,
+      'maintenance',
+      new_state_message || window.state,
+    ].join(' ').capitalize
+    redirect_back fallback_location: cluster_maintenance_windows_path(cluster)
+  end
+
+  def validate_as_if_confirmed(window)
+    original_state = window.state
+    window.state = :confirm
+    window.validate
+    window.state = original_state
   end
 end

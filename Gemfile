@@ -25,9 +25,8 @@ gem 'aws-sdk-s3'
 gem 'clearance'
 gem 'http'
 gem 'kramdown'
-gem 'rails_admin', '~> 1.2'
+gem 'rails_admin', '~> 1.3'
 gem 'rails_email_preview', '~> 2.0.4'
-gem 'seedbank'
 gem 'validates_email_format_of'
 gem 'webpacker', '~> 3.0'
 gem 'draper'
@@ -36,6 +35,9 @@ gem 'font-awesome-rails'
 gem 'request_store'
 gem 'bootsnap', require: false
 gem "sentry-raven"
+gem 'state_machines-activerecord'
+gem 'state_machines-audit_trail'
+gem 'business_time'
 
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.
@@ -69,6 +71,7 @@ end
 group :test do
   gem 'email_spec'
   gem 'rails-controller-testing'
+  gem 'shoulda-matchers'
 end
 
 group :development do
@@ -92,6 +95,10 @@ group :development do
   # Detects various problems in database. Run with `active_record_doctor:*`
   # Rake tasks.
   gem 'active_record_doctor'
+
+  # Regenerate state machine graphs using `rake
+  # alces:generate:state_machine_diagrams`.
+  gem 'state_machines-graphviz'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

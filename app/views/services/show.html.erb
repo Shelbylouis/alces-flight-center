@@ -1,17 +1,5 @@
-
-<%= render 'cases/cases_table', model: service, archive: true %>
-
-<div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          Overview
-        </span>
-      </li>
-    </ul>
-  </div>
-
+<% content_for :subtitle { 'Overview' } %>
+<%= render 'partials/tabs', activate: :overview do %>
   <ul class="list-group list-group-flush">
     <li class="list-group-item">
       <%= service.readable_support_type.capitalize %> service
@@ -23,4 +11,4 @@
       </li>
     <% end %>
   </ul>
-</div>
+<% end %>

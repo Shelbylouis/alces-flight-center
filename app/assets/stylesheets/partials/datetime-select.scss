@@ -1,0 +1,11 @@
+
+.datetime-select {
+  div {
+    // Should match Bootstrap column height (so `vertical-align` vertically
+    // aligns within correct height).
+    line-height: 36.5px;
+
+    vertical-align: middle;
+    text-align: center;
+  }
+}
