@@ -64,6 +64,29 @@ RSpec.feature Log, type: :feature do
 
       expect(submit_log.cases).to contain_exactly(*log_cases)
     end
+
+    it 'cannot select archived Case for subject to associate' do
+      case_attributes = {
+        cluster: cluster,
+        subject: 'archived_case',
+        archived: true
+      }
+      if subject.is_a?(Component)
+        case_attributes.merge!(
+          component: subject,
+          issue: create(:issue, requires_component: true)
+        )
+      end
+      archived_case = create(:case, case_attributes)
+
+      # Revisit the page so given Case would be shown, if we do not
+      # successfully filter it out, to avoid false positive.
+      visit current_path
+
+      expect do
+        select archived_case.subject
+      end.to raise_error(Capybara::ElementNotFound)
+    end
   end
 
   context 'when visiting the cluster log' do
