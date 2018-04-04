@@ -22,7 +22,7 @@
       <%= f.label :case_id, case_label, 'data-test': 'case-select-label' %>
       <%= f.collection_select(
         :case_id,
-        maintenance_window.associated_cluster.cases.order(created_at: :desc).decorate,
+        maintenance_window.associated_cluster.cases.active.order(created_at: :desc).decorate,
         :id,
         :case_select_details,
         {},
