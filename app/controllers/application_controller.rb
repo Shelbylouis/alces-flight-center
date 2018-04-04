@@ -73,7 +73,7 @@ class ApplicationController < ActionController::Base
     if @scope
       @title = <<~EOF.squish
         #{@scope.readable_model_name.split.map(&:capitalize).join(' ')}
-        Dashboard - #{@scope.name}
+        Dashboard: #{@scope.name}
       EOF
     end
   end

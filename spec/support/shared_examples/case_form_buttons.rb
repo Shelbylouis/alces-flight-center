@@ -4,7 +4,7 @@ RSpec.shared_examples 'case_form_buttons' do |model_name|
     subject { create(:"advice_#{model_name}").decorate }
 
     it 'disables Case form button' do
-      disabled_regex = /title="This #{model_name}.*self-managed.*".*<a.* class=".*disabled".*<\/a>/
+      disabled_regex = /<a.* class=".*disabled".*title="This #{model_name}.*self-managed.*".*<\/a>/
 
       expect(subject.case_form_buttons).to match(disabled_regex)
     end
