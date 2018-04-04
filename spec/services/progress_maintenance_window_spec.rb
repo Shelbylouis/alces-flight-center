@@ -87,7 +87,7 @@ RSpec.describe ProgressMaintenanceWindow do
     end
 
     context 'when requested_start and expected_end in future' do
-      let :requested_start { DateTime.current.advance(days: 1) }
+      let :requested_start { 1.day.from_now }
 
       include_examples 'does not progress', MaintenanceWindow.possible_states
     end

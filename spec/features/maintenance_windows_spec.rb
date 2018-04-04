@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.shared_examples 'maintenance form error handling' do |form_action|
   it 're-renders form with error when invalid requested_start entered' do
     original_path = current_path
-    requested_start_in_past = DateTime.new(2016, 9, 20, 13)
+    requested_start_in_past = Time.zone.local(2016, 9, 20, 13)
 
     expect do
       fill_in_datetime_selects 'requested-start', with: requested_start_in_past
@@ -89,7 +89,7 @@ RSpec.feature "Maintenance windows", type: :feature do
   let :cluster { support_case.cluster }
   let :site { support_case.site }
 
-  let :valid_requested_start { DateTime.new(2022, 9, 10, 13, 0) }
+  let :valid_requested_start { Time.zone.local(2022, 9, 10, 13, 0) }
 
   let :reject_button_text { 'Reject' }
   let :end_button_text { 'End' }
@@ -159,7 +159,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       include_examples 'maintenance form initially valid'
 
       it 'uses correct default values' do
-        a_distant_friday = DateTime.new(2025, 3, 7, 0, 0)
+        a_distant_friday = Time.zone.local(2025, 3, 7, 0, 0)
         following_monday_at_9 = a_distant_friday.advance(days: 3, hours: 9)
 
         travel_to a_distant_friday do
