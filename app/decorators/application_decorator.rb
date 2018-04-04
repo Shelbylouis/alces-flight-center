@@ -72,19 +72,21 @@ class ApplicationDecorator < Draper::Decorator
   private
 
   def convert_scope_path(s)
-    (s.match(/\Ascope_.*/) ? "_#{s}" : s.to_s)
-      .sub(/_scope_/, scope_name_for_paths)
-      .sub(/\A_/, '')
-      .sub(/\Apath\Z/, 'root_path')
-      .to_sym
+    name_for_path = scope_name_for_paths.dup.tap do |name|
+      name << '_' if name.present?
+    end
+    s.to_s
+     .sub(/((.+_)?)scope_/, '\1' + name_for_path)
+     .sub(/\Apath\Z/, 'root_path')
+     .to_sym
   end
 
-  # This method is overridden in the Site decorator
+  # Override this method for non-standard scope names/ paths
   def scope_name_for_paths
-    '_' + model.underscored_model_name + '_'
+    model.underscored_model_name
   end
 
-  # This method is overridden in the Site decorator
+  # Override this method for non-standard scope names/ paths
   def arguments_for_scope_path(*a)
     a.unshift(model)
   end
