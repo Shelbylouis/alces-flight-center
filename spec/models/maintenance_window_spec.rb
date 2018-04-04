@@ -361,7 +361,7 @@ RSpec.describe MaintenanceWindow, type: :model do
   end
 
   describe '#expected_end' do
-    let :monday { Time.new(2025, 3, 24, 9, 0) }
+    let :monday { Time.zone.local(2025, 3, 24, 9, 0) }
     let :wednesday { monday.advance(days: 2) }
     let :following_monday { monday.advance(weeks: 1) }
 
