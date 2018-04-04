@@ -5,8 +5,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
   decorates_assigned :site
 
-  helper_method :current_user, :signed_in?, :signed_out?
-
   before_action :set_sentry_raven_context
   before_action :assign_current_user
   before_action :assign_scope
