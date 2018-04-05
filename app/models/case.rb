@@ -79,7 +79,7 @@ class Case < ApplicationRecord
     return if ticket_completed? && !self.completed_at.nil?
     self.last_known_ticket_status = associated_rt_ticket.status
     if ticket_completed?
-      self.completed_at = associated_rt_ticket.resolved
+      self.completed_at = associated_rt_ticket.resolved || DateTime.now.utc
     end
     save!
   end
