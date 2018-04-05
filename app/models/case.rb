@@ -76,9 +76,11 @@ class Case < ApplicationRecord
   end
 
   def update_ticket_status!
-    return if ticket_completed?
-
+    return if ticket_completed? && !self.completed_at.nil?
     self.last_known_ticket_status = associated_rt_ticket.status
+    if ticket_completed?
+      self.completed_at = associated_rt_ticket.resolved
+    end
     save!
   end
 
