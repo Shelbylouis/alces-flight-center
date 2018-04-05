@@ -11,7 +11,7 @@ RSpec.describe 'Cases table', type: :feature do
   end
 
   let! :archived_case do
-    create(:archived_case, cluster: cluster, subject: 'Archived case')
+    create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
   end
 
   RSpec.shared_examples 'open cases table rendered' do
