@@ -105,6 +105,10 @@ class Case < ApplicationRecord
     associated_model.readable_model_name
   end
 
+  def ticket_completed?
+    COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
+  end
+
   private
 
   def create_rt_ticket
@@ -128,10 +132,6 @@ class Case < ApplicationRecord
 
   def assign_default_subject_if_unset
     self.subject ||= issue.default_subject
-  end
-
-  def ticket_completed?
-    COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
   def associated_rt_ticket
