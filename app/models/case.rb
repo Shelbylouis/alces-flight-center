@@ -135,7 +135,7 @@ class Case < ApplicationRecord
   end
 
   def associated_rt_ticket
-    rt.show_ticket(rt_ticket_id)
+    @associated_ticket ||= rt.show_ticket(rt_ticket_id)
   end
 
   def rt
