@@ -1,5 +1,12 @@
 
 FactoryBot.define do
+
+  factory :case_comment do
+    user create(:user)
+    add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
+    text 'This is a comment'
+  end
+
   sequence :email do |n|
     "a.scientist.#{n}@liverpool.ac.uk"
   end
