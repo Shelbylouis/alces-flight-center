@@ -76,9 +76,11 @@ class Case < ApplicationRecord
   end
 
   def update_ticket_status!
-    return if ticket_completed?
-
+    return if ticket_completed? && self.completed_at
     self.last_known_ticket_status = associated_rt_ticket.status
+    if ticket_completed?
+      self.completed_at = DateTime.now.utc
+    end
     save!
   end
 
@@ -101,6 +103,10 @@ class Case < ApplicationRecord
 
   def associated_model_type
     associated_model.readable_model_name
+  end
+
+  def ticket_completed?
+    COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
   private
@@ -128,12 +134,8 @@ class Case < ApplicationRecord
     self.subject ||= issue.default_subject
   end
 
-  def ticket_completed?
-    COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
-  end
-
   def associated_rt_ticket
-    rt.show_ticket(rt_ticket_id)
+    @associated_ticket ||= rt.show_ticket(rt_ticket_id)
   end
 
   def rt
