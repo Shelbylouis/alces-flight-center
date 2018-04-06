@@ -10,7 +10,7 @@ namespace :alces do
       Case.where(archived: false).each do |c|
         c.update_ticket_status!
 
-        if c.ticket_completed? && !c.completed_at.nil? && c.completed_at <= 2.weeks.ago
+        if c.ticket_completed? && c.completed_at && c.completed_at <= 2.weeks.ago
           c.archived = true
           logger.info("Archiving case #{c.id} completed at #{c.completed_at}")
         end
