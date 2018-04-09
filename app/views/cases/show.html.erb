@@ -49,6 +49,16 @@
         <th>Details</th>
         <td><%= simple_format(@case.details) %></td>
       </tr>
+      <tr>
+        <th>Comments</th>
+        <td>
+          <% @case.case_comments.order(:created_at).each do |comment| %>
+            <%= render 'case_comments/case_comment',
+              comment: comment
+            %>
+          <% end %>
+        </td>
+      </tr>
     </table>
   </div>
 </div>
