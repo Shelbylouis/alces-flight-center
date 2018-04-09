@@ -5,6 +5,8 @@ FactoryBot.define do
     cluster
     user
     details "Oh no, my science isn't working"
+    fields [{name: 'Details', value: 'some_details'}]
+    tier_level 2
 
     factory :open_case do
       archived false

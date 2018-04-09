@@ -5,6 +5,20 @@ RSpec.describe Case, type: :model do
 
   let :request_tracker { described_class.send(:request_tracker) }
 
+  describe '#valid?' do
+    subject { create(:case) }
+
+    it { is_expected.to validate_presence_of(:fields) }
+    it { is_expected.to validate_presence_of(:tier_level) }
+
+    it do
+      is_expected.to validate_numericality_of(:tier_level)
+        .only_integer
+        .is_greater_than_or_equal_to(1)
+        .is_less_than_or_equal_to(3)
+    end
+  end
+
   describe '#create' do
     it 'only raises RecordInvalid when no Cluster' do
       # Previously raised DelegationError as tried to use Cluster which wasn't
