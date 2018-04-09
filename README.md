@@ -191,7 +191,10 @@ confirm the account (either the web method or with `Account#confirm()` in the
 console)
 - Via `rails console` in Flight Center, create yourself a Flight Center account
 using the same email address (and don't forget `admin: true`)
-- Log in via SSO. Enjoy admin powers.
+- Log in via SSO. Enjoy admin powers responsibly.
+
+The process is the same in production except that you probably already have a
+Flight SSO account there.
 
 #### Creating accounts for customers
 
