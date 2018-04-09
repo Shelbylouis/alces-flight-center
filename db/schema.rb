@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180405103917) do
+ActiveRecord::Schema.define(version: 20180409150804) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -65,6 +65,8 @@ ActiveRecord::Schema.define(version: 20180405103917) do
     t.text "token", null: false
     t.text "subject", null: false
     t.datetime "completed_at"
+    t.integer "tier_level"
+    t.json "fields"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
     t.index ["issue_id"], name: "index_cases_on_issue_id"
@@ -260,6 +262,15 @@ ActiveRecord::Schema.define(version: 20180405103917) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "canonical_name", null: false
+  end
+
+  create_table "tiers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "level", null: false
+    t.json "fields", null: false
+    t.bigint "issue_id", null: false
+    t.index ["issue_id"], name: "index_tiers_on_issue_id"
   end
 
   create_table "users", force: :cascade do |t|
