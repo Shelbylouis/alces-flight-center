@@ -116,6 +116,7 @@ Rails.application.routes.draw do
         post :archive
         post :restore
       end
+      resources :case_comments, only: :create
     end
 
     resources :clusters, only: :show do
