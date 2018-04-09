@@ -149,6 +149,58 @@ updating to support new features/content/styles etc. for these. To do this:
 
 4. Make the necessary manual updates output at the end of this script.
 
+## Old SSO docs (need to combine with above)
+
+### Required environment variables
+- `SSO_BASE_URL` - base URL for SSO server. In production, should be
+`https://accounts.alces-flight.com`. This is passed through into the generated
+HTML.
+- `JSON_WEB_TOKEN_SECRET` - Shared secret for verifying SSO token signatures. This
+should be the same value as that for `flight-sso` in the environment you're
+running in.
+
+### Running SSO in development
+
+In order to log in to Flight Center in development you'll need a locally-running
+copy of `flight-sso`, which you can check out from
+`https://github.com/alces-software/flight-sso`.
+
+By default (`docker-compose up` to start it) it'll listen on `localhost` port
+`4000`, so the SSO root URL will be `http://accounts.alces-flight.lvh.me:4000`.
+
+Accessing SSO, and SSO-authenticated services, does not work via `localhost`,
+so you'll have to access your local Flight Center through
+`http://center.alces-flight.lvh.me:3000` (or whatever port you're running it on).
+
+Flight Center doesn't need to access the SSO server directly, so you should be
+fine if you're running Center in a VM as long as your browser can access both.
+It does, however, need to have a shared secret with the SSO server, passed in
+either via `secrets.yml` (in development) or the
+`JSON_WEB_TOKEN_SECRET` environment variable in production.
+
+### Creating user accounts
+
+User accounts created in Flight Center are matched with SSO accounts by email
+address.
+
+#### Creating yourself an admin account in development
+
+- Via `rails console` in Flight SSO, or via the website registration form,
+create yourself a Flight SSO account using any email address. Be sure to
+confirm the account (either the web method or with `Account#confirm()` in the
+console)
+- Via `rails console` in Flight Center, create yourself a Flight Center account
+using the same email address (and don't forget `admin: true`)
+- Log in via SSO. Enjoy admin powers.
+
+#### Creating accounts for customers
+
+- If they don't have a Flight SSO account, they should register for one first.
+- Get them to give you the email address they used for their Flight SSO account
+(possibly double-check against the SSO database just to make sure).
+- Create them a Flight Center account in the appropriate site, using the email
+address of their Flight SSO account.
+
 ## Redis
 
 We require a Redis server to handle our asynchronous email queue. In
