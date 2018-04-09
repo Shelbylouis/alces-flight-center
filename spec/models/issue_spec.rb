@@ -170,4 +170,21 @@ RSpec.describe Issue, type: :model do
       end
     end
   end
+
+  context 'on create' do
+    it 'has standard level 3 Tier automatically created' do
+      issue = create(:issue, tiers: [])
+
+      expect(issue.tiers.length).to eq 1
+      tier = issue.tiers.first
+      expect(tier.level).to eq 3
+      expected_fields = [
+        {
+          type: 'textarea',
+          name: 'Details',
+        }
+      ]
+      expect(tier.fields.map(&:symbolize_keys)).to match_array(expected_fields)
+    end
+  end
 end

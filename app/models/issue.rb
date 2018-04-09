@@ -54,6 +54,8 @@ class Issue < ApplicationRecord
             },
             unless: :requires_service
 
+  after_create :create_standard_consultancy_tier
+
   def advice_only?
     support_type == 'advice-only'
   end
@@ -82,5 +84,21 @@ class Issue < ApplicationRecord
 
   def default_subject
     name
+  end
+
+  private
+
+  def create_standard_consultancy_tier
+    # By default we want to support the creation of a Tier 3/consultancy Case,
+    # with the ability to provide any arbitrary details, for every Issue.
+    self.tiers.create!(
+      level: 3,
+      fields: [
+        {
+          type: 'textarea',
+          name: 'Details',
+        }
+      ]
+    )
   end
 end
