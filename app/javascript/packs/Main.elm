@@ -241,7 +241,7 @@ caseForm state =
 
         formElements =
             Maybe.Extra.values
-                [ maybeClustersField state.clusters
+                [ maybeClustersField state
                 , maybeServicesField state
                 , maybeCategoriesField state
                 , issuesField state |> Just
@@ -254,9 +254,12 @@ caseForm state =
     Html.form [ onSubmit submitMsg ] formElements
 
 
-maybeClustersField : SelectList Cluster -> Maybe (Html Msg)
-maybeClustersField clusters =
+maybeClustersField : State -> Maybe (Html Msg)
+maybeClustersField state =
     let
+        clusters =
+            state.clusters
+
         singleCluster =
             SelectList.toList clusters
                 |> List.length
