@@ -14,4 +14,12 @@ class Tier < ApplicationRecord
   def self.globally_available?
     true
   end
+
+  def case_form_json
+    {
+      id: id,
+      level: level,
+      fields: fields,
+    }
+  end
 end

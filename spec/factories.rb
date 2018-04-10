@@ -70,6 +70,15 @@ FactoryBot.define do
     name 'User management'
   end
 
+  factory :tier do
+    issue
+    level 2
+    fields [{
+      type: 'input',
+      name: 'some_field',
+    }]
+  end
+
   factory :asset_record_field_definition, aliases: [:definition] do
     field_name 'Manufacturer/model name'
     level :group
