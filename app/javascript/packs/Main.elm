@@ -6,7 +6,7 @@ import Bootstrap.Modal as Modal
 import Category
 import Cluster exposing (Cluster)
 import Component exposing (Component)
-import FieldValidation exposing (FieldValidation(..))
+import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onSubmit)
@@ -22,6 +22,7 @@ import SelectList.Extra
 import Service exposing (Service)
 import State exposing (State)
 import Utils
+import Validation
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
 
@@ -233,7 +234,7 @@ caseForm state =
 
         formElements =
             Maybe.Extra.values
-                [ maybeClustersField state.clusters
+                [ maybeClustersField state
                 , maybeServicesField state
                 , maybeCategoriesField state
                 , issuesField state |> Just
@@ -246,9 +247,12 @@ caseForm state =
     Html.form [ onSubmit submitMsg ] formElements
 
 
-maybeClustersField : SelectList Cluster -> Maybe (Html Msg)
-maybeClustersField clusters =
+maybeClustersField : State -> Maybe (Html Msg)
+maybeClustersField state =
     let
+        clusters =
+            state.clusters
+
         singleCluster =
             SelectList.toList clusters
                 |> List.length
@@ -260,13 +264,12 @@ maybeClustersField clusters =
         Nothing
     else
         Just
-            (Fields.selectField
-                "Cluster"
+            (Fields.selectField Field.Cluster
                 clusters
                 Cluster.extractId
                 .name
-                (always Valid)
                 ChangeSelectedCluster
+                state
             )
 
 
@@ -277,12 +280,12 @@ maybeCategoriesField state =
         |> Issues.categories
         |> Maybe.map
             (\categories_ ->
-                Fields.selectField "Category"
+                Fields.selectField Field.Category
                     categories_
                     Category.extractId
                     .name
-                    (always Valid)
                     ChangeSelectedCategory
+                    state
             )
 
 
@@ -291,19 +294,13 @@ issuesField state =
     let
         selectedServiceAvailableIssues =
             State.selectedServiceAvailableIssues state
-
-        validateIssue =
-            FieldValidation.validateWithError
-                """This cluster is self-managed; you may only request
-                consultancy support from Alces Software."""
-                (State.issueAvailableForSelectedCluster state)
     in
-    Fields.selectField "Issue"
+    Fields.selectField Field.Issue
         selectedServiceAvailableIssues
         Issue.extractId
         Issue.name
-        validateIssue
         ChangeSelectedIssue
+        state
 
 
 maybeComponentsField : State -> Maybe (Html Msg)
@@ -317,10 +314,9 @@ maybeComponentsField state =
             else
                 SelectionField .components
     in
-    PartsField.maybePartsField "component"
+    PartsField.maybePartsField Field.Component
         config
         Component.extractId
-        Issue.requiresComponent
         state
         ChangeSelectedComponent
 
@@ -344,10 +340,9 @@ maybeServicesField state =
                 |> List.length
                 |> (==) 1
     in
-    PartsField.maybePartsField "service"
+    PartsField.maybePartsField Field.Service
         config
         Service.extractId
-        (always True)
         state
         ChangeSelectedService
 
@@ -357,15 +352,12 @@ subjectField state =
     let
         selectedIssue =
             State.selectedIssue state
-
-        validateSubject =
-            FieldValidation.validateWithEmptyError Issue.subjectValid
     in
-    Fields.inputField "Subject"
+    Fields.inputField Field.Subject
         selectedIssue
         Issue.subject
-        validateSubject
         ChangeSubject
+        state
 
 
 detailsField : State -> Html Msg
@@ -373,16 +365,12 @@ detailsField state =
     let
         selectedIssue =
             State.selectedIssue state
-
-        validateDetails =
-            FieldValidation.validateWithEmptyError Issue.detailsValid
     in
-    Fields.textareaField
-        "Details"
+    Fields.textareaField Field.Details
         selectedIssue
         Issue.details
-        validateDetails
         ChangeDetails
+        state
 
 
 submitButton : State -> Html Msg
@@ -391,7 +379,7 @@ submitButton state =
         [ type_ "submit"
         , value "Create Case"
         , class "btn btn-primary btn-block"
-        , disabled (state.isSubmitting || State.isInvalid state)
+        , disabled (state.isSubmitting || Validation.invalidState state)
         ]
         []
 
