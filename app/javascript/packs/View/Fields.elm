@@ -5,6 +5,7 @@ module View.Fields
         , textareaField
         )
 
+import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
@@ -16,7 +17,7 @@ import Validation exposing (Error, ErrorMessage(..))
 
 
 selectField :
-    Validation.Field
+    Field
     -> SelectList a
     -> (a -> Int)
     -> (a -> String)
@@ -47,7 +48,7 @@ selectField field items toId toOptionLabel changeMsg state =
 
 
 textareaField :
-    Validation.Field
+    Field
     -> a
     -> (a -> String)
     -> (String -> msg)
@@ -58,7 +59,7 @@ textareaField =
 
 
 inputField :
-    Validation.Field
+    Field
     -> a
     -> (a -> String)
     -> (String -> msg)
@@ -75,7 +76,7 @@ type TextField
 
 textField :
     TextField
-    -> Validation.Field
+    -> Field
     -> a
     -> (a -> String)
     -> (String -> msg)
@@ -113,7 +114,7 @@ type alias HtmlFunction msg =
 
 
 formField :
-    Validation.Field
+    Field
     -> a
     -> HtmlFunction msg
     -> List (Attribute msg)

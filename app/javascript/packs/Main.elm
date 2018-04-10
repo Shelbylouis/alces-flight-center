@@ -6,6 +6,7 @@ import Bootstrap.Modal as Modal
 import Category
 import Cluster exposing (Cluster)
 import Component exposing (Component)
+import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onSubmit)
@@ -263,7 +264,7 @@ maybeClustersField state =
         Nothing
     else
         Just
-            (Fields.selectField Validation.Cluster
+            (Fields.selectField Field.Cluster
                 clusters
                 Cluster.extractId
                 .name
@@ -279,7 +280,7 @@ maybeCategoriesField state =
         |> Issues.categories
         |> Maybe.map
             (\categories_ ->
-                Fields.selectField Validation.Category
+                Fields.selectField Field.Category
                     categories_
                     Category.extractId
                     .name
@@ -294,7 +295,7 @@ issuesField state =
         selectedServiceAvailableIssues =
             State.selectedServiceAvailableIssues state
     in
-    Fields.selectField Validation.Issue
+    Fields.selectField Field.Issue
         selectedServiceAvailableIssues
         Issue.extractId
         Issue.name
@@ -313,7 +314,7 @@ maybeComponentsField state =
             else
                 SelectionField .components
     in
-    PartsField.maybePartsField Validation.Component
+    PartsField.maybePartsField Field.Component
         config
         Component.extractId
         state
@@ -339,7 +340,7 @@ maybeServicesField state =
                 |> List.length
                 |> (==) 1
     in
-    PartsField.maybePartsField Validation.Service
+    PartsField.maybePartsField Field.Service
         config
         Service.extractId
         state
@@ -352,7 +353,7 @@ subjectField state =
         selectedIssue =
             State.selectedIssue state
     in
-    Fields.inputField Validation.Subject
+    Fields.inputField Field.Subject
         selectedIssue
         Issue.subject
         ChangeSubject
@@ -365,7 +366,7 @@ detailsField state =
         selectedIssue =
             State.selectedIssue state
     in
-    Fields.textareaField Validation.Details
+    Fields.textareaField Field.Details
         selectedIssue
         Issue.details
         ChangeDetails

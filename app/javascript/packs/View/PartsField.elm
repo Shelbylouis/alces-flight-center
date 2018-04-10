@@ -2,11 +2,11 @@ module View.PartsField exposing (PartsFieldConfig(..), maybePartsField)
 
 import Cluster exposing (Cluster)
 import ClusterPart exposing (ClusterPart)
+import Field exposing (Field)
 import Html exposing (Html)
 import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import SupportType exposing (HasSupportType)
-import Validation
 import View.Fields as Fields
 
 
@@ -21,7 +21,7 @@ type alias PartsFromCluster a =
 
 
 maybePartsField :
-    Validation.Field
+    Field
     -> PartsFieldConfig a
     -> (ClusterPart a -> Int)
     -> State

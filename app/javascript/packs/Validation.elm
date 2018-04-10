@@ -2,12 +2,12 @@ module Validation
     exposing
         ( Error
         , ErrorMessage(..)
-        , Field(..)
         , invalidState
         , validateField
         , validateState
         )
 
+import Field exposing (Field)
 import Issue
 import State exposing (State)
 import Validate exposing (Validator)
@@ -15,16 +15,6 @@ import Validate exposing (Validator)
 
 type alias Error =
     ( Field, ErrorMessage )
-
-
-type Field
-    = Cluster
-    | Service
-    | Category
-    | Issue
-    | Component
-    | Subject
-    | Details
 
 
 type ErrorMessage
@@ -61,8 +51,8 @@ validateField field state =
 stateValidator : Validator Error State
 stateValidator =
     Validate.all
-        [ Validate.ifBlank (State.selectedIssue >> Issue.details) ( Details, Empty )
-        , Validate.ifBlank (State.selectedIssue >> Issue.subject) ( Subject, Empty )
+        [ Validate.ifBlank (State.selectedIssue >> Issue.details) ( Field.Details, Empty )
+        , Validate.ifBlank (State.selectedIssue >> Issue.subject) ( Field.Subject, Empty )
 
         -- XXX Not handling any other validations for now, as these are
         -- currently either very improbable or impossible to trigger (at least
