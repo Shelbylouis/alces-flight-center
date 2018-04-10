@@ -68,13 +68,6 @@ view : Model -> Html Msg
 view model =
     case model of
         Initialized state ->
-            let
-                validatedState =
-                    Validation.validateState state
-
-                logDefinition =
-                    Debug.log "validatedState" validatedState
-            in
             div []
                 (Maybe.Extra.values
                     [ chargingInfoModal state |> Just
