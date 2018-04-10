@@ -3,6 +3,7 @@ module Validation
         ( Error
         , ErrorMessage(..)
         , Field(..)
+        , invalidState
         , validateField
         , validateState
         )
@@ -33,6 +34,11 @@ type ErrorMessage
 
 -- XXX Add and handle this ErrorMessage case when we actually need it.
 -- | Message String
+
+
+invalidState : State -> Bool
+invalidState state =
+    not <| List.isEmpty <| validateState state
 
 
 validateState : State -> List Error
