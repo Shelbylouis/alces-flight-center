@@ -4,7 +4,6 @@ module Issue
         , Issue
         , decoder
         , details
-        , detailsValid
         , extractId
         , isChargeable
         , name
@@ -13,7 +12,6 @@ module Issue
         , setDetails
         , setSubject
         , subject
-        , subjectValid
         , supportType
         )
 
@@ -75,21 +73,6 @@ decoder =
         (D.field "defaultSubject" D.string)
         (D.field "supportType" SupportType.decoder)
         (D.field "chargeable" D.bool)
-
-
-detailsValid : Issue -> Bool
-detailsValid =
-    fieldFilled details
-
-
-subjectValid : Issue -> Bool
-subjectValid =
-    fieldFilled subject
-
-
-fieldFilled : (Issue -> String) -> (Issue -> Bool)
-fieldFilled getField =
-    getField >> String.isEmpty >> not
 
 
 extractId : Issue -> Int

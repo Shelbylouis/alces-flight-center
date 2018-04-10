@@ -1,11 +1,8 @@
 module State
     exposing
         ( State
-        , clusterPartAllowedForSelectedIssue
         , decoder
         , encoder
-        , isInvalid
-        , issueAvailableForSelectedCluster
         , selectedComponent
         , selectedIssue
         , selectedService
@@ -221,73 +218,3 @@ selectedService state =
 selectedServiceAvailableIssues : State -> SelectList Issue
 selectedServiceAvailableIssues state =
     selectedService state |> .issues |> Issues.availableIssues
-
-
-clusterPartAllowedForSelectedIssue : State -> (Issue -> Bool) -> ClusterPart a -> Bool
-clusterPartAllowedForSelectedIssue state issueRequiresPart part =
-    let
-        issue =
-            selectedIssue state
-    in
-    if issueRequiresPart issue then
-        case ( Issue.supportType issue, part.supportType ) of
-            ( Managed, Advice ) ->
-                -- An advice part cannot be associated with a managed issue.
-                False
-
-            ( AdviceOnly, Managed ) ->
-                -- A managed part cannot be associated with an advice-only
-                -- issue.
-                False
-
-            _ ->
-                -- Everything else is valid.
-                True
-    else
-        -- This validation should always pass if part is not required.
-        True
-
-
-issueAvailableForSelectedCluster : State -> Issue -> Bool
-issueAvailableForSelectedCluster state issue =
-    let
-        issueIsManaged =
-            Issue.supportType issue == SupportType.Managed
-
-        clusterIsAdvice =
-            SelectList.selected state.clusters
-                |> SupportType.isAdvice
-    in
-    -- An Issue is available so long as it is not a managed issue while an
-    -- advice-only Cluster is selected.
-    not (issueIsManaged && clusterIsAdvice)
-
-
-isInvalid : State -> Bool
-isInvalid state =
-    let
-        issue =
-            selectedIssue state
-
-        partAllowedForSelectedIssue =
-            clusterPartAllowedForSelectedIssue state
-
-        component =
-            selectedComponent state
-
-        service =
-            selectedService state
-    in
-    List.any not
-        [ Issue.detailsValid issue
-        , Issue.subjectValid issue
-        , issueAvailableForSelectedCluster state issue
-        , partAllowedForSelectedIssue Issue.requiresComponent component
-
-        -- Every Issue which can be associated with a Case using this form now
-        -- requires a Service, and the Ruby encoding of the data used to
-        -- initialize this form combined with the State data model ensures only
-        -- a compatible Service and Issue can be selected, therefore we just
-        -- need to check the compatibilities of their support types here.
-        , partAllowedForSelectedIssue (always True) service
-        ]

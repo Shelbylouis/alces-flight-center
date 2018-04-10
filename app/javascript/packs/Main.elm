@@ -6,7 +6,6 @@ import Bootstrap.Modal as Modal
 import Category
 import Cluster exposing (Cluster)
 import Component exposing (Component)
-import FieldValidation exposing (FieldValidation(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onSubmit)
@@ -268,7 +267,6 @@ maybeClustersField state =
                 clusters
                 Cluster.extractId
                 .name
-                (always Valid)
                 ChangeSelectedCluster
                 state
             )
@@ -285,7 +283,6 @@ maybeCategoriesField state =
                     categories_
                     Category.extractId
                     .name
-                    (always Valid)
                     ChangeSelectedCategory
                     state
             )
@@ -296,18 +293,11 @@ issuesField state =
     let
         selectedServiceAvailableIssues =
             State.selectedServiceAvailableIssues state
-
-        validateIssue =
-            FieldValidation.validateWithError
-                """This cluster is self-managed; you may only request
-                consultancy support from Alces Software."""
-                (State.issueAvailableForSelectedCluster state)
     in
     Fields.selectField Validation.Issue
         selectedServiceAvailableIssues
         Issue.extractId
         Issue.name
-        validateIssue
         ChangeSelectedIssue
         state
 
@@ -326,7 +316,6 @@ maybeComponentsField state =
     PartsField.maybePartsField Validation.Component
         config
         Component.extractId
-        Issue.requiresComponent
         state
         ChangeSelectedComponent
 
@@ -353,7 +342,6 @@ maybeServicesField state =
     PartsField.maybePartsField Validation.Service
         config
         Service.extractId
-        (always True)
         state
         ChangeSelectedService
 
@@ -363,14 +351,10 @@ subjectField state =
     let
         selectedIssue =
             State.selectedIssue state
-
-        validateSubject =
-            FieldValidation.validateWithEmptyError Issue.subjectValid
     in
     Fields.inputField Validation.Subject
         selectedIssue
         Issue.subject
-        validateSubject
         ChangeSubject
         state
 
@@ -380,14 +364,10 @@ detailsField state =
     let
         selectedIssue =
             State.selectedIssue state
-
-        validateDetails =
-            FieldValidation.validateWithEmptyError Issue.detailsValid
     in
     Fields.textareaField Validation.Details
         selectedIssue
         Issue.details
-        validateDetails
         ChangeDetails
         state
 

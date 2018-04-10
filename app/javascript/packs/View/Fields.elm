@@ -1,12 +1,10 @@
 module View.Fields
     exposing
-        ( hiddenInputWithVisibleError
-        , inputField
+        ( inputField
         , selectField
         , textareaField
         )
 
-import FieldValidation exposing (FieldValidation(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
@@ -22,22 +20,17 @@ selectField :
     -> SelectList a
     -> (a -> Int)
     -> (a -> String)
-    -> (a -> FieldValidation a)
     -> (String -> msg)
     -> State
     -> Html msg
-selectField field items toId toOptionLabel validate changeMsg state =
+selectField field items toId toOptionLabel changeMsg state =
     let
-        validatedField =
-            SelectList.selected items |> validate
-
         fieldOption =
             \position ->
                 \item ->
                     option
                         [ toId item |> toString |> value
                         , position == Selected |> selected
-                        , validate item |> FieldValidation.isInvalid |> disabled
                         ]
                         [ toOptionLabel item |> text ]
 
@@ -47,7 +40,6 @@ selectField field items toId toOptionLabel validate changeMsg state =
     in
     formField field
         (SelectList.selected items)
-        validatedField
         select
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
@@ -58,7 +50,6 @@ textareaField :
     Validation.Field
     -> a
     -> (a -> String)
-    -> (a -> FieldValidation a)
     -> (String -> msg)
     -> State
     -> Html msg
@@ -70,7 +61,6 @@ inputField :
     Validation.Field
     -> a
     -> (a -> String)
-    -> (a -> FieldValidation a)
     -> (String -> msg)
     -> State
     -> Html msg
@@ -88,15 +78,11 @@ textField :
     -> Validation.Field
     -> a
     -> (a -> String)
-    -> (a -> FieldValidation a)
     -> (String -> msg)
     -> State
     -> Html msg
-textField textFieldType field item toContent validate inputMsg state =
+textField textFieldType field item toContent inputMsg state =
     let
-        validatedField =
-            validate item
-
         content =
             toContent item
 
@@ -116,7 +102,6 @@ textField textFieldType field item toContent validate inputMsg state =
     in
     formField field
         item
-        validatedField
         element
         attributes
         []
@@ -130,13 +115,12 @@ type alias HtmlFunction msg =
 formField :
     Validation.Field
     -> a
-    -> FieldValidation a
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
     -> State
     -> Html msg
-formField field item validation htmlFn additionalAttributes children state =
+formField field item htmlFn additionalAttributes children state =
     let
         fieldName =
             toString field
@@ -164,26 +148,6 @@ formField field item validation htmlFn additionalAttributes children state =
         , formElement
         , validationFeedback errors
         ]
-
-
-hiddenInputWithVisibleError : a -> (a -> FieldValidation a) -> Html msg
-hiddenInputWithVisibleError item validate =
-    -- XXX Remove or replace this function?
-    -- let
-    --     validation =
-    --         validate item
-    --     formElement =
-    --         input
-    --             [ type_ "hidden"
-    --             , class (formControlClasses validation)
-    --             ]
-    --             []
-    -- in
-    -- div [ class "form-group" ]
-    --     [ formElement
-    --     , validationFeedback item validation
-    --     ]
-    div [] []
 
 
 fieldIdentifier : String -> String
