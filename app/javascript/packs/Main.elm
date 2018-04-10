@@ -22,6 +22,7 @@ import SelectList.Extra
 import Service exposing (Service)
 import State exposing (State)
 import Utils
+import Validation
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
 
@@ -67,6 +68,13 @@ view : Model -> Html Msg
 view model =
     case model of
         Initialized state ->
+            let
+                validatedState =
+                    Validation.validateState state
+
+                logDefinition =
+                    Debug.log "validatedState" validatedState
+            in
             div []
                 (Maybe.Extra.values
                     [ chargingInfoModal state |> Just
