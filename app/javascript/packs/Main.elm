@@ -277,6 +277,7 @@ maybeClustersField state =
                 .name
                 (always Valid)
                 ChangeSelectedCluster
+                state
             )
 
 
@@ -293,6 +294,7 @@ maybeCategoriesField state =
                     .name
                     (always Valid)
                     ChangeSelectedCategory
+                    state
             )
 
 
@@ -314,6 +316,7 @@ issuesField state =
         Issue.name
         validateIssue
         ChangeSelectedIssue
+        state
 
 
 maybeComponentsField : State -> Maybe (Html Msg)
@@ -376,6 +379,7 @@ subjectField state =
         Issue.subject
         validateSubject
         ChangeSubject
+        state
 
 
 detailsField : State -> Html Msg
@@ -392,6 +396,7 @@ detailsField state =
         Issue.details
         validateDetails
         ChangeDetails
+        state
 
 
 submitButton : State -> Html Msg

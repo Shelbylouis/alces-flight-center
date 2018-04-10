@@ -1,4 +1,11 @@
-module Validation exposing (Field(..), validateState)
+module Validation
+    exposing
+        ( Error
+        , ErrorMessage(..)
+        , Field(..)
+        , validateField
+        , validateState
+        )
 
 import Issue
 import State exposing (State)
@@ -31,6 +38,18 @@ type ErrorMessage
 validateState : State -> List Error
 validateState state =
     Validate.validate stateValidator state
+
+
+validateField : Field -> State -> List Error
+validateField field state =
+    let
+        errorsForField =
+            \errors ->
+                List.filter
+                    (Tuple.first >> (==) field)
+                    errors
+    in
+    validateState state |> errorsForField
 
 
 stateValidator : Validator Error State

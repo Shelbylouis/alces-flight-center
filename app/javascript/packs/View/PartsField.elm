@@ -7,7 +7,6 @@ import Html exposing (Html)
 import Issue exposing (Issue)
 import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
-import String.Extra
 import SupportType exposing (HasSupportType)
 import Validation
 import View.Fields as Fields
@@ -56,6 +55,7 @@ maybePartsField field partsFieldConfig toId issueRequiresPart state changeMsg =
                     labelForPart
                     (always Valid)
                     changeMsg
+                    state
                     |> Just
 
         cluster =

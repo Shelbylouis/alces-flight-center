@@ -12,8 +12,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
+import State exposing (State)
 import String.Extra
-import Validation
+import Validation exposing (Error, ErrorMessage(..))
 
 
 selectField :
@@ -23,8 +24,9 @@ selectField :
     -> (a -> String)
     -> (a -> FieldValidation a)
     -> (String -> msg)
+    -> State
     -> Html msg
-selectField field items toId toOptionLabel validate changeMsg =
+selectField field items toId toOptionLabel validate changeMsg state =
     let
         validatedField =
             SelectList.selected items |> validate
@@ -49,6 +51,7 @@ selectField field items toId toOptionLabel validate changeMsg =
         select
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
+        state
 
 
 textareaField :
@@ -57,6 +60,7 @@ textareaField :
     -> (a -> String)
     -> (a -> FieldValidation a)
     -> (String -> msg)
+    -> State
     -> Html msg
 textareaField =
     textField TextArea
@@ -68,6 +72,7 @@ inputField :
     -> (a -> String)
     -> (a -> FieldValidation a)
     -> (String -> msg)
+    -> State
     -> Html msg
 inputField =
     textField Input
@@ -85,8 +90,9 @@ textField :
     -> (a -> String)
     -> (a -> FieldValidation a)
     -> (String -> msg)
+    -> State
     -> Html msg
-textField textFieldType field item toContent validate inputMsg =
+textField textFieldType field item toContent validate inputMsg state =
     let
         validatedField =
             validate item
@@ -114,6 +120,7 @@ textField textFieldType field item toContent validate inputMsg =
         element
         attributes
         []
+        state
 
 
 type alias HtmlFunction msg =
@@ -127,8 +134,9 @@ formField :
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
+    -> State
     -> Html msg
-formField field item validation htmlFn additionalAttributes children =
+formField field item validation htmlFn additionalAttributes children state =
     let
         fieldName =
             toString field
@@ -139,39 +147,43 @@ formField field item validation htmlFn additionalAttributes children =
         attributes =
             List.append
                 [ id identifier
-                , class (formControlClasses validation)
+                , class (formControlClasses errors)
                 ]
                 additionalAttributes
 
         formElement =
             htmlFn attributes children
+
+        errors =
+            Validation.validateField field state
     in
     div [ class "form-group" ]
         [ label
             [ for identifier ]
             [ text fieldName ]
         , formElement
-        , validationFeedback item validation
+        , validationFeedback errors
         ]
 
 
 hiddenInputWithVisibleError : a -> (a -> FieldValidation a) -> Html msg
 hiddenInputWithVisibleError item validate =
-    let
-        validation =
-            validate item
-
-        formElement =
-            input
-                [ type_ "hidden"
-                , class (formControlClasses validation)
-                ]
-                []
-    in
-    div [ class "form-group" ]
-        [ formElement
-        , validationFeedback item validation
-        ]
+    -- XXX Remove or replace this function?
+    -- let
+    --     validation =
+    --         validate item
+    --     formElement =
+    --         input
+    --             [ type_ "hidden"
+    --             , class (formControlClasses validation)
+    --             ]
+    --             []
+    -- in
+    -- div [ class "form-group" ]
+    --     [ formElement
+    --     , validationFeedback item validation
+    --     ]
+    div [] []
 
 
 fieldIdentifier : String -> String
@@ -180,23 +192,34 @@ fieldIdentifier fieldName =
         |> String.Extra.dasherize
 
 
-formControlClasses : FieldValidation a -> String
-formControlClasses validation =
-    "form-control " ++ bootstrapValidationClass validation
+formControlClasses : List Error -> String
+formControlClasses errors =
+    "form-control " ++ bootstrapValidationClass errors
 
 
-bootstrapValidationClass : FieldValidation a -> String
-bootstrapValidationClass validation =
-    case validation of
-        Valid ->
-            "is-valid"
-
-        Invalid _ ->
-            "is-invalid"
+bootstrapValidationClass : List Error -> String
+bootstrapValidationClass errors =
+    if List.isEmpty errors then
+        "is-valid"
+    else
+        "is-invalid"
 
 
-validationFeedback : a -> FieldValidation a -> Html msg
-validationFeedback item validation =
+validationFeedback : List Error -> Html msg
+validationFeedback errors =
+    let
+        errorMessage =
+            -- This elaborate pattern matching to just get an empty string is
+            -- to remind me to actually display the error message(s) once we
+            -- make it possible to set these (as this will then fail to
+            -- compile).
+            case List.head errors of
+                Just ( field, Empty ) ->
+                    ""
+
+                Nothing ->
+                    ""
+    in
     div
         [ class "invalid-feedback" ]
-        [ FieldValidation.error item validation |> text ]
+        [ text errorMessage ]
