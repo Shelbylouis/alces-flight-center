@@ -13,17 +13,18 @@ import Html.Events exposing (onInput)
 import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
 import String.Extra
+import Validation
 
 
 selectField :
-    String
+    Validation.Field
     -> SelectList a
     -> (a -> Int)
     -> (a -> String)
     -> (a -> FieldValidation a)
     -> (String -> msg)
     -> Html msg
-selectField fieldName items toId toOptionLabel validate changeMsg =
+selectField field items toId toOptionLabel validate changeMsg =
     let
         validatedField =
             SelectList.selected items |> validate
@@ -42,7 +43,7 @@ selectField fieldName items toId toOptionLabel validate changeMsg =
             SelectList.mapBy fieldOption items
                 |> SelectList.toList
     in
-    formField fieldName
+    formField field
         (SelectList.selected items)
         validatedField
         select
@@ -51,7 +52,7 @@ selectField fieldName items toId toOptionLabel validate changeMsg =
 
 
 textareaField :
-    String
+    Validation.Field
     -> a
     -> (a -> String)
     -> (a -> FieldValidation a)
@@ -62,7 +63,7 @@ textareaField =
 
 
 inputField :
-    String
+    Validation.Field
     -> a
     -> (a -> String)
     -> (a -> FieldValidation a)
@@ -79,13 +80,13 @@ type TextField
 
 textField :
     TextField
-    -> String
+    -> Validation.Field
     -> a
     -> (a -> String)
     -> (a -> FieldValidation a)
     -> (String -> msg)
     -> Html msg
-textField textFieldType fieldName item toContent validate inputMsg =
+textField textFieldType field item toContent validate inputMsg =
     let
         validatedField =
             validate item
@@ -107,7 +108,7 @@ textField textFieldType fieldName item toContent validate inputMsg =
             ]
                 ++ additionalAttributes
     in
-    formField fieldName
+    formField field
         item
         validatedField
         element
@@ -120,15 +121,18 @@ type alias HtmlFunction msg =
 
 
 formField :
-    String
+    Validation.Field
     -> a
     -> FieldValidation a
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
     -> Html msg
-formField fieldName item validation htmlFn additionalAttributes children =
+formField field item validation htmlFn additionalAttributes children =
     let
+        fieldName =
+            toString field
+
         identifier =
             fieldIdentifier fieldName
 

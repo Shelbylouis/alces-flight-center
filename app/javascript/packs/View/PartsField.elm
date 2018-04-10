@@ -9,6 +9,7 @@ import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import String.Extra
 import SupportType exposing (HasSupportType)
+import Validation
 import View.Fields as Fields
 
 
@@ -23,23 +24,20 @@ type alias PartsFromCluster a =
 
 
 maybePartsField :
-    String
+    Validation.Field
     -> PartsFieldConfig a
     -> (ClusterPart a -> Int)
     -> (Issue -> Bool)
     -> State
     -> (String -> msg)
     -> Maybe (Html msg)
-maybePartsField partName partsFieldConfig toId issueRequiresPart state changeMsg =
+maybePartsField field partsFieldConfig toId issueRequiresPart state changeMsg =
     let
-        fieldLabel =
-            String.Extra.toTitleCase partName
-
-        validatePart =
-            FieldValidation.validateWithErrorForItem
-                (errorForClusterPart partName)
-                (State.clusterPartAllowedForSelectedIssue state issueRequiresPart)
-
+        -- XXX Remove?
+        -- validatePart =
+        --     FieldValidation.validateWithErrorForItem
+        --         (errorForClusterPart partName)
+        --         (State.clusterPartAllowedForSelectedIssue state issueRequiresPart)
         labelForPart =
             \part ->
                 case part.supportType of
@@ -52,11 +50,11 @@ maybePartsField partName partsFieldConfig toId issueRequiresPart state changeMsg
         selectField =
             \parts ->
                 Fields.selectField
-                    fieldLabel
+                    field
                     parts
                     toId
                     labelForPart
-                    validatePart
+                    (always Valid)
                     changeMsg
                     |> Just
 
@@ -77,7 +75,7 @@ maybePartsField partName partsFieldConfig toId issueRequiresPart state changeMsg
             -- We're creating a Case for a specific part => don't want to allow
             -- selection of another part, but do still want to display any
             -- error between this part and selected Issue.
-            Just (Fields.hiddenInputWithVisibleError part validatePart)
+            Just (Fields.hiddenInputWithVisibleError part (always Valid))
 
         NotRequired ->
             -- Issue does not require a part of this type => do not show any

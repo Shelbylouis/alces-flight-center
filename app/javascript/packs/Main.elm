@@ -268,8 +268,7 @@ maybeClustersField clusters =
         Nothing
     else
         Just
-            (Fields.selectField
-                "Cluster"
+            (Fields.selectField Validation.Cluster
                 clusters
                 Cluster.extractId
                 .name
@@ -285,7 +284,7 @@ maybeCategoriesField state =
         |> Issues.categories
         |> Maybe.map
             (\categories_ ->
-                Fields.selectField "Category"
+                Fields.selectField Validation.Category
                     categories_
                     Category.extractId
                     .name
@@ -306,7 +305,7 @@ issuesField state =
                 consultancy support from Alces Software."""
                 (State.issueAvailableForSelectedCluster state)
     in
-    Fields.selectField "Issue"
+    Fields.selectField Validation.Issue
         selectedServiceAvailableIssues
         Issue.extractId
         Issue.name
@@ -325,7 +324,7 @@ maybeComponentsField state =
             else
                 SelectionField .components
     in
-    PartsField.maybePartsField "component"
+    PartsField.maybePartsField Validation.Component
         config
         Component.extractId
         Issue.requiresComponent
@@ -352,7 +351,7 @@ maybeServicesField state =
                 |> List.length
                 |> (==) 1
     in
-    PartsField.maybePartsField "service"
+    PartsField.maybePartsField Validation.Service
         config
         Service.extractId
         (always True)
@@ -369,7 +368,7 @@ subjectField state =
         validateSubject =
             FieldValidation.validateWithEmptyError Issue.subjectValid
     in
-    Fields.inputField "Subject"
+    Fields.inputField Validation.Subject
         selectedIssue
         Issue.subject
         validateSubject
@@ -385,8 +384,7 @@ detailsField state =
         validateDetails =
             FieldValidation.validateWithEmptyError Issue.detailsValid
     in
-    Fields.textareaField
-        "Details"
+    Fields.textareaField Validation.Details
         selectedIssue
         Issue.details
         validateDetails

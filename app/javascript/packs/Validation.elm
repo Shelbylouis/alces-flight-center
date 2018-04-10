@@ -1,4 +1,4 @@
-module Validation exposing (validateState)
+module Validation exposing (Field(..), validateState)
 
 import Issue
 import State exposing (State)
