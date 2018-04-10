@@ -50,12 +50,24 @@ selectField fieldName items toId toOptionLabel validate changeMsg =
         options
 
 
-textareaField : String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
+textareaField :
+    String
+    -> a
+    -> (a -> String)
+    -> (a -> FieldValidation a)
+    -> (String -> msg)
+    -> Html msg
 textareaField =
     textField TextArea
 
 
-inputField : String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
+inputField :
+    String
+    -> a
+    -> (a -> String)
+    -> (a -> FieldValidation a)
+    -> (String -> msg)
+    -> Html msg
 inputField =
     textField Input
 
@@ -65,7 +77,14 @@ type TextField
     | TextArea
 
 
-textField : TextField -> String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
+textField :
+    TextField
+    -> String
+    -> a
+    -> (a -> String)
+    -> (a -> FieldValidation a)
+    -> (String -> msg)
+    -> Html msg
 textField textFieldType fieldName item toContent validate inputMsg =
     let
         validatedField =
