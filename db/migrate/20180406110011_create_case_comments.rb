@@ -6,8 +6,6 @@ class CreateCaseComments < ActiveRecord::Migration[5.1]
       t.string :text, null: false
 
       t.timestamps null: false
-
-      t.index ['case_id'], name: 'index_comments_on_case_id'
     end
   end
 end
