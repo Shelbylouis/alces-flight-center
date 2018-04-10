@@ -40,6 +40,7 @@ class Issue < ApplicationRecord
 
   belongs_to :category, required: false
   belongs_to :service_type, required: false
+  has_many :tiers
 
   validates :name, presence: true
   validates :details_template, presence: true

@@ -31,6 +31,18 @@ class Case < ApplicationRecord
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true
+  validates :fields, presence: true
+
+  validates :tier_level,
+    presence: true,
+    numericality: {
+      only_integer: true,
+      # Cases cannot be created for Tier of level 0; Tier 0 support is just
+      # providing access to documentation without any action needing to be
+      # taken by Alces admins.
+      greater_than_or_equal_to: 1,
+      less_than_or_equal_to: 3,
+    }
 
   validates :last_known_ticket_status,
     presence: true,
