@@ -11,7 +11,6 @@ module State
 
 import Bootstrap.Modal as Modal
 import Cluster exposing (Cluster)
-import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
 import Issue exposing (Issue)
 import Issues
@@ -20,7 +19,6 @@ import Json.Encode as E
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
-import SupportType exposing (SupportType(..))
 
 
 type alias State =
