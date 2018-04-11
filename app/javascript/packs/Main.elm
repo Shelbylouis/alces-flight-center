@@ -18,9 +18,9 @@ import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
-import SelectList.Extra
 import Service exposing (Service)
 import State exposing (State)
+import Tier
 import Utils
 import Validation
 import View.Fields as Fields
@@ -74,6 +74,9 @@ view model =
                     , chargeableIssuePreSubmissionModal state |> Just
                     , State.selectedIssue state |> chargeableIssueAlert
                     , submitErrorAlert state
+
+                    -- XXX Do something better with Tiers
+                    , div [] [ text <| "Tier: " ++ toString (State.selectedTier state) ] |> Just
                     , caseForm state |> Just
                     ]
                 )
@@ -238,6 +241,7 @@ caseForm state =
                 , maybeServicesField state
                 , maybeCategoriesField state
                 , issuesField state |> Just
+                , tiersField state |> Just
                 , maybeComponentsField state
                 , subjectField state |> Just
                 , detailsField state |> Just
@@ -300,6 +304,20 @@ issuesField state =
         Issue.extractId
         Issue.name
         ChangeSelectedIssue
+        state
+
+
+tiersField : State -> Html Msg
+tiersField state =
+    let
+        selectedIssueTiers =
+            State.selectedIssue state |> Issue.tiers
+    in
+    Fields.selectField Field.Tier
+        selectedIssueTiers
+        Tier.extractId
+        Tier.description
+        ChangeSelectedTier
         state
 
 
@@ -392,6 +410,7 @@ type Msg
     = ChangeSelectedCluster String
     | ChangeSelectedCategory String
     | ChangeSelectedIssue String
+    | ChangeSelectedTier String
     | ChangeSelectedComponent String
     | ChangeSelectedService String
     | ChangeSubject String
@@ -436,6 +455,10 @@ updateState msg state =
         ChangeSelectedIssue id ->
             stringToId Issue.Id id
                 |> Maybe.map (handleChangeSelectedIssue state)
+
+        ChangeSelectedTier id ->
+            stringToId Tier.Id id
+                |> Maybe.map (handleChangeSelectedTier state)
 
         ChangeSelectedComponent id ->
             stringToId Component.Id id
@@ -507,7 +530,7 @@ handleChangeSelectedCategory : State -> Category.Id -> ( State, Cmd Msg )
 handleChangeSelectedCategory state categoryId =
     ( { state
         | clusters =
-            Cluster.setSelectedServiceSelectedCategory state.clusters categoryId
+            Cluster.setSelectedCategory state.clusters categoryId
       }
     , Cmd.none
     )
@@ -517,7 +540,17 @@ handleChangeSelectedIssue : State -> Issue.Id -> ( State, Cmd Msg )
 handleChangeSelectedIssue state issueId =
     ( { state
         | clusters =
-            Cluster.setSelectedServiceSelectedIssue state.clusters issueId
+            Cluster.setSelectedIssue state.clusters issueId
+      }
+    , Cmd.none
+    )
+
+
+handleChangeSelectedTier : State -> Tier.Id -> ( State, Cmd Msg )
+handleChangeSelectedTier state tierId =
+    ( { state
+        | clusters =
+            Cluster.setSelectedTier state.clusters tierId
       }
     , Cmd.none
     )
@@ -545,62 +578,18 @@ handleChangeSelectedService state serviceId =
 
 handleChangeSubject : State -> String -> State
 handleChangeSubject state subject =
-    let
-        newClusters =
-            SelectList.Extra.mapSelected updateCluster state.clusters
-
-        updateCluster =
-            \cluster ->
-                SelectList.Extra.mapSelected updateService cluster.services
-                    |> Cluster.asServicesIn cluster
-
-        updateService =
-            \service ->
-                updateIssues service.issues
-                    |> Service.asIssuesIn service
-
-        updateIssues =
-            Issues.mapIssue updateIssueSubject
-
-        updateCategory =
-            \category ->
-                SelectList.Extra.mapSelected updateIssueSubject category.issues
-                    |> Category.asIssuesIn category
-
-        updateIssueSubject =
-            Issue.setSubject subject
-    in
-    { state | clusters = newClusters }
+    { state
+        | clusters =
+            Cluster.updateSelectedIssue state.clusters (Issue.setSubject subject)
+    }
 
 
 handleChangeDetails : State -> String -> State
 handleChangeDetails state details =
-    let
-        newClusters =
-            SelectList.Extra.mapSelected updateCluster state.clusters
-
-        updateCluster =
-            \cluster ->
-                SelectList.Extra.mapSelected updateService cluster.services
-                    |> Cluster.asServicesIn cluster
-
-        updateService =
-            \service ->
-                updateIssues service.issues
-                    |> Service.asIssuesIn service
-
-        updateIssues =
-            Issues.mapIssue updateIssueDetails
-
-        updateCategory =
-            \category ->
-                SelectList.Extra.mapSelected updateIssueDetails category.issues
-                    |> Category.asIssuesIn category
-
-        updateIssueDetails =
-            Issue.setDetails details
-    in
-    { state | clusters = newClusters }
+    { state
+        | clusters =
+            Cluster.updateSelectedIssue state.clusters (Issue.setDetails details)
+    }
 
 
 submitForm : State -> Cmd Msg

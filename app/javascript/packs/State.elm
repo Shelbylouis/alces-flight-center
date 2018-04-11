@@ -7,11 +7,11 @@ module State
         , selectedIssue
         , selectedService
         , selectedServiceAvailableIssues
+        , selectedTier
         )
 
 import Bootstrap.Modal as Modal
 import Cluster exposing (Cluster)
-import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
 import Issue exposing (Issue)
 import Issues
@@ -20,7 +20,7 @@ import Json.Encode as E
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
-import SupportType exposing (SupportType(..))
+import Tier exposing (Tier)
 
 
 type alias State =
@@ -161,13 +161,11 @@ encoder state =
             SelectList.selected state.clusters
 
         partIdValue =
-            \required ->
-                \selected ->
-                    \extractId ->
-                        if required issue then
-                            selected state |> extractId |> E.int
-                        else
-                            E.null
+            \required selected extractId ->
+                if required issue then
+                    selected state |> extractId |> E.int
+                else
+                    E.null
 
         componentIdValue =
             partIdValue
@@ -212,6 +210,13 @@ selectedService : State -> Service
 selectedService state =
     SelectList.selected state.clusters
         |> .services
+        |> SelectList.selected
+
+
+selectedTier : State -> Tier
+selectedTier state =
+    selectedIssue state
+        |> Issue.tiers
         |> SelectList.selected
 
 

@@ -60,9 +60,8 @@ fromList list =
             ( List.head list, List.tail list )
     in
     Maybe.map2
-        (\head ->
-            \tail ->
-                SelectList.fromLists [] head tail
+        (\head tail ->
+            SelectList.fromLists [] head tail
         )
         maybeHead
         maybeTail
@@ -77,12 +76,11 @@ fromList list =
 mapSelected : (a -> a) -> SelectList a -> SelectList a
 mapSelected transform selectList =
     SelectList.mapBy
-        (\position ->
-            \item ->
-                if position == Selected then
-                    transform item
-                else
-                    item
+        (\position item ->
+            if position == Selected then
+                transform item
+            else
+                item
         )
         selectList
 

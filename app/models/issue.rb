@@ -79,7 +79,8 @@ class Issue < ApplicationRecord
       defaultSubject: default_subject,
       requiresComponent: requires_component,
       supportType: support_type,
-      chargeable: chargeable
+      chargeable: chargeable,
+      tiers: tiers.map(&:case_form_json)
     }
   end
 

@@ -9,14 +9,19 @@ module Issue
         , name
         , requiresComponent
         , sameId
+        , selectTier
         , setDetails
         , setSubject
         , subject
         , supportType
+        , tiers
         )
 
 import Json.Decode as D
+import SelectList exposing (SelectList)
+import SelectList.Extra
 import SupportType exposing (SupportType(..))
+import Tier exposing (Tier)
 import Utils
 
 
@@ -32,6 +37,7 @@ type alias IssueData =
     , subject : String
     , supportType : SupportType
     , chargeable : Bool
+    , tiers : SelectList Tier
     }
 
 
@@ -43,29 +49,24 @@ decoder : D.Decoder Issue
 decoder =
     let
         createIssue =
-            \id ->
-                \name ->
-                    \requiresComponent ->
-                        \detailsTemplate ->
-                            \defaultSubject ->
-                                \supportType ->
-                                    \chargeable ->
-                                        let
-                                            data =
-                                                IssueData
-                                                    id
-                                                    name
-                                                    detailsTemplate
-                                                    defaultSubject
-                                                    supportType
-                                                    chargeable
-                                        in
-                                        if requiresComponent then
-                                            ComponentRequiredIssue data
-                                        else
-                                            StandardIssue data
+            \id name requiresComponent detailsTemplate defaultSubject supportType chargeable tiers ->
+                let
+                    data =
+                        IssueData
+                            id
+                            name
+                            detailsTemplate
+                            defaultSubject
+                            supportType
+                            chargeable
+                            tiers
+                in
+                if requiresComponent then
+                    ComponentRequiredIssue data
+                else
+                    StandardIssue data
     in
-    D.map7 createIssue
+    D.map8 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
@@ -73,6 +74,7 @@ decoder =
         (D.field "defaultSubject" D.string)
         (D.field "supportType" SupportType.decoder)
         (D.field "chargeable" D.bool)
+        (D.field "tiers" <| SelectList.Extra.orderedDecoder Tier.levelAsInt Tier.decoder)
 
 
 extractId : Issue -> Int
@@ -107,6 +109,11 @@ subject issue =
     data issue |> .subject
 
 
+tiers : Issue -> SelectList Tier
+tiers issue =
+    data issue |> .tiers
+
+
 setDetails : String -> Issue -> Issue
 setDetails details =
     updateIssueData (\data -> { data | details = details })
@@ -115,6 +122,17 @@ setDetails details =
 setSubject : String -> Issue -> Issue
 setSubject subject =
     updateIssueData (\data -> { data | subject = subject })
+
+
+selectTier : Tier.Id -> Issue -> Issue
+selectTier tierId issue =
+    updateIssueData
+        (\data ->
+            { data
+                | tiers = SelectList.select (Utils.sameId tierId) (tiers issue)
+            }
+        )
+        issue
 
 
 updateIssueData : (IssueData -> IssueData) -> Issue -> Issue
