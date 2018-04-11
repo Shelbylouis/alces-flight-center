@@ -131,16 +131,38 @@ class Case < ApplicationRecord
     ).sort_by(&:created_at)
   end
 
+  def cc_emails
+    site.all_contacts
+        .reject { |contact| contact.email == requestor_email }
+        .map(&:email)
+  end
+
+  def email_subject
+    rt_email_identifier = "[helpdesk.alces-software.com ##{rt_ticket_id}]"
+    "RE: #{rt_email_identifier} #{rt_ticket_subject}"
+  end
+
+  def rt_ticket_subject
+    # NOTE: If the format used here ever changes then this may cause emails
+    # sent using the `mailto` links for existing Cases to not be threaded with
+    # previous emails related to that Case (see
+    # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
+    # for an explanation). If we want to change this format and avoid this
+    # consequence then a solution would be to first add a new field for this
+    # whole string, and save and use the existing format for existing Cases.
+    "#{cluster.name}: #{subject} [#{token}]"
+  end
+
   private
 
   def create_rt_ticket
     return unless cluster
 
     ticket = rt.create_ticket(
-      requestor_email: requestor_email,
-      cc: cc_emails,
-      subject: rt_ticket_subject,
-      text: rt_ticket_text
+    requestor_email: requestor_email,
+    cc: cc_emails,
+    subject: rt_ticket_subject,
+    text: rt_ticket_text
     )
 
     self.rt_ticket_id = ticket.id
@@ -166,28 +188,6 @@ class Case < ApplicationRecord
 
   def requestor_email
     user.email
-  end
-
-  def cc_emails
-    site.all_contacts
-      .reject { |contact| contact.email == requestor_email }
-      .map(&:email)
-  end
-
-  def rt_email_subject
-    rt_email_identifier = "[helpdesk.alces-software.com ##{rt_ticket_id}]"
-    "RE: #{rt_email_identifier} #{rt_ticket_subject}"
-  end
-
-  def rt_ticket_subject
-    # NOTE: If the format used here ever changes then this may cause emails
-    # sent using the `mailto` links for existing Cases to not be threaded with
-    # previous emails related to that Case (see
-    # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
-    # for an explanation). If we want to change this format and avoid this
-    # consequence then a solution would be to first add a new field for this
-    # whole string, and save and use the existing format for existing Cases.
-    "#{cluster.name}: #{subject} [#{token}]"
   end
 
   # We generate a short random token to identify each ticket within email

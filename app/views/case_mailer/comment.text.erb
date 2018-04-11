@@ -1,0 +1,14 @@
+A new comment has been added to the following case:
+
+  <%= @case.rt_ticket_subject %>
+
+-------------------------------------------------------------------------------
+<%= @comment.updated_at.to_formatted_s(:long) %> - <%= @comment.user.name %>:
+
+<%= @comment.text %>
+
+-------------------------------------------------------------------------------
+
+To reply, or to see more details of this case, please visit the following link:
+
+<<%= case_url(@case) %>>
