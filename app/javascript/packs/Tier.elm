@@ -1,4 +1,12 @@
-module Tier exposing (Tier, decoder, description, extractId, levelAsInt)
+module Tier
+    exposing
+        ( Id(..)
+        , Tier
+        , decoder
+        , description
+        , extractId
+        , levelAsInt
+        )
 
 import Json.Decode as D
 

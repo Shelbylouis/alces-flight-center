@@ -314,8 +314,7 @@ tiersField state =
         selectedIssueTiers
         Tier.extractId
         Tier.description
-        -- XXX Use new message for this and actually handle it.
-        ChangeSelectedIssue
+        ChangeSelectedTier
         state
 
 
@@ -408,6 +407,7 @@ type Msg
     = ChangeSelectedCluster String
     | ChangeSelectedCategory String
     | ChangeSelectedIssue String
+    | ChangeSelectedTier String
     | ChangeSelectedComponent String
     | ChangeSelectedService String
     | ChangeSubject String
@@ -452,6 +452,10 @@ updateState msg state =
         ChangeSelectedIssue id ->
             stringToId Issue.Id id
                 |> Maybe.map (handleChangeSelectedIssue state)
+
+        ChangeSelectedTier id ->
+            stringToId Tier.Id id
+                |> Maybe.map (handleChangeSelectedTier state)
 
         ChangeSelectedComponent id ->
             stringToId Component.Id id
@@ -534,6 +538,16 @@ handleChangeSelectedIssue state issueId =
     ( { state
         | clusters =
             Cluster.setSelectedIssue state.clusters issueId
+      }
+    , Cmd.none
+    )
+
+
+handleChangeSelectedTier : State -> Tier.Id -> ( State, Cmd Msg )
+handleChangeSelectedTier state tierId =
+    ( { state
+        | clusters =
+            Cluster.setSelectedTier state.clusters tierId
       }
     , Cmd.none
     )

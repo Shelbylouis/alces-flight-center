@@ -9,6 +9,7 @@ module Issue
         , name
         , requiresComponent
         , sameId
+        , selectTier
         , setDetails
         , setSubject
         , subject
@@ -121,6 +122,17 @@ setDetails details =
 setSubject : String -> Issue -> Issue
 setSubject subject =
     updateIssueData (\data -> { data | subject = subject })
+
+
+selectTier : Tier.Id -> Issue -> Issue
+selectTier tierId issue =
+    updateIssueData
+        (\data ->
+            { data
+                | tiers = SelectList.select (Utils.sameId tierId) (tiers issue)
+            }
+        )
+        issue
 
 
 updateIssueData : (IssueData -> IssueData) -> Issue -> Issue

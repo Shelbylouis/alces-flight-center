@@ -10,6 +10,7 @@ module Cluster
         , setSelectedIssue
         , setSelectedService
         , setSelectedServiceWhere
+        , setSelectedTier
         , setServices
         , updateSelectedIssue
         )
@@ -23,6 +24,7 @@ import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)
+import Tier
 import Utils
 
 
@@ -112,6 +114,11 @@ setSelectedIssue clusters issueId =
         .services
         asServicesIn
         updateService
+
+
+setSelectedTier : SelectList Cluster -> Tier.Id -> SelectList Cluster
+setSelectedTier clusters tierId =
+    updateSelectedIssue clusters (Issue.selectTier tierId)
 
 
 updateSelectedIssue : SelectList Cluster -> (Issue -> Issue) -> SelectList Cluster
