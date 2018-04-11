@@ -5,10 +5,10 @@ module Cluster
         , asServicesIn
         , decoder
         , extractId
+        , setSelectedCategory
         , setSelectedComponent
+        , setSelectedIssue
         , setSelectedService
-        , setSelectedServiceSelectedCategory
-        , setSelectedServiceSelectedIssue
         , setSelectedServiceWhere
         , setServices
         )
@@ -86,8 +86,8 @@ setSelectedServiceWhere clusters shouldSelect =
         shouldSelect
 
 
-setSelectedServiceSelectedCategory : SelectList Cluster -> Category.Id -> SelectList Cluster
-setSelectedServiceSelectedCategory clusters categoryId =
+setSelectedCategory : SelectList Cluster -> Category.Id -> SelectList Cluster
+setSelectedCategory clusters categoryId =
     let
         updateService =
             SelectList.Extra.mapSelected (Service.setSelectedCategory categoryId)
@@ -99,8 +99,8 @@ setSelectedServiceSelectedCategory clusters categoryId =
         updateService
 
 
-setSelectedServiceSelectedIssue : SelectList Cluster -> Issue.Id -> SelectList Cluster
-setSelectedServiceSelectedIssue clusters issueId =
+setSelectedIssue : SelectList Cluster -> Issue.Id -> SelectList Cluster
+setSelectedIssue clusters issueId =
     let
         updateService =
             SelectList.Extra.mapSelected (Service.setSelectedIssue issueId)

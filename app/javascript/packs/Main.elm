@@ -524,7 +524,7 @@ handleChangeSelectedCategory : State -> Category.Id -> ( State, Cmd Msg )
 handleChangeSelectedCategory state categoryId =
     ( { state
         | clusters =
-            Cluster.setSelectedServiceSelectedCategory state.clusters categoryId
+            Cluster.setSelectedCategory state.clusters categoryId
       }
     , Cmd.none
     )
@@ -534,7 +534,7 @@ handleChangeSelectedIssue : State -> Issue.Id -> ( State, Cmd Msg )
 handleChangeSelectedIssue state issueId =
     ( { state
         | clusters =
-            Cluster.setSelectedServiceSelectedIssue state.clusters issueId
+            Cluster.setSelectedIssue state.clusters issueId
       }
     , Cmd.none
     )
