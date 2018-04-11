@@ -67,6 +67,8 @@ class Case < ApplicationRecord
   # if this is possible but it was not explicitly passed.
   before_validation :create_rt_ticket, on: :create
 
+  after_create :send_new_case_email
+
   scope :active, -> { where(archived: false) }
 
   def self.request_tracker
@@ -80,7 +82,7 @@ class Case < ApplicationRecord
 
   def mailto_url
     support_email = 'support@alces-software.com'
-    "mailto:#{support_email}?subject=#{rt_email_subject}"
+    "mailto:#{support_email}?subject=#{email_subject}"
   end
 
   def open
@@ -131,7 +133,7 @@ class Case < ApplicationRecord
     ).sort_by(&:created_at)
   end
 
-  def cc_emails
+  def email_recipients
     site.all_contacts
         .reject { |contact| contact.email == requestor_email }
         .map(&:email)
@@ -153,6 +155,12 @@ class Case < ApplicationRecord
     "#{cluster.name}: #{subject} [#{token}]"
   end
 
+  def rt_ticket_text
+    # Ticket text does not need to be in this format, it is just text, but this
+    # is readable and an adequate format for now.
+    Utils.rt_format(rt_ticket_properties)
+  end
+
   private
 
   def create_rt_ticket
@@ -160,7 +168,7 @@ class Case < ApplicationRecord
 
     ticket = rt.create_ticket(
     requestor_email: requestor_email,
-    cc: cc_emails,
+    cc: email_recipients,
     subject: rt_ticket_subject,
     text: rt_ticket_text
     )
@@ -211,16 +219,6 @@ class Case < ApplicationRecord
       end.join
   end
 
-  def rt_ticket_text
-    # Ticket text does not need to be in this format, it is just text, but this
-    # is readable and an adequate format for now.
-    properties = Utils.rt_format(rt_ticket_properties)
-
-    [
-      'This ticket was created using Alces Flight Center',
-      properties
-    ].join("\n\n")
-  end
 
   def rt_ticket_properties
     {
@@ -232,5 +230,9 @@ class Case < ApplicationRecord
       'Associated service': service&.name,
       Details: details,
     }.reject { |_k, v| v.nil? }
+  end
+
+  def send_new_case_email
+    CaseMailer.with(case: self).new_case.deliver_later
   end
 end
