@@ -9,7 +9,6 @@ module Cluster
         , setSelectedComponent
         , setSelectedIssue
         , setSelectedService
-        , setSelectedServiceWhere
         , setSelectedTier
         , setServices
         , updateSelectedIssue
@@ -78,16 +77,11 @@ asComponentsIn cluster components =
 
 setSelectedService : SelectList Cluster -> Service.Id -> SelectList Cluster
 setSelectedService clusters serviceId =
-    setSelectedServiceWhere clusters (Utils.sameId serviceId)
-
-
-setSelectedServiceWhere : SelectList Cluster -> (Service -> Bool) -> SelectList Cluster
-setSelectedServiceWhere clusters shouldSelect =
     SelectList.Extra.nestedSelect
         clusters
         .services
         asServicesIn
-        shouldSelect
+        (Utils.sameId serviceId)
 
 
 setSelectedCategory : SelectList Cluster -> Category.Id -> SelectList Cluster
