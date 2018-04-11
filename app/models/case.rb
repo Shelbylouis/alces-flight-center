@@ -63,10 +63,6 @@ class Case < ApplicationRecord
 
   before_validation :assign_default_subject_if_unset
 
-  # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
-  # if this is possible but it was not explicitly passed.
-  before_validation :create_rt_ticket, on: :create
-
   after_create :send_new_case_email
 
   scope :active, -> { where(archived: false) }
@@ -162,19 +158,6 @@ class Case < ApplicationRecord
   end
 
   private
-
-  def create_rt_ticket
-    return unless cluster
-
-    ticket = rt.create_ticket(
-    requestor_email: requestor_email,
-    cc: email_recipients,
-    subject: rt_ticket_subject,
-    text: rt_ticket_text
-    )
-
-    self.rt_ticket_id = ticket.id
-  end
 
   def assign_cluster_if_necessary
     return if cluster
