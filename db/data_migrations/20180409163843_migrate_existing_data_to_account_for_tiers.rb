@@ -7,6 +7,7 @@ class MigrateExistingDataToAccountForTiers < ActiveRecord::DataMigration
   private
 
   def create_tiers
+    create_some_level_0_tiers
     create_level_1_tiers_for_support_type_change_issues
     create_initial_level_2_tiers_for_non_special_issues
     create_level_3_tiers_for_non_special_issues
@@ -24,6 +25,29 @@ class MigrateExistingDataToAccountForTiers < ActiveRecord::DataMigration
       # Tier for new Issues, so just delegate to this.
       issue.send(:create_standard_consultancy_tier)
     end
+  end
+
+  def create_some_level_0_tiers
+    Issue.find_by_name('Job running how-to/assistance').tiers.create!(
+      level: 0,
+      fields: [{
+        type: 'markdown',
+        content: <<~MARKDOWN.strip_heredoc
+          See the corresponding documentation for a scheduler available in your
+          environment:
+
+          - [Slurm Scheduler](http://docs.alces-flight.com/en/stable/slurm/slurm.html)
+
+          - [Open Grid Scheduler (SGE)](http://docs.alces-flight.com/en/stable/sge/sge.html)
+
+          - [OpenLava Scheduler](http://docs.alces-flight.com/en/stable/openlava/openlava.html)
+
+          - [TORQUE Scheduler](http://docs.alces-flight.com/en/stable/torque/torque.html)
+
+          - [PBS Pro Scheduler](http://docs.alces-flight.com/en/stable/pbspro/pbspro.html)
+        MARKDOWN
+      }]
+    )
   end
 
   def create_level_1_tiers_for_support_type_change_issues
