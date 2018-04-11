@@ -13,6 +13,7 @@ import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import String.Extra
+import Types
 import Validation exposing (Error, ErrorMessage(..))
 
 
@@ -54,7 +55,7 @@ textareaField :
     -> State
     -> Html msg
 textareaField =
-    textField TextArea
+    textField Types.TextArea
 
 
 inputField :
@@ -65,16 +66,11 @@ inputField :
     -> State
     -> Html msg
 inputField =
-    textField Input
-
-
-type TextField
-    = Input
-    | TextArea
+    textField Types.Input
 
 
 textField :
-    TextField
+    Types.TextField
     -> Field
     -> a
     -> (a -> String)
@@ -88,10 +84,10 @@ textField textFieldType field item toContent inputMsg state =
 
         ( element, additionalAttributes ) =
             case textFieldType of
-                Input ->
+                Types.Input ->
                     ( input, [] )
 
-                TextArea ->
+                Types.TextArea ->
                     ( textarea, [ rows 10 ] )
 
         attributes =

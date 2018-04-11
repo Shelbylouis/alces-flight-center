@@ -9,6 +9,7 @@ module Tier
         )
 
 import Json.Decode as D
+import Types
 
 
 type alias Tier =
@@ -35,7 +36,7 @@ type Field
 
 
 type alias TextInputData =
-    { type_ : TextInputType
+    { type_ : Types.TextField
     , name : String
     , value : String
 
@@ -44,13 +45,6 @@ type alias TextInputData =
     -- | OptionalTextInput TextInput
     , optional : Bool
     }
-
-
-type
-    TextInputType
-    -- XXX Could unify with `View.Fields.TextField`.
-    = Input
-    | Textarea
 
 
 decoder : D.Decoder Tier
@@ -90,10 +84,10 @@ fieldDecoder =
                         markdownDecoder
 
                     "input" ->
-                        textInputDecoder Input
+                        textInputDecoder Types.Input
 
                     "textarea" ->
-                        textInputDecoder Textarea
+                        textInputDecoder Types.TextArea
 
                     _ ->
                         D.fail <| "Invalid type: " ++ type_
@@ -107,7 +101,7 @@ markdownDecoder =
     D.map Markdown <| D.field "content" D.string
 
 
-textInputDecoder : TextInputType -> D.Decoder Field
+textInputDecoder : Types.TextField -> D.Decoder Field
 textInputDecoder type_ =
     let
         initialValueDecoder =
