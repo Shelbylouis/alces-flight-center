@@ -75,9 +75,6 @@ view model =
                     , chargeableIssuePreSubmissionModal state |> Just
                     , State.selectedIssue state |> chargeableIssueAlert
                     , submitErrorAlert state
-
-                    -- XXX Do something better with Tiers
-                    , div [] [ text <| "Tier: " ++ toString (State.selectedTier state) ] |> Just
                     , caseForm state |> Just
                     ]
                 )
