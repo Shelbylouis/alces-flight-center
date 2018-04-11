@@ -1,5 +1,7 @@
 module Tier exposing (..)
 
+import Json.Decode as D
+
 
 type alias Tier =
     { id : Id
@@ -41,3 +43,29 @@ type
     -- XXX Could unify with `View.Fields.TextField`.
     = Input
     | Textarea
+
+
+decoder : D.Decoder Tier
+decoder =
+    -- XXX Actually decode Tiers
+    D.succeed
+        { id = Id -1
+        , level = One
+        , fields = []
+        }
+
+
+levelAsInt : Tier -> Int
+levelAsInt tier =
+    case tier.level of
+        Zero ->
+            0
+
+        One ->
+            1
+
+        Two ->
+            2
+
+        Three ->
+            3
