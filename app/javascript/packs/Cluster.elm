@@ -11,11 +11,13 @@ module Cluster
         , setSelectedService
         , setSelectedServiceWhere
         , setServices
+        , updateSelectedIssue
         )
 
 import Category
 import Component exposing (Component)
-import Issue
+import Issue exposing (Issue)
+import Issues
 import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
@@ -110,6 +112,30 @@ setSelectedIssue clusters issueId =
         .services
         asServicesIn
         updateService
+
+
+updateSelectedIssue : SelectList Cluster -> (Issue -> Issue) -> SelectList Cluster
+updateSelectedIssue clusters changeIssue =
+    let
+        updateCluster =
+            \cluster ->
+                SelectList.Extra.mapSelected updateService cluster.services
+                    |> asServicesIn cluster
+
+        updateService =
+            \service ->
+                updateIssues service.issues
+                    |> Service.asIssuesIn service
+
+        updateIssues =
+            Issues.mapIssue changeIssue
+
+        updateCategory =
+            \category ->
+                SelectList.Extra.mapSelected changeIssue category.issues
+                    |> Category.asIssuesIn category
+    in
+    SelectList.Extra.mapSelected updateCluster clusters
 
 
 setServices : SelectList Service -> Cluster -> Cluster

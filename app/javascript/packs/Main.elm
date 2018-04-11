@@ -18,7 +18,6 @@ import Maybe.Extra
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
-import SelectList.Extra
 import Service exposing (Service)
 import State exposing (State)
 import Tier
@@ -562,62 +561,18 @@ handleChangeSelectedService state serviceId =
 
 handleChangeSubject : State -> String -> State
 handleChangeSubject state subject =
-    let
-        newClusters =
-            SelectList.Extra.mapSelected updateCluster state.clusters
-
-        updateCluster =
-            \cluster ->
-                SelectList.Extra.mapSelected updateService cluster.services
-                    |> Cluster.asServicesIn cluster
-
-        updateService =
-            \service ->
-                updateIssues service.issues
-                    |> Service.asIssuesIn service
-
-        updateIssues =
-            Issues.mapIssue updateIssueSubject
-
-        updateCategory =
-            \category ->
-                SelectList.Extra.mapSelected updateIssueSubject category.issues
-                    |> Category.asIssuesIn category
-
-        updateIssueSubject =
-            Issue.setSubject subject
-    in
-    { state | clusters = newClusters }
+    { state
+        | clusters =
+            Cluster.updateSelectedIssue state.clusters (Issue.setSubject subject)
+    }
 
 
 handleChangeDetails : State -> String -> State
 handleChangeDetails state details =
-    let
-        newClusters =
-            SelectList.Extra.mapSelected updateCluster state.clusters
-
-        updateCluster =
-            \cluster ->
-                SelectList.Extra.mapSelected updateService cluster.services
-                    |> Cluster.asServicesIn cluster
-
-        updateService =
-            \service ->
-                updateIssues service.issues
-                    |> Service.asIssuesIn service
-
-        updateIssues =
-            Issues.mapIssue updateIssueDetails
-
-        updateCategory =
-            \category ->
-                SelectList.Extra.mapSelected updateIssueDetails category.issues
-                    |> Category.asIssuesIn category
-
-        updateIssueDetails =
-            Issue.setDetails details
-    in
-    { state | clusters = newClusters }
+    { state
+        | clusters =
+            Cluster.updateSelectedIssue state.clusters (Issue.setDetails details)
+    }
 
 
 submitForm : State -> Cmd Msg
