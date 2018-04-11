@@ -241,7 +241,7 @@ caseForm state =
                 , maybeServicesField state
                 , maybeCategoriesField state
                 , issuesField state |> Just
-                , tiersField state |> Just
+                , tierSelectField state |> Just
                 , maybeComponentsField state
                 , subjectField state |> Just
                 , detailsField state |> Just
@@ -307,8 +307,8 @@ issuesField state =
         state
 
 
-tiersField : State -> Html Msg
-tiersField state =
+tierSelectField : State -> Html Msg
+tierSelectField state =
     let
         selectedIssueTiers =
             State.selectedIssue state |> Issue.tiers
