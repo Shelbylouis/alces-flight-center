@@ -27,13 +27,12 @@ selectField :
 selectField field items toId toOptionLabel changeMsg state =
     let
         fieldOption =
-            \position ->
-                \item ->
-                    option
-                        [ toId item |> toString |> value
-                        , position == Selected |> selected
-                        ]
-                        [ toOptionLabel item |> text ]
+            \position item ->
+                option
+                    [ toId item |> toString |> value
+                    , position == Selected |> selected
+                    ]
+                    [ toOptionLabel item |> text ]
 
         options =
             SelectList.mapBy fieldOption items

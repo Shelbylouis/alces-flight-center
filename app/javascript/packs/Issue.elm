@@ -47,29 +47,22 @@ decoder : D.Decoder Issue
 decoder =
     let
         createIssue =
-            \id ->
-                \name ->
-                    \requiresComponent ->
-                        \detailsTemplate ->
-                            \defaultSubject ->
-                                \supportType ->
-                                    \chargeable ->
-                                        \tiers ->
-                                            let
-                                                data =
-                                                    IssueData
-                                                        id
-                                                        name
-                                                        detailsTemplate
-                                                        defaultSubject
-                                                        supportType
-                                                        chargeable
-                                                        tiers
-                                            in
-                                            if requiresComponent then
-                                                ComponentRequiredIssue data
-                                            else
-                                                StandardIssue data
+            \id name requiresComponent detailsTemplate defaultSubject supportType chargeable tiers ->
+                let
+                    data =
+                        IssueData
+                            id
+                            name
+                            detailsTemplate
+                            defaultSubject
+                            supportType
+                            chargeable
+                            tiers
+                in
+                if requiresComponent then
+                    ComponentRequiredIssue data
+                else
+                    StandardIssue data
     in
     D.map8 createIssue
         (D.field "id" D.int |> D.map Id)

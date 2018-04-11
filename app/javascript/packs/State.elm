@@ -159,13 +159,11 @@ encoder state =
             SelectList.selected state.clusters
 
         partIdValue =
-            \required ->
-                \selected ->
-                    \extractId ->
-                        if required issue then
-                            selected state |> extractId |> E.int
-                        else
-                            E.null
+            \required selected extractId ->
+                if required issue then
+                    selected state |> extractId |> E.int
+                else
+                    E.null
 
         componentIdValue =
             partIdValue
