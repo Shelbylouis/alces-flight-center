@@ -6,6 +6,7 @@ type Field
     | Service
     | Category
     | Issue
+    | Tier
     | Component
     | Subject
     | Details

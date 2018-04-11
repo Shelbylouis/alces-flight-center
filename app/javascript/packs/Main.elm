@@ -21,6 +21,7 @@ import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
 import Service exposing (Service)
 import State exposing (State)
+import Tier
 import Utils
 import Validation
 import View.Fields as Fields
@@ -238,6 +239,7 @@ caseForm state =
                 , maybeServicesField state
                 , maybeCategoriesField state
                 , issuesField state |> Just
+                , tiersField state |> Just
                 , maybeComponentsField state
                 , subjectField state |> Just
                 , detailsField state |> Just
@@ -299,6 +301,21 @@ issuesField state =
         selectedServiceAvailableIssues
         Issue.extractId
         Issue.name
+        ChangeSelectedIssue
+        state
+
+
+tiersField : State -> Html Msg
+tiersField state =
+    let
+        selectedIssueTiers =
+            State.selectedIssue state |> Issue.tiers
+    in
+    Fields.selectField Field.Tier
+        selectedIssueTiers
+        Tier.extractId
+        Tier.description
+        -- XXX Use new message for this and actually handle it.
         ChangeSelectedIssue
         state
 

@@ -1,4 +1,4 @@
-module Tier exposing (Tier, decoder, levelAsInt)
+module Tier exposing (Tier, decoder, description, extractId, levelAsInt)
 
 import Json.Decode as D
 
@@ -151,3 +151,34 @@ intToLevel int =
 
         _ ->
             Err <| "Invalid level: " ++ toString int
+
+
+extractId : Tier -> Int
+extractId tier =
+    case tier.id of
+        Id id ->
+            id
+
+
+description : Tier -> String
+description tier =
+    let
+        humanTierDescription =
+            case tier.level of
+                Zero ->
+                    "Guides"
+
+                One ->
+                    "Tool"
+
+                Two ->
+                    "Support"
+
+                Three ->
+                    "Consultancy"
+
+        tierNumberPrefix =
+            toString (levelAsInt tier) ++ ":"
+    in
+    String.join " "
+        [ "Tier", tierNumberPrefix, humanTierDescription ]

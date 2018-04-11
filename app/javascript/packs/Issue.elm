@@ -13,6 +13,7 @@ module Issue
         , setSubject
         , subject
         , supportType
+        , tiers
         )
 
 import Json.Decode as D
@@ -105,6 +106,11 @@ details issue =
 subject : Issue -> String
 subject issue =
     data issue |> .subject
+
+
+tiers : Issue -> SelectList Tier
+tiers issue =
+    data issue |> .tiers
 
 
 setDetails : String -> Issue -> Issue
