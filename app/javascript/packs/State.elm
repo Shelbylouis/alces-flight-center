@@ -7,6 +7,7 @@ module State
         , selectedIssue
         , selectedService
         , selectedServiceAvailableIssues
+        , selectedTier
         )
 
 import Bootstrap.Modal as Modal
@@ -19,6 +20,7 @@ import Json.Encode as E
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
+import Tier exposing (Tier)
 
 
 type alias State =
@@ -208,6 +210,13 @@ selectedService : State -> Service
 selectedService state =
     SelectList.selected state.clusters
         |> .services
+        |> SelectList.selected
+
+
+selectedTier : State -> Tier
+selectedTier state =
+    selectedIssue state
+        |> Issue.tiers
         |> SelectList.selected
 
 
