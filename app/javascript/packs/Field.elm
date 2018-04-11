@@ -1,5 +1,7 @@
 module Field exposing (..)
 
+import Tier
+
 
 type Field
     = Cluster
@@ -9,4 +11,5 @@ type Field
     | Tier
     | Component
     | Subject
+    | TierField Tier.TextInputData
     | Details

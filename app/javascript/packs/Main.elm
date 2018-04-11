@@ -244,6 +244,7 @@ caseForm state =
                 , tierSelectField state |> Just
                 , maybeComponentsField state
                 , subjectField state |> Just
+                , dynamicTierFields state |> Just
                 , detailsField state |> Just
                 , submitButton state |> Just
                 ]
@@ -376,6 +377,35 @@ subjectField state =
         Issue.subject
         ChangeSubject
         state
+
+
+dynamicTierFields : State -> Html Msg
+dynamicTierFields state =
+    let
+        tier =
+            State.selectedTier state
+
+        renderedFields =
+            List.map (renderTierField state) tier.fields
+    in
+    div [] renderedFields
+
+
+renderTierField : State -> Tier.Field -> Html Msg
+renderTierField state field =
+    case field of
+        Tier.Markdown content ->
+            -- XXX render this
+            text content
+
+        Tier.TextInput fieldData ->
+            Fields.textField fieldData.type_
+                (Field.TierField fieldData)
+                fieldData
+                .value
+                -- XXX Use proper message type.
+                ChangeDetails
+                state
 
 
 detailsField : State -> Html Msg

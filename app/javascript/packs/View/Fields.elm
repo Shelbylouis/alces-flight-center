@@ -2,6 +2,7 @@ module View.Fields
     exposing
         ( inputField
         , selectField
+        , textField
         , textareaField
         )
 
@@ -119,7 +120,12 @@ formField :
 formField field item htmlFn additionalAttributes children state =
     let
         fieldName =
-            toString field
+            case field of
+                Field.TierField data ->
+                    data.name
+
+                _ ->
+                    toString field
 
         identifier =
             fieldIdentifier fieldName
