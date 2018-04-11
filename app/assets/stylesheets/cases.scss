@@ -6,3 +6,13 @@
 .credit-charge-required-case-row {
   background-color: lightgreen;
 }
+
+.case-form {
+  hr {
+    background-color: #777;
+
+    $margin: 25px;
+    margin-top: $margin;
+    margin-bottom: $margin;
+  }
+}

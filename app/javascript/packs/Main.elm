@@ -69,7 +69,7 @@ view : Model -> Html Msg
 view model =
     case model of
         Initialized state ->
-            div []
+            div [ class "case-form" ]
                 (Maybe.Extra.values
                     [ chargingInfoModal state |> Just
                     , chargeableIssuePreSubmissionModal state |> Just
@@ -240,8 +240,9 @@ caseForm state =
                 , maybeCategoriesField state
                 , issuesField state |> Just
                 , tierSelectField state |> Just
-                , maybeComponentsField state
+                , hr [] [] |> Just
                 , subjectField state |> Just
+                , maybeComponentsField state
                 , dynamicTierFields state |> Just
                 , detailsField state |> Just
                 , submitButton state |> Just
