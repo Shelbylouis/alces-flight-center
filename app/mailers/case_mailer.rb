@@ -3,7 +3,7 @@ class CaseMailer < ApplicationMailer
     @comment = params[:comment]
     @case = @comment.case
     mail(
-      cc: @case.cc_emails,
+      cc: @comment.email_recipients,
       subject: @case.email_subject,
     )
   end
