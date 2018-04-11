@@ -14,6 +14,7 @@ import Http
 import Issue exposing (Issue)
 import Issues
 import Json.Decode as D
+import Markdown
 import Maybe.Extra
 import Navigation
 import Rails
@@ -395,8 +396,7 @@ renderTierField : State -> Tier.Field -> Html Msg
 renderTierField state field =
     case field of
         Tier.Markdown content ->
-            -- XXX render this
-            text content
+            Markdown.toHtml [] content
 
         Tier.TextInput fieldData ->
             Fields.textField fieldData.type_
