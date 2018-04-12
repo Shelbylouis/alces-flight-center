@@ -13,10 +13,12 @@ module State
 import Bootstrap.Modal as Modal
 import Cluster exposing (Cluster)
 import Component exposing (Component)
+import Dict
 import Issue exposing (Issue)
 import Issues
 import Json.Decode as D
 import Json.Encode as E
+import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
@@ -177,6 +179,23 @@ encoder state =
             selectedService state
                 |> Service.extractId
                 |> E.int
+
+        details =
+            selectedTier state
+                |> .fields
+                |> Dict.values
+                |> List.map tierFieldAsString
+                |> Maybe.Extra.values
+                |> String.join "\n"
+
+        tierFieldAsString =
+            \field ->
+                case field of
+                    Tier.Markdown _ ->
+                        Nothing
+
+                    Tier.TextInput data ->
+                        Just <| data.name ++ ": " ++ data.value
     in
     E.object
         [ ( "case"
@@ -186,7 +205,7 @@ encoder state =
                 , ( "component_id", componentIdValue )
                 , ( "service_id", serviceIdValue )
                 , ( "subject", Issue.subject issue |> E.string )
-                , ( "details", Issue.details issue |> E.string )
+                , ( "details", details |> E.string )
                 ]
           )
         ]
