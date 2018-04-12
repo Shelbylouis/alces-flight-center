@@ -18,4 +18,13 @@ class CaseMailer < ApplicationMailer
       subject: @case.email_subject,
     )
   end
+
+  def maintenance
+    @case = params[:case]
+    @text = params[:text]
+    mail(
+      cc: @case.email_recipients,
+      subject: @case.email_subject
+    )
+  end
 end
