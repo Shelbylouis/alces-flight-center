@@ -6,6 +6,7 @@ import Bootstrap.Modal as Modal
 import Category
 import Cluster exposing (Cluster)
 import Component exposing (Component)
+import Dict
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -385,7 +386,8 @@ dynamicTierFields state =
             State.selectedTier state
 
         renderedFields =
-            List.map (renderTierField state) tier.fields
+            Dict.values tier.fields
+                |> List.map (renderTierField state)
     in
     div [] renderedFields
 

@@ -10,6 +10,7 @@ module Tier
         , levelAsInt
         )
 
+import Dict exposing (Dict)
 import Json.Decode as D
 import Types
 
@@ -17,7 +18,7 @@ import Types
 type alias Tier =
     { id : Id
     , level : Level
-    , fields : List Field
+    , fields : Dict Int Field
     }
 
 
@@ -72,8 +73,14 @@ decoder =
     D.map3 intermediateData
         (D.field "id" D.int |> D.map Id)
         (D.field "level" D.int |> D.map intToLevel)
-        (D.field "fields" <| D.list fieldDecoder)
+        (D.field "fields" fieldsDecoder)
         |> D.andThen createTier
+
+
+fieldsDecoder : D.Decoder (Dict Int Field)
+fieldsDecoder =
+    D.list fieldDecoder
+        |> D.map (List.indexedMap (,) >> Dict.fromList)
 
 
 fieldDecoder : D.Decoder Field
