@@ -15,6 +15,7 @@ module Issue
         , subject
         , supportType
         , tiers
+        , updateSelectedTierField
         )
 
 import Json.Decode as D
@@ -130,6 +131,20 @@ selectTier tierId issue =
         (\data ->
             { data
                 | tiers = SelectList.select (Utils.sameId tierId) (tiers issue)
+            }
+        )
+        issue
+
+
+updateSelectedTierField : Int -> String -> Issue -> Issue
+updateSelectedTierField fieldIndex value issue =
+    updateIssueData
+        (\data ->
+            { data
+                | tiers =
+                    SelectList.Extra.mapSelected
+                        (\tier -> Tier.setFieldValue tier fieldIndex value)
+                        data.tiers
             }
         )
         issue

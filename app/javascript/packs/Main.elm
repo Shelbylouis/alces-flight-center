@@ -386,14 +386,14 @@ dynamicTierFields state =
             State.selectedTier state
 
         renderedFields =
-            Dict.values tier.fields
+            Dict.toList tier.fields
                 |> List.map (renderTierField state)
     in
     div [] renderedFields
 
 
-renderTierField : State -> Tier.Field -> Html Msg
-renderTierField state field =
+renderTierField : State -> ( Int, Tier.Field ) -> Html Msg
+renderTierField state ( index, field ) =
     case field of
         Tier.Markdown content ->
             Markdown.toHtml [] content
@@ -403,8 +403,7 @@ renderTierField state field =
                 (Field.TierField fieldData)
                 fieldData
                 .value
-                -- XXX Use proper message type.
-                ChangeDetails
+                (ChangeTierField index)
                 state
 
 
@@ -445,6 +444,7 @@ type Msg
     | ChangeSelectedService String
     | ChangeSubject String
     | ChangeDetails String
+    | ChangeTierField Int String
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
     | ClearError
@@ -499,11 +499,13 @@ updateState msg state =
                 |> Maybe.map (handleChangeSelectedService state)
 
         ChangeSubject subject ->
-            Just
-                ( handleChangeSubject state subject, Cmd.none )
+            Just <| handleChangeSubject state subject ! []
 
         ChangeDetails details ->
             Just <| handleChangeDetails state details ! []
+
+        ChangeTierField index value ->
+            Just <| handleChangeTierField state index value ! []
 
         StartSubmit ->
             Just
@@ -610,6 +612,15 @@ handleChangeDetails state details =
     { state
         | clusters =
             Cluster.updateSelectedIssue state.clusters (Issue.setDetails details)
+    }
+
+
+handleChangeTierField : State -> Int -> String -> State
+handleChangeTierField state index value =
+    { state
+        | clusters =
+            Cluster.updateSelectedIssue state.clusters
+                (Issue.updateSelectedTierField index value)
     }
 
 

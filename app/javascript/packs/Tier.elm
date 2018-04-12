@@ -8,6 +8,7 @@ module Tier
         , description
         , extractId
         , levelAsInt
+        , setFieldValue
         )
 
 import Dict exposing (Dict)
@@ -193,3 +194,24 @@ description tier =
     in
     String.join " "
         [ "Tier", tierNumberPrefix, humanTierDescription ]
+
+
+setFieldValue : Tier -> Int -> String -> Tier
+setFieldValue tier index value =
+    let
+        updateFieldValue =
+            \maybeField ->
+                case maybeField of
+                    Just (Markdown f) ->
+                        Just (Markdown f)
+
+                    Just (TextInput f) ->
+                        Just <| TextInput { f | value = value }
+
+                    Nothing ->
+                        Nothing
+    in
+    { tier
+        | fields =
+            Dict.update index updateFieldValue tier.fields
+    }
