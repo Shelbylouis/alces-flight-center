@@ -101,6 +101,7 @@ class MigrateExistingDataToAccountForTiers < ActiveRecord::DataMigration
       'Job script how-to/assistance',
       'Self application install assistance',
       'Suspected hardware issue',
+      'Suspected service issue',
       storage_quota_issue,
     ].each do |issue_name|
       modify_level_2_tier_for(issue_name) do |tier|

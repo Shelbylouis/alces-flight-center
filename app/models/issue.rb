@@ -44,7 +44,6 @@ class Issue < ApplicationRecord
   has_many :tiers
 
   validates :name, presence: true
-  validates :details_template, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
   validates :identifier, uniqueness: true, if: :identifier
   validates :chargeable, inclusion: {in: [true, false]}
@@ -75,7 +74,6 @@ class Issue < ApplicationRecord
     {
       id: id,
       name: name,
-      detailsTemplate: details_template,
       defaultSubject: default_subject,
       requiresComponent: requires_component,
       supportType: support_type,

@@ -1,20 +1,25 @@
 module Tier
     exposing
-        ( Id(..)
+        ( Field(..)
+        , Id(..)
+        , TextInputData
         , Tier
         , decoder
         , description
         , extractId
         , levelAsInt
+        , setFieldValue
         )
 
+import Dict exposing (Dict)
 import Json.Decode as D
+import Types
 
 
 type alias Tier =
     { id : Id
     , level : Level
-    , fields : List Field
+    , fields : Dict Int Field
     }
 
 
@@ -35,7 +40,7 @@ type Field
 
 
 type alias TextInputData =
-    { type_ : TextInputType
+    { type_ : Types.TextField
     , name : String
     , value : String
 
@@ -44,13 +49,6 @@ type alias TextInputData =
     -- | OptionalTextInput TextInput
     , optional : Bool
     }
-
-
-type
-    TextInputType
-    -- XXX Could unify with `View.Fields.TextField`.
-    = Input
-    | Textarea
 
 
 decoder : D.Decoder Tier
@@ -76,8 +74,14 @@ decoder =
     D.map3 intermediateData
         (D.field "id" D.int |> D.map Id)
         (D.field "level" D.int |> D.map intToLevel)
-        (D.field "fields" <| D.list fieldDecoder)
+        (D.field "fields" fieldsDecoder)
         |> D.andThen createTier
+
+
+fieldsDecoder : D.Decoder (Dict Int Field)
+fieldsDecoder =
+    D.list fieldDecoder
+        |> D.map (List.indexedMap (,) >> Dict.fromList)
 
 
 fieldDecoder : D.Decoder Field
@@ -90,10 +94,10 @@ fieldDecoder =
                         markdownDecoder
 
                     "input" ->
-                        textInputDecoder Input
+                        textInputDecoder Types.Input
 
                     "textarea" ->
-                        textInputDecoder Textarea
+                        textInputDecoder Types.TextArea
 
                     _ ->
                         D.fail <| "Invalid type: " ++ type_
@@ -107,7 +111,7 @@ markdownDecoder =
     D.map Markdown <| D.field "content" D.string
 
 
-textInputDecoder : TextInputType -> D.Decoder Field
+textInputDecoder : Types.TextField -> D.Decoder Field
 textInputDecoder type_ =
     let
         initialValueDecoder =
@@ -190,3 +194,24 @@ description tier =
     in
     String.join " "
         [ "Tier", tierNumberPrefix, humanTierDescription ]
+
+
+setFieldValue : Tier -> Int -> String -> Tier
+setFieldValue tier index value =
+    let
+        updateFieldValue =
+            \maybeField ->
+                case maybeField of
+                    Just (Markdown f) ->
+                        Just (Markdown f)
+
+                    Just (TextInput f) ->
+                        Just <| TextInput { f | value = value }
+
+                    Nothing ->
+                        Nothing
+    in
+    { tier
+        | fields =
+            Dict.update index updateFieldValue tier.fields
+    }

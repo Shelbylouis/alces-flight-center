@@ -3,18 +3,17 @@ module Issue
         ( Id(..)
         , Issue
         , decoder
-        , details
         , extractId
         , isChargeable
         , name
         , requiresComponent
         , sameId
         , selectTier
-        , setDetails
         , setSubject
         , subject
         , supportType
         , tiers
+        , updateSelectedTierField
         )
 
 import Json.Decode as D
@@ -33,7 +32,6 @@ type Issue
 type alias IssueData =
     { id : Id
     , name : String
-    , details : String
     , subject : String
     , supportType : SupportType
     , chargeable : Bool
@@ -49,13 +47,12 @@ decoder : D.Decoder Issue
 decoder =
     let
         createIssue =
-            \id name requiresComponent detailsTemplate defaultSubject supportType chargeable tiers ->
+            \id name requiresComponent defaultSubject supportType chargeable tiers ->
                 let
                     data =
                         IssueData
                             id
                             name
-                            detailsTemplate
                             defaultSubject
                             supportType
                             chargeable
@@ -66,11 +63,10 @@ decoder =
                 else
                     StandardIssue data
     in
-    D.map8 createIssue
+    D.map7 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
-        (D.field "detailsTemplate" D.string)
         (D.field "defaultSubject" D.string)
         (D.field "supportType" SupportType.decoder)
         (D.field "chargeable" D.bool)
@@ -99,11 +95,6 @@ name issue =
     data issue |> .name
 
 
-details : Issue -> String
-details issue =
-    data issue |> .details
-
-
 subject : Issue -> String
 subject issue =
     data issue |> .subject
@@ -112,11 +103,6 @@ subject issue =
 tiers : Issue -> SelectList Tier
 tiers issue =
     data issue |> .tiers
-
-
-setDetails : String -> Issue -> Issue
-setDetails details =
-    updateIssueData (\data -> { data | details = details })
 
 
 setSubject : String -> Issue -> Issue
@@ -130,6 +116,20 @@ selectTier tierId issue =
         (\data ->
             { data
                 | tiers = SelectList.select (Utils.sameId tierId) (tiers issue)
+            }
+        )
+        issue
+
+
+updateSelectedTierField : Int -> String -> Issue -> Issue
+updateSelectedTierField fieldIndex value issue =
+    updateIssueData
+        (\data ->
+            { data
+                | tiers =
+                    SelectList.Extra.mapSelected
+                        (\tier -> Tier.setFieldValue tier fieldIndex value)
+                        data.tiers
             }
         )
         issue

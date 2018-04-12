@@ -6,6 +6,7 @@ import Bootstrap.Modal as Modal
 import Category
 import Cluster exposing (Cluster)
 import Component exposing (Component)
+import Dict
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -14,6 +15,7 @@ import Http
 import Issue exposing (Issue)
 import Issues
 import Json.Decode as D
+import Markdown
 import Maybe.Extra
 import Navigation
 import Rails
@@ -55,7 +57,7 @@ decodeInitialModel value =
 
 init : D.Value -> ( Model, Cmd Msg )
 init flags =
-    ( decodeInitialModel flags, Cmd.none )
+    decodeInitialModel flags ! []
 
 
 
@@ -68,15 +70,12 @@ view : Model -> Html Msg
 view model =
     case model of
         Initialized state ->
-            div []
+            div [ class "case-form" ]
                 (Maybe.Extra.values
                     [ chargingInfoModal state |> Just
                     , chargeableIssuePreSubmissionModal state |> Just
                     , State.selectedIssue state |> chargeableIssueAlert
                     , submitErrorAlert state
-
-                    -- XXX Do something better with Tiers
-                    , div [] [ text <| "Tier: " ++ toString (State.selectedTier state) ] |> Just
                     , caseForm state |> Just
                     ]
                 )
@@ -241,10 +240,11 @@ caseForm state =
                 , maybeServicesField state
                 , maybeCategoriesField state
                 , issuesField state |> Just
-                , tiersField state |> Just
-                , maybeComponentsField state
+                , tierSelectField state |> Just
+                , hr [] [] |> Just
                 , subjectField state |> Just
-                , detailsField state |> Just
+                , maybeComponentsField state
+                , dynamicTierFields state |> Just
                 , submitButton state |> Just
                 ]
     in
@@ -307,8 +307,8 @@ issuesField state =
         state
 
 
-tiersField : State -> Html Msg
-tiersField state =
+tierSelectField : State -> Html Msg
+tierSelectField state =
     let
         selectedIssueTiers =
             State.selectedIssue state |> Issue.tiers
@@ -378,17 +378,32 @@ subjectField state =
         state
 
 
-detailsField : State -> Html Msg
-detailsField state =
+dynamicTierFields : State -> Html Msg
+dynamicTierFields state =
     let
-        selectedIssue =
-            State.selectedIssue state
+        tier =
+            State.selectedTier state
+
+        renderedFields =
+            Dict.toList tier.fields
+                |> List.map (renderTierField state)
     in
-    Fields.textareaField Field.Details
-        selectedIssue
-        Issue.details
-        ChangeDetails
-        state
+    div [] renderedFields
+
+
+renderTierField : State -> ( Int, Tier.Field ) -> Html Msg
+renderTierField state ( index, field ) =
+    case field of
+        Tier.Markdown content ->
+            Markdown.toHtml [] content
+
+        Tier.TextInput fieldData ->
+            Fields.textField fieldData.type_
+                (Field.TierField fieldData)
+                fieldData
+                .value
+                (ChangeTierField index)
+                state
 
 
 submitButton : State -> Html Msg
@@ -414,7 +429,7 @@ type Msg
     | ChangeSelectedComponent String
     | ChangeSelectedService String
     | ChangeSubject String
-    | ChangeDetails String
+    | ChangeTierField Int String
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
     | ClearError
@@ -433,7 +448,7 @@ update msg model =
             let
                 ( newState, cmd ) =
                     updateState msg state
-                        |> Maybe.withDefault ( state, Cmd.none )
+                        |> Maybe.withDefault (state ! [])
             in
             ( Initialized newState, cmd )
 
@@ -469,12 +484,10 @@ updateState msg state =
                 |> Maybe.map (handleChangeSelectedService state)
 
         ChangeSubject subject ->
-            Just
-                ( handleChangeSubject state subject, Cmd.none )
+            Just <| handleChangeSubject state subject ! []
 
-        ChangeDetails details ->
-            Just
-                ( handleChangeDetails state details, Cmd.none )
+        ChangeTierField index value ->
+            Just <| handleChangeTierField state index value ! []
 
         StartSubmit ->
             Just
@@ -490,16 +503,15 @@ updateState msg state =
                     Just ( state, Navigation.load "/" )
 
                 Err error ->
-                    Just
-                        ( { state
+                    Just <|
+                        { state
                             | error = Just (formatSubmitError error)
                             , isSubmitting = False
-                          }
-                        , Cmd.none
-                        )
+                        }
+                            ! []
 
         ClearError ->
-            Just ( { state | error = Nothing }, Cmd.none )
+            Just <| { state | error = Nothing } ! []
 
         ClusterChargingInfoModal modalState ->
             Just ({ state | clusterChargingInfoModal = modalState } ! [])
@@ -521,59 +533,52 @@ handleChangeSelectedCluster state clusterId =
         newClusters =
             SelectList.select (Utils.sameId clusterId) state.clusters
     in
-    ( { state | clusters = newClusters }
-    , Cmd.none
-    )
+    { state | clusters = newClusters } ! []
 
 
 handleChangeSelectedCategory : State -> Category.Id -> ( State, Cmd Msg )
 handleChangeSelectedCategory state categoryId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedCategory state.clusters categoryId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSelectedIssue : State -> Issue.Id -> ( State, Cmd Msg )
 handleChangeSelectedIssue state issueId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedIssue state.clusters issueId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSelectedTier : State -> Tier.Id -> ( State, Cmd Msg )
 handleChangeSelectedTier state tierId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedTier state.clusters tierId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSelectedComponent : State -> Component.Id -> ( State, Cmd Msg )
 handleChangeSelectedComponent state componentId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedComponent state.clusters componentId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSelectedService : State -> Service.Id -> ( State, Cmd Msg )
 handleChangeSelectedService state serviceId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedService state.clusters serviceId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSubject : State -> String -> State
@@ -584,11 +589,12 @@ handleChangeSubject state subject =
     }
 
 
-handleChangeDetails : State -> String -> State
-handleChangeDetails state details =
+handleChangeTierField : State -> Int -> String -> State
+handleChangeTierField state index value =
     { state
         | clusters =
-            Cluster.updateSelectedIssue state.clusters (Issue.setDetails details)
+            Cluster.updateSelectedIssue state.clusters
+                (Issue.updateSelectedTierField index value)
     }
 
 

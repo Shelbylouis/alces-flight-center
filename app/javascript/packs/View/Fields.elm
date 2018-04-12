@@ -2,7 +2,7 @@ module View.Fields
     exposing
         ( inputField
         , selectField
-        , textareaField
+        , textField
         )
 
 import Field exposing (Field)
@@ -13,6 +13,7 @@ import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import String.Extra
+import Types
 import Validation exposing (Error, ErrorMessage(..))
 
 
@@ -46,17 +47,6 @@ selectField field items toId toOptionLabel changeMsg state =
         state
 
 
-textareaField :
-    Field
-    -> a
-    -> (a -> String)
-    -> (String -> msg)
-    -> State
-    -> Html msg
-textareaField =
-    textField TextArea
-
-
 inputField :
     Field
     -> a
@@ -65,16 +55,11 @@ inputField :
     -> State
     -> Html msg
 inputField =
-    textField Input
-
-
-type TextField
-    = Input
-    | TextArea
+    textField Types.Input
 
 
 textField :
-    TextField
+    Types.TextField
     -> Field
     -> a
     -> (a -> String)
@@ -88,10 +73,10 @@ textField textFieldType field item toContent inputMsg state =
 
         ( element, additionalAttributes ) =
             case textFieldType of
-                Input ->
+                Types.Input ->
                     ( input, [] )
 
-                TextArea ->
+                Types.TextArea ->
                     ( textarea, [ rows 10 ] )
 
         attributes =
@@ -123,7 +108,12 @@ formField :
 formField field item htmlFn additionalAttributes children state =
     let
         fieldName =
-            toString field
+            case field of
+                Field.TierField data ->
+                    data.name
+
+                _ ->
+                    toString field
 
         identifier =
             fieldIdentifier fieldName
