@@ -12,4 +12,3 @@ type Field
     | Component
     | Subject
     | TierField Tier.TextInputData
-    | Details

@@ -245,7 +245,6 @@ caseForm state =
                 , subjectField state |> Just
                 , maybeComponentsField state
                 , dynamicTierFields state |> Just
-                , detailsField state |> Just
                 , submitButton state |> Just
                 ]
     in
@@ -407,19 +406,6 @@ renderTierField state ( index, field ) =
                 state
 
 
-detailsField : State -> Html Msg
-detailsField state =
-    let
-        selectedIssue =
-            State.selectedIssue state
-    in
-    Fields.textareaField Field.Details
-        selectedIssue
-        Issue.details
-        ChangeDetails
-        state
-
-
 submitButton : State -> Html Msg
 submitButton state =
     input
@@ -443,7 +429,6 @@ type Msg
     | ChangeSelectedComponent String
     | ChangeSelectedService String
     | ChangeSubject String
-    | ChangeDetails String
     | ChangeTierField Int String
     | StartSubmit
     | SubmitResponse (Result (Rails.Error String) ())
@@ -500,9 +485,6 @@ updateState msg state =
 
         ChangeSubject subject ->
             Just <| handleChangeSubject state subject ! []
-
-        ChangeDetails details ->
-            Just <| handleChangeDetails state details ! []
 
         ChangeTierField index value ->
             Just <| handleChangeTierField state index value ! []
@@ -604,14 +586,6 @@ handleChangeSubject state subject =
     { state
         | clusters =
             Cluster.updateSelectedIssue state.clusters (Issue.setSubject subject)
-    }
-
-
-handleChangeDetails : State -> String -> State
-handleChangeDetails state details =
-    { state
-        | clusters =
-            Cluster.updateSelectedIssue state.clusters (Issue.setDetails details)
     }
 
 

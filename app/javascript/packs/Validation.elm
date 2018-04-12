@@ -51,8 +51,7 @@ validateField field state =
 stateValidator : Validator Error State
 stateValidator =
     Validate.all
-        [ Validate.ifBlank (State.selectedIssue >> Issue.details) ( Field.Details, Empty )
-        , Validate.ifBlank (State.selectedIssue >> Issue.subject) ( Field.Subject, Empty )
+        [ Validate.ifBlank (State.selectedIssue >> Issue.subject) ( Field.Subject, Empty )
 
         -- XXX Not handling any other validations for now, as these are
         -- currently either very improbable or impossible to trigger (at least
