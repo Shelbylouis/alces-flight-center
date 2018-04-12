@@ -57,7 +57,7 @@ decodeInitialModel value =
 
 init : D.Value -> ( Model, Cmd Msg )
 init flags =
-    ( decodeInitialModel flags, Cmd.none )
+    decodeInitialModel flags ! []
 
 
 
@@ -463,7 +463,7 @@ update msg model =
             let
                 ( newState, cmd ) =
                     updateState msg state
-                        |> Maybe.withDefault ( state, Cmd.none )
+                        |> Maybe.withDefault (state ! [])
             in
             ( Initialized newState, cmd )
 
@@ -503,8 +503,7 @@ updateState msg state =
                 ( handleChangeSubject state subject, Cmd.none )
 
         ChangeDetails details ->
-            Just
-                ( handleChangeDetails state details, Cmd.none )
+            Just <| handleChangeDetails state details ! []
 
         StartSubmit ->
             Just
@@ -520,16 +519,15 @@ updateState msg state =
                     Just ( state, Navigation.load "/" )
 
                 Err error ->
-                    Just
-                        ( { state
+                    Just <|
+                        { state
                             | error = Just (formatSubmitError error)
                             , isSubmitting = False
-                          }
-                        , Cmd.none
-                        )
+                        }
+                            ! []
 
         ClearError ->
-            Just ( { state | error = Nothing }, Cmd.none )
+            Just <| { state | error = Nothing } ! []
 
         ClusterChargingInfoModal modalState ->
             Just ({ state | clusterChargingInfoModal = modalState } ! [])
@@ -551,59 +549,52 @@ handleChangeSelectedCluster state clusterId =
         newClusters =
             SelectList.select (Utils.sameId clusterId) state.clusters
     in
-    ( { state | clusters = newClusters }
-    , Cmd.none
-    )
+    { state | clusters = newClusters } ! []
 
 
 handleChangeSelectedCategory : State -> Category.Id -> ( State, Cmd Msg )
 handleChangeSelectedCategory state categoryId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedCategory state.clusters categoryId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSelectedIssue : State -> Issue.Id -> ( State, Cmd Msg )
 handleChangeSelectedIssue state issueId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedIssue state.clusters issueId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSelectedTier : State -> Tier.Id -> ( State, Cmd Msg )
 handleChangeSelectedTier state tierId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedTier state.clusters tierId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSelectedComponent : State -> Component.Id -> ( State, Cmd Msg )
 handleChangeSelectedComponent state componentId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedComponent state.clusters componentId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSelectedService : State -> Service.Id -> ( State, Cmd Msg )
 handleChangeSelectedService state serviceId =
-    ( { state
+    { state
         | clusters =
             Cluster.setSelectedService state.clusters serviceId
-      }
-    , Cmd.none
-    )
+    }
+        ! []
 
 
 handleChangeSubject : State -> String -> State
