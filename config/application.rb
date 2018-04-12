@@ -20,6 +20,8 @@ module AlcesFlightCenter
     # we ever want to handle times in other time zones in future.
     config.active_record.default_timezone = :utc
 
+    config.email_bcc_address = ENV['EMAIL_BCC_ADDRESS'] || 'tickets@alces-software.com'
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
