@@ -3,7 +3,6 @@ module View.Fields
         ( inputField
         , selectField
         , textField
-        , textareaField
         )
 
 import Field exposing (Field)
@@ -46,17 +45,6 @@ selectField field items toId toOptionLabel changeMsg state =
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
         state
-
-
-textareaField :
-    Field
-    -> a
-    -> (a -> String)
-    -> (String -> msg)
-    -> State
-    -> Html msg
-textareaField =
-    textField Types.TextArea
 
 
 inputField :
