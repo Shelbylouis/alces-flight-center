@@ -14,7 +14,7 @@ class CaseComment < ApplicationRecord
   after_create :send_comment_email
 
   def email_recipients
-    site.all_contacts.reject { |c| c == @comment.user }.map(&:email)
+    site.all_contacts.reject { |c| c == user }.map(&:email)
   end
 
   private

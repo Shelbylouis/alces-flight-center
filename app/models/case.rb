@@ -30,7 +30,7 @@ class Case < ApplicationRecord
 
   validates :token, presence: true
   validates :subject, presence: true
-  validates :rt_ticket_id, presence: true, uniqueness: true
+  validates :rt_ticket_id, uniqueness: true
   validates :fields, presence: true
 
   validates :tier_level,
@@ -45,7 +45,6 @@ class Case < ApplicationRecord
     }
 
   validates :last_known_ticket_status,
-    presence: true,
     inclusion: {in: TICKET_STATUSES}
 
   # Only validate Issue relationship on create, as the Issue must be allowed
@@ -86,7 +85,7 @@ class Case < ApplicationRecord
   end
 
   def update_ticket_status!
-    return if ticket_completed? && self.completed_at
+    return if (ticket_completed? && self.completed_at) || !rt_ticket_id
     self.last_known_ticket_status = associated_rt_ticket.status
     if ticket_completed?
       self.completed_at = DateTime.now.utc
@@ -136,8 +135,15 @@ class Case < ApplicationRecord
   end
 
   def email_subject
-    rt_email_identifier = "[helpdesk.alces-software.com ##{rt_ticket_id}]"
-    "RE: #{rt_email_identifier} #{rt_ticket_subject}"
+    "RE: #{email_identifier} #{rt_ticket_subject}"
+  end
+
+  def email_identifier
+    if rt_ticket_id
+      "[helpdesk.alces-software.com ##{rt_ticket_id}]"
+    else
+      "[Alces Flight Center ##{id}]"
+    end
   end
 
   def rt_ticket_subject
@@ -170,7 +176,11 @@ class Case < ApplicationRecord
   end
 
   def associated_rt_ticket
-    @associated_ticket ||= rt.show_ticket(rt_ticket_id)
+    if rt_ticket_id
+      @associated_ticket ||= rt.show_ticket(rt_ticket_id)
+    else
+      nil
+    end
   end
 
   def rt
@@ -216,6 +226,6 @@ class Case < ApplicationRecord
   end
 
   def send_new_case_email
-    CaseMailer.with(case: self).new_case.deliver_later
+    CaseMailer.with(case: self).new_case.deliver_later unless email_recipients.empty?
   end
 end

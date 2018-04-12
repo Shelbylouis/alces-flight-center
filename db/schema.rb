@@ -67,11 +67,11 @@ ActiveRecord::Schema.define(version: 20180417164616) do
     t.integer "cluster_id", null: false
     t.integer "component_id"
     t.integer "user_id", null: false
-    t.bigint "rt_ticket_id", null: false
+    t.bigint "rt_ticket_id"
     t.boolean "archived", default: false, null: false
     t.integer "issue_id", null: false
     t.bigint "service_id"
-    t.string "last_known_ticket_status", default: "new", null: false
+    t.string "last_known_ticket_status", default: "new"
     t.text "token", null: false
     t.text "subject", null: false
     t.datetime "completed_at"
