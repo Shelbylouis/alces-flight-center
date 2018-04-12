@@ -3,7 +3,6 @@ FactoryBot.define do
   factory :issue do
     name 'New user/group'
     requires_component false
-    details_template 'Enter the usernames to create'
     support_type :managed
 
     factory :advice_issue do
