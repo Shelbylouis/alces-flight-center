@@ -226,6 +226,6 @@ class Case < ApplicationRecord
   end
 
   def send_new_case_email
-    CaseMailer.with(case: self).new_case.deliver_later unless email_recipients.empty?
+    CaseMailer.new_case(self).deliver_later unless email_recipients.empty?
   end
 end

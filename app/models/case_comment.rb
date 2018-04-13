@@ -24,6 +24,6 @@ class CaseComment < ApplicationRecord
   end
 
   def send_comment_email
-    CaseMailer.with(comment: self).comment.deliver_later
+    CaseMailer.comment(self).deliver_later
   end
 end
