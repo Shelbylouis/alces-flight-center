@@ -1,18 +1,18 @@
 class CaseMailerPreview < ApplicationMailerPreview
   def new_case
-    CaseMailer.with(case: get_case).new_case
+    CaseMailer.new_case(get_case)
   end
 
   def comment
     my_comment = CaseComment.first || FactoryBot.build(:case_comment)
-    CaseMailer.with(comment: my_comment).comment
+    CaseMailer.comment(my_comment)
   end
 
   def maintenance
-    CaseMailer.with(
-      case: get_case,
-      text: 'This text will be replaced with the text from MaintenanceNotifier'
-    ).maintenance
+    CaseMailer.maintenance(
+      get_case,
+      'This text will be replaced with the text from MaintenanceNotifier'
+    )
   end
 
   private
