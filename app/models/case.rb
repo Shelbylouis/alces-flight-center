@@ -130,7 +130,6 @@ class Case < ApplicationRecord
 
   def email_recipients
     site.all_contacts
-        .reject { |contact| contact.email == requestor_email }
         .map(&:email)
   end
 
@@ -164,7 +163,7 @@ class Case < ApplicationRecord
   def rt_ticket_text
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
-    Utils.rt_format(rt_ticket_properties)
+    Utils.rt_format(case_properties)
   end
 
   private
@@ -217,7 +216,7 @@ class Case < ApplicationRecord
   end
 
 
-  def rt_ticket_properties
+  def case_properties
     {
       Requestor: user.name,
       Cluster: cluster.name,

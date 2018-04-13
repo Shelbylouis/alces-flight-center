@@ -5,7 +5,7 @@ class CaseMailer < ApplicationMailer
   def new_case(my_case)
     @case = my_case
     mail(
-      cc: @case.email_recipients,
+      cc: @case.email_recipients.reject { |contact| contact == @case.user.email }, # Exclude the user raising the case
       subject: @case.email_subject
     )
   end
