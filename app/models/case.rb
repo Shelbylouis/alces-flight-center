@@ -77,7 +77,7 @@ class Case < ApplicationRecord
 
   def mailto_url
     support_email = 'support@alces-software.com'
-    "mailto:#{support_email}?subject=#{email_subject}"
+    "mailto:#{support_email}?subject=#{email_reply_subject}"
   end
 
   def open
@@ -134,8 +134,12 @@ class Case < ApplicationRecord
         .map(&:email)
   end
 
+  def email_reply_subject
+    "RE: #{email_subject}"
+  end
+
   def email_subject
-    "RE: #{email_identifier} #{rt_ticket_subject}"
+    "#{email_identifier} #{ticket_subject}"
   end
 
   def email_identifier
@@ -146,7 +150,7 @@ class Case < ApplicationRecord
     end
   end
 
-  def rt_ticket_subject
+  def ticket_subject
     # NOTE: If the format used here ever changes then this may cause emails
     # sent using the `mailto` links for existing Cases to not be threaded with
     # previous emails related to that Case (see

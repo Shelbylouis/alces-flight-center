@@ -6,7 +6,7 @@ class CaseMailer < ApplicationMailer
     @case = my_case
     mail(
       cc: @case.email_recipients,
-      subject: @case.rt_ticket_subject
+      subject: @case.email_subject
     )
   end
 
@@ -15,7 +15,7 @@ class CaseMailer < ApplicationMailer
     @case = @comment.case
     mail(
       cc: @comment.email_recipients,
-      subject: @case.email_subject,
+      subject: @case.email_reply_subject,
     )
   end
 
@@ -24,7 +24,7 @@ class CaseMailer < ApplicationMailer
     @text = text
     mail(
       cc: @case.email_recipients,
-      subject: @case.email_subject
+      subject: @case.email_reply_subject
     )
   end
 end

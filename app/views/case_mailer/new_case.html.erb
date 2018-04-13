@@ -1,6 +1,6 @@
 <p>A new support case has been created:</p>
 
-<h3><%= @case.rt_ticket_subject %></h3>
+<h3><%= @case.ticket_subject %></h3>
 
 <blockquote>
   <% @case.rt_ticket_text.split(/\n/).each do |line| %>
@@ -11,4 +11,4 @@
 </blockquote>
 
 <p>To comment, or to see more details of this case, please visit the following link:</p>
-<p><a href="<%= case_url(@case) %>"><%= @case.rt_ticket_subject %></a></p>
+<p><a href="<%= case_url(@case) %>"><%= @case.ticket_subject %></a></p>

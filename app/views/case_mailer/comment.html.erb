@@ -1,6 +1,6 @@
 <p>A new comment has been added to the following case:</p>
 
-<h3><%= @case.rt_ticket_subject %></h3>
+<h3><%= @case.ticket_subject %></h3>
 
 <blockquote>
   <%= @comment.text %>
@@ -9,4 +9,4 @@
 </blockquote>
 
 <p>To reply, or to see more details of this case, please visit the following link:</p>
-<p><a href="<%= case_url(@case) %>"><%= @case.rt_ticket_subject %></a></p>
+<p><a href="<%= case_url(@case) %>"><%= @case.ticket_subject %></a></p>
