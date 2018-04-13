@@ -14,7 +14,7 @@ class CaseMailer < ApplicationMailer
     @comment = comment
     @case = @comment.case
     mail(
-      cc: @comment.email_recipients,
+      cc: @case.email_recipients.reject { |contact| contact == @comment.user.email }, # Exclude the user making the comment
       subject: @case.email_reply_subject,
     )
   end
