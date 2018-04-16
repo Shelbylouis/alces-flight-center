@@ -2,6 +2,7 @@ module Tier
     exposing
         ( Field(..)
         , Id(..)
+        , Level(..)
         , TextInputData
         , Tier
         , decoder
