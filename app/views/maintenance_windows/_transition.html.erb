@@ -1,0 +1,10 @@
+<div class="card">
+  <div class="card-header">
+    <%= transition.created_at.to_formatted_s(:long) %> - <b>
+    <%= transition.user&.name || 'Flight Center' %>
+    </b>
+  </div>
+  <div class="card-body">
+    <%= transition.decorate.comment_text %>
+  </div>
+</div>

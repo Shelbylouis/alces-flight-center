@@ -122,6 +122,14 @@ class Case < ApplicationRecord
     COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
+  def events
+    (
+      case_comments.select(&:created_at) +  # We create an empty CaseComment to pass to our view, so there's one knocking
+      # around with no created_at as it's never saved
+      maintenance_windows.map(&:transitions).flatten
+    ).sort_by(&:created_at)
+  end
+
   private
 
   def create_rt_ticket
