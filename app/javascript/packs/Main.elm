@@ -263,11 +263,27 @@ dynamicFields state =
     -- These fields are very dynamic, and either appear/disappear entirely or
     -- have their content changed based on the currently selected Issue and
     -- Tier.
-    [ subjectField state |> Just
-    , maybeComponentsField state
-    , dynamicTierFields state |> Just
-    , submitButton state |> Just
-    ]
+    let
+        selectedTier =
+            State.selectedTier state
+
+        tierFields =
+            dynamicTierFields state |> Just
+    in
+    case selectedTier.level of
+        Tier.Zero ->
+            -- When a level 0 Tier is selected we want to prevent filling in
+            -- any fields or submitting the form, and only show the rendered
+            -- Tier fields, which should include the relevant links to
+            -- documentation.
+            [ tierFields ]
+
+        _ ->
+            [ subjectField state |> Just
+            , maybeComponentsField state
+            , tierFields
+            , submitButton state |> Just
+            ]
 
 
 maybeClustersField : State -> Maybe (Html Msg)
