@@ -126,7 +126,7 @@ class Case < ApplicationRecord
     (
       case_comments.select(&:created_at) +  # We create an empty CaseComment to pass to our view, so there's one knocking
       # around with no created_at as it's never saved
-      maintenance_windows.map(&:transitions).flatten
+      maintenance_windows.map(&:transitions).flatten.select(&:event)
     ).sort_by(&:created_at)
   end
 
