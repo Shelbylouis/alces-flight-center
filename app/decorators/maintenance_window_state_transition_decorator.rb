@@ -1,7 +1,10 @@
 class MaintenanceWindowStateTransitionDecorator < ApplicationDecorator
 
   def event_card
-    h.render 'maintenance_windows/transition', transition: object
+    h.render 'cases/event',
+             date: object.created_at,
+             name: object.user&.name || 'Flight Center',
+             text: comment_text
   end
 
   def comment_text
