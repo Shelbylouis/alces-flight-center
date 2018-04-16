@@ -235,20 +235,39 @@ caseForm state =
                 StartSubmit
 
         formElements =
-            Maybe.Extra.values
-                [ maybeClustersField state
-                , maybeServicesField state
-                , maybeCategoriesField state
-                , issuesField state |> Just
-                , tierSelectField state |> Just
-                , hr [] [] |> Just
-                , subjectField state |> Just
-                , maybeComponentsField state
-                , dynamicTierFields state |> Just
-                , submitButton state |> Just
+            List.concat
+                [ issueDrillDownFields state
+                , [ hr [] [] |> Just ]
+                , dynamicFields state
                 ]
+                |> Maybe.Extra.values
     in
     Html.form [ onSubmit submitMsg ] formElements
+
+
+issueDrillDownFields : State -> List (Maybe (Html Msg))
+issueDrillDownFields state =
+    -- These fields allow a user to drill down to identify the particular Issue
+    -- and possible solutions (via different Tiers) to a problem they are
+    -- having.
+    [ maybeClustersField state
+    , maybeServicesField state
+    , maybeCategoriesField state
+    , issuesField state |> Just
+    , tierSelectField state |> Just
+    ]
+
+
+dynamicFields : State -> List (Maybe (Html Msg))
+dynamicFields state =
+    -- These fields are very dynamic, and either appear/disappear entirely or
+    -- have their content changed based on the currently selected Issue and
+    -- Tier.
+    [ subjectField state |> Just
+    , maybeComponentsField state
+    , dynamicTierFields state |> Just
+    , submitButton state |> Just
+    ]
 
 
 maybeClustersField : State -> Maybe (Html Msg)
