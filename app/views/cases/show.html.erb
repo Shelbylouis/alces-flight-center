@@ -50,7 +50,7 @@
         <td><%= simple_format(@case.details) %></td>
       </tr>
       <tr>
-        <th>Comments</th>
+        <th>Case history</th>
         <td>
           <% @case.events.each do |event| %>
             <%= event.decorate.event_card %>
