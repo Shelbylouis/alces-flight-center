@@ -16,6 +16,7 @@ class CasesController < ApplicationController
 
   def show
     @case = Case.find(params[:id]).decorate
+    @comment = @case.case_comments.new
   end
 
   def new

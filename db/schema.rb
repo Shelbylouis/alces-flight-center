@@ -50,6 +50,16 @@ ActiveRecord::Schema.define(version: 20180412163928) do
     t.index ["component_id"], name: "index_asset_record_fields_on_component_id"
   end
 
+  create_table "case_comments", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "case_id", null: false
+    t.string "text", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["case_id"], name: "index_case_comments_on_case_id"
+    t.index ["user_id"], name: "index_case_comments_on_user_id"
+  end
+
   create_table "cases", force: :cascade do |t|
     t.string "details", null: false
     t.datetime "created_at", null: false
@@ -295,6 +305,8 @@ ActiveRecord::Schema.define(version: 20180412163928) do
   add_foreign_key "asset_record_fields", "asset_record_field_definitions"
   add_foreign_key "asset_record_fields", "component_groups"
   add_foreign_key "asset_record_fields", "components"
+  add_foreign_key "case_comments", "cases"
+  add_foreign_key "case_comments", "users"
   add_foreign_key "cases", "clusters"
   add_foreign_key "cases", "components"
   add_foreign_key "cases", "issues"

@@ -23,6 +23,7 @@ class Case < ApplicationRecord
   has_one :credit_charge, required: false
   has_many :maintenance_windows
   has_and_belongs_to_many :log
+  has_many :case_comments
 
   delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true
