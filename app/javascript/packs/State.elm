@@ -180,9 +180,11 @@ encoder state =
                 |> Service.extractId
                 |> E.int
 
-        details =
+        tier =
             selectedTier state
-                |> .fields
+
+        details =
+            tier.fields
                 |> Dict.values
                 |> List.map tierFieldAsString
                 |> Maybe.Extra.values
@@ -206,6 +208,8 @@ encoder state =
                 , ( "service_id", serviceIdValue )
                 , ( "subject", Issue.subject issue |> E.string )
                 , ( "details", details |> E.string )
+                , ( "tier_level", Tier.levelAsInt tier |> E.int )
+                , ( "fields", Tier.fieldsEncoder tier )
                 ]
           )
         ]

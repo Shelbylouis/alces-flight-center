@@ -79,7 +79,9 @@ RSpec.describe CasesController, type: :controller do
           component_id: first_cluster_component.id,
           issue_id: create(:issue_requiring_component).id,
           subject: 'subject',
-          details: 'Useful info'
+          details: 'Useful info',
+          tier_level: 2,
+          fields: [type: 'textarea'],
         }
       }
     end

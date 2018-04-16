@@ -37,10 +37,7 @@ class CasesController < ApplicationController
   end
 
   def create
-    # XXX Set `fields` and `tier_level` to real rather than junk values.
-    @case = Case.new(
-      case_params.merge(user: current_user, fields: '[]', tier_level: 2)
-    )
+    @case = Case.new(case_params.merge(user: current_user))
 
     respond_to do |format|
       if @case.save
@@ -92,6 +89,8 @@ class CasesController < ApplicationController
       :service_id,
       :subject,
       :details,
+      :tier_level,
+      fields: [:type, :name, :value, :optional],
     )
   end
 

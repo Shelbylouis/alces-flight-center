@@ -8,12 +8,16 @@ module Tier
         , decoder
         , description
         , extractId
+        , fieldsEncoder
         , levelAsInt
         , setFieldValue
         )
 
+import Array
 import Dict exposing (Dict)
 import Json.Decode as D
+import Json.Encode as E
+import Maybe.Extra
 import Types
 
 
@@ -120,6 +124,42 @@ textInputDecoder type_ =
             (D.field "name" D.string)
             initialValueDecoder
             optionalDecoder
+
+
+fieldsEncoder : Tier -> E.Value
+fieldsEncoder tier =
+    E.array
+        (Dict.values tier.fields
+            |> List.map fieldEncoder
+            |> Maybe.Extra.values
+            |> Array.fromList
+        )
+
+
+fieldEncoder : Field -> Maybe E.Value
+fieldEncoder field =
+    case field of
+        Markdown _ ->
+            Nothing
+
+        TextInput data ->
+            Just <|
+                E.object
+                    [ ( "type", textFieldTypeToString data.type_ |> E.string )
+                    , ( "name", E.string data.name )
+                    , ( "value", E.string data.value )
+                    , ( "optional", E.bool data.optional )
+                    ]
+
+
+textFieldTypeToString : Types.TextField -> String
+textFieldTypeToString field =
+    case field of
+        Types.TextArea ->
+            "textarea"
+
+        Types.Input ->
+            "input"
 
 
 levelAsInt : Tier -> Int
