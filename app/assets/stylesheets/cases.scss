@@ -16,3 +16,16 @@
     margin-bottom: $margin;
   }
 }
+
+.event-card {
+  .card-header {
+    span {
+      display: block;
+      flex-grow: 1;
+    }
+
+    .icon {
+      width: auto;
+    }
+  }
+}

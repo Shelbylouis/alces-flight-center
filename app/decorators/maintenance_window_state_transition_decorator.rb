@@ -4,7 +4,8 @@ class MaintenanceWindowStateTransitionDecorator < ApplicationDecorator
     h.render 'cases/event',
              date: object.created_at,
              name: object.user&.name || 'Flight Center',
-             text: comment_text
+             text: comment_text,
+             type: 'wrench'
   end
 
   def comment_text
