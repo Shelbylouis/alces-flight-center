@@ -54,29 +54,20 @@ type alias TextInputData =
 
 decoder : D.Decoder Tier
 decoder =
-    let
-        intermediateData =
-            \id levelResult fields ->
-                { id = id
-                , levelResult = levelResult
-                , fields = fields
-                }
-
-        createTier =
-            \intermediate ->
-                case intermediate.levelResult of
+    D.field "level" D.int
+        |> D.map intToLevel
+        |> D.andThen
+            (\levelResult ->
+                case levelResult of
                     Ok level ->
-                        D.succeed <|
-                            Tier intermediate.id level intermediate.fields
+                        D.map3 Tier
+                            (D.field "id" D.int |> D.map Id)
+                            (D.succeed level)
+                            (D.field "fields" fieldsDecoder)
 
                     Err error ->
                         D.fail error
-    in
-    D.map3 intermediateData
-        (D.field "id" D.int |> D.map Id)
-        (D.field "level" D.int |> D.map intToLevel)
-        (D.field "fields" fieldsDecoder)
-        |> D.andThen createTier
+            )
 
 
 fieldsDecoder : D.Decoder (Dict Int Field)
