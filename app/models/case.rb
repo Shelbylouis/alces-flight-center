@@ -1,18 +1,18 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
 
-  COMPLETED_TICKET_STATUSES = [
+  COMPLETED_RT_TICKET_STATUSES = [
     'resolved',
     'rejected',
     'deleted',
   ]
 
-  TICKET_STATUSES = (
+  RT_TICKET_STATUSES = (
     [
       'new',
       'open',
       'stalled',
-    ] + COMPLETED_TICKET_STATUSES
+    ] + COMPLETED_RT_TICKET_STATUSES
   ).freeze
 
   belongs_to :issue
@@ -28,6 +28,18 @@ class Case < ApplicationRecord
   delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true
 
+  state_machine :state, initial: :open do
+    audit_trail context: [:user]
+
+    state :open  # Open case, still work to do
+    state :resolved  # Has been resolved but not yet accounted for commercially
+    state :archived  # Has been accounted for commercially, nothing more to do
+
+    event(:resolve) { transition open: :resolved }  # Resolved cases cannot be reopened
+    event(:archive) { transition resolved: :archived }
+  end
+
+  validates :details, presence: true
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
@@ -115,7 +127,7 @@ class Case < ApplicationRecord
   end
 
   def ticket_completed?
-    COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
+    COMPLETED_RT_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
   def events
