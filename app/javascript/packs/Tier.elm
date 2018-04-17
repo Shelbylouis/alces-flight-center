@@ -8,12 +8,16 @@ module Tier
         , decoder
         , description
         , extractId
+        , fieldsEncoder
         , levelAsInt
         , setFieldValue
         )
 
+import Array
 import Dict exposing (Dict)
 import Json.Decode as D
+import Json.Encode as E
+import Maybe.Extra
 import Types
 
 
@@ -54,29 +58,20 @@ type alias TextInputData =
 
 decoder : D.Decoder Tier
 decoder =
-    let
-        intermediateData =
-            \id levelResult fields ->
-                { id = id
-                , levelResult = levelResult
-                , fields = fields
-                }
-
-        createTier =
-            \intermediate ->
-                case intermediate.levelResult of
+    D.field "level" D.int
+        |> D.map intToLevel
+        |> D.andThen
+            (\levelResult ->
+                case levelResult of
                     Ok level ->
-                        D.succeed <|
-                            Tier intermediate.id level intermediate.fields
+                        D.map3 Tier
+                            (D.field "id" D.int |> D.map Id)
+                            (D.succeed level)
+                            (D.field "fields" fieldsDecoder)
 
                     Err error ->
                         D.fail error
-    in
-    D.map3 intermediateData
-        (D.field "id" D.int |> D.map Id)
-        (D.field "level" D.int |> D.map intToLevel)
-        (D.field "fields" fieldsDecoder)
-        |> D.andThen createTier
+            )
 
 
 fieldsDecoder : D.Decoder (Dict Int Field)
@@ -129,6 +124,42 @@ textInputDecoder type_ =
             (D.field "name" D.string)
             initialValueDecoder
             optionalDecoder
+
+
+fieldsEncoder : Tier -> E.Value
+fieldsEncoder tier =
+    E.array
+        (Dict.values tier.fields
+            |> List.map fieldEncoder
+            |> Maybe.Extra.values
+            |> Array.fromList
+        )
+
+
+fieldEncoder : Field -> Maybe E.Value
+fieldEncoder field =
+    case field of
+        Markdown _ ->
+            Nothing
+
+        TextInput data ->
+            Just <|
+                E.object
+                    [ ( "type", textFieldTypeToString data.type_ |> E.string )
+                    , ( "name", E.string data.name )
+                    , ( "value", E.string data.value )
+                    , ( "optional", E.bool data.optional )
+                    ]
+
+
+textFieldTypeToString : Types.TextField -> String
+textFieldTypeToString field =
+    case field of
+        Types.TextArea ->
+            "textarea"
+
+        Types.Input ->
+            "input"
 
 
 levelAsInt : Tier -> Int

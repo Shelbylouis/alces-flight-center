@@ -56,7 +56,8 @@ class MigrateExistingDataToAccountForTiers < ActiveRecord::DataMigration
         level: 1,
         fields: [{
           type: 'input',
-          name: 'Info'
+          name: 'Info',
+          value: 'User-requested from management dashboard',
         }],
       )
     end

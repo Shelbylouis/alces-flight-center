@@ -42,12 +42,31 @@
         <td><%= boolean_symbol(@case.archived) %></td>
       </tr>
       <tr>
+        <th>Tier</th>
+        <td><%= @case.tier_description %></td>
+      </tr>
+      <tr>
         <th>Subject</th>
         <td><%= @case.subject %></td>
       </tr>
       <tr>
-        <th>Details</th>
-        <td><%= simple_format(@case.details) %></td>
+        <th>Fields</th>
+        <td>
+          <div class="table-responsive">
+            <table class="table table-sm table-striped table-bordered">
+              <% @case.fields.each do |field| %>
+                <tr>
+                  <th scope="row">
+                    <%= field.fetch('name') %>
+                  </th>
+                  <td>
+                    <%= simple_format(field.fetch('value')) %>
+                  </td>
+                </tr>
+              <% end%>
+            </table>
+          </div>
+        </td>
       </tr>
       <tr>
         <th>Comments</th>

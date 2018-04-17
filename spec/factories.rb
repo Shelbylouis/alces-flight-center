@@ -84,6 +84,10 @@ FactoryBot.define do
       type: 'input',
       name: 'some_field',
     }]
+
+    factory :level_1_tier do
+      level 1
+    end
   end
 
   factory :asset_record_field_definition, aliases: [:definition] do

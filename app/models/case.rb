@@ -28,7 +28,6 @@ class Case < ApplicationRecord
   delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true
 
-  validates :details, presence: true
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, presence: true, uniqueness: true

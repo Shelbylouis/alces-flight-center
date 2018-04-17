@@ -217,13 +217,13 @@ RSpec.describe Case, type: :model do
 
   describe '#active' do
     it 'returns all non-archived Cases' do
-      create(:case, details: 'one', archived: false)
-      create(:case, details: 'two', archived: true)
-      create(:case, details: 'three', archived: false)
+      create(:case, subject: 'one', archived: false)
+      create(:case, subject: 'two', archived: true)
+      create(:case, subject: 'three', archived: false)
 
       active_cases = Case.active
 
-      expect(active_cases.map(&:details)).to match_array(['one', 'three'])
+      expect(active_cases.map(&:subject)).to match_array(['one', 'three'])
     end
   end
 

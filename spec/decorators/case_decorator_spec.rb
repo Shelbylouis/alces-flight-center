@@ -103,4 +103,27 @@ RSpec.describe CaseDecorator do
       expect(link).to eq h.link_to('12345', h.case_path(kase))
     end
   end
+
+  describe '#tier_description' do
+    {
+      1 => 'Tool',
+      2 => 'Support',
+      3 => 'Consultancy',
+    }.each do |level, expected_description|
+      it "gives correct text for level #{level} Tier" do
+        kase = create(:case, tier_level: level).decorate
+
+        expect(kase.tier_description).to eq("#{level} (#{expected_description})")
+      end
+    end
+
+    it 'raises for unhandled tier_level' do
+      # Use `build` as Case with this `tier_level` is currently invalid.
+      kase = build(:case, tier_level: 4).decorate
+
+      expect do
+        kase.tier_description
+      end.to raise_error(RuntimeError, "Unhandled tier_level: 4")
+    end
+  end
 end
