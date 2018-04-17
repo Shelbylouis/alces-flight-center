@@ -112,6 +112,12 @@ RSpec.shared_examples 'associated Cluster part validation' do |part_name|
         it { is_expected.to be_valid }
       end
 
+      context "with `managed` cluster but `advice` #{part_name}" do
+        let :cluster { create(:managed_cluster) }
+        let :part { create(advice_part_name, cluster: cluster) }
+        it { is_expected.to be_valid }
+      end
+
       context "with `advice` #{part_name} which is later switched to `managed`" do
         let :part { create(advice_part_name, cluster: cluster) }
 
