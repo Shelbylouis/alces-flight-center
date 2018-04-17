@@ -78,7 +78,7 @@ RSpec.describe CasesController, type: :controller do
           cluster_id: first_cluster.id,
           component_id: first_cluster_component.id,
           issue_id: create(:issue_requiring_component).id,
-          subject: 'subject',
+          subject: 'some_subject',
           details: 'Useful info',
           tier_level: 2,
           fields: [type: 'textarea'],
@@ -95,7 +95,7 @@ RSpec.describe CasesController, type: :controller do
     def expect_case_created
       user_cases = Case.where(user: user)
       expect(user_cases.length).to eq 1
-      expect(user_cases.first.details).to eq('Useful info')
+      expect(user_cases.first.subject).to eq('some_subject')
     end
 
     context 'when JSON request' do

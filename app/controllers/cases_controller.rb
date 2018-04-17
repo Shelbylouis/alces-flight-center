@@ -88,7 +88,6 @@ class CasesController < ApplicationController
       :component_id,
       :service_id,
       :subject,
-      :details,
       :tier_level,
       fields: [:type, :name, :value, :optional],
     )

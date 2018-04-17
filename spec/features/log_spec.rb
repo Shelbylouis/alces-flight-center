@@ -11,9 +11,9 @@ RSpec.feature Log, type: :feature do
 
   # Create the components and cases for each spec
   before :each do
-    create(:case, details: 'Random other case')
-    ['details1', 'details2', 'details3'].each do |details|
-      create(:case, cluster: cluster, details: details)
+    create(:case, subject: 'Random other case')
+    ['subject1', 'subject2', 'subject3'].each do |case_subject|
+      create(:case, cluster: cluster, subject: case_subject)
     end
 
     create(:component, name: 'Random other component')
@@ -119,10 +119,10 @@ RSpec.feature Log, type: :feature do
     subject { cluster.components.first }
 
     before :each do
-      ['component_case1', 'component_case2'].each do |details|
+      ['component_case1', 'component_case2'].each do |case_subject|
         create :case_requiring_component,
                component: subject,
-               details: details
+               subject: case_subject
       end
       visit component_logs_path subject, as: engineer
     end

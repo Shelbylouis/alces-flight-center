@@ -52,7 +52,6 @@ class ClusterPartDecorator < ApplicationDecorator
           cluster_id: cluster.id,
           part_id_symbol => id,
           issue_id: issue.id,
-          details: 'User-requested from management dashboard',
           fields: tier.fields,
           tier_level: tier.level
         }

@@ -183,13 +183,6 @@ encoder state =
         tier =
             selectedTier state
 
-        details =
-            tier.fields
-                |> Dict.values
-                |> List.map tierFieldAsString
-                |> Maybe.Extra.values
-                |> String.join "\n"
-
         tierFieldAsString =
             \field ->
                 case field of
@@ -207,7 +200,6 @@ encoder state =
                 , ( "component_id", componentIdValue )
                 , ( "service_id", serviceIdValue )
                 , ( "subject", Issue.subject issue |> E.string )
-                , ( "details", details |> E.string )
                 , ( "tier_level", Tier.levelAsInt tier |> E.int )
                 , ( "fields", Tier.fieldsEncoder tier )
                 ]
