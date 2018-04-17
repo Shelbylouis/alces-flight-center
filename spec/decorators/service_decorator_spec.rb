@@ -1,17 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe ServiceDecorator do
-  describe '#change_support_type_button' do
-    let! :request_advice_issue { create(:request_service_becomes_advice_issue) }
-    let! :request_managed_issue { create(:request_service_becomes_managed_issue) }
-
-    it 'gives nothing for internal Service' do
-      service = create(:service, internal: true).decorate
-
-      expect(service.change_support_type_button).to be nil
-    end
-  end
-
   describe '#links' do
     subject { create(:service).decorate }
 

@@ -12,6 +12,9 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
     create(:"request_#{part_name}_becomes_advice_issue")
   end
 
+  let :request_self_management_text { 'Request self-management' }
+  let :request_alces_management_text { 'Request Alces management' }
+
   let :site { create(:site) }
   let :contact { create(:contact, site: site) }
   let :cluster { create(:cluster, site: site) }
@@ -39,7 +42,7 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
     part = create("advice_#{part_name}", cluster: cluster)
 
     visit cluster_parts_path
-    click_button 'Request Alces management'
+    click_button request_alces_management_text
 
     created_case = part.cases.first
     expect(created_case.send(part_name)).to eq(part)
@@ -48,5 +51,16 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
     tier = issue.tiers.first
     expect(created_case.fields).to eq(tier.fields)
     expect(created_case.tier_level).to eq(tier.level)
+  end
+
+  it "displays no buttons for internal #{part_class_name}" do
+    part = create(part_name, internal: true, cluster: cluster)
+
+    visit cluster_parts_path
+    # Sanity check that part itself is actually being displayed.
+    expect(page).to have_text(part.name)
+
+    expect(page).not_to have_button(request_self_management_text)
+    expect(page).not_to have_button(request_alces_management_text)
   end
 end

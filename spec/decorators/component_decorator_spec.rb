@@ -1,17 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe ComponentDecorator do
-  describe '#change_support_type_button' do
-    let! :request_advice_issue { create(:request_component_becomes_advice_issue) }
-    let! :request_managed_issue { create(:request_component_becomes_managed_issue) }
-
-    it 'gives nothing for internal Component' do
-      component = create(:component, internal: true).decorate
-
-      expect(component.change_support_type_button).to be nil
-    end
-  end
-
   describe '#links' do
     subject { create(:component).decorate }
 
