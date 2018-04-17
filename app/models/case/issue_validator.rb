@@ -60,7 +60,7 @@ class Case
     end
 
     def advice_only_issue_for_managed_cluster?
-      record.issue.advice_only? && record.cluster.managed?
+      record.issue.advice_only? && no_parts_required? && record.cluster.managed?
     end
 
     def advice_only_issue_for_managed_part?(part_name)
