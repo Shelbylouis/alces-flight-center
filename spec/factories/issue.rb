@@ -15,11 +15,13 @@ FactoryBot.define do
       factory :request_component_becomes_advice_issue do
         identifier Issue::IDENTIFIERS.request_component_becomes_advice
         support_type 'managed'
+        tiers { [create(:level_1_tier)] }
       end
 
       factory :request_component_becomes_managed_issue do
         identifier Issue::IDENTIFIERS.request_component_becomes_managed
         support_type 'advice-only'
+        tiers { [create(:level_1_tier)] }
       end
     end
 
@@ -29,11 +31,13 @@ FactoryBot.define do
       factory :request_service_becomes_advice_issue do
         identifier Issue::IDENTIFIERS.request_service_becomes_advice
         support_type 'managed'
+        tiers { [create(:level_1_tier)] }
       end
 
       factory :request_service_becomes_managed_issue do
         identifier Issue::IDENTIFIERS.request_service_becomes_managed
         support_type 'advice-only'
+        tiers { [create(:level_1_tier)] }
       end
     end
 

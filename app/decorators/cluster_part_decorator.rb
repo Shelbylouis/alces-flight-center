@@ -41,6 +41,8 @@ class ClusterPartDecorator < ApplicationDecorator
     issue:,
     part_id_symbol:
   )
+    tier = issue.tiers.find_by_level!(1)
+
     h.button_to "Request #{change_description}",
       h.cases_path,
       class: "btn #{button_class} support-type-button",
@@ -50,7 +52,9 @@ class ClusterPartDecorator < ApplicationDecorator
           cluster_id: cluster.id,
           part_id_symbol => id,
           issue_id: issue.id,
-          details: 'User-requested from management dashboard'
+          details: 'User-requested from management dashboard',
+          fields: tier.fields,
+          tier_level: tier.level
         }
       },
       data: {
