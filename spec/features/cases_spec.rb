@@ -145,3 +145,29 @@ RSpec.describe 'Cases table', type: :feature do
     end
   end
 end
+
+RSpec.describe 'Case page' do
+  let! (:admin) { create(:admin) }
+  let (:site) { create(:site, name: 'My Site') }
+  let (:cluster) { create(:cluster, site: site) }
+
+  let! :open_case do
+    create(:open_case, cluster: cluster, subject: 'Open case')
+  end
+
+  it 'shows events in chronological order' do
+    create(:case_comment)
+    evt1 = create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
+    evt2 = create(:case_comment, case: open_case, user: admin, created_at: 4.hours.ago, text: 'First')
+
+    visit case_path(open_case, as: admin)
+
+    event_cards = all('.event-card')
+    expect(event_cards.size).to eq(2)
+
+    expect(event_cards[0].find('.card-body').text).to eq('First')
+    expect(event_cards[1].find('.card-body').text).to eq('Second')
+
+  end
+
+end
