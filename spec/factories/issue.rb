@@ -11,26 +11,30 @@ FactoryBot.define do
 
     factory :issue_requiring_component do
       requires_component true
+
+      factory :request_component_becomes_advice_issue do
+        identifier Issue::IDENTIFIERS.request_component_becomes_advice
+        support_type 'managed'
+      end
+
+      factory :request_component_becomes_managed_issue do
+        identifier Issue::IDENTIFIERS.request_component_becomes_managed
+        support_type 'advice-only'
+      end
     end
 
     factory :issue_requiring_service do
       requires_service true
-    end
 
-    factory :request_component_becomes_advice_issue do
-      identifier Issue::IDENTIFIERS.request_component_becomes_advice
-    end
+      factory :request_service_becomes_advice_issue do
+        identifier Issue::IDENTIFIERS.request_service_becomes_advice
+        support_type 'managed'
+      end
 
-    factory :request_component_becomes_managed_issue do
-      identifier Issue::IDENTIFIERS.request_component_becomes_managed
-    end
-
-    factory :request_service_becomes_advice_issue do
-      identifier Issue::IDENTIFIERS.request_service_becomes_advice
-    end
-
-    factory :request_service_becomes_managed_issue do
-      identifier Issue::IDENTIFIERS.request_service_becomes_managed
+      factory :request_service_becomes_managed_issue do
+        identifier Issue::IDENTIFIERS.request_service_becomes_managed
+        support_type 'advice-only'
+      end
     end
 
     factory :special_issue do
