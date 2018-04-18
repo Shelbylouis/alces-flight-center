@@ -10,10 +10,6 @@ RSpec.describe SiteDecorator do
     let :user { create(:user) }
     let :contact { create(:contact) }
 
-    it 'gives nothing when Site has no managed Clusters' do
-      expect(subject.case_form_buttons).to be nil
-    end
-
     context 'when Site has managed Clusters' do
       before :each do
         create(:managed_cluster, site: subject)

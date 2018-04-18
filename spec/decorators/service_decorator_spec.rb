@@ -24,17 +24,9 @@ RSpec.describe ServiceDecorator do
   describe '#case_form_buttons' do
     subject { create(:service).decorate }
 
-    include_examples 'case_form_buttons', 'service'
-
     it 'includes link to Service Case form' do
       expect(subject.case_form_buttons).to include(
         h.new_service_case_path(service_id: subject.id)
-      )
-    end
-
-    it 'includes link to Service consultancy form' do
-      expect(subject.case_form_buttons).to include(
-        h.new_service_consultancy_path(service_id: subject.id)
       )
     end
   end

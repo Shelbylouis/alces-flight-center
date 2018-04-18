@@ -32,8 +32,7 @@ class ApplicationDecorator < Draper::Decorator
   # entire Cluster, but I don't have a better name for that yet.
   def cluster_part_case_form_buttons
     buttons = [
-      case_form_button(new_scope_case_path, disabled: advice?),
-      consultancy_form_button(consultancy_form_path)
+      case_form_button(new_scope_case_path),
     ].join
     h.raw("<div class='btn-group d-flex w-100' role='group'>#{buttons}</div>")
   end
@@ -131,11 +130,6 @@ class ApplicationDecorator < Draper::Decorator
     h.send(link_helper, self)
   end
 
-  def consultancy_form_path
-    helper = "new_#{readable_model_name}_consultancy_path"
-    h.send(helper, id_key => self.id)
-  end
-
   def id_key
     "#{readable_model_name}_id".to_sym
   end
@@ -151,12 +145,6 @@ class ApplicationDecorator < Draper::Decorator
       buttonClass: 'btn-primary',
       disabled: disabled,
       title: title
-  end
-
-  def consultancy_form_button(path)
-    tab_top_button_link 'Request consultancy',
-      path,
-      buttonClass: 'btn-danger'
   end
 
   def tab_top_button_link(text, path, buttonClass:, disabled: false, title: nil)
