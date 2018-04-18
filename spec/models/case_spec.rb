@@ -3,8 +3,6 @@ require 'rails_helper'
 RSpec.describe Case, type: :model do
   let :random_token_regex { /[A-Z][0-9][A-Z][0-9][A-Z]/ }
 
-  let :request_tracker { described_class.send(:request_tracker) }
-
   describe '#valid?' do
     subject { create(:case) }
 
@@ -84,6 +82,36 @@ RSpec.describe Case, type: :model do
       support_case.reload
 
       expect(support_case.subject).to eq('some_subject')
+    end
+  end
+
+  describe 'Email creation on Case creation' do
+    subject do
+      build(:case)
+    end
+
+    let :stub_mail do
+      obj = double
+      expect(obj).to receive(:deliver_later)
+      obj
+    end
+
+    it 'sends an email' do
+      # To find out what email it sends, see spec/mailers/case_mailer_spec.rb
+      expect(CaseMailer).to receive(:new_case).with(
+        subject
+      ).and_return(stub_mail)
+
+      subject.save!
+    end
+
+    it 'saves generated ticket token to later use in mailto_url' do
+      subject.save!
+      created_ticket_token = subject.token
+      expect(created_ticket_token).to match(random_token_regex)
+      subject.reload
+
+      expect(subject.mailto_url).to include(created_ticket_token)
     end
   end
 
