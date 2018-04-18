@@ -52,6 +52,7 @@ issueDrillDownFields state =
     , maybeServicesField state
     , maybeCategoriesField state
     , issuesField state |> Just
+    , maybeComponentsField state
     , tierSelectField state |> Just
     ]
 
@@ -78,7 +79,6 @@ dynamicFields state =
 
         _ ->
             [ subjectField state |> Just
-            , maybeComponentsField state
             , tierFields
             , submitButton state |> Just
             ]
