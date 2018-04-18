@@ -17,6 +17,7 @@ import Issues
 import Json.Decode as D
 import Markdown
 import Maybe.Extra
+import Msg exposing (..)
 import Navigation
 import Rails
 import SelectList exposing (Position(..), SelectList)
@@ -450,26 +451,6 @@ submitButton state =
         , disabled (state.isSubmitting || Validation.invalidState state)
         ]
         []
-
-
-
--- MESSAGE
-
-
-type Msg
-    = ChangeSelectedCluster String
-    | ChangeSelectedCategory String
-    | ChangeSelectedIssue String
-    | ChangeSelectedTier String
-    | ChangeSelectedComponent String
-    | ChangeSelectedService String
-    | ChangeSubject String
-    | ChangeTierField Int String
-    | StartSubmit
-    | SubmitResponse (Result (Rails.Error String) ())
-    | ClearError
-    | ClusterChargingInfoModal Modal.State
-    | ChargeableIssuePreSubmissionModal Modal.State
 
 
 
