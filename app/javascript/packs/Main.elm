@@ -6,16 +6,12 @@ import Bootstrap.Modal as Modal
 import Category
 import Cluster exposing (Cluster)
 import Component exposing (Component)
-import Dict
-import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onSubmit)
 import Http
 import Issue exposing (Issue)
-import Issues
 import Json.Decode as D
-import Markdown
 import Maybe.Extra
 import Msg exposing (..)
 import Navigation
@@ -25,9 +21,7 @@ import Service exposing (Service)
 import State exposing (State)
 import Tier
 import Utils
-import Validation
-import View.Fields as Fields
-import View.PartsField as PartsField exposing (PartsFieldConfig(..))
+import View.CaseForm as CaseForm
 
 
 -- MODEL
@@ -77,7 +71,7 @@ view model =
                     , chargeableIssuePreSubmissionModal state |> Just
                     , State.selectedIssue state |> chargeableIssueAlert
                     , submitErrorAlert state
-                    , caseForm state |> Just
+                    , CaseForm.view state |> Just
                     ]
                 )
 
@@ -224,233 +218,6 @@ chargeableIssueAlert issue =
             |> Just
     else
         Nothing
-
-
-caseForm : State -> Html Msg
-caseForm state =
-    let
-        submitMsg =
-            if State.selectedIssue state |> Issue.isChargeable then
-                ChargeableIssuePreSubmissionModal Modal.visibleState
-            else
-                StartSubmit
-
-        formElements =
-            List.concat
-                [ issueDrillDownFields state
-                , [ hr [] [] |> Just ]
-                , dynamicFields state
-                ]
-                |> Maybe.Extra.values
-    in
-    Html.form [ onSubmit submitMsg ] formElements
-
-
-issueDrillDownFields : State -> List (Maybe (Html Msg))
-issueDrillDownFields state =
-    -- These fields allow a user to drill down to identify the particular Issue
-    -- and possible solutions (via different Tiers) to a problem they are
-    -- having.
-    [ maybeClustersField state
-    , maybeServicesField state
-    , maybeCategoriesField state
-    , issuesField state |> Just
-    , tierSelectField state |> Just
-    ]
-
-
-dynamicFields : State -> List (Maybe (Html Msg))
-dynamicFields state =
-    -- These fields are very dynamic, and either appear/disappear entirely or
-    -- have their content changed based on the currently selected Issue and
-    -- Tier.
-    let
-        selectedTier =
-            State.selectedTier state
-
-        tierFields =
-            dynamicTierFields state |> Just
-    in
-    case selectedTier.level of
-        Tier.Zero ->
-            -- When a level 0 Tier is selected we want to prevent filling in
-            -- any fields or submitting the form, and only show the rendered
-            -- Tier fields, which should include the relevant links to
-            -- documentation.
-            [ tierFields ]
-
-        _ ->
-            [ subjectField state |> Just
-            , maybeComponentsField state
-            , tierFields
-            , submitButton state |> Just
-            ]
-
-
-maybeClustersField : State -> Maybe (Html Msg)
-maybeClustersField state =
-    let
-        clusters =
-            state.clusters
-
-        singleCluster =
-            SelectList.toList clusters
-                |> List.length
-                |> (==) 1
-    in
-    if singleCluster then
-        -- Only one Cluster available => no need to display Cluster selection
-        -- field.
-        Nothing
-    else
-        Just
-            (Fields.selectField Field.Cluster
-                clusters
-                Cluster.extractId
-                .name
-                ChangeSelectedCluster
-                state
-            )
-
-
-maybeCategoriesField : State -> Maybe (Html Msg)
-maybeCategoriesField state =
-    State.selectedService state
-        |> .issues
-        |> Issues.categories
-        |> Maybe.map
-            (\categories_ ->
-                Fields.selectField Field.Category
-                    categories_
-                    Category.extractId
-                    .name
-                    ChangeSelectedCategory
-                    state
-            )
-
-
-issuesField : State -> Html Msg
-issuesField state =
-    let
-        selectedServiceAvailableIssues =
-            State.selectedServiceAvailableIssues state
-    in
-    Fields.selectField Field.Issue
-        selectedServiceAvailableIssues
-        Issue.extractId
-        Issue.name
-        ChangeSelectedIssue
-        state
-
-
-tierSelectField : State -> Html Msg
-tierSelectField state =
-    let
-        selectedIssueTiers =
-            State.selectedIssue state |> Issue.tiers
-    in
-    Fields.selectField Field.Tier
-        selectedIssueTiers
-        Tier.extractId
-        Tier.description
-        ChangeSelectedTier
-        state
-
-
-maybeComponentsField : State -> Maybe (Html Msg)
-maybeComponentsField state =
-    let
-        config =
-            if State.selectedIssue state |> Issue.requiresComponent |> not then
-                NotRequired
-            else if state.singleComponent then
-                SinglePartField (State.selectedComponent state)
-            else
-                SelectionField .components
-    in
-    PartsField.maybePartsField Field.Component
-        config
-        Component.extractId
-        state
-        ChangeSelectedComponent
-
-
-maybeServicesField : State -> Maybe (Html Msg)
-maybeServicesField state =
-    let
-        config =
-            if state.singleComponent && singleServiceApplicable then
-                -- No need to allow selection of a Service if we're in single
-                -- Component mode and there's only one Service with Issues
-                -- which require a Component.
-                NotRequired
-            else if state.singleService then
-                SinglePartField (State.selectedService state)
-            else
-                SelectionField .services
-
-        singleServiceApplicable =
-            SelectList.toList state.clusters
-                |> List.length
-                |> (==) 1
-    in
-    PartsField.maybePartsField Field.Service
-        config
-        Service.extractId
-        state
-        ChangeSelectedService
-
-
-subjectField : State -> Html Msg
-subjectField state =
-    let
-        selectedIssue =
-            State.selectedIssue state
-    in
-    Fields.inputField Field.Subject
-        selectedIssue
-        Issue.subject
-        ChangeSubject
-        state
-
-
-dynamicTierFields : State -> Html Msg
-dynamicTierFields state =
-    let
-        tier =
-            State.selectedTier state
-
-        renderedFields =
-            Dict.toList tier.fields
-                |> List.map (renderTierField state)
-    in
-    div [] renderedFields
-
-
-renderTierField : State -> ( Int, Tier.Field ) -> Html Msg
-renderTierField state ( index, field ) =
-    case field of
-        Tier.Markdown content ->
-            Markdown.toHtml [] content
-
-        Tier.TextInput fieldData ->
-            Fields.textField fieldData.type_
-                (Field.TierField fieldData)
-                fieldData
-                .value
-                (ChangeTierField index)
-                state
-
-
-submitButton : State -> Html Msg
-submitButton state =
-    input
-        [ type_ "submit"
-        , value "Create Case"
-        , class "btn btn-primary btn-block"
-        , disabled (state.isSubmitting || Validation.invalidState state)
-        ]
-        []
 
 
 
