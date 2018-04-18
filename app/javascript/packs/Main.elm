@@ -14,6 +14,7 @@ import SelectList
 import State exposing (State)
 import State.Update
 import View.CaseForm as CaseForm
+import View.Utils
 
 
 -- MODEL
@@ -66,7 +67,7 @@ view model =
                         ++ message
                         ++ ". Please contact "
                     )
-                , supportEmailLink
+                , View.Utils.supportEmailLink
                 , text "."
                 ]
 
@@ -82,19 +83,6 @@ stateView state =
             , CaseForm.view state |> Just
             ]
         )
-
-
-supportEmailLink : Html msg
-supportEmailLink =
-    let
-        email =
-            "support@alces-software.com"
-    in
-    a
-        [ "mailto:" ++ email |> href
-        , target "_blank"
-        ]
-        [ text email ]
 
 
 chargingInfoModal : State -> Html Msg
@@ -113,7 +101,7 @@ chargingInfoModal state =
                 [ text "No charging info has been provided by Alces Software for "
                 , strong [] [ text cluster.name ]
                 , text "; if you require clarification on what charges you may incur please contact "
-                , supportEmailLink
+                , View.Utils.supportEmailLink
                 , text "."
                 ]
     in
