@@ -135,17 +135,10 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   def case_form_button(path)
-    tab_top_button_link 'Create new support case',
+    h.link_to 'Create new support case',
       path,
-      buttonClass: 'btn-primary'
-  end
-
-  def tab_top_button_link(text, path, buttonClass:, disabled: false, title: nil)
-    h.link_to text,
-      path,
-      class: ['btn w-100', buttonClass, disabled ? 'disabled' : nil],
-      role: 'button',
-      title: title
+      class: 'w-100 btn btn-primary',
+      role: 'button'
   end
 
   def tabs_builder
