@@ -28,13 +28,11 @@ class ApplicationDecorator < Draper::Decorator
     h.raw(icons.join)
   end
 
-  # As above: strictly speaking this gives the buttons for a ClusterPart or
-  # entire Cluster, but I don't have a better name for that yet.
-  def cluster_part_case_form_buttons
-    buttons = [
-      case_form_button(new_scope_case_path),
-    ].join
-    h.raw("<div class='btn-group d-flex w-100' role='group'>#{buttons}</div>")
+  def case_form_button
+    h.link_to 'Create new support case',
+      new_scope_case_path,
+      class: 'w-100 btn btn-primary',
+      role: 'button'
   end
 
   # Override this method to generate the tab bars
@@ -132,13 +130,6 @@ class ApplicationDecorator < Draper::Decorator
 
   def id_key
     "#{readable_model_name}_id".to_sym
-  end
-
-  def case_form_button(path)
-    h.link_to 'Create new support case',
-      path,
-      class: 'w-100 btn btn-primary',
-      role: 'button'
   end
 
   def tabs_builder

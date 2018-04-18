@@ -1,8 +1,6 @@
 class ComponentDecorator < ClusterPartDecorator
   include AssetRecordDecorator
 
-  alias :case_form_buttons :cluster_part_case_form_buttons
-
   def change_support_type_button
     render_change_support_type_button(
       request_advice_issue: Issue.request_component_becomes_advice_issue,
