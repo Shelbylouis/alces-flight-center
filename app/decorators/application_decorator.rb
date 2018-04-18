@@ -134,17 +134,10 @@ class ApplicationDecorator < Draper::Decorator
     "#{readable_model_name}_id".to_sym
   end
 
-  def case_form_button(path, disabled: false)
-    title = <<~EOF.squish if disabled
-      This #{readable_model_name} is self-managed; if required you
-      may only request consultancy support from Alces Software.
-    EOF
-
+  def case_form_button(path)
     tab_top_button_link 'Create new support case',
       path,
-      buttonClass: 'btn-primary',
-      disabled: disabled,
-      title: title
+      buttonClass: 'btn-primary'
   end
 
   def tab_top_button_link(text, path, buttonClass:, disabled: false, title: nil)
