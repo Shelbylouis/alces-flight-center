@@ -122,7 +122,6 @@ Rails.application.routes.draw do
     resources :clusters, only: :show do
       archive_cases.call
       resources :services, only: :index
-      resources :consultancy, only: :new
       resources :maintenance_windows, path: :maintenance, only: :index
       resources :components, only: :index
       logs.call
@@ -131,7 +130,6 @@ Rails.application.routes.draw do
 
     resources :components, only: :show do
       archive_cases.call
-      resources :consultancy, only: :new
       resources :component_expansions,
                 path: component_expansions_alias,
                 only: :index
@@ -148,7 +146,6 @@ Rails.application.routes.draw do
 
     resources :services, only: :show do
       archive_cases.call
-      resources :consultancy, only: :new
       confirm_maintenance_form.call
     end
 

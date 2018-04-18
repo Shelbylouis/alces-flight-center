@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe SiteDecorator do
-  describe '#case_form_buttons' do
+  describe '#case_form_button' do
     before :each do
       allow(h).to receive(:current_user).and_return(user)
     end
@@ -9,10 +9,6 @@ RSpec.describe SiteDecorator do
     subject { create(:site, users: [contact]).decorate }
     let :user { create(:user) }
     let :contact { create(:contact) }
-
-    it 'gives nothing when Site has no managed Clusters' do
-      expect(subject.case_form_buttons).to be nil
-    end
 
     context 'when Site has managed Clusters' do
       before :each do
@@ -23,7 +19,7 @@ RSpec.describe SiteDecorator do
         let :user { contact }
 
         it 'includes link to top level Case form' do
-          expect(subject.case_form_buttons).to include(
+          expect(subject.case_form_button).to include(
             h.new_case_path
           )
         end
@@ -33,7 +29,7 @@ RSpec.describe SiteDecorator do
         let :user { create(:admin) }
 
         it 'includes link to Site Case form' do
-          expect(subject.case_form_buttons).to include(
+          expect(subject.case_form_button).to include(
             h.new_site_case_path(subject)
           )
         end

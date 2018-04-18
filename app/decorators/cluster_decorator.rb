@@ -3,8 +3,6 @@ class ClusterDecorator < ApplicationDecorator
   decorates_association :component_groups
   decorates_association :services
 
-  alias :case_form_buttons :cluster_part_case_form_buttons
-
   def path
     h.cluster_path(self)
   end
