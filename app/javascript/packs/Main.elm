@@ -57,15 +57,7 @@ view : Model -> Html Msg
 view model =
     case model of
         Initialized state ->
-            div [ class "case-form" ]
-                (Maybe.Extra.values
-                    [ chargingInfoModal state |> Just
-                    , chargeableIssuePreSubmissionModal state |> Just
-                    , State.selectedIssue state |> chargeableIssueAlert
-                    , submitErrorAlert state
-                    , CaseForm.view state |> Just
-                    ]
-                )
+            stateView state
 
         Error message ->
             span []
@@ -77,6 +69,19 @@ view model =
                 , supportEmailLink
                 , text "."
                 ]
+
+
+stateView : State -> Html Msg
+stateView state =
+    div [ class "case-form" ]
+        (Maybe.Extra.values
+            [ chargingInfoModal state |> Just
+            , chargeableIssuePreSubmissionModal state |> Just
+            , State.selectedIssue state |> chargeableIssueAlert
+            , submitErrorAlert state
+            , CaseForm.view state |> Just
+            ]
+        )
 
 
 supportEmailLink : Html msg
