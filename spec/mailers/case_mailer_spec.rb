@@ -59,11 +59,12 @@ RSpec.describe 'Case mailer', :type => :mailer do
     )
   }
 
-  it 'sends an email on case creation' do
-
+  before(:each) do
     site.users = [requestor, another_user]
     site.additional_contacts = [additional_contact]
+  end
 
+  it 'sends an email on case creation' do
     mail = CaseMailer.new_case(kase)
     expect(mail.subject).to eq "[helpdesk.alces-software.com #1138] somecluster: my_subject [#{kase.token}]"
 
@@ -90,11 +91,7 @@ EOF
     let(:requires_component) { false }
     let(:component) { nil }
 
-    it 'does not include corresponding line in ticket text' do
-
-      site.users = [requestor, another_user]
-      site.additional_contacts = [additional_contact]
-
+    it 'does not include corresponding line in email text' do
       mail = CaseMailer.new_case(kase)
       expect(mail.body.encoded).not_to match('Associated component:')
     end
@@ -105,15 +102,27 @@ EOF
     let(:requires_service) { false }
     let(:service) { nil }
 
-    it 'does not include corresponding line in ticket text' do
-
-      site.users = [requestor, another_user]
-      site.additional_contacts = [additional_contact]
-
+    it 'does not include corresponding line in email text' do
       mail = CaseMailer.new_case(kase)
       expect(mail.body.encoded).not_to match('Associated service:')
     end
 
+  end
+
+  it 'sends an email on case comment being added' do
+    comment = create(:case_comment,
+      case: kase,
+      user: another_user,
+      text: 'I can haz comment'
+    )
+
+    mail = CaseMailer.comment(comment)
+
+    expect(mail.to).to eq nil
+    expect(mail.cc).to eq %w(someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.bcc).to eq(['tickets@alces-software.com'])
+
+    expect(mail.body.encoded).to match('I can haz comment')
   end
 
 end
