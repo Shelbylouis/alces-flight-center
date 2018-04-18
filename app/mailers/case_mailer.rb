@@ -1,5 +1,7 @@
 class CaseMailer < ApplicationMailer
 
+  layout 'case_mailer'
+
   default bcc: Rails.application.config.email_bcc_address
 
   def new_case(my_case)

@@ -7,6 +7,3 @@
   <br />
   <cite><%= @comment.updated_at.to_formatted_s(:long) %> - <b><%= @comment.user.name %></b></cite>
 </blockquote>
-
-<p>To reply, or to see more details of this case, please visit the following link:</p>
-<p><a href="<%= case_url(@case) %>"><%= @case.ticket_subject %></a></p>

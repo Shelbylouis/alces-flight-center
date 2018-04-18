@@ -1,0 +1,6 @@
+<% content_for :content do %>
+<%= yield %>
+<p>To comment, or to see more details of this case, please visit the following link:</p>
+<p><a href="<%= case_url(@case) %>"><%= @case.ticket_subject %></a></p>
+<% end %>
+<%= render template: 'layouts/mailer' %>

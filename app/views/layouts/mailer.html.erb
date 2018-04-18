@@ -61,7 +61,7 @@
               </tr>
               <tr>
                 <td colspan="3">
-                  <%= yield %>
+                  <%= content_for?(:content) ? yield(:content) : yield %>
                 </td>
               </tr>
               </tbody>
