@@ -85,7 +85,7 @@ class Case < ApplicationRecord
   end
 
   def update_ticket_status!
-    return if (ticket_completed? && self.completed_at) || !rt_ticket_id
+    return unless incomplete_rt_ticket?
     self.last_known_ticket_status = associated_rt_ticket.status
     if ticket_completed?
       self.completed_at = DateTime.now.utc
@@ -167,6 +167,10 @@ class Case < ApplicationRecord
   end
 
   private
+
+  def incomplete_rt_ticket?
+    rt_ticket_id && (!ticket_completed? || !self.completed_at)
+  end
 
   def assign_cluster_if_necessary
     return if cluster
