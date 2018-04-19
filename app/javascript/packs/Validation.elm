@@ -80,5 +80,5 @@ unavailableTierErrorMessage : State -> String
 unavailableTierErrorMessage state =
     "Selected "
         ++ State.associatedModelTypeName state
-        ++ """ is self-managed; if required you may only request consultancy
-        support from Alces Software."""
+        ++ " is self-managed; if required you may only request consultancy"
+        ++ " support from Alces Software."
