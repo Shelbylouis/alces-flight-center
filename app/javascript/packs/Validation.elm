@@ -3,6 +3,7 @@ module Validation
         ( Error
         , ErrorMessage(..)
         , invalidState
+        , unavailableTierErrorMessage
         , validateField
         , validateState
         )
@@ -70,13 +71,14 @@ subjectPresentValidator =
 
 createAvailableTierValidator : State -> Validator Error State
 createAvailableTierValidator state =
-    let
-        errorMessage =
-            "Selected "
-                ++ State.associatedModelTypeName state
-                ++ """ is self-managed; if required you may only request
-                consultancy support from Alces Software."""
-    in
     Validate.ifFalse
         State.canRequestSupportForSelectedTier
-        ( Field.Tier, Message errorMessage )
+        ( Field.Tier, Message <| unavailableTierErrorMessage state )
+
+
+unavailableTierErrorMessage : State -> String
+unavailableTierErrorMessage state =
+    "Selected "
+        ++ State.associatedModelTypeName state
+        ++ """ is self-managed; if required you may only request consultancy
+        support from Alces Software."""

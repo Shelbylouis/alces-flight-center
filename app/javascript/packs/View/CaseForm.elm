@@ -78,13 +78,24 @@ dynamicFields state =
                     , submitButton state
                     ]
 
+        attributes =
+            if sectionDisabled then
+                [ class "disabled-section"
+                , title <| Validation.unavailableTierErrorMessage state
+                ]
+            else
+                []
+
+        sectionDisabled =
+            not <| State.canRequestSupportForSelectedTier state
+
         selectedTier =
             State.selectedTier state
 
         tierFields =
             dynamicTierFields state
     in
-    section [] fields
+    section attributes fields
 
 
 maybeClustersField : State -> Maybe (Html Msg)

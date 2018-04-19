@@ -116,6 +116,12 @@ formField field item htmlFn additionalAttributes children state =
                 _ ->
                     toString field
 
+        fieldIsUnavailable =
+            tierIsUnavailable && Field.isDynamicField field
+
+        tierIsUnavailable =
+            not <| State.canRequestSupportForSelectedTier state
+
         identifier =
             fieldIdentifier fieldName
 
@@ -123,6 +129,7 @@ formField field item htmlFn additionalAttributes children state =
             List.append
                 [ id identifier
                 , class (formControlClasses errors)
+                , disabled fieldIsUnavailable
                 ]
                 additionalAttributes
 
