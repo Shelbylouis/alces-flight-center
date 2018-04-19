@@ -1,6 +1,7 @@
 class CaseStateTransition < ApplicationRecord
   belongs_to :case
   belongs_to :user
+  alias_attribute :requesting_user, :user
 
   delegate :site, to: :case
 

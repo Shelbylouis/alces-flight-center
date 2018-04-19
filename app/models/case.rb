@@ -25,11 +25,14 @@ class Case < ApplicationRecord
   has_and_belongs_to_many :log
   has_many :case_comments
 
+  has_many :case_state_transitions
+  alias_attribute :transitions, :case_state_transitions
+
   delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true
 
-  state_machine :state, initial: :open do
-    audit_trail context: [:user]
+  state_machine initial: :open do
+    audit_trail context: [:requesting_user]
 
     state :open  # Open case, still work to do
     state :resolved  # Has been resolved but not yet accounted for commercially
@@ -37,6 +40,7 @@ class Case < ApplicationRecord
 
     event(:resolve) { transition open: :resolved }  # Resolved cases cannot be reopened
     event(:archive) { transition resolved: :archived }
+
   end
 
   validates :details, presence: true
@@ -179,6 +183,15 @@ class Case < ApplicationRecord
   end
 
   private
+
+  # Picked up by state_machines-audit_trail due to `context` setting above, and
+  # used to automatically set user who instigated the transition in created
+  # CaseStateTransition.
+  # Refer to
+  # https://github.com/state-machines/state_machines-audit_trail#example-5---store-advanced-method-results.
+  def requesting_user(transition)
+    transition.args&.first
+  end
 
   def incomplete_rt_ticket?
     rt_ticket_id && (!ticket_completed? || !self.completed_at)
