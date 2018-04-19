@@ -2,7 +2,6 @@ module State
     exposing
         ( State
         , associatedModelTypeName
-        , canRequestSupportForSelectedTier
         , decoder
         , encoder
         , selectedComponent
@@ -10,6 +9,7 @@ module State
         , selectedService
         , selectedServiceAvailableIssues
         , selectedTier
+        , selectedTierSupportUnavailable
         )
 
 import Bootstrap.Modal as Modal
@@ -241,8 +241,8 @@ selectedServiceAvailableIssues state =
     selectedService state |> .issues |> Issues.availableIssues
 
 
-canRequestSupportForSelectedTier : State -> Bool
-canRequestSupportForSelectedTier state =
+selectedTierSupportUnavailable : State -> Bool
+selectedTierSupportUnavailable state =
     let
         tier =
             selectedTier state
@@ -250,19 +250,19 @@ canRequestSupportForSelectedTier state =
     case tier.level of
         Tier.Three ->
             -- Can always request Tier 3 support.
-            True
+            False
 
         _ ->
             case associatedModelSupportType state of
                 SupportType.Managed ->
                     -- Can request any Tier support for managed
                     -- Components/Services.
-                    True
+                    False
 
                 SupportType.Advice ->
                     -- Cannot request any other Tier support for advice-only
                     -- Components/Services.
-                    False
+                    True
 
 
 {-| Returns the SupportType for the currently selected 'associated model'.

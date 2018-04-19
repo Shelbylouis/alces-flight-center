@@ -120,7 +120,7 @@ formField field item htmlFn additionalAttributes children state =
             tierIsUnavailable && Field.isDynamicField field
 
         tierIsUnavailable =
-            not <| State.canRequestSupportForSelectedTier state
+            State.selectedTierSupportUnavailable state
 
         identifier =
             fieldIdentifier fieldName

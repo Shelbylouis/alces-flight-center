@@ -71,8 +71,8 @@ subjectPresentValidator =
 
 createAvailableTierValidator : State -> Validator Error State
 createAvailableTierValidator state =
-    Validate.ifFalse
-        State.canRequestSupportForSelectedTier
+    Validate.ifTrue
+        State.selectedTierSupportUnavailable
         ( Field.Tier, Message <| unavailableTierErrorMessage state )
 
 

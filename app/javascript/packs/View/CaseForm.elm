@@ -87,7 +87,7 @@ dynamicFields state =
                 []
 
         sectionDisabled =
-            not <| State.canRequestSupportForSelectedTier state
+            State.selectedTierSupportUnavailable state
 
         selectedTier =
             State.selectedTier state
