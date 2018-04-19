@@ -1,6 +1,7 @@
 module State
     exposing
         ( State
+        , associatedModelTypeName
         , canRequestSupportForSelectedTier
         , decoder
         , encoder
@@ -277,3 +278,11 @@ associatedModelSupportType state =
         selectedComponent state |> .supportType
     else
         selectedService state |> .supportType
+
+
+associatedModelTypeName : State -> String
+associatedModelTypeName state =
+    if selectedIssue state |> Issue.requiresComponent then
+        "component"
+    else
+        "service"

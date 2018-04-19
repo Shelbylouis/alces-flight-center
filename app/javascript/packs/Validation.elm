@@ -29,7 +29,11 @@ invalidState state =
 
 validateState : State -> List Error
 validateState state =
-    Validate.validate stateValidator state
+    let
+        validator =
+            createStateValidator state
+    in
+    Validate.validate validator state
 
 
 validateField : Field -> State -> List Error
@@ -44,13 +48,18 @@ validateField field state =
     validateState state |> errorsForField
 
 
-stateValidator : Validator Error State
-stateValidator =
+createStateValidator : State -> Validator Error State
+createStateValidator state =
+    let
+        tierErrorMessage =
+            "Selected "
+                ++ State.associatedModelTypeName state
+                ++ """ is self-managed; if required you may only request
+            consultancy support from Alces Software."""
+    in
     Validate.all
         [ Validate.ifBlank (State.selectedIssue >> Issue.subject) ( Field.Subject, Empty )
-
-        -- XXX Display error message for this error.
-        , Validate.ifFalse State.canRequestSupportForSelectedTier ( Field.Tier, Empty )
+        , Validate.ifFalse State.canRequestSupportForSelectedTier ( Field.Tier, Message tierErrorMessage )
 
         -- XXX Not handling any other validations for now, as these are
         -- currently either very improbable or impossible to trigger (at least
