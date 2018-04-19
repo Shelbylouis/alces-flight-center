@@ -19,11 +19,7 @@ type alias Error =
 
 type ErrorMessage
     = Empty
-
-
-
--- XXX Add and handle this ErrorMessage case when we actually need it.
--- | Message String
+    | Message String
 
 
 invalidState : State -> Bool
