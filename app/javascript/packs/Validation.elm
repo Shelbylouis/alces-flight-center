@@ -50,19 +50,33 @@ validateField field state =
 
 createStateValidator : State -> Validator Error State
 createStateValidator state =
-    let
-        tierErrorMessage =
-            "Selected "
-                ++ State.associatedModelTypeName state
-                ++ """ is self-managed; if required you may only request
-            consultancy support from Alces Software."""
-    in
     Validate.all
-        [ Validate.ifBlank (State.selectedIssue >> Issue.subject) ( Field.Subject, Empty )
-        , Validate.ifFalse State.canRequestSupportForSelectedTier ( Field.Tier, Message tierErrorMessage )
+        [ subjectPresentValidator
+        , createAvailableTierValidator state
 
         -- XXX Not handling any other validations for now, as these are
         -- currently either very improbable or impossible to trigger (at least
         -- with the current production data and how we initialize the Case form
         -- app) and will significantly change anyway once we handle Tiers.
         ]
+
+
+subjectPresentValidator : Validator Error State
+subjectPresentValidator =
+    Validate.ifBlank
+        (State.selectedIssue >> Issue.subject)
+        ( Field.Subject, Empty )
+
+
+createAvailableTierValidator : State -> Validator Error State
+createAvailableTierValidator state =
+    let
+        errorMessage =
+            "Selected "
+                ++ State.associatedModelTypeName state
+                ++ """ is self-managed; if required you may only request
+                consultancy support from Alces Software."""
+    in
+    Validate.ifFalse
+        State.canRequestSupportForSelectedTier
+        ( Field.Tier, Message errorMessage )
