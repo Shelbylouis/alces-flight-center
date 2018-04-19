@@ -1,8 +1,8 @@
 
 FactoryBot.define do
   factory :case_state_transition do
-    case nil
-    namespace "MyString"
+    add_attribute(:case) { nil }
+    add_attribute(:namespace) { "MyString" }
     event "MyString"
     from "MyString"
     to "MyString"
