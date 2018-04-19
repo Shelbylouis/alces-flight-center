@@ -6,9 +6,6 @@ import Json.Decode as D
 type SupportType
     = Managed
     | Advice
-      -- `advice-only` only makes sense for Issues; indicates the Issue can only
-      -- be associated with an `advice` Component.
-    | AdviceOnly
 
 
 type alias HasSupportType a =
@@ -26,9 +23,6 @@ decoder =
 
                     "advice" ->
                         D.succeed Advice
-
-                    "advice-only" ->
-                        D.succeed AdviceOnly
 
                     other ->
                         D.fail ("Unknown support type: " ++ other)

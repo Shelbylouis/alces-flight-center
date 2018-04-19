@@ -1,6 +1,7 @@
 module State
     exposing
         ( State
+        , associatedModelTypeName
         , decoder
         , encoder
         , selectedComponent
@@ -8,20 +9,20 @@ module State
         , selectedService
         , selectedServiceAvailableIssues
         , selectedTier
+        , selectedTierSupportUnavailable
         )
 
 import Bootstrap.Modal as Modal
 import Cluster exposing (Cluster)
 import Component exposing (Component)
-import Dict
 import Issue exposing (Issue)
 import Issues
 import Json.Decode as D
 import Json.Encode as E
-import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
+import SupportType exposing (SupportType)
 import Tier exposing (Tier)
 
 
@@ -238,3 +239,50 @@ selectedTier state =
 selectedServiceAvailableIssues : State -> SelectList Issue
 selectedServiceAvailableIssues state =
     selectedService state |> .issues |> Issues.availableIssues
+
+
+selectedTierSupportUnavailable : State -> Bool
+selectedTierSupportUnavailable state =
+    let
+        tier =
+            selectedTier state
+    in
+    case tier.level of
+        Tier.Three ->
+            -- Can always request Tier 3 support.
+            False
+
+        _ ->
+            case associatedModelSupportType state of
+                SupportType.Managed ->
+                    -- Can request any Tier support for managed
+                    -- Components/Services.
+                    False
+
+                SupportType.Advice ->
+                    -- Cannot request any other Tier support for advice-only
+                    -- Components/Services.
+                    True
+
+
+{-| Returns the SupportType for the currently selected 'associated model'.
+
+The associated model is the model which would be most closely associated with
+the current Case if it was created, i.e. the selected Component if the selected
+Issue requires one, or the selected Service if not.
+
+-}
+associatedModelSupportType : State -> SupportType
+associatedModelSupportType state =
+    if selectedIssue state |> Issue.requiresComponent then
+        selectedComponent state |> .supportType
+    else
+        selectedService state |> .supportType
+
+
+associatedModelTypeName : State -> String
+associatedModelTypeName state =
+    if selectedIssue state |> Issue.requiresComponent then
+        "component"
+    else
+        "service"

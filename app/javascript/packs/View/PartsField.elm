@@ -75,14 +75,3 @@ maybePartsField field partsFieldConfig toId state changeMsg =
             -- Issue does not require a part of this type => do not show any
             -- select.
             Nothing
-
-
-errorForClusterPart : String -> HasSupportType a -> String
-errorForClusterPart partName part =
-    if SupportType.isManaged part then
-        "This " ++ partName ++ " is already fully managed."
-    else
-        "This "
-            ++ partName
-            ++ """ is self-managed; if required you may only request
-            consultancy support from Alces Software."""

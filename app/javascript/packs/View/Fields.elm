@@ -10,6 +10,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Json.Decode as D
+import Maybe.Extra
 import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import String.Extra
@@ -115,6 +116,12 @@ formField field item htmlFn additionalAttributes children state =
                 _ ->
                     toString field
 
+        fieldIsUnavailable =
+            tierIsUnavailable && Field.isDynamicField field
+
+        tierIsUnavailable =
+            State.selectedTierSupportUnavailable state
+
         identifier =
             fieldIdentifier fieldName
 
@@ -122,6 +129,7 @@ formField field item htmlFn additionalAttributes children state =
             List.append
                 [ id identifier
                 , class (formControlClasses errors)
+                , disabled fieldIsUnavailable
                 ]
                 additionalAttributes
 
@@ -162,18 +170,23 @@ bootstrapValidationClass errors =
 validationFeedback : List Error -> Html msg
 validationFeedback errors =
     let
-        errorMessage =
-            -- This elaborate pattern matching to just get an empty string is
-            -- to remind me to actually display the error message(s) once we
-            -- make it possible to set these (as this will then fail to
-            -- compile).
-            case List.head errors of
-                Just ( field, Empty ) ->
-                    ""
+        combinedErrorMessages =
+            List.map unpackErrorMessage errorMessages
+                |> Maybe.Extra.values
+                |> String.join "; "
 
-                Nothing ->
-                    ""
+        errorMessages =
+            List.map Tuple.second errors
+
+        unpackErrorMessage =
+            \error ->
+                case error of
+                    Empty ->
+                        Nothing
+
+                    Message message ->
+                        Just message
     in
     div
         [ class "invalid-feedback" ]
-        [ text errorMessage ]
+        [ text combinedErrorMessages ]

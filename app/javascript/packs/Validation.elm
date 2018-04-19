@@ -3,6 +3,7 @@ module Validation
         ( Error
         , ErrorMessage(..)
         , invalidState
+        , unavailableTierErrorMessage
         , validateField
         , validateState
         )
@@ -19,11 +20,7 @@ type alias Error =
 
 type ErrorMessage
     = Empty
-
-
-
--- XXX Add and handle this ErrorMessage case when we actually need it.
--- | Message String
+    | Message String
 
 
 invalidState : State -> Bool
@@ -33,7 +30,11 @@ invalidState state =
 
 validateState : State -> List Error
 validateState state =
-    Validate.validate stateValidator state
+    let
+        validator =
+            createStateValidator state
+    in
+    Validate.validate validator state
 
 
 validateField : Field -> State -> List Error
@@ -48,13 +49,36 @@ validateField field state =
     validateState state |> errorsForField
 
 
-stateValidator : Validator Error State
-stateValidator =
+createStateValidator : State -> Validator Error State
+createStateValidator state =
     Validate.all
-        [ Validate.ifBlank (State.selectedIssue >> Issue.subject) ( Field.Subject, Empty )
+        [ subjectPresentValidator
+        , createAvailableTierValidator state
 
         -- XXX Not handling any other validations for now, as these are
         -- currently either very improbable or impossible to trigger (at least
         -- with the current production data and how we initialize the Case form
         -- app) and will significantly change anyway once we handle Tiers.
         ]
+
+
+subjectPresentValidator : Validator Error State
+subjectPresentValidator =
+    Validate.ifBlank
+        (State.selectedIssue >> Issue.subject)
+        ( Field.Subject, Empty )
+
+
+createAvailableTierValidator : State -> Validator Error State
+createAvailableTierValidator state =
+    Validate.ifTrue
+        State.selectedTierSupportUnavailable
+        ( Field.Tier, Message <| unavailableTierErrorMessage state )
+
+
+unavailableTierErrorMessage : State -> String
+unavailableTierErrorMessage state =
+    "Selected "
+        ++ State.associatedModelTypeName state
+        ++ " is self-managed; if required you may only request consultancy"
+        ++ " support from Alces Software."
