@@ -1,6 +1,7 @@
 module State
     exposing
         ( State
+        , canRequestSupportForSelectedTier
         , decoder
         , encoder
         , selectedComponent
@@ -20,6 +21,7 @@ import Json.Encode as E
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
+import SupportType exposing (SupportType)
 import Tier exposing (Tier)
 
 
@@ -236,3 +238,42 @@ selectedTier state =
 selectedServiceAvailableIssues : State -> SelectList Issue
 selectedServiceAvailableIssues state =
     selectedService state |> .issues |> Issues.availableIssues
+
+
+canRequestSupportForSelectedTier : State -> Bool
+canRequestSupportForSelectedTier state =
+    let
+        tier =
+            selectedTier state
+    in
+    case tier.level of
+        Tier.Three ->
+            -- Can always request Tier 3 support.
+            True
+
+        _ ->
+            case associatedModelSupportType state of
+                SupportType.Managed ->
+                    -- Can request any Tier support for managed
+                    -- Components/Services.
+                    True
+
+                SupportType.Advice ->
+                    -- Cannot request any other Tier support for advice-only
+                    -- Components/Services.
+                    False
+
+
+{-| Returns the SupportType for the currently selected 'associated model'.
+
+The associated model is the model which would be most closely associated with
+the current Case if it was created, i.e. the selected Component if the selected
+Issue requires one, or the selected Service if not.
+
+-}
+associatedModelSupportType : State -> SupportType
+associatedModelSupportType state =
+    if selectedIssue state |> Issue.requiresComponent then
+        selectedComponent state |> .supportType
+    else
+        selectedService state |> .supportType

@@ -53,6 +53,9 @@ stateValidator =
     Validate.all
         [ Validate.ifBlank (State.selectedIssue >> Issue.subject) ( Field.Subject, Empty )
 
+        -- XXX Display error message for this error.
+        , Validate.ifFalse State.canRequestSupportForSelectedTier ( Field.Tier, Empty )
+
         -- XXX Not handling any other validations for now, as these are
         -- currently either very improbable or impossible to trigger (at least
         -- with the current production data and how we initialize the Case form
