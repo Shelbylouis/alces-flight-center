@@ -11,7 +11,6 @@ module Issue
         , selectTier
         , setSubject
         , subject
-        , supportType
         , tiers
         , updateSelectedTierField
         )
@@ -19,7 +18,6 @@ module Issue
 import Json.Decode as D
 import SelectList exposing (SelectList)
 import SelectList.Extra
-import SupportType exposing (SupportType(..))
 import Tier exposing (Tier)
 import Utils
 
@@ -33,7 +31,6 @@ type alias IssueData =
     { id : Id
     , name : String
     , subject : String
-    , supportType : SupportType
     , chargeable : Bool
     , tiers : SelectList Tier
     }
@@ -47,14 +44,13 @@ decoder : D.Decoder Issue
 decoder =
     let
         createIssue =
-            \id name requiresComponent defaultSubject supportType chargeable tiers ->
+            \id name requiresComponent defaultSubject chargeable tiers ->
                 let
                     data =
                         IssueData
                             id
                             name
                             defaultSubject
-                            supportType
                             chargeable
                             tiers
                 in
@@ -63,12 +59,11 @@ decoder =
                 else
                     StandardIssue data
     in
-    D.map7 createIssue
+    D.map6 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
         (D.field "defaultSubject" D.string)
-        (D.field "supportType" SupportType.decoder)
         (D.field "chargeable" D.bool)
         (D.field "tiers" <| SelectList.Extra.orderedDecoder Tier.levelAsInt Tier.decoder)
 
@@ -147,11 +142,6 @@ updateIssueData changeData issue =
 
         StandardIssue _ ->
             StandardIssue newData
-
-
-supportType : Issue -> SupportType
-supportType issue =
-    data issue |> .supportType
 
 
 isChargeable : Issue -> Bool
