@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180417164616) do
+ActiveRecord::Schema.define(version: 20180417162934) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,6 +60,18 @@ ActiveRecord::Schema.define(version: 20180417164616) do
     t.index ["user_id"], name: "index_case_comments_on_user_id"
   end
 
+  create_table "case_state_transitions", force: :cascade do |t|
+    t.bigint "case_id", null: false
+    t.string "namespace"
+    t.string "event"
+    t.string "from"
+    t.string "to", null: false
+    t.datetime "created_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["case_id"], name: "index_case_state_transitions_on_case_id"
+    t.index ["user_id"], name: "index_case_state_transitions_on_user_id"
+  end
+
   create_table "cases", force: :cascade do |t|
     t.string "details"
     t.datetime "created_at", null: false
@@ -77,6 +89,7 @@ ActiveRecord::Schema.define(version: 20180417164616) do
     t.datetime "completed_at"
     t.integer "tier_level"
     t.json "fields"
+    t.text "state", default: "open", null: false
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
     t.index ["issue_id"], name: "index_cases_on_issue_id"
@@ -307,6 +320,8 @@ ActiveRecord::Schema.define(version: 20180417164616) do
   add_foreign_key "asset_record_fields", "components"
   add_foreign_key "case_comments", "cases"
   add_foreign_key "case_comments", "users"
+  add_foreign_key "case_state_transitions", "cases"
+  add_foreign_key "case_state_transitions", "users"
   add_foreign_key "cases", "clusters"
   add_foreign_key "cases", "components"
   add_foreign_key "cases", "issues"
