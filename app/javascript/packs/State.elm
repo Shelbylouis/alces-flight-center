@@ -13,12 +13,10 @@ module State
 import Bootstrap.Modal as Modal
 import Cluster exposing (Cluster)
 import Component exposing (Component)
-import Dict
 import Issue exposing (Issue)
 import Issues
 import Json.Decode as D
 import Json.Encode as E
-import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
