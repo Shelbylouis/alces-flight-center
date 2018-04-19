@@ -63,7 +63,7 @@ class Case < ApplicationRecord
 
   # @deprecated - to be removed in next release
   validates :last_known_ticket_status,
-    inclusion: {in: TICKET_STATUSES}
+    inclusion: {in: RT_TICKET_STATUSES}
 
   # Only validate Issue relationship on create, as the Issue must be allowed
   # given the associated model for this Case at the point when the Case is
@@ -136,16 +136,6 @@ class Case < ApplicationRecord
     COMPLETED_RT_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
-  def events
-    (
-      case_comments.select(&:created_at) +  # Note that CasesController#show
-        # creates a new, unsaved CaseComment (because the view needs it)
-        # so there will be one included in this set without a created_at
-        # date. We clearly don't want to include that in the events stream.
-      maintenance_windows.map(&:transitions).flatten.select(&:event)
-    ).sort_by(&:created_at)
-  end
-
   def email_recipients
     site.all_contacts
         .map(&:email)
@@ -153,6 +143,17 @@ class Case < ApplicationRecord
 
   def email_reply_subject
     "RE: #{email_subject}"
+  end
+
+  def events
+    (
+      case_comments.select(&:created_at) +  # Note that CasesController#show
+        # creates a new, unsaved CaseComment (because the view needs it)
+        # so there will be one included in this set without a created_at
+        # date. We clearly don't want to include that in the events stream.
+      maintenance_windows.map(&:transitions).flatten.select(&:event) +
+      case_state_transitions
+    ).sort_by(&:created_at)
   end
 
   def email_subject
