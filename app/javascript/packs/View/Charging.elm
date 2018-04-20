@@ -20,23 +20,25 @@ chargeableAlert state =
         isChargeable =
             Tier.isChargeable <| State.selectedTier state
 
+        alertChildren =
+            List.intersperse (text " ")
+                [ dollars
+                , chargeableText
+                , chargingInfoModalLink
+                ]
+
+        dollars =
+            span [] (List.repeat 3 dollar)
+
         dollar =
             span [ class "fa fa-dollar" ] []
 
-        chargingInfo =
-            """ Creating a support case at this tier is potentially chargeable,
-            and may incur a charge of support credits. """
+        chargeableText =
+            text """Creating a support case at this tier is potentially
+            chargeable, and may incur a charge of support credits."""
 
-        clusterChargingInfoLinkText =
-            "Click here for the charging details for this cluster."
-    in
-    if isChargeable then
-        Alert.warning
-            [ dollar
-            , dollar
-            , dollar
-            , text chargingInfo
-            , Alert.link
+        chargingInfoModalLink =
+            Alert.link
                 [ ClusterChargingInfoModal Modal.visibleState |> onClick
 
                 -- This makes this display as a normal link, but clicking on it
@@ -44,9 +46,10 @@ chargeableAlert state =
                 -- `href="#"` does not work.
                 , href "javascript:void(0)"
                 ]
-                [ text clusterChargingInfoLinkText ]
-            ]
-            |> Just
+                [ text "Click here for the charging details for this cluster." ]
+    in
+    if isChargeable then
+        Just <| Alert.warning alertChildren
     else
         Nothing
 
