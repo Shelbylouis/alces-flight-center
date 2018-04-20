@@ -79,6 +79,12 @@ class CasesController < ApplicationController
     )
   end
 
+  def resolve
+    change_action 'Support case resolved.' do |kase|
+      kase.resolve(current_user)
+    end
+  end
+
   private
 
   def case_params
@@ -94,8 +100,14 @@ class CasesController < ApplicationController
   end
 
   def archived_change_action(archived:, success_flash:)
+    change_action success_flash do |kase|
+      kase.archived = archived
+    end
+  end
+
+  def change_action(success_flash, &block)
     @case = Case.find(params[:id])
-    @case.archived = archived
+    block.call(@case)
     if @case.save
       flash[:success] = success_flash
     else

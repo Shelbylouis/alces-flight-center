@@ -64,7 +64,9 @@ Rails.application.routes.draw do
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      archive_cases.call(only: :show)
+      archive_cases.call(only: :show) do
+        post :resolve  # Only admins may resolve a case
+      end
     end
 
     resources :clusters, only: []  do
