@@ -30,7 +30,7 @@ view state =
     let
         submitMsg =
             if State.selectedIssue state |> Issue.isChargeable then
-                ChargeableIssuePreSubmissionModal Modal.visibleState
+                ChargeablePreSubmissionModal Modal.visibleState
             else
                 StartSubmit
 
