@@ -19,6 +19,7 @@ import Json.Decode as D
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Tier exposing (Tier)
+import Tier.Level
 import Utils
 
 
@@ -65,7 +66,11 @@ decoder =
         (D.field "requiresComponent" D.bool)
         (D.field "defaultSubject" D.string)
         (D.field "chargeable" D.bool)
-        (D.field "tiers" <| SelectList.Extra.orderedDecoder Tier.levelAsInt Tier.decoder)
+        (D.field "tiers" <|
+            SelectList.Extra.orderedDecoder
+                (.level >> Tier.Level.asInt)
+                Tier.decoder
+        )
 
 
 extractId : Issue -> Int

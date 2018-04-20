@@ -24,6 +24,7 @@ import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)
 import Tier exposing (Tier)
+import Tier.Level
 
 
 type alias State =
@@ -201,7 +202,7 @@ encoder state =
                 , ( "component_id", componentIdValue )
                 , ( "service_id", serviceIdValue )
                 , ( "subject", Issue.subject issue |> E.string )
-                , ( "tier_level", Tier.levelAsInt tier |> E.int )
+                , ( "tier_level", Tier.Level.asInt tier.level |> E.int )
                 , ( "fields", Tier.fieldsEncoder tier )
                 ]
           )
@@ -248,7 +249,7 @@ selectedTierSupportUnavailable state =
             selectedTier state
     in
     case tier.level of
-        Tier.Three ->
+        Tier.Level.Three ->
             -- Can always request Tier 3 support.
             False
 

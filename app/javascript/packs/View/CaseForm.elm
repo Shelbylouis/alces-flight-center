@@ -17,7 +17,9 @@ import Msg exposing (..)
 import SelectList
 import Service
 import State exposing (State)
-import Tier
+import Tier exposing (Tier)
+import Tier.DisplayWrapper
+import Tier.Level as Level exposing (Level)
 import Validation
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
@@ -65,7 +67,7 @@ dynamicFields state =
     let
         fields =
             case selectedTier.level of
-                Tier.Zero ->
+                Level.Zero ->
                     -- When a level 0 Tier is selected we want to prevent filling in
                     -- any fields or submitting the form, and only show the rendered
                     -- Tier fields, which should include the relevant links to
@@ -119,6 +121,7 @@ maybeClustersField state =
                 clusters
                 Cluster.extractId
                 .name
+                (always False)
                 ChangeSelectedCluster
                 state
             )
@@ -135,6 +138,7 @@ maybeCategoriesField state =
                     categories_
                     Category.extractId
                     .name
+                    (always False)
                     ChangeSelectedCategory
                     state
             )
@@ -150,6 +154,7 @@ issuesField state =
         selectedServiceAvailableIssues
         Issue.extractId
         Issue.name
+        (always False)
         ChangeSelectedIssue
         state
 
@@ -157,13 +162,16 @@ issuesField state =
 tierSelectField : State -> Html Msg
 tierSelectField state =
     let
-        selectedIssueTiers =
-            State.selectedIssue state |> Issue.tiers
+        wrappedTiers =
+            State.selectedIssue state
+                |> Issue.tiers
+                |> Tier.DisplayWrapper.wrap
     in
     Fields.selectField Field.Tier
-        selectedIssueTiers
-        Tier.extractId
-        Tier.description
+        wrappedTiers
+        Tier.DisplayWrapper.extractId
+        Tier.DisplayWrapper.description
+        Tier.DisplayWrapper.isUnavailable
         ChangeSelectedTier
         state
 
