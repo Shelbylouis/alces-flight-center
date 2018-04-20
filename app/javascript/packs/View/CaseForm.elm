@@ -171,7 +171,7 @@ tierSelectField state =
         wrappedTiers
         Tier.DisplayWrapper.extractId
         Tier.DisplayWrapper.description
-        (always False)
+        Tier.DisplayWrapper.isUnavailable
         ChangeSelectedTier
         state
 

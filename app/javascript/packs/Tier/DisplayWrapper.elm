@@ -3,6 +3,7 @@ module Tier.DisplayWrapper
         ( DisplayWrapper(..)
         , description
         , extractId
+        , isUnavailable
         , wrap
         )
 
@@ -91,3 +92,13 @@ toTier wrapper =
 
         UnavailableTier _ ->
             Nothing
+
+
+isUnavailable : DisplayWrapper -> Bool
+isUnavailable wrapper =
+    case wrapper of
+        AvailableTier _ ->
+            False
+
+        UnavailableTier _ ->
+            True
