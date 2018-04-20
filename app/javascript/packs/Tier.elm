@@ -7,6 +7,7 @@ module Tier
         , decoder
         , extractId
         , fieldsEncoder
+        , isChargeable
         , setFieldValue
         )
 
@@ -179,3 +180,13 @@ setFieldValue tier index value =
         | fields =
             Dict.update index updateFieldValue tier.fields
     }
+
+
+isChargeable : Tier -> Bool
+isChargeable tier =
+    case tier.level of
+        Level.Three ->
+            True
+
+        _ ->
+            False

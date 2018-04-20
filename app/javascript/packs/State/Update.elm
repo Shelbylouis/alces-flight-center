@@ -76,8 +76,8 @@ update msg state =
         ClusterChargingInfoModal modalState ->
             Just ({ state | clusterChargingInfoModal = modalState } ! [])
 
-        ChargeableIssuePreSubmissionModal modalState ->
-            Just ({ state | chargeableIssuePreSubmissionModal = modalState } ! [])
+        ChargeablePreSubmissionModal modalState ->
+            Just ({ state | chargeablePreSubmissionModal = modalState } ! [])
 
 
 stringToId : (Int -> id) -> String -> Maybe id

@@ -17,4 +17,4 @@ type Msg
     | SubmitResponse (Result (Rails.Error String) ())
     | ClearError
     | ClusterChargingInfoModal Modal.State
-    | ChargeableIssuePreSubmissionModal Modal.State
+    | ChargeablePreSubmissionModal Modal.State

@@ -4,7 +4,6 @@ module Issue
         , Issue
         , decoder
         , extractId
-        , isChargeable
         , name
         , requiresComponent
         , sameId
@@ -32,7 +31,6 @@ type alias IssueData =
     { id : Id
     , name : String
     , subject : String
-    , chargeable : Bool
     , tiers : SelectList Tier
     }
 
@@ -45,14 +43,13 @@ decoder : D.Decoder Issue
 decoder =
     let
         createIssue =
-            \id name requiresComponent defaultSubject chargeable tiers ->
+            \id name requiresComponent defaultSubject tiers ->
                 let
                     data =
                         IssueData
                             id
                             name
                             defaultSubject
-                            chargeable
                             tiers
                 in
                 if requiresComponent then
@@ -60,12 +57,11 @@ decoder =
                 else
                     StandardIssue data
     in
-    D.map6 createIssue
+    D.map5 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
         (D.field "defaultSubject" D.string)
-        (D.field "chargeable" D.bool)
         (D.field "tiers" <|
             SelectList.Extra.orderedDecoder
                 (.level >> Tier.Level.asInt)
@@ -147,11 +143,6 @@ updateIssueData changeData issue =
 
         StandardIssue _ ->
             StandardIssue newData
-
-
-isChargeable : Issue -> Bool
-isChargeable issue =
-    data issue |> .chargeable
 
 
 data : Issue -> IssueData
