@@ -3,15 +3,55 @@ module Tier.DisplayWrapper
         ( DisplayWrapper(..)
         , description
         , extractId
+        , wrap
         )
 
+import SelectList exposing (SelectList)
 import Tier exposing (Tier)
 import Tier.Level as Level exposing (Level)
+import Utils
 
 
 type DisplayWrapper
     = AvailableTier Tier
     | UnavailableTier Level
+
+
+wrap : SelectList Tier -> SelectList DisplayWrapper
+wrap availableTiers =
+    let
+        allLevels =
+            SelectList.fromLists []
+                Level.Zero
+                [ Level.One, Level.Two, Level.Three ]
+
+        wrapTierToDisplay =
+            \level ->
+                case tierWithLevel level of
+                    Just tier ->
+                        AvailableTier tier
+
+                    Nothing ->
+                        UnavailableTier level
+
+        tierWithLevel =
+            \level ->
+                List.filter
+                    (\tier -> tier.level == level)
+                    (SelectList.toList availableTiers)
+                    |> List.head
+
+        reselectSelectedTier =
+            \wrapper ->
+                case wrapper of
+                    AvailableTier tier ->
+                        Utils.sameId tier.id (SelectList.selected availableTiers)
+
+                    UnavailableTier _ ->
+                        False
+    in
+    SelectList.map wrapTierToDisplay allLevels
+        |> SelectList.select reselectSelectedTier
 
 
 extractId : DisplayWrapper -> Int

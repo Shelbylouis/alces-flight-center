@@ -20,7 +20,6 @@ import State exposing (State)
 import Tier exposing (Tier)
 import Tier.DisplayWrapper
 import Tier.Level as Level exposing (Level)
-import Utils
 import Validation
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
@@ -160,43 +159,13 @@ issuesField state =
 tierSelectField : State -> Html Msg
 tierSelectField state =
     let
-        selectedIssueTiers =
-            State.selectedIssue state |> Issue.tiers
-
-        displayedTiers =
-            SelectList.fromLists
-                []
-                Level.Zero
-                [ Level.One, Level.Two, Level.Three ]
-                |> SelectList.map wrapTierToDisplay
-                |> SelectList.select
-                    (\wrapper ->
-                        case wrapper of
-                            Tier.DisplayWrapper.AvailableTier tier ->
-                                Utils.sameId tier.id (State.selectedTier state)
-
-                            Tier.DisplayWrapper.UnavailableTier _ ->
-                                False
-                    )
-
-        wrapTierToDisplay =
-            \level ->
-                case tierWithLevel level of
-                    Just tier ->
-                        Tier.DisplayWrapper.AvailableTier tier
-
-                    Nothing ->
-                        Tier.DisplayWrapper.UnavailableTier level
-
-        tierWithLevel =
-            \level ->
-                List.filter
-                    (\tier -> tier.level == level)
-                    (SelectList.toList selectedIssueTiers)
-                    |> List.head
+        wrappedTiers =
+            State.selectedIssue state
+                |> Issue.tiers
+                |> Tier.DisplayWrapper.wrap
     in
     Fields.selectField Field.Tier
-        displayedTiers
+        wrappedTiers
         Tier.DisplayWrapper.extractId
         Tier.DisplayWrapper.description
         ChangeSelectedTier
