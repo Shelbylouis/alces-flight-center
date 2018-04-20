@@ -7,7 +7,20 @@
   </div>
   <div class="form-group">
     <%= f.submit "Add new comment",
-          class: 'btn btn-primary btn-block'
+          class: 'btn btn-primary'
     %>
+
+    <% if current_user.admin? && @case.state == 'open' %>
+      <%= button_to 'Resolve this case',
+            resolve_case_path(@case.id),
+            form_class: 'form',
+            class: 'btn btn-secondary',
+            method: :post,
+            title: 'Resolve this support case if it has been completed or is no longer relevant',
+            data: {
+                confirm: 'Are you sure you want to resolve this support case?'
+            }
+      %>
+    <% end %>
   </div>
 <% end %>
