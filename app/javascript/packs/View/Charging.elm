@@ -1,4 +1,9 @@
-module View.Charging exposing (..)
+module View.Charging
+    exposing
+        ( chargeableAlert
+        , chargeablePreSubmissionModal
+        , infoModal
+        )
 
 import Bootstrap.Alert as Alert
 import Bootstrap.Button as Button
@@ -6,7 +11,6 @@ import Bootstrap.Modal as Modal
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Issue
 import Msg exposing (..)
 import SelectList
 import State exposing (State)
@@ -23,7 +27,7 @@ chargeableAlert state =
         alertChildren =
             List.intersperse (text " ")
                 [ dollars
-                , chargeableText
+                , potentiallyChargeableText
                 , chargingInfoModalLink
                 ]
 
@@ -32,10 +36,6 @@ chargeableAlert state =
 
         dollar =
             span [ class "fa fa-dollar" ] []
-
-        chargeableText =
-            text """Creating a support case at this tier is potentially
-            chargeable, and may incur a charge of support credits."""
 
         chargingInfoModalLink =
             Alert.link
@@ -92,11 +92,7 @@ chargeablePreSubmissionModal : State -> Html Msg
 chargeablePreSubmissionModal state =
     let
         bodyContent =
-            [ p []
-                [ text "The selected issue ("
-                , em [] [ State.selectedIssue state |> Issue.name |> text ]
-                , text ") is chargeable, and creating this support case may incur a support credit charge."
-                ]
+            [ p [] [ potentiallyChargeableText ]
             , p [] [ text "Do you wish to continue?" ]
             ]
     in
@@ -118,3 +114,9 @@ chargeablePreSubmissionModal state =
                 [ text "Create Case" ]
             ]
         |> Modal.view state.chargeablePreSubmissionModal
+
+
+potentiallyChargeableText : Html Msg
+potentiallyChargeableText =
+    text """Creating a support case at this tier is potentially
+    chargeable, and may incur a charge of support credits."""

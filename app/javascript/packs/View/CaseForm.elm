@@ -30,7 +30,7 @@ view : State -> Html Msg
 view state =
     let
         submitMsg =
-            if State.selectedIssue state |> Issue.isChargeable then
+            if State.selectedTier state |> Tier.isChargeable then
                 ChargeablePreSubmissionModal Modal.visibleState
             else
                 StartSubmit
