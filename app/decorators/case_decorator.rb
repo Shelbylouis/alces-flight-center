@@ -1,8 +1,8 @@
 class CaseDecorator < ApplicationDecorator
   delegate_all
 
-  # Note: These should match values used in `Tier.description` in Case form
-  # app.
+  # Note: These should match values used in `Tier.Level.description` in Case
+  # form app.
   TIER_DESCRIPTIONS = {
     1 => 'Tool',
     2 => 'Support',

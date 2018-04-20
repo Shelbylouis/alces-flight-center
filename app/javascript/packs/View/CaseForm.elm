@@ -18,6 +18,7 @@ import SelectList
 import Service
 import State exposing (State)
 import Tier exposing (Tier)
+import Tier.Level as Level exposing (Level)
 import Utils
 import Validation
 import View.Fields as Fields
@@ -66,7 +67,7 @@ dynamicFields state =
     let
         fields =
             case selectedTier.level of
-                Tier.Zero ->
+                Level.Zero ->
                     -- When a level 0 Tier is selected we want to prevent filling in
                     -- any fields or submitting the form, and only show the rendered
                     -- Tier fields, which should include the relevant links to
@@ -162,7 +163,10 @@ tierSelectField state =
             State.selectedIssue state |> Issue.tiers
 
         displayedTiers =
-            SelectList.fromLists [] Tier.Zero [ Tier.One, Tier.Two, Tier.Three ]
+            SelectList.fromLists
+                []
+                Level.Zero
+                [ Level.One, Level.Two, Level.Three ]
                 |> SelectList.map wrapTierToDisplay
                 |> SelectList.select
                     (\wrapper ->
@@ -200,7 +204,7 @@ tierSelectField state =
 
 type TierDisplayWrapper
     = AvailableTier Tier
-    | UnavailableTier Tier.Level
+    | UnavailableTier Level
 
 
 extractId : TierDisplayWrapper -> Int
@@ -219,10 +223,10 @@ extractId wrapper =
 
 description : TierDisplayWrapper -> String
 description wrapper =
-    Tier.description <| getLevel wrapper
+    Level.description <| getLevel wrapper
 
 
-getLevel : TierDisplayWrapper -> Tier.Level
+getLevel : TierDisplayWrapper -> Level
 getLevel wrapper =
     case wrapper of
         AvailableTier tier ->

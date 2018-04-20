@@ -19,6 +19,7 @@ import Json.Decode as D
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Tier exposing (Tier)
+import Tier.Level
 import Utils
 
 
@@ -67,7 +68,7 @@ decoder =
         (D.field "chargeable" D.bool)
         (D.field "tiers" <|
             SelectList.Extra.orderedDecoder
-                (.level >> Tier.levelAsInt)
+                (.level >> Tier.Level.asInt)
                 Tier.decoder
         )
 

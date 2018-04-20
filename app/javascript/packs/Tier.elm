@@ -2,14 +2,11 @@ module Tier
     exposing
         ( Field(..)
         , Id(..)
-        , Level(..)
         , TextInputData
         , Tier
         , decoder
-        , description
         , extractId
         , fieldsEncoder
-        , levelAsInt
         , setFieldValue
         )
 
@@ -18,6 +15,7 @@ import Dict exposing (Dict)
 import Json.Decode as D
 import Json.Encode as E
 import Maybe.Extra
+import Tier.Level as Level exposing (Level)
 import Types
 
 
@@ -30,13 +28,6 @@ type alias Tier =
 
 type Id
     = Id Int
-
-
-type Level
-    = Zero
-    | One
-    | Two
-    | Three
 
 
 type Field
@@ -59,7 +50,7 @@ type alias TextInputData =
 decoder : D.Decoder Tier
 decoder =
     D.field "level" D.int
-        |> D.map intToLevel
+        |> D.map Level.fromInt
         |> D.andThen
             (\levelResult ->
                 case levelResult of
@@ -162,70 +153,11 @@ textFieldTypeToString field =
             "input"
 
 
-levelAsInt : Level -> Int
-levelAsInt level =
-    case level of
-        Zero ->
-            0
-
-        One ->
-            1
-
-        Two ->
-            2
-
-        Three ->
-            3
-
-
-intToLevel : Int -> Result String Level
-intToLevel int =
-    case int of
-        0 ->
-            Ok Zero
-
-        1 ->
-            Ok One
-
-        2 ->
-            Ok Two
-
-        3 ->
-            Ok Three
-
-        _ ->
-            Err <| "Invalid level: " ++ toString int
-
-
 extractId : Tier -> Int
 extractId tier =
     case tier.id of
         Id id ->
             id
-
-
-description : Level -> String
-description level =
-    let
-        humanTierDescription =
-            case level of
-                Zero ->
-                    "Guides"
-
-                One ->
-                    "Tool"
-
-                Two ->
-                    "Support"
-
-                Three ->
-                    "Consultancy"
-
-        tierNumberPrefix =
-            toString (levelAsInt level) ++ ":"
-    in
-    String.join " "
-        [ "Tier", tierNumberPrefix, humanTierDescription ]
 
 
 setFieldValue : Tier -> Int -> String -> Tier
