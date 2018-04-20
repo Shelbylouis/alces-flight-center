@@ -18,6 +18,7 @@ import SelectList
 import Service
 import State exposing (State)
 import Tier exposing (Tier)
+import Tier.DisplayWrapper
 import Tier.Level as Level exposing (Level)
 import Utils
 import Validation
@@ -171,10 +172,10 @@ tierSelectField state =
                 |> SelectList.select
                     (\wrapper ->
                         case wrapper of
-                            AvailableTier tier ->
+                            Tier.DisplayWrapper.AvailableTier tier ->
                                 Utils.sameId tier.id (State.selectedTier state)
 
-                            UnavailableTier _ ->
+                            Tier.DisplayWrapper.UnavailableTier _ ->
                                 False
                     )
 
@@ -182,10 +183,10 @@ tierSelectField state =
             \level ->
                 case tierWithLevel level of
                     Just tier ->
-                        AvailableTier tier
+                        Tier.DisplayWrapper.AvailableTier tier
 
                     Nothing ->
-                        UnavailableTier level
+                        Tier.DisplayWrapper.UnavailableTier level
 
         tierWithLevel =
             \level ->
@@ -196,54 +197,10 @@ tierSelectField state =
     in
     Fields.selectField Field.Tier
         displayedTiers
-        extractId
-        description
+        Tier.DisplayWrapper.extractId
+        Tier.DisplayWrapper.description
         ChangeSelectedTier
         state
-
-
-type TierDisplayWrapper
-    = AvailableTier Tier
-    | UnavailableTier Level
-
-
-extractId : TierDisplayWrapper -> Int
-extractId wrapper =
-    case toTier wrapper of
-        Just tier ->
-            Tier.extractId tier
-
-        Nothing ->
-            -- Use this as a placeholder ID when we don't have a real Tier and
-            -- so a real ID. Not ideal, but unlikely to ever cause a problem
-            -- and simpler than changing everywhere we expect an Int id to
-            -- accept a Maybe Int.
-            -1
-
-
-description : TierDisplayWrapper -> String
-description wrapper =
-    Level.description <| getLevel wrapper
-
-
-getLevel : TierDisplayWrapper -> Level
-getLevel wrapper =
-    case wrapper of
-        AvailableTier tier ->
-            tier.level
-
-        UnavailableTier level ->
-            level
-
-
-toTier : TierDisplayWrapper -> Maybe Tier
-toTier wrapper =
-    case wrapper of
-        AvailableTier tier ->
-            Just tier
-
-        UnavailableTier _ ->
-            Nothing
 
 
 maybeComponentsField : State -> Maybe (Html Msg)
