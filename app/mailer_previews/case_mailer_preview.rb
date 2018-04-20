@@ -4,7 +4,7 @@ class CaseMailerPreview < ApplicationMailerPreview
   end
 
   def comment
-    my_comment = CaseComment.first || FactoryBot.build(:case_comment)
+    my_comment = CaseComment.first || FactoryBot.build_stubbed(:case_comment)
     CaseMailer.comment(my_comment)
   end
 
