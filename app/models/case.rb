@@ -30,7 +30,7 @@ class Case < ApplicationRecord
 
   validates :token, presence: true
   validates :subject, presence: true
-  validates :rt_ticket_id, uniqueness: true
+  validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
   validates :fields, presence: true
 
   validates :tier_level,
