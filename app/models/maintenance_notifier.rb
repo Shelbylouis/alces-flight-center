@@ -3,7 +3,7 @@ MaintenanceNotifier = Struct.new(:window) do
   def add_transition_comment(event)
     comment_method = "#{event}_comment".to_sym
     comment = send(comment_method).squish
-    add_rt_ticket_correspondence(comment)
+    send_email(comment)
   end
 
   private
@@ -88,8 +88,8 @@ MaintenanceNotifier = Struct.new(:window) do
     EOF
   end
 
-  def add_rt_ticket_correspondence(text)
-    window.case.add_rt_ticket_correspondence(text)
+  def send_email(text)
+    CaseMailer.maintenance(window.case, text).deliver_later
   end
 
   def cluster_dashboard_url

@@ -11,9 +11,15 @@ class CaseComment < ApplicationRecord
 
   validate :valid_user, on: :create
 
+  after_create :send_comment_email
+
   private
 
   def valid_user
     errors.add(:user, 'does not have permission to post a comment on this case') unless user.admin? || user.site == site
+  end
+
+  def send_comment_email
+    CaseMailer.comment(self).deliver_later
   end
 end

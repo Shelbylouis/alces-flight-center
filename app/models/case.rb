@@ -30,7 +30,7 @@ class Case < ApplicationRecord
 
   validates :token, presence: true
   validates :subject, presence: true
-  validates :rt_ticket_id, presence: true, uniqueness: true
+  validates :rt_ticket_id, uniqueness: true
   validates :fields, presence: true
 
   validates :tier_level,
@@ -45,7 +45,6 @@ class Case < ApplicationRecord
     }
 
   validates :last_known_ticket_status,
-    presence: true,
     inclusion: {in: TICKET_STATUSES}
 
   # Only validate Issue relationship on create, as the Issue must be allowed
@@ -63,9 +62,7 @@ class Case < ApplicationRecord
 
   before_validation :assign_default_subject_if_unset
 
-  # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
-  # if this is possible but it was not explicitly passed.
-  before_validation :create_rt_ticket, on: :create
+  after_create :send_new_case_email
 
   scope :active, -> { where(archived: false) }
 
@@ -80,7 +77,7 @@ class Case < ApplicationRecord
 
   def mailto_url
     support_email = 'support@alces-software.com'
-    "mailto:#{support_email}?subject=#{rt_email_subject}"
+    "mailto:#{support_email}?subject=#{email_reply_subject}"
   end
 
   def open
@@ -88,7 +85,7 @@ class Case < ApplicationRecord
   end
 
   def update_ticket_status!
-    return if ticket_completed? && self.completed_at
+    return unless incomplete_rt_ticket?
     self.last_known_ticket_status = associated_rt_ticket.status
     if ticket_completed?
       self.completed_at = DateTime.now.utc
@@ -131,19 +128,48 @@ class Case < ApplicationRecord
     ).sort_by(&:created_at)
   end
 
+  def email_recipients
+    site.all_contacts
+        .map(&:email)
+  end
+
+  def email_reply_subject
+    "RE: #{email_subject}"
+  end
+
+  def email_subject
+    "#{email_identifier} #{ticket_subject}"
+  end
+
+  def email_identifier
+    if rt_ticket_id
+      "[helpdesk.alces-software.com ##{rt_ticket_id}]"
+    else
+      "[Alces Flight Center ##{id}]"
+    end
+  end
+
+  def ticket_subject
+    # NOTE: If the format used here ever changes then this may cause emails
+    # sent using the `mailto` links for existing Cases to not be threaded with
+    # previous emails related to that Case (see
+    # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
+    # for an explanation). If we want to change this format and avoid this
+    # consequence then a solution would be to first add a new field for this
+    # whole string, and save and use the existing format for existing Cases.
+    "#{cluster.name}: #{subject} [#{token}]"
+  end
+
+  def rt_ticket_text
+    # Ticket text does not need to be in this format, it is just text, but this
+    # is readable and an adequate format for now.
+    Utils.rt_format(case_properties)
+  end
+
   private
 
-  def create_rt_ticket
-    return unless cluster
-
-    ticket = rt.create_ticket(
-      requestor_email: requestor_email,
-      cc: cc_emails,
-      subject: rt_ticket_subject,
-      text: rt_ticket_text
-    )
-
-    self.rt_ticket_id = ticket.id
+  def incomplete_rt_ticket?
+    rt_ticket_id && (!ticket_completed? || !self.completed_at)
   end
 
   def assign_cluster_if_necessary
@@ -157,7 +183,11 @@ class Case < ApplicationRecord
   end
 
   def associated_rt_ticket
-    @associated_ticket ||= rt.show_ticket(rt_ticket_id)
+    if rt_ticket_id
+      @associated_ticket ||= rt.show_ticket(rt_ticket_id)
+    else
+      nil
+    end
   end
 
   def rt
@@ -166,28 +196,6 @@ class Case < ApplicationRecord
 
   def requestor_email
     user.email
-  end
-
-  def cc_emails
-    site.all_contacts
-      .reject { |contact| contact.email == requestor_email }
-      .map(&:email)
-  end
-
-  def rt_email_subject
-    rt_email_identifier = "[helpdesk.alces-software.com ##{rt_ticket_id}]"
-    "RE: #{rt_email_identifier} #{rt_ticket_subject}"
-  end
-
-  def rt_ticket_subject
-    # NOTE: If the format used here ever changes then this may cause emails
-    # sent using the `mailto` links for existing Cases to not be threaded with
-    # previous emails related to that Case (see
-    # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
-    # for an explanation). If we want to change this format and avoid this
-    # consequence then a solution would be to first add a new field for this
-    # whole string, and save and use the existing format for existing Cases.
-    "#{cluster.name}: #{subject} [#{token}]"
   end
 
   # We generate a short random token to identify each ticket within email
@@ -211,18 +219,8 @@ class Case < ApplicationRecord
       end.join
   end
 
-  def rt_ticket_text
-    # Ticket text does not need to be in this format, it is just text, but this
-    # is readable and an adequate format for now.
-    properties = Utils.rt_format(rt_ticket_properties)
 
-    [
-      'This ticket was created using Alces Flight Center',
-      properties
-    ].join("\n\n")
-  end
-
-  def rt_ticket_properties
+  def case_properties
     {
       Requestor: user.name,
       Cluster: cluster.name,
@@ -232,5 +230,9 @@ class Case < ApplicationRecord
       'Associated service': service&.name,
       Details: details,
     }.reject { |_k, v| v.nil? }
+  end
+
+  def send_new_case_email
+    CaseMailer.new_case(self).deliver_later
   end
 end

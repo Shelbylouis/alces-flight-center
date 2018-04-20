@@ -2,8 +2,8 @@
 FactoryBot.define do
 
   factory :case_comment do
-    user { create(:admin) }
-    add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
+    association :user, factory: :admin
+    association :case # Avoid conflict with case keyword.
     text 'This is a comment'
   end
 
@@ -106,19 +106,19 @@ FactoryBot.define do
 
   factory :credit_deposit do
     cluster
-    user { create(:admin) }
+    association :user, factory: :admin
     amount 10
   end
 
   factory :credit_charge do
-    add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
-    user { create(:admin) }
+    association :case # Avoid conflict with case keyword.
+    association :user, factory: :admin
     amount 2
   end
 
   factory :log do
     details 'I am the factory default details'
     cluster
-    engineer { create :admin }
+    association :engineer, factory: :admin
   end
 end

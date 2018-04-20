@@ -1,7 +1,7 @@
 
 FactoryBot.define do
   factory :maintenance_window do
-    add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
+    association :case # Avoid conflict with case keyword.
     created_at 7.days.ago
     requested_start 1.days.from_now.at_midnight
     duration 1

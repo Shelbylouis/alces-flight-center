@@ -8,7 +8,9 @@ RSpec.describe CaseDecorator do
 
     context 'when Case has Component' do
       subject do
-        create(:case_with_component).decorate
+        create(:case_with_component).decorate.tap do
+          Draper::ViewContext.clear!
+        end
       end
 
       let :component { subject.component }
@@ -32,7 +34,9 @@ RSpec.describe CaseDecorator do
 
     context 'when Case has Service' do
       subject do
-        create(:case_with_service).decorate
+        create(:case_with_service).decorate.tap do
+          Draper::ViewContext.clear!
+        end
       end
 
       let :service { subject.service }
@@ -57,7 +61,9 @@ RSpec.describe CaseDecorator do
 
     context 'when Case has no Component or Service' do
       subject do
-        create(:case).decorate
+        create(:case).decorate.tap do
+          Draper::ViewContext.clear!
+        end
       end
 
       it 'returns link to Cluster' do
@@ -98,7 +104,9 @@ RSpec.describe CaseDecorator do
       kase = create(:case)
       kase.rt_ticket_id = 12345
 
-      link = kase.decorate.ticket_link
+      link = kase.decorate.tap do
+        Draper::ViewContext.clear!
+      end.ticket_link
 
       expect(link).to eq h.link_to('12345', h.case_path(kase))
     end

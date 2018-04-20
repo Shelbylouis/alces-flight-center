@@ -6,6 +6,7 @@ FactoryBot.define do
     user
     fields [{name: 'Details', value: 'some_details'}]
     tier_level 2
+    sequence(:rt_ticket_id) { |n| n }
 
     factory :open_case do
       archived false
@@ -23,8 +24,9 @@ FactoryBot.define do
       end
 
       factory :case_with_component do
+        component
+
         before :create do |instance|
-          instance.component = create(:component)
           instance.cluster = instance.component.cluster
         end
       end
@@ -39,8 +41,9 @@ FactoryBot.define do
       end
 
       factory :case_with_service do
+        service
+
         before :create do |instance|
-          instance.service = create(:service)
           instance.cluster = instance.service.cluster
         end
       end

@@ -1,0 +1,144 @@
+/*=============================================================================
+ * Copyright (C) 2014 Stephen F. Norledge and Alces Software Ltd.
+ *
+ * This file is part of Alces Portal.
+ *
+ * All rights reserved, see LICENSE.txt.
+ *===========================================================================*/
+/* Alces Portal main inlined styles */
+
+@import 'layouts/mailer/settings';
+
+body {
+    font-family: $c-fontFamily--base;
+    color: $base-color;
+}
+
+a {
+    color: $base-link-color;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.section {
+    width: 600px;
+}
+
+.notes {
+    font-size: 12px;
+    text-align: center;
+    color: #666;
+}
+
+#container {
+    font-size: 16px;
+    line-height: 20px;
+}
+
+#main {
+    .v-spacer {
+        height: 28px;
+    }
+
+    .h-spacer {
+        width: 5%;
+    }
+}
+
+#content {
+    font-family: $c-fontFamily--content;
+
+    p {
+        line-height: 22px;
+    }
+}
+
+#footer {
+    p {
+        margin-top: 16px;
+        font-size: 12px;
+    }
+
+    .content-row {
+        background: $c-primary-color--lightest;
+        border-top: 1px solid $c-primary-color--light;
+        color: #666;
+        height: 80px;
+    }
+
+    .content-cell {
+        width: 95%;
+        text-align: center;
+        padding: 16px 0 32px;
+        line-height: 24px;
+    }
+
+    .v-spacer {
+        height: 28px;
+    }
+
+    .h-spacer {
+        width: 2.5%;
+    }
+}
+
+hr {
+    border-color: $c-primary-color--lighter;
+    box-shadow: 0 0 5px $c-primary-color--light;
+    margin: 20px;
+    border-style: solid;
+}
+
+dt {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 2px;
+}
+
+dd {
+    font-size: 14px;
+}
+
+.portal-account {
+    font-weight: bold;
+    font-size: 12px;
+    background-color: rgb(240,240,240);
+    background-color: rgba(240,240,240,0.7);
+    color: $text-muted;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+code {
+    color: #85643b;
+    background-color: rgb(255,244,231);
+    background-color: rgba(255,244,231,0.7);
+    border-radius: 4px;
+    font-size: 16px;
+    padding: 2px 4px;
+}
+
+blockquote {
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 0 5px $c-primary-color;
+    background-color: $c-primary-color--lightest;
+    border: 1px solid $c-primary-color;
+    line-height: 1.5rem;
+
+    table tbody td {
+        padding: 1px 10px;
+    }
+
+  cite {
+    display: block;
+    margin-top: 1rem;
+  }
+}
+
+img {
+    font-size: 18px;
+    color: $text-muted;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}

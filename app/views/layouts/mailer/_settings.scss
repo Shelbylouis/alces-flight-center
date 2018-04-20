@@ -1,0 +1,62 @@
+/*=============================================================================
+ * Copyright (C) 2014 Stephen F. Norledge and Alces Software Ltd.
+ *
+ * This file is part of Alces Portal.
+ *
+ * All rights reserved, see LICENSE.txt.
+ *===========================================================================*/
+/* ----- Base Colors ----- */
+
+$base-background: #fff;
+$base-color: #333;
+$base-link-color: #4088b8;
+$base-link-color--hover: #a66819;
+
+/* ----- Base Borders & Box Shadows ----- */
+
+$base-border: 1px solid $base-color;
+$base-borderRadius: 3px;
+$base-boxShadow: 0 1px 2px rgba($base-color, 0.25);
+
+/* ----- Base Content ----- */
+
+$base-fontFamily: Arial, Helvetica, sans-serif;
+$base-fontSize: 16px;
+$base-lineHeight: 1.5;
+
+/* ----- Base Layout ----- */
+
+$base-whitespace: 20px;
+
+/* ----- Content ----- */
+
+$c-primary-color: #4089B8;
+$c-primary-color--dark: #3C637C;
+$c-primary-color--darker: #013557;
+$c-primary-color--darkest: #002137;
+$c-primary-color--light: #ACDEFF;
+$c-primary-color--lighter: #DFEBF2;
+$c-primary-color--lightest: #EEF8FF;
+
+$c-sec1-color: #4F55C3;
+$c-sec1-color--muted: #454661;
+$c-sec1-color--darker: #00033A;
+$c-sec1-color--deep: #171B61;
+$c-sec1-color--pastel: #343873;
+
+$c-sec2-color: #3CC382;
+$c-sec2-color--dark: #406251;
+$c-sec2-color--darker: #003B1E;
+$c-sec2-color--pastel: #418162;
+$c-sec2-color--muted: #6C8579;
+
+$c-complement-color: #FFB14E;
+$c-complement-color--muted: #806C53;
+$c-complement-color--deep: #4D2B00;
+$c-complement-color--dark: #85643B;
+$c-complement-color--darker: #45341F;
+
+$c-fontFamily--base: $base-fontFamily;
+$c-fontFamily--content: Tahoma, $base-fontFamily;
+
+$text-muted: $c-sec2-color--muted;

@@ -1,0 +1,11 @@
+<p>A new support case has been created:</p>
+
+<h3><%= @case.ticket_subject %></h3>
+
+<blockquote>
+  <% @case.rt_ticket_text.split(/\n/).each do |line| %>
+    <%= line %><br/>
+  <% end %>
+  <br/>
+  <cite><%= @case.created_at.to_formatted_s(:long) %> - <b><%= @case.user.name %></b></cite>
+</blockquote>

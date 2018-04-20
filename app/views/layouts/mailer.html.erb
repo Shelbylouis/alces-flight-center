@@ -1,13 +1,134 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <style>
-      /* Email styles need to be inline */
-    </style>
-  </head>
+<%#
+  Copyright (C) 2018 Stephen F. Norledge and Alces Flight Ltd.
 
-  <body>
-    <%= yield %>
-  </body>
+  This file is part of Alces Flight.
+
+  All rights reserved, see LICENSE.txt.
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width:device-width, initial-scale=1.0"/>
+  <% if content_for?(:title) %>
+    <title>
+      <%= content_for(:title) %>
+    </title>
+  <% end %>
+  <style data-roadie-ignore><%= render "layouts/mailer/immutable" %></style>
+  <style>
+    <%= render "layouts/mailer/global_inline" %>
+  </style>
+  <% if content_for?(:styles) %>
+    <style>
+      <%= content_for(:styles) %>
+    </style>
+  <% end %>
+</head>
+<body>
+<table id="container" cellpadding="0" cellspacing="0" border="0">
+  <tbody>
+  <tr id="main">
+    <td width="<%= td_width(1) %>">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" class="section">
+        <tbody>
+        <tr>
+          <td class="v-spacer" colspan="3"></td>
+        </tr>
+        <tr>
+          <%#
+                                            "Clients like Outlook 2007 don’t respect
+                                    percentage widths, especially for nested
+                                    tables. Stick to pixels." --
+                                        https://www.campaignmonitor.com/resources/will-it-work/guidelines/
+          %>
+          <td class="h-spacer" width="<%= td_width(0.05) %>"></td>
+          <td width="<%= td_width(0.9) %>">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" id="content">
+              <tbody>
+              <tr>
+                <td valign="top" style="width: <%= td_width(0.9 * 0.2) %>">
+                  &nbsp;
+                </td>
+                <td valign="top" width="<%= td_width(0.9 * 0.2) %>" >
+                  &nbsp;
+                </td>
+                <td valign="top" width="<%= td_width(0.9 * 0.6) %>" >
+                  <%= link_to(root_url) do %>
+                    <%= image_tag(image_path('flight-mailer-logo.png'), size: "283x60", alt: "A message from Alces Flight Center.", class: "image_fix") %>
+                  <% end %>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="3">
+                  <%= content_for?(:content) ? yield(:content) : yield %>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </td>
+          <td class="h-spacer" width="<%= td_width(0.05) %>"></td>
+        </tr>
+        <tr>
+          <td class="v-spacer" colspan="3">
+            <hr/>
+          </td>
+        </tr>
+        <tr>
+          <td class="h-spacer"></td>
+          <td width="<%= td_width(0.9) %>">
+            <%= content_for(:notes) %>
+            <p class="notes">
+              Add
+              <a href="mailto:support@alces-flight.com">
+                support@alces-flight.com
+              </a>
+              to your address book to ensure messages from
+              <em>Alces Flight Center</em> aren't marked as spam.
+            </p>
+            <p class="notes">
+              Replies to this email are not monitored. To request
+              help or to send us any feedback please visit
+              <a href="https://center.alces-flight.com">
+                Alces Flight Center
+              </a>
+              or our
+              <a href="https://community.alces-flight.com">
+                Community Support Portal
+              </a>.
+            </p>
+          </td>
+          <td class="h-spacer" width="<%= td_width(0.05) %>"></td>
+        </tr>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+  <tr id="footer">
+    <td width="<%= td_width(1) %>">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" class="section">
+        <tbody>
+        <tr>
+          <td class="v-spacer" colspan="3"></td>
+        </tr>
+        <tr class="content-row">
+          <td class="h-spacer" width="<%= td_width(0.025) %>"></td>
+          <td class="content-cell" width="<%= td_width(0.95) %>">
+            <p>
+              <a href="<%= root_url %>"><em>Alces Flight</em></a>
+              is a service provided by
+              <a href="http://www.alces-flight.com/">Alces Flight Ltd</a>
+              <br/>
+              Reg. No 10095215 &bull; 4 Murdock Road &bull; Bicester &bull; Oxon &bull; OX26 4PP
+            </p>
+          </td>
+          <td class="h-spacer" width="<%= td_width(0.025) %>"></td>
+        </tr>
+        </tbody>
+      </table>
+    </td>
+  </tr>
+  </tbody>
+</table>
+</body>
 </html>
