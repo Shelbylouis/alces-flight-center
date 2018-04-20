@@ -121,6 +121,16 @@ class Case < ApplicationRecord
     COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
+  def events
+    (
+      case_comments.select(&:created_at) +  # Note that CasesController#show
+        # creates a new, unsaved CaseComment (because the view needs it)
+        # so there will be one included in this set without a created_at
+        # date. We clearly don't want to include that in the events stream.
+      maintenance_windows.map(&:transitions).flatten.select(&:event)
+    ).sort_by(&:created_at)
+  end
+
   private
 
   def create_rt_ticket

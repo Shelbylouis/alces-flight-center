@@ -69,12 +69,10 @@
         </td>
       </tr>
       <tr>
-        <th>Comments</th>
+        <th>Case history</th>
         <td>
-          <% @case.case_comments.order(:created_at).each do |comment| %>
-            <%= render 'case_comments/case_comment',
-              comment: comment
-            %>
+          <% @case.events.each do |event| %>
+            <%= event.decorate.event_card %>
           <% end %>
           <%= render 'case_comments/form' %>
         </td>

@@ -32,3 +32,16 @@
    color: #000;
   }
 }
+
+.event-card {
+  .card-header {
+    span {
+      display: block;
+      flex-grow: 1;
+    }
+
+    .icon {
+      width: auto;
+    }
+  }
+}

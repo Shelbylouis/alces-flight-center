@@ -1,0 +1,9 @@
+<div class="card event-card">
+  <div class="card-header d-inline-flex justify-content-between align-items-center">
+    <span><%= date.to_formatted_s(:long) %> - <b><%= name %></b></span>
+    <%= icon(type) %>
+  </div>
+  <div class="card-body">
+    <%= text %>
+  </div>
+</div>

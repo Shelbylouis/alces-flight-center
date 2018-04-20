@@ -2,7 +2,7 @@
 FactoryBot.define do
 
   factory :case_comment do
-    user create(:user)
+    user { create(:admin) }
     add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
     text 'This is a comment'
   end

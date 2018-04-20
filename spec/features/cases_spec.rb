@@ -145,3 +145,39 @@ RSpec.describe 'Cases table', type: :feature do
     end
   end
 end
+
+RSpec.describe 'Case page' do
+  let! (:admin) { create(:admin) }
+  let (:site) { create(:site, name: 'My Site') }
+  let (:cluster) { create(:cluster, site: site) }
+
+  let! :open_case do
+    create(:open_case, cluster: cluster, subject: 'Open case')
+  end
+
+  let (:mw) { create(:maintenance_window, case: open_case) }
+
+  it 'shows events in chronological order' do
+    create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
+    create(
+      :maintenance_window_state_transition,
+      maintenance_window: mw,
+      user: admin,
+      event: :request
+    )
+    create(:case_comment, case: open_case, user: admin, created_at: 4.hours.ago, text: 'First')
+
+    visit case_path(open_case, as: admin)
+
+    event_cards = all('.event-card')
+    expect(event_cards.size).to eq(3)
+
+    expect(event_cards[0].find('.card-body').text).to eq('First')
+    expect(event_cards[1].find('.card-body').text).to eq('Second')
+    expect(event_cards[2].find('.card-body').text).to match(
+      /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
+    )
+
+  end
+
+end
