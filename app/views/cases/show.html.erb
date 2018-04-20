@@ -1,7 +1,7 @@
 <% content_for :subtitle { 'Support Case' } %>
 <div class='card'>
   <%= render 'partials/card_header_nav',
-    title: 'Overview'
+    title: "#{@case.display_id} - #{@case.subject}"
   %>
   <div class='table-responsive'>
     <table class="table">
@@ -44,10 +44,6 @@
       <tr>
         <th>Tier</th>
         <td><%= @case.tier_description %></td>
-      </tr>
-      <tr>
-        <th>Subject</th>
-        <td><%= @case.subject %></td>
       </tr>
       <tr>
         <th>Fields</th>

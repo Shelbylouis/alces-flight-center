@@ -22,6 +22,10 @@ class CaseDecorator < ApplicationDecorator
     end
   end
 
+  def display_id
+    "##{object.id}"
+  end
+
   def case_select_details
     [
       "RT ticket #{rt_ticket_id}",
