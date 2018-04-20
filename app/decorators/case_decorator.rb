@@ -9,6 +9,19 @@ class CaseDecorator < ApplicationDecorator
     3 => 'Consultancy',
   }.freeze
 
+  def user_facing_state
+    case model.state
+    when 'open'
+      'Open'
+    when 'resolved'
+      'Resolved'
+    when 'archived'
+      'Archived'
+    else
+      model.state.to_s.titlecase
+    end
+  end
+
   def case_select_details
     [
       "RT ticket #{rt_ticket_id}",

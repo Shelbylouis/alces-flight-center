@@ -96,8 +96,12 @@ class Case < ApplicationRecord
     "mailto:#{support_email}?subject=#{email_reply_subject}"
   end
 
-  def open
-    !archived
+  def open?
+    self.state == 'open'
+  end
+
+  def archived?
+    self.state == 'resolved' || self.state == 'archived'
   end
 
   def update_ticket_status!
