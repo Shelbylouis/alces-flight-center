@@ -71,7 +71,19 @@ extractId wrapper =
 
 description : DisplayWrapper -> String
 description wrapper =
-    Level.description <| getLevel wrapper
+    let
+        levelDescription =
+            Level.description <| getLevel wrapper
+    in
+    case wrapper of
+        AvailableTier _ ->
+            levelDescription
+
+        UnavailableTier _ ->
+            String.join " "
+                [ levelDescription
+                , "(unavailable for selected issue)"
+                ]
 
 
 getLevel : DisplayWrapper -> Level
