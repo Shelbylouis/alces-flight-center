@@ -163,7 +163,7 @@ tierSelectField state =
     Fields.selectField Field.Tier
         selectedIssueTiers
         Tier.extractId
-        Tier.description
+        (.level >> Tier.description)
         ChangeSelectedTier
         state
 

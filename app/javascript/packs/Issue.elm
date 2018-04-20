@@ -65,7 +65,11 @@ decoder =
         (D.field "requiresComponent" D.bool)
         (D.field "defaultSubject" D.string)
         (D.field "chargeable" D.bool)
-        (D.field "tiers" <| SelectList.Extra.orderedDecoder Tier.levelAsInt Tier.decoder)
+        (D.field "tiers" <|
+            SelectList.Extra.orderedDecoder
+                (.level >> Tier.levelAsInt)
+                Tier.decoder
+        )
 
 
 extractId : Issue -> Int

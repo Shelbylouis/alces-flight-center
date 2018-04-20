@@ -162,9 +162,9 @@ textFieldTypeToString field =
             "input"
 
 
-levelAsInt : Tier -> Int
-levelAsInt tier =
-    case tier.level of
+levelAsInt : Level -> Int
+levelAsInt level =
+    case level of
         Zero ->
             0
 
@@ -204,11 +204,11 @@ extractId tier =
             id
 
 
-description : Tier -> String
-description tier =
+description : Level -> String
+description level =
     let
         humanTierDescription =
-            case tier.level of
+            case level of
                 Zero ->
                     "Guides"
 
@@ -222,7 +222,7 @@ description tier =
                     "Consultancy"
 
         tierNumberPrefix =
-            toString (levelAsInt tier) ++ ":"
+            toString (levelAsInt level) ++ ":"
     in
     String.join " "
         [ "Tier", tierNumberPrefix, humanTierDescription ]

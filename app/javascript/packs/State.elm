@@ -201,7 +201,7 @@ encoder state =
                 , ( "component_id", componentIdValue )
                 , ( "service_id", serviceIdValue )
                 , ( "subject", Issue.subject issue |> E.string )
-                , ( "tier_level", Tier.levelAsInt tier |> E.int )
+                , ( "tier_level", Tier.levelAsInt tier.level |> E.int )
                 , ( "fields", Tier.fieldsEncoder tier )
                 ]
           )
