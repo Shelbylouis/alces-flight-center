@@ -23,16 +23,18 @@ selectField :
     -> SelectList a
     -> (a -> Int)
     -> (a -> String)
+    -> (a -> Bool)
     -> (String -> msg)
     -> State
     -> Html msg
-selectField field items toId toOptionLabel changeMsg state =
+selectField field items toId toOptionLabel isDisabled changeMsg state =
     let
         fieldOption =
             \position item ->
                 option
                     [ toId item |> toString |> value
                     , position == Selected |> selected
+                    , isDisabled item |> disabled
                     ]
                     [ toOptionLabel item |> text ]
 

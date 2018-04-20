@@ -121,6 +121,7 @@ maybeClustersField state =
                 clusters
                 Cluster.extractId
                 .name
+                (always False)
                 ChangeSelectedCluster
                 state
             )
@@ -137,6 +138,7 @@ maybeCategoriesField state =
                     categories_
                     Category.extractId
                     .name
+                    (always False)
                     ChangeSelectedCategory
                     state
             )
@@ -152,6 +154,7 @@ issuesField state =
         selectedServiceAvailableIssues
         Issue.extractId
         Issue.name
+        (always False)
         ChangeSelectedIssue
         state
 
@@ -168,6 +171,7 @@ tierSelectField state =
         wrappedTiers
         Tier.DisplayWrapper.extractId
         Tier.DisplayWrapper.description
+        (always False)
         ChangeSelectedTier
         state
 

@@ -45,6 +45,7 @@ maybePartsField field partsFieldConfig toId state changeMsg =
                     parts
                     toId
                     labelForPart
+                    (always False)
                     changeMsg
                     state
                     |> Just
