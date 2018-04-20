@@ -4,50 +4,40 @@
     title: "#{@case.display_id} - #{@case.subject}"
   %>
   <div class='table-responsive'>
-    <table class="table">
+    <table class="table case-table">
       <tr style="width: 100%;">
-        <th>Date</th>
+        <th>Created</th>
         <td><%= @case.created_at.to_formatted_s(:long) %></td>
-      </tr>
-      <tr>
-        <th>Creator</th>
+        <th>By</th>
         <td><%= @case.user.name %></td>
       </tr>
       <tr>
         <th>Association</th>
         <td><%= @case.association_info %></td>
-      </tr>
-      <tr>
-        <th>Ticket ID</th>
-        <td><%= @case.rt_ticket_id %></td>
+        <th>State</th>
+        <td><%= @case.user_facing_state %></td>
       </tr>
       <tr>
         <th>Category</th>
         <td><%= @case.category&.name || 'None' %></td>
-      </tr>
-      <tr>
         <th>Issue</th>
         <td><%= @case.issue.name %></td>
       </tr>
       <tr>
-        <th>Chargeable</th>
-        <td><%= @case.chargeable_symbol %></td>
+        <th>Tier</th>
+        <td><%= @case.tier_description %>
+        <th>RT Ticket ID</th>
+        <td><%= @case.rt_ticket_id %></td>
       </tr>
       <tr>
+        <th>Chargeable</th>
+        <td><%= @case.chargeable_symbol %></td>
         <th>Credit charge</th>
         <td><%= @case.credit_charge_info %></td>
       </tr>
       <tr>
-        <th>Archived</th>
-        <td><%= boolean_symbol(@case.archived) %></td>
-      </tr>
-      <tr>
-        <th>Tier</th>
-        <td><%= @case.tier_description %></td>
-      </tr>
-      <tr>
         <th>Fields</th>
-        <td>
+        <td colspan="3">
           <div class="table-responsive">
             <table class="table table-sm table-striped table-bordered">
               <% @case.fields.each do |field| %>
@@ -66,7 +56,7 @@
       </tr>
       <tr>
         <th>Case history</th>
-        <td>
+        <td colspan="3">
           <% @case.events.each do |event| %>
             <%= event.decorate.event_card %>
           <% end %>
