@@ -1,6 +1,6 @@
 module Tier.DisplayWrapper
     exposing
-        ( DisplayWrapper(..)
+        ( DisplayWrapper
         , description
         , extractId
         , isUnavailable
