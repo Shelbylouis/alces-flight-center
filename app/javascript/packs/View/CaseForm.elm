@@ -17,7 +17,8 @@ import Msg exposing (..)
 import SelectList
 import Service
 import State exposing (State)
-import Tier
+import Tier exposing (Tier)
+import Utils
 import Validation
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
@@ -159,13 +160,86 @@ tierSelectField state =
     let
         selectedIssueTiers =
             State.selectedIssue state |> Issue.tiers
+
+        displayedTiers =
+            SelectList.fromLists [] Tier.Zero [ Tier.One, Tier.Two, Tier.Three ]
+                |> SelectList.map wrapTierToDisplay
+                |> SelectList.select
+                    (\wrapper ->
+                        case wrapper of
+                            AvailableTier tier ->
+                                Utils.sameId tier.id (State.selectedTier state)
+
+                            UnavailableTier _ ->
+                                False
+                    )
+
+        wrapTierToDisplay =
+            \level ->
+                case tierWithLevel level of
+                    Just tier ->
+                        AvailableTier tier
+
+                    Nothing ->
+                        UnavailableTier level
+
+        tierWithLevel =
+            \level ->
+                List.filter
+                    (\tier -> tier.level == level)
+                    (SelectList.toList selectedIssueTiers)
+                    |> List.head
     in
     Fields.selectField Field.Tier
-        selectedIssueTiers
-        Tier.extractId
-        (.level >> Tier.description)
+        displayedTiers
+        extractId
+        description
         ChangeSelectedTier
         state
+
+
+type TierDisplayWrapper
+    = AvailableTier Tier
+    | UnavailableTier Tier.Level
+
+
+extractId : TierDisplayWrapper -> Int
+extractId wrapper =
+    case toTier wrapper of
+        Just tier ->
+            Tier.extractId tier
+
+        Nothing ->
+            -- Use this as a placeholder ID when we don't have a real Tier and
+            -- so a real ID. Not ideal, but unlikely to ever cause a problem
+            -- and simpler than changing everywhere we expect an Int id to
+            -- accept a Maybe Int.
+            -1
+
+
+description : TierDisplayWrapper -> String
+description wrapper =
+    Tier.description <| getLevel wrapper
+
+
+getLevel : TierDisplayWrapper -> Tier.Level
+getLevel wrapper =
+    case wrapper of
+        AvailableTier tier ->
+            tier.level
+
+        UnavailableTier level ->
+            level
+
+
+toTier : TierDisplayWrapper -> Maybe Tier
+toTier wrapper =
+    case wrapper of
+        AvailableTier tier ->
+            Just tier
+
+        UnavailableTier _ ->
+            Nothing
 
 
 maybeComponentsField : State -> Maybe (Html Msg)
