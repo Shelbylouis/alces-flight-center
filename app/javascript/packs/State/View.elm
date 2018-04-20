@@ -21,7 +21,6 @@ view state =
         (Maybe.Extra.values
             [ Charging.infoModal state |> Just
             , Charging.chargeablePreSubmissionModal state |> Just
-            , State.selectedIssue state |> Charging.chargeableAlert
             , submitErrorAlert state
             , CaseForm.view state |> Just
             ]

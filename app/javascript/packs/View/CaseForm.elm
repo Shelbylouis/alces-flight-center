@@ -21,6 +21,7 @@ import Tier exposing (Tier)
 import Tier.DisplayWrapper
 import Tier.Level as Level exposing (Level)
 import Validation
+import View.Charging as Charging
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
 
@@ -56,6 +57,7 @@ issueDrillDownFields state =
             , issuesField state |> Just
             , maybeComponentsField state
             , tierSelectField state |> Just
+            , Charging.chargeableAlert state
             ]
 
 

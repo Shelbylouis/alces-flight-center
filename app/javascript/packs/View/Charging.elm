@@ -6,26 +6,31 @@ import Bootstrap.Modal as Modal
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Issue exposing (Issue)
+import Issue
 import Msg exposing (..)
 import SelectList
 import State exposing (State)
+import Tier
 import View.Utils
 
 
-chargeableAlert : Issue -> Maybe (Html Msg)
-chargeableAlert issue =
+chargeableAlert : State -> Maybe (Html Msg)
+chargeableAlert state =
     let
+        isChargeable =
+            Tier.isChargeable <| State.selectedTier state
+
         dollar =
             span [ class "fa fa-dollar" ] []
 
         chargingInfo =
-            " This issue is chargeable and may incur a charge of support credits. "
+            """ Creating a support case at this tier is potentially chargeable,
+            and may incur a charge of support credits. """
 
         clusterChargingInfoLinkText =
             "Click here for the charging details for this cluster."
     in
-    if Issue.isChargeable issue then
+    if isChargeable then
         Alert.warning
             [ dollar
             , dollar
