@@ -63,6 +63,9 @@ chdir APP_ROOT do
   puts "\n== Next steps! =="
   next_steps += [
     <<~EOF,
+      Edit `.env` file as needed to use valid environment variables.
+    EOF
+    <<~EOF,
       You will probably want to run `rails
       alces:data:import_and_migrate_production` to give you a local development
       database as close to production as possible.
