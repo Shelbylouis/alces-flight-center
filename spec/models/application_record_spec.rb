@@ -18,6 +18,14 @@ RSpec.describe ApplicationRecord, type: :model do
     end
   end
 
+  describe '#id_param_name' do
+    subject { create(:component_group) }
+
+    it 'returns param name which would typically be used for model ID' do
+      expect(subject.id_param_name).to eq :component_group_id
+    end
+  end
+
   describe 'permissions' do
     def mock_request_user
       allow(Request).to receive(:current_user).and_return(user)

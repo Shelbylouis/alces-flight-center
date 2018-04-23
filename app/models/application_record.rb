@@ -15,6 +15,10 @@ class ApplicationRecord < ActiveRecord::Base
     model_name.param_key
   end
 
+  def id_param_name
+    self.class.to_s.foreign_key.to_sym
+  end
+
   class << self
     # Every model in app is assumed to be related to a specific Site, unless it
     # is explicitly defined as global by overriding this method.
