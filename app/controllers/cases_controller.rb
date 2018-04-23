@@ -37,11 +37,11 @@ class CasesController < ApplicationController
   end
 
   def create
-    @case = Case.new(case_params.merge(user: current_user))
+    @case = Case.new(case_params.merge(user: current_user)).decorate
 
     respond_to do |format|
       if @case.save
-        flash[:success] = 'Support case successfully created.'
+        flash[:success] = "Support case #{@case.display_id} successfully created."
 
         format.json do
           # Return no errors and success status to case form app; it will
@@ -66,13 +66,13 @@ class CasesController < ApplicationController
   end
 
   def archive
-    change_action 'Support case archived.' do |kase|
+    change_action "Support case %s archived." do |kase|
       kase.archive(current_user)
     end
   end
 
   def resolve
-    change_action 'Support case resolved.' do |kase|
+    change_action "Support case %s resolved." do |kase|
       kase.resolve(current_user)
     end
   end
@@ -92,12 +92,12 @@ class CasesController < ApplicationController
   end
 
   def change_action(success_flash, &block)
-    @case = Case.find(params[:id])
+    @case = Case.find(params[:id]).decorate
     block.call(@case)
     if @case.save
-      flash[:success] = success_flash
+      flash[:success] = success_flash % @case.display_id
     else
-      flash[:error] = "Error updating support case: #{format_errors(support_case)}"
+      flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
     redirect_to root_path
   end
