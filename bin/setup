@@ -16,10 +16,28 @@ chdir APP_ROOT do
   system('bundle check') || system!('bundle install')
   system! 'bin/yarn'
 
-  # Install system dependencies in same way as in production (refer to
-  # https://github.com/F4-Group/dokku-apt).
-  File.read('apt-packages').lines.map(&:chomp).reject(&:empty?).map do |package|
-    system! "sudo apt-get install #{package}"
+  # This is required for `squish` below, but must occur after the `bundle
+  # install` above otherwise it will fail the first time this script it run.
+  require 'active_support/core_ext/string'
+
+  next_steps = []
+
+  # Install system dependencies in same way as in production, if `apt-get`
+  # available (refer to https://github.com/F4-Group/dokku-apt).
+  needed_apt_packages = File.read('apt-packages').lines.map(&:chomp).reject(&:empty?)
+  `which apt-get 2>/dev/null`
+  apt_get = $? == 0
+  if apt_get
+    needed_apt_packages.map do |package|
+      system! "sudo apt-get install #{package}"
+    end
+  else
+    next_steps.push(
+    <<~EOF
+      NOTE: `apt-get` not available, you should install the following packages
+      specific to your distro: `#{needed_apt_packages.join(', ')}`.
+    EOF
+    )
   end
 
   puts "\n== Copying sample files =="
@@ -43,7 +61,7 @@ chdir APP_ROOT do
   include ActionView::Helpers::TextHelper
 
   puts "\n== Next steps! =="
-  next_steps = [
+  next_steps += [
     <<~EOF,
       You will probably want to run `rails
       alces:data:import_and_migrate_production` to give you a local development
