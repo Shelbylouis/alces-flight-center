@@ -1,0 +1,23 @@
+<% if current_user.admin? %>
+  <% if @case.state == 'open' %>
+    <%= link_to 'Resolve this case',
+                resolve_case_path(@case.id),
+                class: 'btn btn-secondary',
+                method: :post,
+                title: 'Resolve this support case if it has been completed or is no longer relevant',
+                data: {
+                    confirm: 'Are you sure you want to resolve this support case?'
+                }
+    %>
+  <% elsif @case.state == 'resolved' %>
+    <%= link_to 'Archive this case',
+                archive_case_path(@case.id),
+                class: 'btn btn-secondary',
+                method: :post,
+                title: 'Archive this support case if it has been appropriately processed as part of credit reporting',
+                data: {
+                    confirm: 'Are you sure you want to archive this support case?'
+                }
+    %>
+  <% end %>
+<% end %>
