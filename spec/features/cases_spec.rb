@@ -10,6 +10,10 @@ RSpec.describe 'Cases table', type: :feature do
     create(:open_case, cluster: cluster, subject: 'Open case')
   end
 
+  let! :resolved_case do
+    create(:resolved_case, cluster: cluster, subject: 'Resolved case', completed_at: 1.days.ago, rt_ticket_id: nil)
+  end
+
   let! :archived_case do
     create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
   end
@@ -20,15 +24,14 @@ RSpec.describe 'Cases table', type: :feature do
 
       cases = all('tr').map(&:text)
       expect(cases).to have_text('Open case')
+      expect(cases).not_to have_text('Resolved case')
       expect(cases).not_to have_text('Archived case')
 
       headings = all('th').map(&:text)
       expect(headings).to include('Contact support')
-      expect(headings).to include('Archive')
 
       links = all('a').map { |a| a[:href] }
       expect(links).to include(open_case.mailto_url)
-      expect(links).to include(archive_case_path(open_case))
     end
   end
 
@@ -47,21 +50,15 @@ RSpec.describe 'Cases table', type: :feature do
 
         cases = all('tr').map(&:text)
         expect(cases).to have_text('Open case')
+        expect(cases).to have_text('Resolved case')
+        expect(cases).to have_text('Archived case')
 
         headings = all('th').map(&:text)
         expect(headings).to include('Contact support')
-        expect(headings).to include('Archive/Restore')
 
         links = all('a').map { |a| a[:href] }
         expect(links).to include(open_case.mailto_url)
-        expect(links).to include(archive_case_path(open_case))
 
-        archived_case_row = find('.archived-case-row')
-        expect(archived_case_row).to have_text('Archived case')
-
-        archived_case_links = archived_case_row.all('a').map { |a| a[:href] }
-        expect(archived_case_links).not_to include(archived_case.mailto_url)
-        expect(archived_case_links).to include(restore_case_path(archived_case))
       end
     end
   end

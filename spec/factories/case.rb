@@ -10,10 +10,16 @@ FactoryBot.define do
 
     factory :open_case do
       archived false
+      state 'open'
+    end
+
+    factory :resolved_case do
+      state 'resolved'
     end
 
     factory :archived_case do
       archived true
+      state 'archived'
     end
 
     factory :case_requiring_component do
