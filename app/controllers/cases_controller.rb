@@ -66,17 +66,9 @@ class CasesController < ApplicationController
   end
 
   def archive
-    archived_change_action(
-      archived: true,
-      success_flash: 'Support case archived.'
-    )
-  end
-
-  def restore
-    archived_change_action(
-      archived: false,
-      success_flash: 'Support case restored from archive.'
-    )
+    change_action 'Support case archived.' do |kase|
+      kase.archive(current_user)
+    end
   end
 
   def resolve
@@ -97,12 +89,6 @@ class CasesController < ApplicationController
       :tier_level,
       fields: [:type, :name, :value, :optional],
     )
-  end
-
-  def archived_change_action(archived:, success_flash:)
-    change_action success_flash do |kase|
-      kase.archived = archived
-    end
   end
 
   def change_action(success_flash, &block)

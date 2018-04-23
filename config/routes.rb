@@ -70,6 +70,7 @@ Rails.application.routes.draw do
     resources :cases, only: [] do
       member do
         post :resolve  # Only admins may resolve a case
+        post :archive  # Only admins may archive a case
       end
     end
 
@@ -118,10 +119,6 @@ Rails.application.routes.draw do
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
     archive_cases.call(only: [:show, :create]) do
-      member do
-        post :archive
-        post :restore
-      end
       resources :case_comments, only: :create
     end
 
