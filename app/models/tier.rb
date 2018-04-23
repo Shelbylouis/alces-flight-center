@@ -5,6 +5,10 @@ class Tier < ApplicationRecord
 
   validates :level,
     presence: true,
+    uniqueness: {
+      scope: :issue,
+      message: 'associated issue already has tier at this level'
+    },
     numericality: {
       only_integer: true,
       greater_than_or_equal_to: 0,
