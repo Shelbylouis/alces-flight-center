@@ -45,7 +45,6 @@ class Case < ApplicationRecord
 
   end
 
-  validates :details, presence: true
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
@@ -248,7 +247,6 @@ class Case < ApplicationRecord
         (position.even? ? letters : digits).sample
       end.join
   end
-
 
   def case_properties
     {
