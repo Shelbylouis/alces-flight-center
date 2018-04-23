@@ -15,7 +15,10 @@
         <th>Association</th>
         <td><%= @case.association_info %></td>
         <th>State</th>
-        <td><%= @case.user_facing_state %></td>
+        <td id="case-state-controls">
+          <%= @case.user_facing_state %>
+          <%= render 'cases/case_state_controls' %>
+        </td>
       </tr>
       <tr>
         <th>Category</th>

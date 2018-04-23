@@ -194,7 +194,7 @@ RSpec.describe 'Case page' do
     expect(form.find('input').value).to eq 'Add new comment'
 
     # No resolve/archive controls
-    expect { form.find('a') }.to raise_error(Capybara::ElementNotFound)
+    expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
     visit case_path(resolved_case, as: user)
     expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
@@ -213,7 +213,7 @@ RSpec.describe 'Case page' do
 
     expect(form.find('input').value).to eq 'Add new comment'
 
-    expect(form.find('a').text).to eq 'Resolve this case'
+    expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
 
     visit case_path(resolved_case, as: admin)
     expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
