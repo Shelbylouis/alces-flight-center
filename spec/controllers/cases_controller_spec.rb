@@ -154,4 +154,42 @@ RSpec.describe CasesController, type: :controller do
       end
     end
   end
+
+  describe 'case state management' do
+    let (:open_case) {
+      create(:open_case)
+    }
+
+    let (:resolved_case) {
+      create(:resolved_case)
+    }
+
+    let (:archived_case) {
+      create(:archived_case)
+    }
+
+    let(:admin) { create(:admin) }
+
+    before(:each) { sign_in_as(admin) }
+
+    it 'resolves an open case' do
+      post :resolve, params: { id: open_case.id }
+      expect(flash[:success]).to eq "Support case ##{open_case.id} resolved."
+    end
+
+    it 'archives a resolved case' do
+      post :archive, params: { id: resolved_case.id }
+      expect(flash[:success]).to eq "Support case ##{resolved_case.id} archived."
+    end
+
+    it 'does not resolve an archived case' do
+      post :resolve, params: { id: archived_case.id }
+      expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "resolve"'
+    end
+
+    it 'does not archive an open case' do
+      post :archive, params: { id: open_case.id }
+      expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "archive"'
+    end
+  end
 end

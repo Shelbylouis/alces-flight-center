@@ -67,13 +67,13 @@ class CasesController < ApplicationController
 
   def archive
     change_action "Support case %s archived." do |kase|
-      kase.archive(current_user)
+      kase.archive!(current_user)
     end
   end
 
   def resolve
     change_action "Support case %s resolved." do |kase|
-      kase.resolve(current_user)
+      kase.resolve!(current_user)
     end
   end
 
@@ -93,10 +93,11 @@ class CasesController < ApplicationController
 
   def change_action(success_flash, &block)
     @case = Case.find(params[:id]).decorate
-    block.call(@case)
-    if @case.save
+    begin
+      block.call(@case)
+      @case.save!
       flash[:success] = success_flash % @case.display_id
-    else
+    rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
       flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
     redirect_to root_path
