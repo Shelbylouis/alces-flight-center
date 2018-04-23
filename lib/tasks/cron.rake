@@ -7,6 +7,6 @@ namespace :alces do
     task every_minute: 'alces:maintenance_windows:progress'
 
     desc 'Tasks to run every hour'
-    task hourly: 'alces:cases:auto_archive'
+    task hourly: nil
   end
 end
