@@ -11,8 +11,7 @@ class ClusterPartDecorator < ApplicationDecorator
 
   def render_change_support_type_button(
     request_advice_issue:,
-    request_managed_issue:,
-    part_id_symbol:
+    request_managed_issue:
   )
     return if internal
 
@@ -31,15 +30,14 @@ class ClusterPartDecorator < ApplicationDecorator
                  button_class: 'btn-success',
                  issue: request_managed_issue,
                }
-             end.merge(part_id_symbol: part_id_symbol)
+             end
     change_support_type_button_with(**params)
   end
 
   def change_support_type_button_with(
     change_description:,
     button_class:,
-    issue:,
-    part_id_symbol:
+    issue:
   )
     tier = issue.tiers.find_by_level!(1)
 
@@ -50,7 +48,7 @@ class ClusterPartDecorator < ApplicationDecorator
       params: {
         case: {
           cluster_id: cluster.id,
-          part_id_symbol => id,
+          id_param_name => id,
           issue_id: issue.id,
           fields: tier.fields,
           tier_level: tier.level
