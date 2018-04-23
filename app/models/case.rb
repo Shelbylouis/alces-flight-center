@@ -32,7 +32,7 @@ class Case < ApplicationRecord
   delegate :site, to: :cluster, allow_nil: true
 
   state_machine initial: :open do
-    audit_trail context: [:requesting_user]
+    audit_trail context: [:requesting_user], initial: false
 
     state :open  # Open case, still work to do
     state :resolved  # Has been resolved but not yet accounted for commercially
