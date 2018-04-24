@@ -71,6 +71,13 @@ class CasesController < ApplicationController
     end
   end
 
+  def assign
+    new_assignee = User.find(params[:assignee_id])
+    change_action "Support case %s assigned to #{new_assignee.name}." do |kase|
+      kase.assignee = new_assignee
+    end
+  end
+
   def resolve
     change_action "Support case %s resolved." do |kase|
       kase.resolve!(current_user)
