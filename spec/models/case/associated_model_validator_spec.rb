@@ -44,7 +44,11 @@ RSpec.describe Case, type: :model do
         issue: issue,
         cluster: cluster,
         component: component,
-        service: service
+        service: service,
+        # Specify consultancy Tier explicitly here, to avoid triggering
+        # validations from AvailableSupportValidator which would get in the
+        # way.
+        tier_level: 3,
       }
 
       # If `part` is set, appropriately add Case attribute depending on `part`

@@ -71,8 +71,7 @@ class Case < ApplicationRecord
   # Issue's) may later change and become incompatible with this Issue, but this
   # should not invalidate a Case which was allowed at the point when it was
   # created.
-  # XXX Remove or replace this.
-  # validates_with IssueValidator, on: :create
+  validates_with AvailableSupportValidator #, on: :create
 
   validates_with AssociatedModelValidator
 

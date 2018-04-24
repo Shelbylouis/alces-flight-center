@@ -5,7 +5,7 @@ FactoryBot.define do
     cluster
     user
     fields [{name: 'Details', value: 'some_details'}]
-    tier_level 2
+    tier_level 3
     sequence(:rt_ticket_id) { |n| n }
 
     factory :open_case do
@@ -19,6 +19,11 @@ FactoryBot.define do
     factory :archived_case do
       state 'archived'
     end
+
+    # Every Case requires a Cluster, so this is just the same as the standard
+    # `case` factory; this is useful though to allow us to handle creating a
+    # Case requiring each type of part in the same way.
+    factory :case_requiring_cluster {}
 
     factory :case_requiring_component do
       association :issue, factory: :issue_requiring_component
