@@ -5,6 +5,7 @@ module Tier.Field
         , data
         , decoder
         , encoder
+        , replaceValue
         )
 
 import Json.Decode as D
@@ -109,3 +110,13 @@ data field =
 
         TextInput d ->
             Just d
+
+
+replaceValue : String -> Field -> Field
+replaceValue value field =
+    case field of
+        Markdown s ->
+            Markdown s
+
+        TextInput d ->
+            TextInput { d | value = value }

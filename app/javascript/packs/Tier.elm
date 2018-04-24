@@ -74,16 +74,7 @@ setFieldValue : Tier -> Int -> String -> Tier
 setFieldValue tier index value =
     let
         updateFieldValue =
-            \maybeField ->
-                case maybeField of
-                    Just (Field.Markdown f) ->
-                        Just (Field.Markdown f)
-
-                    Just (Field.TextInput f) ->
-                        Just <| Field.TextInput { f | value = value }
-
-                    Nothing ->
-                        Nothing
+            Maybe.map <| Field.replaceValue value
     in
     { tier
         | fields =
