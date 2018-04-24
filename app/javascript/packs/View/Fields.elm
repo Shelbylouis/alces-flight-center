@@ -143,7 +143,7 @@ formField field item htmlFn additionalAttributes children optional state =
         attributes =
             List.append
                 [ id identifier
-                , class (formControlClasses errors)
+                , class (formControlClasses field errors)
                 , disabled fieldIsUnavailable
                 ]
                 additionalAttributes
@@ -170,17 +170,28 @@ fieldIdentifier fieldName =
         |> String.Extra.dasherize
 
 
-formControlClasses : List Error -> String
-formControlClasses errors =
-    "form-control " ++ bootstrapValidationClass errors
+formControlClasses : Field -> List Error -> String
+formControlClasses field errors =
+    "form-control " ++ bootstrapValidationClass field errors
 
 
-bootstrapValidationClass : List Error -> String
-bootstrapValidationClass errors =
-    if List.isEmpty errors then
-        "is-valid"
+bootstrapValidationClass : Field -> List Error -> String
+bootstrapValidationClass field errors =
+    let
+        validationClass =
+            if List.isEmpty errors then
+                "is-valid"
+            else
+                "is-invalid"
+    in
+    if Field.hasBeenTouched field then
+        validationClass
     else
-        "is-invalid"
+        -- If the field is not considered to have been touched yet then just
+        -- give nothing, rather than showing either success or failure, to
+        -- avoid showing the user many errors for fields they haven't yet
+        -- looked at.
+        ""
 
 
 validationFeedback : List Error -> Html msg

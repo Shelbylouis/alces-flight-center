@@ -2,6 +2,7 @@ module Tier.Field
     exposing
         ( Field(..)
         , TextInputData
+        , Touched(..)
         , data
         , decoder
         , encoder
@@ -23,11 +24,23 @@ type alias TextInputData =
     , name : String
     , value : String
 
+    -- Whether this field has been touched yet by a user.
+    , touched : Touched
+
     -- XXX Could encode `optional` in `Field` type like:
     -- | RequiredTextInput TextInput
     -- | OptionalTextInput TextInput
     , optional : Bool
     }
+
+
+type
+    Touched
+    -- This is essentially a Bool, but use a custom type to force us to be
+    -- explicit about what we're doing and prevent accidentally using it in the
+    -- wrong place, at the expense of being slightly more verbose.
+    = Touched
+    | Untouched
 
 
 decoder : D.Decoder Field
@@ -69,10 +82,12 @@ textInputDecoder type_ =
                 |> D.map (Maybe.withDefault False)
     in
     D.map TextInput <|
-        D.map4 TextInputData
+        D.map5 TextInputData
             (D.succeed type_)
             (D.field "name" D.string)
             initialValueDecoder
+            -- Every field is initially untouched.
+            (D.succeed Untouched)
             optionalDecoder
 
 
@@ -119,4 +134,8 @@ replaceValue value field =
             Markdown s
 
         TextInput d ->
-            TextInput { d | value = value }
+            TextInput
+                { d
+                    | value = value
+                    , touched = Touched
+                }

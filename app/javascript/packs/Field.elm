@@ -29,3 +29,22 @@ isDynamicField field =
 
         _ ->
             False
+
+
+hasBeenTouched : Field -> Bool
+hasBeenTouched field =
+    case field of
+        TierField data ->
+            -- A Tier field has been touched if we have saved that we have
+            -- touched it.
+            case data.touched of
+                Tier.Field.Touched ->
+                    True
+
+                Tier.Field.Untouched ->
+                    False
+
+        _ ->
+            -- Always consider every other field touched, since they all start
+            -- pre-filled.
+            True
