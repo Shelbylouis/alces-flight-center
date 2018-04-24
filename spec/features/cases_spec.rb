@@ -95,50 +95,6 @@ RSpec.describe 'Cases table', type: :feature do
           find('.archived-case-row')
         end.to raise_error(Capybara::ElementNotFound)
       end
-
-      ['resolved', 'rejected', 'deleted'].each do |completion_status|
-        it "reloads Case ticket status on load until reaches #{completion_status}" do
-          expect(
-            Case.request_tracker
-          ).to receive(
-            :show_ticket
-          ).thrice do |ticket_id|
-            # Return object with status specific to particular ticket given; do
-            # this explicitly rather than using `and_return` with multiple
-            # values as that was failing intermittently, likely due to it not
-            # being entirely deterministic the order we request ticket info in.
-            case ticket_id
-            when open_case.rt_ticket_id
-              OpenStruct.new(status: 'open')
-            when archived_case.rt_ticket_id
-              OpenStruct.new(status: completion_status)
-            end
-          end
-
-          # Neither Case's ticket has reached completion status yet so both
-          # should have reloaded RT ticket status.
-          visit archives_site_cases_path(site, as: user)
-          expect(open_case.reload.last_known_ticket_status).to eq 'open'
-          expect(archived_case.reload.last_known_ticket_status).to eq completion_status
-
-          tds = all('td').map(&:text)
-          expect(tds).to include('open')
-          expect(tds).to include(completion_status)
-
-          # Archived Case has reached completion status so ticket status is not
-          # reloaded.
-          visit archives_site_cases_path(site, as: user)
-          expect(open_case.reload.last_known_ticket_status).to eq 'open'
-          expect(archived_case.reload.last_known_ticket_status).to eq completion_status
-
-          tds = all('td').map(&:text)
-          expect(tds).to include('open')
-          expect(tds).to include(completion_status)
-
-          headings = all('th').map(&:text)
-          expect(headings).to include('Ticket status')
-        end
-      end
     end
   end
 end
