@@ -86,15 +86,16 @@ createTierFieldsValidator : State -> Validator Error State
 createTierFieldsValidator state =
     let
         tierFieldValidators =
-            List.map createTierFieldValidator tierFieldsTextInputData
+            List.map createRequiredFieldValidator requiredTierFieldsTextInputData
 
-        tierFieldsTextInputData =
+        requiredTierFieldsTextInputData =
             State.selectedTier state
                 |> .fields
                 |> Dict.values
                 |> List.filterMap Tier.Field.data
+                |> List.filter (not << .optional)
 
-        createTierFieldValidator =
+        createRequiredFieldValidator =
             \textInputData ->
                 Validate.ifBlank
                     (always textInputData.value)
