@@ -8,9 +8,11 @@ module Validation
         , validateState
         )
 
+import Dict
 import Field exposing (Field)
 import Issue
 import State exposing (State)
+import Tier
 import Validate exposing (Validator)
 
 
@@ -54,11 +56,7 @@ createStateValidator state =
     Validate.all
         [ subjectPresentValidator
         , createAvailableTierValidator state
-
-        -- XXX Not handling any other validations for now, as these are
-        -- currently either very improbable or impossible to trigger (at least
-        -- with the current production data and how we initialize the Case form
-        -- app) and will significantly change anyway once we handle Tiers.
+        , createTierFieldsValidator state
         ]
 
 
@@ -82,3 +80,32 @@ unavailableTierErrorMessage state =
         ++ State.associatedModelTypeName state
         ++ " is self-managed; if required you may only request consultancy"
         ++ " support from Alces Software."
+
+
+createTierFieldsValidator : State -> Validator Error State
+createTierFieldsValidator state =
+    let
+        tierFieldValidators =
+            List.map createTierFieldValidator tierFieldsTextInputData
+
+        tierFieldsTextInputData =
+            State.selectedTier state
+                |> .fields
+                |> Dict.values
+                |> List.filterMap
+                    (\field ->
+                        case field of
+                            Tier.Markdown _ ->
+                                Nothing
+
+                            Tier.TextInput data ->
+                                Just data
+                    )
+
+        createTierFieldValidator =
+            \textInputData ->
+                Validate.ifBlank
+                    (always textInputData.value)
+                    ( Field.TierField textInputData, Empty )
+    in
+    Validate.all tierFieldValidators
