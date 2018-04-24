@@ -16,7 +16,6 @@ import Json.Encode as E
 import Maybe.Extra
 import Tier.Field as Field exposing (Field)
 import Tier.Level as Level exposing (Level)
-import Types
 
 
 type alias Tier =
