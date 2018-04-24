@@ -24,6 +24,7 @@ import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)
 import Tier exposing (Tier)
+import Tier.Field
 import Tier.Level
 
 
@@ -188,10 +189,10 @@ encoder state =
         tierFieldAsString =
             \field ->
                 case field of
-                    Tier.Markdown _ ->
+                    Tier.Field.Markdown _ ->
                         Nothing
 
-                    Tier.TextInput data ->
+                    Tier.Field.TextInput data ->
                         Just <| data.name ++ ": " ++ data.value
     in
     E.object

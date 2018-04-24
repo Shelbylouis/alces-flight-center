@@ -19,6 +19,7 @@ import Service
 import State exposing (State)
 import Tier exposing (Tier)
 import Tier.DisplayWrapper
+import Tier.Field
 import Tier.Level as Level exposing (Level)
 import Validation
 import View.Charging as Charging
@@ -248,13 +249,13 @@ dynamicTierFields state =
     div [] renderedFields
 
 
-renderTierField : State -> ( Int, Tier.Field ) -> Html Msg
+renderTierField : State -> ( Int, Tier.Field.Field ) -> Html Msg
 renderTierField state ( index, field ) =
     case field of
-        Tier.Markdown content ->
+        Tier.Field.Markdown content ->
             Markdown.toHtml [] content
 
-        Tier.TextInput fieldData ->
+        Tier.Field.TextInput fieldData ->
             Fields.textField fieldData.type_
                 (Field.TierField fieldData)
                 fieldData

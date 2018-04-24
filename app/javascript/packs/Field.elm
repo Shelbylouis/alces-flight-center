@@ -1,6 +1,6 @@
 module Field exposing (..)
 
-import Tier
+import Tier.Field
 
 
 type Field
@@ -11,7 +11,7 @@ type Field
     | Tier
     | Component
     | Subject
-    | TierField Tier.TextInputData
+    | TierField Tier.Field.TextInputData
 
 
 {-| The 'dynamic' fields are those shown in the lower section of the form,

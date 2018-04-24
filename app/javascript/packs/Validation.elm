@@ -12,7 +12,7 @@ import Dict
 import Field exposing (Field)
 import Issue
 import State exposing (State)
-import Tier
+import Tier.Field
 import Validate exposing (Validator)
 
 
@@ -95,10 +95,10 @@ createTierFieldsValidator state =
                 |> List.filterMap
                     (\field ->
                         case field of
-                            Tier.Markdown _ ->
+                            Tier.Field.Markdown _ ->
                                 Nothing
 
-                            Tier.TextInput data ->
+                            Tier.Field.TextInput data ->
                                 Just data
                     )
 
