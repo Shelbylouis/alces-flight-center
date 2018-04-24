@@ -179,7 +179,7 @@ class Case < ApplicationRecord
     "#{cluster.name}: #{subject} [#{token}]"
   end
 
-  def rt_ticket_text
+  def text_summary
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
     Utils.rt_format(case_properties)
