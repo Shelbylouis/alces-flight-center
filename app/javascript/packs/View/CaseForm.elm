@@ -32,7 +32,7 @@ view state =
     let
         submitMsg =
             if State.selectedTier state |> Tier.isChargeable then
-                ChargeablePreSubmissionModal Modal.visibleState
+                ChargeablePreSubmissionModal Modal.shown
             else
                 StartSubmit
 
