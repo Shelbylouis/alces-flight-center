@@ -7,9 +7,15 @@
     <table class="table case-table">
       <tr style="width: 100%;">
         <th>Created</th>
-        <td><%= @case.created_at.to_formatted_s(:long) %></td>
-        <th>By</th>
-        <td><%= @case.user.name %></td>
+        <td>
+          <%= @case.created_at.to_formatted_s(:long) %>
+          by
+          <%= @case.user.name %>
+        </td>
+        <th>Assigned to</th>
+        <td>
+          <%= @case.assignee&.name or 'Nobody' %>
+        </td>
       </tr>
       <tr>
         <th>Association</th>
