@@ -22,6 +22,7 @@ class Case < ApplicationRecord
   belongs_to :component, required: false
   belongs_to :service, required: false
   belongs_to :user
+  belongs_to :assignee, class_name: 'User', required: false
   has_one :credit_charge, required: false
   has_many :maintenance_windows
   has_and_belongs_to_many :log
