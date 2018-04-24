@@ -23,14 +23,14 @@ FactoryBot.define do
     factory :case_requiring_component do
       association :issue, factory: :issue_requiring_component
 
-      before :create do |instance|
+      after :build do |instance|
         instance.cluster = instance.component&.cluster
       end
 
       factory :case_with_component do
         component
 
-        before :create do |instance|
+        after :build do |instance|
           instance.cluster = instance.component.cluster
         end
       end
@@ -40,14 +40,14 @@ FactoryBot.define do
     factory :case_requiring_service do
       association :issue, factory: :issue_requiring_service
 
-      before :create do |instance|
+      after :build do |instance|
         instance.cluster = instance.service&.cluster
       end
 
       factory :case_with_service do
         service
 
-        before :create do |instance|
+        after :build do |instance|
           instance.cluster = instance.service.cluster
         end
       end
