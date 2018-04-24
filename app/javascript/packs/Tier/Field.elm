@@ -1,4 +1,11 @@
-module Tier.Field exposing (Field(..), TextInputData, decoder, encoder)
+module Tier.Field
+    exposing
+        ( Field(..)
+        , TextInputData
+        , data
+        , decoder
+        , encoder
+        )
 
 import Json.Decode as D
 import Json.Encode as E
@@ -92,3 +99,13 @@ textFieldTypeToString field =
 
         Types.Input ->
             "input"
+
+
+data : Field -> Maybe TextInputData
+data field =
+    case field of
+        Markdown _ ->
+            Nothing
+
+        TextInput d ->
+            Just d

@@ -92,15 +92,7 @@ createTierFieldsValidator state =
             State.selectedTier state
                 |> .fields
                 |> Dict.values
-                |> List.filterMap
-                    (\field ->
-                        case field of
-                            Tier.Field.Markdown _ ->
-                                Nothing
-
-                            Tier.Field.TextInput data ->
-                                Just data
-                    )
+                |> List.filterMap Tier.Field.data
 
         createTierFieldValidator =
             \textInputData ->
