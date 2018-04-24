@@ -16,8 +16,6 @@ end %>
           <th>Subject</th>
           <th>Association</th>
           <% if manage_cases_page %>
-            <th>RT ticket</th>
-            <th>Ticket status</th>
             <th>Chargeable</th>
           <% else %>
             <th>Contact support</th>
@@ -52,10 +50,6 @@ end %>
               <td><%= link_to c.subject, case_path(c) %></td>
               <td><%= c.association_info %></td>
               <% if manage_cases_page %>
-                <td><%= c.rt_ticket_id %></td>
-                <td>
-                  <%= link_to c.last_known_ticket_status, c.rt_ticket_url %>
-                </td>
                 <td><%= c.chargeable_symbol %></td>
               <% else %>
                 <td><%= render 'cases/email_support_icon', support_case: c %></td>
