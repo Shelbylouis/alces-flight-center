@@ -5,6 +5,7 @@ class CaseStateTransition < ApplicationRecord
 
   delegate :site, to: :case
 
+  validates_presence_of :user
   validate :validate_user_can_initiate
 
   private
