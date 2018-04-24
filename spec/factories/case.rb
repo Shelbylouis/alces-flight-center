@@ -9,7 +9,6 @@ FactoryBot.define do
     sequence(:rt_ticket_id) { |n| n }
 
     factory :open_case do
-      archived false
       state 'open'
     end
 
@@ -18,7 +17,6 @@ FactoryBot.define do
     end
 
     factory :archived_case do
-      archived true
       state 'archived'
     end
 

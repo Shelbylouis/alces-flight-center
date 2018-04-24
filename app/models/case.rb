@@ -1,12 +1,14 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
 
+  # @deprecated - to be removed in next release
   COMPLETED_RT_TICKET_STATUSES = [
     'resolved',
     'rejected',
     'deleted',
   ]
 
+  # @deprecated - to be removed in next release
   RT_TICKET_STATUSES = (
     [
       'new',
@@ -60,6 +62,7 @@ class Case < ApplicationRecord
       less_than_or_equal_to: 3,
     }
 
+  # @deprecated - to be removed in next release
   validates :last_known_ticket_status,
     inclusion: {in: TICKET_STATUSES}
 
@@ -80,8 +83,9 @@ class Case < ApplicationRecord
 
   after_create :send_new_case_email
 
-  scope :active, -> { where(archived: false) }
+  scope :active, -> { where(state: 'open') }
 
+  # @deprecated - to be removed in next release
   def self.request_tracker
     # Note: `rt_interface_class` is a string which we `constantize`, rather
     # than a constant directly, otherwise Rails autoloading in development
@@ -104,12 +108,10 @@ class Case < ApplicationRecord
     self.state == 'resolved' || self.state == 'archived'
   end
 
+  # @deprecated - to be removed in next release
   def update_ticket_status!
     return unless incomplete_rt_ticket?
     self.last_known_ticket_status = associated_rt_ticket.status
-    if ticket_completed?
-      self.completed_at = DateTime.now.utc
-    end
     save!
   end
 
@@ -122,10 +124,6 @@ class Case < ApplicationRecord
     ticket_completed? && chargeable
   end
 
-  def add_rt_ticket_correspondence(text)
-    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
-  end
-
   def associated_model
     component || service || cluster
   end
@@ -134,6 +132,7 @@ class Case < ApplicationRecord
     associated_model.readable_model_name
   end
 
+  # @deprecated - to be removed in next release
   def ticket_completed?
     COMPLETED_RT_TICKET_STATUSES.include?(last_known_ticket_status)
   end
@@ -211,6 +210,7 @@ class Case < ApplicationRecord
     self.subject ||= issue.default_subject
   end
 
+  # @deprecated - to be removed in next release
   def associated_rt_ticket
     if rt_ticket_id
       @associated_ticket ||= rt.show_ticket(rt_ticket_id)
@@ -219,6 +219,7 @@ class Case < ApplicationRecord
     end
   end
 
+  # @deprecated - to be removed in next release
   def rt
     self.class.request_tracker
   end

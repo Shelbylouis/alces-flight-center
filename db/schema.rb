@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180417162934) do
+ActiveRecord::Schema.define(version: 20180423170804) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -80,7 +80,6 @@ ActiveRecord::Schema.define(version: 20180417162934) do
     t.integer "component_id"
     t.integer "user_id", null: false
     t.bigint "rt_ticket_id"
-    t.boolean "archived", default: false, null: false
     t.integer "issue_id", null: false
     t.bigint "service_id"
     t.string "last_known_ticket_status", default: "new"

@@ -1,5 +1,5 @@
 
-<% if support_case.archived %>
+<% if support_case.archived? %>
   <%= icon 'envelope-o' %>
 <% else %>
   <%= link_to raw(icon 'envelope-o', interactive: true),
