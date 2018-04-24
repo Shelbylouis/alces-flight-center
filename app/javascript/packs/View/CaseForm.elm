@@ -233,6 +233,7 @@ subjectField state =
         selectedIssue
         Issue.subject
         ChangeSubject
+        False
         state
 
 
@@ -261,6 +262,7 @@ renderTierField state ( index, field ) =
                 fieldData
                 .value
                 (ChangeTierField index)
+                fieldData.optional
                 state
 
 

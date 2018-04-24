@@ -5,6 +5,8 @@ module View.Fields
         , textField
         )
 
+import Bootstrap.Badge as Badge
+import Bootstrap.Utilities.Spacing as Spacing
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -47,6 +49,7 @@ selectField field items toId toOptionLabel isDisabled changeMsg state =
         select
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
+        False
         state
 
 
@@ -55,6 +58,7 @@ inputField :
     -> a
     -> (a -> String)
     -> (String -> msg)
+    -> Bool
     -> State
     -> Html msg
 inputField =
@@ -67,9 +71,10 @@ textField :
     -> a
     -> (a -> String)
     -> (String -> msg)
+    -> Bool
     -> State
     -> Html msg
-textField textFieldType field item toContent inputMsg state =
+textField textFieldType field item toContent inputMsg optional state =
     let
         content =
             toContent item
@@ -93,6 +98,7 @@ textField textFieldType field item toContent inputMsg state =
         element
         attributes
         []
+        optional
         state
 
 
@@ -106,9 +112,10 @@ formField :
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
+    -> Bool
     -> State
     -> Html msg
-formField field item htmlFn additionalAttributes children state =
+formField field item htmlFn additionalAttributes children optional state =
     let
         fieldName =
             case field of
@@ -126,6 +133,12 @@ formField field item htmlFn additionalAttributes children state =
 
         identifier =
             fieldIdentifier fieldName
+
+        optionalBadge =
+            if optional then
+                Badge.badgeSuccess [ Spacing.ml1 ] [ text "Optional" ]
+            else
+                text ""
 
         attributes =
             List.append
@@ -145,6 +158,7 @@ formField field item htmlFn additionalAttributes children state =
         [ label
             [ for identifier ]
             [ text fieldName ]
+        , optionalBadge
         , formElement
         , validationFeedback errors
         ]
