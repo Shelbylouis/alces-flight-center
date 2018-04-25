@@ -100,6 +100,6 @@ class CasesController < ApplicationController
     rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
       flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
-    redirect_to root_path
+    redirect_to @case
   end
 end
