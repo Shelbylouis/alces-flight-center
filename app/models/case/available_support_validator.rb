@@ -1,6 +1,6 @@
 
 class Case
-  class AvailableSupportValidator < Validator
+  class AvailableSupportValidator < ActiveModel::Validator
     def validate(record)
       @record = record
 
@@ -8,6 +8,8 @@ class Case
     end
 
     private
+
+    attr_reader :record
 
     delegate :associated_model, to: :record
 
