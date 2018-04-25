@@ -14,6 +14,7 @@ end %>
           <th>State</th>
           <th>Creator</th>
           <th>Subject</th>
+          <th>Assigned to</th>
           <th>Association</th>
           <% if manage_cases_page %>
             <th>Chargeable</th>
@@ -48,6 +49,7 @@ end %>
               <td><%= c.user_facing_state %></td>
               <td><%= c.user.name %></td>
               <td><%= link_to c.subject, case_path(c) %></td>
+              <td><%= c.assignee&.name || 'Nobody' %></td>
               <td><%= c.association_info %></td>
               <% if manage_cases_page %>
                 <td><%= c.chargeable_symbol %></td>
