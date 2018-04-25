@@ -11,9 +11,7 @@ RSpec.shared_examples 'associated Cluster part validation' do |part_name|
       issue_attributes.merge!(requires_part_name => true)
     end
 
-    # Explicitly specify advice cluster to ensure only relying on part
-    # `support_type`, in tests where this is relevant.
-    let :cluster { create(:advice_cluster) }
+    let :cluster { create(:cluster) }
 
     context "when not associated with #{part_name}" do
       it 'should be invalid' do
@@ -73,10 +71,7 @@ RSpec.describe Case, type: :model do
     let :part { nil }
 
     let :issue { create(:issue, **issue_attributes) }
-
-    # Specify advice issue to avoid managed issue-related validations failing,
-    # unless explicitly testing these.
-    let :issue_attributes { attributes_for(:advice_issue) }
+    let :issue_attributes { attributes_for(:issue) }
 
     include_examples 'associated Cluster part validation', :component
     include_examples 'associated Cluster part validation', :service
