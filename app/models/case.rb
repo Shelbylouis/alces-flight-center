@@ -75,6 +75,8 @@ class Case < ApplicationRecord
 
   validates_with AssociatedModelValidator
 
+  validate :validates_user_assignment
+
   after_initialize :assign_cluster_if_necessary
   after_initialize :generate_token, on: :create
 
@@ -263,5 +265,10 @@ class Case < ApplicationRecord
 
   def send_new_case_email
     CaseMailer.new_case(self).deliver_later
+  end
+
+  def validates_user_assignment
+    return if assignee.nil?
+    errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
   end
 end
