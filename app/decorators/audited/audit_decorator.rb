@@ -21,7 +21,7 @@ module Audited
       type = send("#{field}_type")
       text = send("#{field}_text", from, to)
 
-      render_card(date, user.name, type, text)
+      render_card(date, user&.name || 'Flight Center', type, text)
     end
 
     def render_card(date, name, type, text)
