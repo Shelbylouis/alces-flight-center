@@ -13,8 +13,8 @@
           <%= @case.user.name %>
         </td>
         <th>Assigned to</th>
-        <td>
-          <%= @case.assignee&.name or 'Nobody' %>
+        <td id="case-assignment">
+          <%= render 'cases/case_assignment_controls' %>
         </td>
       </tr>
       <tr>

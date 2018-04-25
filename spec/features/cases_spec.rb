@@ -100,84 +100,132 @@ RSpec.describe 'Cases table', type: :feature do
 end
 
 RSpec.describe 'Case page' do
-  let (:user) { create(:contact, site: site) }
-  let (:admin) { create(:admin) }
+  let! (:user) { create(:contact, site: site) }
+  let! (:admin) { create(:admin) }
   let (:site) { create(:site, name: 'My Site') }
   let (:cluster) { create(:cluster, site: site) }
+  let (:assignee) { nil }
 
-  let! :open_case do
-    create(:open_case, cluster: cluster, subject: 'Open case')
+  let :open_case do
+    create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee)
   end
 
-  let! :resolved_case do
+  let :resolved_case do
     create(:resolved_case, cluster: cluster, subject: 'Resolved case')
   end
 
-  let! :archived_case do
+  let :archived_case do
     create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
   end
 
   let (:mw) { create(:maintenance_window, case: open_case) }
 
-  it 'shows events in chronological order' do
-    create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
-    create(
-      :maintenance_window_state_transition,
-      maintenance_window: mw,
-      user: admin,
-      event: :request
-    )
-    create(:case_comment, case: open_case, user: admin, created_at: 4.hours.ago, text: 'First')
+  describe 'events list' do
+    it 'shows events in chronological order' do
+      create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
+      create(
+        :maintenance_window_state_transition,
+        maintenance_window: mw,
+        user: admin,
+        event: :request
+      )
+      create(:case_comment, case: open_case, user: admin, created_at: 4.hours.ago, text: 'First')
 
-    visit case_path(open_case, as: admin)
+      visit case_path(open_case, as: admin)
 
-    event_cards = all('.event-card')
-    expect(event_cards.size).to eq(3)
+      event_cards = all('.event-card')
+      expect(event_cards.size).to eq(3)
 
-    expect(event_cards[0].find('.card-body').text).to eq('First')
-    expect(event_cards[1].find('.card-body').text).to eq('Second')
-    expect(event_cards[2].find('.card-body').text).to match(
-      /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
-    )
+      expect(event_cards[0].find('.card-body').text).to eq('First')
+      expect(event_cards[1].find('.card-body').text).to eq('Second')
+      expect(event_cards[2].find('.card-body').text).to match(
+        /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
+      )
+    end
   end
 
-  it 'shows or hides add comment form for contacts' do
-    visit case_path(open_case, as: user)
+  describe 'comments form' do
+    it 'shows or hides add comment form for contacts' do
+      visit case_path(open_case, as: user)
 
-    form = find('#new_case_comment')
-    form.find('#case_comment_text')
+      form = find('#new_case_comment')
+      form.find('#case_comment_text')
 
-    expect(form.find('input').value).to eq 'Add new comment'
+      expect(form.find('input').value).to eq 'Add new comment'
 
-    # No resolve/archive controls
-    expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+      visit case_path(resolved_case, as: user)
+      expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
 
-    visit case_path(resolved_case, as: user)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
-    expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+      visit case_path(archived_case, as: user)
+      expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    end
 
-    visit case_path(archived_case, as: user)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
-    expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+    it 'shows or hides add comment form for admins' do
+      visit case_path(open_case, as: admin)
+
+      form = find('#new_case_comment')
+      form.find('#case_comment_text')
+
+      expect(form.find('input').value).to eq 'Add new comment'
+
+      visit case_path(resolved_case, as: admin)
+      expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+
+      visit case_path(archived_case, as: admin)
+      expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    end
   end
 
-  it 'shows or hides add comment form and state controls for admins' do
-    visit case_path(open_case, as: admin)
+  describe 'state controls' do
+    it 'hides state controls for contacts' do
+      visit case_path(open_case, as: user)
+      expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-    form = find('#new_case_comment')
-    form.find('#case_comment_text')
+      visit case_path(resolved_case, as: user)
+      expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-    expect(form.find('input').value).to eq 'Add new comment'
+      visit case_path(archived_case, as: user)
+      expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+    end
 
-    expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
+    it 'shows or hides state controls for admins' do
+      visit case_path(open_case, as: admin)
 
-    visit case_path(resolved_case, as: admin)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
-    expect(find('#case-state-controls').find('a').text).to eq 'Archive this case'
+      expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
 
-    visit case_path(archived_case, as: admin)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
-    expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+      visit case_path(resolved_case, as: admin)
+      expect(find('#case-state-controls').find('a').text).to eq 'Archive this case'
+
+      visit case_path(archived_case, as: admin)
+      expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+    end
+  end
+
+  describe 'case assignment' do
+    it 'hides assignment controls for contacts' do
+      visit case_path(open_case, as: user)
+      assignment_td = find('#case-assignment')
+      expect { assignment_td.find('input') }.to raise_error(Capybara::ElementNotFound)
+      expect(assignment_td.text).to eq('Nobody')
+    end
+
+    it 'displays assignment controls for admins' do
+      visit case_path(open_case, as: admin)
+      assignment_select = find('#case-assignment').find('select')
+
+      options = assignment_select.all('option').map(&:text)
+      expect(options).to eq(['Nobody', 'A Scientist', '* A Scientist'])
+    end
+
+    context 'when a case has an assignee' do
+      let(:assignee) { user }
+      it 'preselects the current assignee' do
+        visit case_path(open_case, as: admin)
+        assignment_select = find('#case-assignment').find('select')
+
+        expect(assignment_select.value).to eq(user.id.to_s)
+      end
+    end
   end
 
 end

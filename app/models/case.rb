@@ -187,6 +187,11 @@ class Case < ApplicationRecord
     Utils.rt_format(case_properties)
   end
 
+  def potential_assignees
+    User.where(site: site).order(:name) +
+        User.where(admin: true).order(:name)
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
