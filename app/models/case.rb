@@ -46,6 +46,8 @@ class Case < ApplicationRecord
 
   end
 
+  audited only: :assignee_id
+
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
