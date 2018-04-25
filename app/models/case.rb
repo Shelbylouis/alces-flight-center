@@ -46,7 +46,7 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: :assignee_id
+  audited only: :assignee_id, on: [ :update ]
 
   validates :token, presence: true
   validates :subject, presence: true
