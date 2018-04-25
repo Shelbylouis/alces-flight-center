@@ -31,12 +31,12 @@ module Audited
     def assignee_id_text(from, to)
       if from
         if to
-          "Changed assignee from #{User.find(from).name} to #{User.find(to).name}."
+          "Changed the assignee of this case from #{User.find(from).name} to #{User.find(to).name}."
         else
-          "Unassigned #{User.find(from).name} from this case."
+          "Unassigned this case from #{User.find(from).name}."
         end
       else
-        "Assigned #{User.find(to).name} to this case."
+        "Assigned this case to #{User.find(to).name}."
       end
     end
 
