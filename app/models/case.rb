@@ -156,7 +156,8 @@ class Case < ApplicationRecord
         # so there will be one included in this set without a created_at
         # date. We clearly don't want to include that in the events stream.
       maintenance_windows.map(&:transitions).flatten.select(&:event) +
-      case_state_transitions
+      case_state_transitions +
+      audits
     ).sort_by(&:created_at)
   end
 
