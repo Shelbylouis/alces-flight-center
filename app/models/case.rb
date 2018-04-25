@@ -65,13 +65,12 @@ class Case < ApplicationRecord
   validates :last_known_ticket_status,
     inclusion: {in: RT_TICKET_STATUSES}
 
-  # Only validate Issue relationship on create, as the Issue must be allowed
-  # given the associated model for this Case at the point when the Case is
-  # created, but the associated model's `support_type` (or less commonly the
-  # Issue's) may later change and become incompatible with this Issue, but this
-  # should not invalidate a Case which was allowed at the point when it was
-  # created.
-  validates_with AvailableSupportValidator #, on: :create
+  # Only validate this type of support is available on create, as this is the
+  # only point at which we should prevent users accessing support they are not
+  # entitled to; after this point any aspects of the Case and related models
+  # might change and make an identical Case not be able to be created today,
+  # but this should not invalidate existing Cases.
+  validates_with AvailableSupportValidator, on: :create
 
   validates_with AssociatedModelValidator
 
