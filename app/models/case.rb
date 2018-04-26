@@ -184,6 +184,7 @@ class Case < ApplicationRecord
       'Issue': issue.name,
       'Associated component': component&.name,
       'Associated service': service&.name,
+      Tier: decorate.tier_description,
       Fields: field_hash,
     }.reject { |_k, v| v.nil? }
   end

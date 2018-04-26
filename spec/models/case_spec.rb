@@ -297,6 +297,7 @@ RSpec.describe Case, type: :model do
         service: service,
         user: requestor,
         subject: 'my_subject',
+        tier_level: 3,
         fields: [
           {name: 'field1', value: 'value1'},
           {name: 'field2', value: 'value2', optional: true},
@@ -311,6 +312,7 @@ RSpec.describe Case, type: :model do
         Issue: 'Crashed node',
         'Associated component': 'node01',
         'Associated service': 'Some service',
+        Tier: '3 (Consultancy)',
         Fields: {
           field1: 'value1',
           field2: 'value2',
