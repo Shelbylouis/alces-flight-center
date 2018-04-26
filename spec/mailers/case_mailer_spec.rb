@@ -70,7 +70,6 @@ RSpec.describe 'Case mailer', :type => :mailer do
     expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
     expected_lines = [
-      /Requestor:.* Some User/,
       /Cluster:.* somecluster/,
       /Category:.* Hardware issue/,
       /Issue:.* Crashed node/,

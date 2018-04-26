@@ -179,7 +179,6 @@ class Case < ApplicationRecord
 
   def email_properties
     {
-      Requestor: user.name,
       Cluster: cluster.name,
       Category: category&.name,
       'Issue': issue.name,

@@ -307,7 +307,6 @@ RSpec.describe Case, type: :model do
 
     it 'includes all needed Case properties with values' do
       expected_properties = {
-        Requestor: 'Some User',
         Cluster: 'somecluster',
         Category: 'Hardware issue',
         Issue: 'Crashed node',
