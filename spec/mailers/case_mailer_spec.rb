@@ -26,14 +26,11 @@ RSpec.describe 'Case mailer', :type => :mailer do
     create(
         :issue,
         name: 'Crashed node',
-        requires_component: requires_component,
-        requires_service: requires_service,
+        requires_component: true,
+        requires_service: true,
         category: category
     )
   end
-
-  let(:requires_component) { true }
-  let(:requires_service) { true }
 
   let(:category) { create(:category, name: 'Hardware issue') }
   let(:cluster) { create(:cluster, site: site, name: 'somecluster') }
@@ -85,28 +82,6 @@ RSpec.describe 'Case mailer', :type => :mailer do
     EOF
 
     expect(mail.body.encoded).to match(expected_body)
-  end
-
-  context 'when no associated component' do
-    let(:requires_component) { false }
-    let(:component) { nil }
-
-    it 'does not include corresponding line in email text' do
-      mail = CaseMailer.new_case(kase)
-      expect(mail.body.encoded).not_to match('Associated component:')
-    end
-
-  end
-
-  context 'when no associated service' do
-    let(:requires_service) { false }
-    let(:service) { nil }
-
-    it 'does not include corresponding line in email text' do
-      mail = CaseMailer.new_case(kase)
-      expect(mail.body.encoded).not_to match('Associated service:')
-    end
-
   end
 
   it 'sends an email on case comment being added' do
