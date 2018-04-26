@@ -183,4 +183,15 @@ RSpec.describe 'Case page' do
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
   end
 
+  context 'for open non-consultancy Case' do
+    subject { create(:open_case, cluster: cluster, tier_level: 2) }
+
+    it 'disables commenting for site contact' do
+      visit case_path(subject, as: contact)
+
+      form = find(comment_form_class)
+      expect(form.find('textarea')).to be_disabled
+      expect(form).to have_button(comment_button_text, disabled: true)
+    end
+  end
 end
