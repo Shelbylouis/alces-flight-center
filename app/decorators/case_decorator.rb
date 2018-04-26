@@ -69,4 +69,8 @@ class CaseDecorator < ApplicationDecorator
     description = TIER_DESCRIPTIONS[tier_level]
     "#{tier_level} (#{description})"
   end
+
+  def commenting_disabled?
+    current_user.contact? && !consultancy?
+  end
 end

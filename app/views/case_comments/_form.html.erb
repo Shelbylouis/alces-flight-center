@@ -1,9 +1,8 @@
 
 <%
 
-  commenting_disabled = current_user.contact? && !@case.consultancy?
   additional_attributes =
-    if commenting_disabled
+    if @case.commenting_disabled?
       {
         disabled: true,
         title: <<~TITLE.squish
