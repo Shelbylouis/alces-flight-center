@@ -91,6 +91,9 @@ class MigrateExistingDataToAccountForTiers < ActiveRecord::DataMigration
           details of available Alces Gridware.
         MARKDOWN
       }
+
+      # Make this field an example of an optional field.
+      tier.fields[-1] = tier.fields[-1].merge(optional: true)
     end
 
     storage_quota_issue = 'File System storage quota changes'

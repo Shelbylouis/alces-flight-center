@@ -39,7 +39,7 @@ chargeableAlert state =
 
         chargingInfoModalLink =
             Alert.link
-                [ ClusterChargingInfoModal Modal.visibleState |> onClick
+                [ ClusterChargingInfoModal Modal.shown |> onClick
 
                 -- This makes this display as a normal link, but clicking on it
                 -- not reload the page. There may be a better way to do this;
@@ -49,7 +49,7 @@ chargeableAlert state =
                 [ text "Click here for the charging details for this cluster." ]
     in
     if isChargeable then
-        Just <| Alert.warning alertChildren
+        Just <| Alert.simpleWarning [] alertChildren
     else
         Nothing
 
@@ -74,14 +74,14 @@ infoModal state =
                 , text "."
                 ]
     in
-    Modal.config ClusterChargingInfoModal
+    Modal.config (ClusterChargingInfoModal Modal.hidden)
         |> Modal.h5 [] [ cluster.name ++ " charging info" |> text ]
         |> Modal.body [] [ chargingInfo ]
         |> Modal.footer []
             [ Button.button
                 [ Button.outlinePrimary
                 , Button.attrs
-                    [ ClusterChargingInfoModal Modal.hiddenState |> onClick ]
+                    [ ClusterChargingInfoModal Modal.hidden |> onClick ]
                 ]
                 [ text "Close" ]
             ]
@@ -96,14 +96,14 @@ chargeablePreSubmissionModal state =
             , p [] [ text "Do you wish to continue?" ]
             ]
     in
-    Modal.config ChargeablePreSubmissionModal
+    Modal.config (ChargeablePreSubmissionModal Modal.hidden)
         |> Modal.h5 [] [ text "This support case may incur charges" ]
         |> Modal.body [] bodyContent
         |> Modal.footer []
             [ Button.button
                 [ Button.outlinePrimary
                 , Button.attrs
-                    [ ChargeablePreSubmissionModal Modal.hiddenState |> onClick ]
+                    [ ChargeablePreSubmissionModal Modal.hidden |> onClick ]
                 ]
                 [ text "Cancel" ]
             , Button.button

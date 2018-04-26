@@ -33,8 +33,8 @@ type alias State =
     , singleComponent : Bool
     , singleService : Bool
     , isSubmitting : Bool
-    , clusterChargingInfoModal : Modal.State
-    , chargeablePreSubmissionModal : Modal.State
+    , clusterChargingInfoModal : Modal.Visibility
+    , chargeablePreSubmissionModal : Modal.Visibility
     }
 
 
@@ -53,8 +53,8 @@ decoder =
                         , singleComponent = False
                         , singleService = False
                         , isSubmitting = False
-                        , clusterChargingInfoModal = Modal.hiddenState
-                        , chargeablePreSubmissionModal = Modal.hiddenState
+                        , clusterChargingInfoModal = Modal.hidden
+                        , chargeablePreSubmissionModal = Modal.hidden
                         }
                 in
                 case mode of
@@ -184,15 +184,6 @@ encoder state =
 
         tier =
             selectedTier state
-
-        tierFieldAsString =
-            \field ->
-                case field of
-                    Tier.Markdown _ ->
-                        Nothing
-
-                    Tier.TextInput data ->
-                        Just <| data.name ++ ": " ++ data.value
     in
     E.object
         [ ( "case"

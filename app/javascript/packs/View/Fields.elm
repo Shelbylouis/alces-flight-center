@@ -5,6 +5,8 @@ module View.Fields
         , textField
         )
 
+import Bootstrap.Badge as Badge
+import Bootstrap.Utilities.Spacing as Spacing
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -47,6 +49,7 @@ selectField field items toId toOptionLabel isDisabled changeMsg state =
         select
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
+        False
         state
 
 
@@ -55,6 +58,7 @@ inputField :
     -> a
     -> (a -> String)
     -> (String -> msg)
+    -> Bool
     -> State
     -> Html msg
 inputField =
@@ -67,9 +71,10 @@ textField :
     -> a
     -> (a -> String)
     -> (String -> msg)
+    -> Bool
     -> State
     -> Html msg
-textField textFieldType field item toContent inputMsg state =
+textField textFieldType field item toContent inputMsg optional state =
     let
         content =
             toContent item
@@ -93,6 +98,7 @@ textField textFieldType field item toContent inputMsg state =
         element
         attributes
         []
+        optional
         state
 
 
@@ -106,9 +112,10 @@ formField :
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
+    -> Bool
     -> State
     -> Html msg
-formField field item htmlFn additionalAttributes children state =
+formField field item htmlFn additionalAttributes children optional state =
     let
         fieldName =
             case field of
@@ -127,10 +134,16 @@ formField field item htmlFn additionalAttributes children state =
         identifier =
             fieldIdentifier fieldName
 
+        optionalBadge =
+            if optional then
+                Badge.badgeSuccess [ Spacing.ml1 ] [ text "Optional" ]
+            else
+                text ""
+
         attributes =
             List.append
                 [ id identifier
-                , class (formControlClasses errors)
+                , class (formControlClasses field errors)
                 , disabled fieldIsUnavailable
                 ]
                 additionalAttributes
@@ -145,6 +158,7 @@ formField field item htmlFn additionalAttributes children state =
         [ label
             [ for identifier ]
             [ text fieldName ]
+        , optionalBadge
         , formElement
         , validationFeedback errors
         ]
@@ -156,17 +170,28 @@ fieldIdentifier fieldName =
         |> String.Extra.dasherize
 
 
-formControlClasses : List Error -> String
-formControlClasses errors =
-    "form-control " ++ bootstrapValidationClass errors
+formControlClasses : Field -> List Error -> String
+formControlClasses field errors =
+    "form-control " ++ bootstrapValidationClass field errors
 
 
-bootstrapValidationClass : List Error -> String
-bootstrapValidationClass errors =
-    if List.isEmpty errors then
-        "is-valid"
+bootstrapValidationClass : Field -> List Error -> String
+bootstrapValidationClass field errors =
+    let
+        validationClass =
+            if List.isEmpty errors then
+                "is-valid"
+            else
+                "is-invalid"
+    in
+    if Field.hasBeenTouched field then
+        validationClass
     else
-        "is-invalid"
+        -- If the field is not considered to have been touched yet then just
+        -- give nothing, rather than showing either success or failure, to
+        -- avoid showing the user many errors for fields they haven't yet
+        -- looked at.
+        ""
 
 
 validationFeedback : List Error -> Html msg

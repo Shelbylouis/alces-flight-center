@@ -34,7 +34,11 @@ submitErrorAlert state =
     let
         displayError =
             \error ->
-                Alert.danger
+                -- XXX Update this to use new `Alert.dismissable` or
+                -- `Alert/dismissableWithAnimation` function from
+                -- elm-bootstrap, rather than handling dismissing ourselves.
+                Alert.simpleDanger
+                    []
                     [ button
                         [ type_ "button"
                         , class "close"
