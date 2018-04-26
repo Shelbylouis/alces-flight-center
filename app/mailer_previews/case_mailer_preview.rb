@@ -23,9 +23,6 @@ class CaseMailerPreview < ApplicationMailerPreview
   private
 
   def get_case
-    Case.first || FactoryBot.build(
-        :case,
-        created_at: DateTime.now
-    )
+    @case_id ? Case.find(@case_id) : Case.last
   end
 end
