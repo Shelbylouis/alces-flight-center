@@ -60,30 +60,43 @@ RSpec.describe 'Case mailer', :type => :mailer do
     site.additional_contacts = [additional_contact]
   end
 
-  it 'sends an email on case creation' do
-    mail = CaseMailer.new_case(kase)
-    expect(mail.subject).to eq "[helpdesk.alces-software.com #1138] somecluster: my_subject [#{kase.token}]"
+  describe 'Case creation email' do
+    subject { CaseMailer.new_case(kase) }
 
-    expect(mail.to).to eq nil
-    expect(mail.cc).to match_array %w(another.user@somecluster.com mailing-list@somecluster.com)
-    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
+    it 'has correct subject' do
+      expect(
+        subject.subject
+      ).to eq "[helpdesk.alces-software.com #1138] somecluster: my_subject [#{kase.token}]"
+    end
 
-    expected_lines = [
-      /Cluster:.* somecluster/m,
-      /Category:.* Hardware issue/m,
-      /Issue:.* Crashed node/m,
-      /Associated component:.* node01/m,
-      /Associated service:.* Some service/m,
-      /Fields:/,
-      /field1:.* value1/m,
-      /field2:.* value2/m,
-    ]
+    it 'has correct addressees' do
+      expect(subject.to).to eq nil
+      expect(subject.cc).to match_array %w(another.user@somecluster.com mailing-list@somecluster.com)
+      expect(subject.bcc).to match_array(['tickets@alces-software.com'])
+    end
 
     [:text, :html].each do |format|
-      raw_body = mail.send("#{format}_part").body.raw_source
+      describe "#{format} body" do
+        let :raw_body do
+          subject.send("#{format}_part").body.raw_source
+        end
 
-      expected_lines.each do |line|
-        expect(raw_body).to match(line)
+        it 'includes required lines' do
+          expected_lines = [
+            /Cluster:.* somecluster/m,
+            /Category:.* Hardware issue/m,
+            /Issue:.* Crashed node/m,
+            /Associated component:.* node01/m,
+            /Associated service:.* Some service/m,
+            /Fields:/,
+            /field1:.* value1/m,
+            /field2:.* value2/m,
+          ]
+
+          expected_lines.each do |line|
+            expect(raw_body).to match(line)
+          end
+        end
       end
     end
   end
