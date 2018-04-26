@@ -2,6 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+AWS_PROFILE='alces'
 LOCAL_BACKUPS_PATH='tmp/backups/'
 BACKUPS_S3_URL='s3://alces-flight-center/backups/'
 DATABASE_CONFIG_PATH='config/database.yml'
@@ -89,6 +90,10 @@ obfuscate_imported_data() {
     end
 RUBY
 
+}
+
+aws() {
+  command aws --profile "$AWS_PROFILE" "$@"
 }
 
 log_info() {
