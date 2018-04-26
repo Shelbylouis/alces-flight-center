@@ -4,8 +4,17 @@
 
 <blockquote>
   <% @case.email_properties.each do |key, value| %>
-    <strong><%= key %>:</strong> <%= value %><br/>
+    <strong><%= key %>:</strong>
+    <% if value.is_a?(Hash) %>
+      <ul style="list-style-type: none; margin: 0;">
+        <% value.each do |k, v| %>
+          <li><strong><%= k %>:</strong> <%= v %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <%= value %>
+    <% end %>
+    <br/>
   <% end %>
-  <br/>
   <cite><%= @case.created_at.to_formatted_s(:long) %> - <b><%= @case.user.name %></b></cite>
 </blockquote>

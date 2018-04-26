@@ -48,11 +48,10 @@ RSpec.describe 'Case mailer', :type => :mailer do
         service: service,
         user: requestor,
         subject: 'my_subject',
-        details: <<-EOF.strip_heredoc
-          Oh no
-          my node
-          is broken
-        EOF
+        fields: [
+          {name: 'field1', value: 'value1'},
+          {name: 'field2', value: 'value2', optional: true},
+        ]
     )
   }
 
@@ -70,11 +69,14 @@ RSpec.describe 'Case mailer', :type => :mailer do
     expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
     expected_lines = [
-      /Cluster:.* somecluster/,
-      /Category:.* Hardware issue/,
-      /Issue:.* Crashed node/,
-      /Associated component:.* node01/,
-      /Associated service:.* Some service/,
+      /Cluster:.* somecluster/m,
+      /Category:.* Hardware issue/m,
+      /Issue:.* Crashed node/m,
+      /Associated component:.* node01/m,
+      /Associated service:.* Some service/m,
+      /Fields:/,
+      /field1:.* value1/m,
+      /field2:.* value2/m,
     ]
 
     [:text, :html].each do |format|

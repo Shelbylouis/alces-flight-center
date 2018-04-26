@@ -297,11 +297,10 @@ RSpec.describe Case, type: :model do
         service: service,
         user: requestor,
         subject: 'my_subject',
-        details: <<-EOF.strip_heredoc
-          Oh no
-          my node
-          is broken
-        EOF
+        fields: [
+          {name: 'field1', value: 'value1'},
+          {name: 'field2', value: 'value2', optional: true},
+        ]
       )
     }
 
@@ -312,11 +311,10 @@ RSpec.describe Case, type: :model do
         Issue: 'Crashed node',
         'Associated component': 'node01',
         'Associated service': 'Some service',
-        Details: <<-EOF.strip_heredoc
-          Oh no
-          my node
-          is broken
-        EOF
+        Fields: {
+          field1: 'value1',
+          field2: 'value2',
+        }
       }
 
       expect(kase.email_properties).to eq expected_properties

@@ -184,7 +184,7 @@ class Case < ApplicationRecord
       'Issue': issue.name,
       'Associated component': component&.name,
       'Associated service': service&.name,
-      Details: details,
+      Fields: field_hash,
     }.reject { |_k, v| v.nil? }
   end
 
@@ -279,5 +279,11 @@ class Case < ApplicationRecord
   def validates_user_assignment
     return if assignee.nil?
     errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
+  end
+
+  def field_hash
+    fields.map do |f|
+      [f['name'], f['value']]
+    end.to_h.symbolize_keys
   end
 end
