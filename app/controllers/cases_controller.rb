@@ -37,11 +37,11 @@ class CasesController < ApplicationController
   end
 
   def create
-    @case = Case.new(case_params.merge(user: current_user))
+    @case = Case.new(case_params.merge(user: current_user)).decorate
 
     respond_to do |format|
       if @case.save
-        flash[:success] = 'Support case successfully created.'
+        flash[:success] = "Support case #{@case.display_id} successfully created."
 
         format.json do
           # Return no errors and success status to case form app; it will
@@ -66,17 +66,15 @@ class CasesController < ApplicationController
   end
 
   def archive
-    archived_change_action(
-      archived: true,
-      success_flash: 'Support case archived.'
-    )
+    change_action "Support case %s archived." do |kase|
+      kase.archive!(current_user)
+    end
   end
 
-  def restore
-    archived_change_action(
-      archived: false,
-      success_flash: 'Support case restored from archive.'
-    )
+  def resolve
+    change_action "Support case %s resolved." do |kase|
+      kase.resolve!(current_user)
+    end
   end
 
   private
@@ -93,14 +91,15 @@ class CasesController < ApplicationController
     )
   end
 
-  def archived_change_action(archived:, success_flash:)
-    @case = Case.find(params[:id])
-    @case.archived = archived
-    if @case.save
-      flash[:success] = success_flash
-    else
-      flash[:error] = "Error updating support case: #{format_errors(support_case)}"
+  def change_action(success_flash, &block)
+    @case = Case.find(params[:id]).decorate
+    begin
+      block.call(@case)
+      @case.save!
+      flash[:success] = success_flash % @case.display_id
+    rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
+      flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
-    redirect_to root_path
+    redirect_to @case
   end
 end

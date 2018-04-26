@@ -10,6 +10,10 @@ RSpec.describe 'Cases table', type: :feature do
     create(:open_case, cluster: cluster, subject: 'Open case')
   end
 
+  let! :resolved_case do
+    create(:resolved_case, cluster: cluster, subject: 'Resolved case', completed_at: 1.days.ago, rt_ticket_id: nil)
+  end
+
   let! :archived_case do
     create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
   end
@@ -20,15 +24,14 @@ RSpec.describe 'Cases table', type: :feature do
 
       cases = all('tr').map(&:text)
       expect(cases).to have_text('Open case')
+      expect(cases).not_to have_text('Resolved case')
       expect(cases).not_to have_text('Archived case')
 
       headings = all('th').map(&:text)
       expect(headings).to include('Contact support')
-      expect(headings).to include('Archive')
 
       links = all('a').map { |a| a[:href] }
       expect(links).to include(open_case.mailto_url)
-      expect(links).to include(archive_case_path(open_case))
     end
   end
 
@@ -47,21 +50,15 @@ RSpec.describe 'Cases table', type: :feature do
 
         cases = all('tr').map(&:text)
         expect(cases).to have_text('Open case')
+        expect(cases).to have_text('Resolved case')
+        expect(cases).to have_text('Archived case')
 
         headings = all('th').map(&:text)
         expect(headings).to include('Contact support')
-        expect(headings).to include('Archive/Restore')
 
         links = all('a').map { |a| a[:href] }
         expect(links).to include(open_case.mailto_url)
-        expect(links).to include(archive_case_path(open_case))
 
-        archived_case_row = find('.archived-case-row')
-        expect(archived_case_row).to have_text('Archived case')
-
-        archived_case_links = archived_case_row.all('a').map { |a| a[:href] }
-        expect(archived_case_links).not_to include(archived_case.mailto_url)
-        expect(archived_case_links).to include(restore_case_path(archived_case))
       end
     end
   end
@@ -98,61 +95,26 @@ RSpec.describe 'Cases table', type: :feature do
           find('.archived-case-row')
         end.to raise_error(Capybara::ElementNotFound)
       end
-
-      ['resolved', 'rejected', 'deleted'].each do |completion_status|
-        it "reloads Case ticket status on load until reaches #{completion_status}" do
-          expect(
-            Case.request_tracker
-          ).to receive(
-            :show_ticket
-          ).thrice do |ticket_id|
-            # Return object with status specific to particular ticket given; do
-            # this explicitly rather than using `and_return` with multiple
-            # values as that was failing intermittently, likely due to it not
-            # being entirely deterministic the order we request ticket info in.
-            case ticket_id
-            when open_case.rt_ticket_id
-              OpenStruct.new(status: 'open')
-            when archived_case.rt_ticket_id
-              OpenStruct.new(status: completion_status)
-            end
-          end
-
-          # Neither Case's ticket has reached completion status yet so both
-          # should have reloaded RT ticket status.
-          visit archives_site_cases_path(site, as: user)
-          expect(open_case.reload.last_known_ticket_status).to eq 'open'
-          expect(archived_case.reload.last_known_ticket_status).to eq completion_status
-
-          tds = all('td').map(&:text)
-          expect(tds).to include('open')
-          expect(tds).to include(completion_status)
-
-          # Archived Case has reached completion status so ticket status is not
-          # reloaded.
-          visit archives_site_cases_path(site, as: user)
-          expect(open_case.reload.last_known_ticket_status).to eq 'open'
-          expect(archived_case.reload.last_known_ticket_status).to eq completion_status
-
-          tds = all('td').map(&:text)
-          expect(tds).to include('open')
-          expect(tds).to include(completion_status)
-
-          headings = all('th').map(&:text)
-          expect(headings).to include('Ticket status')
-        end
-      end
     end
   end
 end
 
 RSpec.describe 'Case page' do
-  let! (:admin) { create(:admin) }
+  let (:user) { create(:contact, site: site) }
+  let (:admin) { create(:admin) }
   let (:site) { create(:site, name: 'My Site') }
   let (:cluster) { create(:cluster, site: site) }
 
   let! :open_case do
     create(:open_case, cluster: cluster, subject: 'Open case')
+  end
+
+  let! :resolved_case do
+    create(:resolved_case, cluster: cluster, subject: 'Resolved case')
+  end
+
+  let! :archived_case do
+    create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
   end
 
   let (:mw) { create(:maintenance_window, case: open_case) }
@@ -177,7 +139,45 @@ RSpec.describe 'Case page' do
     expect(event_cards[2].find('.card-body').text).to match(
       /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
     )
+  end
 
+  it 'shows or hides add comment form for contacts' do
+    visit case_path(open_case, as: user)
+
+    form = find('#new_case_comment')
+    form.find('#case_comment_text')
+
+    expect(form.find('input').value).to eq 'Add new comment'
+
+    # No resolve/archive controls
+    expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+
+    visit case_path(resolved_case, as: user)
+    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+
+    visit case_path(archived_case, as: user)
+    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+  end
+
+  it 'shows or hides add comment form and state controls for admins' do
+    visit case_path(open_case, as: admin)
+
+    form = find('#new_case_comment')
+    form.find('#case_comment_text')
+
+    expect(form.find('input').value).to eq 'Add new comment'
+
+    expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
+
+    visit case_path(resolved_case, as: admin)
+    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect(find('#case-state-controls').find('a').text).to eq 'Archive this case'
+
+    visit case_path(archived_case, as: admin)
+    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
   end
 
 end

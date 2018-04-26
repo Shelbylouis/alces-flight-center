@@ -231,12 +231,29 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(invalid_feedback).to have_text('Must be greater than 0')
       end
 
+      it 'cannot select resolved Case for Cluster to associate' do
+        resolved_case = create(
+          :case,
+          cluster: cluster,
+          subject: 'resolved_case',
+          state: 'resolved'
+        )
+
+        # Revisit the page so given Case would be shown, if we do not
+        # successfully filter it out, to avoid false positive.
+        visit current_path
+
+        expect do
+          select resolved_case.subject
+        end.to raise_error(Capybara::ElementNotFound)
+      end
+
       it 'cannot select archived Case for Cluster to associate' do
         archived_case = create(
           :case,
           cluster: cluster,
           subject: 'archived_case',
-          archived: true
+          state: 'archived'
         )
 
         # Revisit the page so given Case would be shown, if we do not

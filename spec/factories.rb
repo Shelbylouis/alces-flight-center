@@ -1,5 +1,13 @@
 
 FactoryBot.define do
+  factory :case_state_transition do
+    add_attribute(:case) { create(:open_case) }
+    add_attribute(:namespace) { "MyString" }
+    event "MyString"
+    from "MyString"
+    to "MyString"
+    created_at "2018-04-17 17:29:34"
+  end
 
   factory :case_comment do
     association :user, factory: :admin

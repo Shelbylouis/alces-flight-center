@@ -1,18 +1,20 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
 
-  COMPLETED_TICKET_STATUSES = [
+  # @deprecated - to be removed in next release
+  COMPLETED_RT_TICKET_STATUSES = [
     'resolved',
     'rejected',
     'deleted',
   ]
 
-  TICKET_STATUSES = (
+  # @deprecated - to be removed in next release
+  RT_TICKET_STATUSES = (
     [
       'new',
       'open',
       'stalled',
-    ] + COMPLETED_TICKET_STATUSES
+    ] + COMPLETED_RT_TICKET_STATUSES
   ).freeze
 
   belongs_to :issue
@@ -25,8 +27,23 @@ class Case < ApplicationRecord
   has_and_belongs_to_many :log
   has_many :case_comments
 
+  has_many :case_state_transitions
+  alias_attribute :transitions, :case_state_transitions
+
   delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true
+
+  state_machine initial: :open do
+    audit_trail context: [:requesting_user], initial: false
+
+    state :open  # Open case, still work to do
+    state :resolved  # Has been resolved but not yet accounted for commercially
+    state :archived  # Has been accounted for commercially, nothing more to do
+
+    event(:resolve) { transition open: :resolved }  # Resolved cases cannot be reopened
+    event(:archive) { transition resolved: :archived }
+
+  end
 
   validates :token, presence: true
   validates :subject, presence: true
@@ -44,8 +61,9 @@ class Case < ApplicationRecord
       less_than_or_equal_to: 3,
     }
 
+  # @deprecated - to be removed in next release
   validates :last_known_ticket_status,
-    inclusion: {in: TICKET_STATUSES}
+    inclusion: {in: RT_TICKET_STATUSES}
 
   # Only validate Issue relationship on create, as the Issue must be allowed
   # given the associated model for this Case at the point when the Case is
@@ -64,8 +82,9 @@ class Case < ApplicationRecord
 
   after_create :send_new_case_email
 
-  scope :active, -> { where(archived: false) }
+  scope :active, -> { where(state: 'open') }
 
+  # @deprecated - to be removed in next release
   def self.request_tracker
     # Note: `rt_interface_class` is a string which we `constantize`, rather
     # than a constant directly, otherwise Rails autoloading in development
@@ -80,16 +99,18 @@ class Case < ApplicationRecord
     "mailto:#{support_email}?subject=#{email_reply_subject}"
   end
 
-  def open
-    !archived
+  def open?
+    self.state == 'open'
   end
 
+  def archived?
+    self.state == 'resolved' || self.state == 'archived'
+  end
+
+  # @deprecated - to be removed in next release
   def update_ticket_status!
     return unless incomplete_rt_ticket?
     self.last_known_ticket_status = associated_rt_ticket.status
-    if ticket_completed?
-      self.completed_at = DateTime.now.utc
-    end
     save!
   end
 
@@ -102,10 +123,6 @@ class Case < ApplicationRecord
     ticket_completed? && chargeable
   end
 
-  def add_rt_ticket_correspondence(text)
-    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
-  end
-
   def associated_model
     component || service || cluster
   end
@@ -114,18 +131,9 @@ class Case < ApplicationRecord
     associated_model.readable_model_name
   end
 
+  # @deprecated - to be removed in next release
   def ticket_completed?
-    COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
-  end
-
-  def events
-    (
-      case_comments.select(&:created_at) +  # Note that CasesController#show
-        # creates a new, unsaved CaseComment (because the view needs it)
-        # so there will be one included in this set without a created_at
-        # date. We clearly don't want to include that in the events stream.
-      maintenance_windows.map(&:transitions).flatten.select(&:event)
-    ).sort_by(&:created_at)
+    COMPLETED_RT_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
   def email_recipients
@@ -135,6 +143,17 @@ class Case < ApplicationRecord
 
   def email_reply_subject
     "RE: #{email_subject}"
+  end
+
+  def events
+    (
+      case_comments.select(&:created_at) +  # Note that CasesController#show
+        # creates a new, unsaved CaseComment (because the view needs it)
+        # so there will be one included in this set without a created_at
+        # date. We clearly don't want to include that in the events stream.
+      maintenance_windows.map(&:transitions).flatten.select(&:event) +
+      case_state_transitions
+    ).sort_by(&:created_at)
   end
 
   def email_subject
@@ -160,13 +179,22 @@ class Case < ApplicationRecord
     "#{cluster.name}: #{subject} [#{token}]"
   end
 
-  def rt_ticket_text
+  def text_summary
     # Ticket text does not need to be in this format, it is just text, but this
     # is readable and an adequate format for now.
     Utils.rt_format(case_properties)
   end
 
   private
+
+  # Picked up by state_machines-audit_trail due to `context` setting above, and
+  # used to automatically set user who instigated the transition in created
+  # CaseStateTransition.
+  # Refer to
+  # https://github.com/state-machines/state_machines-audit_trail#example-5---store-advanced-method-results.
+  def requesting_user(transition)
+    transition.args&.first
+  end
 
   def incomplete_rt_ticket?
     rt_ticket_id && (!ticket_completed? || !self.completed_at)
@@ -182,6 +210,7 @@ class Case < ApplicationRecord
     self.subject ||= issue.default_subject
   end
 
+  # @deprecated - to be removed in next release
   def associated_rt_ticket
     if rt_ticket_id
       @associated_ticket ||= rt.show_ticket(rt_ticket_id)
@@ -190,6 +219,7 @@ class Case < ApplicationRecord
     end
   end
 
+  # @deprecated - to be removed in next release
   def rt
     self.class.request_tracker
   end
@@ -218,7 +248,6 @@ class Case < ApplicationRecord
         (position.even? ? letters : digits).sample
       end.join
   end
-
 
   def case_properties
     {
