@@ -3,7 +3,7 @@
 <% if @case.assignee %>
     <p>
       This case has been assigned to
-      <em><%= @case.assignee.name %></em><% if @previous %>(previously assigned
+      <em><%= @case.assignee.name %></em><% if @previous %> (previously assigned
         to <%= @previous.name %>)<% end %>.
     </p>
 <% else %>
