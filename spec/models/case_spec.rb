@@ -213,4 +213,18 @@ RSpec.describe Case, type: :model do
     subject { create(:case_with_component).associated_model_type }
     it { is_expected.to eq 'component' }
   end
+
+  describe '#consultancy?' do
+    it 'returns true when tier_level == 3' do
+      kase = create(:case, tier_level: 3)
+
+      expect(kase).to be_consultancy
+    end
+
+    it 'returns false when tier_level < 3' do
+      kase = create(:case, tier_level: 2)
+
+      expect(kase).not_to be_consultancy
+    end
+  end
 end

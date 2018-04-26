@@ -184,6 +184,10 @@ class Case < ApplicationRecord
     Utils.rt_format(case_properties)
   end
 
+  def consultancy?
+    tier_level >= 3
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
