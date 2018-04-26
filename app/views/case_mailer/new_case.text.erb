@@ -5,6 +5,8 @@ A new support case has been created:
 -------------------------------------------------------------------------------
 <%= @case.created_at.to_formatted_s(:long) %> - <%= @case.user.name %>:
 
-<%= @case.text_summary %>
+<% @case.email_properties.each do |key, value| %>
+  <%= key %>: <%= value %>
+<% end %>
 
 -------------------------------------------------------------------------------

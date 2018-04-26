@@ -177,10 +177,16 @@ class Case < ApplicationRecord
     "#{cluster.name}: #{subject} [#{token}]"
   end
 
-  def text_summary
-    # Ticket text does not need to be in this format, it is just text, but this
-    # is readable and an adequate format for now.
-    Utils.rt_format(case_properties)
+  def email_properties
+    {
+      Requestor: user.name,
+      Cluster: cluster.name,
+      Category: category&.name,
+      'Issue': issue.name,
+      'Associated component': component&.name,
+      'Associated service': service&.name,
+      Details: details,
+    }.reject { |_k, v| v.nil? }
   end
 
   def consultancy?
@@ -260,18 +266,6 @@ class Case < ApplicationRecord
       (0...length).map do |position|
         (position.even? ? letters : digits).sample
       end.join
-  end
-
-  def case_properties
-    {
-      Requestor: user.name,
-      Cluster: cluster.name,
-      Category: category&.name,
-      'Issue': issue.name,
-      'Associated component': component&.name,
-      'Associated service': service&.name,
-      Details: details,
-    }.reject { |_k, v| v.nil? }
   end
 
   def send_new_case_email

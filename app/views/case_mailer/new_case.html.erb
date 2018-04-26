@@ -3,8 +3,8 @@
 <h3><%= @case.ticket_subject %></h3>
 
 <blockquote>
-  <% @case.text_summary.split(/\n/).each do |line| %>
-    <%= line %><br/>
+  <% @case.email_properties.each do |key, value| %>
+    <strong><%= key %>:</strong> <%= value %><br/>
   <% end %>
   <br/>
   <cite><%= @case.created_at.to_formatted_s(:long) %> - <b><%= @case.user.name %></b></cite>

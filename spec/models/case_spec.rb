@@ -261,7 +261,7 @@ RSpec.describe Case, type: :model do
     it { is_expected.to eq 'component' }
   end
 
-  describe '#text_summary' do
+  describe '#email_properties' do
     let :site { create(:site) }
 
     let :requestor do
@@ -306,19 +306,21 @@ RSpec.describe Case, type: :model do
     }
 
     it 'includes all needed Case properties with values' do
-      expected_text = <<~EOF.strip_heredoc
-        Requestor: Some User
-        Cluster: somecluster
-        Category: Hardware issue
-        Issue: Crashed node
-        Associated component: node01
-        Associated service: Some service
-        Details: Oh no
-         my node
-         is broken
-      EOF
+      expected_properties = {
+        Requestor: 'Some User',
+        Cluster: 'somecluster',
+        Category: 'Hardware issue',
+        Issue: 'Crashed node',
+        'Associated component': 'node01',
+        'Associated service': 'Some service',
+        Details: <<-EOF.strip_heredoc
+          Oh no
+          my node
+          is broken
+        EOF
+      }
 
-      expect(kase.text_summary).to match(expected_text)
+      expect(kase.email_properties).to eq expected_properties
     end
 
     context 'when no associated component' do
@@ -326,7 +328,7 @@ RSpec.describe Case, type: :model do
       let(:component) { nil }
 
       it 'does not include corresponding line' do
-        expect(kase.text_summary).not_to match('Associated component:')
+        expect(kase.email_properties).not_to include(:'Associated component')
       end
     end
 
@@ -335,7 +337,7 @@ RSpec.describe Case, type: :model do
       let(:service) { nil }
 
       it 'does not include corresponding line' do
-        expect(kase.text_summary).not_to match('Associated service:')
+        expect(kase.email_properties).not_to include(:'Associated service')
       end
     end
   end

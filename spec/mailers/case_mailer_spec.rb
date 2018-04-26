@@ -70,22 +70,19 @@ RSpec.describe 'Case mailer', :type => :mailer do
     expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
     expected_lines = [
-      'Requestor: Some User',
-      'Cluster: somecluster',
-      'Category: Hardware issue',
-      'Issue: Crashed node',
-      'Associated component: node01',
-      'Associated service: Some service',
-      'Details: Oh no',
-       'my node',
-       'is broken',
+      /Requestor:.* Some User/,
+      /Cluster:.* somecluster/,
+      /Category:.* Hardware issue/,
+      /Issue:.* Crashed node/,
+      /Associated component:.* node01/,
+      /Associated service:.* Some service/,
     ]
 
     [:text, :html].each do |format|
       raw_body = mail.send("#{format}_part").body.raw_source
 
       expected_lines.each do |line|
-        expect(raw_body).to include(line)
+        expect(raw_body).to match(line)
       end
     end
   end
