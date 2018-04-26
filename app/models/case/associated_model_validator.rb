@@ -1,6 +1,6 @@
 
 class Case
-  class AssociatedModelValidator < Validator
+  class AssociatedModelValidator < ActiveModel::Validator
     def validate(record)
       @record = record
 
@@ -11,6 +11,8 @@ class Case
     end
 
     private
+
+    attr_reader :record
 
     def validate_correct_cluster_part_relationship(part_name)
       part = part(part_name)
@@ -39,6 +41,14 @@ class Case
           record.errors.add(:service, error)
         end
       end
+    end
+
+    def part_required?(part_name)
+      record.issue.send("requires_#{part_name}")
+    end
+
+    def part(part_name)
+      record.send(part_name)
     end
   end
 end
