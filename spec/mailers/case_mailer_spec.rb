@@ -125,7 +125,7 @@ EOF
     expect(mail.body.encoded).to match('I can haz comment')
   end
 
-  it 'sends an email on case assignment' do
+  it 'sends an email on initial case assignment' do
     kase.assignee = another_user
     mail = CaseMailer.change_assignee(kase, nil)
 
