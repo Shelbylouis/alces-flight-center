@@ -100,7 +100,7 @@ RSpec.describe 'Cases table', type: :feature do
 end
 
 RSpec.describe 'Case page' do
-  let (:user) { create(:contact, site: site) }
+  let (:contact) { create(:contact, site: site) }
   let (:admin) { create(:admin) }
   let (:site) { create(:site, name: 'My Site') }
   let (:cluster) { create(:cluster, site: site) }
@@ -142,7 +142,7 @@ RSpec.describe 'Case page' do
   end
 
   it 'shows or hides add comment form for contacts' do
-    visit case_path(open_case, as: user)
+    visit case_path(open_case, as: contact)
 
     form = find('#new_case_comment')
     form.find('#case_comment_text')
@@ -152,11 +152,11 @@ RSpec.describe 'Case page' do
     # No resolve/archive controls
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-    visit case_path(resolved_case, as: user)
+    visit case_path(resolved_case, as: contact)
     expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-    visit case_path(archived_case, as: user)
+    visit case_path(archived_case, as: contact)
     expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
   end
