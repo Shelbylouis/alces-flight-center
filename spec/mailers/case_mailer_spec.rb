@@ -69,19 +69,25 @@ RSpec.describe 'Case mailer', :type => :mailer do
     expect(mail.cc).to match_array %w(another.user@somecluster.com mailing-list@somecluster.com)
     expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
-    expected_body = <<~EOF.strip_heredoc
-      Requestor: Some User
-      Cluster: somecluster
-      Category: Hardware issue
-      Issue: Crashed node
-      Associated component: node01
-      Associated service: Some service
-      Details: Oh no
-       my node
-       is broken
-    EOF
+    expected_lines = [
+      'Requestor: Some User',
+      'Cluster: somecluster',
+      'Category: Hardware issue',
+      'Issue: Crashed node',
+      'Associated component: node01',
+      'Associated service: Some service',
+      'Details: Oh no',
+       'my node',
+       'is broken',
+    ]
 
-    expect(mail.body.encoded).to match(expected_body)
+    [:text, :html].each do |format|
+      raw_body = mail.send("#{format}_part").body.raw_source
+
+      expected_lines.each do |line|
+        expect(raw_body).to include(line)
+      end
+    end
   end
 
   it 'sends an email on case comment being added' do
