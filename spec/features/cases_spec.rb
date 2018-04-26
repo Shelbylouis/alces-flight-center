@@ -100,7 +100,7 @@ RSpec.describe 'Cases table', type: :feature do
 end
 
 RSpec.describe 'Case page' do
-  let (:user) { create(:contact, site: site) }
+  let (:contact) { create(:contact, site: site) }
   let (:admin) { create(:admin) }
   let (:site) { create(:site, name: 'My Site') }
   let (:cluster) { create(:cluster, site: site) }
@@ -118,6 +118,9 @@ RSpec.describe 'Case page' do
   end
 
   let (:mw) { create(:maintenance_window, case: open_case) }
+
+  let :comment_form_class { '#new_case_comment' }
+  let :comment_button_text { 'Add new comment' }
 
   it 'shows events in chronological order' do
     create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
@@ -142,42 +145,53 @@ RSpec.describe 'Case page' do
   end
 
   it 'shows or hides add comment form for contacts' do
-    visit case_path(open_case, as: user)
+    visit case_path(open_case, as: contact)
 
-    form = find('#new_case_comment')
+    form = find(comment_form_class)
     form.find('#case_comment_text')
 
-    expect(form.find('input').value).to eq 'Add new comment'
+    expect(form.find('input').value).to eq comment_button_text
 
     # No resolve/archive controls
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-    visit case_path(resolved_case, as: user)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    visit case_path(resolved_case, as: contact)
+    expect { find(comment_form_class) }.to raise_error(Capybara::ElementNotFound)
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-    visit case_path(archived_case, as: user)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    visit case_path(archived_case, as: contact)
+    expect { find(comment_form_class) }.to raise_error(Capybara::ElementNotFound)
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
   end
 
   it 'shows or hides add comment form and state controls for admins' do
     visit case_path(open_case, as: admin)
 
-    form = find('#new_case_comment')
+    form = find(comment_form_class)
     form.find('#case_comment_text')
 
-    expect(form.find('input').value).to eq 'Add new comment'
+    expect(form.find('input').value).to eq comment_button_text
 
     expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
 
     visit case_path(resolved_case, as: admin)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect { find(comment_form_class) }.to raise_error(Capybara::ElementNotFound)
     expect(find('#case-state-controls').find('a').text).to eq 'Archive this case'
 
     visit case_path(archived_case, as: admin)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect { find(comment_form_class) }.to raise_error(Capybara::ElementNotFound)
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
   end
 
+  context 'for open non-consultancy Case' do
+    subject { create(:open_case, cluster: cluster, tier_level: 2) }
+
+    it 'disables commenting for site contact' do
+      visit case_path(subject, as: contact)
+
+      form = find(comment_form_class)
+      expect(form.find('textarea')).to be_disabled
+      expect(form).to have_button(comment_button_text, disabled: true)
+    end
+  end
 end

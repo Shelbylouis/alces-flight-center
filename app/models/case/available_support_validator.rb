@@ -18,7 +18,8 @@ class Case
       # via separate buttons outside of the standard Case form.
       return if record.issue.special?
 
-      if associated_model&.advice? && record.tier_level < 3
+      return if record.consultancy?
+      if associated_model&.advice?
         record.errors.add(associated_model_name, advice_part_error)
       end
     end
