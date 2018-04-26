@@ -119,6 +119,9 @@ RSpec.describe 'Case page' do
 
   let (:mw) { create(:maintenance_window, case: open_case) }
 
+  let :comment_form_class { '#new_case_comment' }
+  let :comment_button_text { 'Add new comment' }
+
   it 'shows events in chronological order' do
     create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
     create(
@@ -144,39 +147,39 @@ RSpec.describe 'Case page' do
   it 'shows or hides add comment form for contacts' do
     visit case_path(open_case, as: contact)
 
-    form = find('#new_case_comment')
+    form = find(comment_form_class)
     form.find('#case_comment_text')
 
-    expect(form.find('input').value).to eq 'Add new comment'
+    expect(form.find('input').value).to eq comment_button_text
 
     # No resolve/archive controls
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
     visit case_path(resolved_case, as: contact)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect { find(comment_form_class) }.to raise_error(Capybara::ElementNotFound)
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
     visit case_path(archived_case, as: contact)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect { find(comment_form_class) }.to raise_error(Capybara::ElementNotFound)
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
   end
 
   it 'shows or hides add comment form and state controls for admins' do
     visit case_path(open_case, as: admin)
 
-    form = find('#new_case_comment')
+    form = find(comment_form_class)
     form.find('#case_comment_text')
 
-    expect(form.find('input').value).to eq 'Add new comment'
+    expect(form.find('input').value).to eq comment_button_text
 
     expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
 
     visit case_path(resolved_case, as: admin)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect { find(comment_form_class) }.to raise_error(Capybara::ElementNotFound)
     expect(find('#case-state-controls').find('a').text).to eq 'Archive this case'
 
     visit case_path(archived_case, as: admin)
-    expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    expect { find(comment_form_class) }.to raise_error(Capybara::ElementNotFound)
     expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
   end
 
