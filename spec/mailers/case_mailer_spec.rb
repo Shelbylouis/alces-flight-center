@@ -55,7 +55,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
           Oh no
           my node
           is broken
-    EOF
+        EOF
     )
   }
 
@@ -72,17 +72,17 @@ RSpec.describe 'Case mailer', :type => :mailer do
     expect(mail.cc).to match_array %w(another.user@somecluster.com mailing-list@somecluster.com)
     expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
-    expected_body = <<EOF
-Requestor: Some User
-Cluster: somecluster
-Category: Hardware issue
-Issue: Crashed node
-Associated component: node01
-Associated service: Some service
-Details: Oh no
- my node
- is broken
-EOF
+    expected_body = <<~EOF.strip_heredoc
+      Requestor: Some User
+      Cluster: somecluster
+      Category: Hardware issue
+      Issue: Crashed node
+      Associated component: node01
+      Associated service: Some service
+      Details: Oh no
+       my node
+       is broken
+    EOF
 
     expect(mail.body.encoded).to match(expected_body)
   end
