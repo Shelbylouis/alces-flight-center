@@ -8,8 +8,14 @@ A new support case has been created:
 <% @case.email_properties.each do |key, value| %>
   <% if value.is_a?(Hash) %>
   <%= key %>:
-    <% value.each do |k, v| %>
+    <% value.each do |k, v| -%>
+      <% if v.include?("\n") %>
+      <%= k %>: <% v.split(/\n+/).each do |line| %>
+        <%= line %>
+      <% end %>
+      <% else %>
       <%= k %>: <%= v %>
+      <% end %>
     <% end %>
   <% else %>
   <%= key %>: <%= value %>

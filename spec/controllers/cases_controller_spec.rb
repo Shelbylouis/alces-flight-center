@@ -81,7 +81,11 @@ RSpec.describe CasesController, type: :controller do
           subject: 'some_subject',
           details: 'Useful info',
           tier_level: 2,
-          fields: [type: 'textarea'],
+          fields: [{
+            type: 'textarea',
+            name: 'some_field',
+            value: 'some_value',
+          }],
         }
       }
     end

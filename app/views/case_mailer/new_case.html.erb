@@ -8,7 +8,10 @@
     <% if value.is_a?(Hash) %>
       <ul style="list-style-type: none; margin: 0;">
         <% value.each do |k, v| %>
-          <li><strong><%= k %>:</strong> <%= v %></li>
+          <li>
+            <strong><%= k %>:</strong>
+          <%= v.include?("\n") ? simple_format(v) : v %>
+          </li>
         <% end %>
       </ul>
     <% else %>
