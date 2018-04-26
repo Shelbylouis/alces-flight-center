@@ -1,0 +1,13 @@
+<h3><%= @case.ticket_subject %></h3>
+
+<% if @case.assignee %>
+    <p>
+      This case has been assigned to
+      <em><%= @case.assignee.name %></em><% if @previous %>(previously assigned
+        to <%= @previous.name %>)<% end %>.
+    </p>
+<% else %>
+  <p>
+    This case is no longer assigned<% if @previous %> to <%= @previous.name %><% end %>.
+  </p>
+<% end %>

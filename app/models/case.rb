@@ -85,6 +85,7 @@ class Case < ApplicationRecord
   before_validation :assign_default_subject_if_unset
 
   after_create :send_new_case_email
+  after_update :maybe_send_new_assignee_email
 
   scope :active, -> { where(state: 'open') }
 
@@ -195,6 +196,12 @@ class Case < ApplicationRecord
         User.where(admin: true).order(:name)
   end
 
+  def assignee=(new_assignee)
+    @old_assignee = assignee
+    @assignee_changed = true
+    super(new_assignee)
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
@@ -273,6 +280,11 @@ class Case < ApplicationRecord
 
   def send_new_case_email
     CaseMailer.new_case(self).deliver_later
+  end
+
+  def maybe_send_new_assignee_email
+    return unless @assignee_changed
+    CaseMailer.change_assignee(self, @old_assignee).deliver_later
   end
 
   def validates_user_assignment

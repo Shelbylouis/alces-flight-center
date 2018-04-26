@@ -125,4 +125,36 @@ EOF
     expect(mail.body.encoded).to match('I can haz comment')
   end
 
+  it 'sends an email on case assignment' do
+    kase.assignee = another_user
+    mail = CaseMailer.change_assignee(kase, nil)
+
+    expect(mail.to).to eq nil
+    expect(mail.cc).to eq %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.bcc).to eq(['tickets@alces-software.com'])
+
+    expect(mail.body.encoded).to match('This case has been assigned to A Scientist.')
+  end
+
+  it 'sends an email on case assignment change' do
+    kase.assignee = another_user
+    mail = CaseMailer.change_assignee(kase, requestor)
+
+    expect(mail.to).to eq nil
+    expect(mail.cc).to eq %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.bcc).to eq(['tickets@alces-software.com'])
+
+    expect(mail.body.encoded).to match(/This case has been assigned to A Scientist \(previously\s+assigned to Some User\)\./)
+  end
+
+  it 'sends an email on case assignee removal' do
+    mail = CaseMailer.change_assignee(kase, another_user)
+
+    expect(mail.to).to eq nil
+    expect(mail.cc).to eq %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.bcc).to eq(['tickets@alces-software.com'])
+
+    expect(mail.body.encoded).to match('This case is no longer assigned to A Scientist.')
+  end
+
 end
