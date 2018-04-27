@@ -284,7 +284,8 @@ class Case < ApplicationRecord
 
   def field_hash
     fields.map do |f|
-      [f['name'], f['value']]
+      f = f.with_indifferent_access
+      [f.fetch(:name), f.fetch(:value)]
     end.to_h.symbolize_keys
   end
 end
