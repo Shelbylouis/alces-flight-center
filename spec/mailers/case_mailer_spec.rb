@@ -69,8 +69,8 @@ RSpec.describe 'Case mailer', :type => :mailer do
     expect(mail.subject).to eq "[helpdesk.alces-software.com #1138] somecluster: my_subject [#{kase.token}]"
 
     expect(mail.to).to eq nil
-    expect(mail.cc).to eq %w(another.user@somecluster.com mailing-list@somecluster.com)
-    expect(mail.bcc).to eq(['tickets@alces-software.com'])
+    expect(mail.cc).to match_array %w(another.user@somecluster.com mailing-list@somecluster.com)
+    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
     expected_body = <<EOF
 Requestor: Some User
@@ -119,8 +119,8 @@ EOF
     mail = CaseMailer.comment(comment)
 
     expect(mail.to).to eq nil
-    expect(mail.cc).to eq %w(someuser@somecluster.com mailing-list@somecluster.com)
-    expect(mail.bcc).to eq(['tickets@alces-software.com'])
+    expect(mail.cc).to match_array %w(someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
     expect(mail.body.encoded).to match('I can haz comment')
   end
@@ -130,8 +130,8 @@ EOF
     mail = CaseMailer.change_assignee(kase, nil)
 
     expect(mail.to).to eq nil
-    expect(mail.cc).to eq %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
-    expect(mail.bcc).to eq(['tickets@alces-software.com'])
+    expect(mail.cc).to match_array %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
     expect(mail.body.encoded).to match('This case has been assigned to A Scientist.')
   end
@@ -141,8 +141,8 @@ EOF
     mail = CaseMailer.change_assignee(kase, requestor)
 
     expect(mail.to).to eq nil
-    expect(mail.cc).to eq %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
-    expect(mail.bcc).to eq(['tickets@alces-software.com'])
+    expect(mail.cc).to match_array %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
     expect(mail.body.encoded).to match(/This case has been assigned to A Scientist \(previously\s+assigned to Some User\)\./)
   end
@@ -151,8 +151,8 @@ EOF
     mail = CaseMailer.change_assignee(kase, another_user)
 
     expect(mail.to).to eq nil
-    expect(mail.cc).to eq %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
-    expect(mail.bcc).to eq(['tickets@alces-software.com'])
+    expect(mail.cc).to match_array %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
     expect(mail.body.encoded).to match('This case is no longer assigned to A Scientist.')
   end
