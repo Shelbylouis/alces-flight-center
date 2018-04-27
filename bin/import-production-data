@@ -2,9 +2,6 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-AWS_PROFILE='alces'
-LOCAL_BACKUPS_PATH='tmp/backups/'
-BACKUPS_S3_URL='s3://alces-flight-center/backups/'
 DATABASE_CONFIG_PATH='config/database.yml'
 
 # Usage: run the script; no arguments needed. If everything works correctly it
@@ -17,23 +14,10 @@ DATABASE_CONFIG_PATH='config/database.yml'
 # bucket.
 
 main() {
-  local most_recent_backup_file local_backup_file_path backup_file_url
+  local backup_file_path
 
-  log_info 'Determining most recent database backup...'
-  most_recent_backup_file="$(aws s3 ls "$BACKUPS_S3_URL" | tail -n 1 | sed 's/ \+/ /g' | cut -d' ' -f4)"
-  local_backup_file_path="$LOCAL_BACKUPS_PATH/$most_recent_backup_file"
-
-  # Fetch the most recent backup if we don't have it locally already (or at
-  # least if we don't have a file with the same name).
-  if [ ! -f "$local_backup_file_path" ]; then
-    log_info 'Retrieving backup...'
-    backup_file_url="${BACKUPS_S3_URL}${most_recent_backup_file}"
-    aws s3 cp "$backup_file_url" "$local_backup_file_path"
-  else
-    log_info 'Already retrieved most recent backup; using existing download.'
-  fi
-
-  import_backup "$local_backup_file_path"
+  backup_file_path=$(bin/retrieve-production-backup)
+  import_backup "$backup_file_path"
   obfuscate_imported_data
   log_info 'Done!'
 }
@@ -43,6 +27,9 @@ import_backup() {
   backup_file_path="$1"
 
   log_info 'Creating fresh development database...'
+  # This is required if existing local development database is empty for some
+  # reason.
+  bin/rake db:environment:set RAILS_ENV=development
   bin/rake db:drop
   bin/rake db:create
 
@@ -90,10 +77,6 @@ obfuscate_imported_data() {
     end
 RUBY
 
-}
-
-aws() {
-  command aws --profile "$AWS_PROFILE" "$@"
 }
 
 log_info() {
