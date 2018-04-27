@@ -65,50 +65,29 @@ RSpec.feature Log, type: :feature do
       expect(submit_log.cases).to contain_exactly(*log_cases)
     end
 
-    it 'cannot select resolved Case for subject to associate' do
-      case_attributes = {
-        cluster: cluster,
-        subject: 'resolved_case',
-        state: 'resolved'
-      }
-      if subject.is_a?(Component)
-        case_attributes.merge!(
-          component: subject,
-          issue: create(:issue, requires_component: true)
-        )
+    %w(resolved archived).each do |state|
+      it "cannot select #{state} Case for subject to associate" do
+        case_attributes = {
+            cluster: cluster,
+            subject: 'my_case',
+            state: state
+        }
+        if subject.is_a?(Component)
+          case_attributes.merge!(
+              component: subject,
+              issue: create(:issue, requires_component: true)
+          )
+        end
+        my_case = create(:case, case_attributes)
+
+        # Revisit the page so given Case would be shown, if we do not
+        # successfully filter it out, to avoid false positive.
+        visit current_path
+
+        expect do
+          select my_case.subject
+        end.to raise_error(Capybara::ElementNotFound)
       end
-      resolved_case = create(:case, case_attributes)
-
-      # Revisit the page so given Case would be shown, if we do not
-      # successfully filter it out, to avoid false positive.
-      visit current_path
-
-      expect do
-        select resolved_case.subject
-      end.to raise_error(Capybara::ElementNotFound)
-    end
-
-    it 'cannot select archived Case for subject to associate' do
-      case_attributes = {
-        cluster: cluster,
-        subject: 'archived_case',
-        state: 'archived'
-      }
-      if subject.is_a?(Component)
-        case_attributes.merge!(
-          component: subject,
-          issue: create(:issue, requires_component: true)
-        )
-      end
-      archived_case = create(:case, case_attributes)
-
-      # Revisit the page so given Case would be shown, if we do not
-      # successfully filter it out, to avoid false positive.
-      visit current_path
-
-      expect do
-        select archived_case.subject
-      end.to raise_error(Capybara::ElementNotFound)
     end
   end
 

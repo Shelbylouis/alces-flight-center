@@ -237,16 +237,45 @@ RSpec.describe 'Case page' do
       end
     end
   end
+  
+  describe 'Commenting' do
 
-  context 'for open non-consultancy Case' do
-    subject { create(:open_case, cluster: cluster, tier_level: 2) }
+    context 'for open non-consultancy Case' do
+      subject { create(:open_case, cluster: cluster, tier_level: 2) }
 
-    it 'disables commenting for site contact' do
-      visit case_path(subject, as: contact)
+      it 'disables commenting for site contact' do
+        visit case_path(subject, as: contact)
 
-      form = find(comment_form_class)
-      expect(form.find('textarea')).to be_disabled
-      expect(form).to have_button(comment_button_text, disabled: true)
+        form = find(comment_form_class)
+        expect(form.find('textarea')).to be_disabled
+        expect(form).to have_button(comment_button_text, disabled: true)
+      end
     end
+
+    it 'allows a comment to be added' do
+      visit case_path(open_case, as: admin)
+
+      fill_in 'case_comment_text', with: 'This is a test comment'
+      click_button 'Add new comment'
+
+      open_case.reload
+
+      expect(open_case.case_comments.count).to be 1
+      expect(find('.event-card').find('.card-body').text).to eq('This is a test comment')
+      expect(find('.alert')).to have_text('New comment added')
+    end
+
+    it 'does not allow empty comments' do
+      visit case_path(open_case, as: admin)
+
+      fill_in 'case_comment_text', with: ''
+      click_button 'Add new comment'
+
+      open_case.reload
+
+      expect(open_case.case_comments.count).to be 0
+      expect(find('.alert')).to have_text('Empty comments are not permitted')
+    end
+
   end
 end

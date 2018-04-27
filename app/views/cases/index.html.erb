@@ -28,7 +28,7 @@ end %>
       <tbody>
         <% @scope.cases.order(created_at: :desc).decorate.each do |c| %>
           <% if @archive || c.open? %>
-            <% if c.archived? && !manage_cases_page %>
+            <% if c.hidden? && !manage_cases_page %>
               <tr
                 class="archived-case-row"
                 title="This support case has been archived; you should open a new support case if you wish to contact Alces Flight Support"
