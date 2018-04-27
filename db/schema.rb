@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180423170804) do
+ActiveRecord::Schema.define(version: 20180425134112) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,6 +48,28 @@ ActiveRecord::Schema.define(version: 20180423170804) do
     t.index ["asset_record_field_definition_id"], name: "index_asset_record_fields_on_asset_record_field_definition_id"
     t.index ["component_group_id"], name: "index_asset_record_fields_on_component_group_id"
     t.index ["component_id"], name: "index_asset_record_fields_on_component_id"
+  end
+
+  create_table "audits", force: :cascade do |t|
+    t.integer "auditable_id"
+    t.string "auditable_type"
+    t.integer "associated_id"
+    t.string "associated_type"
+    t.integer "user_id"
+    t.string "user_type"
+    t.string "username"
+    t.string "action"
+    t.jsonb "audited_changes"
+    t.integer "version", default: 0
+    t.string "comment"
+    t.string "remote_address"
+    t.string "request_uuid"
+    t.datetime "created_at"
+    t.index ["associated_type", "associated_id"], name: "associated_index"
+    t.index ["auditable_type", "auditable_id"], name: "auditable_index"
+    t.index ["created_at"], name: "index_audits_on_created_at"
+    t.index ["request_uuid"], name: "index_audits_on_request_uuid"
+    t.index ["user_id", "user_type"], name: "user_index"
   end
 
   create_table "case_comments", force: :cascade do |t|
@@ -89,6 +111,8 @@ ActiveRecord::Schema.define(version: 20180423170804) do
     t.integer "tier_level"
     t.json "fields"
     t.text "state", default: "open", null: false
+    t.bigint "assignee_id"
+    t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
     t.index ["issue_id"], name: "index_cases_on_issue_id"
@@ -326,6 +350,7 @@ ActiveRecord::Schema.define(version: 20180423170804) do
   add_foreign_key "cases", "issues"
   add_foreign_key "cases", "services"
   add_foreign_key "cases", "users"
+  add_foreign_key "cases", "users", column: "assignee_id"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"

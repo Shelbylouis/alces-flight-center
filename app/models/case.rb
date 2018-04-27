@@ -22,6 +22,7 @@ class Case < ApplicationRecord
   belongs_to :component, required: false
   belongs_to :service, required: false
   belongs_to :user
+  belongs_to :assignee, class_name: 'User', required: false
   has_one :credit_charge, required: false
   has_many :maintenance_windows
   has_and_belongs_to_many :log
@@ -44,6 +45,8 @@ class Case < ApplicationRecord
     event(:archive) { transition resolved: :archived }
 
   end
+
+  audited only: :assignee_id, on: [ :update ]
 
   validates :token, presence: true
   validates :subject, presence: true
@@ -74,12 +77,15 @@ class Case < ApplicationRecord
 
   validates_with AssociatedModelValidator
 
+  validate :validates_user_assignment
+
   after_initialize :assign_cluster_if_necessary
   after_initialize :generate_token, on: :create
 
   before_validation :assign_default_subject_if_unset
 
   after_create :send_new_case_email
+  after_update :maybe_send_new_assignee_email
 
   scope :active, -> { where(state: 'open') }
 
@@ -151,7 +157,8 @@ class Case < ApplicationRecord
         # so there will be one included in this set without a created_at
         # date. We clearly don't want to include that in the events stream.
       maintenance_windows.map(&:transitions).flatten.select(&:event) +
-      case_state_transitions
+      case_state_transitions +
+      audits
     ).sort_by(&:created_at)
   end
 
@@ -186,6 +193,17 @@ class Case < ApplicationRecord
 
   def consultancy?
     tier_level >= 3
+  end
+
+  def potential_assignees
+    User.where(site: site).order(:name) +
+        User.where(admin: true).order(:name)
+  end
+
+  def assignee=(new_assignee)
+    @old_assignee = assignee
+    @assignee_changed = true
+    super(new_assignee)
   end
 
   private
@@ -266,5 +284,15 @@ class Case < ApplicationRecord
 
   def send_new_case_email
     CaseMailer.new_case(self).deliver_later
+  end
+
+  def maybe_send_new_assignee_email
+    return unless @assignee_changed
+    CaseMailer.change_assignee(self, @old_assignee).deliver_later
+  end
+
+  def validates_user_assignment
+    return if assignee.nil?
+    errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
   end
 end

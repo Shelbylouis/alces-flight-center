@@ -71,6 +71,7 @@ Rails.application.routes.draw do
       member do
         post :resolve  # Only admins may resolve a case
         post :archive  # Only admins may archive a case
+        post :assign  # Only admins may (re)assign a case
       end
     end
 

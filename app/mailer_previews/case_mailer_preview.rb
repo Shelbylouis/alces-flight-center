@@ -3,6 +3,11 @@ class CaseMailerPreview < ApplicationMailerPreview
     CaseMailer.new_case(get_case)
   end
 
+  def change_assignee
+    my_case = get_case
+    CaseMailer.change_assignee(my_case, user)
+  end
+
   def comment
     my_comment = CaseComment.first || FactoryBot.build_stubbed(:case_comment)
     CaseMailer.comment(my_comment)

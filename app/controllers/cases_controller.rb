@@ -71,6 +71,18 @@ class CasesController < ApplicationController
     end
   end
 
+  def assign
+    new_assignee_id = params[:case][:assignee_id]
+    new_assignee = new_assignee_id.empty? ? nil : User.find(new_assignee_id)
+    success_flash = new_assignee ?
+                        "Support case %s assigned to #{new_assignee.name}."
+                        : 'Support case %s unassigned.'
+
+    change_action success_flash, redirect_path: case_path do |kase|
+      kase.assignee = new_assignee
+    end
+  end
+
   def resolve
     change_action "Support case %s resolved." do |kase|
       kase.resolve!(current_user)
@@ -91,7 +103,7 @@ class CasesController < ApplicationController
     )
   end
 
-  def change_action(success_flash, &block)
+  def change_action(success_flash, redirect_path: case_path, &block)
     @case = Case.find(params[:id]).decorate
     begin
       block.call(@case)
@@ -100,6 +112,6 @@ class CasesController < ApplicationController
     rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
       flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
-    redirect_to @case
+    redirect_to redirect_path
   end
 end

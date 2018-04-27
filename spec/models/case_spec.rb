@@ -85,6 +85,7 @@ RSpec.describe Case, type: :model do
     end
   end
 
+
   describe 'Email creation on Case creation' do
     subject do
       build(:case)
@@ -112,6 +113,52 @@ RSpec.describe Case, type: :model do
       subject.reload
 
       expect(subject.mailto_url).to include(created_ticket_token)
+    end
+  end
+
+  describe 'Email creation on assignee change' do
+
+    let(:initial_assignee) { nil }
+    let(:site) { create(:site) }
+    let(:cluster) { create(:cluster, site: site) }
+
+    subject do
+      create(:case, assignee: initial_assignee, cluster: cluster)
+    end
+
+    let :stub_mail do
+      obj = double
+      expect(obj).to receive(:deliver_later)
+      obj
+    end
+
+    context 'with no previous assignee' do
+      it 'sends an email' do
+        assignee = create(:admin)
+        subject.assignee = assignee
+
+        expect(CaseMailer).to receive(:change_assignee).with(
+          subject,
+          nil
+        ).and_return(stub_mail)
+
+        subject.save!
+      end
+    end
+
+    context 'with a previous assignee' do
+      let(:initial_assignee) { create(:user, site: site) }
+      it 'sends an email' do
+        assignee = create(:admin)
+        subject.assignee = assignee
+
+        expect(CaseMailer).to receive(:change_assignee).with(
+          subject,
+          initial_assignee
+        ).and_return(stub_mail)
+
+        subject.save!
+      end
     end
   end
 

@@ -49,6 +49,8 @@ GEM
       public_suffix (>= 2.0.2, < 4.0)
     arel (8.0.0)
     ast (2.4.0)
+    audited (4.7.1)
+      activerecord (>= 4.0, < 5.3)
     autoprefixer-rails (8.1.0)
       execjs
     aws-partitions (1.68.0)
@@ -395,6 +397,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_record_doctor
+  audited (~> 4.7)
   aws-sdk-s3
   bootsnap
   bootstrap (~> 4.0.0)

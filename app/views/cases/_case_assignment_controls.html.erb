@@ -1,0 +1,28 @@
+<% if current_user.admin? %>
+  <%= form_for @case, url: assign_case_path, method: :post do |f| %>
+    <div class="form-group">
+      <div class="input-group">
+      <%= f.collection_select(
+            :assignee_id,
+            @case.potential_assignees,
+            :id,
+            Proc.new { |a| "#{a.admin ? '* ' : ''}#{a.name}"},
+            {
+              include_blank: 'Nobody',
+            },
+            {
+              class: 'form-control'
+            }
+          )
+      %>
+        <div class="input-group-append">
+      <%= f.submit "Change assignment",
+                   class: 'btn btn-primary btn-sm'
+      %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <%= @case.assignee&.name or 'Nobody' %>
+<% end %>
