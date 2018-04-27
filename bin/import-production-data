@@ -43,6 +43,9 @@ import_backup() {
   backup_file_path="$1"
 
   log_info 'Creating fresh development database...'
+  # This is required if existing local development database is empty for some
+  # reason.
+  bin/rake db:environment:set RAILS_ENV=development
   bin/rake db:drop
   bin/rake db:create
 
