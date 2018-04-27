@@ -36,7 +36,7 @@
         <th>Tier</th>
         <td><%= @case.tier_description %>
         <th>RT Ticket ID</th>
-        <td><%= @case.rt_ticket_id %></td>
+        <td><%= @case.rt_ticket_id || 'N/A' %></td>
       </tr>
       <tr>
         <th>Chargeable</th>
