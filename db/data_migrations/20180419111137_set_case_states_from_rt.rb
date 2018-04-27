@@ -17,8 +17,6 @@ class SetCaseStatesFromRt < ActiveRecord::DataMigration
       :open
     when 'resolved', 'rejected', 'deleted'
       return :resolved
-    else
-      :open
     end
   end
 end
