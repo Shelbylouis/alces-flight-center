@@ -261,6 +261,86 @@ RSpec.describe Case, type: :model do
     it { is_expected.to eq 'component' }
   end
 
+  describe '#email_properties' do
+    let :site { create(:site) }
+
+    let :requestor do
+      create(:user, name: 'Some User', email: 'someuser@somecluster.com', site: site)
+    end
+
+    let :issue do
+      create(
+        :issue,
+        name: 'Crashed node',
+        requires_component: requires_component,
+        requires_service: requires_service,
+        category: category
+      )
+    end
+
+    let(:requires_component) { true }
+    let(:requires_service) { true }
+
+    let(:category) { create(:category, name: 'Hardware issue') }
+    let(:cluster) { create(:cluster, site: site, name: 'somecluster') }
+    let(:component) { create(:component, name: 'node01', cluster: cluster) }
+    let(:service) { create(:service, name: 'Some service', cluster: cluster) }
+
+    let(:kase) {
+      create(
+        :case,
+        rt_ticket_id: 1138,
+        created_at: Time.now,
+        cluster: cluster,
+        issue: issue,
+        component: component,
+        service: service,
+        user: requestor,
+        subject: 'my_subject',
+        tier_level: 3,
+        fields: [
+          {name: 'field1', value: 'value1'},
+          {name: 'field2', value: 'value2', optional: true},
+        ]
+      )
+    }
+
+    it 'includes all needed Case properties with values' do
+      expected_properties = {
+        Cluster: 'somecluster',
+        Category: 'Hardware issue',
+        Issue: 'Crashed node',
+        'Associated component': 'node01',
+        'Associated service': 'Some service',
+        Tier: '3 (Consultancy)',
+        Fields: {
+          field1: 'value1',
+          field2: 'value2',
+        }
+      }
+
+      expect(kase.email_properties).to eq expected_properties
+    end
+
+    context 'when no associated component' do
+      let(:requires_component) { false }
+      let(:component) { nil }
+
+      it 'does not include corresponding line' do
+        expect(kase.email_properties).not_to include(:'Associated component')
+      end
+    end
+
+    context 'when no associated service' do
+      let(:requires_service) { false }
+      let(:service) { nil }
+
+      it 'does not include corresponding line' do
+        expect(kase.email_properties).not_to include(:'Associated service')
+      end
+    end
+  end
+
   describe '#consultancy?' do
     it 'returns true when tier_level == 3' do
       kase = create(:case, tier_level: 3)

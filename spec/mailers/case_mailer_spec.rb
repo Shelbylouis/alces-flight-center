@@ -26,14 +26,11 @@ RSpec.describe 'Case mailer', :type => :mailer do
     create(
         :issue,
         name: 'Crashed node',
-        requires_component: requires_component,
-        requires_service: requires_service,
+        requires_component: true,
+        requires_service: true,
         category: category
     )
   end
-
-  let(:requires_component) { true }
-  let(:requires_service) { true }
 
   let(:category) { create(:category, name: 'Hardware issue') }
   let(:cluster) { create(:cluster, site: site, name: 'somecluster') }
@@ -51,11 +48,10 @@ RSpec.describe 'Case mailer', :type => :mailer do
         service: service,
         user: requestor,
         subject: 'my_subject',
-        details: <<-EOF.strip_heredoc
-          Oh no
-          my node
-          is broken
-    EOF
+        fields: [
+          {name: 'field1', value: 'value1'},
+          {name: 'field2', value: 'value2', optional: true},
+        ]
     )
   }
 
@@ -64,49 +60,45 @@ RSpec.describe 'Case mailer', :type => :mailer do
     site.additional_contacts = [additional_contact]
   end
 
-  it 'sends an email on case creation' do
-    mail = CaseMailer.new_case(kase)
-    expect(mail.subject).to eq "[helpdesk.alces-software.com #1138] somecluster: my_subject [#{kase.token}]"
+  describe 'Case creation email' do
+    subject { CaseMailer.new_case(kase) }
 
-    expect(mail.to).to eq nil
-    expect(mail.cc).to match_array %w(another.user@somecluster.com mailing-list@somecluster.com)
-    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
-
-    expected_body = <<EOF
-Requestor: Some User
-Cluster: somecluster
-Category: Hardware issue
-Issue: Crashed node
-Associated component: node01
-Associated service: Some service
-Details: Oh no
- my node
- is broken
-EOF
-
-    expect(mail.body.encoded).to match(expected_body)
-  end
-
-  context 'when no associated component' do
-    let(:requires_component) { false }
-    let(:component) { nil }
-
-    it 'does not include corresponding line in email text' do
-      mail = CaseMailer.new_case(kase)
-      expect(mail.body.encoded).not_to match('Associated component:')
+    it 'has correct subject' do
+      expect(
+        subject.subject
+      ).to eq "[helpdesk.alces-software.com #1138] somecluster: my_subject [#{kase.token}]"
     end
 
-  end
-
-  context 'when no associated service' do
-    let(:requires_service) { false }
-    let(:service) { nil }
-
-    it 'does not include corresponding line in email text' do
-      mail = CaseMailer.new_case(kase)
-      expect(mail.body.encoded).not_to match('Associated service:')
+    it 'has correct addressees' do
+      expect(subject.to).to eq nil
+      expect(subject.cc).to match_array %w(another.user@somecluster.com mailing-list@somecluster.com)
+      expect(subject.bcc).to match_array(['tickets@alces-software.com'])
     end
 
+    [:text, :html].each do |format|
+      describe "#{format} body" do
+        let :raw_body do
+          subject.send("#{format}_part").body.raw_source
+        end
+
+        it 'includes required lines' do
+          expected_lines = [
+            /Cluster:.* somecluster/m,
+            /Category:.* Hardware issue/m,
+            /Issue:.* Crashed node/m,
+            /Associated component:.* node01/m,
+            /Associated service:.* Some service/m,
+            /Fields:/,
+            /field1:.* value1/m,
+            /field2:.* value2/m,
+          ]
+
+          expected_lines.each do |line|
+            expect(raw_body).to match(line)
+          end
+        end
+      end
+    end
   end
 
   it 'sends an email on case comment being added' do

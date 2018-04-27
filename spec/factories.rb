@@ -89,6 +89,7 @@ FactoryBot.define do
     fields [{
       type: 'input',
       name: 'some_field',
+      value: 'some_value',
     }]
 
     factory :level_1_tier do

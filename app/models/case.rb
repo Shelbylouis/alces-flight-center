@@ -177,10 +177,16 @@ class Case < ApplicationRecord
     "#{cluster.name}: #{subject} [#{token}]"
   end
 
-  def text_summary
-    # Ticket text does not need to be in this format, it is just text, but this
-    # is readable and an adequate format for now.
-    Utils.rt_format(case_properties)
+  def email_properties
+    {
+      Cluster: cluster.name,
+      Category: category&.name,
+      'Issue': issue.name,
+      'Associated component': component&.name,
+      'Associated service': service&.name,
+      Tier: decorate.tier_description,
+      Fields: field_hash,
+    }.reject { |_k, v| v.nil? }
   end
 
   def consultancy?
@@ -262,18 +268,6 @@ class Case < ApplicationRecord
       end.join
   end
 
-  def case_properties
-    {
-      Requestor: user.name,
-      Cluster: cluster.name,
-      Category: category&.name,
-      'Issue': issue.name,
-      'Associated component': component&.name,
-      'Associated service': service&.name,
-      Details: details,
-    }.reject { |_k, v| v.nil? }
-  end
-
   def send_new_case_email
     CaseMailer.new_case(self).deliver_later
   end
@@ -286,5 +280,12 @@ class Case < ApplicationRecord
   def validates_user_assignment
     return if assignee.nil?
     errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
+  end
+
+  def field_hash
+    fields.map do |f|
+      f = f.with_indifferent_access
+      [f.fetch(:name), f.fetch(:value)]
+    end.to_h.symbolize_keys
   end
 end
