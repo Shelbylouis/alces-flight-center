@@ -22,8 +22,8 @@ class Deployment
     run 'git push origin'
     run "git push -f #{remote}"
 
-    run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run #{app_name} rake db:migrate'"
-    run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run #{app_name} rake data:migrate'"
+    dokku_run 'rake db:migrate', app: app_name
+    dokku_run 'rake data:migrate', app: app_name
 
     run "git tag #{remote} master -f"
     run "git tag #{tag} master"
@@ -54,6 +54,10 @@ class Deployment
 
   def today
     Date.today.iso8601
+  end
+
+  def dokku_run(command, app:)
+    run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run #{app} #{command}'"
   end
 
   def run(*args)
