@@ -20,7 +20,7 @@ class Deployment
 
     run 'git checkout master'
     run 'git push origin'
-    run "git push #{remote}"
+    run "git push -f #{remote}"
 
     run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run #{app_name} rake db:migrate'"
     run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run #{app_name} rake data:migrate'"
