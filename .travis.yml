@@ -5,3 +5,5 @@ rvm:
 sudo: required
 install:
   - bin/setup
+addons:
+  postgresql: "9.6"

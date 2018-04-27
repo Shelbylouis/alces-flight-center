@@ -1,0 +1,25 @@
+A new support case has been created:
+
+<%= @case.ticket_subject %>
+
+-------------------------------------------------------------------------------
+<%= @case.created_at.to_formatted_s(:long) %> - <%= @case.user.name %>:
+
+<% @case.email_properties.each do |key, value| %>
+  <% if value.is_a?(Hash) %>
+  <%= key %>:
+    <% value.each do |k, v| -%>
+      <% if v.include?("\n") %>
+      <%= k %>: <% v.split(/\n+/).each do |line| %>
+        <%= line %>
+      <% end %>
+      <% else %>
+      <%= k %>: <%= v %>
+      <% end %>
+    <% end %>
+  <% else %>
+  <%= key %>: <%= value %>
+  <% end %>
+<% end %>
+
+-------------------------------------------------------------------------------

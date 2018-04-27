@@ -5,22 +5,25 @@ module Cluster
         , asServicesIn
         , decoder
         , extractId
+        , setSelectedCategory
         , setSelectedComponent
+        , setSelectedIssue
         , setSelectedService
-        , setSelectedServiceSelectedCategory
-        , setSelectedServiceSelectedIssue
-        , setSelectedServiceWhere
+        , setSelectedTier
         , setServices
+        , updateSelectedIssue
         )
 
 import Category
 import Component exposing (Component)
-import Issue
+import Issue exposing (Issue)
+import Issues
 import Json.Decode as D
 import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)
+import Tier
 import Utils
 
 
@@ -74,20 +77,15 @@ asComponentsIn cluster components =
 
 setSelectedService : SelectList Cluster -> Service.Id -> SelectList Cluster
 setSelectedService clusters serviceId =
-    setSelectedServiceWhere clusters (Utils.sameId serviceId)
-
-
-setSelectedServiceWhere : SelectList Cluster -> (Service -> Bool) -> SelectList Cluster
-setSelectedServiceWhere clusters shouldSelect =
     SelectList.Extra.nestedSelect
         clusters
         .services
         asServicesIn
-        shouldSelect
+        (Utils.sameId serviceId)
 
 
-setSelectedServiceSelectedCategory : SelectList Cluster -> Category.Id -> SelectList Cluster
-setSelectedServiceSelectedCategory clusters categoryId =
+setSelectedCategory : SelectList Cluster -> Category.Id -> SelectList Cluster
+setSelectedCategory clusters categoryId =
     let
         updateService =
             SelectList.Extra.mapSelected (Service.setSelectedCategory categoryId)
@@ -99,8 +97,8 @@ setSelectedServiceSelectedCategory clusters categoryId =
         updateService
 
 
-setSelectedServiceSelectedIssue : SelectList Cluster -> Issue.Id -> SelectList Cluster
-setSelectedServiceSelectedIssue clusters issueId =
+setSelectedIssue : SelectList Cluster -> Issue.Id -> SelectList Cluster
+setSelectedIssue clusters issueId =
     let
         updateService =
             SelectList.Extra.mapSelected (Service.setSelectedIssue issueId)
@@ -110,6 +108,35 @@ setSelectedServiceSelectedIssue clusters issueId =
         .services
         asServicesIn
         updateService
+
+
+setSelectedTier : SelectList Cluster -> Tier.Id -> SelectList Cluster
+setSelectedTier clusters tierId =
+    updateSelectedIssue clusters (Issue.selectTier tierId)
+
+
+updateSelectedIssue : SelectList Cluster -> (Issue -> Issue) -> SelectList Cluster
+updateSelectedIssue clusters changeIssue =
+    let
+        updateCluster =
+            \cluster ->
+                SelectList.Extra.mapSelected updateService cluster.services
+                    |> asServicesIn cluster
+
+        updateService =
+            \service ->
+                updateIssues service.issues
+                    |> Service.asIssuesIn service
+
+        updateIssues =
+            Issues.mapIssue changeIssue
+
+        updateCategory =
+            \category ->
+                SelectList.Extra.mapSelected changeIssue category.issues
+                    |> Category.asIssuesIn category
+    in
+    SelectList.Extra.mapSelected updateCluster clusters
 
 
 setServices : SelectList Service -> Cluster -> Cluster

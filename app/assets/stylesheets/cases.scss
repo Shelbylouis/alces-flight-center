@@ -6,3 +6,46 @@
 .credit-charge-required-case-row {
   background-color: lightgreen;
 }
+
+.case-form {
+  hr {
+    background-color: #777;
+
+    $margin: 25px;
+    margin-top: $margin;
+    margin-bottom: $margin;
+  }
+
+  section {
+    padding: 10px;
+  }
+
+  .disabled-section {
+    border: 1px #111 solid;
+    border-radius: 5px;
+    opacity: 0.5;
+  }
+
+  // Make disabled select options look disabled.
+  select option:disabled {
+   background: #ccc;
+   color: #000;
+  }
+}
+
+.event-card {
+  .card-header {
+    span {
+      display: block;
+      flex-grow: 1;
+    }
+
+    .icon {
+      width: auto;
+    }
+  }
+}
+
+.case-table th {
+  text-align: right;
+}

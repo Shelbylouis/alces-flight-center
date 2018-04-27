@@ -38,6 +38,7 @@ gem "sentry-raven"
 gem 'state_machines-activerecord'
 gem 'state_machines-audit_trail'
 gem 'business_time'
+gem "audited", "~> 4.7"
 
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.
@@ -53,6 +54,10 @@ gem 'jbuilder', '~> 2.5'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
+
+# For pretty emails
+gem 'roadie-rails', '~> 1.0'
+gem 'sass'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

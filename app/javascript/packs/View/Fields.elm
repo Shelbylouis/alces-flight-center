@@ -1,85 +1,90 @@
 module View.Fields
     exposing
-        ( hiddenInputWithVisibleError
-        , inputField
+        ( inputField
         , selectField
-        , textareaField
+        , textField
         )
 
-import FieldValidation exposing (FieldValidation(..))
+import Bootstrap.Badge as Badge
+import Bootstrap.Utilities.Spacing as Spacing
+import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Json.Decode as D
+import Maybe.Extra
 import SelectList exposing (Position(..), SelectList)
+import State exposing (State)
 import String.Extra
+import Types
+import Validation exposing (Error, ErrorMessage(..))
 
 
 selectField :
-    String
+    Field
     -> SelectList a
     -> (a -> Int)
     -> (a -> String)
-    -> (a -> FieldValidation a)
+    -> (a -> Bool)
     -> (String -> msg)
+    -> State
     -> Html msg
-selectField fieldName items toId toOptionLabel validate changeMsg =
+selectField field items toId toOptionLabel isDisabled changeMsg state =
     let
-        validatedField =
-            SelectList.selected items |> validate
-
         fieldOption =
-            \position ->
-                \item ->
-                    option
-                        [ toId item |> toString |> value
-                        , position == Selected |> selected
-                        , validate item |> FieldValidation.isInvalid |> disabled
-                        ]
-                        [ toOptionLabel item |> text ]
+            \position item ->
+                option
+                    [ toId item |> toString |> value
+                    , position == Selected |> selected
+                    , isDisabled item |> disabled
+                    ]
+                    [ toOptionLabel item |> text ]
 
         options =
             SelectList.mapBy fieldOption items
                 |> SelectList.toList
     in
-    formField fieldName
+    formField field
         (SelectList.selected items)
-        validatedField
         select
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
+        False
+        state
 
 
-textareaField : String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
-textareaField =
-    textField TextArea
-
-
-inputField : String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
+inputField :
+    Field
+    -> a
+    -> (a -> String)
+    -> (String -> msg)
+    -> Bool
+    -> State
+    -> Html msg
 inputField =
-    textField Input
+    textField Types.Input
 
 
-type TextField
-    = Input
-    | TextArea
-
-
-textField : TextField -> String -> a -> (a -> String) -> (a -> FieldValidation a) -> (String -> msg) -> Html msg
-textField textFieldType fieldName item toContent validate inputMsg =
+textField :
+    Types.TextField
+    -> Field
+    -> a
+    -> (a -> String)
+    -> (String -> msg)
+    -> Bool
+    -> State
+    -> Html msg
+textField textFieldType field item toContent inputMsg optional state =
     let
-        validatedField =
-            validate item
-
         content =
             toContent item
 
         ( element, additionalAttributes ) =
             case textFieldType of
-                Input ->
+                Types.Input ->
                     ( input, [] )
 
-                TextArea ->
+                Types.TextArea ->
                     ( textarea, [ rows 10 ] )
 
         attributes =
@@ -88,12 +93,13 @@ textField textFieldType fieldName item toContent validate inputMsg =
             ]
                 ++ additionalAttributes
     in
-    formField fieldName
+    formField field
         item
-        validatedField
         element
         attributes
         []
+        optional
+        state
 
 
 type alias HtmlFunction msg =
@@ -101,53 +107,60 @@ type alias HtmlFunction msg =
 
 
 formField :
-    String
+    Field
     -> a
-    -> FieldValidation a
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
+    -> Bool
+    -> State
     -> Html msg
-formField fieldName item validation htmlFn additionalAttributes children =
+formField field item htmlFn additionalAttributes children optional state =
     let
+        fieldName =
+            case field of
+                Field.TierField data ->
+                    data.name
+
+                _ ->
+                    toString field
+
+        fieldIsUnavailable =
+            tierIsUnavailable && Field.isDynamicField field
+
+        tierIsUnavailable =
+            State.selectedTierSupportUnavailable state
+
         identifier =
             fieldIdentifier fieldName
+
+        optionalBadge =
+            if optional then
+                Badge.badgeSuccess [ Spacing.ml1 ] [ text "Optional" ]
+            else
+                text ""
 
         attributes =
             List.append
                 [ id identifier
-                , class (formControlClasses validation)
+                , class (formControlClasses field errors)
+                , disabled fieldIsUnavailable
                 ]
                 additionalAttributes
 
         formElement =
             htmlFn attributes children
+
+        errors =
+            Validation.validateField field state
     in
     div [ class "form-group" ]
         [ label
             [ for identifier ]
             [ text fieldName ]
+        , optionalBadge
         , formElement
-        , validationFeedback item validation
-        ]
-
-
-hiddenInputWithVisibleError : a -> (a -> FieldValidation a) -> Html msg
-hiddenInputWithVisibleError item validate =
-    let
-        validation =
-            validate item
-
-        formElement =
-            input
-                [ type_ "hidden"
-                , class (formControlClasses validation)
-                ]
-                []
-    in
-    div [ class "form-group" ]
-        [ formElement
-        , validationFeedback item validation
+        , validationFeedback errors
         ]
 
 
@@ -157,23 +170,50 @@ fieldIdentifier fieldName =
         |> String.Extra.dasherize
 
 
-formControlClasses : FieldValidation a -> String
-formControlClasses validation =
-    "form-control " ++ bootstrapValidationClass validation
+formControlClasses : Field -> List Error -> String
+formControlClasses field errors =
+    "form-control " ++ bootstrapValidationClass field errors
 
 
-bootstrapValidationClass : FieldValidation a -> String
-bootstrapValidationClass validation =
-    case validation of
-        Valid ->
-            "is-valid"
+bootstrapValidationClass : Field -> List Error -> String
+bootstrapValidationClass field errors =
+    let
+        validationClass =
+            if List.isEmpty errors then
+                "is-valid"
+            else
+                "is-invalid"
+    in
+    if Field.hasBeenTouched field then
+        validationClass
+    else
+        -- If the field is not considered to have been touched yet then just
+        -- give nothing, rather than showing either success or failure, to
+        -- avoid showing the user many errors for fields they haven't yet
+        -- looked at.
+        ""
 
-        Invalid _ ->
-            "is-invalid"
 
+validationFeedback : List Error -> Html msg
+validationFeedback errors =
+    let
+        combinedErrorMessages =
+            List.map unpackErrorMessage errorMessages
+                |> Maybe.Extra.values
+                |> String.join "; "
 
-validationFeedback : a -> FieldValidation a -> Html msg
-validationFeedback item validation =
+        errorMessages =
+            List.map Tuple.second errors
+
+        unpackErrorMessage =
+            \error ->
+                case error of
+                    Empty ->
+                        Nothing
+
+                    Message message ->
+                        Just message
+    in
     div
         [ class "invalid-feedback" ]
-        [ FieldValidation.error item validation |> text ]
+        [ text combinedErrorMessages ]

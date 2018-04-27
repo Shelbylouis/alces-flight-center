@@ -10,8 +10,12 @@ RSpec.describe 'Cases table', type: :feature do
     create(:open_case, cluster: cluster, subject: 'Open case')
   end
 
+  let! :resolved_case do
+    create(:resolved_case, cluster: cluster, subject: 'Resolved case', completed_at: 1.days.ago, rt_ticket_id: nil)
+  end
+
   let! :archived_case do
-    create(:archived_case, cluster: cluster, subject: 'Archived case')
+    create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
   end
 
   RSpec.shared_examples 'open cases table rendered' do
@@ -20,15 +24,14 @@ RSpec.describe 'Cases table', type: :feature do
 
       cases = all('tr').map(&:text)
       expect(cases).to have_text('Open case')
+      expect(cases).not_to have_text('Resolved case')
       expect(cases).not_to have_text('Archived case')
 
       headings = all('th').map(&:text)
       expect(headings).to include('Contact support')
-      expect(headings).to include('Archive')
 
       links = all('a').map { |a| a[:href] }
       expect(links).to include(open_case.mailto_url)
-      expect(links).to include(archive_case_path(open_case))
     end
   end
 
@@ -47,21 +50,15 @@ RSpec.describe 'Cases table', type: :feature do
 
         cases = all('tr').map(&:text)
         expect(cases).to have_text('Open case')
+        expect(cases).to have_text('Resolved case')
+        expect(cases).to have_text('Archived case')
 
         headings = all('th').map(&:text)
         expect(headings).to include('Contact support')
-        expect(headings).to include('Archive/Restore')
 
         links = all('a').map { |a| a[:href] }
         expect(links).to include(open_case.mailto_url)
-        expect(links).to include(archive_case_path(open_case))
 
-        archived_case_row = find('.archived-case-row')
-        expect(archived_case_row).to have_text('Archived case')
-
-        archived_case_links = archived_case_row.all('a').map { |a| a[:href] }
-        expect(archived_case_links).not_to include(archived_case.mailto_url)
-        expect(archived_case_links).to include(restore_case_path(archived_case))
       end
     end
   end
@@ -98,50 +95,187 @@ RSpec.describe 'Cases table', type: :feature do
           find('.archived-case-row')
         end.to raise_error(Capybara::ElementNotFound)
       end
+    end
+  end
+end
 
-      ['resolved', 'rejected', 'deleted'].each do |completion_status|
-        it "reloads Case ticket status on load until reaches #{completion_status}" do
-          expect(
-            Case.request_tracker
-          ).to receive(
-            :show_ticket
-          ).thrice do |ticket_id|
-            # Return object with status specific to particular ticket given; do
-            # this explicitly rather than using `and_return` with multiple
-            # values as that was failing intermittently, likely due to it not
-            # being entirely deterministic the order we request ticket info in.
-            case ticket_id
-            when open_case.rt_ticket_id
-              OpenStruct.new(status: 'open')
-            when archived_case.rt_ticket_id
-              OpenStruct.new(status: completion_status)
-            end
-          end
+RSpec.describe 'Case page' do
+  let! (:contact) { create(:contact, site: site) }
+  let! (:admin) { create(:admin) }
+  let (:site) { create(:site, name: 'My Site') }
+  let (:cluster) { create(:cluster, site: site) }
+  let (:assignee) { nil }
 
-          # Neither Case's ticket has reached completion status yet so both
-          # should have reloaded RT ticket status.
-          visit archives_site_cases_path(site, as: user)
-          expect(open_case.reload.last_known_ticket_status).to eq 'open'
-          expect(archived_case.reload.last_known_ticket_status).to eq completion_status
+  let :open_case do
+    create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee)
+  end
 
-          tds = all('td').map(&:text)
-          expect(tds).to include('open')
-          expect(tds).to include(completion_status)
+  let :resolved_case do
+    create(:resolved_case, cluster: cluster, subject: 'Resolved case')
+  end
 
-          # Archived Case has reached completion status so ticket status is not
-          # reloaded.
-          visit archives_site_cases_path(site, as: user)
-          expect(open_case.reload.last_known_ticket_status).to eq 'open'
-          expect(archived_case.reload.last_known_ticket_status).to eq completion_status
+  let :archived_case do
+    create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
+  end
 
-          tds = all('td').map(&:text)
-          expect(tds).to include('open')
-          expect(tds).to include(completion_status)
+  let (:mw) { create(:maintenance_window, case: open_case) }
 
-          headings = all('th').map(&:text)
-          expect(headings).to include('Ticket status')
-        end
+  let :comment_form_class { '#new_case_comment' }
+  let :comment_button_text { 'Add new comment' }
+
+  describe 'events list' do
+    it 'shows events in chronological order' do
+      create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
+      create(
+        :maintenance_window_state_transition,
+        maintenance_window: mw,
+        user: admin,
+        event: :request
+      )
+      create(:case_comment, case: open_case, user: admin, created_at: 4.hours.ago, text: 'First')
+
+      # Generate an assignee-change audit entry
+      open_case.assignee = admin
+      open_case.save
+
+      visit case_path(open_case, as: admin)
+
+      event_cards = all('.event-card')
+      expect(event_cards.size).to eq(4)
+
+      expect(event_cards[0].find('.card-body').text).to eq('First')
+      expect(event_cards[1].find('.card-body').text).to eq('Second')
+      expect(event_cards[2].find('.card-body').text).to match(
+        /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
+      )
+      expect(event_cards[3].find('.card-body').text).to eq(
+          'Assigned this case to A Scientist.'
+      )
+    end
+  end
+
+  describe 'comments form' do
+    it 'shows or hides add comment form for contacts' do
+      visit case_path(open_case, as: contact)
+
+      form = find('#new_case_comment')
+      form.find('#case_comment_text')
+
+      expect(form.find('input').value).to eq 'Add new comment'
+
+      visit case_path(resolved_case, as: contact)
+      expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+
+      visit case_path(archived_case, as: contact)
+      expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    end
+
+    it 'shows or hides add comment form for admins' do
+      visit case_path(open_case, as: admin)
+
+      form = find('#new_case_comment')
+      form.find('#case_comment_text')
+
+      expect(form.find('input').value).to eq 'Add new comment'
+
+      visit case_path(resolved_case, as: admin)
+      expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+
+      visit case_path(archived_case, as: admin)
+      expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+    end
+  end
+
+  describe 'state controls' do
+    it 'hides state controls for contacts' do
+      visit case_path(open_case, as: contact)
+      expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+
+      visit case_path(resolved_case, as: contact)
+      expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+
+      visit case_path(archived_case, as: contact)
+      expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+    end
+
+    it 'shows or hides state controls for admins' do
+      visit case_path(open_case, as: admin)
+
+      expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
+
+      visit case_path(resolved_case, as: admin)
+      expect(find('#case-state-controls').find('a').text).to eq 'Archive this case'
+
+      visit case_path(archived_case, as: admin)
+      expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
+    end
+  end
+
+  describe 'case assignment' do
+    it 'hides assignment controls for contacts' do
+      visit case_path(open_case, as: contact)
+      assignment_td = find('#case-assignment')
+      expect { assignment_td.find('input') }.to raise_error(Capybara::ElementNotFound)
+      expect(assignment_td.text).to eq('Nobody')
+    end
+
+    it 'displays assignment controls for admins' do
+      visit case_path(open_case, as: admin)
+      assignment_select = find('#case-assignment').find('select')
+
+      options = assignment_select.all('option').map(&:text)
+      expect(options).to eq(['Nobody', 'A Scientist', '* A Scientist'])
+    end
+
+    context 'when a case has an assignee' do
+      let(:assignee) { contact }
+      it 'preselects the current assignee' do
+        visit case_path(open_case, as: admin)
+        assignment_select = find('#case-assignment').find('select')
+
+        expect(assignment_select.value).to eq(contact.id.to_s)
       end
     end
+  end
+  
+  describe 'Commenting' do
+
+    context 'for open non-consultancy Case' do
+      subject { create(:open_case, cluster: cluster, tier_level: 2) }
+
+      it 'disables commenting for site contact' do
+        visit case_path(subject, as: contact)
+
+        form = find(comment_form_class)
+        expect(form.find('textarea')).to be_disabled
+        expect(form).to have_button(comment_button_text, disabled: true)
+      end
+    end
+
+    it 'allows a comment to be added' do
+      visit case_path(open_case, as: admin)
+
+      fill_in 'case_comment_text', with: 'This is a test comment'
+      click_button 'Add new comment'
+
+      open_case.reload
+
+      expect(open_case.case_comments.count).to be 1
+      expect(find('.event-card').find('.card-body').text).to eq('This is a test comment')
+      expect(find('.alert')).to have_text('New comment added')
+    end
+
+    it 'does not allow empty comments' do
+      visit case_path(open_case, as: admin)
+
+      fill_in 'case_comment_text', with: ''
+      click_button 'Add new comment'
+
+      open_case.reload
+
+      expect(open_case.case_comments.count).to be 0
+      expect(find('.alert')).to have_text('Empty comments are not permitted')
+    end
+
   end
 end

@@ -78,8 +78,14 @@ RSpec.describe CasesController, type: :controller do
           cluster_id: first_cluster.id,
           component_id: first_cluster_component.id,
           issue_id: create(:issue_requiring_component).id,
-          subject: 'subject',
-          details: 'Useful info'
+          subject: 'some_subject',
+          details: 'Useful info',
+          tier_level: 2,
+          fields: [{
+            type: 'textarea',
+            name: 'some_field',
+            value: 'some_value',
+          }],
         }
       }
     end
@@ -93,7 +99,7 @@ RSpec.describe CasesController, type: :controller do
     def expect_case_created
       user_cases = Case.where(user: user)
       expect(user_cases.length).to eq 1
-      expect(user_cases.first.details).to eq('Useful info')
+      expect(user_cases.first.subject).to eq('some_subject')
     end
 
     context 'when JSON request' do
@@ -150,6 +156,44 @@ RSpec.describe CasesController, type: :controller do
           expect(response).to redirect_to(root_path)
         end
       end
+    end
+  end
+
+  describe 'case state management' do
+    let (:open_case) {
+      create(:open_case)
+    }
+
+    let (:resolved_case) {
+      create(:resolved_case)
+    }
+
+    let (:archived_case) {
+      create(:archived_case)
+    }
+
+    let(:admin) { create(:admin) }
+
+    before(:each) { sign_in_as(admin) }
+
+    it 'resolves an open case' do
+      post :resolve, params: { id: open_case.id }
+      expect(flash[:success]).to eq "Support case ##{open_case.id} resolved."
+    end
+
+    it 'archives a resolved case' do
+      post :archive, params: { id: resolved_case.id }
+      expect(flash[:success]).to eq "Support case ##{resolved_case.id} archived."
+    end
+
+    it 'does not resolve an archived case' do
+      post :resolve, params: { id: archived_case.id }
+      expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "resolve"'
+    end
+
+    it 'does not archive an open case' do
+      post :archive, params: { id: open_case.id }
+      expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "archive"'
     end
   end
 end

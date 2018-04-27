@@ -40,9 +40,10 @@ class Issue < ApplicationRecord
 
   belongs_to :category, required: false
   belongs_to :service_type, required: false
+  has_many :cases
+  has_many :tiers
 
   validates :name, presence: true
-  validates :details_template, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
   validates :identifier, uniqueness: true, if: :identifier
   validates :chargeable, inclusion: {in: [true, false]}
@@ -52,6 +53,8 @@ class Issue < ApplicationRecord
               message: 'can only require particular service type if issue requires service',
             },
             unless: :requires_service
+
+  after_create :create_standard_consultancy_tier
 
   def advice_only?
     support_type == 'advice-only'
@@ -71,15 +74,31 @@ class Issue < ApplicationRecord
     {
       id: id,
       name: name,
-      detailsTemplate: details_template,
       defaultSubject: default_subject,
       requiresComponent: requires_component,
       supportType: support_type,
-      chargeable: chargeable
+      chargeable: chargeable,
+      tiers: tiers.map(&:case_form_json)
     }
   end
 
   def default_subject
     name
+  end
+
+  private
+
+  def create_standard_consultancy_tier
+    # By default we want to support the creation of a Tier 3/consultancy Case,
+    # with the ability to provide any arbitrary details, for every Issue.
+    self.tiers.create!(
+      level: 3,
+      fields: [
+        {
+          type: 'textarea',
+          name: 'Details',
+        }
+      ]
+    )
   end
 end

@@ -1,6 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe MaintenanceWindow, type: :model do
+
+  let :stub_mail do
+    obj = double
+    expect(obj).to receive(:deliver_later)
+    obj
+  end
+
   describe 'states' do
     it 'is initially in new state' do
       window = create(:maintenance_window)
@@ -16,16 +23,16 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject).to be_cancelled
       end
 
-      it 'has RT ticket comment added when cancelled' do
+      it 'generates an email when cancelled' do
         subject.component = create(:component, name: 'some_component')
         user = create(:admin, name: 'some_user')
 
-        expect(Case.request_tracker).to receive(
-          :add_ticket_correspondence
+        expect(CaseMailer).to receive(
+          :maintenance
         ).with(
-          id: subject.case.rt_ticket_id,
-          text: /Request for maintenance of some_component cancelled by some_user/
-        )
+          subject.case,
+          /Request for maintenance of some_component cancelled by some_user/
+        ).and_return(stub_mail)
 
         subject.cancel!(user)
       end
@@ -38,7 +45,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject).to be_expired
       end
 
-      it 'has RT ticket comment added when auto-expired' do
+      it 'generates an email when auto-expired' do
         subject.component = create(:component, name: 'some_component')
 
         expected_start = subject.requested_start.to_formatted_s(:short)
@@ -50,9 +57,9 @@ RSpec.describe MaintenanceWindow, type: :model do
           maintenance of some_component was not confirmed before requested
           start.*#{expected_start}.*rescheduled.*confirmed.*#{expected_cluster_dashboard_url}
         REGEX
-        expect(Case.request_tracker).to receive(
-          :add_ticket_correspondence
-        ).with(id: subject.case.rt_ticket_id, text: text_regex)
+        expect(CaseMailer).to receive(
+          :maintenance
+        ).with(subject.case, text_regex).and_return(stub_mail)
 
         subject.auto_expire!
       end
@@ -66,7 +73,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject).to be_requested
       end
 
-      it 'has RT ticket comment added when requested' do
+      it 'generates an email when requested' do
         subject.component = create(:component, name: 'some_component')
         subject.requested_start = 1.days.since
         requestor = create(:admin, name: 'some_user')
@@ -81,9 +88,10 @@ RSpec.describe MaintenanceWindow, type: :model do
           requested.*some_component.*#{expected_start}.*#{expected_end}.*by
           some_user.*must be confirmed.*#{expected_cluster_dashboard_url}
         REGEX
-        expect(Case.request_tracker).to receive(
-          :add_ticket_correspondence
-        ).with( id: subject.case.rt_ticket_id, text: text_regex)
+        expect(CaseMailer).to receive(
+          :maintenance
+        ).with(subject.case, text_regex)
+        .and_return(stub_mail)
 
         subject.request!(requestor)
       end
@@ -98,7 +106,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject.confirmed_by).to eq(user)
       end
 
-      it 'has RT ticket comment added when confirmed' do
+      it 'generates an email when confirmed' do
         subject.component = create(:component, name: 'some_component')
         user = create(:user, name: 'some_user')
 
@@ -108,9 +116,10 @@ RSpec.describe MaintenanceWindow, type: :model do
           maintenance.*some_component.*confirmed by
           some_user.*scheduled.*#{expected_start}.*#{expected_end}
         REGEX
-        expect(Case.request_tracker).to receive(
-          :add_ticket_correspondence
-        ).with(id: subject.case.rt_ticket_id, text: text_regex)
+        expect(CaseMailer).to receive(
+          :maintenance
+        ).with(subject.case, text_regex)
+        .and_return(stub_mail)
 
         subject.confirm!(user)
       end
@@ -125,7 +134,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject.confirmed_by).to eq user
       end
 
-      it 'has RT ticket added when mandated' do
+      it 'generates an email when mandated' do
         subject.component = create(:component, name: 'some_component')
         user = create(:admin, name: 'some_admin')
 
@@ -135,9 +144,10 @@ RSpec.describe MaintenanceWindow, type: :model do
           Maintenance.*some_component.*scheduled.*from #{expected_start} until
           #{expected_end} by.*some_admin.*mandatory
         EOF
-        expect(Case.request_tracker).to receive(
-          :add_ticket_correspondence
-        ).with(id: subject.case.rt_ticket_id, text: text_regex)
+        expect(CaseMailer).to receive(
+          :maintenance
+        ).with(subject.case, text_regex)
+        .and_return(stub_mail)
 
         subject.mandate!(user)
       end
@@ -151,16 +161,16 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject).to be_rejected
       end
 
-      it 'has RT ticket comment added when rejected' do
+      it 'generates an email when rejected' do
         subject.component = create(:component, name: 'some_component')
         user = create(:user, name: 'some_user')
 
-        expect(Case.request_tracker).to receive(
-          :add_ticket_correspondence
+        expect(CaseMailer).to receive(
+          :maintenance
         ).with(
-          id: subject.case.rt_ticket_id,
-          text: /maintenance.*some_component.*rejected by some_user/
-        )
+          subject.case,
+          /maintenance.*some_component.*rejected by some_user/
+        ).and_return(stub_mail)
 
         subject.reject!(user)
       end
@@ -173,7 +183,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject).to be_started
       end
 
-      it 'has RT ticket comment added when auto-started' do
+      it 'generates an email when auto-started' do
         subject.component = create(:component, name: 'some_component')
 
         expected_end = subject.expected_end.to_formatted_s(:short)
@@ -181,9 +191,10 @@ RSpec.describe MaintenanceWindow, type: :model do
           maintenance of some_component .* started.*this component.*under
           maintenance until #{expected_end}
         REGEX
-        expect(Case.request_tracker).to receive(
-          :add_ticket_correspondence
-        ).with(id: subject.case.rt_ticket_id, text: text_regex)
+        expect(CaseMailer).to receive(
+          :maintenance
+        ).with(subject.case, text_regex)
+        .and_return(stub_mail)
 
         subject.auto_start!
       end
@@ -201,7 +212,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject.state).to eq(original_state)
       end
 
-      it 'has RT ticket comment added when auto-started' do
+      it 'generates an email when auto-started' do
         subject.component = create(:component, name: 'some_component')
         subject.duration = 5
 
@@ -212,9 +223,10 @@ RSpec.describe MaintenanceWindow, type: :model do
           extended.*this component.*under maintenance from #{expected_start}
           until #{expected_end}
         REGEX
-        expect(Case.request_tracker).to receive(
-          :add_ticket_correspondence
-        ).with(id: subject.case.rt_ticket_id, text: text_regex)
+        expect(CaseMailer).to receive(
+          :maintenance
+        ).with(subject.case, text_regex)
+        .and_return(stub_mail)
 
         subject.extend_duration!(create(:admin))
       end
@@ -227,13 +239,13 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject).to be_ended
       end
 
-      it 'has RT ticket comment added when auto-ended' do
+      it 'generates an email when auto-ended' do
         subject.component = create(:component, name: 'some_component')
 
-        expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
-          id: subject.case.rt_ticket_id,
-          text: /maintenance of some_component .* ended/
-        )
+        expect(CaseMailer).to receive(:maintenance).with(
+          subject.case,
+          /maintenance of some_component .* ended/
+        ).and_return(stub_mail)
 
         subject.auto_end!
       end
@@ -248,14 +260,14 @@ RSpec.describe MaintenanceWindow, type: :model do
         expect(subject.ended_by).to eq admin
       end
 
-      it 'has RT ticket comment added when ended' do
+      it 'generates an email when ended' do
         admin = create(:admin, name: 'some_admin')
         subject.component = create(:component, name: 'some_component')
 
-        expect(Case.request_tracker).to receive(:add_ticket_correspondence).with(
-          id: subject.case.rt_ticket_id,
-          text: /maintenance of some_component ended by some_admin/i
-        )
+        expect(CaseMailer).to receive(:maintenance).with(
+          subject.case,
+          /maintenance of some_component ended by some_admin/i
+        ).and_return(stub_mail)
 
         subject.end!(admin)
       end
@@ -314,7 +326,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       window = create(:maintenance_window, state: :started)
       window.legacy_migration_mode = true
 
-      expect(Case.request_tracker).not_to receive(:add_ticket_correspondence)
+      expect(CaseMailer).not_to receive(:maintenance)
 
       window.auto_end!
     end

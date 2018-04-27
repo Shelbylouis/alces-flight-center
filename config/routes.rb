@@ -67,6 +67,14 @@ Rails.application.routes.draw do
       archive_cases.call(only: :show)
     end
 
+    resources :cases, only: [] do
+      member do
+        post :resolve  # Only admins may resolve a case
+        post :archive  # Only admins may archive a case
+        post :assign  # Only admins may (re)assign a case
+      end
+    end
+
     resources :clusters, only: []  do
       request_maintenance_form.call
       admin_logs.call
@@ -112,16 +120,12 @@ Rails.application.routes.draw do
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
     archive_cases.call(only: [:show, :create]) do
-      member do
-        post :archive
-        post :restore
-      end
+      resources :case_comments, only: :create
     end
 
     resources :clusters, only: :show do
       archive_cases.call
       resources :services, only: :index
-      resources :consultancy, only: :new
       resources :maintenance_windows, path: :maintenance, only: :index
       resources :components, only: :index
       logs.call
@@ -130,7 +134,6 @@ Rails.application.routes.draw do
 
     resources :components, only: :show do
       archive_cases.call
-      resources :consultancy, only: :new
       resources :component_expansions,
                 path: component_expansions_alias,
                 only: :index
@@ -147,7 +150,6 @@ Rails.application.routes.draw do
 
     resources :services, only: :show do
       archive_cases.call
-      resources :consultancy, only: :new
       confirm_maintenance_form.call
     end
 

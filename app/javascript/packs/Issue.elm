@@ -3,22 +3,22 @@ module Issue
         ( Id(..)
         , Issue
         , decoder
-        , details
-        , detailsValid
         , extractId
-        , isChargeable
         , name
         , requiresComponent
         , sameId
-        , setDetails
+        , selectTier
         , setSubject
         , subject
-        , subjectValid
-        , supportType
+        , tiers
+        , updateSelectedTierField
         )
 
 import Json.Decode as D
-import SupportType exposing (SupportType(..))
+import SelectList exposing (SelectList)
+import SelectList.Extra
+import Tier exposing (Tier)
+import Tier.Level
 import Utils
 
 
@@ -30,10 +30,8 @@ type Issue
 type alias IssueData =
     { id : Id
     , name : String
-    , details : String
     , subject : String
-    , supportType : SupportType
-    , chargeable : Bool
+    , tiers : SelectList Tier
     }
 
 
@@ -45,51 +43,30 @@ decoder : D.Decoder Issue
 decoder =
     let
         createIssue =
-            \id ->
-                \name ->
-                    \requiresComponent ->
-                        \detailsTemplate ->
-                            \defaultSubject ->
-                                \supportType ->
-                                    \chargeable ->
-                                        let
-                                            data =
-                                                IssueData
-                                                    id
-                                                    name
-                                                    detailsTemplate
-                                                    defaultSubject
-                                                    supportType
-                                                    chargeable
-                                        in
-                                        if requiresComponent then
-                                            ComponentRequiredIssue data
-                                        else
-                                            StandardIssue data
+            \id name requiresComponent defaultSubject tiers ->
+                let
+                    data =
+                        IssueData
+                            id
+                            name
+                            defaultSubject
+                            tiers
+                in
+                if requiresComponent then
+                    ComponentRequiredIssue data
+                else
+                    StandardIssue data
     in
-    D.map7 createIssue
+    D.map5 createIssue
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "requiresComponent" D.bool)
-        (D.field "detailsTemplate" D.string)
         (D.field "defaultSubject" D.string)
-        (D.field "supportType" SupportType.decoder)
-        (D.field "chargeable" D.bool)
-
-
-detailsValid : Issue -> Bool
-detailsValid =
-    fieldFilled details
-
-
-subjectValid : Issue -> Bool
-subjectValid =
-    fieldFilled subject
-
-
-fieldFilled : (Issue -> String) -> (Issue -> Bool)
-fieldFilled getField =
-    getField >> String.isEmpty >> not
+        (D.field "tiers" <|
+            SelectList.Extra.orderedDecoder
+                (.level >> Tier.Level.asInt)
+                Tier.decoder
+        )
 
 
 extractId : Issue -> Int
@@ -114,24 +91,44 @@ name issue =
     data issue |> .name
 
 
-details : Issue -> String
-details issue =
-    data issue |> .details
-
-
 subject : Issue -> String
 subject issue =
     data issue |> .subject
 
 
-setDetails : String -> Issue -> Issue
-setDetails details =
-    updateIssueData (\data -> { data | details = details })
+tiers : Issue -> SelectList Tier
+tiers issue =
+    data issue |> .tiers
 
 
 setSubject : String -> Issue -> Issue
 setSubject subject =
     updateIssueData (\data -> { data | subject = subject })
+
+
+selectTier : Tier.Id -> Issue -> Issue
+selectTier tierId issue =
+    updateIssueData
+        (\data ->
+            { data
+                | tiers = SelectList.select (Utils.sameId tierId) (tiers issue)
+            }
+        )
+        issue
+
+
+updateSelectedTierField : Int -> String -> Issue -> Issue
+updateSelectedTierField fieldIndex value issue =
+    updateIssueData
+        (\data ->
+            { data
+                | tiers =
+                    SelectList.Extra.mapSelected
+                        (\tier -> Tier.setFieldValue tier fieldIndex value)
+                        data.tiers
+            }
+        )
+        issue
 
 
 updateIssueData : (IssueData -> IssueData) -> Issue -> Issue
@@ -146,16 +143,6 @@ updateIssueData changeData issue =
 
         StandardIssue _ ->
             StandardIssue newData
-
-
-supportType : Issue -> SupportType
-supportType issue =
-    data issue |> .supportType
-
-
-isChargeable : Issue -> Bool
-isChargeable issue =
-    data issue |> .chargeable
 
 
 data : Issue -> IssueData

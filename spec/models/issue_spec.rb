@@ -38,26 +38,32 @@ RSpec.describe Issue, type: :model do
         :issue,
         id: 1,
         name: 'New user request',
-        details_template: 'Give a username',
         requires_component: false,
         requires_service: service_type.present?,
         service_type: service_type,
         support_type: :managed,
-        chargeable: true
-      )
+        chargeable: true,
+        tiers: [tier]
+      ).tap do |issue|
+        # Issue creates a Tier by default on create, so remove any associated
+        # Tier other than the one we want for straightforward tests.
+        issue.tiers.each { |t| t.destroy! unless t == tier }
+        issue.tiers.reload
+      end
     end
 
     let :service_type { create(:service_type) }
+    let :tier { create(:tier) }
 
     it 'gives correct JSON' do
       expect(subject.case_form_json).to eq(
         id: 1,
         name: 'New user request',
-        detailsTemplate: 'Give a username',
         defaultSubject: 'New user request',
         requiresComponent: false,
         supportType: 'managed',
-        chargeable: true
+        chargeable: true,
+        tiers: [tier.case_form_json]
       )
     end
   end
@@ -168,6 +174,23 @@ RSpec.describe Issue, type: :model do
 
         expect(issue).not_to be_special
       end
+    end
+  end
+
+  context 'on create' do
+    it 'has standard level 3 Tier automatically created' do
+      issue = create(:issue, tiers: [])
+
+      expect(issue.tiers.length).to eq 1
+      tier = issue.tiers.first
+      expect(tier.level).to eq 3
+      expected_fields = [
+        {
+          type: 'textarea',
+          name: 'Details',
+        }
+      ]
+      expect(tier.fields.map(&:symbolize_keys)).to match_array(expected_fields)
     end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180329164959) do
+ActiveRecord::Schema.define(version: 20180425134112) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -50,20 +50,69 @@ ActiveRecord::Schema.define(version: 20180329164959) do
     t.index ["component_id"], name: "index_asset_record_fields_on_component_id"
   end
 
+  create_table "audits", force: :cascade do |t|
+    t.integer "auditable_id"
+    t.string "auditable_type"
+    t.integer "associated_id"
+    t.string "associated_type"
+    t.integer "user_id"
+    t.string "user_type"
+    t.string "username"
+    t.string "action"
+    t.jsonb "audited_changes"
+    t.integer "version", default: 0
+    t.string "comment"
+    t.string "remote_address"
+    t.string "request_uuid"
+    t.datetime "created_at"
+    t.index ["associated_type", "associated_id"], name: "associated_index"
+    t.index ["auditable_type", "auditable_id"], name: "auditable_index"
+    t.index ["created_at"], name: "index_audits_on_created_at"
+    t.index ["request_uuid"], name: "index_audits_on_request_uuid"
+    t.index ["user_id", "user_type"], name: "user_index"
+  end
+
+  create_table "case_comments", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "case_id", null: false
+    t.string "text", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["case_id"], name: "index_case_comments_on_case_id"
+    t.index ["user_id"], name: "index_case_comments_on_user_id"
+  end
+
+  create_table "case_state_transitions", force: :cascade do |t|
+    t.bigint "case_id", null: false
+    t.string "namespace"
+    t.string "event"
+    t.string "from"
+    t.string "to", null: false
+    t.datetime "created_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["case_id"], name: "index_case_state_transitions_on_case_id"
+    t.index ["user_id"], name: "index_case_state_transitions_on_user_id"
+  end
+
   create_table "cases", force: :cascade do |t|
-    t.string "details", null: false
+    t.string "details"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "cluster_id", null: false
     t.integer "component_id"
     t.integer "user_id", null: false
-    t.bigint "rt_ticket_id", null: false
-    t.boolean "archived", default: false, null: false
+    t.bigint "rt_ticket_id"
     t.integer "issue_id", null: false
     t.bigint "service_id"
-    t.string "last_known_ticket_status", default: "new", null: false
+    t.string "last_known_ticket_status", default: "new"
     t.text "token", null: false
     t.text "subject", null: false
+    t.datetime "completed_at"
+    t.integer "tier_level"
+    t.json "fields"
+    t.text "state", default: "open", null: false
+    t.bigint "assignee_id"
+    t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
     t.index ["issue_id"], name: "index_cases_on_issue_id"
@@ -180,7 +229,7 @@ ActiveRecord::Schema.define(version: 20180329164959) do
     t.boolean "requires_component", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "details_template", null: false
+    t.string "details_template"
     t.string "support_type", null: false
     t.string "identifier"
     t.boolean "requires_service", default: false, null: false
@@ -220,21 +269,16 @@ ActiveRecord::Schema.define(version: 20180329164959) do
   create_table "maintenance_windows", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "ended_at_legacy"
-    t.bigint "requested_by_id_legacy"
     t.bigint "case_id", null: false
-    t.bigint "confirmed_by_id_legacy"
     t.bigint "cluster_id"
     t.bigint "component_id"
     t.bigint "service_id"
     t.text "state", default: "new", null: false
-    t.datetime "requested_start"
-    t.integer "duration"
+    t.datetime "requested_start", null: false
+    t.integer "duration", null: false
     t.index ["case_id"], name: "index_maintenance_windows_on_case_id"
     t.index ["cluster_id"], name: "index_maintenance_windows_on_cluster_id"
     t.index ["component_id"], name: "index_maintenance_windows_on_component_id"
-    t.index ["confirmed_by_id_legacy"], name: "index_maintenance_windows_on_confirmed_by_id_legacy"
-    t.index ["requested_by_id_legacy"], name: "index_maintenance_windows_on_requested_by_id_legacy"
     t.index ["service_id"], name: "index_maintenance_windows_on_service_id"
   end
 
@@ -266,6 +310,15 @@ ActiveRecord::Schema.define(version: 20180329164959) do
     t.string "canonical_name", null: false
   end
 
+  create_table "tiers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "level", null: false
+    t.json "fields", null: false
+    t.bigint "issue_id", null: false
+    t.index ["issue_id"], name: "index_tiers_on_issue_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -288,11 +341,16 @@ ActiveRecord::Schema.define(version: 20180329164959) do
   add_foreign_key "asset_record_fields", "asset_record_field_definitions"
   add_foreign_key "asset_record_fields", "component_groups"
   add_foreign_key "asset_record_fields", "components"
+  add_foreign_key "case_comments", "cases"
+  add_foreign_key "case_comments", "users"
+  add_foreign_key "case_state_transitions", "cases"
+  add_foreign_key "case_state_transitions", "users"
   add_foreign_key "cases", "clusters"
   add_foreign_key "cases", "components"
   add_foreign_key "cases", "issues"
   add_foreign_key "cases", "services"
   add_foreign_key "cases", "users"
+  add_foreign_key "cases", "users", column: "assignee_id"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"
@@ -314,8 +372,6 @@ ActiveRecord::Schema.define(version: 20180329164959) do
   add_foreign_key "maintenance_windows", "clusters"
   add_foreign_key "maintenance_windows", "components"
   add_foreign_key "maintenance_windows", "services"
-  add_foreign_key "maintenance_windows", "users", column: "confirmed_by_id_legacy"
-  add_foreign_key "maintenance_windows", "users", column: "requested_by_id_legacy"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
   add_foreign_key "users", "sites"

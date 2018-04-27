@@ -3,7 +3,6 @@ module Category
         ( Category
         , Id(..)
         , asIssuesIn
-          -- , availableForSelectedCluster
         , decoder
         , extractId
         , setSelectedIssue

@@ -19,6 +19,7 @@
    ```crontab
    # Flight Center tasks.
    * * * * * dokku --rm run flight-center rake alces:cron:every_minute
+   @hourly   dokku --rm run flight-center rake alces:cron:hourly
    0 */3 * * * /home/ubuntu/flight-center-backup-database
    ```
 

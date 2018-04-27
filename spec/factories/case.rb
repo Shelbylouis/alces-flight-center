@@ -4,26 +4,38 @@ FactoryBot.define do
     issue
     cluster
     user
-    details "Oh no, my science isn't working"
+    fields [{name: 'Details', value: 'some_details'}]
+    tier_level 3
+    sequence(:rt_ticket_id) { |n| n }
 
     factory :open_case do
-      archived false
+      state 'open'
+    end
+
+    factory :resolved_case do
+      state 'resolved'
     end
 
     factory :archived_case do
-      archived true
+      state 'archived'
     end
+
+    # Every Case requires a Cluster, so this is just the same as the standard
+    # `case` factory; this is useful though to allow us to handle creating a
+    # Case requiring each type of part in the same way.
+    factory :case_requiring_cluster {}
 
     factory :case_requiring_component do
       association :issue, factory: :issue_requiring_component
 
-      before :create do |instance|
+      after :build do |instance|
         instance.cluster = instance.component&.cluster
       end
 
       factory :case_with_component do
-        before :create do |instance|
-          instance.component = create(:component)
+        component
+
+        after :build do |instance|
           instance.cluster = instance.component.cluster
         end
       end
@@ -33,13 +45,14 @@ FactoryBot.define do
     factory :case_requiring_service do
       association :issue, factory: :issue_requiring_service
 
-      before :create do |instance|
+      after :build do |instance|
         instance.cluster = instance.service&.cluster
       end
 
       factory :case_with_service do
-        before :create do |instance|
-          instance.service = create(:service)
+        service
+
+        after :build do |instance|
           instance.cluster = instance.service.cluster
         end
       end

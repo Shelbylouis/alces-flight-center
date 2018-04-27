@@ -11,9 +11,9 @@ RSpec.feature Log, type: :feature do
 
   # Create the components and cases for each spec
   before :each do
-    create(:case, details: 'Random other case')
-    ['details1', 'details2', 'details3'].each do |details|
-      create(:case, cluster: cluster, details: details)
+    create(:case, subject: 'Random other case')
+    ['subject1', 'subject2', 'subject3'].each do |case_subject|
+      create(:case, cluster: cluster, subject: case_subject)
     end
 
     create(:component, name: 'Random other component')
@@ -65,27 +65,29 @@ RSpec.feature Log, type: :feature do
       expect(submit_log.cases).to contain_exactly(*log_cases)
     end
 
-    it 'cannot select archived Case for subject to associate' do
-      case_attributes = {
-        cluster: cluster,
-        subject: 'archived_case',
-        archived: true
-      }
-      if subject.is_a?(Component)
-        case_attributes.merge!(
-          component: subject,
-          issue: create(:issue, requires_component: true)
-        )
+    %w(resolved archived).each do |state|
+      it "cannot select #{state} Case for subject to associate" do
+        case_attributes = {
+            cluster: cluster,
+            subject: 'my_case',
+            state: state
+        }
+        if subject.is_a?(Component)
+          case_attributes.merge!(
+              component: subject,
+              issue: create(:issue, requires_component: true)
+          )
+        end
+        my_case = create(:case, case_attributes)
+
+        # Revisit the page so given Case would be shown, if we do not
+        # successfully filter it out, to avoid false positive.
+        visit current_path
+
+        expect do
+          select my_case.subject
+        end.to raise_error(Capybara::ElementNotFound)
       end
-      archived_case = create(:case, case_attributes)
-
-      # Revisit the page so given Case would be shown, if we do not
-      # successfully filter it out, to avoid false positive.
-      visit current_path
-
-      expect do
-        select archived_case.subject
-      end.to raise_error(Capybara::ElementNotFound)
     end
   end
 
@@ -119,10 +121,10 @@ RSpec.feature Log, type: :feature do
     subject { cluster.components.first }
 
     before :each do
-      ['component_case1', 'component_case2'].each do |details|
+      ['component_case1', 'component_case2'].each do |case_subject|
         create :case_requiring_component,
                component: subject,
-               details: details
+               subject: case_subject
       end
       visit component_logs_path subject, as: engineer
     end

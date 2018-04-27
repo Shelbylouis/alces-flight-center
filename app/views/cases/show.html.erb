@@ -1,53 +1,70 @@
 <% content_for :subtitle { 'Support Case' } %>
 <div class='card'>
   <%= render 'partials/card_header_nav',
-    title: 'Overview'
+    title: "#{@case.display_id} - #{@case.subject}"
   %>
   <div class='table-responsive'>
-    <table class="table">
+    <table class="table case-table">
       <tr style="width: 100%;">
-        <th>Date</th>
-        <td><%= @case.created_at.to_formatted_s(:long) %></td>
-      </tr>
-      <tr>
-        <th>Creator</th>
-        <td><%= @case.user.name %></td>
+        <th>Created</th>
+        <td>
+          <%= @case.created_at.to_formatted_s(:long) %>
+          by
+          <%= @case.user.name %>
+        </td>
+        <th>Assigned to</th>
+        <td id="case-assignment">
+          <%= render 'cases/case_assignment_controls' %>
+        </td>
       </tr>
       <tr>
         <th>Association</th>
         <td><%= @case.association_info %></td>
-      </tr>
-      <tr>
-        <th>Ticket ID</th>
-        <td><%= @case.rt_ticket_id %></td>
+        <th>State</th>
+        <td id="case-state-controls">
+          <%= @case.user_facing_state %>
+          <%= render 'cases/case_state_controls' %>
+        </td>
       </tr>
       <tr>
         <th>Category</th>
         <td><%= @case.category&.name || 'None' %></td>
-      </tr>
-      <tr>
         <th>Issue</th>
         <td><%= @case.issue.name %></td>
       </tr>
       <tr>
-        <th>Chargeable</th>
-        <td><%= @case.chargeable_symbol %></td>
+        <th>Tier</th>
+        <td><%= @case.tier_description %>
+        <th>RT Ticket ID</th>
+        <td><%= @case.rt_ticket_id || 'N/A' %></td>
       </tr>
       <tr>
-        <th>Credit charge</th>
-        <td><%= @case.credit_charge_info %></td>
+        <th>Fields</th>
+        <td colspan="3">
+          <div class="table-responsive">
+            <table class="table table-sm table-striped table-bordered">
+              <% @case.fields.each do |field| %>
+                <tr>
+                  <th scope="row">
+                    <%= field.fetch('name') %>
+                  </th>
+                  <td>
+                    <%= simple_format(field.fetch('value')) %>
+                  </td>
+                </tr>
+              <% end%>
+            </table>
+          </div>
+        </td>
       </tr>
       <tr>
-        <th>Archived</th>
-        <td><%= boolean_symbol(@case.archived) %></td>
-      </tr>
-      <tr>
-        <th>Subject</th>
-        <td><%= @case.subject %></td>
-      </tr>
-      <tr>
-        <th>Details</th>
-        <td><%= simple_format(@case.details) %></td>
+        <th>Case history</th>
+        <td colspan="3">
+          <% @case.events.each do |event| %>
+            <%= event.decorate.event_card %>
+          <% end %>
+          <%= render 'case_comments/form' %>
+        </td>
       </tr>
     </table>
   </div>

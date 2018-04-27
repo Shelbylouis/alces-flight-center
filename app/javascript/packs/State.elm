@@ -1,20 +1,19 @@
 module State
     exposing
         ( State
-        , clusterPartAllowedForSelectedIssue
+        , associatedModelTypeName
         , decoder
         , encoder
-        , isInvalid
-        , issueAvailableForSelectedCluster
         , selectedComponent
         , selectedIssue
         , selectedService
         , selectedServiceAvailableIssues
+        , selectedTier
+        , selectedTierSupportUnavailable
         )
 
 import Bootstrap.Modal as Modal
 import Cluster exposing (Cluster)
-import ClusterPart exposing (ClusterPart)
 import Component exposing (Component)
 import Issue exposing (Issue)
 import Issues
@@ -23,7 +22,9 @@ import Json.Encode as E
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
-import SupportType exposing (SupportType(..))
+import SupportType exposing (SupportType)
+import Tier exposing (Tier)
+import Tier.Level
 
 
 type alias State =
@@ -32,8 +33,8 @@ type alias State =
     , singleComponent : Bool
     , singleService : Bool
     , isSubmitting : Bool
-    , clusterChargingInfoModal : Modal.State
-    , chargeableIssuePreSubmissionModal : Modal.State
+    , clusterChargingInfoModal : Modal.Visibility
+    , chargeablePreSubmissionModal : Modal.Visibility
     }
 
 
@@ -52,8 +53,8 @@ decoder =
                         , singleComponent = False
                         , singleService = False
                         , isSubmitting = False
-                        , clusterChargingInfoModal = Modal.hiddenState
-                        , chargeableIssuePreSubmissionModal = Modal.hiddenState
+                        , clusterChargingInfoModal = Modal.hidden
+                        , chargeablePreSubmissionModal = Modal.hidden
                         }
                 in
                 case mode of
@@ -164,13 +165,11 @@ encoder state =
             SelectList.selected state.clusters
 
         partIdValue =
-            \required ->
-                \selected ->
-                    \extractId ->
-                        if required issue then
-                            selected state |> extractId |> E.int
-                        else
-                            E.null
+            \required selected extractId ->
+                if required issue then
+                    selected state |> extractId |> E.int
+                else
+                    E.null
 
         componentIdValue =
             partIdValue
@@ -182,6 +181,9 @@ encoder state =
             selectedService state
                 |> Service.extractId
                 |> E.int
+
+        tier =
+            selectedTier state
     in
     E.object
         [ ( "case"
@@ -191,7 +193,8 @@ encoder state =
                 , ( "component_id", componentIdValue )
                 , ( "service_id", serviceIdValue )
                 , ( "subject", Issue.subject issue |> E.string )
-                , ( "details", Issue.details issue |> E.string )
+                , ( "tier_level", Tier.Level.asInt tier.level |> E.int )
+                , ( "fields", Tier.fieldsEncoder tier )
                 ]
           )
         ]
@@ -218,76 +221,60 @@ selectedService state =
         |> SelectList.selected
 
 
+selectedTier : State -> Tier
+selectedTier state =
+    selectedIssue state
+        |> Issue.tiers
+        |> SelectList.selected
+
+
 selectedServiceAvailableIssues : State -> SelectList Issue
 selectedServiceAvailableIssues state =
     selectedService state |> .issues |> Issues.availableIssues
 
 
-clusterPartAllowedForSelectedIssue : State -> (Issue -> Bool) -> ClusterPart a -> Bool
-clusterPartAllowedForSelectedIssue state issueRequiresPart part =
+selectedTierSupportUnavailable : State -> Bool
+selectedTierSupportUnavailable state =
     let
-        issue =
-            selectedIssue state
+        tier =
+            selectedTier state
     in
-    if issueRequiresPart issue then
-        case ( Issue.supportType issue, part.supportType ) of
-            ( Managed, Advice ) ->
-                -- An advice part cannot be associated with a managed issue.
-                False
+    case tier.level of
+        Tier.Level.Three ->
+            -- Can always request Tier 3 support.
+            False
 
-            ( AdviceOnly, Managed ) ->
-                -- A managed part cannot be associated with an advice-only
-                -- issue.
-                False
+        _ ->
+            case associatedModelSupportType state of
+                SupportType.Managed ->
+                    -- Can request any Tier support for managed
+                    -- Components/Services.
+                    False
 
-            _ ->
-                -- Everything else is valid.
-                True
+                SupportType.Advice ->
+                    -- Cannot request any other Tier support for advice-only
+                    -- Components/Services.
+                    True
+
+
+{-| Returns the SupportType for the currently selected 'associated model'.
+
+The associated model is the model which would be most closely associated with
+the current Case if it was created, i.e. the selected Component if the selected
+Issue requires one, or the selected Service if not.
+
+-}
+associatedModelSupportType : State -> SupportType
+associatedModelSupportType state =
+    if selectedIssue state |> Issue.requiresComponent then
+        selectedComponent state |> .supportType
     else
-        -- This validation should always pass if part is not required.
-        True
+        selectedService state |> .supportType
 
 
-issueAvailableForSelectedCluster : State -> Issue -> Bool
-issueAvailableForSelectedCluster state issue =
-    let
-        issueIsManaged =
-            Issue.supportType issue == SupportType.Managed
-
-        clusterIsAdvice =
-            SelectList.selected state.clusters
-                |> SupportType.isAdvice
-    in
-    -- An Issue is available so long as it is not a managed issue while an
-    -- advice-only Cluster is selected.
-    not (issueIsManaged && clusterIsAdvice)
-
-
-isInvalid : State -> Bool
-isInvalid state =
-    let
-        issue =
-            selectedIssue state
-
-        partAllowedForSelectedIssue =
-            clusterPartAllowedForSelectedIssue state
-
-        component =
-            selectedComponent state
-
-        service =
-            selectedService state
-    in
-    List.any not
-        [ Issue.detailsValid issue
-        , Issue.subjectValid issue
-        , issueAvailableForSelectedCluster state issue
-        , partAllowedForSelectedIssue Issue.requiresComponent component
-
-        -- Every Issue which can be associated with a Case using this form now
-        -- requires a Service, and the Ruby encoding of the data used to
-        -- initialize this form combined with the State data model ensures only
-        -- a compatible Service and Issue can be selected, therefore we just
-        -- need to check the compatibilities of their support types here.
-        , partAllowedForSelectedIssue (always True) service
-        ]
+associatedModelTypeName : State -> String
+associatedModelTypeName state =
+    if selectedIssue state |> Issue.requiresComponent then
+        "component"
+    else
+        "service"

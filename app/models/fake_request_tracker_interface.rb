@@ -15,7 +15,8 @@ class FakeRequestTrackerInterface
     status = id % 2 == 0 ? 'open' : 'resolved'
     {
       id: id,
-      status: status
+      status: status,
+      resolved: id % 2 == 0 ? nil : Time.now
     }.to_struct
   end
 end

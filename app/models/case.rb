@@ -1,18 +1,20 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
 
-  COMPLETED_TICKET_STATUSES = [
+  # @deprecated - to be removed in next release
+  COMPLETED_RT_TICKET_STATUSES = [
     'resolved',
     'rejected',
     'deleted',
   ]
 
-  TICKET_STATUSES = (
+  # @deprecated - to be removed in next release
+  RT_TICKET_STATUSES = (
     [
       'new',
       'open',
       'stalled',
-    ] + COMPLETED_TICKET_STATUSES
+    ] + COMPLETED_RT_TICKET_STATUSES
   ).freeze
 
   belongs_to :issue
@@ -20,43 +22,74 @@ class Case < ApplicationRecord
   belongs_to :component, required: false
   belongs_to :service, required: false
   belongs_to :user
+  belongs_to :assignee, class_name: 'User', required: false
   has_one :credit_charge, required: false
   has_many :maintenance_windows
   has_and_belongs_to_many :log
+  has_many :case_comments
+
+  has_many :case_state_transitions
+  alias_attribute :transitions, :case_state_transitions
 
   delegate :category, :chargeable, to: :issue
   delegate :site, to: :cluster, allow_nil: true
 
-  validates :details, presence: true
+  state_machine initial: :open do
+    audit_trail context: [:requesting_user], initial: false
+
+    state :open  # Open case, still work to do
+    state :resolved  # Has been resolved but not yet accounted for commercially
+    state :archived  # Has been accounted for commercially, nothing more to do
+
+    event(:resolve) { transition open: :resolved }  # Resolved cases cannot be reopened
+    event(:archive) { transition resolved: :archived }
+
+  end
+
+  audited only: :assignee_id, on: [ :update ]
+
   validates :token, presence: true
   validates :subject, presence: true
-  validates :rt_ticket_id, presence: true, uniqueness: true
+  validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
+  validates :fields, presence: true
 
-  validates :last_known_ticket_status,
+  validates :tier_level,
     presence: true,
-    inclusion: {in: TICKET_STATUSES}
+    numericality: {
+      only_integer: true,
+      # Cases cannot be created for Tier of level 0; Tier 0 support is just
+      # providing access to documentation without any action needing to be
+      # taken by Alces admins.
+      greater_than_or_equal_to: 1,
+      less_than_or_equal_to: 3,
+    }
 
-  # Only validate Issue relationship on create, as the Issue must be allowed
-  # given the associated model for this Case at the point when the Case is
-  # created, but the associated model's `support_type` (or less commonly the
-  # Issue's) may later change and become incompatible with this Issue, but this
-  # should not invalidate a Case which was allowed at the point when it was
-  # created.
-  validates_with IssueValidator, on: :create
+  # @deprecated - to be removed in next release
+  validates :last_known_ticket_status,
+    inclusion: {in: RT_TICKET_STATUSES}
+
+  # Only validate this type of support is available on create, as this is the
+  # only point at which we should prevent users accessing support they are not
+  # entitled to; after this point any aspects of the Case and related models
+  # might change and make an identical Case not be able to be created today,
+  # but this should not invalidate existing Cases.
+  validates_with AvailableSupportValidator, on: :create
 
   validates_with AssociatedModelValidator
+
+  validate :validates_user_assignment
 
   after_initialize :assign_cluster_if_necessary
   after_initialize :generate_token, on: :create
 
   before_validation :assign_default_subject_if_unset
 
-  # This must occur after `assign_cluster_if_necessary`, so that Cluster is set
-  # if this is possible but it was not explicitly passed.
-  before_validation :create_rt_ticket, on: :create
+  after_create :send_new_case_email
+  after_update :maybe_send_new_assignee_email
 
-  scope :active, -> { where(archived: false) }
+  scope :active, -> { where(state: 'open') }
 
+  # @deprecated - to be removed in next release
   def self.request_tracker
     # Note: `rt_interface_class` is a string which we `constantize`, rather
     # than a constant directly, otherwise Rails autoloading in development
@@ -68,16 +101,12 @@ class Case < ApplicationRecord
 
   def mailto_url
     support_email = 'support@alces-software.com'
-    "mailto:#{support_email}?subject=#{rt_email_subject}"
+    "mailto:#{support_email}?subject=#{email_reply_subject}"
   end
 
-  def open
-    !archived
-  end
-
+  # @deprecated - to be removed in next release
   def update_ticket_status!
-    return if ticket_completed?
-
+    return unless incomplete_rt_ticket?
     self.last_known_ticket_status = associated_rt_ticket.status
     save!
   end
@@ -91,10 +120,6 @@ class Case < ApplicationRecord
     ticket_completed? && chargeable
   end
 
-  def add_rt_ticket_correspondence(text)
-    rt.add_ticket_correspondence(id: rt_ticket_id, text: text)
-  end
-
   def associated_model
     component || service || cluster
   end
@@ -103,19 +128,95 @@ class Case < ApplicationRecord
     associated_model.readable_model_name
   end
 
+  # @deprecated - to be removed in next release
+  def ticket_completed?
+    COMPLETED_RT_TICKET_STATUSES.include?(last_known_ticket_status)
+  end
+
+  def email_recipients
+    site.all_contacts
+        .map(&:email)
+  end
+
+  def email_reply_subject
+    "RE: #{email_subject}"
+  end
+
+  def events
+    (
+      case_comments.select(&:created_at) +  # Note that CasesController#show
+        # creates a new, unsaved CaseComment (because the view needs it)
+        # so there will be one included in this set without a created_at
+        # date. We clearly don't want to include that in the events stream.
+      maintenance_windows.map(&:transitions).flatten.select(&:event) +
+      case_state_transitions +
+      audits
+    ).sort_by(&:created_at)
+  end
+
+  def email_subject
+    "#{email_identifier} #{ticket_subject}"
+  end
+
+  def email_identifier
+    if rt_ticket_id
+      "[helpdesk.alces-software.com ##{rt_ticket_id}]"
+    else
+      "[Alces Flight Center ##{id}]"
+    end
+  end
+
+  def ticket_subject
+    # NOTE: If the format used here ever changes then this may cause emails
+    # sent using the `mailto` links for existing Cases to not be threaded with
+    # previous emails related to that Case (see
+    # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
+    # for an explanation). If we want to change this format and avoid this
+    # consequence then a solution would be to first add a new field for this
+    # whole string, and save and use the existing format for existing Cases.
+    "#{cluster.name}: #{subject} [#{token}]"
+  end
+
+  def email_properties
+    {
+      Cluster: cluster.name,
+      Category: category&.name,
+      'Issue': issue.name,
+      'Associated component': component&.name,
+      'Associated service': service&.name,
+      Tier: decorate.tier_description,
+      Fields: field_hash,
+    }.reject { |_k, v| v.nil? }
+  end
+
+  def consultancy?
+    tier_level >= 3
+  end
+
+  def potential_assignees
+    User.where(site: site).order(:name) +
+        User.where(admin: true).order(:name)
+  end
+
+  def assignee=(new_assignee)
+    @old_assignee = assignee
+    @assignee_changed = true
+    super(new_assignee)
+  end
+
   private
 
-  def create_rt_ticket
-    return unless cluster
+  # Picked up by state_machines-audit_trail due to `context` setting above, and
+  # used to automatically set user who instigated the transition in created
+  # CaseStateTransition.
+  # Refer to
+  # https://github.com/state-machines/state_machines-audit_trail#example-5---store-advanced-method-results.
+  def requesting_user(transition)
+    transition.args&.first
+  end
 
-    ticket = rt.create_ticket(
-      requestor_email: requestor_email,
-      cc: cc_emails,
-      subject: rt_ticket_subject,
-      text: rt_ticket_text
-    )
-
-    self.rt_ticket_id = ticket.id
+  def incomplete_rt_ticket?
+    rt_ticket_id && (!ticket_completed? || !self.completed_at)
   end
 
   def assign_cluster_if_necessary
@@ -128,42 +229,22 @@ class Case < ApplicationRecord
     self.subject ||= issue.default_subject
   end
 
-  def ticket_completed?
-    COMPLETED_TICKET_STATUSES.include?(last_known_ticket_status)
-  end
-
+  # @deprecated - to be removed in next release
   def associated_rt_ticket
-    rt.show_ticket(rt_ticket_id)
+    if rt_ticket_id
+      @associated_ticket ||= rt.show_ticket(rt_ticket_id)
+    else
+      nil
+    end
   end
 
+  # @deprecated - to be removed in next release
   def rt
     self.class.request_tracker
   end
 
   def requestor_email
     user.email
-  end
-
-  def cc_emails
-    site.all_contacts
-      .reject { |contact| contact.email == requestor_email }
-      .map(&:email)
-  end
-
-  def rt_email_subject
-    rt_email_identifier = "[helpdesk.alces-software.com ##{rt_ticket_id}]"
-    "RE: #{rt_email_identifier} #{rt_ticket_subject}"
-  end
-
-  def rt_ticket_subject
-    # NOTE: If the format used here ever changes then this may cause emails
-    # sent using the `mailto` links for existing Cases to not be threaded with
-    # previous emails related to that Case (see
-    # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
-    # for an explanation). If we want to change this format and avoid this
-    # consequence then a solution would be to first add a new field for this
-    # whole string, and save and use the existing format for existing Cases.
-    "#{cluster.name}: #{subject} [#{token}]"
   end
 
   # We generate a short random token to identify each ticket within email
@@ -187,26 +268,24 @@ class Case < ApplicationRecord
       end.join
   end
 
-  def rt_ticket_text
-    # Ticket text does not need to be in this format, it is just text, but this
-    # is readable and an adequate format for now.
-    properties = Utils.rt_format(rt_ticket_properties)
-
-    [
-      'This ticket was created using Alces Flight Center',
-      properties
-    ].join("\n\n")
+  def send_new_case_email
+    CaseMailer.new_case(self).deliver_later
   end
 
-  def rt_ticket_properties
-    {
-      Requestor: user.name,
-      Cluster: cluster.name,
-      Category: category&.name,
-      'Issue': issue.name,
-      'Associated component': component&.name,
-      'Associated service': service&.name,
-      Details: details,
-    }.reject { |_k, v| v.nil? }
+  def maybe_send_new_assignee_email
+    return unless @assignee_changed
+    CaseMailer.change_assignee(self, @old_assignee).deliver_later
+  end
+
+  def validates_user_assignment
+    return if assignee.nil?
+    errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
+  end
+
+  def field_hash
+    fields.map do |f|
+      f = f.with_indifferent_access
+      [f.fetch(:name), f.fetch(:value)]
+    end.to_h.symbolize_keys
   end
 end

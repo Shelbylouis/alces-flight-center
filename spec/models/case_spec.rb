@@ -3,7 +3,19 @@ require 'rails_helper'
 RSpec.describe Case, type: :model do
   let :random_token_regex { /[A-Z][0-9][A-Z][0-9][A-Z]/ }
 
-  let :request_tracker { described_class.send(:request_tracker) }
+  describe '#valid?' do
+    subject { create(:case) }
+
+    it { is_expected.to validate_presence_of(:fields) }
+    it { is_expected.to validate_presence_of(:tier_level) }
+
+    it do
+      is_expected.to validate_numericality_of(:tier_level)
+        .only_integer
+        .is_greater_than_or_equal_to(1)
+        .is_less_than_or_equal_to(3)
+    end
+  end
 
   describe '#create' do
     it 'only raises RecordInvalid when no Cluster' do
@@ -73,90 +85,23 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe 'RT ticket creation on Case creation' do
+
+  describe 'Email creation on Case creation' do
     subject do
-      build(
-        :case,
-        cluster: cluster,
-        issue: issue,
-        component: component,
-        service: service,
-        user: requestor,
-        subject: 'my_subject',
-        details: <<-EOF.strip_heredoc
-          Oh no
-          my node
-          is broken
-        EOF
-      )
+      build(:case)
     end
 
-    let :requestor do
-      create(:user, name: 'Some User', email: 'someuser@somecluster.com')
+    let :stub_mail do
+      obj = double
+      expect(obj).to receive(:deliver_later)
+      obj
     end
 
-    let :site do
-      create(:site)
-    end
-
-    let :another_user do
-      create(:user, site: site, email: 'another.user@somecluster.com' )
-    end
-
-    let :additional_contact do
-      create(
-        :additional_contact,
-        site: site,
-        email: 'mailing-list@somecluster.com'
-      )
-    end
-
-    let :issue do
-      create(
-        :issue,
-        name: 'Crashed node',
-        requires_component: requires_component,
-        requires_service: requires_service,
-        category: category
-      )
-    end
-
-    let :requires_component { true }
-    let :requires_service { true }
-
-    let :category { create(:category, name: 'Hardware issue') }
-    let :cluster { create(:cluster, site: site, name: 'somecluster') }
-    let :component { create(:component, name: 'node01', cluster: cluster) }
-    let :service { create(:service, name: 'Some service', cluster: cluster) }
-
-    let :fake_rt_ticket { OpenStruct.new(id: 1234) }
-
-    it 'creates rt ticket with correct properties' do
-      expected_create_ticket_args = {
-        requestor_email: requestor.email,
-
-        # CC'ed emails should be those for all the site contacts and additional
-        # contacts, apart from the requestor.
-        cc: [another_user.email, additional_contact.email],
-        subject: /somecluster: my_subject \[#{random_token_regex}\]/,
-        text: <<-EOF.strip_heredoc
-          This ticket was created using Alces Flight Center
-
-          Requestor: Some User
-          Cluster: somecluster
-          Category: Hardware issue
-          Issue: Crashed node
-          Associated component: node01
-          Associated service: Some service
-          Details: Oh no
-           my node
-           is broken
-        EOF
-      }
-
-      expect(request_tracker).to receive(:create_ticket).with(
-        expected_create_ticket_args
-      ).and_return(fake_rt_ticket)
+    it 'sends an email' do
+      # To find out what email it sends, see spec/mailers/case_mailer_spec.rb
+      expect(CaseMailer).to receive(:new_case).with(
+        subject
+      ).and_return(stub_mail)
 
       subject.save!
     end
@@ -169,32 +114,48 @@ RSpec.describe Case, type: :model do
 
       expect(subject.mailto_url).to include(created_ticket_token)
     end
+  end
 
-    context 'when no associated component' do
-      let :requires_component { false }
-      let :component { nil }
+  describe 'Email creation on assignee change' do
 
-      it 'does not include corresponding line in ticket text' do
-        expect(request_tracker).to receive(:create_ticket).with(
-          hash_excluding(
-            text: /Associated component:/
-          )
-        ).and_return(fake_rt_ticket)
+    let(:initial_assignee) { nil }
+    let(:site) { create(:site) }
+    let(:cluster) { create(:cluster, site: site) }
+
+    subject do
+      create(:case, assignee: initial_assignee, cluster: cluster)
+    end
+
+    let :stub_mail do
+      obj = double
+      expect(obj).to receive(:deliver_later)
+      obj
+    end
+
+    context 'with no previous assignee' do
+      it 'sends an email' do
+        assignee = create(:admin)
+        subject.assignee = assignee
+
+        expect(CaseMailer).to receive(:change_assignee).with(
+          subject,
+          nil
+        ).and_return(stub_mail)
 
         subject.save!
       end
     end
 
-    context 'when no associated service' do
-      let :requires_service { false }
-      let :service { nil }
+    context 'with a previous assignee' do
+      let(:initial_assignee) { create(:user, site: site) }
+      it 'sends an email' do
+        assignee = create(:admin)
+        subject.assignee = assignee
 
-      it 'does not include corresponding line in ticket text' do
-        expect(request_tracker).to receive(:create_ticket).with(
-          hash_excluding(
-            text: /Associated service:/
-          )
-        ).and_return(fake_rt_ticket)
+        expect(CaseMailer).to receive(:change_assignee).with(
+          subject,
+          initial_assignee
+        ).and_return(stub_mail)
 
         subject.save!
       end
@@ -202,24 +163,23 @@ RSpec.describe Case, type: :model do
   end
 
   describe '#active' do
-    it 'returns all non-archived Cases' do
-      create(:case, details: 'one', archived: false)
-      create(:case, details: 'two', archived: true)
-      create(:case, details: 'three', archived: false)
+    it 'returns all open Cases' do
+      create(:case, subject: 'one', state: 'open')
+      create(:case, subject: 'two', state: 'resolved')
+      create(:case, subject: 'three', state: 'archived')
+      create(:case, subject: 'four', state: 'open')
 
       active_cases = Case.active
 
-      expect(active_cases.map(&:details)).to match_array(['one', 'three'])
+      expect(active_cases.map(&:subject)).to match_array(['one', 'four'])
     end
   end
 
   describe '#mailto_url' do
     it 'creates correct mailto URL' do
       cluster = create(:cluster, name: 'somecluster')
-      fake_ticket = OpenStruct.new(id: 12345)
-      allow(request_tracker).to receive(:create_ticket).and_return(fake_ticket)
 
-      support_case = create(:case, cluster: cluster, subject: 'somesubject')
+      support_case = create(:case, cluster: cluster, subject: 'somesubject', rt_ticket_id: 12345)
 
       expected_subject =
         /RE: \[helpdesk\.alces-software\.com #12345\] somecluster: somesubject \[#{random_token_regex}\]/
@@ -299,5 +259,99 @@ RSpec.describe Case, type: :model do
   describe '#associated_model_type' do
     subject { create(:case_with_component).associated_model_type }
     it { is_expected.to eq 'component' }
+  end
+
+  describe '#email_properties' do
+    let :site { create(:site) }
+
+    let :requestor do
+      create(:user, name: 'Some User', email: 'someuser@somecluster.com', site: site)
+    end
+
+    let :issue do
+      create(
+        :issue,
+        name: 'Crashed node',
+        requires_component: requires_component,
+        requires_service: requires_service,
+        category: category
+      )
+    end
+
+    let(:requires_component) { true }
+    let(:requires_service) { true }
+
+    let(:category) { create(:category, name: 'Hardware issue') }
+    let(:cluster) { create(:cluster, site: site, name: 'somecluster') }
+    let(:component) { create(:component, name: 'node01', cluster: cluster) }
+    let(:service) { create(:service, name: 'Some service', cluster: cluster) }
+
+    let(:kase) {
+      create(
+        :case,
+        rt_ticket_id: 1138,
+        created_at: Time.now,
+        cluster: cluster,
+        issue: issue,
+        component: component,
+        service: service,
+        user: requestor,
+        subject: 'my_subject',
+        tier_level: 3,
+        fields: [
+          {name: 'field1', value: 'value1'},
+          {name: 'field2', value: 'value2', optional: true},
+        ]
+      )
+    }
+
+    it 'includes all needed Case properties with values' do
+      expected_properties = {
+        Cluster: 'somecluster',
+        Category: 'Hardware issue',
+        Issue: 'Crashed node',
+        'Associated component': 'node01',
+        'Associated service': 'Some service',
+        Tier: '3 (Consultancy)',
+        Fields: {
+          field1: 'value1',
+          field2: 'value2',
+        }
+      }
+
+      expect(kase.email_properties).to eq expected_properties
+    end
+
+    context 'when no associated component' do
+      let(:requires_component) { false }
+      let(:component) { nil }
+
+      it 'does not include corresponding line' do
+        expect(kase.email_properties).not_to include(:'Associated component')
+      end
+    end
+
+    context 'when no associated service' do
+      let(:requires_service) { false }
+      let(:service) { nil }
+
+      it 'does not include corresponding line' do
+        expect(kase.email_properties).not_to include(:'Associated service')
+      end
+    end
+  end
+
+  describe '#consultancy?' do
+    it 'returns true when tier_level == 3' do
+      kase = create(:case, tier_level: 3)
+
+      expect(kase).to be_consultancy
+    end
+
+    it 'returns false when tier_level < 3' do
+      kase = create(:case, tier_level: 2)
+
+      expect(kase).not_to be_consultancy
+    end
   end
 end

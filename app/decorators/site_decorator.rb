@@ -2,11 +2,6 @@ class SiteDecorator < ApplicationDecorator
   delegate_all
   decorates_association :clusters
 
-  def case_form_buttons
-    return unless managed_clusters.present?
-    case_form_button(new_scope_case_path)
-  end
-
   def tabs
     [tabs_builder.overview, tabs_builder.cases]
   end

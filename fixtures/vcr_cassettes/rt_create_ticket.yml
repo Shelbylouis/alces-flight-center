@@ -19,11 +19,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Mon, 12 Mar 2018 11:09:47 GMT
+      - Wed, 11 Apr 2018 15:44:36 GMT
       Server:
       - Apache/2.2.9 (Debian) mod_perl/2.0.4 Perl/v5.10.0
       Set-Cookie:
-      - RT_SID_<RT_API_HOST>.80=164a3483277a28121ef1c113bf2e1cab; path=/rt
+      - RT_SID_<RT_API_HOST>.80=31f082953d73178bd2e285401d94120d; path=/rt
       Vary:
       - Accept-Encoding
       Connection:
@@ -37,8 +37,8 @@ http_interactions:
       string: |+
         RT/3.6.7 200 Ok
 
-        # Ticket 11738 created.
+        # Ticket 11878 created.
 
     http_version: 
-  recorded_at: Mon, 12 Mar 2018 11:10:28 GMT
+  recorded_at: Wed, 11 Apr 2018 15:45:22 GMT
 recorded_with: VCR 4.0.0

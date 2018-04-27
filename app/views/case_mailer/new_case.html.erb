@@ -1,0 +1,23 @@
+<p>A new support case has been created:</p>
+
+<h3><%= @case.ticket_subject %></h3>
+
+<blockquote>
+  <% @case.email_properties.each do |key, value| %>
+    <strong><%= key %>:</strong>
+    <% if value.is_a?(Hash) %>
+      <ul style="list-style-type: none; margin: 0;">
+        <% value.each do |k, v| %>
+          <li>
+            <strong><%= k %>:</strong>
+          <%= v.include?("\n") ? simple_format(v) : v %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <%= value %>
+    <% end %>
+    <br/>
+  <% end %>
+  <cite><%= @case.created_at.to_formatted_s(:long) %> - <b><%= @case.user.name %></b></cite>
+</blockquote>

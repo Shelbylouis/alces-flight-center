@@ -28,14 +28,11 @@ class ApplicationDecorator < Draper::Decorator
     h.raw(icons.join)
   end
 
-  # As above: strictly speaking this gives the buttons for a ClusterPart or
-  # entire Cluster, but I don't have a better name for that yet.
-  def cluster_part_case_form_buttons
-    buttons = [
-      case_form_button(new_scope_case_path, disabled: advice?),
-      consultancy_form_button(consultancy_form_path)
-    ].join
-    h.raw("<div class='btn-group d-flex w-100' role='group'>#{buttons}</div>")
+  def case_form_button
+    h.link_to 'Create new support case',
+      new_scope_case_path,
+      class: 'w-100 btn btn-primary',
+      role: 'button'
   end
 
   # Override this method to generate the tab bars
@@ -131,40 +128,8 @@ class ApplicationDecorator < Draper::Decorator
     h.send(link_helper, self)
   end
 
-  def consultancy_form_path
-    helper = "new_#{readable_model_name}_consultancy_path"
-    h.send(helper, id_key => self.id)
-  end
-
   def id_key
     "#{readable_model_name}_id".to_sym
-  end
-
-  def case_form_button(path, disabled: false)
-    title = <<~EOF.squish if disabled
-      This #{readable_model_name} is self-managed; if required you
-      may only request consultancy support from Alces Software.
-    EOF
-
-    tab_top_button_link 'Create new support case',
-      path,
-      buttonClass: 'btn-primary',
-      disabled: disabled,
-      title: title
-  end
-
-  def consultancy_form_button(path)
-    tab_top_button_link 'Request consultancy',
-      path,
-      buttonClass: 'btn-danger'
-  end
-
-  def tab_top_button_link(text, path, buttonClass:, disabled: false, title: nil)
-    h.link_to text,
-      path,
-      class: ['btn w-100', buttonClass, disabled ? 'disabled' : nil],
-      role: 'button',
-      title: title
   end
 
   def tabs_builder

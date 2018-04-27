@@ -1,5 +1,18 @@
 
 FactoryBot.define do
+  factory :case_state_transition do
+    association :case
+    event 'resolve'
+    from 'open'
+    to 'resolved'
+  end
+
+  factory :case_comment do
+    association :user, factory: :admin
+    association :case # Avoid conflict with case keyword.
+    text 'This is a comment'
+  end
+
   sequence :email do |n|
     "a.scientist.#{n}@liverpool.ac.uk"
   end
@@ -70,6 +83,20 @@ FactoryBot.define do
     name 'User management'
   end
 
+  factory :tier do
+    issue
+    level 2
+    fields [{
+      type: 'input',
+      name: 'some_field',
+      value: 'some_value',
+    }]
+
+    factory :level_1_tier do
+      level 1
+    end
+  end
+
   factory :asset_record_field_definition, aliases: [:definition] do
     field_name 'Manufacturer/model name'
     level :group
@@ -86,19 +113,19 @@ FactoryBot.define do
 
   factory :credit_deposit do
     cluster
-    user { create(:admin) }
+    association :user, factory: :admin
     amount 10
   end
 
   factory :credit_charge do
-    add_attribute(:case) { create(:case) } # Avoid conflict with case keyword.
-    user { create(:admin) }
+    association :case # Avoid conflict with case keyword.
+    association :user, factory: :admin
     amount 2
   end
 
   factory :log do
     details 'I am the factory default details'
     cluster
-    engineer { create :admin }
+    association :engineer, factory: :admin
   end
 end

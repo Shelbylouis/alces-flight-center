@@ -1,0 +1,19 @@
+/*=============================================================================
+ * Copyright (C) 2014 Stephen F. Norledge and Alces Software Ltd.
+ *
+ * This file is part of Alces Portal.
+ *
+ * All rights reserved, see LICENSE.txt.
+ *===========================================================================*/
+@import 'layouts/mailer/settings';
+
+%section-title {
+    text-align: center;
+    background: $c-primary-color--dark;
+    color: $c-primary-color--lightest !important;
+    margin: 0;
+    padding: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom: 1px solid $c-primary-color;
+}
