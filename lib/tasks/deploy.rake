@@ -33,13 +33,7 @@ namespace :alces do
 
     namespace :staging do
       task obfuscate_user_data: :environment do
-        staging_password = ENV['STAGING_PASSWORD']
-        unless staging_password
-          raise <<~ERROR.squish
-            STAGING_PASSWORD environment variable must be set, to be used as
-            password for all Site contacts in staging environment
-          ERROR
-        end
+        staging_password = Deployment::Staging.password
 
         User.where(admin: false).each do |user|
           email_base = user.email.split('@').first

@@ -35,6 +35,19 @@ class Deployment
     EOF
   end
 
+  module Staging
+    STAGING_PASSWORD = 'STAGING_PASSWORD'
+
+    def self.password
+      ENV.fetch(STAGING_PASSWORD)
+    rescue KeyError
+      raise <<~ERROR.squish
+        #{STAGING_PASSWORD} environment variable must be set, to be used as
+        password for all Site contacts in staging environment
+      ERROR
+    end
+  end
+
   private
 
   attr_reader :remote, :tag
