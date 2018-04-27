@@ -4,7 +4,8 @@ require 'rake'
 class Deployment
   include Rake::DSL
 
-  def initialize(dry_run: false)
+  def initialize(type, dry_run: false)
+    @remote, @tag = parse_deploy_type(type)
     @dry_run = dry_run
   end
 
@@ -13,22 +14,41 @@ class Deployment
 
     run 'git checkout master'
     run 'git push origin'
-    run 'git push production'
+    run "git push #{remote}"
 
-    run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run flight-center rake db:migrate'"
-    run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run flight-center rake data:migrate'"
+    run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run #{app_name} rake db:migrate'"
+    run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run #{app_name} rake data:migrate'"
 
-    today = Date.today.iso8601
-    # today="$(date -I)-hotfix" # Uncomment for hotfix release. XXX handle this
-
-    run 'git tag production master -f'
-    run "git tag #{today} master"
+    run "git tag #{remote} master -f"
+    run "git tag #{tag} master"
     run 'git push --tags -f origin master'
 
-    important "Don't forget to rename the 'Done' Trello list to '#{today}'!"
+    important <<~EOF.squish
+      Don't forget to move all Trello cards included in this release to a
+      '#{tag}' list!
+    EOF
   end
 
   private
+
+  attr_reader :remote, :tag
+
+  def parse_deploy_type(type)
+    case type
+    when :production
+      [:production, today]
+    when :hotfix
+      [:production, "#{today}-hotfix"]
+    when :staging
+      [:staging, "#{today}-staging"]
+    else
+      raise "Unknown deployment type: '#{type}'"
+    end
+  end
+
+  def today
+    Date.today.iso8601
+  end
 
   def run(*args)
     if dry_run?
@@ -40,6 +60,17 @@ class Deployment
 
   def dry_run?
     @dry_run
+  end
+
+  def app_name
+    case remote
+    when :production
+      'flight-center'
+    when :staging
+      'flight-center-staging'
+    else
+      raise "Don't know how to handle remote: '#{remote}'"
+    end
   end
 
   def important(message)
