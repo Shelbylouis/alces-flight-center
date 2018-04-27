@@ -104,10 +104,6 @@ class Case < ApplicationRecord
     "mailto:#{support_email}?subject=#{email_reply_subject}"
   end
 
-  def archived?
-    self.state == 'resolved' || self.state == 'archived'
-  end
-
   # @deprecated - to be removed in next release
   def update_ticket_status!
     return unless incomplete_rt_ticket?
