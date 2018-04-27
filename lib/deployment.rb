@@ -12,6 +12,12 @@ class Deployment
   def deploy
     important 'Make sure you merge anything you want deployed to master!'
 
+    unless dry_run?
+      STDERR.puts "About to deploy to real #{remote} environment, are you sure? [y/n]"
+      input = STDIN.gets.chomp
+      abort unless input.downcase == 'y'
+    end
+
     run 'git checkout master'
     run 'git push origin'
     run "git push #{remote}"
