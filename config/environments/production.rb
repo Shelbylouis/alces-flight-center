@@ -68,7 +68,7 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
 
   # Host to use when generating URls in emails.
-  config.action_mailer.default_url_options = { host: ENV.fetch('DEFAULT_EMAIL_HOST', 'center.alces-flight.com') }
+  config.action_mailer.default_url_options = { host: ENV.fetch('ACTION_MAILER_URL_OPTIONS_HOST', 'center.alces-flight.com') }
 
   config.roadie.url_options = config.action_mailer.default_url_options
 
