@@ -65,7 +65,7 @@ Rails.application.configure do
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.raise_delivery_errors = true
 
   # Host to use when generating URls in emails.
   config.action_mailer.default_url_options = { host: ENV.fetch('DEFAULT_EMAIL_HOST', 'center.alces-flight.com') }
