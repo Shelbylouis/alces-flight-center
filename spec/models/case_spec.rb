@@ -182,7 +182,7 @@ RSpec.describe Case, type: :model do
       support_case = create(:case, cluster: cluster, subject: 'somesubject', rt_ticket_id: 12345)
 
       expected_subject =
-        /RE: \[helpdesk\.alces-software\.com #12345\] somecluster: somesubject \[#{random_token_regex}\]/
+        /Re: \[helpdesk\.alces-software\.com #12345\] somecluster: somesubject \[#{random_token_regex}\]/
       expected_mailto_url = /mailto:support@alces-software\.com\?subject=#{expected_subject}/
       expect(support_case.mailto_url).to match expected_mailto_url
     end

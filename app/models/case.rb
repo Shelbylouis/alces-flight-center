@@ -139,7 +139,7 @@ class Case < ApplicationRecord
   end
 
   def email_reply_subject
-    "RE: #{email_subject}"
+    "Re: #{email_subject}"
   end
 
   def events
