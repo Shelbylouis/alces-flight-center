@@ -59,8 +59,9 @@ module ApplicationHelper
                                         nav_icon: 'fa-cubes')
       end
 
-      if @cluster_part
-        @scope_nav_link_procs << nav_link_proc(model: @cluster_part,
+      cluster_part = model_from_scope(:service) || model_from_scope(:component)
+      if cluster_part
+        @scope_nav_link_procs << nav_link_proc(model: cluster_part,
                                         nav_icon: 'fa-cube')
       end
     end
