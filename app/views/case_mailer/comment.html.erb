@@ -3,7 +3,7 @@
 <h3><%= @case.ticket_subject %></h3>
 
 <blockquote>
-  <%= @comment.text %>
+  <%= simple_format(@comment.text) %>
   <br />
   <cite><%= @comment.updated_at.to_formatted_s(:long) %> - <b><%= @comment.user.name %></b></cite>
 </blockquote>
