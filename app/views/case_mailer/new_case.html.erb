@@ -1,6 +1,6 @@
 <p>A new support case has been created:</p>
 
-<h3><%= @case.ticket_subject %></h3>
+<h3><%= @case.display_id %> <%= @case.ticket_subject %></h3>
 
 <blockquote>
   <% @case.email_properties.each do |key, value| %>

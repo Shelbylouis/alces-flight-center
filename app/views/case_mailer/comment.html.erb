@@ -1,6 +1,6 @@
 <p>A new comment has been added to the following case:</p>
 
-<h3><%= @case.ticket_subject %></h3>
+<h3><%= @case.display_id %> <%= @case.ticket_subject %></h3>
 
 <blockquote>
   <%= simple_format(@comment.text) %>
