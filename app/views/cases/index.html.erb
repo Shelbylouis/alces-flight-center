@@ -50,7 +50,7 @@ end %>
                 timestamp: c.created_at
               ) %>
               <td><%= c.user_facing_state %></td>
-              <td><%= c.user.name %></td>
+              <td style="white-space: nowrap;"><%= c.user.name %></td>
               <td><%= link_to c.subject, case_path(c) %></td>
               <td><%= c.assignee&.name || 'Nobody' %></td>
               <td><%= c.association_info %></td>

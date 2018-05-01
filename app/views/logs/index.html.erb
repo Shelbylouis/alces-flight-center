@@ -11,7 +11,7 @@
       <% @logs.each do |log| %>
         <tr>
           <%= timestamp_td(description:  'Logged', timestamp: log.created_at) %>
-          <td><%= log.engineer.name %></td>
+          <td style="white-space: nowrap;"><%= log.engineer.name %></td>
           <td><%= log.details %></td>
           <td>
             <% log.cases.map(&:decorate).each do |kase| %>
