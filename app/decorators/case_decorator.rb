@@ -23,9 +23,8 @@ class CaseDecorator < ApplicationDecorator
 
   def case_select_details
     [
-      "RT ticket #{rt_ticket_id}",
+      "#{display_id} #{subject}",
       created_at.to_formatted_s(:long),
-      subject,
       associated_model.name,
       "Created by #{user.name}"
     ].join(' | ')
