@@ -106,6 +106,24 @@ RSpec.feature 'Navigation Bar', type: :feature do
       before :each { visit_subject :service_path }
       it_behaves_like 'a cluster navigation bar'
     end
+
+    context 'when visiting a case' do
+      subject do
+        create(:case_requiring_component, component: associated_model)
+      end
+      let :associated_model { create(:component, cluster: cluster) }
+
+      let :expected_cluster_links do
+        [
+          cluster_path(associated_model.cluster),
+          component_group_path(associated_model.component_group),
+          component_path(associated_model),
+        ]
+      end
+
+      before :each { visit_subject :case_path }
+      it_behaves_like 'a cluster navigation bar'
+    end
   end
 
   context 'with an admin logged in' do
