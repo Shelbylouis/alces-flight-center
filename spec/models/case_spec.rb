@@ -139,7 +139,7 @@ RSpec.describe Case, type: :model do
 
         expect(CaseMailer).to receive(:change_assignee).with(
           subject,
-          nil
+          assignee
         ).and_return(stub_mail)
 
         subject.save!
@@ -154,8 +154,19 @@ RSpec.describe Case, type: :model do
 
         expect(CaseMailer).to receive(:change_assignee).with(
           subject,
-          initial_assignee
+          assignee
         ).and_return(stub_mail)
+
+        subject.save!
+      end
+    end
+
+    context 'when being de-assigned' do
+      let(:initial_assignee) { create(:user, site: site) }
+      it 'does not send an email' do
+        subject.assignee = nil
+
+        expect(CaseMailer).not_to receive(:change_assignee)
 
         subject.save!
       end
