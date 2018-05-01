@@ -10,7 +10,7 @@
       </thead>
       <% @logs.each do |log| %>
         <tr>
-          <td><%= log.created_at.to_formatted_s(:long) %></td>
+          <%= timestamp_td(description:  'Logged', timestamp: log.created_at) %>
           <td><%= log.engineer.name %></td>
           <td><%= log.details %></td>
           <td>

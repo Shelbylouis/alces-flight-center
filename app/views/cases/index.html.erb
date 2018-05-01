@@ -45,11 +45,10 @@ end %>
             <% else %>
               <tr>
             <% end %>
-              <td
-                title="Support case created on <%= c.created_at.to_formatted_s(:long) %>"
-              >
-                <%= c.created_at.to_formatted_s(:short) %>
-              </td>
+              <%= timestamp_td(
+                description:  'Support case created',
+                timestamp: c.created_at
+              ) %>
               <td><%= c.user_facing_state %></td>
               <td><%= c.user.name %></td>
               <td><%= link_to c.subject, case_path(c) %></td>

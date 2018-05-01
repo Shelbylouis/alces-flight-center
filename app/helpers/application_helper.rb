@@ -38,6 +38,19 @@ module ApplicationHelper
     ['btn', 'btn-primary', 'btn-block']
   end
 
+  def timestamp_td(description:, timestamp:)
+    raw(
+      <<~EOF.strip_heredoc
+        <td
+          title="#{description} on #{timestamp.to_formatted_s(:long)}"
+          style="white-space: nowrap;"
+        >
+          #{timestamp.to_formatted_s(:short)}
+        </td>
+      EOF
+    )
+  end
+
   private
 
   # Map function with given name over enumerable collection of objects, then
