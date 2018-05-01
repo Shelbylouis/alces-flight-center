@@ -9,7 +9,7 @@ class CasesController < ApplicationController
     current_site.cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
-  def archives
+  def resolved
     index(show_resolved: true)
     render :index
   end

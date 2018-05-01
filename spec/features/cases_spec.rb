@@ -46,7 +46,7 @@ RSpec.describe 'Cases table', type: :feature do
 
     context 'when visit archive cases page' do
       it 'renders table of all resolved or closed Cases' do
-        visit archives_cases_path(as: user)
+        visit resolved_cases_path(as: user)
 
         cases = all('tr').map(&:text)
         expect(cases).not_to have_text('Open case')
@@ -76,7 +76,7 @@ RSpec.describe 'Cases table', type: :feature do
 
     context 'when visit archive cases page' do
       it 'renders table of all resolved and closed Cases, without Contact-specific buttons/info' do
-        visit archives_site_cases_path(site, as: user)
+        visit resolved_site_cases_path(site, as: user)
 
         headings = all('th').map(&:text)
         expect(headings).not_to include('Contact support')
