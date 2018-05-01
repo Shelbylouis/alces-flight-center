@@ -134,11 +134,11 @@ formField field item htmlFn additionalAttributes children optional state =
         identifier =
             fieldIdentifier fieldName
 
-        optionalBadge =
+        requiredBadge =
             if optional then
-                Badge.badgeSuccess [ Spacing.ml1 ] [ text "Optional" ]
-            else
                 text ""
+            else
+                Badge.badgeLight [ Spacing.ml1 ] [ text "Required" ]
 
         attributes =
             List.append
@@ -158,7 +158,7 @@ formField field item htmlFn additionalAttributes children optional state =
         [ label
             [ for identifier ]
             [ text fieldName ]
-        , optionalBadge
+        , requiredBadge
         , formElement
         , validationFeedback errors
         ]
