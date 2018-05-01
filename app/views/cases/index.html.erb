@@ -1,6 +1,6 @@
-<% manage_cases_page = current_user.admin? && @archive %>
+<% manage_cases_page = current_user.admin? && @show_resolved %>
 <%= content_for :subtitle do
-  "#{@archive ? 'All' : 'Open'} Cases"
+  "#{@show_resolved ? 'Resolved' : 'Open'} Cases"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
   <ul class='nav nav-tabs nav-justified' >
@@ -28,10 +28,10 @@ end %>
       <tbody>
         <% @scope.cases.order(created_at: :desc).decorate.each do |c| %>
       <%
-        # If @archive, show only non-open cases; if not @archive, show only open cases.
+        # If @show_resolved, show only non-open cases; if not @show_resolved, show only open cases.
         # Hence logic simplifies to the below (!=)
       %>
-          <% if @archive != c.open?  %>
+          <% if @show_resolved != c.open?  %>
             <% if c.hidden? && !manage_cases_page %>
               <tr
                 class="archived-case-row"
