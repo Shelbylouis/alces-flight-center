@@ -111,7 +111,7 @@ RSpec.describe 'Case page' do
   let :comment_button_text { 'Add new comment' }
 
   describe 'events list' do
-    it 'shows events in chronological order' do
+    it 'shows events in reverse chronological order' do
       create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
       create(
         :maintenance_window_state_transition,
@@ -130,12 +130,12 @@ RSpec.describe 'Case page' do
       event_cards = all('.event-card')
       expect(event_cards.size).to eq(4)
 
-      expect(event_cards[0].find('.card-body').text).to eq('First')
-      expect(event_cards[1].find('.card-body').text).to eq('Second')
-      expect(event_cards[2].find('.card-body').text).to match(
+      expect(event_cards[3].find('.card-body').text).to eq('First')
+      expect(event_cards[2].find('.card-body').text).to eq('Second')
+      expect(event_cards[1].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
-      expect(event_cards[3].find('.card-body').text).to eq(
+      expect(event_cards[0].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'
       )
     end

@@ -146,7 +146,7 @@ class Case < ApplicationRecord
       maintenance_windows.map(&:transitions).flatten.select(&:event) +
       case_state_transitions +
       audits
-    ).sort_by(&:created_at)
+    ).sort_by(&:created_at).reverse!
   end
 
   def email_subject

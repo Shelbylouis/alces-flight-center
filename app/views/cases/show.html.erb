@@ -58,10 +58,10 @@
       <tr>
         <th>Case history</th>
         <td colspan="3">
+          <%= render 'case_comments/form' %>
           <% @case.events.each do |event| %>
             <%= event.decorate.event_card %>
           <% end %>
-          <%= render 'case_comments/form' %>
         </td>
       </tr>
     </table>
