@@ -10,6 +10,7 @@ end %>
     <table class="table">
       <thead>
         <tr>
+          <th>ID</th>
           <th>Date</th>
           <th>State</th>
           <th>Creator</th>
@@ -43,6 +44,7 @@ end %>
             <% else %>
               <tr>
             <% end %>
+              <td><%= c.display_id %></td>
               <%= timestamp_td(
                 description:  'Support case created',
                 timestamp: c.created_at
