@@ -134,4 +134,18 @@ RSpec.describe CaseDecorator do
       end.to raise_error(RuntimeError, "Unhandled tier_level: 4")
     end
   end
+
+  describe '#display_id' do
+    it "gives RT ticket ID with 'RT' prefix when RT ticket ID associated" do
+      kase = create(:case, rt_ticket_id: 12345).decorate
+
+      expect(kase.display_id).to eq('RT12345')
+    end
+
+    it "gives object ID with '#' prefix when no RT ticket ID associated" do
+      kase = create(:case, id: 123).decorate
+
+      expect(kase.display_id).to eq('#123')
+    end
+  end
 end
