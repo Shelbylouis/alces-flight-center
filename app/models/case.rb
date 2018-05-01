@@ -39,10 +39,10 @@ class Case < ApplicationRecord
 
     state :open  # Open case, still work to do
     state :resolved  # Has been resolved but not yet accounted for commercially
-    state :archived  # Has been accounted for commercially, nothing more to do
+    state :closed  # Has been accounted for commercially, nothing more to do
 
     event(:resolve) { transition open: :resolved }  # Resolved cases cannot be reopened
-    event(:archive) { transition resolved: :archived }
+    event(:close) { transition resolved: :closed }
 
   end
 

@@ -3,14 +3,14 @@ class CasesController < ApplicationController
 
   decorates_assigned :site
 
-  def index(archive: false)
+  def index(show_resolved: false)
     @site = current_site
-    @archive = archive
+    @show_resolved = show_resolved
     current_site.cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
-  def archives
-    index(archive: true)
+  def resolved
+    index(show_resolved: true)
     render :index
   end
 
@@ -65,9 +65,9 @@ class CasesController < ApplicationController
     end
   end
 
-  def archive
-    change_action "Support case %s archived." do |kase|
-      kase.archive!(current_user)
+  def close
+    change_action "Support case %s closed." do |kase|
+      kase.close!(current_user)
     end
   end
 

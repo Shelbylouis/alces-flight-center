@@ -177,7 +177,7 @@ RSpec.describe Case, type: :model do
     it 'returns all open Cases' do
       create(:case, subject: 'one', state: 'open')
       create(:case, subject: 'two', state: 'resolved')
-      create(:case, subject: 'three', state: 'archived')
+      create(:case, subject: 'three', state: 'closed')
       create(:case, subject: 'four', state: 'open')
 
       active_cases = Case.active

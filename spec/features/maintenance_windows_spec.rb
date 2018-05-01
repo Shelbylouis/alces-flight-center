@@ -231,7 +231,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect(invalid_feedback).to have_text('Must be greater than 0')
       end
 
-      %w(resolved archived).each do |state|
+      %w(resolved closed).each do |state|
         it "cannot select #{state} Case for Cluster to associate" do
           my_case = create(
             :case,
