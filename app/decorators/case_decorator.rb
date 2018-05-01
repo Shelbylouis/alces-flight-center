@@ -5,8 +5,8 @@ class CaseDecorator < ApplicationDecorator
   # form app.
   TIER_DESCRIPTIONS = {
     1 => 'Tool',
-    2 => 'Support',
-    3 => 'Consultancy',
+    2 => 'Routine Maintenance',
+    3 => 'General Support',
   }.freeze
 
   def user_facing_state
@@ -18,7 +18,9 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def display_id
-    "##{object.id}"
+    # TODO Once https://trello.com/c/dzY3fb5C has been implemented we should
+    # replace `##{object.id}` with that identifier for non-RT tickets.
+    rt_ticket_id ? "RT#{rt_ticket_id}" : "##{object.id}"
   end
 
   def case_select_details
@@ -38,8 +40,8 @@ class CaseDecorator < ApplicationDecorator
     "http://helpdesk.alces-software.com/rt/Ticket/Display.html?id=#{rt_ticket_id}"
   end
 
-  def ticket_link
-    h.link_to(rt_ticket_id, h.case_path(self))
+  def case_link
+    h.link_to(display_id, h.case_path(self))
   end
 
   def chargeable_symbol

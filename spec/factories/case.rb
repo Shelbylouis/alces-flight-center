@@ -6,7 +6,6 @@ FactoryBot.define do
     user
     fields [{name: 'Details', value: 'some_details'}]
     tier_level 3
-    sequence(:rt_ticket_id) { |n| n }
 
     factory :open_case do
       state 'open'

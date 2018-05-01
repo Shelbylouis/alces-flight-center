@@ -99,24 +99,24 @@ RSpec.describe CaseDecorator do
     end
   end
 
-  describe '#ticket_link' do
-    it 'returns link to Case page with ticket id as text' do
+  describe '#case_link' do
+    it 'returns link to Case page with display_id as text' do
       kase = create(:case)
       kase.rt_ticket_id = 12345
 
       link = kase.decorate.tap do
         Draper::ViewContext.clear!
-      end.ticket_link
+      end.case_link
 
-      expect(link).to eq h.link_to('12345', h.case_path(kase))
+      expect(link).to eq h.link_to('RT12345', h.case_path(kase))
     end
   end
 
   describe '#tier_description' do
     {
       1 => 'Tool',
-      2 => 'Support',
-      3 => 'Consultancy',
+      2 => 'Routine Maintenance',
+      3 => 'General Support',
     }.each do |level, expected_description|
       it "gives correct text for level #{level} Tier" do
         kase = create(:case, tier_level: level).decorate
@@ -132,6 +132,20 @@ RSpec.describe CaseDecorator do
       expect do
         kase.tier_description
       end.to raise_error(RuntimeError, "Unhandled tier_level: 4")
+    end
+  end
+
+  describe '#display_id' do
+    it "gives RT ticket ID with 'RT' prefix when RT ticket ID associated" do
+      kase = create(:case, rt_ticket_id: 12345).decorate
+
+      expect(kase.display_id).to eq('RT12345')
+    end
+
+    it "gives object ID with '#' prefix when no RT ticket ID associated" do
+      kase = create(:case, id: 123).decorate
+
+      expect(kase.display_id).to eq('#123')
     end
   end
 end
