@@ -323,7 +323,7 @@ RSpec.describe Case, type: :model do
         Issue: 'Crashed node',
         'Associated component': 'node01',
         'Associated service': 'Some service',
-        Tier: '3 (Consultancy)',
+        Tier: '3 (General Support)',
         Fields: {
           field1: 'value1',
           field2: 'value2',

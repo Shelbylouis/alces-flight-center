@@ -5,8 +5,8 @@ class CaseDecorator < ApplicationDecorator
   # form app.
   TIER_DESCRIPTIONS = {
     1 => 'Tool',
-    2 => 'Support',
-    3 => 'Consultancy',
+    2 => 'Routine Maintenance',
+    3 => 'General Support',
   }.freeze
 
   def user_facing_state

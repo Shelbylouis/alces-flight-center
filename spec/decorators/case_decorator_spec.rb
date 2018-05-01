@@ -115,8 +115,8 @@ RSpec.describe CaseDecorator do
   describe '#tier_description' do
     {
       1 => 'Tool',
-      2 => 'Support',
-      3 => 'Consultancy',
+      2 => 'Routine Maintenance',
+      3 => 'General Support',
     }.each do |level, expected_description|
       it "gives correct text for level #{level} Tier" do
         kase = create(:case, tier_level: level).decorate

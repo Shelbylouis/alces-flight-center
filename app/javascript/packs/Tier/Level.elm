@@ -61,10 +61,10 @@ description level =
                     "Tool"
 
                 Two ->
-                    "Support"
+                    "Routine Maintenance"
 
                 Three ->
-                    "Consultancy"
+                    "General Support"
 
         tierNumberPrefix =
             toString (asInt level) ++ ":"
