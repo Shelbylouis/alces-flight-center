@@ -67,13 +67,17 @@ class ApplicationController < ActionController::Base
                id = scope_id_param(:service_id)
                @service = @cluster_part = Service.find(id)
              else
-               @site = if request.path =~ /^\/sites/
-                         id = scope_id_param(:site_id)
-                         Site.find(id)
-                       elsif current_user.contact?
-                         current_user.site
-                       end
+               assign_site_scope
              end
+  end
+
+  def assign_site_scope
+    @site = if request.path =~ /^\/sites/
+              id = scope_id_param(:site_id)
+              Site.find(id)
+            elsif current_user.contact?
+              current_user.site
+            end
   end
 
   def assign_title
