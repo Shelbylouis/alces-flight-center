@@ -65,9 +65,9 @@ class CasesController < ApplicationController
     end
   end
 
-  def archive
-    change_action "Support case %s archived." do |kase|
-      kase.archive!(current_user)
+  def close
+    change_action "Support case %s closed." do |kase|
+      kase.close!(current_user)
     end
   end
 

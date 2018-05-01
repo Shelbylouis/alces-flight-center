@@ -14,8 +14,8 @@ RSpec.describe 'Cases table', type: :feature do
     create(:resolved_case, cluster: cluster, subject: 'Resolved case', completed_at: 1.days.ago, rt_ticket_id: nil)
   end
 
-  let! :archived_case do
-    create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
+  let! :closed_case do
+    create(:closed_case, cluster: cluster, subject: 'Closed case', completed_at: 2.days.ago)
   end
 
   RSpec.shared_examples 'open cases table rendered' do
@@ -25,7 +25,7 @@ RSpec.describe 'Cases table', type: :feature do
       cases = all('tr').map(&:text)
       expect(cases).to have_text('Open case')
       expect(cases).not_to have_text('Resolved case')
-      expect(cases).not_to have_text('Archived case')
+      expect(cases).not_to have_text('Closed case')
 
       headings = all('th').map(&:text)
       expect(headings).to include('Contact support')
@@ -51,7 +51,7 @@ RSpec.describe 'Cases table', type: :feature do
         cases = all('tr').map(&:text)
         expect(cases).to have_text('Open case')
         expect(cases).to have_text('Resolved case')
-        expect(cases).to have_text('Archived case')
+        expect(cases).to have_text('Closed case')
 
         headings = all('th').map(&:text)
         expect(headings).to include('Contact support')
@@ -114,8 +114,8 @@ RSpec.describe 'Case page' do
     create(:resolved_case, cluster: cluster, subject: 'Resolved case')
   end
 
-  let :archived_case do
-    create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
+  let :closed_case do
+    create(:closed_case, cluster: cluster, subject: 'Closed case', completed_at: 2.days.ago)
   end
 
   let (:mw) { create(:maintenance_window, case: open_case) }
@@ -166,7 +166,7 @@ RSpec.describe 'Case page' do
       visit case_path(resolved_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
 
-      visit case_path(archived_case, as: contact)
+      visit case_path(closed_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
     end
 
@@ -181,7 +181,7 @@ RSpec.describe 'Case page' do
       visit case_path(resolved_case, as: admin)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
 
-      visit case_path(archived_case, as: admin)
+      visit case_path(closed_case, as: admin)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
     end
   end
@@ -194,7 +194,7 @@ RSpec.describe 'Case page' do
       visit case_path(resolved_case, as: contact)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-      visit case_path(archived_case, as: contact)
+      visit case_path(closed_case, as: contact)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
     end
 
@@ -204,9 +204,9 @@ RSpec.describe 'Case page' do
       expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
 
       visit case_path(resolved_case, as: admin)
-      expect(find('#case-state-controls').find('a').text).to eq 'Archive this case'
+      expect(find('#case-state-controls').find('a').text).to eq 'Close this case'
 
-      visit case_path(archived_case, as: admin)
+      visit case_path(closed_case, as: admin)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
     end
   end

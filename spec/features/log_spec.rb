@@ -65,7 +65,7 @@ RSpec.feature Log, type: :feature do
       expect(submit_log.cases).to contain_exactly(*log_cases)
     end
 
-    %w(resolved archived).each do |state|
+    %w(resolved closed).each do |state|
       it "cannot select #{state} Case for subject to associate" do
         case_attributes = {
             cluster: cluster,

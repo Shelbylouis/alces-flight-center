@@ -16,8 +16,8 @@ FactoryBot.define do
       state 'resolved'
     end
 
-    factory :archived_case do
-      state 'archived'
+    factory :closed_case do
+      state 'closed'
     end
 
     # Every Case requires a Cluster, so this is just the same as the standard

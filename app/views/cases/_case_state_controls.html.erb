@@ -11,14 +11,14 @@
                 }
     %>
   <% elsif @case.state == 'resolved' %>
-    <%= link_to 'Archive this case',
-                archive_case_path(@case.id),
+    <%= link_to 'Close this case',
+                close_case_path(@case.id),
                 class: 'btn btn-secondary ml-2 btn-sm',
                 method: :post,
                 role: 'button',
-                title: 'Archive this support case if it has been appropriately processed as part of credit reporting',
+                title: 'Close this support case if it has been appropriately processed as part of credit reporting',
                 data: {
-                    confirm: 'Are you sure you want to archive this support case?'
+                    confirm: 'Are you sure you want to close this support case?'
                 }
     %>
   <% end %>
