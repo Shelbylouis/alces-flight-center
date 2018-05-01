@@ -1,6 +1,6 @@
 A new support case has been created:
 
-<%= @case.ticket_subject %>
+<%= @case.display_id %> <%= @case.ticket_subject %>
 
 -------------------------------------------------------------------------------
 <%= @case.created_at.to_formatted_s(:long) %> - <%= @case.user.name %>:

@@ -1,3 +1,5 @@
+require 'resque/server'
+
 Rails.application.routes.draw do
   asset_record_alias = 'asset-record'
   component_expansions_alias = 'expansions'
@@ -62,6 +64,9 @@ Rails.application.routes.draw do
   end
 
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
+
+    mount Resque::Server, at: '/resque'
+
     root 'sites#index'
     resources :sites, only: [:show, :index] do
       archive_cases.call(only: :show)

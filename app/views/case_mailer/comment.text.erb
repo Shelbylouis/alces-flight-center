@@ -1,6 +1,6 @@
 A new comment has been added to the following case:
 
-  <%= @case.ticket_subject %>
+<%= @case.display_id %> <%= @case.ticket_subject %>
 
 -------------------------------------------------------------------------------
 <%= @comment.updated_at.to_formatted_s(:long) %> - <%= @comment.user.name %>:

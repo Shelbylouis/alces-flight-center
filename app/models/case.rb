@@ -139,7 +139,7 @@ class Case < ApplicationRecord
   end
 
   def email_reply_subject
-    "RE: #{email_subject}"
+    "Re: #{email_subject}"
   end
 
   def events
@@ -199,7 +199,6 @@ class Case < ApplicationRecord
   end
 
   def assignee=(new_assignee)
-    @old_assignee = assignee
     @assignee_changed = true
     super(new_assignee)
   end
@@ -274,7 +273,8 @@ class Case < ApplicationRecord
 
   def maybe_send_new_assignee_email
     return unless @assignee_changed
-    CaseMailer.change_assignee(self, @old_assignee).deliver_later
+    return if assignee.nil?
+    CaseMailer.change_assignee(self, assignee).deliver_later
   end
 
   def validates_user_assignment
