@@ -1,21 +1,32 @@
 
 <%
-
+  disabled_message_text = <<~TITLE.squish
+            This is a non-consultancy support case and so additional discussion is
+            not available. If you wish to request additional support please open a
+            new support case.
+  TITLE
   additional_attributes =
     if @case.commenting_disabled?
       {
         disabled: true,
-        title: <<~TITLE.squish
-          This is a non-consultancy support case and so additional discussion is
-          not available. If you wish to request additional support please open a
-          new support case.
-        TITLE
+        title: disabled_message_text
       }
     else
       {}
     end
 
 %>
+
+<% if @case.commenting_disabled? %>
+   <div class="card bg-light">
+     <div class="card-body">
+       <span class="float-left mr-3">
+         <%= icon('info') %>
+       </span>
+       <%= disabled_message_text %>
+     </div>
+   </div>
+<% end %>
 
 <% if @case.state == 'open' %>
   <%= form_for [@case, @comment] do |f| %>
