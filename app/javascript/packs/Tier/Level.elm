@@ -52,6 +52,8 @@ fromInt int =
 description : Level -> String
 description level =
     let
+        -- Note: These should match values used in
+        -- `app/decorators/case_decorator.rb`
         humanTierDescription =
             case level of
                 Zero ->
