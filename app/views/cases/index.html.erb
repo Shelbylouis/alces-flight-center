@@ -18,8 +18,6 @@ end %>
           <th>Association</th>
           <% if manage_cases_page %>
             <th>Chargeable</th>
-          <% else %>
-            <th>Contact support</th>
           <% end %>
           <th>Credit charge</th>
         </tr>
@@ -56,8 +54,6 @@ end %>
               <td><%= c.association_info %></td>
               <% if manage_cases_page %>
                 <td><%= c.chargeable_symbol %></td>
-              <% else %>
-                <td><%= render 'cases/email_support_icon', support_case: c %></td>
               <% end %>
               <td>
                 <% if c.credit_charge_allowed? && manage_cases_page %>

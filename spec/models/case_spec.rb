@@ -106,13 +106,13 @@ RSpec.describe Case, type: :model do
       subject.save!
     end
 
-    it 'saves generated ticket token to later use in mailto_url' do
+    it 'saves generated ticket token' do
       subject.save!
       created_ticket_token = subject.token
       expect(created_ticket_token).to match(random_token_regex)
       subject.reload
 
-      expect(subject.mailto_url).to include(created_ticket_token)
+      expect(subject.token).to eq(created_ticket_token)
     end
   end
 
@@ -183,19 +183,6 @@ RSpec.describe Case, type: :model do
       active_cases = Case.active
 
       expect(active_cases.map(&:subject)).to match_array(['one', 'four'])
-    end
-  end
-
-  describe '#mailto_url' do
-    it 'creates correct mailto URL' do
-      cluster = create(:cluster, name: 'somecluster')
-
-      support_case = create(:case, cluster: cluster, subject: 'somesubject', rt_ticket_id: 12345)
-
-      expected_subject =
-        /Re: \[helpdesk\.alces-software\.com #12345\] somecluster: somesubject \[#{random_token_regex}\]/
-      expected_mailto_url = /mailto:support@alces-software\.com\?subject=#{expected_subject}/
-      expect(support_case.mailto_url).to match expected_mailto_url
     end
   end
 

@@ -26,12 +26,6 @@ RSpec.describe 'Cases table', type: :feature do
       expect(cases).to have_text('Open case')
       expect(cases).not_to have_text('Resolved case')
       expect(cases).not_to have_text('Closed case')
-
-      headings = all('th').map(&:text)
-      expect(headings).to include('Contact support')
-
-      links = all('a').map { |a| a[:href] }
-      expect(links).to include(open_case.mailto_url)
     end
   end
 
@@ -52,13 +46,6 @@ RSpec.describe 'Cases table', type: :feature do
         expect(cases).not_to have_text('Open case')
         expect(cases).to have_text('Resolved case')
         expect(cases).to have_text('Closed case')
-
-        headings = all('th').map(&:text)
-        expect(headings).to include('Contact support')
-
-        links = all('a').map { |a| a[:href] }
-        expect(links).not_to include(open_case.mailto_url)
-
       end
     end
   end

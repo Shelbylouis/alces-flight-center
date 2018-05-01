@@ -99,11 +99,6 @@ class Case < ApplicationRecord
     @rt ||= Rails.configuration.rt_interface_class.constantize.new
   end
 
-  def mailto_url
-    support_email = 'support@alces-software.com'
-    "mailto:#{support_email}?subject=#{email_reply_subject}"
-  end
-
   # @deprecated - to be removed in next release
   def update_ticket_status!
     return unless incomplete_rt_ticket?
