@@ -36,10 +36,6 @@ class CaseDecorator < ApplicationDecorator
     associated_model.decorate.links
   end
 
-  def rt_ticket_url
-    "http://helpdesk.alces-software.com/rt/Ticket/Display.html?id=#{rt_ticket_id}"
-  end
-
   def case_link
     h.link_to(display_id, h.case_path(self))
   end
