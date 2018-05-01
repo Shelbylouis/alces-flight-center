@@ -45,11 +45,11 @@ RSpec.describe 'Cases table', type: :feature do
     end
 
     context 'when visit archive cases page' do
-      it 'renders table of all Cases' do
+      it 'renders table of all resolved or closed Cases' do
         visit archives_cases_path(as: user)
 
         cases = all('tr').map(&:text)
-        expect(cases).to have_text('Open case')
+        expect(cases).not_to have_text('Open case')
         expect(cases).to have_text('Resolved case')
         expect(cases).to have_text('Closed case')
 
@@ -57,7 +57,7 @@ RSpec.describe 'Cases table', type: :feature do
         expect(headings).to include('Contact support')
 
         links = all('a').map { |a| a[:href] }
-        expect(links).to include(open_case.mailto_url)
+        expect(links).not_to include(open_case.mailto_url)
 
       end
     end
@@ -75,7 +75,7 @@ RSpec.describe 'Cases table', type: :feature do
     end
 
     context 'when visit archive cases page' do
-      it 'renders table of all Cases, without Contact-specific buttons/info' do
+      it 'renders table of all resolved and closed Cases, without Contact-specific buttons/info' do
         visit archives_site_cases_path(site, as: user)
 
         headings = all('th').map(&:text)

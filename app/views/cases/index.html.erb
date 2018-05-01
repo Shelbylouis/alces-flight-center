@@ -27,7 +27,11 @@ end %>
 
       <tbody>
         <% @scope.cases.order(created_at: :desc).decorate.each do |c| %>
-          <% if @archive || c.open? %>
+      <%
+        # If @archive, show only non-open cases; if not @archive, show only open cases.
+        # Hence logic simplifies to the below (!=)
+      %>
+          <% if @archive != c.open?  %>
             <% if c.hidden? && !manage_cases_page %>
               <tr
                 class="archived-case-row"
