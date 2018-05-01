@@ -15,7 +15,7 @@
           <td><%= log.details %></td>
           <td>
             <% log.cases.map(&:decorate).each do |kase| %>
-              <%= kase.ticket_link %>
+              <%= kase.case_link %>
             <% end %>
           </td>
         </tr>

@@ -40,8 +40,8 @@ class CaseDecorator < ApplicationDecorator
     "http://helpdesk.alces-software.com/rt/Ticket/Display.html?id=#{rt_ticket_id}"
   end
 
-  def ticket_link
-    h.link_to(rt_ticket_id, h.case_path(self))
+  def case_link
+    h.link_to(display_id, h.case_path(self))
   end
 
   def chargeable_symbol
