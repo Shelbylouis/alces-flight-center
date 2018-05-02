@@ -352,4 +352,18 @@ RSpec.describe Case, type: :model do
       expect(kase).not_to be_consultancy
     end
   end
+
+  describe '#display_id' do
+    it "gives RT ticket ID with 'RT' prefix when RT ticket ID associated" do
+      kase = create(:case, rt_ticket_id: 12345)
+
+      expect(kase.display_id).to eq('RT12345')
+    end
+
+    it "gives object ID with '#' prefix when no RT ticket ID associated" do
+      kase = create(:case, id: 123)
+
+      expect(kase.display_id).to eq('#123')
+    end
+  end
 end

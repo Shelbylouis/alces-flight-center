@@ -17,12 +17,6 @@ class CaseDecorator < ApplicationDecorator
     state == 'resolved' || state == 'archived'
   end
 
-  def display_id
-    # TODO Once https://trello.com/c/dzY3fb5C has been implemented we should
-    # replace `##{object.id}` with that identifier for non-RT tickets.
-    rt_ticket_id ? "RT#{rt_ticket_id}" : "##{object.id}"
-  end
-
   def case_select_details
     [
       "#{display_id} #{subject}",
