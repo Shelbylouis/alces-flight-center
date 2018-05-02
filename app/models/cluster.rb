@@ -95,6 +95,14 @@ class Cluster < ApplicationRecord
       .reverse
   end
 
+  def next_case_index
+    with_lock do  # Prevent concurrent reads of this record
+      self.case_index = case_index + 1
+      save!
+      case_index
+    end
+  end
+
   private
 
   def validate_all_components_advice

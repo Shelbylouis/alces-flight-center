@@ -48,6 +48,8 @@ class Case < ApplicationRecord
 
   audited only: :assignee_id, on: [ :update ]
 
+  validates :display_id, uniqueness: true
+  validate :has_display_id_when_saved
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
@@ -84,6 +86,7 @@ class Case < ApplicationRecord
 
   before_validation :assign_default_subject_if_unset
 
+  after_create :set_display_id
   after_create :send_new_case_email
   after_update :maybe_send_new_assignee_email
 
@@ -284,6 +287,25 @@ class Case < ApplicationRecord
   def validates_user_assignment
     return if assignee.nil?
     errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
+  end
+
+  def set_display_id
+    return if self.display_id
+    # Note: this method is called AFTER create, to ensure that the case is valid
+    # before we increment the cluster's `case_index` field. Otherwise display IDs
+    # could end up non-sequential.
+
+    if self.rt_ticket_id
+      self.display_id = "RT#{rt_ticket_id}"
+    else
+      self.display_id = "#{cluster.shortcode}#{cluster.next_case_index}"
+    end
+    save!
+  end
+
+  def has_display_id_when_saved
+    # We want to be able to save the case initially without a display id
+    errors.add(:display_id, 'must be present') unless !persisted? or display_id
   end
 
   def field_hash
