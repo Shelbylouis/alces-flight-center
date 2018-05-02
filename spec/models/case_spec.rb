@@ -363,6 +363,22 @@ RSpec.describe Case, type: :model do
       kase = create(:case)
 
       expect(kase.display_id).to eq("#{kase.cluster.shortcode}1")
+      expect(kase.cluster.case_index).to eq 1
+    end
+
+    it 'doesn\'t use up a case_index when case is invalid' do
+
+      cluster = create(:cluster)
+
+      expect(cluster.case_index).to eq 0
+
+      bad_case = build(:case, cluster: cluster, tier_level: 99)
+
+      expect do
+        bad_case.save!
+      end.to raise_error(ActiveRecord::RecordInvalid)
+
+      expect(cluster.case_index).to eq 0
     end
   end
 end
