@@ -162,9 +162,9 @@ class Case < ApplicationRecord
   end
 
   def ticket_subject
-    # NOTE: If the format used here ever changes then this may cause emails
-    # sent using the `mailto` links for existing Cases to not be threaded with
-    # previous emails related to that Case (see
+    # NOTE: If the format used here ever changes then this may cause new emails
+    # sent in relation to an existing Cases to not be threaded with previous
+    # emails related to that Case (see
     # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
     # for an explanation). If we want to change this format and avoid this
     # consequence then a solution would be to first add a new field for this
