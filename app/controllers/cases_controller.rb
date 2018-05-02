@@ -37,7 +37,7 @@ class CasesController < ApplicationController
   end
 
   def create
-    @case = Case.new(case_params.merge(user: current_user)).decorate
+    @case = Case.new(case_params.merge(user: current_user))
 
     respond_to do |format|
       if @case.save
@@ -104,7 +104,7 @@ class CasesController < ApplicationController
   end
 
   def change_action(success_flash, redirect_path: case_path, &block)
-    @case = Case.find(params[:id]).decorate
+    @case = Case.find(params[:id])
     begin
       block.call(@case)
       @case.save!

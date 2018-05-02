@@ -106,13 +106,13 @@ RSpec.describe Case, type: :model do
       subject.save!
     end
 
-    it 'saves generated ticket token' do
+    it 'saves generated token' do
       subject.save!
-      created_ticket_token = subject.token
-      expect(created_ticket_token).to match(random_token_regex)
+      generated_token = subject.token
+      expect(generated_token).to match(random_token_regex)
       subject.reload
 
-      expect(subject.token).to eq(created_ticket_token)
+      expect(subject.token).to eq(generated_token)
     end
   end
 
@@ -287,7 +287,6 @@ RSpec.describe Case, type: :model do
     let(:kase) {
       create(
         :case,
-        rt_ticket_id: 1138,
         created_at: Time.now,
         cluster: cluster,
         issue: issue,
@@ -350,6 +349,20 @@ RSpec.describe Case, type: :model do
       kase = create(:case, tier_level: 2)
 
       expect(kase).not_to be_consultancy
+    end
+  end
+
+  describe '#display_id' do
+    it "gives RT ticket ID with 'RT' prefix when RT ticket ID associated" do
+      kase = create(:case, rt_ticket_id: 12345)
+
+      expect(kase.display_id).to eq('RT12345')
+    end
+
+    it "gives object ID with '#' prefix when no RT ticket ID associated" do
+      kase = create(:case, id: 123)
+
+      expect(kase.display_id).to eq('#123')
     end
   end
 end

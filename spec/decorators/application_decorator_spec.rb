@@ -54,41 +54,41 @@ RSpec.describe ApplicationDecorator do
 
       it 'includes correct icon when has requested maintenance window' do
         window = create(:requested_maintenance_window, component: component)
-        ticket_id = window.case.rt_ticket_id
+        display_id = window.case.display_id
 
         expect(subject).to include(
           h.icon(
             'wrench',
             inline: true,
             class: 'faded-icon',
-            title: "Maintenance has been requested for #{component.name} for ticket #{ticket_id}"
+            title: "Maintenance has been requested for #{component.name} for case #{display_id}"
           )
         )
       end
 
       it 'includes correct icon when has confirmed maintenance window' do
         window = create(:confirmed_maintenance_window, component: component)
-        ticket_id = window.case.rt_ticket_id
+        display_id = window.case.display_id
 
         expect(subject).to include(
           h.icon(
             'wrench',
             inline: true,
             class: 'faded-icon',
-            title: "Maintenance is scheduled for #{component.name} for ticket #{ticket_id}"
+            title: "Maintenance is scheduled for #{component.name} for case #{display_id}"
           )
         )
       end
 
       it 'includes correct icon when has in progress maintenance window' do
         window = create(:maintenance_window, state: :started, component: component)
-        ticket_id = window.case.rt_ticket_id
+        display_id = window.case.display_id
 
         expect(subject).to include(
           h.icon(
             'wrench',
             inline: true,
-            title: "#{component.name} currently under maintenance for ticket #{ticket_id}"
+            title: "#{component.name} currently under maintenance for case #{display_id}"
           )
         )
       end

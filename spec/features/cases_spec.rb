@@ -11,7 +11,7 @@ RSpec.describe 'Cases table', type: :feature do
   end
 
   let! :resolved_case do
-    create(:resolved_case, cluster: cluster, subject: 'Resolved case', completed_at: 1.days.ago, rt_ticket_id: nil)
+    create(:resolved_case, cluster: cluster, subject: 'Resolved case', completed_at: 1.days.ago)
   end
 
   let! :closed_case do

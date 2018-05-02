@@ -157,18 +157,21 @@ class Case < ApplicationRecord
     if rt_ticket_id
       "[helpdesk.alces-software.com ##{rt_ticket_id}]"
     else
+      # TODO Update this with identifier in format `BAR123` once this exists.
       "[Alces Flight Center ##{id}]"
     end
   end
 
   def ticket_subject
-    # NOTE: If the format used here ever changes then this may cause emails
-    # sent using the `mailto` links for existing Cases to not be threaded with
-    # previous emails related to that Case (see
+    # NOTE: If the format used here ever changes then this may cause new emails
+    # sent in relation to an existing Cases to not be threaded with previous
+    # emails related to that Case (see
     # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
     # for an explanation). If we want to change this format and avoid this
     # consequence then a solution would be to first add a new field for this
     # whole string, and save and use the existing format for existing Cases.
+    # TODO should we update this to include identifier in format `BAR123` once
+    # this exists?
     "#{cluster.name}: #{subject} [#{token}]"
   end
 
@@ -196,6 +199,12 @@ class Case < ApplicationRecord
   def assignee=(new_assignee)
     @assignee_changed = true
     super(new_assignee)
+  end
+
+  def display_id
+    # TODO Once https://trello.com/c/dzY3fb5C has been implemented we should
+    # replace `##{object.id}` with that identifier for non-RT tickets.
+    rt_ticket_id ? "RT#{rt_ticket_id}" : "##{id}"
   end
 
   private
@@ -241,11 +250,11 @@ class Case < ApplicationRecord
     user.email
   end
 
-  # We generate a short random token to identify each ticket within email
-  # clients and RT. Without this, similar but distinct tickets can be hard to
-  # distinguish in RT as they will have identical subjects, and many email
-  # clients will also collapse different tickets into the same thread due to
-  # their similar subjects (see
+  # We generate a short random token to identify each Case within email
+  # clients. Without this, similar but distinct Cases can be hard to
+  # distinguish in many email clients as they can have identical subjects, as
+  # many email clients will collapse different tickets into the same thread due
+  # to their similar subjects (see
   # https://github.com/alces-software/alces-flight-center/issues/41#issuecomment-361307971).
   #
   # We generate this token with alternating letters and digits to minimize the
