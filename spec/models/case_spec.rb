@@ -359,10 +359,10 @@ RSpec.describe Case, type: :model do
       expect(kase.display_id).to eq('RT12345')
     end
 
-    it "gives object ID with '#' prefix when no RT ticket ID associated" do
-      kase = create(:case, id: 123)
+    it "gives cluster-specific unique ID when no RT ticket ID associated" do
+      kase = create(:case)
 
-      expect(kase.display_id).to eq('#123')
+      expect(kase.display_id).to eq("#{kase.cluster.shortcode}1")
     end
   end
 end

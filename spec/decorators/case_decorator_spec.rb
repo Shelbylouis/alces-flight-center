@@ -101,8 +101,7 @@ RSpec.describe CaseDecorator do
 
   describe '#case_link' do
     it 'returns link to Case page with display_id as text' do
-      kase = create(:case)
-      kase.rt_ticket_id = 12345
+      kase = create(:case, rt_ticket_id: 12345)
 
       link = kase.decorate.tap do
         Draper::ViewContext.clear!

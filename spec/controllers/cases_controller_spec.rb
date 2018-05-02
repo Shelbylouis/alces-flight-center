@@ -178,12 +178,12 @@ RSpec.describe CasesController, type: :controller do
 
     it 'resolves an open case' do
       post :resolve, params: { id: open_case.id }
-      expect(flash[:success]).to eq "Support case ##{open_case.id} resolved."
+      expect(flash[:success]).to eq "Support case #{open_case.display_id} resolved."
     end
 
     it 'closes a resolved case' do
       post :close, params: { id: resolved_case.id }
-      expect(flash[:success]).to eq "Support case ##{resolved_case.id} closed."
+      expect(flash[:success]).to eq "Support case #{resolved_case.display_id} closed."
     end
 
     it 'does not resolve a closed case' do

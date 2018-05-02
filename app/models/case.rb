@@ -204,12 +204,6 @@ class Case < ApplicationRecord
     super(new_assignee)
   end
 
-  def display_id
-    # TODO Once https://trello.com/c/dzY3fb5C has been implemented we should
-    # replace `##{object.id}` with that identifier for non-RT tickets.
-    rt_ticket_id ? "RT#{rt_ticket_id}" : "##{id}"
-  end
-
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
