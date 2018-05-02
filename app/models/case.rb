@@ -247,11 +247,11 @@ class Case < ApplicationRecord
     user.email
   end
 
-  # We generate a short random token to identify each ticket within email
-  # clients and RT. Without this, similar but distinct tickets can be hard to
-  # distinguish in RT as they will have identical subjects, and many email
-  # clients will also collapse different tickets into the same thread due to
-  # their similar subjects (see
+  # We generate a short random token to identify each Case within email
+  # clients. Without this, similar but distinct Cases can be hard to
+  # distinguish in many email clients as they can have identical subjects, as
+  # many email clients will collapse different tickets into the same thread due
+  # to their similar subjects (see
   # https://github.com/alces-software/alces-flight-center/issues/41#issuecomment-361307971).
   #
   # We generate this token with alternating letters and digits to minimize the
