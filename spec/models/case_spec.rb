@@ -287,7 +287,6 @@ RSpec.describe Case, type: :model do
     let(:kase) {
       create(
         :case,
-        rt_ticket_id: 1138,
         created_at: Time.now,
         cluster: cluster,
         issue: issue,
