@@ -44,7 +44,7 @@ end %>
             <% else %>
               <tr>
             <% end %>
-              <td><%= c.display_id %></td>
+              <td><%= link_to c.display_id, case_path(c) %></td>
               <%= timestamp_td(
                 description:  'Support case created',
                 timestamp: c.created_at
