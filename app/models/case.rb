@@ -172,8 +172,7 @@ class Case < ApplicationRecord
     if rt_ticket_id
       "[helpdesk.alces-software.com ##{rt_ticket_id}]"
     else
-      # TODO Update this with identifier in format `BAR123` once this exists.
-      "[Alces Flight Center ##{id}]"
+      "[Alces Flight Center #{display_id}]"
     end
   end
 
@@ -185,9 +184,16 @@ class Case < ApplicationRecord
     # for an explanation). If we want to change this format and avoid this
     # consequence then a solution would be to first add a new field for this
     # whole string, and save and use the existing format for existing Cases.
-    # TODO should we update this to include identifier in format `BAR123` once
-    # this exists?
-    "#{cluster.name}: #{subject} [#{token}]"
+    #
+    # FSR using the conditional in `#email_identifier` rather than repeating it
+    # here causes Rails to Base64-encode the plain text part of the email, which
+    # causes some of our tests to fail...
+    if rt_ticket_id
+      "#{cluster.name}: #{subject} [#{token}]"
+    else
+      # With 'new' display IDs we have a cluster hint, so don't include it twice.
+      "#{subject} [#{token}]"
+    end
   end
 
   def email_properties
