@@ -157,6 +157,7 @@ class Case < ApplicationRecord
     if rt_ticket_id
       "[helpdesk.alces-software.com ##{rt_ticket_id}]"
     else
+      # TODO Update this with identifier in format `BAR123` once this exists.
       "[Alces Flight Center ##{id}]"
     end
   end
@@ -169,6 +170,8 @@ class Case < ApplicationRecord
     # for an explanation). If we want to change this format and avoid this
     # consequence then a solution would be to first add a new field for this
     # whole string, and save and use the existing format for existing Cases.
+    # TODO should we update this to include identifier in format `BAR123` once
+    # this exists?
     "#{cluster.name}: #{subject} [#{token}]"
   end
 
