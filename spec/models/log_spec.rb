@@ -59,7 +59,7 @@ RSpec.describe Log, type: :model do
       subject.cases << bad_case
       subject.reload
 
-      expect_single_error subject, "#{bad_case.rt_ticket_id}"
+      expect_single_error subject, "#{bad_case.display_id}"
     end
   end
 

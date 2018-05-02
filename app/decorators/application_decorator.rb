@@ -118,7 +118,7 @@ class ApplicationDecorator < Draper::Decorator
       return
     end
 
-    title = "#{title_base} for ticket #{window.case.rt_ticket_id}"
+    title = "#{title_base} for case #{window.case.display_id}"
 
     h.icon('wrench', inline: true, class: class_names, title: title)
   end

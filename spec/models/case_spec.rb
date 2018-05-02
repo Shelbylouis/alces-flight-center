@@ -106,13 +106,13 @@ RSpec.describe Case, type: :model do
       subject.save!
     end
 
-    it 'saves generated ticket token' do
+    it 'saves generated token' do
       subject.save!
-      created_ticket_token = subject.token
-      expect(created_ticket_token).to match(random_token_regex)
+      generated_token = subject.token
+      expect(generated_token).to match(random_token_regex)
       subject.reload
 
-      expect(subject.token).to eq(created_ticket_token)
+      expect(subject.token).to eq(generated_token)
     end
   end
 
