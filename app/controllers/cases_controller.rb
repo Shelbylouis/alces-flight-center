@@ -6,7 +6,6 @@ class CasesController < ApplicationController
   def index(show_resolved: false)
     @site = current_site
     @show_resolved = show_resolved
-    current_site.cases.map(&:update_ticket_status!) if current_user.admin?
   end
 
   def resolved
