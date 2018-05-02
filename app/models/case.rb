@@ -48,8 +48,13 @@ class Case < ApplicationRecord
 
   audited only: :assignee_id, on: [ :update ]
 
-  validates :display_id, uniqueness: true
-  validate :has_display_id_when_saved
+  # XXX Remove if: display_id when we can do so
+  validates :display_id, uniqueness: true, if: :display_id
+
+  # XXX We want to enable this validation when we've migrated production over -
+  # otherwise historical migrations will fail :(
+  #validate :has_display_id_when_saved
+
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
