@@ -92,6 +92,18 @@ class Case < ApplicationRecord
 
   scope :active, -> { where(state: 'open') }
 
+  def to_param
+    self.display_id.parameterize.upcase
+  end
+
+  def self.find_from_id(id)
+    if /^[0-9]+$/.match(id)  # It's just a numeric ID
+      Case.find(id).decorate
+    else # It has non-digits in - let's assume it's a display ID
+      Case.find_by_display_id(id.upcase)
+    end
+  end
+
   # @deprecated - to be removed in next release
   def self.request_tracker
     # Note: `rt_interface_class` is a string which we `constantize`, rather
