@@ -101,11 +101,11 @@ class Case < ApplicationRecord
     self.display_id.parameterize.upcase
   end
 
-  def self.find_from_id(id)
+  def self.find_from_id!(id)
     if /^[0-9]+$/.match(id)  # It's just a numeric ID
       Case.find(id).decorate
     else # It has non-digits in - let's assume it's a display ID
-      Case.find_by_display_id(id.upcase)
+      Case.find_by_display_id!(id&.upcase)
     end
   end
 

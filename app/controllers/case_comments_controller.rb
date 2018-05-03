@@ -2,7 +2,7 @@ class CaseCommentsController < ApplicationController
   before_action :require_login
 
   def create
-    my_case = Case.find_from_id(params.require(:case_id))
+    my_case = Case.find_from_id!(params.require(:case_id))
 
     new_comment = my_case.case_comments.create(
         user: current_user,

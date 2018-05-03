@@ -69,11 +69,7 @@ class ApplicationController < ActionController::Base
              when /^\/cases/
                begin
                  id = scope_id_param(:case_id)
-                 if id
-                  Case.find_from_id(id).associated_model
-                 else
-                   assign_site_scope
-                 end
+                 Case.find_from_id!(id).associated_model
                rescue ActiveRecord::RecordNotFound
                  # There are various routes which begin `/cases/` but are not
                  # the route for a particular Case; if we can't find the Case

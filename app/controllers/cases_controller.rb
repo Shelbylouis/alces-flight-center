@@ -116,6 +116,6 @@ class CasesController < ApplicationController
   end
 
   def case_from_params
-    Case.find_from_id(params.require(:id)).decorate
+    Case.find_from_id!(params.require(:id)).decorate
   end
 end
