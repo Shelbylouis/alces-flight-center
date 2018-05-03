@@ -28,15 +28,14 @@ class Deployment
 
     import_production_backup_to_staging if staging?
 
-    run 'git push origin'
-    run "git push #{remote} -f HEAD:master"
+    run "git push #{remote} -f #{current_branch}:master"
 
     dokku_run 'rake db:migrate', app: app_name
     dokku_run 'rake data:migrate', app: app_name
 
-    run "git tag #{remote} -f"
-    run "git tag #{tag}"
-    run 'git push --tags -f origin'
+    run "git tag -f #{remote} #{current_branch}"
+    run "git tag -f #{tag} #{current_branch}"
+    run "git push --tags -f origin #{current_branch}"
 
     important <<~EOF.squish
       Don't forget to move all Trello cards included in this release to a
