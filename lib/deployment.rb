@@ -26,6 +26,8 @@ class Deployment
       abort unless input.downcase == 'y'
     end
 
+    import_production_backup_to_staging if staging?
+
     run 'git push origin'
     run "git push #{remote} -f HEAD:master"
 
@@ -83,8 +85,52 @@ class Deployment
     `git rev-parse --abbrev-ref HEAD`.strip.inquiry
   end
 
+  def import_production_backup_to_staging
+    # Get staging password first so we fail before doing anything if this
+    # hasn't been given.
+    staging_password = Staging.password
+
+    staging_database_url = dokku_config_get('DATABASE_URL', app: STAGING_APP)
+    database_server_url = File.dirname(staging_database_url)
+
+    # Drop existing and then recreate empty staging database; need to stop app
+    # container first so no open connections to database (which would cause
+    # this to fail).
+    dokku_stop STAGING_APP
+    drop_database_command =
+      "psql -d #{database_server_url} -c 'drop database \"#{STAGING_APP}\"'"
+    run drop_database_command
+    dokku_run 'rake db:create', app: STAGING_APP
+
+    # Determine, download, and then import latest production backup to new
+    # staging database.
+    production_backup_file = `#{'bin/retrieve-production-backup'}`
+    run "psql -d #{staging_database_url} -f #{production_backup_file}"
+
+    # Obfuscate the imported production data for non-admin users to not use
+    # real emails and to all use password passed as environment variable.
+    obfuscate_dokku_command = <<~COMMAND.squish
+      rake alces:deploy:staging:obfuscate_user_data
+      STAGING_PASSWORD="#{Shellwords.escape(staging_password)}"
+    COMMAND
+    dokku_run obfuscate_dokku_command, app: STAGING_APP
+  end
+
   def dokku_run(command, app:)
-    run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run #{app} #{command}'"
+    run dokku_command("--rm run #{app} #{command}")
+  end
+
+  def dokku_config_get(env_var, app:)
+    command = dokku_command("config:get #{app} #{env_var}")
+    `#{command}`
+  end
+
+  def dokku_stop(app)
+    run dokku_command("ps:stop #{app}")
+  end
+
+  def dokku_command(args)
+    "ssh ubuntu@apps.alces-flight.com -- 'dokku #{args}'"
   end
 
   def run(*args)
@@ -97,6 +143,10 @@ class Deployment
 
   def production?
     remote == :production
+  end
+
+  def staging?
+    remote == :staging
   end
 
   def dry_run?
