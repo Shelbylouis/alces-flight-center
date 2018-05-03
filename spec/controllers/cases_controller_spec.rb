@@ -111,7 +111,7 @@ RSpec.describe CasesController, type: :controller do
         post :create, params: valid_params, format: :json
 
         expect(response).to have_http_status(:ok)
-        expect(response_json).to match({errors: ''})
+        expect(response_json).to match({redirect: /\/cases\/.+/})
         expect(flash[:success]).to match(/successfully created/)
         expect_case_created
       end
