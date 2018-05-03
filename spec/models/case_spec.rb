@@ -359,10 +359,26 @@ RSpec.describe Case, type: :model do
       expect(kase.display_id).to eq('RT12345')
     end
 
-    it "gives object ID with '#' prefix when no RT ticket ID associated" do
-      kase = create(:case, id: 123)
+    it "gives cluster-specific unique ID when no RT ticket ID associated" do
+      kase = create(:case)
 
-      expect(kase.display_id).to eq('#123')
+      expect(kase.display_id).to eq("#{kase.cluster.shortcode}1")
+      expect(kase.cluster.case_index).to eq 1
+    end
+
+    it 'doesn\'t use up a case_index when case is invalid' do
+
+      cluster = create(:cluster)
+
+      expect(cluster.case_index).to eq 0
+
+      bad_case = build(:case, cluster: cluster, tier_level: 99)
+
+      expect do
+        bad_case.save!
+      end.to raise_error(ActiveRecord::RecordInvalid)
+
+      expect(cluster.case_index).to eq 0
     end
   end
 end

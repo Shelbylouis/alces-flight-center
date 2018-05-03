@@ -2,8 +2,7 @@ class CaseCommentsController < ApplicationController
   before_action :require_login
 
   def create
-    case_id = params.require(:case_id)
-    my_case = Case.find(case_id)
+    my_case = Case.find_from_id!(params.require(:case_id))
 
     new_comment = my_case.case_comments.create(
         user: current_user,
@@ -18,10 +17,10 @@ class CaseCommentsController < ApplicationController
       flash[:error] = "Your comment was not added. #{new_comment.errors.full_messages.join('; ').strip}"
     end
 
-    redirect_to case_path(case_id)
+    redirect_to case_path(my_case)
 
   rescue ActionController::ParameterMissing
     flash[:error] = 'Empty comments are not permitted.'
-    redirect_to case_path(case_id)
+    redirect_to case_path(my_case)
   end
 end

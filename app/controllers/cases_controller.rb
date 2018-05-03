@@ -14,7 +14,7 @@ class CasesController < ApplicationController
   end
 
   def show
-    @case = Case.find(params[:id]).decorate
+    @case = case_from_params
     @comment = @case.case_comments.new
   end
 
@@ -103,7 +103,7 @@ class CasesController < ApplicationController
   end
 
   def change_action(success_flash, redirect_path: case_path, &block)
-    @case = Case.find(params[:id])
+    @case = case_from_params
     begin
       block.call(@case)
       @case.save!
@@ -112,5 +112,9 @@ class CasesController < ApplicationController
       flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
     redirect_to redirect_path
+  end
+
+  def case_from_params
+    Case.find_from_id!(params.require(:id)).decorate
   end
 end

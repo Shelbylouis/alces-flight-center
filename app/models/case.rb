@@ -48,6 +48,13 @@ class Case < ApplicationRecord
 
   audited only: :assignee_id, on: [ :update ]
 
+  # XXX Remove if: display_id when we can do so
+  validates :display_id, uniqueness: true, if: :display_id
+
+  # XXX We want to enable this validation when we've migrated production over -
+  # otherwise historical migrations will fail :(
+  #validate :has_display_id_when_saved
+
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
@@ -84,10 +91,23 @@ class Case < ApplicationRecord
 
   before_validation :assign_default_subject_if_unset
 
+  before_create :set_display_id
   after_create :send_new_case_email
   after_update :maybe_send_new_assignee_email
 
   scope :active, -> { where(state: 'open') }
+
+  def to_param
+    self.display_id.parameterize.upcase
+  end
+
+  def self.find_from_id!(id)
+    if /^[0-9]+$/.match(id)  # It's just a numeric ID
+      Case.find(id).decorate
+    else # It has non-digits in - let's assume it's a display ID
+      Case.find_by_display_id!(id&.upcase)
+    end
+  end
 
   # @deprecated - to be removed in next release
   def self.request_tracker
@@ -157,8 +177,7 @@ class Case < ApplicationRecord
     if rt_ticket_id
       "[helpdesk.alces-software.com ##{rt_ticket_id}]"
     else
-      # TODO Update this with identifier in format `BAR123` once this exists.
-      "[Alces Flight Center ##{id}]"
+      "[Alces Flight Center #{display_id}]"
     end
   end
 
@@ -170,9 +189,16 @@ class Case < ApplicationRecord
     # for an explanation). If we want to change this format and avoid this
     # consequence then a solution would be to first add a new field for this
     # whole string, and save and use the existing format for existing Cases.
-    # TODO should we update this to include identifier in format `BAR123` once
-    # this exists?
-    "#{cluster.name}: #{subject} [#{token}]"
+    #
+    # FSR using the conditional in `#email_identifier` rather than repeating it
+    # here causes Rails to Base64-encode the plain text part of the email, which
+    # causes some of our tests to fail...
+    if rt_ticket_id
+      "#{cluster.name}: #{subject} [#{token}]"
+    else
+      # With 'new' display IDs we have a cluster hint, so don't include it twice.
+      "#{subject} [#{token}]"
+    end
   end
 
   def email_properties
@@ -199,12 +225,6 @@ class Case < ApplicationRecord
   def assignee=(new_assignee)
     @assignee_changed = true
     super(new_assignee)
-  end
-
-  def display_id
-    # TODO Once https://trello.com/c/dzY3fb5C has been implemented we should
-    # replace `##{object.id}` with that identifier for non-RT tickets.
-    rt_ticket_id ? "RT#{rt_ticket_id}" : "##{id}"
   end
 
   private
@@ -284,6 +304,24 @@ class Case < ApplicationRecord
   def validates_user_assignment
     return if assignee.nil?
     errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
+  end
+
+  def set_display_id
+    return if self.display_id
+    # Note: this method is called `before_create`, which is AFTER validation is run.
+    # This ensures that the case is valid before we increment the cluster's
+    # `case_index` field. Otherwise display IDs could end up non-sequential.
+
+    if self.rt_ticket_id
+      self.display_id = "RT#{rt_ticket_id}"
+    else
+      self.display_id = "#{cluster.shortcode}#{cluster.next_case_index}"
+    end
+  end
+
+  def has_display_id_when_saved
+    # We want to be able to validate the case initially without a display id
+    errors.add(:display_id, 'must be present') unless !persisted? or display_id
   end
 
   def field_hash

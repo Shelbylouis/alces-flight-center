@@ -280,4 +280,17 @@ RSpec.describe Cluster, type: :model do
       expect(resulting_window_ids).to eq([2, 1])
     end
   end
+
+  describe '#next_case_index' do
+    subject { create(:cluster) }
+
+    it 'gives a sequence of case indices starting with 1' do
+      results = []
+      results << subject.next_case_index
+      results << subject.next_case_index
+      results << subject.next_case_index
+
+      expect(results).to eq [1, 2, 3]
+    end
+  end
 end
