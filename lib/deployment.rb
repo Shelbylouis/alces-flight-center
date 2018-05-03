@@ -81,7 +81,7 @@ class Deployment
   end
 
   def current_branch
-    `git rev-parse --abbrev-ref HEAD`.strip.inquiry
+    @current_branch ||= `git rev-parse --abbrev-ref HEAD`.strip.inquiry
   end
 
   def import_production_backup_to_staging
