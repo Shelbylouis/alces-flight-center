@@ -10,24 +10,31 @@ class Deployment
   end
 
   def deploy
-    important 'Make sure you merge anything you want deployed to master!'
+    if production? && !current_branch.master?
+      abort 'Must be on `master` branch to deploy to production!'
+    end
+
+    important 'Make sure you have anything you want deployed on this branch!'
 
     unless dry_run?
-      STDERR.puts "About to deploy to real #{remote} environment, are you sure? [y/n]"
+      STDERR.puts <<~EOF.squish
+        About to deploy `#{current_branch}` branch to real #{remote}
+        environment, are you sure? [y/n]
+      EOF
+
       input = STDIN.gets.chomp
       abort unless input.downcase == 'y'
     end
 
-    run 'git checkout master'
     run 'git push origin'
-    run "git push -f #{remote}"
+    run "git push #{remote} -f HEAD:master"
 
     dokku_run 'rake db:migrate', app: app_name
     dokku_run 'rake data:migrate', app: app_name
 
-    run "git tag #{remote} master -f"
-    run "git tag #{tag} master"
-    run 'git push --tags -f origin master'
+    run "git tag #{remote} -f"
+    run "git tag #{tag}"
+    run 'git push --tags -f origin'
 
     important <<~EOF.squish
       Don't forget to move all Trello cards included in this release to a
@@ -69,6 +76,10 @@ class Deployment
     Date.today.iso8601
   end
 
+  def current_branch
+    `git rev-parse --abbrev-ref HEAD`.strip.inquiry
+  end
+
   def dokku_run(command, app:)
     run "ssh ubuntu@apps.alces-flight.com -- 'dokku --rm run #{app} #{command}'"
   end
@@ -79,6 +90,10 @@ class Deployment
     else
       sh(*args)
     end
+  end
+
+  def production?
+    remote == :production
   end
 
   def dry_run?
