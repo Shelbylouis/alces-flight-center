@@ -18,7 +18,7 @@ main() {
   if [ ! -f "$local_backup_file_path" ]; then
     log_info 'Retrieving backup...'
     backup_file_url="${BACKUPS_S3_URL}${most_recent_backup_file}"
-    aws s3 cp "$backup_file_url" "$local_backup_file_path"
+    aws s3 cp "$backup_file_url" "$local_backup_file_path" >&2
   else
     log_info 'Already retrieved most recent backup; using existing download.'
   fi
