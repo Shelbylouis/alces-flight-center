@@ -57,10 +57,10 @@ update msg state =
 
         SubmitResponse result ->
             case result of
-                Ok () ->
+                Ok redirect ->
                     -- Success response indicates case was successfully
                     -- created, so redirect to root page.
-                    Just ( state, Navigation.load "/" )
+                    Just ( state, Navigation.load redirect )
 
                 Err error ->
                     Just <|
@@ -167,8 +167,11 @@ submitForm state =
         getErrors =
             D.field "errors" D.string
                 |> Rails.decodeErrors
+
+        getSuccess =
+            D.field "redirect" D.string
     in
-    Rails.post "/cases" body (D.succeed ())
+    Rails.post "/cases" body getSuccess
         |> Http.send (getErrors >> SubmitResponse)
 
 

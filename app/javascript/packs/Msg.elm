@@ -14,7 +14,7 @@ type Msg
     | ChangeSubject String
     | ChangeTierField Int String
     | StartSubmit
-    | SubmitResponse (Result (Rails.Error String) ())
+    | SubmitResponse (Result (Rails.Error String) String)
     | ClearError
     | ClusterChargingInfoModal Modal.Visibility
     | ChargeablePreSubmissionModal Modal.Visibility

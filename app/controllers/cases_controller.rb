@@ -44,8 +44,8 @@ class CasesController < ApplicationController
 
         format.json do
           # Return no errors and success status to case form app; it will
-          # handle redirect appropriately.
-          render json: { errors: '' }
+          # redirect to the path we give it.
+          render json: { redirect: case_path(@case) }
         end
       else
         errors = format_errors(@case)
