@@ -59,6 +59,9 @@ class Deployment
 
   attr_reader :remote, :tag
 
+  PRODUCTION_APP = 'flight-center'
+  STAGING_APP = 'flight-center-staging'
+
   def parse_deploy_type(type)
     case type
     when :production
@@ -103,9 +106,9 @@ class Deployment
   def app_name
     case remote
     when :production
-      'flight-center'
+      PRODUCTION_APP
     when :staging
-      'flight-center-staging'
+      STAGING_APP
     else
       raise "Don't know how to handle remote: '#{remote}'"
     end
