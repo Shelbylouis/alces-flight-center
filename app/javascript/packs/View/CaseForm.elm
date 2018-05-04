@@ -229,14 +229,16 @@ subjectField state =
     let
         selectedIssue =
             State.selectedIssue state
+
+        textFieldConfig =
+            { fieldType = Types.Input
+            , field = Field.Subject
+            , toContent = Issue.subject
+            , inputMsg = ChangeSubject
+            , optional = False
+            }
     in
-    Fields.textField Types.Input
-        Field.Subject
-        selectedIssue
-        Issue.subject
-        ChangeSubject
-        False
-        state
+    Fields.textField textFieldConfig state selectedIssue
 
 
 dynamicTierFields : State -> Html Msg
@@ -259,13 +261,16 @@ renderTierField state ( index, field ) =
             Markdown.toHtml [] content
 
         Tier.Field.TextInput fieldData ->
-            Fields.textField fieldData.type_
-                (Field.TierField fieldData)
-                fieldData
-                .value
-                (ChangeTierField index)
-                fieldData.optional
-                state
+            let
+                textFieldConfig =
+                    { fieldType = fieldData.type_
+                    , field = Field.TierField fieldData
+                    , toContent = .value
+                    , inputMsg = ChangeTierField index
+                    , optional = fieldData.optional
+                    }
+            in
+            Fields.textField textFieldConfig state fieldData
 
 
 submitButton : State -> Html Msg

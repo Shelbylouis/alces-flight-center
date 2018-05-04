@@ -12,6 +12,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Json.Decode as D
 import Maybe.Extra
+import Msg exposing (Msg)
 import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import String.Extra
@@ -52,22 +53,23 @@ selectField field items toId toOptionLabel isDisabled changeMsg state =
         state
 
 
-textField :
-    Types.TextField
-    -> Field
-    -> a
-    -> (a -> String)
-    -> (String -> msg)
-    -> Bool
-    -> State
-    -> Html msg
-textField textFieldType field item toContent inputMsg optional state =
+type alias TextFieldConfig a =
+    { fieldType : Types.TextField
+    , field : Field
+    , toContent : a -> String
+    , inputMsg : String -> Msg
+    , optional : Bool
+    }
+
+
+textField : TextFieldConfig a -> State -> a -> Html Msg
+textField config state item =
     let
         content =
-            toContent item
+            config.toContent item
 
         ( element, additionalAttributes ) =
-            case textFieldType of
+            case config.fieldType of
                 Types.Input ->
                     ( input, [] )
 
@@ -75,17 +77,17 @@ textField textFieldType field item toContent inputMsg optional state =
                     ( textarea, [ rows 10 ] )
 
         attributes =
-            [ onInput inputMsg
+            [ onInput config.inputMsg
             , value content
             ]
                 ++ additionalAttributes
     in
-    formField field
+    formField config.field
         item
         element
         attributes
         []
-        optional
+        config.optional
         state
 
 
