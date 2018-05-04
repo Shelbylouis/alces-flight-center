@@ -21,6 +21,7 @@ import Tier exposing (Tier)
 import Tier.DisplayWrapper
 import Tier.Field
 import Tier.Level as Level exposing (Level)
+import Types
 import Validation
 import View.Charging as Charging
 import View.Fields as Fields
@@ -228,13 +229,17 @@ subjectField state =
     let
         selectedIssue =
             State.selectedIssue state
+
+        textFieldConfig =
+            { fieldType = Types.Input
+            , field = Field.Subject
+            , toContent = Issue.subject
+            , inputMsg = ChangeSubject
+            , optional = False
+            , help = Nothing
+            }
     in
-    Fields.inputField Field.Subject
-        selectedIssue
-        Issue.subject
-        ChangeSubject
-        False
-        state
+    Fields.textField textFieldConfig state selectedIssue
 
 
 dynamicTierFields : State -> Html Msg
@@ -257,13 +262,17 @@ renderTierField state ( index, field ) =
             Markdown.toHtml [] content
 
         Tier.Field.TextInput fieldData ->
-            Fields.textField fieldData.type_
-                (Field.TierField fieldData)
-                fieldData
-                .value
-                (ChangeTierField index)
-                fieldData.optional
-                state
+            let
+                textFieldConfig =
+                    { fieldType = fieldData.type_
+                    , field = Field.TierField fieldData
+                    , toContent = .value
+                    , inputMsg = ChangeTierField index
+                    , optional = fieldData.optional
+                    , help = fieldData.help
+                    }
+            in
+            Fields.textField textFieldConfig state fieldData
 
 
 submitButton : State -> Html Msg
