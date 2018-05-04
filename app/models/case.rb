@@ -72,6 +72,11 @@ class Case < ApplicationRecord
       less_than_or_equal_to: 3,
     }
 
+  validates :time_worked, numericality: {
+      greater_than_or_equal_to: 0,
+      only_integer: true  # We store time worked as integer minutes.
+  }
+
   # @deprecated - to be removed in next release
   validates :last_known_ticket_status,
     inclusion: {in: RT_TICKET_STATUSES}
