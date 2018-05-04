@@ -1,6 +1,5 @@
 <% if current_user.admin?
-  hours = @case.time_worked % 60
-  minutes = @case.time_worked - (60 * hours)
+  hours, minutes = @case.time_worked.divmod(60)
 %>
 <tr>
   <th>Time worked</th>
