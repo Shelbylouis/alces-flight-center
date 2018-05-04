@@ -18,6 +18,7 @@ import State exposing (State)
 import String.Extra
 import Types
 import Validation exposing (Error, ErrorMessage(..))
+import View.Utils
 
 
 selectField :
@@ -129,7 +130,7 @@ formField field item htmlFn additionalAttributes children optional help state =
 
         requiredBadge =
             if optional then
-                text ""
+                View.Utils.nothing
             else
                 Badge.badgeLight [ Spacing.ml1 ] [ text "Required" ]
 
@@ -153,7 +154,7 @@ formField field item htmlFn additionalAttributes children optional help state =
                         [ text helpText ]
 
                 Nothing ->
-                    text ""
+                    View.Utils.nothing
 
         helpIdentifier =
             identifier ++ "-help"

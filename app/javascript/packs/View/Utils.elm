@@ -15,3 +15,8 @@ supportEmailLink =
         , target "_blank"
         ]
         [ text email ]
+
+
+nothing : Html msg
+nothing =
+    text ""
