@@ -4,7 +4,11 @@
 <tr>
   <th>Time worked</th>
   <td colspan="3">
-    <%= form_tag({ controller: 'cases', action: 'set_time' }, method: :post, class: 'form-inline') do %>
+    <%= form_tag({ controller: 'cases', action: 'set_time' },
+                 method: :post,
+                 class: 'form-inline',
+                 id: 'case-time-form'
+        ) do %>
       <div class="form-group">
         <label>
           <%= number_field :time, :hours, class: 'form-control mr-1', min: 0, value: hours %>

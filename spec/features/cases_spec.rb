@@ -265,4 +265,21 @@ RSpec.describe 'Case page' do
     end
 
   end
+
+  describe 'Time logging' do
+
+    let (:time_form_id) { '#case-time-form' }
+
+    subject do
+      create(:open_case, time_worked: (2 * 60) + 17)
+    end
+
+    it 'correctly displays existing time in hours and minutes' do
+      visit case_path(subject, as: admin)
+
+      form = find(time_form_id)
+      expect(form.find_field('time[hours]').value).to eq "2"
+      expect(form.find_field('time[minutes]').value).to eq "17"
+    end
+  end
 end

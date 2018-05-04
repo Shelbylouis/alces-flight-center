@@ -196,4 +196,19 @@ RSpec.describe CasesController, type: :controller do
       expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "close"'
     end
   end
+
+  describe 'case time management' do
+
+    let(:some_case) { create(:open_case, time_worked: 0)}
+    let(:admin) { create(:admin) }
+
+    before(:each) { sign_in_as(admin) }
+
+    it 'converts from hours and minutes to minutes on a case' do
+      post :set_time, params: { id: some_case.id, time: { hours: 3, minutes: 21 }}
+      some_case.reload
+      expect(some_case.time_worked).to eq (3 * 60) + 21
+      expect(flash[:success]).to eq "Updated 'time worked' for support case #{some_case.display_id}."
+    end
+  end
 end
