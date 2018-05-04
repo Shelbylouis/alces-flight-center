@@ -1,7 +1,6 @@
 module View.Fields
     exposing
-        ( inputField
-        , selectField
+        ( selectField
         , textField
         )
 
@@ -51,18 +50,6 @@ selectField field items toId toOptionLabel isDisabled changeMsg state =
         options
         False
         state
-
-
-inputField :
-    Field
-    -> a
-    -> (a -> String)
-    -> (String -> msg)
-    -> Bool
-    -> State
-    -> Html msg
-inputField =
-    textField Types.Input
 
 
 textField :

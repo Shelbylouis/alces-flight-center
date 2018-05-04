@@ -21,6 +21,7 @@ import Tier exposing (Tier)
 import Tier.DisplayWrapper
 import Tier.Field
 import Tier.Level as Level exposing (Level)
+import Types
 import Validation
 import View.Charging as Charging
 import View.Fields as Fields
@@ -229,7 +230,8 @@ subjectField state =
         selectedIssue =
             State.selectedIssue state
     in
-    Fields.inputField Field.Subject
+    Fields.textField Types.Input
+        Field.Subject
         selectedIssue
         Issue.subject
         ChangeSubject
