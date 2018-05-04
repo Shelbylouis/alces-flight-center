@@ -113,7 +113,7 @@ ActiveRecord::Schema.define(version: 20180509144921) do
     t.text "state", default: "open", null: false
     t.bigint "assignee_id"
     t.string "display_id"
-    t.integer "time_worked", default: 0
+    t.integer "time_worked", default: 0, null: false
     t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
