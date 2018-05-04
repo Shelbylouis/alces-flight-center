@@ -266,37 +266,63 @@ RSpec.describe 'Case page' do
 
   end
 
-  describe 'Time logging' do
+  describe 'time logging' do
 
     let (:time_form_id) { '#case-time-form' }
+    let (:time_form_submit_button) { 'Change time worked' }
 
-    subject do
-      create(:open_case, cluster: cluster, time_worked: (2 * 60) + 17)
+    RSpec.shared_examples 'time display' do
+      it 'correctly displays existing time in hours and minutes' do
+        visit case_path(subject, as: admin)
+
+        form = find(time_form_id)
+        expect(form.find_field('time[hours]', disabled: :all).value).to eq "2"
+        expect(form.find_field('time[minutes]', disabled: :all).value).to eq "17"
+      end
+
+      it 'doesn\'t show time worked to contacts' do
+        visit case_path(subject, as: contact)
+        expect { find(time_form_id) }.to raise_error(Capybara::ElementNotFound)
+      end
     end
 
-    it 'correctly displays existing time in hours and minutes' do
-      visit case_path(subject, as: admin)
+    context 'for an open case' do
+      subject do
+        create(:open_case, cluster: cluster, time_worked: (2 * 60) + 17)
+      end
 
-      form = find(time_form_id)
-      expect(form.find_field('time[hours]').value).to eq "2"
-      expect(form.find_field('time[minutes]').value).to eq "17"
+      include_examples 'time display'
+
+      it 'allows admins to set time worked' do
+        visit case_path(subject, as: admin)
+
+        fill_in 'time[hours]', with: '3'
+        fill_in 'time[minutes]', with: '42'
+        click_button time_form_submit_button
+
+        subject.reload
+
+        expect(subject.time_worked).to eq (3 * 60) + 42
+      end
+
+
     end
 
-    it 'allows admins to set time worked' do
-      visit case_path(subject, as: admin)
+    context 'for a resolved case' do
+      subject do
+        create(:resolved_case, cluster: cluster, time_worked: (2 * 60) + 17)
+      end
 
-      fill_in 'time[hours]', with: '3'
-      fill_in 'time[minutes]', with: '42'
-      click_button 'Change time worked'
+      include_examples 'time display'
 
-      subject.reload
+      it 'does not allow time worked to be changed' do
+        visit case_path(subject, as: admin)
 
-      expect(subject.time_worked).to eq (3 * 60) + 42
-    end
-
-    it 'doesn\'t show time worked to contacts' do
-      visit case_path(subject, as: contact)
-      expect { find(time_form_id) }.to raise_error(Capybara::ElementNotFound)
+        expect(find_field('time[hours]', disabled: true)).to be_disabled
+        expect(find_field('time[minutes]', disabled: true)).to be_disabled
+        expect(find(time_form_id)).to \
+          have_button(time_form_submit_button, disabled: true)
+      end
     end
   end
 end

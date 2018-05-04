@@ -141,6 +141,10 @@ class Case < ApplicationRecord
     ticket_completed? && chargeable
   end
 
+  def time_entry_allowed?
+    open?
+  end
+
   def associated_model
     component || service || cluster
   end

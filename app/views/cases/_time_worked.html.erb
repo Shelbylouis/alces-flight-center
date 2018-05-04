@@ -11,15 +11,31 @@
         ) do %>
       <div class="form-group">
         <label>
-          <%= number_field :time, :hours, class: 'form-control mr-1', min: 0, value: hours %>
+          <%= number_field :time,
+                           :hours,
+                           class: 'form-control mr-1',
+                           disabled: !@case.time_entry_allowed?,
+                           min: 0,
+                           value: hours
+          %>
           hours
         </label>
         <label class="ml-1">
-          <%= number_field :time, :minutes, class: 'form-control mr-1', min: 0, max: 59, value: minutes %>
+          <%= number_field :time,
+                           :minutes,
+                           class: 'form-control mr-1',
+                           disabled: !@case.time_entry_allowed?,
+                           min: 0,
+                           max: 59,
+                           value: minutes
+          %>
           minutes
         </label>
       </div>
-      <%= submit_tag 'Change time worked', class: 'form-control btn-primary ml-2' %>
+      <%= submit_tag 'Change time worked',
+                     class: 'form-control btn-primary ml-2',
+                     disabled: !@case.time_entry_allowed?
+      %>
     <% end %>
   </td>
 </tr>
