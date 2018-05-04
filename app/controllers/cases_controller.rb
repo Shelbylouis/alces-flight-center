@@ -88,6 +88,10 @@ class CasesController < ApplicationController
     end
   end
 
+  def set_time
+    redirect_to case_path
+  end
+
   private
 
   def case_params

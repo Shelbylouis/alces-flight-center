@@ -1,0 +1,23 @@
+<% if current_user.admin?
+  hours = @case.time_worked % 60
+  minutes = @case.time_worked - (60 * hours)
+%>
+<tr>
+  <th>Time worked</th>
+  <td colspan="3">
+    <%= form_tag({ controller: 'cases', action: 'set_time' }, method: :post, class: 'form-inline') do %>
+      <div class="form-group">
+        <label>
+          <%= number_field :time, :hours, class: 'form-control mr-1', min: 0, value: hours %>
+          hours
+        </label>
+        <label class="ml-1">
+          <%= number_field :time, :minutes, class: 'form-control mr-1', min: 0, max: 59, value: minutes %>
+          minutes
+        </label>
+      </div>
+      <%= submit_tag 'Change time worked', class: 'form-control btn-primary ml-2' %>
+    <% end %>
+  </td>
+</tr>
+<% end %>

@@ -81,6 +81,7 @@ Rails.application.routes.draw do
         post :resolve  # Only admins may resolve a case
         post :close  # Only admins may close a case
         post :assign  # Only admins may (re)assign a case
+        post :set_time
       end
     end
 
