@@ -50,6 +50,7 @@ selectField field items toId toOptionLabel isDisabled changeMsg state =
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
         False
+        Nothing
         state
 
 
@@ -59,6 +60,7 @@ type alias TextFieldConfig a =
     , toContent : a -> String
     , inputMsg : String -> Msg
     , optional : Bool
+    , help : Maybe String
     }
 
 
@@ -88,6 +90,7 @@ textField config state item =
         attributes
         []
         config.optional
+        config.help
         state
 
 
@@ -102,9 +105,10 @@ formField :
     -> List (Attribute msg)
     -> List (Html msg)
     -> Bool
+    -> Maybe String
     -> State
     -> Html msg
-formField field item htmlFn additionalAttributes children optional state =
+formField field item htmlFn additionalAttributes children optional help state =
     let
         fieldName =
             case field of
@@ -134,11 +138,25 @@ formField field item htmlFn additionalAttributes children optional state =
                 [ id identifier
                 , class (formControlClasses field errors)
                 , disabled fieldIsUnavailable
+                , attribute "aria-describedBy" helpIdentifier
                 ]
                 additionalAttributes
 
         formElement =
             htmlFn attributes children
+
+        helpElement =
+            case help of
+                Just helpText ->
+                    small
+                        [ id helpIdentifier, class "form-text text-muted" ]
+                        [ text helpText ]
+
+                Nothing ->
+                    text ""
+
+        helpIdentifier =
+            identifier ++ "-help"
 
         errors =
             Validation.validateField field state
@@ -149,6 +167,7 @@ formField field item htmlFn additionalAttributes children optional state =
             [ text fieldName ]
         , requiredBadge
         , formElement
+        , helpElement
         , validationFeedback errors
         ]
 

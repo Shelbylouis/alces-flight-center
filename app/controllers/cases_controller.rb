@@ -98,7 +98,7 @@ class CasesController < ApplicationController
       :service_id,
       :subject,
       :tier_level,
-      fields: [:type, :name, :value, :optional],
+      fields: [:type, :name, :value, :optional, :help],
     )
   end
 
