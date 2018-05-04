@@ -271,7 +271,7 @@ RSpec.describe 'Case page' do
     let (:time_form_id) { '#case-time-form' }
 
     subject do
-      create(:open_case, time_worked: (2 * 60) + 17)
+      create(:open_case, cluster: cluster, time_worked: (2 * 60) + 17)
     end
 
     it 'correctly displays existing time in hours and minutes' do
@@ -280,6 +280,23 @@ RSpec.describe 'Case page' do
       form = find(time_form_id)
       expect(form.find_field('time[hours]').value).to eq "2"
       expect(form.find_field('time[minutes]').value).to eq "17"
+    end
+
+    it 'allows admins to set time worked' do
+      visit case_path(subject, as: admin)
+
+      fill_in 'time[hours]', with: '3'
+      fill_in 'time[minutes]', with: '42'
+      click_button 'Change time worked'
+
+      subject.reload
+
+      expect(subject.time_worked).to eq (3 * 60) + 42
+    end
+
+    it 'doesn\'t show time worked to contacts' do
+      visit case_path(subject, as: contact)
+      expect { find(time_form_id) }.to raise_error(Capybara::ElementNotFound)
     end
   end
 end
