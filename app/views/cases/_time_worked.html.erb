@@ -38,7 +38,7 @@
                        disabled: !@case.time_entry_allowed?
         %>
       <% else %>
-        <i class='ml-4'>Case is resolved - time cannot be changed</i>
+        <i class='ml-4'>Case is <%= @case.user_facing_state.downcase %> - time cannot be changed</i>
       <% end %>
     <% end %>
   </td>
