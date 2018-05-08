@@ -107,6 +107,7 @@ RSpec.feature Log, type: :feature do
     it 'can create a log without a component' do
       fill_details_input
       expect(submit_log.component).to be_nil
+      expect(page).to have_text 'None'
     end
 
     it 'can create a log with a component' do
@@ -114,6 +115,7 @@ RSpec.feature Log, type: :feature do
       component = subject.components.last
       select component.name, from: component_select_id
       expect(submit_log.component).to eq(component)
+      expect(page).to have_link(component.name, href: component_path(component))
     end
   end
 
