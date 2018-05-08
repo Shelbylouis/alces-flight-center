@@ -6,6 +6,7 @@
         <th>Date Created</th>
         <th>Engineer</th>
         <th>Details</th>
+        <th>Associated Component</th>
         <th>Related Case(s)</th>
       </thead>
       <% @logs.each do |log| %>
@@ -13,6 +14,9 @@
           <%= timestamp_td(description:  'Logged', timestamp: log.created_at) %>
           <td style="white-space: nowrap;"><%= log.engineer.name %></td>
           <td><%= log.details %></td>
+          <td>
+            <%= log.component&.decorate&.link || raw("<em>None</em>") %>
+          </td>
           <td>
             <% log.cases.map(&:decorate).each do |kase| %>
               <%= kase.case_link %>
