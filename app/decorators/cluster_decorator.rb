@@ -14,7 +14,7 @@ class ClusterDecorator < ApplicationDecorator
   def tabs
     [
       tabs_builder.overview,
-      { id: :logs, path: h.cluster_logs_path(self) },
+      tabs_builder.logs,
       tabs_builder.cases,
       {
         id: :maintenance,
