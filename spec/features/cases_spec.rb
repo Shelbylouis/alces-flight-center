@@ -145,6 +145,20 @@ RSpec.describe 'Case page' do
           'Assigned this case to A Scientist.'
       )
     end
+
+    it 'does not show time-worked events to contacts' do
+      open_case.time_worked = 1138
+      open_case.save
+
+      visit case_path(open_case, as: contact)
+
+      open_case.reload
+
+      expect(open_case.audits.count).to eq 1  # It's there...
+      expect do
+        find('.event-card')
+      end.to raise_error(Capybara::ElementNotFound) # ...but we don't show it
+    end
   end
 
   describe 'comments form' do
