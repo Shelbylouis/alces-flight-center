@@ -382,4 +382,28 @@ RSpec.describe Case, type: :model do
       expect(cluster.case_index).to eq 0
     end
   end
+
+  describe ':time_worked' do
+
+    it 'can be changed when case is open' do
+      kase = create(:open_case, time_worked:42)
+
+      kase.time_worked = 48
+      expect do
+        kase.save!
+      end.not_to raise_error
+    end
+
+    %w(resolved closed).each do |state|
+      it "cannot be changed when case is #{state}" do
+        kase = create(:case, state: state, time_worked:42)
+
+        kase.time_worked = 48
+        expect do
+          kase.save!
+        end.to raise_error(ActiveRecord::RecordInvalid)
+        expect(kase.errors.messages).to match({time_worked: ["must not be changed when case is #{state}"]})
+      end
+    end
+  end
 end

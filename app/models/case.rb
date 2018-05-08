@@ -77,6 +77,8 @@ class Case < ApplicationRecord
       only_integer: true  # We store time worked as integer minutes.
   }
 
+  validate :time_worked_not_changed_unless_open
+
   # @deprecated - to be removed in next release
   validates :last_known_ticket_status,
     inclusion: {in: RT_TICKET_STATUSES}
@@ -142,7 +144,8 @@ class Case < ApplicationRecord
   end
 
   def time_entry_allowed?
-    open?
+    # Allow if not persisted - e.g. allow time to be initially set for all states
+    open? || !persisted?
   end
 
   def associated_model
@@ -235,6 +238,11 @@ class Case < ApplicationRecord
   def assignee=(new_assignee)
     @assignee_changed = true
     super(new_assignee)
+  end
+
+  def time_worked=(new_time)
+    @time_worked_changed = (new_time != time_worked)
+    super(new_time)
   end
 
   private
@@ -332,6 +340,11 @@ class Case < ApplicationRecord
   def has_display_id_when_saved
     # We want to be able to validate the case initially without a display id
     errors.add(:display_id, 'must be present') unless !persisted? or display_id
+  end
+
+  def time_worked_not_changed_unless_open
+    error_condition = !time_entry_allowed? && @time_worked_changed
+    errors.add(:time_worked, "must not be changed when case is #{state}") unless !error_condition
   end
 
   def field_hash
