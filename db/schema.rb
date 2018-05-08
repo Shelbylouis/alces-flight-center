@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180508171035) do
+ActiveRecord::Schema.define(version: 20180508173313) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -154,6 +154,7 @@ ActiveRecord::Schema.define(version: 20180508171035) do
     t.string "charging_info"
     t.string "shortcode"
     t.integer "case_index", default: 0, null: false
+    t.text "motd"
     t.index ["shortcode"], name: "index_clusters_on_shortcode", unique: true
     t.index ["site_id"], name: "index_clusters_on_site_id"
   end
@@ -329,6 +330,7 @@ ActiveRecord::Schema.define(version: 20180508171035) do
     t.integer "level", null: false
     t.json "fields", null: false
     t.bigint "issue_id", null: false
+    t.text "tool"
     t.index ["issue_id"], name: "index_tiers_on_issue_id"
   end
 
