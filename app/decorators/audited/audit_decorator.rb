@@ -14,18 +14,26 @@ module Audited
 
     private
 
+    ADMIN_ONLY_CARDS = %w(time_worked)
+
     def change_card(date, user, change)
       field = change[0]
       from, to = *change[1]
 
       type = send("#{field}_type")
       text = send("#{field}_text", from, to)
+      admin_only = ADMIN_ONLY_CARDS.include?(field)
 
-      render_card(date, user&.name || 'Flight Center', type, text)
+      render_card(date, user&.name || 'Flight Center', type, text, admin_only)
     end
 
-    def render_card(date, name, type, text)
-      h.render 'cases/event', date: date, name: name, type: type, text: text
+    def render_card(date, name, type, text, admin_only)
+      h.render 'cases/event',
+               admin_only: admin_only,
+               date: date,
+               name: name,
+               text: text,
+               type: type
     end
 
     def assignee_id_text(from, to)
