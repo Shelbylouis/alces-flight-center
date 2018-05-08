@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180502104232) do
+ActiveRecord::Schema.define(version: 20180508171035) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -133,6 +133,14 @@ ActiveRecord::Schema.define(version: 20180502104232) do
     t.string "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "change_motd_requests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "motd", null: false
+    t.bigint "case_id", null: false
+    t.index ["case_id"], name: "index_change_motd_requests_on_case_id"
   end
 
   create_table "clusters", force: :cascade do |t|
