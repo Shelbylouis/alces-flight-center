@@ -77,7 +77,7 @@ class Case < ApplicationRecord
       only_integer: true  # We store time worked as integer minutes.
   }
 
-  validate :time_worked_not_changed_unless_open
+  validate :time_worked_not_changed_unless_allowed
 
   # @deprecated - to be removed in next release
   validates :last_known_ticket_status,
@@ -342,7 +342,7 @@ class Case < ApplicationRecord
     errors.add(:display_id, 'must be present') unless !persisted? or display_id
   end
 
-  def time_worked_not_changed_unless_open
+  def time_worked_not_changed_unless_allowed
     error_condition = !time_entry_allowed? && @time_worked_changed
     errors.add(:time_worked, "must not be changed when case is #{state}") unless !error_condition
   end
