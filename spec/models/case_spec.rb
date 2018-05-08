@@ -187,48 +187,6 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe '#requires_credit_charge?' do
-    let :support_case do
-      create(
-        :case,
-        issue: issue,
-        last_known_ticket_status: last_known_ticket_status
-      )
-    end
-
-    subject { support_case.requires_credit_charge? }
-
-    context 'when Issue chargeable and ticket complete' do
-      let :issue { create(:issue, chargeable: true) }
-      let :last_known_ticket_status { 'resolved' }
-
-      it { is_expected.to be true }
-
-      context 'when Case already has credit charge associated' do
-        before :each do
-          create(:credit_charge, case: support_case)
-          support_case.reload
-        end
-
-        it { is_expected.to be false }
-      end
-    end
-
-    context 'when Issue chargeable and ticket incomplete' do
-      let :issue { create(:issue, chargeable: true) }
-      let :last_known_ticket_status { 'stalled' }
-
-      it { is_expected.to be false }
-    end
-
-    context 'when Issue non-chargeable and ticket complete' do
-      let :issue { create(:issue, chargeable: false) }
-      let :last_known_ticket_status { 'resolved' }
-
-      it { is_expected.to be false }
-    end
-  end
-
   describe '#associated_model' do
     context 'when Case with Component' do
       subject { create(:case_with_component) }

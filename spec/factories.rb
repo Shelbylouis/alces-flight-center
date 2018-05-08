@@ -111,18 +111,6 @@ FactoryBot.define do
     end
   end
 
-  factory :credit_deposit do
-    cluster
-    association :user, factory: :admin
-    amount 10
-  end
-
-  factory :credit_charge do
-    association :case # Avoid conflict with case keyword.
-    association :user, factory: :admin
-    amount 2
-  end
-
   factory :log do
     details 'I am the factory default details'
     cluster

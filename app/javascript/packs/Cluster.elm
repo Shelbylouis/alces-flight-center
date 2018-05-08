@@ -35,7 +35,6 @@ type alias Cluster =
     , services : SelectList Service
     , supportType : SupportType
     , chargingInfo : Maybe String
-    , credits : Int
     , motd : String
     , motdHtml : String
     }
@@ -64,7 +63,6 @@ decodeWithMotd motd =
         |> P.required "services" (SelectList.Extra.nameOrderedDecoder serviceDecoder)
         |> P.required "supportType" SupportType.decoder
         |> P.required "chargingInfo" (D.nullable D.string)
-        |> P.required "credits" D.int
         |> P.hardcoded motd
         |> P.required "motdHtml" D.string
 

@@ -23,7 +23,7 @@ class Case < ApplicationRecord
   belongs_to :service, required: false
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
-  has_one :credit_charge, required: false
+
   has_many :maintenance_windows
   has_and_belongs_to_many :log
   has_many :case_comments
@@ -132,15 +132,6 @@ class Case < ApplicationRecord
     return unless incomplete_rt_ticket?
     self.last_known_ticket_status = associated_rt_ticket.status
     save!
-  end
-
-  def requires_credit_charge?
-    return false if credit_charge
-    credit_charge_allowed?
-  end
-
-  def credit_charge_allowed?
-    ticket_completed? && chargeable
   end
 
   def time_entry_allowed?
