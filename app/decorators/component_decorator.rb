@@ -20,4 +20,8 @@ class ComponentDecorator < ClusterPartDecorator
       { id: :expansions, path: h.component_component_expansions_path(self) },
     ]
   end
+
+  def link
+    h.link_to self.name, path
+  end
 end
