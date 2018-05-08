@@ -43,5 +43,22 @@ module Audited
     def assignee_id_type
       'user'
     end
+
+    def time_worked_text(from, to)
+      "Changed time worked from #{format_minutes(from)} to #{format_minutes(to)}."
+    end
+
+    def time_worked_type
+      'hourglass-half'
+    end
+
+    def format_minutes(mins)
+      hours, minutes = mins.divmod(60)
+      if hours > 0
+        "#{hours}h #{minutes}m"
+      else
+        "#{minutes}m"
+      end
+    end
   end
 end
