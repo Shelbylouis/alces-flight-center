@@ -320,8 +320,8 @@ RSpec.describe 'Case page' do
 
         expect(find_field('time[hours]', disabled: true)).to be_disabled
         expect(find_field('time[minutes]', disabled: true)).to be_disabled
-        expect(find(time_form_id)).to \
-          have_button(time_form_submit_button, disabled: true)
+        expect(find(time_form_id)).not_to \
+          have_button(time_form_submit_button, disabled: :any)
       end
     end
   end

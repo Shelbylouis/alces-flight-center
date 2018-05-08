@@ -32,10 +32,14 @@
           minutes
         </label>
       </div>
-      <%= submit_tag 'Change time worked',
-                     class: 'form-control btn-primary ml-2',
-                     disabled: !@case.time_entry_allowed?
-      %>
+      <% if @case.time_entry_allowed? %>
+        <%= submit_tag 'Change time worked',
+                       class: 'form-control btn-primary ml-2',
+                       disabled: !@case.time_entry_allowed?
+        %>
+      <% else %>
+        <i class='ml-4'>Case is resolved - time cannot be changed</i>
+      <% end %>
     <% end %>
   </td>
 </tr>
