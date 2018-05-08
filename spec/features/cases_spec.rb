@@ -123,18 +123,24 @@ RSpec.describe 'Case page' do
 
       # Generate an assignee-change audit entry
       open_case.assignee = admin
+      # ...and a time-worked one
+      open_case.time_worked = 123
       open_case.save
+
 
       visit case_path(open_case, as: admin)
 
       event_cards = all('.event-card')
-      expect(event_cards.size).to eq(4)
+      expect(event_cards.size).to eq(5)
 
-      expect(event_cards[3].find('.card-body').text).to eq('First')
-      expect(event_cards[2].find('.card-body').text).to eq('Second')
-      expect(event_cards[1].find('.card-body').text).to match(
+      expect(event_cards[4].find('.card-body').text).to eq('First')
+      expect(event_cards[3].find('.card-body').text).to eq('Second')
+      expect(event_cards[2].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
+
+      expect(event_cards[1].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
+
       expect(event_cards[0].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'
       )
