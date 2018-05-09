@@ -211,7 +211,7 @@ RSpec.describe 'Case page' do
       expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
 
       visit case_path(resolved_case, as: admin)
-      expect(find('#case-state-controls').find('a').text).to eq 'Close this case'
+      expect(find('#case-state-controls').find('input[type=submit]').value).to eq 'Set charge and close case'
 
       visit case_path(closed_case, as: admin)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
