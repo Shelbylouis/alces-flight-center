@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180508173313) do
+ActiveRecord::Schema.define(version: 20180509144921) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -135,11 +135,24 @@ ActiveRecord::Schema.define(version: 20180508173313) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "change_motd_request_state_transitions", force: :cascade do |t|
+    t.bigint "change_motd_request_id", null: false
+    t.string "namespace"
+    t.string "event"
+    t.string "from"
+    t.string "to", null: false
+    t.datetime "created_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["change_motd_request_id"], name: "index_cmrst_on_cmr_id"
+    t.index ["user_id"], name: "index_change_motd_request_state_transitions_on_user_id"
+  end
+
   create_table "change_motd_requests", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "motd", null: false
     t.bigint "case_id", null: false
+    t.text "state", null: false
     t.index ["case_id"], name: "index_change_motd_requests_on_case_id"
   end
 
@@ -366,6 +379,8 @@ ActiveRecord::Schema.define(version: 20180508173313) do
   add_foreign_key "cases", "services"
   add_foreign_key "cases", "users"
   add_foreign_key "cases", "users", column: "assignee_id"
+  add_foreign_key "change_motd_request_state_transitions", "change_motd_requests"
+  add_foreign_key "change_motd_request_state_transitions", "users"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"
