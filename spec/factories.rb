@@ -128,4 +128,9 @@ FactoryBot.define do
     cluster
     association :engineer, factory: :admin
   end
+
+  factory :change_motd_request do
+    motd 'Some new MOTD'
+    association :case # Avoid conflict with case keyword.
+  end
 end
