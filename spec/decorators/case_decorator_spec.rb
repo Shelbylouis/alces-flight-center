@@ -107,7 +107,8 @@ RSpec.describe CaseDecorator do
         Draper::ViewContext.clear!
       end.case_link
 
-      expect(link).to eq h.link_to('RT12345', h.case_path(kase))
+      expect(link).to eq h
+        .link_to('RT12345', h.case_path(kase), title: kase.subject)
     end
   end
 

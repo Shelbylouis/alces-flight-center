@@ -31,7 +31,7 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def case_link
-    h.link_to(display_id, h.case_path(self))
+    h.link_to(display_id, h.case_path(self), title: subject)
   end
 
   def chargeable_symbol
