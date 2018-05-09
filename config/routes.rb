@@ -139,6 +139,7 @@ Rails.application.routes.draw do
 
     resources :components, only: :show do
       resolved_cases.call
+      resources :maintenance_windows, path: :maintenance, only: :index
       resources :component_expansions,
                 path: component_expansions_alias,
                 only: :index
@@ -155,6 +156,7 @@ Rails.application.routes.draw do
 
     resources :services, only: :show do
       resolved_cases.call
+      resources :maintenance_windows, path: :maintenance, only: :index
       confirm_maintenance_form.call
     end
 
