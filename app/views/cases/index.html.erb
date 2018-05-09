@@ -14,6 +14,9 @@ end %>
           <th>Subject</th>
           <th>Assigned to</th>
           <th>Association</th>
+          <% if @show_resolved %>
+            <th>Credit usage</th>
+          <% end %>
         </tr>
       </thead>
 
@@ -42,6 +45,9 @@ end %>
               <td><%= link_to c.subject, case_path(c) %></td>
               <td><%= c.assignee&.name || 'Nobody' %></td>
               <td><%= c.association_info %></td>
+              <% if @show_resolved %>
+                <td><%= c.credit_charge %></td>
+              <% end %>
             </tr>
           <% end %>
         <% end %>
