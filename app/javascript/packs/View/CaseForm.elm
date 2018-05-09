@@ -76,11 +76,11 @@ dynamicFields state =
                     -- any fields or submitting the form, and only show the rendered
                     -- Tier fields, which should include the relevant links to
                     -- documentation.
-                    [ tierFields ]
+                    [ tierContentElements ]
 
                 _ ->
                     [ subjectField state
-                    , tierFields
+                    , tierContentElements
                     , submitButton state
                     ]
 
@@ -98,8 +98,8 @@ dynamicFields state =
         selectedTier =
             State.selectedTier state
 
-        tierFields =
-            dynamicTierFields state
+        tierContentElements =
+            tierContent state
     in
     section attributes fields
 
@@ -242,17 +242,22 @@ subjectField state =
     Fields.textField textFieldConfig state selectedIssue
 
 
-dynamicTierFields : State -> Html Msg
-dynamicTierFields state =
+tierContent : State -> Html Msg
+tierContent state =
     let
         tier =
             State.selectedTier state
 
-        renderedFields =
-            Dict.toList tier.fields
-                |> List.map (renderTierField state)
+        content =
+            case tier.content of
+                Tier.Fields fields ->
+                    Dict.toList fields
+                        |> List.map (renderTierField state)
+
+                Tier.MotdTool ->
+                    [ text "Need to actually implement MOTD tool!" ]
     in
-    div [] renderedFields
+    div [] content
 
 
 renderTierField : State -> ( Int, Tier.Field.Field ) -> Html Msg

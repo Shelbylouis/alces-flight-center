@@ -1,6 +1,7 @@
 module Tier
     exposing
-        ( Id(..)
+        ( Content(..)
+        , Id(..)
         , Tier
         , decoder
         , extractId
@@ -21,12 +22,17 @@ import Tier.Level as Level exposing (Level)
 type alias Tier =
     { id : Id
     , level : Level
-    , fields : Dict Int Field
+    , content : Content
     }
 
 
 type Id
     = Id Int
+
+
+type Content
+    = Fields (Dict Int Field)
+    | MotdTool
 
 
 decoder : D.Decoder Tier
@@ -40,27 +46,60 @@ decoder =
                         D.map3 Tier
                             (D.field "id" D.int |> D.map Id)
                             (D.succeed level)
-                            (D.field "fields" fieldsDecoder)
+                            contentDecoder
 
                     Err error ->
                         D.fail error
             )
 
 
-fieldsDecoder : D.Decoder (Dict Int Field)
+contentDecoder : D.Decoder Content
+contentDecoder =
+    D.oneOf
+        [ D.field "fields" fieldsDecoder
+        , D.field "tool" toolDecoder
+        ]
+
+
+fieldsDecoder : D.Decoder Content
 fieldsDecoder =
-    D.list Field.decoder
-        |> D.map (List.indexedMap (,) >> Dict.fromList)
+    let
+        fieldDictDecoder =
+            D.list Field.decoder
+                |> D.map (List.indexedMap (,) >> Dict.fromList)
+    in
+    D.map Fields fieldDictDecoder
+
+
+toolDecoder : D.Decoder Content
+toolDecoder =
+    let
+        decodeTool =
+            \toolName ->
+                case toolName of
+                    "motd" ->
+                        D.succeed MotdTool
+
+                    _ ->
+                        D.fail <| "Unknown tool:" ++ toolName
+    in
+    D.string |> D.andThen decodeTool
 
 
 fieldsEncoder : Tier -> E.Value
 fieldsEncoder tier =
-    E.array
-        (Dict.values tier.fields
-            |> List.map Field.encoder
-            |> Maybe.Extra.values
-            |> Array.fromList
-        )
+    case tier.content of
+        Fields fields ->
+            E.array
+                (Dict.values fields
+                    |> List.map Field.encoder
+                    |> Maybe.Extra.values
+                    |> Array.fromList
+                )
+
+        MotdTool ->
+            -- XXX Do something useful
+            E.null
 
 
 extractId : Tier -> Int
@@ -75,11 +114,16 @@ setFieldValue tier index value =
     let
         updateFieldValue =
             Maybe.map <| Field.replaceValue value
+
+        newContent =
+            case tier.content of
+                Fields fields ->
+                    Fields <| Dict.update index updateFieldValue fields
+
+                x ->
+                    x
     in
-    { tier
-        | fields =
-            Dict.update index updateFieldValue tier.fields
-    }
+    { tier | content = newContent }
 
 
 isChargeable : Tier -> Bool

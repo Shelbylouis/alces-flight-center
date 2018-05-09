@@ -12,6 +12,7 @@ import Dict
 import Field exposing (Field)
 import Issue
 import State exposing (State)
+import Tier
 import Tier.Field
 import Validate exposing (Validator)
 
@@ -89,11 +90,14 @@ createTierFieldsValidator state =
             List.map createRequiredFieldValidator requiredTierFieldsTextInputData
 
         requiredTierFieldsTextInputData =
-            State.selectedTier state
-                |> .fields
-                |> Dict.values
-                |> List.filterMap Tier.Field.data
-                |> List.filter (not << .optional)
+            case State.selectedTier state |> .content of
+                Tier.Fields fields ->
+                    Dict.values fields
+                        |> List.filterMap Tier.Field.data
+                        |> List.filter (not << .optional)
+
+                Tier.MotdTool ->
+                    []
 
         createRequiredFieldValidator =
             \textInputData ->
