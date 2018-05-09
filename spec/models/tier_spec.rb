@@ -38,6 +38,21 @@ RSpec.describe Tier, type: :model do
 
       it { is_expected.to be_valid }
     end
+
+    describe 'tool validation' do
+      context 'when level 1 Tier' do
+        subject { create(:tier, level: 1) }
+
+        it { is_expected.not_to validate_absence_of(:tool) }
+        it { is_expected.to validate_inclusion_of(:tool).in_array(['motd']) }
+      end
+
+      context 'when another level Tier' do
+        subject { create(:tier, level: 2) }
+
+        it { is_expected.to validate_absence_of(:tool) }
+      end
+    end
   end
 
   describe '#case_form_json' do

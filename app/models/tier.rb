@@ -15,6 +15,10 @@ class Tier < ApplicationRecord
       less_than_or_equal_to: 3,
     }
 
+  validates :tool,
+    absence: {unless: :can_have_tool?},
+    inclusion: {in: ['motd'], if: :tool}
+
   def self.globally_available?
     true
   end
@@ -25,5 +29,11 @@ class Tier < ApplicationRecord
       level: level,
       fields: fields,
     }
+  end
+
+  private
+
+  def can_have_tool?
+    level == 1
   end
 end
