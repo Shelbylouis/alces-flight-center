@@ -3,9 +3,6 @@
   "#{@show_resolved ? 'Resolved' : 'Open'} Cases"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
-  <ul class='nav nav-tabs nav-justified' >
-    <%= @scope.decorate.case_form_button %>
-  </ul>
   <div class='table-responsive'>
     <table class="table">
       <thead>

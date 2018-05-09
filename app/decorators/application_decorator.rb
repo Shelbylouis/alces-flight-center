@@ -28,13 +28,6 @@ class ApplicationDecorator < Draper::Decorator
     h.raw(icons.join)
   end
 
-  def case_form_button
-    h.link_to 'Create new support case',
-      new_scope_case_path,
-      class: 'w-100 btn btn-primary',
-      role: 'button'
-  end
-
   # Override this method to generate the tab bars
   def tabs
     []
