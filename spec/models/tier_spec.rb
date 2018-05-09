@@ -40,17 +40,40 @@ RSpec.describe Tier, type: :model do
     end
 
     describe 'tool validation' do
-      context 'when level 1 Tier' do
-        subject { create(:tier, level: 1) }
+      context 'when level 1 Tier without fields' do
+        subject { build(:tier, level: 1, fields: nil) }
 
         it { is_expected.not_to validate_absence_of(:tool) }
         it { is_expected.to validate_inclusion_of(:tool).in_array(['motd']) }
+
+        context 'when has tool' do
+          before :each do
+            subject.tool = 'motd'
+          end
+
+          it { is_expected.to validate_absence_of(:fields) }
+        end
+      end
+
+      RSpec.shared_examples 'cannot have tool' do
+        it do
+          is_expected.to validate_absence_of(:tool)
+            .with_message('must be a level 1 Tier without fields to associate tool')
+        end
+      end
+
+      context 'when level 1 Tier with fields' do
+        subject do
+          build(:tier, level: 1, fields: [{type: 'input', name: 'Some field'}])
+        end
+
+        include_examples 'cannot have tool'
       end
 
       context 'when another level Tier' do
-        subject { create(:tier, level: 2) }
+        subject { build(:tier, level: 2) }
 
-        it { is_expected.to validate_absence_of(:tool) }
+        include_examples 'cannot have tool'
       end
     end
   end

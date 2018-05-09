@@ -1,8 +1,6 @@
 class Tier < ApplicationRecord
   belongs_to :issue
 
-  validates_presence_of :fields
-
   validates :level,
     presence: true,
     uniqueness: {
@@ -15,8 +13,15 @@ class Tier < ApplicationRecord
       less_than_or_equal_to: 3,
     }
 
+  validates :fields,
+    presence: {unless: :tool},
+    absence: {if: :tool}
+
   validates :tool,
-    absence: {unless: :can_have_tool?},
+    absence: {
+      unless: :can_have_tool?,
+      message: 'must be a level 1 Tier without fields to associate tool'
+    },
     inclusion: {in: ['motd'], if: :tool}
 
   def self.globally_available?
@@ -34,6 +39,6 @@ class Tier < ApplicationRecord
   private
 
   def can_have_tool?
-    level == 1
+    level == 1 && !self.fields
   end
 end

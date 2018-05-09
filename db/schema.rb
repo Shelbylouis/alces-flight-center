@@ -328,7 +328,7 @@ ActiveRecord::Schema.define(version: 20180508173313) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "level", null: false
-    t.json "fields", null: false
+    t.json "fields"
     t.bigint "issue_id", null: false
     t.text "tool"
     t.index ["issue_id"], name: "index_tiers_on_issue_id"
