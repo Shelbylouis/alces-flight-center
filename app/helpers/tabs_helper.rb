@@ -27,6 +27,22 @@ module TabsHelper
       { id: :logs, path: scope.scope_logs_path }
     end
 
+    def maintenance
+      {
+        id: :maintenance,
+        path: scope.scope_maintenance_windows_path,
+        admin_dropdown: [
+          {
+            text: 'Pending',
+            path: scope.scope_maintenance_windows_path
+          }, {
+            text: 'Request',
+            path: scope.new_scope_maintenance_window_path
+          }
+        ]
+      }
+    end
+
     private
 
     attr_reader :scope
