@@ -83,6 +83,13 @@ class Case < ApplicationRecord
   validates :last_known_ticket_status,
     inclusion: {in: RT_TICKET_STATUSES}
 
+  validates :credit_charge, numericality: {
+      only_integer: true,
+      greater_than_or_equal_to: 0
+  }, if: :credit_charge  # Credit charge can be null (not set)
+
+  validates :credit_charge, presence: true,  if: :closed?
+
   # Only validate this type of support is available on create, as this is the
   # only point at which we should prevent users accessing support they are not
   # entitled to; after this point any aspects of the Case and related models
