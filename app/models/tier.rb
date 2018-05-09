@@ -32,13 +32,20 @@ class Tier < ApplicationRecord
     {
       id: id,
       level: level,
-      fields: fields,
-    }
+    }.merge(fields_or_tool_json)
   end
 
   private
 
   def can_have_tool?
     level == 1 && !self.fields
+  end
+
+  def fields_or_tool_json
+    if fields
+      {fields: fields}
+    else
+      {tool: tool}
+    end
   end
 end
