@@ -11,6 +11,15 @@ class Service < ApplicationRecord
     super.merge(categories_or_issues)
   end
 
+  def unfinished_related_maintenance_windows
+    service = [self]
+    service
+      .map(&:maintenance_windows)
+      .flat_map(&:unfinished)
+      .sort_by(&:created_at)
+      .reverse
+  end
+
   private
 
   def categories_or_issues

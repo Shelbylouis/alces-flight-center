@@ -20,6 +20,15 @@ class Component < ApplicationRecord
 
   after_create :create_component_expansions_from_defaults
 
+  def unfinished_related_maintenance_windows
+    component = [self]
+    component
+      .map(&:maintenance_windows)
+      .flat_map(&:unfinished)
+      .sort_by(&:created_at)
+      .reverse
+  end
+
   private
 
   def create_component_expansions_from_defaults
