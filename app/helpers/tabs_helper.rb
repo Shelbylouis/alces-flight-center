@@ -12,6 +12,7 @@ module TabsHelper
       {
         id: :cases, path: scope.scope_cases_path,
         dropdown: [
+          { text: 'Create', path: scope.new_scope_case_path },
           { text: 'Current', path: scope.scope_cases_path },
           { text: 'Resolved', path: scope.resolved_scope_cases_path }
         ]
