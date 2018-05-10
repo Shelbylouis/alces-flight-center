@@ -10,6 +10,7 @@ FactoryBot.define do
     name 'Hamilton Research Computing Cluster'
     support_type :managed
     shortcode
+    motd 'My MOTD'
 
     factory :managed_cluster do
       support_type :managed

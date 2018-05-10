@@ -8,6 +8,7 @@ RSpec.describe Case, type: :model do
 
     it { is_expected.to validate_presence_of(:fields) }
     it { is_expected.to validate_presence_of(:tier_level) }
+    it { is_expected.to have_one(:change_motd_request) }
 
     it do
       is_expected.to validate_numericality_of(:tier_level)

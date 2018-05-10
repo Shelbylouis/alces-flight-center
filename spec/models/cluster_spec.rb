@@ -5,6 +5,14 @@ RSpec.describe Cluster, type: :model do
   include_examples 'markdown_description'
 
   describe '#valid?' do
+    subject { create(:cluster) }
+
+    # XXX Add this back once current staging deployed and so `rake
+    # alces:data:import_and_migrate_production` should succeed with this set
+    # (failing right now due to multiple Cluster data migrations since last
+    # deploy).
+    # it { is_expected.to validate_presence_of(:motd) }
+
     context 'when managed cluster' do
       subject do
         create(:managed_cluster)
