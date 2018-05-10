@@ -47,15 +47,25 @@ type Id
 
 decoder : D.Decoder Cluster
 decoder =
+    D.field "motd" D.string
+        |> D.andThen decodeWithMotd
+
+
+decodeWithMotd : String -> D.Decoder Cluster
+decodeWithMotd motd =
+    let
+        serviceDecoder =
+            Service.decoder motd
+    in
     P.decode Cluster
         |> P.required "id" (D.int |> D.map Id)
         |> P.required "name" D.string
         |> P.required "components" (SelectList.Extra.nameOrderedDecoder Component.decoder)
-        |> P.required "services" (SelectList.Extra.nameOrderedDecoder Service.decoder)
+        |> P.required "services" (SelectList.Extra.nameOrderedDecoder serviceDecoder)
         |> P.required "supportType" SupportType.decoder
         |> P.required "chargingInfo" (D.nullable D.string)
         |> P.required "credits" D.int
-        |> P.required "motd" D.string
+        |> P.hardcoded motd
         |> P.required "motdHtml" D.string
 
 

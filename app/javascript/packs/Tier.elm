@@ -35,8 +35,8 @@ type Content
     | MotdTool
 
 
-decoder : D.Decoder Tier
-decoder =
+decoder : String -> D.Decoder Tier
+decoder clusterMotd =
     D.field "level" D.int
         |> D.map Level.fromInt
         |> D.andThen
