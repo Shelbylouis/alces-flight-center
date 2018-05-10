@@ -86,15 +86,15 @@ RSpec.describe 'Case page' do
   let (:assignee) { nil }
 
   let :open_case do
-    create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee)
+    create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee, tier_level: 2)
   end
 
   let :resolved_case do
-    create(:resolved_case, cluster: cluster, subject: 'Resolved case')
+    create(:resolved_case, cluster: cluster, subject: 'Resolved case', tier_level: 2)
   end
 
   let :closed_case do
-    create(:closed_case, cluster: cluster, subject: 'Closed case', completed_at: 2.days.ago)
+    create(:closed_case, cluster: cluster, subject: 'Closed case', completed_at: 2.days.ago, tier_level: 2)
   end
 
   let (:mw) { create(:maintenance_window, case: open_case) }
@@ -117,24 +117,28 @@ RSpec.describe 'Case page' do
       open_case.assignee = admin
       # ...and a time-worked one
       open_case.time_worked = 123
+      # And an escalation entry
+      open_case.tier_level = 3
       open_case.save
 
 
       visit case_path(open_case, as: admin)
 
       event_cards = all('.event-card')
-      expect(event_cards.size).to eq(5)
+      expect(event_cards.size).to eq(6)
 
-      expect(event_cards[4].find('.card-body').text).to eq('First')
-      expect(event_cards[3].find('.card-body').text).to eq('Second')
-      expect(event_cards[2].find('.card-body').text).to match(
+      expect(event_cards[5].find('.card-body').text).to eq('First')
+      expect(event_cards[4].find('.card-body').text).to eq('Second')
+      expect(event_cards[3].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
+      expect(event_cards[2].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
 
-      expect(event_cards[1].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
-
-      expect(event_cards[0].find('.card-body').text).to eq(
+      expect(event_cards[1].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'
+      )
+      expect(event_cards[0].find('.card-body').text).to eq(
+          'Escalated this case to tier 3 (General support).'
       )
     end
 
@@ -335,6 +339,60 @@ RSpec.describe 'Case page' do
         expect(find(time_form_id)).not_to \
           have_button(time_form_submit_button, disabled: :any)
       end
+    end
+  end
+
+  describe 'escalation' do
+    context 'for open tier 2 case' do
+      subject do
+        create(:open_case, tier_level:2)
+      end
+      it 'shows escalate button' do
+        visit case_path(subject, as: admin)
+
+        expect do
+          find_button 'Escalate'
+        end.not_to raise_error
+
+        click_button 'Escalate'
+
+        # Using find(...).click instead of click_button waits for modal to appear
+        find('#confirm-escalate-button').click
+
+        subject.reload
+        expect(subject.tier_level).to eq 3
+      end
+    end
+
+    RSpec.shared_examples 'for inapplicable cases' do
+      it 'does not show escalate button' do
+        visit case_path(subject, as: admin)
+
+        expect do
+          find_button 'Escalate'
+        end.to raise_error(Capybara::ElementNotFound)
+      end
+    end
+
+    context 'for open tier 3 case' do
+      subject do
+        create(:open_case, tier_level: 3)
+      end
+      it_behaves_like 'for inapplicable cases'
+    end
+
+    context 'for resolved tier 2 case' do
+      subject do
+        create(:resolved_case, tier_level: 2)
+      end
+      it_behaves_like 'for inapplicable cases'
+    end
+
+    context 'for closed tier 2 case' do
+      subject do
+        create(:closed_case, tier_level: 2)
+      end
+      it_behaves_like 'for inapplicable cases'
     end
   end
 end

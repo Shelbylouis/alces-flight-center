@@ -19,6 +19,7 @@
           <%= link_to 'Escalate',
                       escalate_case_path(@case.id),
                       class: 'btn btn-outline-warning',
+                      id: 'confirm-escalate-button',
                       method: :post,
                       role: 'button'
           %>

@@ -244,15 +244,14 @@ class Case < ApplicationRecord
     super(new_assignee)
   end
 
-<<<<<<< HEAD
   def time_worked=(new_time)
     @time_worked_changed = (new_time != time_worked)
     super(new_time)
-=======
+  end
+
   def tier_level=(new_level)
     @tier_level_changed = (new_level != tier_level)
     super(new_level)
->>>>>>> Don't allow resolved or closed cases to be escalated.
   end
 
   private
