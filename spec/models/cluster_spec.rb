@@ -84,6 +84,10 @@ RSpec.describe Cluster, type: :model do
     end
 
     it 'gives correct JSON' do
+      text_helper = Class.new do
+        include ActionView::Helpers::TextHelper
+      end.new
+
       expect(subject.case_form_json).to eq(
         id: 1,
         name: 'Some Cluster',
@@ -93,6 +97,7 @@ RSpec.describe Cluster, type: :model do
         chargingInfo: '£1000',
         credits: 17, # Calculated by `credits` method as deposits - charges.
         motd: 'Some MOTD',
+        motdHtml: text_helper.simple_format('Some MOTD')
       )
     end
   end

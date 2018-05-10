@@ -37,6 +37,7 @@ type alias Cluster =
     , chargingInfo : Maybe String
     , credits : Int
     , motd : String
+    , motdHtml : String
     }
 
 
@@ -55,6 +56,7 @@ decoder =
         |> P.required "chargingInfo" (D.nullable D.string)
         |> P.required "credits" D.int
         |> P.required "motd" D.string
+        |> P.required "motdHtml" D.string
 
 
 extractId : Cluster -> Int
