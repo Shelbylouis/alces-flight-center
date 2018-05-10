@@ -47,7 +47,7 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: :assignee_id, on: [ :update ]
+  audited only: [:assignee_id, :time_worked], on: [ :update ]
 
   # XXX Remove if: display_id when we can do so
   validates :display_id, uniqueness: true, if: :display_id
@@ -71,6 +71,13 @@ class Case < ApplicationRecord
       greater_than_or_equal_to: 1,
       less_than_or_equal_to: 3,
     }
+
+  validates :time_worked, numericality: {
+      greater_than_or_equal_to: 0,
+      only_integer: true  # We store time worked as integer minutes.
+  }
+
+  validate :time_worked_not_changed_unless_allowed
 
   # @deprecated - to be removed in next release
   validates :last_known_ticket_status,
@@ -134,6 +141,11 @@ class Case < ApplicationRecord
 
   def credit_charge_allowed?
     ticket_completed? && chargeable
+  end
+
+  def time_entry_allowed?
+    # Allow if not persisted - e.g. allow time to be initially set for all states
+    open? || !persisted?
   end
 
   def associated_model
@@ -226,6 +238,11 @@ class Case < ApplicationRecord
   def assignee=(new_assignee)
     @assignee_changed = true
     super(new_assignee)
+  end
+
+  def time_worked=(new_time)
+    @time_worked_changed = (new_time != time_worked)
+    super(new_time)
   end
 
   private
@@ -323,6 +340,11 @@ class Case < ApplicationRecord
   def has_display_id_when_saved
     # We want to be able to validate the case initially without a display id
     errors.add(:display_id, 'must be present') unless !persisted? or display_id
+  end
+
+  def time_worked_not_changed_unless_allowed
+    error_condition = !time_entry_allowed? && @time_worked_changed
+    errors.add(:time_worked, "must not be changed when case is #{state}") unless !error_condition
   end
 
   def field_hash

@@ -14,18 +14,26 @@ module Audited
 
     private
 
+    ADMIN_ONLY_CARDS = %w(time_worked)
+
     def change_card(date, user, change)
       field = change[0]
       from, to = *change[1]
 
       type = send("#{field}_type")
       text = send("#{field}_text", from, to)
+      admin_only = ADMIN_ONLY_CARDS.include?(field)
 
-      render_card(date, user&.name || 'Flight Center', type, text)
+      render_card(date, user&.name || 'Flight Center', type, text, admin_only)
     end
 
-    def render_card(date, name, type, text)
-      h.render 'cases/event', date: date, name: name, type: type, text: text
+    def render_card(date, name, type, text, admin_only)
+      h.render 'cases/event',
+               admin_only: admin_only,
+               date: date,
+               name: name,
+               text: text,
+               type: type
     end
 
     def assignee_id_text(from, to)
@@ -42,6 +50,23 @@ module Audited
 
     def assignee_id_type
       'user'
+    end
+
+    def time_worked_text(from, to)
+      "Changed time worked from #{format_minutes(from)} to #{format_minutes(to)}."
+    end
+
+    def time_worked_type
+      'hourglass-half'
+    end
+
+    def format_minutes(mins)
+      hours, minutes = mins.divmod(60)
+      if hours > 0
+        "#{hours}h #{minutes}m"
+      else
+        "#{minutes}m"
+      end
     end
   end
 end

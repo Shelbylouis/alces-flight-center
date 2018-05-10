@@ -123,21 +123,41 @@ RSpec.describe 'Case page' do
 
       # Generate an assignee-change audit entry
       open_case.assignee = admin
+      # ...and a time-worked one
+      open_case.time_worked = 123
       open_case.save
+
 
       visit case_path(open_case, as: admin)
 
       event_cards = all('.event-card')
-      expect(event_cards.size).to eq(4)
+      expect(event_cards.size).to eq(5)
 
-      expect(event_cards[3].find('.card-body').text).to eq('First')
-      expect(event_cards[2].find('.card-body').text).to eq('Second')
-      expect(event_cards[1].find('.card-body').text).to match(
+      expect(event_cards[4].find('.card-body').text).to eq('First')
+      expect(event_cards[3].find('.card-body').text).to eq('Second')
+      expect(event_cards[2].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
+
+      expect(event_cards[1].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
+
       expect(event_cards[0].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'
       )
+    end
+
+    it 'does not show time-worked events to contacts' do
+      open_case.time_worked = 1138
+      open_case.save
+
+      visit case_path(open_case, as: contact)
+
+      open_case.reload
+
+      expect(open_case.audits.count).to eq 1  # It's there...
+      expect do
+        find('.event-card')
+      end.to raise_error(Capybara::ElementNotFound) # ...but we don't show it
     end
   end
 
@@ -264,5 +284,65 @@ RSpec.describe 'Case page' do
       expect(find('.alert')).to have_text('Empty comments are not permitted')
     end
 
+  end
+
+  describe 'time logging' do
+
+    let (:time_form_id) { '#case-time-form' }
+    let (:time_form_submit_button) { 'Change time worked' }
+
+    RSpec.shared_examples 'time display' do
+      it 'correctly displays existing time in hours and minutes' do
+        visit case_path(subject, as: admin)
+
+        form = find(time_form_id)
+        expect(form.find_field('time[hours]', disabled: :all).value).to eq "2"
+        expect(form.find_field('time[minutes]', disabled: :all).value).to eq "17"
+      end
+
+      it 'doesn\'t show time worked to contacts' do
+        visit case_path(subject, as: contact)
+        expect { find(time_form_id) }.to raise_error(Capybara::ElementNotFound)
+      end
+    end
+
+    context 'for an open case' do
+      subject do
+        create(:open_case, cluster: cluster, time_worked: (2 * 60) + 17)
+      end
+
+      include_examples 'time display'
+
+      it 'allows admins to set time worked' do
+        visit case_path(subject, as: admin)
+
+        fill_in 'time[hours]', with: '3'
+        fill_in 'time[minutes]', with: '42'
+        click_button time_form_submit_button
+
+        subject.reload
+
+        expect(subject.time_worked).to eq (3 * 60) + 42
+      end
+
+
+    end
+
+    context 'for a resolved case' do
+      subject do
+        create(:resolved_case, cluster: cluster, time_worked: (2 * 60) + 17)
+      end
+
+      include_examples 'time display'
+
+      it 'does not allow time worked to be changed' do
+        visit case_path(subject, as: admin)
+
+        expect(find_field('time[hours]', disabled: true)).to be_disabled
+        expect(find_field('time[minutes]', disabled: true)).to be_disabled
+        expect(find(time_form_id)).not_to \
+          have_button(time_form_submit_button, disabled: :any)
+      end
+    end
   end
 end
