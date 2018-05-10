@@ -1,7 +1,11 @@
 class AddPlaceholderMotds < ActiveRecord::DataMigration
   def up
     Cluster.update_all(
-      motd: 'Placeholder MOTD - need to set real value before release'
+      motd: <<~MOTD.strip_heredoc
+        Placeholder MOTD - need to set real value before release.
+
+        It can show across multiple lines too.
+      MOTD
     )
   end
 end
