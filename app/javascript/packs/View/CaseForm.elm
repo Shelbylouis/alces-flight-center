@@ -1,5 +1,6 @@
 module View.CaseForm exposing (view)
 
+import Bootstrap.Alert as Alert
 import Bootstrap.Modal as Modal
 import Category
 import Cluster
@@ -8,6 +9,7 @@ import Dict
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Attributes.Extra
 import Html.Events exposing (onClick, onSubmit)
 import Issue
 import Issues
@@ -255,7 +257,7 @@ tierContent state =
                         |> List.map (renderTierField state)
 
                 Tier.MotdTool ->
-                    [ text "Need to actually implement MOTD tool!" ]
+                    [ currentMotdAlert state ]
     in
     div [] content
 
@@ -278,6 +280,18 @@ renderTierField state ( index, field ) =
                     }
             in
             Fields.textField textFieldConfig state fieldData
+
+
+currentMotdAlert : State -> Html msg
+currentMotdAlert state =
+    let
+        cluster =
+            State.selectedCluster state
+    in
+    Alert.simpleSecondary []
+        [ Alert.h5 [] [ text "Current MOTD" ]
+        , div [ Html.Attributes.Extra.innerHtml cluster.motdHtml ] []
+        ]
 
 
 submitButton : State -> Html Msg
