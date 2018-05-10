@@ -73,6 +73,7 @@ class Case < ApplicationRecord
       greater_than_or_equal_to: 1,
       less_than_or_equal_to: 3,
     }
+  validate :validate_tier_level_changes
 
   validates :time_worked, numericality: {
       greater_than_or_equal_to: 0,
@@ -243,9 +244,15 @@ class Case < ApplicationRecord
     super(new_assignee)
   end
 
+<<<<<<< HEAD
   def time_worked=(new_time)
     @time_worked_changed = (new_time != time_worked)
     super(new_time)
+=======
+  def tier_level=(new_level)
+    @tier_level_changed = (new_level != tier_level)
+    super(new_level)
+>>>>>>> Don't allow resolved or closed cases to be escalated.
   end
 
   private
@@ -348,6 +355,11 @@ class Case < ApplicationRecord
   def time_worked_not_changed_unless_allowed
     error_condition = !time_entry_allowed? && @time_worked_changed
     errors.add(:time_worked, "must not be changed when case is #{state}") unless !error_condition
+  end
+
+  def validate_tier_level_changes
+    error_condition = @tier_level_changed && persisted? && !open?
+    errors.add(:tier_level, "cannot be changed when a case is #{state}") if error_condition
   end
 
   def field_hash

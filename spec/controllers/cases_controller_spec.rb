@@ -217,7 +217,7 @@ RSpec.describe CasesController, type: :controller do
     end
   end
 
-  describe 'case escalation' do
+  describe 'POST #escalate' do
     let (:open_case) {
       create(:open_case, cluster: first_cluster, tier_level: 2)
     }
@@ -240,6 +240,17 @@ RSpec.describe CasesController, type: :controller do
         open_case.reload
 
         expect(open_case.tier_level).to eq 3
+      end
+
+      %w(resolved closed).each do |state|
+        it "does not escalate a #{state} case" do
+          kase = send("#{state}_case")
+          post :escalate, params: { id: kase.id }
+
+          expect(flash[:error]).to eq "Error updating support case: tier_level cannot be changed when a case is #{state}"
+          kase.reload
+          expect(open_case.tier_level).to eq 2
+        end
       end
     end
 
