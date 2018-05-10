@@ -7,3 +7,5 @@ install:
   - bin/setup
 addons:
   postgresql: "9.6"
+apt:
+  update: true

@@ -13,10 +13,6 @@ class CaseDecorator < ApplicationDecorator
     model.state.to_s.titlecase
   end
 
-  def hidden?
-    state == 'resolved' || state == 'archived'
-  end
-
   def case_select_details
     [
       "#{display_id} #{subject}",

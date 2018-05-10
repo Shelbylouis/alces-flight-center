@@ -31,10 +31,10 @@ end %>
         # Hence logic simplifies to the below (!=)
       %>
           <% if @show_resolved != c.open?  %>
-            <% if c.hidden? && !manage_cases_page %>
+            <% if (c.resolved? || c.closed?) && !manage_cases_page %>
               <tr
-                class="archived-case-row"
-                title="This support case has been archived; you should open a new support case if you wish to contact Alces Flight Support"
+                class="closed-case-row"
+                title="This support case has been resolved; you should open a new support case if you wish to contact Alces Flight Support"
               >
             <% elsif manage_cases_page && c.requires_credit_charge? %>
               <tr
