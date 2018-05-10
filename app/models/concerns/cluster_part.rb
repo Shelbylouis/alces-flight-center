@@ -34,4 +34,10 @@ module ClusterPart
       supportType: support_type,
     }
   end
+
+  def unfinished_related_maintenance_windows
+    maintenance_windows.unfinished
+      .sort_by(&:created_at)
+      .reverse
+  end
 end
