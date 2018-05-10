@@ -12,7 +12,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Msg exposing (..)
-import SelectList
 import State exposing (State)
 import Tier
 import View.Utils
@@ -58,7 +57,7 @@ infoModal : State -> Html Msg
 infoModal state =
     let
         cluster =
-            SelectList.selected state.clusters
+            State.selectedCluster state
 
         chargingInfo =
             cluster.chargingInfo
