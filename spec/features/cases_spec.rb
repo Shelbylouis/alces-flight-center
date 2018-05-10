@@ -15,7 +15,7 @@ RSpec.describe 'Cases table', type: :feature do
   end
 
   let! :closed_case do
-    create(:closed_case, cluster: cluster, subject: 'Closed case', completed_at: 2.days.ago)
+    create(:closed_case, cluster: cluster, subject: 'Closed case', completed_at: 2.days.ago, credit_charge: 1138)
   end
 
   RSpec.shared_examples 'open cases table rendered' do
@@ -46,6 +46,7 @@ RSpec.describe 'Cases table', type: :feature do
         expect(cases).not_to have_text('Open case')
         expect(cases).to have_text('Resolved case')
         expect(cases).to have_text('Closed case')
+        expect(cases).to have_text('1138')
       end
     end
   end
