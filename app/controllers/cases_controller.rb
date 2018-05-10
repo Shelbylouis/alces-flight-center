@@ -101,6 +101,12 @@ class CasesController < ApplicationController
     end
   end
 
+  def escalate
+    change_action "Support case %s escalated." do |kase|
+      kase.tier_level = 3
+    end
+  end
+
   private
 
   def case_params
