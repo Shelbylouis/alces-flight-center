@@ -19,6 +19,7 @@ import Component exposing (Component)
 import Issue exposing (Issue)
 import Issues
 import Json.Decode as D
+import Json.Decode.Pipeline as P
 import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
 import Service exposing (Service)
@@ -45,15 +46,15 @@ type Id
 
 decoder : D.Decoder Cluster
 decoder =
-    D.map8 Cluster
-        (D.field "id" D.int |> D.map Id)
-        (D.field "name" D.string)
-        (D.field "components" (SelectList.Extra.nameOrderedDecoder Component.decoder))
-        (D.field "services" (SelectList.Extra.nameOrderedDecoder Service.decoder))
-        (D.field "supportType" SupportType.decoder)
-        (D.field "chargingInfo" (D.nullable D.string))
-        (D.field "credits" D.int)
-        (D.field "motd" D.string)
+    P.decode Cluster
+        |> P.required "id" (D.int |> D.map Id)
+        |> P.required "name" D.string
+        |> P.required "components" (SelectList.Extra.nameOrderedDecoder Component.decoder)
+        |> P.required "services" (SelectList.Extra.nameOrderedDecoder Service.decoder)
+        |> P.required "supportType" SupportType.decoder
+        |> P.required "chargingInfo" (D.nullable D.string)
+        |> P.required "credits" D.int
+        |> P.required "motd" D.string
 
 
 extractId : Cluster -> Int
