@@ -1,0 +1,12 @@
+<% if @case.open? && !@case.consultancy? %>
+  <%= link_to 'Escalate',
+              resolve_case_path(@case.id),
+              class: 'btn btn-warning ml-2 btn-sm',
+              method: :post,
+              role: 'button',
+              data: {
+                  confirm: 'Are you sure you want to escalate this support case?
+Escalating will mean that this case is potentially chargeable, and may incur a charge of support credits.'
+              }
+  %>
+<% end %>

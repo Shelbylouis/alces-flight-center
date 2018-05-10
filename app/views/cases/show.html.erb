@@ -39,7 +39,10 @@
       </tr>
       <tr>
         <th>Tier</th>
-        <td><%= @case.tier_description %></td>
+        <td>
+          <%= @case.tier_description %>
+          <%= render 'cases/escalation_controls' %>
+        </td>
         <th>Unique identifier</th>
         <td><%= @case.display_id %></td>
       </tr>
