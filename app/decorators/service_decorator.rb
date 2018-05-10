@@ -11,6 +11,6 @@ class ServiceDecorator < ClusterPartDecorator
   end
 
   def tabs
-    [tabs_builder.overview, tabs_builder.cases]
+    [tabs_builder.overview, tabs_builder.cases, tabs_builder.maintenance]
   end
 end

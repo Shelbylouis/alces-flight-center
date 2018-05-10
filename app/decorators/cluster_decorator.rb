@@ -16,19 +16,7 @@ class ClusterDecorator < ApplicationDecorator
       tabs_builder.overview,
       tabs_builder.logs,
       tabs_builder.cases,
-      {
-        id: :maintenance,
-        path: h.cluster_maintenance_windows_path(self),
-        admin_dropdown: [
-          {
-            text: 'Pending',
-            path: h.cluster_maintenance_windows_path(self)
-          }, {
-            text: 'Request',
-            path: h.new_cluster_maintenance_window_path(self)
-          }
-        ]
-      },
+      tabs_builder.maintenance,
       { id: :services, path: h.cluster_services_path(self) },
       {
         id: :components,
