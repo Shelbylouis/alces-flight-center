@@ -51,7 +51,7 @@ maybePartsField field partsFieldConfig toId state changeMsg =
                     |> Just
 
         cluster =
-            SelectList.selected state.clusters
+            State.selectedCluster state
     in
     case partsFieldConfig of
         SelectionField partsForCluster ->

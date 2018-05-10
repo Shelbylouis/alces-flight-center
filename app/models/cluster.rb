@@ -3,6 +3,9 @@ class Cluster < ApplicationRecord
   include HasSupportType
   include MarkdownDescription
 
+  # XXX Extract `case_form_json` to decorator so can remove this.
+  include ActionView::Helpers::TextHelper
+
   SUPPORT_TYPES = SupportType::VALUES
   PART_NAMES = [:component, :service].freeze
 
@@ -42,7 +45,13 @@ class Cluster < ApplicationRecord
       services: services.map(&:case_form_json),
       supportType: support_type,
       chargingInfo: charging_info,
-      credits: credits
+      credits: credits,
+      # Encode MOTD in two forms: the raw form, to be used as the initial value
+      # to be edited in the MOTD tool, and as sanitized, formatted HTML so the
+      # current value can be displayed as it will be on the Cluster and in the
+      # rest of Flight Center.
+      motd: motd,
+      motdHtml: simple_format(motd),
     }
   end
 

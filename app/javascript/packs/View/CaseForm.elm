@@ -1,5 +1,6 @@
 module View.CaseForm exposing (view)
 
+import Bootstrap.Alert as Alert
 import Bootstrap.Modal as Modal
 import Category
 import Cluster
@@ -8,6 +9,7 @@ import Dict
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Attributes.Extra
 import Html.Events exposing (onClick, onSubmit)
 import Issue
 import Issues
@@ -76,11 +78,11 @@ dynamicFields state =
                     -- any fields or submitting the form, and only show the rendered
                     -- Tier fields, which should include the relevant links to
                     -- documentation.
-                    [ tierFields ]
+                    [ tierContentElements ]
 
                 _ ->
                     [ subjectField state
-                    , tierFields
+                    , tierContentElements
                     , submitButton state
                     ]
 
@@ -98,8 +100,8 @@ dynamicFields state =
         selectedTier =
             State.selectedTier state
 
-        tierFields =
-            dynamicTierFields state
+        tierContentElements =
+            tierContent state
     in
     section attributes fields
 
@@ -242,17 +244,26 @@ subjectField state =
     Fields.textField textFieldConfig state selectedIssue
 
 
-dynamicTierFields : State -> Html Msg
-dynamicTierFields state =
+tierContent : State -> Html Msg
+tierContent state =
     let
         tier =
             State.selectedTier state
 
+        content =
+            case tier.content of
+                Tier.Fields _ ->
+                    renderedFields
+
+                Tier.MotdTool _ ->
+                    currentMotdAlert state :: renderedFields
+
         renderedFields =
-            Dict.toList tier.fields
+            Tier.fields tier
+                |> Dict.toList
                 |> List.map (renderTierField state)
     in
-    div [] renderedFields
+    div [] content
 
 
 renderTierField : State -> ( Int, Tier.Field.Field ) -> Html Msg
@@ -273,6 +284,18 @@ renderTierField state ( index, field ) =
                     }
             in
             Fields.textField textFieldConfig state fieldData
+
+
+currentMotdAlert : State -> Html msg
+currentMotdAlert state =
+    let
+        cluster =
+            State.selectedCluster state
+    in
+    Alert.simpleSecondary []
+        [ Alert.h5 [] [ text "Current MOTD" ]
+        , div [ Html.Attributes.Extra.innerHtml cluster.motdHtml ] []
+        ]
 
 
 submitButton : State -> Html Msg

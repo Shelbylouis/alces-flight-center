@@ -12,6 +12,7 @@ import Dict
 import Field exposing (Field)
 import Issue
 import State exposing (State)
+import Tier
 import Tier.Field
 import Validate exposing (Validator)
 
@@ -90,7 +91,7 @@ createTierFieldsValidator state =
 
         requiredTierFieldsTextInputData =
             State.selectedTier state
-                |> .fields
+                |> Tier.fields
                 |> Dict.values
                 |> List.filterMap Tier.Field.data
                 |> List.filter (not << .optional)

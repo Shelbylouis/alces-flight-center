@@ -41,13 +41,13 @@ asIssuesIn service issues =
     { service | issues = issues }
 
 
-decoder : D.Decoder Service
-decoder =
+decoder : String -> D.Decoder Service
+decoder clusterMotd =
     D.map4 Service
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "supportType" SupportType.decoder)
-        Issues.decoder
+        (Issues.decoder clusterMotd)
 
 
 extractId : Service -> Int

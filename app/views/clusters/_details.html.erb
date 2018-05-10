@@ -20,5 +20,9 @@
     <%= cluster.credits %>
     support <%= 'credit'.pluralize(cluster.credits) %> available
   </li>
+  <li class="list-group-item">
+    <h6>MOTD</h6>
+    <%= simple_format(cluster.motd) %>
+  </li>
 </ul>
 

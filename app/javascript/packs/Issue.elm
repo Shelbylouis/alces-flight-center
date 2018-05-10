@@ -39,8 +39,8 @@ type Id
     = Id Int
 
 
-decoder : D.Decoder Issue
-decoder =
+decoder : String -> D.Decoder Issue
+decoder clusterMotd =
     let
         createIssue =
             \id name requiresComponent defaultSubject tiers ->
@@ -65,7 +65,7 @@ decoder =
         (D.field "tiers" <|
             SelectList.Extra.orderedDecoder
                 (.level >> Tier.Level.asInt)
-                Tier.decoder
+                (Tier.decoder clusterMotd)
         )
 
 
