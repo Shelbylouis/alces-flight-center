@@ -35,6 +35,7 @@ type alias Cluster =
     , supportType : SupportType
     , chargingInfo : Maybe String
     , credits : Int
+    , motd : String
     }
 
 
@@ -44,7 +45,7 @@ type Id
 
 decoder : D.Decoder Cluster
 decoder =
-    D.map7 Cluster
+    D.map8 Cluster
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "components" (SelectList.Extra.nameOrderedDecoder Component.decoder))
@@ -52,6 +53,7 @@ decoder =
         (D.field "supportType" SupportType.decoder)
         (D.field "chargingInfo" (D.nullable D.string))
         (D.field "credits" D.int)
+        (D.field "motd" D.string)
 
 
 extractId : Cluster -> Int
