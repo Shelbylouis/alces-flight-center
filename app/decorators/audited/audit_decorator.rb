@@ -24,7 +24,9 @@ module Audited
       text = send("#{field}_text", from, to)
       admin_only = ADMIN_ONLY_CARDS.include?(field)
 
-      render_card(date, user&.name || 'Flight Center', type, text, admin_only)
+      if text
+        render_card(date, user&.name || 'Flight Center', type, text, admin_only)
+      end
     end
 
     def render_card(date, name, type, text, admin_only)
@@ -84,6 +86,8 @@ module Audited
     def tier_level_text(from, to)
       if to == 3 && from < 3
         'Escalated this case to tier 3 (General support).'
+      elsif from.nil?  # Hide initial transitions caused by data migration
+        nil
       else
         raise "Unsupported tier level transition #{from} => #{to}"
       end
