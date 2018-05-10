@@ -5,6 +5,7 @@ module Tier
         , Tier
         , decoder
         , extractId
+        , fields
         , fieldsEncoder
         , isChargeable
         , setFieldValue
@@ -17,6 +18,7 @@ import Json.Encode as E
 import Maybe.Extra
 import Tier.Field as Field exposing (Field)
 import Tier.Level as Level exposing (Level)
+import Types
 
 
 type alias Tier =
@@ -31,8 +33,12 @@ type Id
 
 
 type Content
-    = Fields (Dict Int Field)
-    | MotdTool
+    = Fields FieldsDict
+    | MotdTool FieldsDict
+
+
+type alias FieldsDict =
+    Dict Int Field
 
 
 decoder : String -> D.Decoder Tier
@@ -46,18 +52,18 @@ decoder clusterMotd =
                         D.map3 Tier
                             (D.field "id" D.int |> D.map Id)
                             (D.succeed level)
-                            contentDecoder
+                            (contentDecoder clusterMotd)
 
                     Err error ->
                         D.fail error
             )
 
 
-contentDecoder : D.Decoder Content
-contentDecoder =
+contentDecoder : String -> D.Decoder Content
+contentDecoder clusterMotd =
     D.oneOf
         [ D.field "fields" fieldsDecoder
-        , D.field "tool" toolDecoder
+        , D.field "tool" (toolDecoder clusterMotd)
         ]
 
 
@@ -71,19 +77,41 @@ fieldsDecoder =
     D.map Fields fieldDictDecoder
 
 
-toolDecoder : D.Decoder Content
-toolDecoder =
+toolDecoder : String -> D.Decoder Content
+toolDecoder clusterMotd =
     let
         decodeTool =
             \toolName ->
                 case toolName of
                     "motd" ->
-                        D.succeed MotdTool
+                        D.succeed <| motdTool clusterMotd
 
                     _ ->
                         D.fail <| "Unknown tool:" ++ toolName
     in
     D.string |> D.andThen decodeTool
+
+
+motdTool : String -> Content
+motdTool clusterMotd =
+    let
+        fields =
+            Dict.fromList [ ( 1, motdField ) ]
+
+        motdField =
+            Field.TextInput
+                { type_ = Types.TextArea
+                , name = "New MOTD"
+                , value = clusterMotd
+
+                -- Can initially be considered touched as already contains
+                -- content (the current MOTD).
+                , touched = Field.Touched
+                , optional = False
+                , help = Nothing
+                }
+    in
+    MotdTool fields
 
 
 fieldsEncoder : Tier -> E.Value
@@ -97,7 +125,7 @@ fieldsEncoder tier =
                     |> Array.fromList
                 )
 
-        MotdTool ->
+        MotdTool _ ->
             -- XXX Do something useful
             E.null
 
@@ -109,19 +137,32 @@ extractId tier =
             id
 
 
+fields : Tier -> FieldsDict
+fields tier =
+    case tier.content of
+        Fields fields ->
+            fields
+
+        MotdTool fields ->
+            fields
+
+
 setFieldValue : Tier -> Int -> String -> Tier
 setFieldValue tier index value =
     let
         updateFieldValue =
             Maybe.map <| Field.replaceValue value
 
+        updateFields =
+            Dict.update index updateFieldValue
+
         newContent =
             case tier.content of
                 Fields fields ->
-                    Fields <| Dict.update index updateFieldValue fields
+                    Fields <| updateFields fields
 
-                x ->
-                    x
+                MotdTool fields ->
+                    MotdTool <| updateFields fields
     in
     { tier | content = newContent }
 

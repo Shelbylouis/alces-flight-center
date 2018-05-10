@@ -90,14 +90,11 @@ createTierFieldsValidator state =
             List.map createRequiredFieldValidator requiredTierFieldsTextInputData
 
         requiredTierFieldsTextInputData =
-            case State.selectedTier state |> .content of
-                Tier.Fields fields ->
-                    Dict.values fields
-                        |> List.filterMap Tier.Field.data
-                        |> List.filter (not << .optional)
-
-                Tier.MotdTool ->
-                    []
+            State.selectedTier state
+                |> Tier.fields
+                |> Dict.values
+                |> List.filterMap Tier.Field.data
+                |> List.filter (not << .optional)
 
         createRequiredFieldValidator =
             \textInputData ->

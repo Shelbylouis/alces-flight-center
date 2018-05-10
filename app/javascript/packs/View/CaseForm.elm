@@ -252,12 +252,16 @@ tierContent state =
 
         content =
             case tier.content of
-                Tier.Fields fields ->
-                    Dict.toList fields
-                        |> List.map (renderTierField state)
+                Tier.Fields _ ->
+                    renderedFields
 
-                Tier.MotdTool ->
-                    [ currentMotdAlert state ]
+                Tier.MotdTool _ ->
+                    currentMotdAlert state :: renderedFields
+
+        renderedFields =
+            Tier.fields tier
+                |> Dict.toList
+                |> List.map (renderTierField state)
     in
     div [] content
 
