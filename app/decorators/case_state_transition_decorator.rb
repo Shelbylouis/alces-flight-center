@@ -14,8 +14,8 @@ class CaseStateTransitionDecorator < ApplicationDecorator
     case event
     when 'resolve'
       return 'This case was marked as resolved.', 'check-circle-o'
-    when 'archive'
-      return 'This case was archived.', 'archive'
+    when 'close'
+      return 'This case was closed.', 'lock'
     end
   end
 end
