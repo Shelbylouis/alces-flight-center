@@ -121,7 +121,7 @@ class Deployment
 
   def dokku_config_get(env_var, app:)
     command = dokku_command("config:get #{app} #{env_var}")
-    `#{command}`
+    `#{command}`.strip
   end
 
   def dokku_stop(app)
