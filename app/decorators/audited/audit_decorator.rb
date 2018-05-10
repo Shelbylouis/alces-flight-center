@@ -80,5 +80,17 @@ module Audited
     def credit_charge_type
       'usd'
     end
+
+    def tier_level_text(from, to)
+      if to == 3 && from < 3
+        'Escalated this case to tier 3 (General support)'
+      else
+        raise "Unsupported tier level transition #{from} => #{to}"
+      end
+    end
+
+    def tier_level_type
+      'chevron-circle-up'
+    end
   end
 end
