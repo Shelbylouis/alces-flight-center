@@ -38,10 +38,7 @@ class Deployment
     run "git tag -f #{tag} #{current_branch}"
     run "git push --tags -f origin #{current_branch}"
 
-    important <<~EOF.squish
-      Don't forget to move all Trello cards included in this release to a
-      '#{tag}' list!
-    EOF
+    output_manual_steps
   end
 
   module Staging
@@ -114,6 +111,39 @@ class Deployment
       STAGING_PASSWORD="#{Shellwords.escape(staging_password)}"
     COMMAND
     dokku_run obfuscate_dokku_command, app: STAGING_APP
+  end
+
+  def output_manual_steps
+    manual_steps = [
+      [
+        <<~EOF.squish,
+          Ensure shared production server `crontab` for user log in as (currently
+          `ubuntu`) includes the following section:
+        EOF
+        <<~EOF.strip_heredoc,
+        ```
+        #{crontab}
+        ```
+        EOF
+      ].join("\n\n"),
+      <<~EOF.squish,
+        Move all Trello cards for things included in this release to a '#{tag}'
+        column at https://trello.com/b/EYQnm3F9/alces-flight-center.
+      EOF
+      <<~EOF.squish
+        Announce the release at https://alces.slack.com/messages/C72GT476Y/,
+        mentioning where to see what's in this release (the new '#{tag}'
+        column).
+      EOF
+    ]
+
+    important <<~EOF.squish
+      You're not done yet! The following manual steps are still required
+    EOF
+    manual_steps.each_with_index do |step, index|
+      formatted_step = "#{index + 1}. #{step}"
+      puts formatted_step
+    end
   end
 
   def crontab
