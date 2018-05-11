@@ -1,5 +1,6 @@
 
 require 'rake'
+require 'erb'
 
 class Deployment
   include Rake::DSL
@@ -113,6 +114,24 @@ class Deployment
       STAGING_PASSWORD="#{Shellwords.escape(staging_password)}"
     COMMAND
     dokku_run obfuscate_dokku_command, app: STAGING_APP
+  end
+
+  def crontab
+    variables = { remote: remote, app_name: app_name }
+    render_erb(crontab_template, variables)
+  end
+
+  def crontab_template
+    current_dir = File.expand_path(File.dirname(__FILE__))
+    File.read(File.join(current_dir, 'deployment/crontab.erb'))
+  end
+
+  def render_erb(template, variables)
+    safe_level = 0
+    trim_mode = '-'
+    ERB.new(template, safe_level, trim_mode).result(
+      OpenStruct.new(variables).instance_eval { binding }
+    )
   end
 
   def dokku_run(command, app:)
