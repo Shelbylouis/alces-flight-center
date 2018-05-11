@@ -1,5 +1,6 @@
 class ClusterDecorator < ApplicationDecorator
   delegate_all
+  decorates_association :components
   decorates_association :component_groups
   decorates_association :services
 

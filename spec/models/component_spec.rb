@@ -3,25 +3,6 @@ require 'rails_helper'
 RSpec.describe Component, type: :model do
   include_examples 'inheritable_support_type'
 
-  describe '#case_form_json' do
-    subject do
-      create(
-        :component,
-        id: 1,
-        name: 'Some Component',
-        support_type: :managed
-      )
-    end
-
-    it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq(
-        id: 1,
-        name: 'Some Component',
-        supportType: 'managed'
-      )
-    end
-  end
-
   describe '#asset_record' do
     subject { create(:component) }
 
