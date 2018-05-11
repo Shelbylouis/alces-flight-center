@@ -47,7 +47,7 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: [:assignee_id, :time_worked], on: [ :update ]
+  audited only: [:assignee_id, :time_worked, :credit_charge], on: [ :update ]
 
   # XXX Remove if: display_id when we can do so
   validates :display_id, uniqueness: true, if: :display_id
