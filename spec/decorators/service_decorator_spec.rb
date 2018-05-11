@@ -114,7 +114,7 @@ RSpec.describe ServiceDecorator do
       categories = subject.case_form_json[:categories]
 
       expect(categories).to match [
-        hash_including(category.case_form_json)
+        hash_including(category.decorate.case_form_json)
       ]
 
       category_issue_names = categories.first[:issues].pluck(:name)
