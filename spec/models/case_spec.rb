@@ -354,7 +354,7 @@ RSpec.describe Case, type: :model do
 
     %w(resolved closed).each do |state|
       it "cannot be changed when case is #{state}" do
-        kase = create(:case, state: state, time_worked:42)
+        kase = create("#{state}_case".to_sym, time_worked:42)
 
         kase.time_worked = 48
         expect do
