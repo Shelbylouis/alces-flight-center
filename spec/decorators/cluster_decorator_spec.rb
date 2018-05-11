@@ -32,10 +32,6 @@ RSpec.describe ClusterDecorator do
     end
 
     it 'gives correct JSON' do
-      text_helper = Class.new do
-        include ActionView::Helpers::TextHelper
-      end.new
-
       expect(subject.case_form_json).to eq(
         id: 1,
         name: 'Some Cluster',
@@ -44,7 +40,7 @@ RSpec.describe ClusterDecorator do
         supportType: 'managed',
         chargingInfo: '£1000',
         motd: 'Some MOTD',
-        motdHtml: text_helper.simple_format('Some MOTD')
+        motdHtml: h.simple_format('Some MOTD')
       )
     end
   end

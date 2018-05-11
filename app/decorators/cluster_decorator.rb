@@ -43,7 +43,7 @@ class ClusterDecorator < ApplicationDecorator
       # current value can be displayed as it will be on the Cluster and in the
       # rest of Flight Center.
       motd: motd,
-      motdHtml: simple_format(motd),
+      motdHtml: h.simple_format(motd),
     }
   end
 end

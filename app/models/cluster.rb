@@ -3,9 +3,6 @@ class Cluster < ApplicationRecord
   include HasSupportType
   include MarkdownDescription
 
-  # XXX Extract `case_form_json` to decorator so can remove this.
-  include ActionView::Helpers::TextHelper
-
   SUPPORT_TYPES = SupportType::VALUES
   PART_NAMES = [:component, :service].freeze
 
