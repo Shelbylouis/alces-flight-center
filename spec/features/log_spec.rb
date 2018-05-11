@@ -69,8 +69,7 @@ RSpec.feature Log, type: :feature do
       it "cannot select #{state} Case for subject to associate" do
         case_attributes = {
             cluster: cluster,
-            subject: 'my_case',
-            state: state
+            subject: 'my_case'
         }
         if subject.is_a?(Component)
           case_attributes.merge!(
@@ -78,7 +77,7 @@ RSpec.feature Log, type: :feature do
               issue: create(:issue, requires_component: true)
           )
         end
-        my_case = create(:case, case_attributes)
+        my_case = create("#{state}_case".to_sym, case_attributes)
 
         # Revisit the page so given Case would be shown, if we do not
         # successfully filter it out, to avoid false positive.

@@ -68,5 +68,17 @@ module Audited
         "#{minutes}m"
       end
     end
+
+    def credit_charge_text(from, to)
+      if from.nil?
+        "A charge of #{h.pluralize(to, 'credit')} was added for this case."
+      else
+        "The credit charge attached to this case was changed from #{from} to #{pluralize(to, 'credit')}"
+      end
+    end
+
+    def credit_charge_type
+      'usd'
+    end
   end
 end

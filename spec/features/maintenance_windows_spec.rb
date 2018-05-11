@@ -234,10 +234,9 @@ RSpec.feature "Maintenance windows", type: :feature do
       %w(resolved closed).each do |state|
         it "cannot select #{state} Case for Cluster to associate" do
           my_case = create(
-            :case,
+            "#{state}_case".to_sym,
             cluster: cluster,
             subject: 'my_case',
-            state: state
           )
 
           # Revisit the page so given Case would be shown, if we do not

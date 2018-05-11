@@ -65,9 +65,14 @@ class CasesController < ApplicationController
   end
 
   def close
+    charge = params.require(:case).require(:credit_charge).to_i
     change_action "Support case %s closed." do |kase|
+      kase.credit_charge = charge
       kase.close!(current_user)
     end
+  rescue ActionController::ParameterMissing
+    flash[:error] = 'You must specify a credit charge to close this case.'
+    redirect_to case_path
   end
 
   def assign

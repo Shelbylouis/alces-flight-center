@@ -23,7 +23,7 @@ class Case < ApplicationRecord
   belongs_to :service, required: false
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
-  has_one :credit_charge, required: false
+
   has_many :maintenance_windows
   has_and_belongs_to_many :log
   has_many :case_comments
@@ -47,7 +47,7 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: [:assignee_id, :time_worked], on: [ :update ]
+  audited only: [:assignee_id, :time_worked, :credit_charge], on: [ :update ]
 
   # XXX Remove if: display_id when we can do so
   validates :display_id, uniqueness: true, if: :display_id
@@ -82,6 +82,13 @@ class Case < ApplicationRecord
   # @deprecated - to be removed in next release
   validates :last_known_ticket_status,
     inclusion: {in: RT_TICKET_STATUSES}
+
+  validates :credit_charge, numericality: {
+      only_integer: true,
+      greater_than_or_equal_to: 0
+  }, if: :credit_charge  # Credit charge can be null (not set)
+
+  validates :credit_charge, presence: true,  if: :closed?
 
   # Only validate this type of support is available on create, as this is the
   # only point at which we should prevent users accessing support they are not
@@ -132,15 +139,6 @@ class Case < ApplicationRecord
     return unless incomplete_rt_ticket?
     self.last_known_ticket_status = associated_rt_ticket.status
     save!
-  end
-
-  def requires_credit_charge?
-    return false if credit_charge
-    credit_charge_allowed?
-  end
-
-  def credit_charge_allowed?
-    ticket_completed? && chargeable
   end
 
   def time_entry_allowed?

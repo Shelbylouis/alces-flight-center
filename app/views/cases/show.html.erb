@@ -24,6 +24,13 @@
           <%= render 'cases/case_state_controls' %>
         </td>
       </tr>
+      <% if @case.credit_charge %>
+      <tr>
+        <td colspan="2"></td>
+        <th>Credit usage</th>
+        <td><%= pluralize(@case.credit_charge, 'credit') %></td>
+      </tr>
+      <% end %>
       <tr>
         <th>Category</th>
         <td><%= @case.category&.name || 'None' %></td>

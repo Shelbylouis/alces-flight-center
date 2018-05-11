@@ -11,9 +11,6 @@ module AdminConfig::Case
         configure :last_known_ticket_status do
           hide
         end
-        configure :credit_charge do
-          hide
-        end
         configure :token do
           hide
         end

@@ -176,56 +176,14 @@ RSpec.describe Case, type: :model do
 
   describe '#active' do
     it 'returns all open Cases' do
-      create(:case, subject: 'one', state: 'open')
-      create(:case, subject: 'two', state: 'resolved')
-      create(:case, subject: 'three', state: 'closed')
-      create(:case, subject: 'four', state: 'open')
+      create(:open_case, subject: 'one')
+      create(:resolved_case, subject: 'two')
+      create(:closed_case, subject: 'three')
+      create(:open_case, subject: 'four')
 
       active_cases = Case.active
 
       expect(active_cases.map(&:subject)).to match_array(['one', 'four'])
-    end
-  end
-
-  describe '#requires_credit_charge?' do
-    let :support_case do
-      create(
-        :case,
-        issue: issue,
-        last_known_ticket_status: last_known_ticket_status
-      )
-    end
-
-    subject { support_case.requires_credit_charge? }
-
-    context 'when Issue chargeable and ticket complete' do
-      let :issue { create(:issue, chargeable: true) }
-      let :last_known_ticket_status { 'resolved' }
-
-      it { is_expected.to be true }
-
-      context 'when Case already has credit charge associated' do
-        before :each do
-          create(:credit_charge, case: support_case)
-          support_case.reload
-        end
-
-        it { is_expected.to be false }
-      end
-    end
-
-    context 'when Issue chargeable and ticket incomplete' do
-      let :issue { create(:issue, chargeable: true) }
-      let :last_known_ticket_status { 'stalled' }
-
-      it { is_expected.to be false }
-    end
-
-    context 'when Issue non-chargeable and ticket complete' do
-      let :issue { create(:issue, chargeable: false) }
-      let :last_known_ticket_status { 'resolved' }
-
-      it { is_expected.to be false }
     end
   end
 
@@ -396,7 +354,7 @@ RSpec.describe Case, type: :model do
 
     %w(resolved closed).each do |state|
       it "cannot be changed when case is #{state}" do
-        kase = create(:case, state: state, time_worked:42)
+        kase = create("#{state}_case".to_sym, time_worked:42)
 
         kase.time_worked = 48
         expect do

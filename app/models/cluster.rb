@@ -15,8 +15,6 @@ class Cluster < ApplicationRecord
   has_many :services, dependent: :destroy
   has_many :cases
   has_many :maintenance_windows
-  has_many :credit_deposits
-  has_many :credit_charges, through: :cases
   has_many :logs, dependent: :destroy
 
   validates_associated :site
@@ -45,7 +43,6 @@ class Cluster < ApplicationRecord
       services: services.map(&:case_form_json),
       supportType: support_type,
       chargingInfo: charging_info,
-      credits: credits,
       # Encode MOTD in two forms: the raw form, to be used as the initial value
       # to be edited in the MOTD tool, and as sanitized, formatted HTML so the
       # current value can be displayed as it will be on the Cluster and in the
@@ -85,15 +82,6 @@ class Cluster < ApplicationRecord
         component_groups: groups
       }.to_struct
     end.sort_by(&:ordering)
-  end
-
-  def credits
-    deposits = credit_deposits.reduce(0) do |total, deposit|
-      total += deposit.amount
-    end
-    credit_charges.reduce(deposits) do |total, charge|
-      total -= charge.amount
-    end
   end
 
   def unfinished_related_maintenance_windows

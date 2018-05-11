@@ -76,9 +76,8 @@ RSpec.describe Cluster, type: :model do
       ).tap do |cluster|
         cluster.components = [create(:component, cluster: cluster)]
         cluster.services = [create(:service, cluster: cluster)]
-        cluster.credit_deposits = [create(:credit_deposit, amount: 20)]
         cluster.cases = [
-          create(:case, credit_charge: create(:credit_charge, amount: 3))
+          create(:case)
         ]
       end
     end
@@ -95,7 +94,6 @@ RSpec.describe Cluster, type: :model do
         services: subject.services.map(&:case_form_json),
         supportType: 'managed',
         chargingInfo: '£1000',
-        credits: 17, # Calculated by `credits` method as deposits - charges.
         motd: 'Some MOTD',
         motdHtml: text_helper.simple_format('Some MOTD')
       )
@@ -244,28 +242,6 @@ RSpec.describe Cluster, type: :model do
       type_names = subject.map(&:name)
       expect(type_names).to eq(['Another Type', 'Server'])
     end
-  end
-
-  describe '#credits' do
-    subject do
-      create(:cluster).tap do |cluster|
-        create(:credit_deposit, cluster: cluster, amount: 20)
-        create(:credit_deposit, cluster: cluster, amount: 2)
-
-        create(:case, cluster: cluster).tap do |case_|
-          create(:credit_charge, case: case_, amount: 5)
-        end
-
-        create(:case, cluster: cluster).tap do |case_|
-          create(:credit_charge, case: case_, amount: 2)
-        end
-
-        # Case without CreditCharge; should not effect total credits.
-        create(:case, cluster: cluster)
-      end.credits
-    end
-
-    it { is_expected.to eq 15 }
   end
 
   describe '#unfinished_related_maintenance_windows' do

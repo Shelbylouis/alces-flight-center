@@ -17,6 +17,7 @@ FactoryBot.define do
 
     factory :closed_case do
       state 'closed'
+      credit_charge 0
     end
 
     # Every Case requires a Cluster, so this is just the same as the standard

@@ -34,16 +34,6 @@ class CaseDecorator < ApplicationDecorator
     h.boolean_symbol(chargeable)
   end
 
-  def credit_charge_info
-    if credit_charge
-      credit_charge.amount.to_s
-    elsif chargeable
-      'Pending'
-    else
-      'N/A'
-    end
-  end
-
   def tier_description
     unless TIER_DESCRIPTIONS.has_key?(tier_level)
       raise "Unhandled tier_level: #{tier_level}"
