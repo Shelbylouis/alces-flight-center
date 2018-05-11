@@ -254,6 +254,17 @@ class Case < ApplicationRecord
     super(new_level)
   end
 
+  def save!
+    # Particularly in tests, rather than in normal controller operation, we might keep this object
+    # around after saving and do more things to it.
+    # So that the validation on these setters works properly, we need to reset the "changed" state
+    # of them all before continuing.
+    super
+    @assignee_changed = false
+    @time_worked_changed = false
+    @tier_level_changed = false
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
