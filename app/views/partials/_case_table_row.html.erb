@@ -20,7 +20,7 @@
     <td><%= kase.user_facing_state %></td>
     <td style="white-space: nowrap;"><%= kase.user.name %></td>
     <td><%= link_to kase.subject, case_path(kase) %></td>
-    <td><%= kase.assignee&.name || 'Nobody' %></td>
+    <td><%= current_user == kase.assignee ? 'Me' : kase.assignee&.name || 'Nobody' %></td>
     <td><%= kase.association_info %></td>
     <% if show_resolved %>
       <td><%= kase.credit_charge %></td>
