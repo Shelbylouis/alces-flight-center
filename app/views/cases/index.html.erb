@@ -1,4 +1,3 @@
-<% manage_cases_page = current_user.admin? && @show_resolved %>
 <%= content_for :subtitle do
   "#{@show_resolved ? 'Resolved' : 'Open'} Cases"
 end %>
@@ -20,36 +19,15 @@ end %>
         </tr>
       </thead>
 
+      <tbody class="current-user">
+        <% @scope.cases.assigned_to(current_user).order(created_at: :desc).decorate.each do |c| %>
+          <%= render 'partials/case_table_row', kase: c, show_resolved: @show_resolved %>
+        <% end %>
+      </tbody>
+
       <tbody>
-        <% @scope.cases.order(created_at: :desc).decorate.each do |c| %>
-      <%
-        # If @show_resolved, show only non-open cases; if not @show_resolved, show only open cases.
-        # Hence logic simplifies to the below (!=)
-      %>
-          <% if @show_resolved != c.open?  %>
-            <% if (c.resolved? || c.closed?) && !manage_cases_page %>
-              <tr
-                class="closed-case-row"
-                title="This support case has been resolved; you should open a new support case if you wish to contact Alces Flight Support"
-              >
-            <% else %>
-              <tr>
-            <% end %>
-              <td><%= link_to c.display_id, case_path(c) %></td>
-              <%= timestamp_td(
-                description:  'Support case created',
-                timestamp: c.created_at
-              ) %>
-              <td><%= c.user_facing_state %></td>
-              <td style="white-space: nowrap;"><%= c.user.name %></td>
-              <td><%= link_to c.subject, case_path(c) %></td>
-              <td><%= c.assignee&.name || 'Nobody' %></td>
-              <td><%= c.association_info %></td>
-              <% if @show_resolved %>
-                <td><%= c.credit_charge %></td>
-              <% end %>
-            </tr>
-          <% end %>
+        <% @scope.cases.not_assigned_to(current_user).order(created_at: :desc).decorate.each do |c| %>
+          <%= render 'partials/case_table_row', kase: c, show_resolved: @show_resolved %>
         <% end %>
       </tbody>
     </table>

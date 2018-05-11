@@ -1,18 +1,13 @@
-<% manage_cases_page = current_user.admin? && @show_resolved %>
+<% manage_cases_page = current_user.admin? && show_resolved %>
 <%
   # If @show_resolved, show only non-open cases; if not @show_resolved, show only open cases.
   # Hence logic simplifies to the below (!=)
 %>
-<% if @show_resolved != kase.open?  %>
-  <% if kase.hidden? && !manage_cases_page %>
+<% if show_resolved != kase.open?  %>
+  <% if (kase.resolved? || kase.closed?) && !manage_cases_page %>
     <tr
-      class="archived-case-row"
-      title="This support case has been archived; you should open a new support case if you wish to contact Alces Flight Support"
-    >
-  <% elsif manage_cases_page && kase.requires_credit_charge? %>
-    <tr
-      class="credit-charge-required-case-row"
-      title="This support case is chargeable and has been completed, and needs some credits associated with it."
+      class="closed-case-row"
+      title="This support case has been resolved; you should open a new support case if you wish to contact Alces Flight Support"
     >
   <% else %>
     <tr>
@@ -27,20 +22,8 @@
     <td><%= link_to kase.subject, case_path(kase) %></td>
     <td><%= kase.assignee&.name || 'Nobody' %></td>
     <td><%= kase.association_info %></td>
-    <% if manage_cases_page %>
-      <td><%= kase.chargeable_symbol %></td>
+    <% if show_resolved %>
+      <td><%= kase.credit_charge %></td>
     <% end %>
-    <td>
-      <% if kase.credit_charge_allowed? && manage_cases_page %>
-        <% credit_charge = kase.credit_charge || CreditCharge.new(case: kase) %>
-        <%= form_for credit_charge, class: 'form-inline' do |f| %>
-          <%= f.hidden_field :case_id %>
-          <%= f.number_field :amount, class: 'form-control', required: true %>
-          <%= f.submit '+', class: 'btn btn-success', style: 'width: 100%' %>
-        <% end %>
-      <% else %>
-        <%= kase.credit_charge_info %>
-      <% end %>
-    </td>
   </tr>
 <% end %>
