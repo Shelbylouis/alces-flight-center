@@ -24,7 +24,7 @@ class ServiceDecorator < ClusterPartDecorator
     if any_categorised_issues?
       {categories: categorised_applicable_issues}
     else
-      {issues: applicable_issues.map(&:case_form_json)}
+      {issues: json_for_issues(applicable_issues)}
     end
   end
 
@@ -38,7 +38,7 @@ class ServiceDecorator < ClusterPartDecorator
       .transform_keys do |category|
       category.nil? ? Category.new(name: 'Other', id: -1) : category
     end.map do |category, issues|
-      category.decorate.case_form_json.merge(issues: issues.map(&:case_form_json))
+      category.decorate.case_form_json.merge(issues: json_for_issues(issues))
     end.reject(&:nil?)
   end
 
@@ -48,5 +48,9 @@ class ServiceDecorator < ClusterPartDecorator
       service_type: nil
     )
     (service_type.issues + issues_requiring_any_service).reject(&:special?)
+  end
+
+  def json_for_issues(issues)
+    issues.map { |issue| issue.decorate.case_form_json }
   end
 end

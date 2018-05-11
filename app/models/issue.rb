@@ -70,18 +70,6 @@ class Issue < ApplicationRecord
     IDENTIFIER_NAMES.include?(identifier&.to_sym)
   end
 
-  def case_form_json
-    {
-      id: id,
-      name: name,
-      defaultSubject: default_subject,
-      requiresComponent: requires_component,
-      supportType: support_type,
-      chargeable: chargeable,
-      tiers: tiers.map(&:case_form_json)
-    }
-  end
-
   def default_subject
     name
   end

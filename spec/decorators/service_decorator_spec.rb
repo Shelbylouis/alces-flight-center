@@ -52,7 +52,7 @@ RSpec.describe ServiceDecorator do
     it 'renders Issues using their `case_form_json` method' do
       issue = create(:issue_requiring_service, name: 'my issue')
 
-      expect(subject.case_form_json[:issues]).to eq([issue.case_form_json])
+      expect(subject.case_form_json[:issues]).to eq([issue.decorate.case_form_json])
     end
 
     it 'includes Issue requiring Service of this type' do
