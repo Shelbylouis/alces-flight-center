@@ -20,4 +20,23 @@ RSpec.describe ComponentDecorator do
       )
     end
   end
+
+  describe '#case_form_json' do
+    subject do
+      create(
+        :component,
+        id: 1,
+        name: 'Some Component',
+        support_type: :managed
+      ).decorate
+    end
+
+    it 'gives correct JSON' do
+      expect(subject.case_form_json).to eq(
+        id: 1,
+        name: 'Some Component',
+        supportType: 'managed'
+      )
+    end
+  end
 end

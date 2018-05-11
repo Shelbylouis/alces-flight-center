@@ -1,5 +1,6 @@
 class ClusterDecorator < ApplicationDecorator
   delegate_all
+  decorates_association :components
   decorates_association :component_groups
   decorates_association :services
 
@@ -28,5 +29,22 @@ class ClusterDecorator < ApplicationDecorator
         end.push(text: 'All', path: h.cluster_components_path(self))
       }
     ]
+  end
+
+  def case_form_json
+    {
+      id: id,
+      name: name,
+      components: components.map(&:case_form_json),
+      services: services.map(&:case_form_json),
+      supportType: support_type,
+      chargingInfo: charging_info,
+      # Encode MOTD in two forms: the raw form, to be used as the initial value
+      # to be edited in the MOTD tool, and as sanitized, formatted HTML so the
+      # current value can be displayed as it will be on the Cluster and in the
+      # rest of Flight Center.
+      motd: motd,
+      motdHtml: h.simple_format(motd),
+    }
   end
 end

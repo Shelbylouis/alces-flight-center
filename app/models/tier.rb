@@ -28,24 +28,9 @@ class Tier < ApplicationRecord
     true
   end
 
-  def case_form_json
-    {
-      id: id,
-      level: level,
-    }.merge(fields_or_tool_json)
-  end
-
   private
 
   def can_have_tool?
     level == 1 && !self.fields
-  end
-
-  def fields_or_tool_json
-    if fields
-      {fields: fields}
-    else
-      {tool: tool}
-    end
   end
 end
