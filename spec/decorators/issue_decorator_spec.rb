@@ -32,7 +32,7 @@ RSpec.describe IssueDecorator do
         requiresComponent: false,
         supportType: 'managed',
         chargeable: true,
-        tiers: [tier.case_form_json]
+        tiers: [tier.decorate.case_form_json]
       )
     end
   end
