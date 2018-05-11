@@ -52,19 +52,28 @@ class ServiceDecorator < ClusterPartDecorator
     def categorised_applicable_issues
       applicable_issues
         .group_by(&:category)
-        .transform_keys do |category|
-        category.nil? ? Category.new(name: 'Other', id: -1).decorate : category
-      end.map do |category, issues|
-        category.case_form_json.merge(issues: issues.map(&:case_form_json))
-      end.reject(&:nil?)
+        .transform_keys { |category| category.nil? ? other_category : category }
+        .map { |category, issues| category_json_for(category, issues: issues) }
     end
 
     def applicable_issues
-      issues_requiring_any_service = Issue.where(
+      @applicable_issues ||=
+        (service_type.issues + issues_requiring_any_service).reject(&:special?)
+    end
+
+    def issues_requiring_any_service
+      Issue.where(
         requires_service: true,
         service_type: nil
       ).decorate
-      (service_type.issues + issues_requiring_any_service).reject(&:special?)
+    end
+
+    def other_category
+      Category.new(name: 'Other', id: -1).decorate
+    end
+
+    def category_json_for(category, issues:)
+      category.case_form_json.merge(issues: issues.map(&:case_form_json))
     end
   end
 end
