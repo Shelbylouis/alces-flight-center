@@ -1,4 +1,6 @@
 class ServiceDecorator < ClusterPartDecorator
+  decorates_association :service_type
+
   def change_support_type_button
     render_change_support_type_button(
       request_advice_issue: Issue.request_service_becomes_advice_issue,
@@ -30,7 +32,7 @@ class ServiceDecorator < ClusterPartDecorator
       if any_categorised_issues?
         {categories: categorised_applicable_issues}
       else
-        {issues: json_for_issues(applicable_issues)}
+        {issues: applicable_issues.map(&:case_form_json)}
       end
     end
 
@@ -51,9 +53,9 @@ class ServiceDecorator < ClusterPartDecorator
       applicable_issues
         .group_by(&:category)
         .transform_keys do |category|
-        category.nil? ? Category.new(name: 'Other', id: -1) : category
+        category.nil? ? Category.new(name: 'Other', id: -1).decorate : category
       end.map do |category, issues|
-        category.decorate.case_form_json.merge(issues: json_for_issues(issues))
+        category.case_form_json.merge(issues: issues.map(&:case_form_json))
       end.reject(&:nil?)
     end
 
@@ -61,12 +63,8 @@ class ServiceDecorator < ClusterPartDecorator
       issues_requiring_any_service = Issue.where(
         requires_service: true,
         service_type: nil
-      )
+      ).decorate
       (service_type.issues + issues_requiring_any_service).reject(&:special?)
-    end
-
-    def json_for_issues(issues)
-      issues.map { |issue| issue.decorate.case_form_json }
     end
   end
 end
