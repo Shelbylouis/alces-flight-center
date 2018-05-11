@@ -89,3 +89,13 @@ body {
     pointer-events: none;
   }
 }
+
+table {
+  .shrink {
+    white-space: nowrap;
+  }
+
+  .expand {
+    width: 99%
+  }
+}
