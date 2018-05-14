@@ -19,14 +19,14 @@ end %>
         </tr>
       </thead>
 
-      <tbody class="current-user">
-        <% @scope.cases.assigned_to(current_user).order(created_at: :desc).decorate.each do |c| %>
+      <tbody class="assigned-cases">
+        <% @scope.cases.assigned_to(current_user).decorate.each do |c| %>
           <%= render 'partials/case_table_row', kase: c, show_resolved: @show_resolved %>
         <% end %>
       </tbody>
 
       <tbody>
-        <% @scope.cases.not_assigned_to(current_user).order(created_at: :desc).decorate.each do |c| %>
+        <% @scope.cases.not_assigned_to(current_user).decorate.each do |c| %>
           <%= render 'partials/case_table_row', kase: c, show_resolved: @show_resolved %>
         <% end %>
       </tbody>

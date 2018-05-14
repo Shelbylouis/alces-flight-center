@@ -59,7 +59,7 @@ RSpec.describe 'Cases table', type: :feature do
       )
 
       visit cases_path(as: user)
-      assigned_cases = find('.current-user').all('tr').map(&:text)
+      assigned_cases = find('.assigned-cases').all('tr').map(&:text)
       expect(assigned_cases).to have_text('Assigned case')
       expect(assigned_cases).not_to have_text('Open case')
     end
