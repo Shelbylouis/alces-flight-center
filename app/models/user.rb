@@ -36,10 +36,6 @@ class User < ApplicationRecord
     contact? && !primary_contact?
   end
 
-  def info
-    "#{name} <#{email}>"
-  end
-
   def self.globally_available?
     true
   end
