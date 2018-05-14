@@ -3,9 +3,9 @@ class AllSitesDecorator < ApplicationDecorator
 
   def tabs
     [
-      #{ id: :overview, path: h.cases_path },
+      { id: :all_sites, path: h.root_path },
       {
-        id: :cases, path: h.cases_path,
+        id: :cases, text: 'All Cases', path: h.cases_path,
         dropdown: [
           { text: 'Current', path: h.cases_path },
           { text: 'Resolved', path: h.resolved_cases_path }
