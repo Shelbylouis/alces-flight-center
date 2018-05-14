@@ -1,4 +1,5 @@
 class MaintenanceWindow < ApplicationRecord
+  default_scope { order(created_at: :desc) }
   belongs_to :case
   belongs_to :cluster, required: false
   belongs_to :component, required: false

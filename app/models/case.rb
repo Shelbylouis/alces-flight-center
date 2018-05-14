@@ -1,6 +1,8 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
 
+  default_scope { order(created_at: :desc) }
+
   # @deprecated - to be removed in next release
   COMPLETED_RT_TICKET_STATUSES = [
     'resolved',
