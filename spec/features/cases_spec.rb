@@ -49,6 +49,20 @@ RSpec.describe 'Cases table', type: :feature do
         expect(cases).to have_text('1138')
       end
     end
+
+    it 'shows cases assigned to current user in separate section' do
+      create(
+        :open_case,
+        cluster: cluster,
+        subject: 'Assigned case',
+        assignee: user
+      )
+
+      visit cases_path(as: user)
+      assigned_cases = find('.current-user').all('tr').map(&:text)
+      expect(assigned_cases).to have_text('Assigned case')
+      expect(assigned_cases).not_to have_text('Open case')
+    end
   end
 
   context 'when user is admin' do
