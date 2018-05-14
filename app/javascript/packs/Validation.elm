@@ -77,10 +77,9 @@ createAvailableTierValidator state =
 
 unavailableTierErrorMessage : State -> String
 unavailableTierErrorMessage state =
-    "Selected "
+    "Logging tier 0-2 cases for a self-managed "
         ++ State.associatedModelTypeName state
-        ++ " is self-managed; if required you may only request consultancy"
-        ++ " support from Alces Software."
+        ++ " is not available."
 
 
 createTierFieldsValidator : State -> Validator Error State

@@ -40,16 +40,18 @@ view state =
                 StartSubmit
 
         formElements =
-            [ issueDrillDownFields state
-            , hr [] []
-            , dynamicFields state
-            ]
+            Maybe.Extra.values
+                [ Just <| issueDrillDownSection state
+                , maybeSubjectSection state
+                , Just <| dynamicFieldsSection state
+                ]
+                |> List.intersperse (hr [] [])
     in
     Html.form [ onSubmit submitMsg ] formElements
 
 
-issueDrillDownFields : State -> Html Msg
-issueDrillDownFields state =
+issueDrillDownSection : State -> Html Msg
+issueDrillDownSection state =
     -- These fields allow a user to drill down to identify the particular Issue
     -- and possible solutions (via different Tiers) to a problem they are
     -- having.
@@ -65,8 +67,25 @@ issueDrillDownFields state =
             ]
 
 
-dynamicFields : State -> Html Msg
-dynamicFields state =
+maybeSubjectSection : State -> Maybe (Html Msg)
+maybeSubjectSection state =
+    let
+        selectedTier =
+            State.selectedTier state
+    in
+    case selectedTier.level of
+        Level.Zero ->
+            -- Does not make sense to display subject field when a level 0 Tier
+            -- is selected, since the form cannot be submitted and only
+            -- information is displayed.
+            Nothing
+
+        _ ->
+            Just <| section [] [ subjectField state ]
+
+
+dynamicFieldsSection : State -> Html Msg
+dynamicFieldsSection state =
     -- These fields are very dynamic, and either appear/disappear entirely or
     -- have their content changed based on the currently selected Issue and
     -- Tier.
@@ -81,8 +100,7 @@ dynamicFields state =
                     [ tierContentElements ]
 
                 _ ->
-                    [ subjectField state
-                    , tierContentElements
+                    [ tierContentElements
                     , submitButton state
                     ]
 
