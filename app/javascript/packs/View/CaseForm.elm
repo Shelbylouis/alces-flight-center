@@ -41,17 +41,17 @@ view state =
 
         formElements =
             Maybe.Extra.values
-                [ Just <| issueDrillDownFields state
+                [ Just <| issueDrillDownSection state
                 , maybeSubjectSection state
-                , Just <| dynamicFields state
+                , Just <| dynamicFieldsSection state
                 ]
                 |> List.intersperse (hr [] [])
     in
     Html.form [ onSubmit submitMsg ] formElements
 
 
-issueDrillDownFields : State -> Html Msg
-issueDrillDownFields state =
+issueDrillDownSection : State -> Html Msg
+issueDrillDownSection state =
     -- These fields allow a user to drill down to identify the particular Issue
     -- and possible solutions (via different Tiers) to a problem they are
     -- having.
@@ -84,8 +84,8 @@ maybeSubjectSection state =
             Just <| section [] [ subjectField state ]
 
 
-dynamicFields : State -> Html Msg
-dynamicFields state =
+dynamicFieldsSection : State -> Html Msg
+dynamicFieldsSection state =
     -- These fields are very dynamic, and either appear/disappear entirely or
     -- have their content changed based on the currently selected Issue and
     -- Tier.
