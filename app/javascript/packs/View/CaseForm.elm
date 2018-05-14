@@ -40,10 +40,12 @@ view state =
                 StartSubmit
 
         formElements =
-            [ issueDrillDownFields state
-            , hr [] []
-            , dynamicFields state
-            ]
+            Maybe.Extra.values
+                [ Just <| issueDrillDownFields state
+                , maybeSubjectSection state
+                , Just <| dynamicFields state
+                ]
+                |> List.intersperse (hr [] [])
     in
     Html.form [ onSubmit submitMsg ] formElements
 
@@ -65,6 +67,23 @@ issueDrillDownFields state =
             ]
 
 
+maybeSubjectSection : State -> Maybe (Html Msg)
+maybeSubjectSection state =
+    let
+        selectedTier =
+            State.selectedTier state
+    in
+    case selectedTier.level of
+        Level.Zero ->
+            -- Does not make sense to display subject field when a level 0 Tier
+            -- is selected, since the form cannot be submitted and only
+            -- information is displayed.
+            Nothing
+
+        _ ->
+            Just <| section [] [ subjectField state ]
+
+
 dynamicFields : State -> Html Msg
 dynamicFields state =
     -- These fields are very dynamic, and either appear/disappear entirely or
@@ -81,8 +100,7 @@ dynamicFields state =
                     [ tierContentElements ]
 
                 _ ->
-                    [ subjectField state
-                    , tierContentElements
+                    [ tierContentElements
                     , submitButton state
                     ]
 
