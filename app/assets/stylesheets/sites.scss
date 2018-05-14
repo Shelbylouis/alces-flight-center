@@ -1,3 +1,16 @@
 // Place all the styles related to the sites controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.cluster-list {
+  .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    justify-items: center;
+
+    h4 {
+      line-height: 1.5em;
+      margin: 0;
+    }
+  }
+}
