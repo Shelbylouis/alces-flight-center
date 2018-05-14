@@ -2,10 +2,10 @@
 http_interactions:
 - request:
     method: post
-    uri: http://<RT_API_HOST>/rt/REST/1.0/ticket/11878/comment?pass=<RT_PASSWORD>&user=<RT_USERNAME>
+    uri: http://<RT_API_HOST>/rt/REST/1.0/ticket/12016/comment?pass=<RT_PASSWORD>&user=<RT_USERNAME>
     body:
       encoding: UTF-8
-      string: content=id%3A+11878%0AAction%3A+correspond%0AText%3A+Alces+Flight+Center+test+comment%0A
+      string: content=id%3A+12016%0AAction%3A+correspond%0AText%3A+Alces+Flight+Center+test+comment%0A
     headers:
       Connection:
       - close
@@ -19,11 +19,11 @@ http_interactions:
       message: OK
     headers:
       Date:
-      - Wed, 11 Apr 2018 15:44:37 GMT
+      - Mon, 14 May 2018 13:03:10 GMT
       Server:
       - Apache/2.2.9 (Debian) mod_perl/2.0.4 Perl/v5.10.0
       Set-Cookie:
-      - RT_SID_<RT_API_HOST>.80=be4c003543e74136c80a447a9c7e9420; path=/rt
+      - RT_SID_<RT_API_HOST>.80=e06c79ec7abd416b9750129039e80cad; path=/rt
       Vary:
       - Accept-Encoding
       Connection:
@@ -40,5 +40,5 @@ http_interactions:
         # Message recorded
 
     http_version: 
-  recorded_at: Wed, 11 Apr 2018 15:45:22 GMT
+  recorded_at: Mon, 14 May 2018 13:03:11 GMT
 recorded_with: VCR 4.0.0
