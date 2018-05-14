@@ -68,9 +68,8 @@ infoModal state =
             span []
                 [ text "No charging info has been provided by Alces Software for "
                 , strong [] [ text cluster.name ]
-                , text "; if you require clarification on what charges you may incur please contact "
-                , View.Utils.supportEmailLink
-                , text "."
+                , text
+                    "; if you require clarification on what charges you may incur please contact support."
                 ]
     in
     Modal.config (ClusterChargingInfoModal Modal.hidden)
