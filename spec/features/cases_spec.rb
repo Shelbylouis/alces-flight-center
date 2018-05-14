@@ -49,6 +49,20 @@ RSpec.describe 'Cases table', type: :feature do
         expect(cases).to have_text('1138')
       end
     end
+
+    it 'shows cases assigned to current user in separate section' do
+      create(
+        :open_case,
+        cluster: cluster,
+        subject: 'Assigned case',
+        assignee: user
+      )
+
+      visit cases_path(as: user)
+      assigned_cases = find('.assigned-cases').all('tr').map(&:text)
+      expect(assigned_cases).to have_text('Assigned case')
+      expect(assigned_cases).not_to have_text('Open case')
+    end
   end
 
   context 'when user is admin' do
@@ -60,29 +74,6 @@ RSpec.describe 'Cases table', type: :feature do
       # At least for now, want to render open Cases table on Site dashboard the
       # same for both admins as contacts.
       include_examples 'open cases table rendered'
-    end
-
-    context 'when visit archive cases page' do
-      it 'renders table of all resolved and closed Cases, without Contact-specific buttons/info' do
-        visit resolved_site_cases_path(site, as: user)
-
-        headings = all('th').map(&:text)
-        expect(headings).not_to include('Contact support')
-        expect(headings).not_to include('Archive/Restore')
-
-        # Only include links in the table NOT the tab bar
-        links = first('table').all('a')
-
-        mailto_links = links.select { |a| a[:href]&.match?('mailto') }
-        expect(mailto_links).to eq []
-
-        archive_links = links.select { |a| a[:href]&.match?('archive') }
-        expect(archive_links).to eq []
-
-        expect do
-          find('.archived-case-row')
-        end.to raise_error(Capybara::ElementNotFound)
-      end
     end
   end
 end
@@ -245,7 +236,7 @@ RSpec.describe 'Case page' do
       end
     end
   end
-  
+
   describe 'Commenting' do
 
     context 'for open non-consultancy Case' do

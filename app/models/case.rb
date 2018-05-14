@@ -1,6 +1,8 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
 
+  default_scope { order(created_at: :desc) }
+
   # @deprecated - to be removed in next release
   COMPLETED_RT_TICKET_STATUSES = [
     'resolved',
@@ -111,6 +113,9 @@ class Case < ApplicationRecord
   after_update :maybe_send_new_assignee_email
 
   scope :active, -> { where(state: 'open') }
+
+  scope :assigned_to, ->(user) { where(assignee: user) }
+  scope :not_assigned_to, ->(user) { where.not(assignee: user).or(where(assignee: nil)) }
 
   def to_param
     self.display_id.parameterize.upcase
