@@ -1,5 +1,5 @@
 class PasswordsMailer < ApplicationMailer
-  def reset_password_complete(user:, password:)
+  def reset_password_complete(user, password)
     @user = user
     @password = password
     mail(
