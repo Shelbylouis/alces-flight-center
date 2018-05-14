@@ -15,7 +15,7 @@ class ScopeNavLinksBuilder
                                             nav_icon: 'fa-globe')
     end
 
-    if scope
+    if scope && !scope.is_a?(AllSites)
       site_obj = model_from_scope :site
       path_for_site = if h.current_user.admin?
                         site_obj

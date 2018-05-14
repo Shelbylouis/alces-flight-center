@@ -117,7 +117,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     include_examples 'cluster and part variable assignment'
 
     describe "get '/'" do
-      subject { nil }
+      subject { AllSites.new }
       before :each do
         get root_path(as: user)
       end

@@ -85,19 +85,23 @@ class ApplicationController < ActionController::Base
   end
 
   def assign_site_scope
-    @site = if request.path =~ /^\/sites/
-              id = scope_id_param(:site_id)
-              Site.find(id)
-            elsif current_user.contact?
-              current_user.site
-            end
+    if current_user.contact?
+      @site = current_user.site
+    else
+      if request.path =~ /^\/sites/
+        id = scope_id_param(:site_id)
+        @site = Site.find(id)
+      else
+        AllSites.new
+      end
+    end
   end
 
   def assign_title
     if @scope
       @title = <<~EOF.squish
         #{@scope.readable_model_name.split.map(&:capitalize).join(' ')}
-        Dashboard: #{@scope.name}
+        Dashboard#{@scope.respond_to?(:name) ? ": #{@scope.name}" : ''}
       EOF
     end
   end

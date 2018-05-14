@@ -4,7 +4,6 @@ class CasesController < ApplicationController
   decorates_assigned :site
 
   def index(show_resolved: false)
-    @site = current_site
     @show_resolved = show_resolved
   end
 
