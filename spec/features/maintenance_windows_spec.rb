@@ -158,6 +158,10 @@ RSpec.feature "Maintenance windows", type: :feature do
       include_examples 'maintenance form error handling', 'request'
       include_examples 'maintenance form initially valid'
 
+      it 'displays the component for which maintenance is being requested' do
+        expect(find('h4').text).to eq "Requesting maintenance for #{component.name} (#{cluster.name})"
+      end
+
       it 'uses correct default values' do
         a_distant_friday = Time.zone.local(2025, 3, 7, 0, 0)
         following_monday_at_9 = a_distant_friday.advance(days: 3, hours: 9)
