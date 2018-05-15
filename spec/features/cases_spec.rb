@@ -138,7 +138,7 @@ RSpec.describe 'Case page' do
           'Assigned this case to A Scientist.'
       )
       expect(event_cards[0].find('.card-body').text).to eq(
-          'Escalated this case to tier 3 (General support).'
+          'Escalated this case to tier 3 (General Support).'
       )
     end
 
