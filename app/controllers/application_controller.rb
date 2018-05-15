@@ -85,19 +85,28 @@ class ApplicationController < ActionController::Base
   end
 
   def assign_site_scope
-    @site = if request.path =~ /^\/sites/
-              id = scope_id_param(:site_id)
-              Site.find(id)
-            elsif current_user.contact?
-              current_user.site
-            end
+    if current_user.contact?
+      # For a Site contact, the Site in scope is always the Site they belong
+      # to.
+      @site = current_user.site
+    elsif request.path =~ /^\/sites/
+      # For an admin viewing the pages for a particular Site, that is the Site
+      # in scope.
+      id = scope_id_param(:site_id)
+      @site = Site.find(id)
+    else
+      # If we reach this point we must be an admin viewing the top-level pages
+      # which show cross-site information, so assign the AllSites scope which
+      # handles this in a similar way to any of the other scopes.
+      AllSites.new
+    end
   end
 
   def assign_title
     if @scope
       @title = <<~EOF.squish
         #{@scope.readable_model_name.split.map(&:capitalize).join(' ')}
-        Dashboard: #{@scope.name}
+        Dashboard#{@scope.respond_to?(:name) ? ": #{@scope.name}" : ''}
       EOF
     end
   end
