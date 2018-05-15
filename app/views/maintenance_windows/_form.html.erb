@@ -18,7 +18,12 @@
     <%= f.hidden_field :component_id %>
     <%= f.hidden_field :service_id %>
 
-    <h4>Requesting maintenance for <%= maintenance_window.associated_model.decorate.links %></h4>
+    <h4>
+      Requesting maintenance for <%= maintenance_window.associated_model.decorate.links %>
+      <% if maintenance_window.associated_model.is_a? Cluster %>
+      (whole cluster)
+      <% end %>
+    </h4>
     <div class="form-group">
       <%= f.label :case_id, case_label, 'data-test': 'case-select-label' %>
       <%= f.collection_select(
