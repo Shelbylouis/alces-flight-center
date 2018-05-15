@@ -9,6 +9,12 @@ VCR.configure do |c|
   # Log most recent debug output from VCR here.
   c.debug_logger = File.open('log/vcr.log', 'w')
 
+  c.ignore_request do |request|
+    # Required so tests using Selenium can work, as these need to make
+    # requests to URLs like `http://127.0.0.1:34129/__identify__`.
+    true if request.uri =~ /^http:\/\/127\.0\.0\.1/
+  end
+
   # Filter sensitive data from saved cassettes, or any other data which will
   # prevent VCR from identifying cassettes as being for the same request in
   # different environments.
