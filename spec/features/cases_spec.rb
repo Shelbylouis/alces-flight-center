@@ -399,7 +399,7 @@ RSpec.describe 'Case page' do
   describe 'maintenance window request' do
 
     RSpec.shared_examples 'does not show maintenance button' do
-      it 'doesn\'t' do # Why does RSpec force you to be quite so verbose? :(
+      it 'doesn\'t show maintenance button' do
         visit case_path(subject, as: user)
         expect do
           find('a', text: 'Request maintenance')
@@ -422,7 +422,7 @@ RSpec.describe 'Case page' do
 
         context 'as a contact' do
           let(:user) { contact }
-          it_behaves_like 'does not show maintenance button'
+          include_examples 'does not show maintenance button'
         end
       end
     end
@@ -435,7 +435,7 @@ RSpec.describe 'Case page' do
 
         let(:user) { admin }
 
-        it_behaves_like 'does not show maintenance button'
+        include_examples 'does not show maintenance button'
       end
     end
   end
