@@ -29,29 +29,29 @@ class ScopeNavLinksBuilder
   end
 
   def site_link
-    site_obj = model_from_scope :site
-    return nil unless site_obj
+    site = model_from_scope :site
+    return nil unless site
     path_for_site = if h.current_user.admin?
-                      site_obj
+                      site
                     else
                       h.root_path
                     end
-    nav_link_proc(model: site_obj,
+    nav_link_proc(model: site,
                   path: path_for_site,
                   nav_icon: 'fa-institution')
   end
 
   def cluster_link
-    cluster_obj = model_from_scope :cluster
-    return nil unless cluster_obj
-    nav_link_proc(model: cluster_obj,
+    cluster = model_from_scope :cluster
+    return nil unless cluster
+    nav_link_proc(model: cluster,
                   nav_icon: 'fa-server')
   end
 
   def component_group_link
-    component_group_obj = model_from_scope :component_group
-    return nil unless component_group_obj
-    nav_link_proc(model: component_group_obj,
+    component_group = model_from_scope :component_group
+    return nil unless component_group
+    nav_link_proc(model: component_group,
                   nav_icon: 'fa-cubes')
   end
 
