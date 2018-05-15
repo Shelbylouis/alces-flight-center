@@ -61,7 +61,11 @@ class Case < ApplicationRecord
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
-  validates :fields, presence: true
+
+  validates :fields,
+    presence: {unless: :change_motd_request},
+    absence: {if: :change_motd_request}
+  validates_absence_of :change_motd_request, if: :fields
 
   validates :tier_level,
     presence: true,

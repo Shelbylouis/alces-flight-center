@@ -6,7 +6,6 @@ RSpec.describe Case, type: :model do
   describe '#valid?' do
     subject { create(:case) }
 
-    it { is_expected.to validate_presence_of(:fields) }
     it { is_expected.to validate_presence_of(:tier_level) }
     it { is_expected.to have_one(:change_motd_request) }
 
@@ -15,6 +14,32 @@ RSpec.describe Case, type: :model do
         .only_integer
         .is_greater_than_or_equal_to(1)
         .is_less_than_or_equal_to(3)
+    end
+
+    describe 'fields validation' do
+      it { is_expected.to validate_presence_of(:fields) }
+
+      context 'when has fields' do
+        subject do
+          build(:case, fields: [{type: 'input', name: 'Some field'}])
+        end
+
+        it { is_expected.to validate_absence_of(:change_motd_request) }
+        it { is_expected.to be_valid }
+      end
+
+      context 'when has change_mode_request' do
+        subject do
+          build(
+            :case,
+            fields: nil,
+            change_motd_request: build(:change_motd_request)
+          )
+        end
+
+        it { is_expected.to validate_absence_of(:fields) }
+        it { is_expected.to be_valid }
+      end
     end
   end
 
