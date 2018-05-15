@@ -87,13 +87,11 @@ class ApplicationController < ActionController::Base
   def assign_site_scope
     if current_user.contact?
       @site = current_user.site
+    elsif request.path =~ /^\/sites/
+      id = scope_id_param(:site_id)
+      @site = Site.find(id)
     else
-      if request.path =~ /^\/sites/
-        id = scope_id_param(:site_id)
-        @site = Site.find(id)
-      else
-        AllSites.new
-      end
+      AllSites.new
     end
   end
 
