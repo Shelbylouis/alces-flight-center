@@ -9,8 +9,12 @@
     justify-items: center;
 
     h4 {
-      line-height: 1.5em;
-      margin: 0;
+      margin: 0.75rem 0;
+    }
+
+    & > span {
+      line-height: 3rem;
+      text-align: right;
     }
   }
 }
