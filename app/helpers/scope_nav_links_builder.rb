@@ -7,6 +7,7 @@ class ScopeNavLinksBuilder
   end
 
   def build
+    return [] unless scope
     scope_nav_link_procs = []
 
     if h.current_user&.admin?
@@ -15,34 +16,34 @@ class ScopeNavLinksBuilder
                                             nav_icon: 'fa-globe')
     end
 
-    if scope && !scope.is_a?(AllSites)
-      site_obj = model_from_scope :site
-      path_for_site = if h.current_user.admin?
-                        site_obj
-                      else
-                        h.root_path
-                      end
+    site_obj = model_from_scope :site
+    path_for_site = if h.current_user.admin?
+                      site_obj
+                    else
+                      h.root_path
+                    end
+    if site_obj
       scope_nav_link_procs << nav_link_proc(model: site_obj,
                                             path: path_for_site,
                                             nav_icon: 'fa-institution')
+    end
 
-      cluster_obj = model_from_scope :cluster
-      if cluster_obj
-        scope_nav_link_procs << nav_link_proc(model: cluster_obj,
-                                              nav_icon: 'fa-server')
-      end
+    cluster_obj = model_from_scope :cluster
+    if cluster_obj
+      scope_nav_link_procs << nav_link_proc(model: cluster_obj,
+                                            nav_icon: 'fa-server')
+    end
 
-      component_group_obj = model_from_scope :component_group
-      if component_group_obj
-        scope_nav_link_procs << nav_link_proc(model: component_group_obj,
-                                              nav_icon: 'fa-cubes')
-      end
+    component_group_obj = model_from_scope :component_group
+    if component_group_obj
+      scope_nav_link_procs << nav_link_proc(model: component_group_obj,
+                                            nav_icon: 'fa-cubes')
+    end
 
-      cluster_part = model_from_scope(:service) || model_from_scope(:component)
-      if cluster_part
-        scope_nav_link_procs << nav_link_proc(model: cluster_part,
-                                              nav_icon: 'fa-cube')
-      end
+    cluster_part = model_from_scope(:service) || model_from_scope(:component)
+    if cluster_part
+      scope_nav_link_procs << nav_link_proc(model: cluster_part,
+                                            nav_icon: 'fa-cube')
     end
 
     scope_nav_link_procs
