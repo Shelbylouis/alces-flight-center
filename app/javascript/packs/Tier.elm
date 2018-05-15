@@ -4,9 +4,9 @@ module Tier
         , Id(..)
         , Tier
         , decoder
+        , encodeContentPair
         , extractId
         , fields
-        , fieldsEncoder
         , isChargeable
         , setFieldValue
         )
@@ -114,20 +114,22 @@ motdTool clusterMotd =
     MotdTool fields
 
 
-fieldsEncoder : Tier -> E.Value
-fieldsEncoder tier =
+encodeContentPair : Tier -> ( String, E.Value )
+encodeContentPair tier =
     case tier.content of
         Fields fields ->
-            E.array
+            ( "fields"
+            , E.array
                 (Dict.values fields
                     |> List.map Field.encoder
                     |> Maybe.Extra.values
                     |> Array.fromList
                 )
+            )
 
         MotdTool _ ->
             -- XXX Do something useful
-            E.null
+            ( "tool_fields", E.null )
 
 
 extractId : Tier -> Int
