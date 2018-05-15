@@ -42,24 +42,28 @@ class ScopeNavLinksBuilder
   end
 
   def cluster_link
-    cluster = model_from_scope :cluster
-    return nil unless cluster
-    nav_link_proc(model: cluster,
-                  nav_icon: 'fa-server')
+    link_for_model(:cluster, nav_icon: 'fa-server')
   end
 
   def component_group_link
-    component_group = model_from_scope :component_group
-    return nil unless component_group
-    nav_link_proc(model: component_group,
-                  nav_icon: 'fa-cubes')
+    link_for_model(:component_group, nav_icon: 'fa-cubes')
   end
 
   def cluster_part_link
-    cluster_part = model_from_scope(:service) || model_from_scope(:component)
-    return nil unless cluster_part
-    nav_link_proc(model: cluster_part,
-                  nav_icon: 'fa-cube')
+    link_for_model([:service, :component], nav_icon: 'fa-cube')
+  end
+
+  def link_for_model(possible_types, nav_icon:)
+    model = first_model_from_scope(possible_types)
+    return nil unless model
+    nav_link_proc(model: model, nav_icon: nav_icon)
+  end
+
+  def first_model_from_scope(possible_types)
+    Array.wrap(possible_types)
+      .lazy
+      .map { |type| model_from_scope(type) }
+      .find(&:itself)
   end
 
   def model_from_scope(type)
