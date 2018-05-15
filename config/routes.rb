@@ -129,6 +129,9 @@ Rails.application.routes.draw do
 
     resolved_cases.call(only: [:show, :create]) do
       resources :case_comments, only: :create
+      member do
+        post :escalate
+      end
     end
 
     resources :clusters, only: :show do

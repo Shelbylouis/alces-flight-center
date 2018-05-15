@@ -9,4 +9,5 @@ class ApplicationMailer < ActionMailer::Base
   default from: 'Alces Flight Center <center@alces-flight.com>'
   layout 'mailer'
   helper 'mailer'
+  helper 'application'
 end

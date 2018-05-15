@@ -81,7 +81,7 @@ class CasesController < ApplicationController
                         "Support case %s assigned to #{new_assignee.name}."
                         : 'Support case %s unassigned.'
 
-    change_action success_flash, redirect_path: case_path do |kase|
+    change_action success_flash do |kase|
       kase.assignee = new_assignee
     end
   end
@@ -101,6 +101,12 @@ class CasesController < ApplicationController
     end
   end
 
+  def escalate
+    change_action "Support case %s escalated." do |kase|
+      kase.tier_level = 3
+    end
+  end
+
   private
 
   def case_params
@@ -115,7 +121,7 @@ class CasesController < ApplicationController
     )
   end
 
-  def change_action(success_flash, redirect_path: case_path, &block)
+  def change_action(success_flash, &block)
     @case = case_from_params
     begin
       block.call(@case)
@@ -124,7 +130,7 @@ class CasesController < ApplicationController
     rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
       flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
-    redirect_to redirect_path
+    redirect_to case_path(@case)
   end
 
   def case_from_params

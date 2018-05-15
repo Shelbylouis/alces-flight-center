@@ -50,6 +50,21 @@ module ApplicationHelper
       EOF
     )
   end
+  # Note: These should match values used in `Tier.Level.description` in Case
+  # form app.
+  TIER_DESCRIPTIONS = {
+      1 => 'Tool',
+      2 => 'Routine Maintenance',
+      3 => 'General Support',
+  }.freeze
+
+  def tier_description(tier_level)
+    unless TIER_DESCRIPTIONS.has_key?(tier_level)
+      raise "Unhandled tier_level: #{tier_level}"
+    end
+    description = TIER_DESCRIPTIONS[tier_level]
+    "#{tier_level} (#{description})"
+  end
 
   private
 
