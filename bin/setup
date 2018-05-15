@@ -71,6 +71,13 @@ chdir APP_ROOT do
       database as close to production as possible.
     EOF
     <<~EOF,
+      You'll need a version of geckodriver
+      (https://github.com/mozilla/geckodriver) to run Selenium tests which use
+      this; you can install this via a package manager of your choice, or by
+      running `rake alces:setup:geckodriver` if you have no other preference or
+      it is unavailable for your package manager.
+    EOF
+    <<~EOF,
       Update this script to document or fix anything which broke or you had
       trouble with.
     EOF
