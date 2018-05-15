@@ -74,6 +74,7 @@ class MaintenanceWindowsController < ApplicationController
 
   def default_maintenance_window_params
     {
+      case_id: params[:case_id],
       cluster_id: params[:cluster_id],
       component_id: params[:component_id],
       service_id: params[:service_id],

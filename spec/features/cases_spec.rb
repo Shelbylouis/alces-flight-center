@@ -395,4 +395,48 @@ RSpec.describe 'Case page' do
       it_behaves_like 'for inapplicable cases'
     end
   end
+
+  describe 'maintenance window request' do
+
+    RSpec.shared_examples 'does not show maintenance button' do
+      it 'doesn\'t' do # Why does RSpec force you to be quite so verbose? :(
+        visit case_path(subject, as: user)
+        expect do
+          find('a', text: 'Request maintenance')
+        end.to raise_error(Capybara::ElementNotFound)
+      end
+    end
+
+    context 'for an open case' do
+      subject { open_case }
+
+      context 'as an admin' do
+        let(:user) { admin }
+
+        it 'shows button' do
+          visit case_path(subject, as: user)
+
+          request_link = find('a', text: 'Request maintenance')
+          expect(request_link[:href]).to eq new_cluster_maintenance_window_path(cluster, case_id: open_case.id)
+        end
+
+        context 'as a contact' do
+          let(:user) { contact }
+          it_behaves_like 'does not show maintenance button'
+        end
+      end
+    end
+
+    %w(resolved closed).each do |state|
+      context "for a #{state} case" do
+        subject do
+          send("#{state}_case")
+        end
+
+        let(:user) { admin }
+
+        it_behaves_like 'does not show maintenance button'
+      end
+    end
+  end
 end
