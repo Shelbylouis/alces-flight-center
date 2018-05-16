@@ -10,7 +10,7 @@
         <% value.each do |k, v| %>
           <li>
             <strong><%= k %>:</strong>
-          <%= v.include?("\n") ? simple_format(v) : v %>
+          <%= simple_format_if_needed(v) %>
           </li>
         <% end %>
       </ul>

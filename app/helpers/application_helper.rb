@@ -66,6 +66,10 @@ module ApplicationHelper
     "#{tier_level} (#{description})"
   end
 
+  def simple_format_if_needed(text)
+    text.include?("\n") ? simple_format(text) : text
+  end
+
   private
 
   # Map function with given name over enumerable collection of objects, then
