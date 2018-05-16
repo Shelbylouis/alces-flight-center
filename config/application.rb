@@ -24,6 +24,8 @@ module AlcesFlightCenter
 
     config.active_job.queue_adapter = :resque
 
+    config.email_app_name = ENV['EMAIL_APP_NAME'] || 'Alces Flight Center'
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
