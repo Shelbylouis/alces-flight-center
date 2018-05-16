@@ -1,23 +1,21 @@
-<% if show_resolved != kase.open?  %>
-  <tr>
-    <td><%= link_to kase.display_id, case_path(kase) %></td>
-    <%= timestamp_td(
-      description:  'Support case created',
-      timestamp: kase.created_at
-    ) %>
-    <td><%= kase.user_facing_state %></td>
-    <td class="nowrap"><%= kase.user.name %></td>
-    <td><%= link_to kase.subject, case_path(kase) %></td>
-    <td>
-      <% if current_user == kase.assignee %>
-        <%= raw('<strong>Me</strong>') %>
-      <% else %>
-        <%= kase.assignee&.name || 'Nobody' %>
-      <% end %>
-    </td>
-    <td><%= kase.association_info %></td>
-    <% if show_resolved %>
-      <td><%= kase.credit_charge %></td>
+<tr>
+  <td><%= link_to kase.display_id, case_path(kase) %></td>
+  <%= timestamp_td(
+    description:  'Support case created',
+    timestamp: kase.created_at
+  ) %>
+  <td><%= kase.user_facing_state %></td>
+  <td style="white-space: nowrap;"><%= kase.user.name %></td>
+  <td><%= link_to kase.subject, case_path(kase) %></td>
+  <td>
+    <% if current_user == kase.assignee %>
+      <%= raw('<strong>Me</strong>') %>
+    <% else %>
+      <%= kase.assignee&.name || 'Nobody' %>
     <% end %>
-  </tr>
-<% end %>
+  </td>
+  <td><%= kase.association_info %></td>
+  <% if kase.resolved? || kase.closed? %>
+    <td><%= kase.credit_charge %></td>
+  <% end %>
+</tr>

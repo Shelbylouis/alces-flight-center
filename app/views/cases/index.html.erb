@@ -1,5 +1,8 @@
+<%
+  cases = @show_resolved ? @scope.cases.inactive : @scope.cases.active
+%>
 <%= content_for :subtitle do
-  "#{@show_resolved ? 'Resolved' : 'Open'} Cases"
+  "#{cases.length} #{@show_resolved ? 'Resolved' : 'Open'} Cases"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
   <div class='table-responsive'>
@@ -20,14 +23,14 @@ end %>
       </thead>
 
       <tbody class="assigned-cases">
-        <% @scope.cases.assigned_to(current_user).decorate.each do |c| %>
-          <%= render 'partials/case_table_row', kase: c, show_resolved: @show_resolved %>
+        <% cases.assigned_to(current_user).decorate.each do |c| %>
+          <%= render 'partials/case_table_row', kase: c %>
         <% end %>
       </tbody>
 
       <tbody>
-        <% @scope.cases.not_assigned_to(current_user).decorate.each do |c| %>
-          <%= render 'partials/case_table_row', kase: c, show_resolved: @show_resolved %>
+        <% cases.not_assigned_to(current_user).decorate.each do |c| %>
+          <%= render 'partials/case_table_row', kase: c %>
         <% end %>
       </tbody>
     </table>
