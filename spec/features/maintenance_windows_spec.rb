@@ -330,6 +330,22 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       expect(page).not_to have_button(extend_button_text)
     end
+
+    context 'when maintenance is for the entire cluster' do
+      subject do
+        create(
+            :requested_maintenance_window,
+            cluster: cluster,
+            case: support_case
+        )
+      end
+
+      it 'shows the entire-cluster-warning message' do
+        visit new_cluster_maintenance_window_path(id: subject.id, cluster_id: cluster.id, as: user)
+
+        expect(find('p.alert-warning').text).to match 'Not what you want? Try selecting a component or a service from this cluster.'
+      end
+    end
   end
 
   context 'when user is contact' do
@@ -444,6 +460,24 @@ RSpec.feature "Maintenance windows", type: :feature do
       visit cluster_maintenance_windows_path(cluster, as: user)
 
       expect(page).not_to have_button(extend_button_text)
+    end
+
+    context 'when maintenance is for the entire cluster' do
+      subject do
+        create(
+            :requested_maintenance_window,
+            cluster: cluster,
+            case: support_case
+        )
+      end
+
+      it 'does not show the entire-cluster-warning message' do
+        visit confirm_cluster_maintenance_window_path(id: subject.id, cluster_id: cluster.id, as: user)
+
+        expect do
+          find('p.alert-warning')
+        end.to raise_error(Capybara::ElementNotFound)
+      end
     end
   end
 end

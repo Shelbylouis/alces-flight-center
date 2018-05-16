@@ -18,23 +18,28 @@
     <%= f.hidden_field :component_id %>
     <%= f.hidden_field :service_id %>
 
-    <h4>
-      Requesting maintenance for <%= maintenance_window.associated_model.decorate.links %>
-      <% if maintenance_window.associated_model.is_a? Cluster %>
-      (whole cluster)
-      <% end %>
-    </h4>
+    <% if action.request? %>
 
-    <% if maintenance_window.associated_model.is_a? Cluster %>
-      <p class="p-3 bg-warning">
-        <i class="fa fa-warning"></i>
-        Not what you want? Try selecting a
-        <%= link_to 'component', cluster_components_path %>
-        or a
-        <%= link_to 'service', cluster_services_path %>
-        from this cluster.
-      </p>
+      <h4>
+        Requesting maintenance for <%= maintenance_window.associated_model.decorate.links %>
+        <% if maintenance_window.associated_model.is_a? Cluster %>
+        (whole cluster)
+        <% end %>
+      </h4>
+
+      <% if maintenance_window.associated_model.is_a? Cluster %>
+        <p class="p-3 alert alert-warning">
+          <i class="fa fa-warning"></i>
+          Not what you want? Try selecting a
+          <%= link_to 'component', cluster_components_path, class: 'alert-link' %>
+          or a
+          <%= link_to 'service', cluster_services_path, class: 'alert-link' %>
+          from this cluster.
+        </p>
+      <% end %>
+
     <% end %>
+
     <div class="form-group">
       <%= f.label :case_id, case_label, 'data-test': 'case-select-label' %>
       <%= f.collection_select(
