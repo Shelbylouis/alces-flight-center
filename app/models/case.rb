@@ -269,6 +269,12 @@ class Case < ApplicationRecord
     @tier_level_changed = false
   end
 
+  def tool_fields=(tool_hash)
+    tool_hash = tool_hash.deep_symbolize_keys
+    tool_type = tool_hash.fetch(:type).to_sym
+    handle_tool(tool_type, fields: tool_hash)
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
@@ -381,5 +387,16 @@ class Case < ApplicationRecord
       f = f.with_indifferent_access
       [f.fetch(:name), f.fetch(:value)]
     end.to_h.symbolize_keys
+  end
+
+  def handle_tool(type, fields:)
+    case type
+    when :motd
+      self.build_change_motd_request(
+        fields.slice(:motd)
+      )
+    else
+      raise "Unknown type: '#{type}'"
+    end
   end
 end

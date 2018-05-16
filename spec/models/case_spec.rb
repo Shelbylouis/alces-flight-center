@@ -391,4 +391,47 @@ RSpec.describe Case, type: :model do
       end
     end
   end
+
+  describe '#tool_fields=' do
+    subject do
+      build(:case, fields: nil)
+    end
+
+    let :motd_tool_fields {
+      {
+        type: 'motd',
+        motd: motd_field,
+      }
+    }
+    let :motd_field { 'New MOTD' }
+
+
+    it 'also works when keys are strings' do
+      stringified_tool_fields = motd_tool_fields.deep_stringify_keys
+      subject.tool_fields = stringified_tool_fields
+
+      expect(subject.change_motd_request).not_to be_nil
+    end
+
+    context "when given hash with type field 'motd'" do
+      it "builds ChangeMotdRequest from given 'motd' field" do
+        subject.tool_fields = motd_tool_fields
+
+        expect(subject.change_motd_request).not_to be_nil
+        expect(subject.change_motd_request.motd).to eq motd_field
+        expect(subject.change_motd_request).to be_valid
+        # Should initially be unsaved, and should be saved iff the Case itself
+        # is successfully saved.
+        expect(subject.change_motd_request).not_to be_persisted
+      end
+    end
+
+    context "when given hash with unknown type field" do
+      it "raises error" do
+        expect do
+          subject.tool_fields = { type: 'foo' }
+        end.to raise_error("Unknown type: 'foo'")
+      end
+    end
+  end
 end
