@@ -12,7 +12,7 @@
       <% @logs.each do |log| %>
         <tr>
           <%= timestamp_td(description:  'Logged', timestamp: log.created_at) %>
-          <td style="white-space: nowrap;"><%= log.engineer.name %></td>
+          <td class="nowrap"><%= log.engineer.name %></td>
           <td><%= log.details %></td>
           <td>
             <%= log.component&.decorate&.link || raw("<em>None</em>") %>

@@ -6,7 +6,7 @@
       timestamp: kase.created_at
     ) %>
     <td><%= kase.user_facing_state %></td>
-    <td style="white-space: nowrap;"><%= kase.user.name %></td>
+    <td class="nowrap"><%= kase.user.name %></td>
     <td><%= link_to kase.subject, case_path(kase) %></td>
     <td>
       <% if current_user == kase.assignee %>

@@ -51,7 +51,7 @@ module ApplicationHelper
       <<~EOF.strip_heredoc
         <td
           title="#{description} on #{timestamp.to_formatted_s(:long)}"
-          style="white-space: nowrap;"
+          class="nowrap"
         >
           #{timestamp.to_formatted_s(:short)}
         </td>
