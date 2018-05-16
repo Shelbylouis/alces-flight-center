@@ -231,6 +231,7 @@ class Case < ApplicationRecord
       'Associated service': service&.name,
       Tier: decorate.tier_description,
       Fields: field_hash,
+      'Requested MOTD': change_motd_request&.motd
     }.reject { |_k, v| v.nil? }
   end
 
@@ -383,6 +384,7 @@ class Case < ApplicationRecord
   end
 
   def field_hash
+    return nil unless fields
     fields.map do |f|
       f = f.with_indifferent_access
       [f.fetch(:name), f.fetch(:value)]

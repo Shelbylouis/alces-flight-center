@@ -270,6 +270,14 @@ RSpec.describe Case, type: :model do
     let(:component) { create(:component, name: 'node01', cluster: cluster) }
     let(:service) { create(:service, name: 'Some service', cluster: cluster) }
 
+    let :fields do
+      [
+        {name: 'field1', value: 'value1'},
+        {name: 'field2', value: 'value2', optional: true},
+      ]
+    end
+    let :change_motd_request { nil }
+
     let(:kase) {
       create(
         :case,
@@ -281,10 +289,8 @@ RSpec.describe Case, type: :model do
         user: requestor,
         subject: 'my_subject',
         tier_level: 3,
-        fields: [
-          {name: 'field1', value: 'value1'},
-          {name: 'field2', value: 'value2', optional: true},
-        ]
+        fields: fields,
+        change_motd_request: change_motd_request,
       )
     }
 
@@ -320,6 +326,20 @@ RSpec.describe Case, type: :model do
 
       it 'does not include corresponding line' do
         expect(kase.email_properties).not_to include(:'Associated service')
+      end
+    end
+
+    context 'when Case has ChangeMotdRequest rather than fields' do
+      let :fields { nil }
+
+      let :motd { 'My new MOTD' }
+      let :change_motd_request do
+        build(:change_motd_request, motd: motd)
+      end
+
+      it 'includes requested MOTD and not fields' do
+        expect(kase.email_properties).to include(:'Requested MOTD' => motd)
+        expect(kase.email_properties).not_to include(:Fields)
       end
     end
   end
