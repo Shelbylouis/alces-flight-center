@@ -1,17 +1,5 @@
-<% manage_cases_page = current_user.admin? && show_resolved %>
-<%
-  # If @show_resolved, show only non-open cases; if not @show_resolved, show only open cases.
-  # Hence logic simplifies to the below (!=)
-%>
 <% if show_resolved != kase.open?  %>
-  <% if (kase.resolved? || kase.closed?) && !manage_cases_page %>
-    <tr
-      class="closed-case-row"
-      title="This support case has been resolved; you should open a new support case if you wish to contact Alces Flight Support"
-    >
-  <% else %>
-    <tr>
-  <% end %>
+  <tr>
     <td><%= link_to kase.display_id, case_path(kase) %></td>
     <%= timestamp_td(
       description:  'Support case created',
