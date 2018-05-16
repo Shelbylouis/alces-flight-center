@@ -332,16 +332,8 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     context 'when maintenance is for the entire cluster' do
-      subject do
-        create(
-            :requested_maintenance_window,
-            cluster: cluster,
-            case: support_case
-        )
-      end
-
       it 'shows the entire-cluster-warning message' do
-        visit new_cluster_maintenance_window_path(id: subject.id, cluster_id: cluster.id, as: user)
+        visit new_cluster_maintenance_window_path(cluster_id: cluster.id, as: user)
 
         expect(find('p.alert-warning').text).to match 'Not what you want? Try selecting a component or a service from this cluster.'
       end
