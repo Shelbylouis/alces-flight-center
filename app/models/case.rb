@@ -29,7 +29,7 @@ class Case < ApplicationRecord
   has_many :maintenance_windows
   has_and_belongs_to_many :log
   has_many :case_comments
-  has_one :change_motd_request, required: false
+  has_one :change_motd_request, required: false, autosave: true
 
   has_many :case_state_transitions
   alias_attribute :transitions, :case_state_transitions

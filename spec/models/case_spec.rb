@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe Case, type: :model do
   let :random_token_regex { /[A-Z][0-9][A-Z][0-9][A-Z]/ }
 
+  it { is_expected.to have_one(:change_motd_request).autosave(true) }
+
   describe '#valid?' do
     subject { create(:case) }
 
