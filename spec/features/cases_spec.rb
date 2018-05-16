@@ -280,6 +280,27 @@ RSpec.describe 'Case page' do
       expect(find('.alert')).to have_text('Empty comments are not permitted')
     end
 
+    %w(resolved closed).each do |state|
+      context "for a #{state} case" do
+        subject { create("#{state}_case".to_sym, cluster: cluster, tier_level: 3) }
+
+        it 'does not allow commenting by site contact' do
+          visit case_path(subject, as: contact)
+          expect do
+            find('textarea')
+          end.to raise_error(Capybara::ElementNotFound)
+        end
+
+        it 'does not allow commenting by admin' do
+          visit case_path(subject, as: admin)
+          expect do
+            find('textarea')
+          end.to raise_error(Capybara::ElementNotFound)
+        end
+
+      end
+    end
+
   end
 
   describe 'time logging' do

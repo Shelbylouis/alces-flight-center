@@ -17,18 +17,19 @@
 
 %>
 
-<% if @case.commenting_disabled? %>
-   <div class="card bg-light">
-     <div class="card-body">
-       <span class="float-left mr-3">
-         <%= icon('info') %>
-       </span>
-       <%= disabled_message_text %>
-     </div>
-   </div>
-<% end %>
-
 <% if @case.state == 'open' %>
+
+  <% if @case.commenting_disabled? %>
+     <div class="card bg-light">
+       <div class="card-body">
+         <span class="float-left mr-3">
+           <%= icon('info') %>
+         </span>
+         <%= disabled_message_text %>
+       </div>
+     </div>
+  <% end %>
+
   <%= form_for [@case, @comment] do |f| %>
     <div class="form-group">
       <%= f.text_area :text,
@@ -44,4 +45,16 @@
       %>
     </div>
   <% end %>
+
+<% else %>
+
+  <div class="card bg-light">
+     <div class="card-body">
+       <span class="float-left mr-3">
+         <%= icon('info') %>
+       </span>
+       Commenting is disabled as this case is <%= @case.state %>.
+     </div>
+  </div>
+
 <% end %>
