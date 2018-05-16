@@ -47,18 +47,6 @@ RSpec.describe Site, type: :model do
     )
   end
 
-  describe '#secondary_contacts_info' do
-    subject { site.secondary_contacts_info }
-
-    it { is_expected.to eq "#{secondary_contact.info}, #{another_secondary_contact.info}" }
-  end
-
-  describe '#additional_contacts_info' do
-    subject { site.additional_contacts_info }
-
-    it { is_expected.to eq "#{additional_contact_1.email}, #{additional_contact_2.email}" }
-  end
-
   describe '#all_contacts' do
     subject { site.all_contacts }
 
