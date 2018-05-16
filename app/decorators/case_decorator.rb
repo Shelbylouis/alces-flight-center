@@ -27,8 +27,8 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def request_maintenance_path
-    assoc_class = model.associated_model.class.name.downcase
-    h.send("new_#{assoc_class}_maintenance_window_path", model.associated_model.id, case_id: model.id)
+    assoc_class = model.associated_model.underscored_model_name
+    h.send("new_#{assoc_class}_maintenance_window_path", model.associated_model, case_id: model.id)
   end
 
   def tier_description
