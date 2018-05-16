@@ -6,7 +6,6 @@
 <% if show_resolved != kase.open?  %>
   <% if (kase.resolved? || kase.closed?) && !manage_cases_page %>
     <tr
-      class="closed-case-row"
       title="This support case has been resolved; you should open a new support case if you wish to contact Alces Flight Support"
     >
   <% else %>
