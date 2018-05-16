@@ -3,10 +3,11 @@ require 'rails_helper'
 RSpec.describe Case, type: :model do
   let :random_token_regex { /[A-Z][0-9][A-Z][0-9][A-Z]/ }
 
+  it { is_expected.to have_one(:change_motd_request).autosave(true) }
+
   describe '#valid?' do
     subject { create(:case) }
 
-    it { is_expected.to validate_presence_of(:fields) }
     it { is_expected.to validate_presence_of(:tier_level) }
     it { is_expected.to have_one(:change_motd_request) }
 
@@ -15,6 +16,32 @@ RSpec.describe Case, type: :model do
         .only_integer
         .is_greater_than_or_equal_to(1)
         .is_less_than_or_equal_to(3)
+    end
+
+    describe 'fields validation' do
+      it { is_expected.to validate_presence_of(:fields) }
+
+      context 'when has fields' do
+        subject do
+          build(:case, fields: [{type: 'input', name: 'Some field'}])
+        end
+
+        it { is_expected.to validate_absence_of(:change_motd_request) }
+        it { is_expected.to be_valid }
+      end
+
+      context 'when has change_mode_request' do
+        subject do
+          build(
+            :case,
+            fields: nil,
+            change_motd_request: build(:change_motd_request)
+          )
+        end
+
+        it { is_expected.to validate_absence_of(:fields) }
+        it { is_expected.to be_valid }
+      end
     end
   end
 
@@ -243,6 +270,14 @@ RSpec.describe Case, type: :model do
     let(:component) { create(:component, name: 'node01', cluster: cluster) }
     let(:service) { create(:service, name: 'Some service', cluster: cluster) }
 
+    let :fields do
+      [
+        {name: 'field1', value: 'value1'},
+        {name: 'field2', value: 'value2', optional: true},
+      ]
+    end
+    let :change_motd_request { nil }
+
     let(:kase) {
       create(
         :case,
@@ -254,10 +289,8 @@ RSpec.describe Case, type: :model do
         user: requestor,
         subject: 'my_subject',
         tier_level: 3,
-        fields: [
-          {name: 'field1', value: 'value1'},
-          {name: 'field2', value: 'value2', optional: true},
-        ]
+        fields: fields,
+        change_motd_request: change_motd_request,
       )
     }
 
@@ -293,6 +326,20 @@ RSpec.describe Case, type: :model do
 
       it 'does not include corresponding line' do
         expect(kase.email_properties).not_to include(:'Associated service')
+      end
+    end
+
+    context 'when Case has ChangeMotdRequest rather than fields' do
+      let :fields { nil }
+
+      let :motd { 'My new MOTD' }
+      let :change_motd_request do
+        build(:change_motd_request, motd: motd)
+      end
+
+      it 'includes requested MOTD and not fields' do
+        expect(kase.email_properties).to include(:'Requested MOTD' => motd)
+        expect(kase.email_properties).not_to include(:Fields)
       end
     end
   end
@@ -361,6 +408,49 @@ RSpec.describe Case, type: :model do
           kase.save!
         end.to raise_error(ActiveRecord::RecordInvalid)
         expect(kase.errors.messages).to match({time_worked: ["must not be changed when case is #{state}"]})
+      end
+    end
+  end
+
+  describe '#tool_fields=' do
+    subject do
+      build(:case, fields: nil)
+    end
+
+    let :motd_tool_fields {
+      {
+        type: 'motd',
+        motd: motd_field,
+      }
+    }
+    let :motd_field { 'New MOTD' }
+
+
+    it 'also works when keys are strings' do
+      stringified_tool_fields = motd_tool_fields.deep_stringify_keys
+      subject.tool_fields = stringified_tool_fields
+
+      expect(subject.change_motd_request).not_to be_nil
+    end
+
+    context "when given hash with type field 'motd'" do
+      it "builds ChangeMotdRequest from given 'motd' field" do
+        subject.tool_fields = motd_tool_fields
+
+        expect(subject.change_motd_request).not_to be_nil
+        expect(subject.change_motd_request.motd).to eq motd_field
+        expect(subject.change_motd_request).to be_valid
+        # Should initially be unsaved, and should be saved iff the Case itself
+        # is successfully saved.
+        expect(subject.change_motd_request).not_to be_persisted
+      end
+    end
+
+    context "when given hash with unknown type field" do
+      it "raises error" do
+        expect do
+          subject.tool_fields = { type: 'foo' }
+        end.to raise_error("Unknown type: 'foo'")
       end
     end
   end

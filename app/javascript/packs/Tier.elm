@@ -4,9 +4,9 @@ module Tier
         , Id(..)
         , Tier
         , decoder
+        , encodeContentPair
         , extractId
         , fields
-        , fieldsEncoder
         , isChargeable
         , setFieldValue
         )
@@ -114,20 +114,37 @@ motdTool clusterMotd =
     MotdTool fields
 
 
-fieldsEncoder : Tier -> E.Value
-fieldsEncoder tier =
+encodeContentPair : Tier -> ( String, E.Value )
+encodeContentPair tier =
     case tier.content of
         Fields fields ->
-            E.array
+            ( "fields"
+            , E.array
                 (Dict.values fields
                     |> List.map Field.encoder
                     |> Maybe.Extra.values
                     |> Array.fromList
                 )
+            )
 
-        MotdTool _ ->
-            -- XXX Do something useful
-            E.null
+        MotdTool fields ->
+            let
+                motdFieldValue =
+                    Dict.values fields
+                        |> List.head
+                        |> Maybe.map Field.data
+                        |> Maybe.Extra.join
+                        |> Maybe.map (.value >> E.string)
+                        -- Should never happen, but this should cause an
+                        -- obvious error if it ever somehow does.
+                        |> Maybe.withDefault E.null
+            in
+            ( "tool_fields"
+            , E.object
+                [ ( "type", E.string "motd" )
+                , ( "motd", motdFieldValue )
+                ]
+            )
 
 
 extractId : Tier -> Int

@@ -47,23 +47,28 @@
         <td><%= @case.display_id %></td>
       </tr>
       <tr>
-        <th>Fields</th>
-        <td colspan="3">
-          <div class="table-responsive">
-            <table class="table table-sm table-striped table-bordered">
-              <% @case.fields.each do |field| %>
-                <tr>
-                  <th scope="row" class="shrink">
-                    <%= field.fetch('name') %>
-                  </th>
-                  <td class="expand">
-                    <%= simple_format(field.fetch('value')) %>
-                  </td>
-                </tr>
-              <% end%>
-            </table>
-          </div>
-        </td>
+        <% if @case.fields %>
+          <th>Fields</th>
+          <td colspan="3">
+            <div class="table-responsive">
+              <table class="table table-sm table-striped table-bordered">
+                <% @case.fields.each do |field| %>
+                  <tr>
+                    <th scope="row" class="shrink">
+                      <%= field.fetch('name') %>
+                    </th>
+                    <td class="expand">
+                      <%= simple_format(field.fetch('value')) %>
+                    </td>
+                  </tr>
+                <% end%>
+              </table>
+            </div>
+          </td>
+        <% elsif @case.change_motd_request %>
+          <th>Requested MOTD</th>
+          <td><%= simple_format(@case.change_motd_request.motd) %></td>
+        <% end %>
       </tr>
       <%= render 'cases/time_worked' %>
       <tr>

@@ -29,7 +29,7 @@ class Case < ApplicationRecord
   has_many :maintenance_windows
   has_and_belongs_to_many :log
   has_many :case_comments
-  has_one :change_motd_request, required: false
+  has_one :change_motd_request, required: false, autosave: true
 
   has_many :case_state_transitions
   alias_attribute :transitions, :case_state_transitions
@@ -61,7 +61,11 @@ class Case < ApplicationRecord
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
-  validates :fields, presence: true
+
+  validates :fields,
+    presence: {unless: :change_motd_request},
+    absence: {if: :change_motd_request}
+  validates_absence_of :change_motd_request, if: :fields
 
   validates :tier_level,
     presence: true,
@@ -227,6 +231,7 @@ class Case < ApplicationRecord
       'Associated service': service&.name,
       Tier: decorate.tier_description,
       Fields: field_hash,
+      'Requested MOTD': change_motd_request&.motd
     }.reject { |_k, v| v.nil? }
   end
 
@@ -263,6 +268,12 @@ class Case < ApplicationRecord
     @assignee_changed = false
     @time_worked_changed = false
     @tier_level_changed = false
+  end
+
+  def tool_fields=(tool_hash)
+    tool_hash = tool_hash.deep_symbolize_keys
+    tool_type = tool_hash.fetch(:type).to_sym
+    handle_tool(tool_type, fields: tool_hash)
   end
 
   private
@@ -373,9 +384,21 @@ class Case < ApplicationRecord
   end
 
   def field_hash
+    return nil unless fields
     fields.map do |f|
       f = f.with_indifferent_access
       [f.fetch(:name), f.fetch(:value)]
     end.to_h.symbolize_keys
+  end
+
+  def handle_tool(type, fields:)
+    case type
+    when :motd
+      self.build_change_motd_request(
+        fields.slice(:motd)
+      )
+    else
+      raise "Unknown type: '#{type}'"
+    end
   end
 end

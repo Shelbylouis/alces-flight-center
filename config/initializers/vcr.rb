@@ -4,7 +4,7 @@ return unless defined?(VCR)
 VCR.configure do |c|
   # Have VCR cassettes be regenerated occasionally, as a last guard against
   # these getting out of date with actual APIs.
-  c.default_cassette_options = { :re_record_interval => 30.days }
+  c.default_cassette_options = { :re_record_interval => 90.days }
 
   # Log most recent debug output from VCR here.
   c.debug_logger = File.open('log/vcr.log', 'w')

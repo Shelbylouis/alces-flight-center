@@ -23,6 +23,6 @@ class CaseMailerPreview < ApplicationMailerPreview
   private
 
   def get_case
-    @case_id ? Case.find(@case_id) : Case.last
+    @case_id ? Case.find_from_id!(@case_id) : Case.last
   end
 end

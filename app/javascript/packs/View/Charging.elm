@@ -14,7 +14,6 @@ import Html.Events exposing (onClick)
 import Msg exposing (..)
 import State exposing (State)
 import Tier
-import View.Utils
 
 
 chargeableAlert : State -> Maybe (Html Msg)

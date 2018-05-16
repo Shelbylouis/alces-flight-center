@@ -38,5 +38,23 @@ RSpec.describe ApplicationHelper do
       expect(boolean_symbol(false)).to eq(raw('&cross;'))
     end
   end
+
+  describe '#simple_format_if_needed' do
+    it 'simple_formats multi-line text' do
+      text = "my\ntext"
+
+      result  = simple_format_if_needed(text)
+
+      expect(result).to eq(simple_format(text))
+    end
+
+    it 'does not simple_format single line text' do
+      text = "my text"
+
+      result  = simple_format_if_needed(text)
+
+      expect(result).to eq(text)
+    end
+  end
 end
 

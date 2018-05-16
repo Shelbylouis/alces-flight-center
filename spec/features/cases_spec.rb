@@ -102,6 +102,40 @@ RSpec.describe 'Case page' do
   let :comment_form_class { '#new_case_comment' }
   let :comment_button_text { 'Add new comment' }
 
+  describe 'data display' do
+    it 'shows table of fields for Case with fields' do
+      field_name = 'Some field'
+      field_value = 'Some value'
+      kase = create(
+        :case,
+        fields: [{name: field_name, value: field_value}],
+        cluster: cluster
+      )
+
+      visit case_path(kase, as: contact)
+
+      header_text = all('th').map(&:text)
+      expect(header_text).to include(field_name)
+      data_text = all('td').map(&:text)
+      expect(data_text).to include(field_value)
+    end
+
+    it 'shows requested MOTD for Case with associated ChangeMotdRequest' do
+      motd = 'Some new MOTD'
+      kase = create(
+        :case,
+        fields: nil,
+        cluster: cluster,
+        change_motd_request: build(:change_motd_request, motd: motd),
+      )
+
+      visit case_path(kase, as: contact)
+
+      data_text = all('td').map(&:text)
+      expect(data_text).to include(motd)
+    end
+  end
+
   describe 'events list' do
     it 'shows events in reverse chronological order' do
       create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')

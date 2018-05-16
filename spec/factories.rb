@@ -94,6 +94,11 @@ FactoryBot.define do
 
     factory :level_1_tier do
       level 1
+
+      factory :tier_with_tool do
+        tool :motd
+        fields { nil }
+      end
     end
   end
 

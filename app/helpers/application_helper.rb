@@ -1,4 +1,12 @@
 module ApplicationHelper
+  # Note: These should match values used in `Tier.Level.description` in Case
+  # form app.
+  TIER_DESCRIPTIONS = {
+      1 => 'Tool',
+      2 => 'Routine Maintenance',
+      3 => 'General Support',
+  }.freeze
+
   def icon(name, interactive: false, inline: false, **args)
     classes = [
       (inline ? 'inline-icon' : 'fa-2x'),
@@ -50,13 +58,6 @@ module ApplicationHelper
       EOF
     )
   end
-  # Note: These should match values used in `Tier.Level.description` in Case
-  # form app.
-  TIER_DESCRIPTIONS = {
-      1 => 'Tool',
-      2 => 'Routine Maintenance',
-      3 => 'General Support',
-  }.freeze
 
   def tier_description(tier_level)
     unless TIER_DESCRIPTIONS.has_key?(tier_level)
@@ -64,6 +65,10 @@ module ApplicationHelper
     end
     description = TIER_DESCRIPTIONS[tier_level]
     "#{tier_level} (#{description})"
+  end
+
+  def simple_format_if_needed(text)
+    text.include?("\n") ? simple_format(text) : text
   end
 
   private
