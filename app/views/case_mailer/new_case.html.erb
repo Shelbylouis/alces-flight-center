@@ -15,7 +15,7 @@
         <% end %>
       </ul>
     <% else %>
-      <%= value %>
+      <%= simple_format_if_needed(value) %>
     <% end %>
     <br/>
   <% end %>
