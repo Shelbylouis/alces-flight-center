@@ -22,7 +22,7 @@ RSpec.describe 'alces:deploy:staging:obfuscate_user_data' do
   it 'changes contacts to have `@alces-software.com` emails' do
     subject.invoke
 
-    expect(contact.reload.email).to eq 'some.contact@alces-software.com'
+    expect(contact.reload.email).to eq 'center+somecontact@alces-software.com'
   end
 
   it 'sets contact passwords to STAGING_PASSWORD environment variable' do

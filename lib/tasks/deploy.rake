@@ -36,8 +36,7 @@ namespace :alces do
         staging_password = Deployment::Staging.password
 
         User.where(admin: false).each do |user|
-          email_base = user.email.split('@').first
-          new_email = "#{email_base}@alces-software.com"
+          new_email = "center+#{user.name.gsub(/ /, '')}@alces-software.com"
           user.update!(email: new_email, password: staging_password)
         end
       end
