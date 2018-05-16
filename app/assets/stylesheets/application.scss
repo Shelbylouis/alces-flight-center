@@ -97,11 +97,11 @@ body {
   }
 }
 
-table {
-  .shrink {
-    white-space: nowrap;
-  }
+.nowrap {
+  white-space: nowrap;
+}
 
+table {
   .expand {
     width: 99%
   }
