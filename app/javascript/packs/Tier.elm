@@ -127,9 +127,24 @@ encodeContentPair tier =
                 )
             )
 
-        MotdTool _ ->
-            -- XXX Do something useful
-            ( "tool_fields", E.null )
+        MotdTool fields ->
+            let
+                motdFieldValue =
+                    Dict.values fields
+                        |> List.head
+                        |> Maybe.map Field.data
+                        |> Maybe.Extra.join
+                        |> Maybe.map (.value >> E.string)
+                        -- Should never happen, but this should cause an
+                        -- obvious error if it ever somehow does.
+                        |> Maybe.withDefault E.null
+            in
+            ( "tool_fields"
+            , E.object
+                [ ( "type", E.string "motd" )
+                , ( "motd", motdFieldValue )
+                ]
+            )
 
 
 extractId : Tier -> Int

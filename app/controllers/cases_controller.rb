@@ -118,6 +118,7 @@ class CasesController < ApplicationController
       :subject,
       :tier_level,
       fields: [:type, :name, :value, :optional, :help],
+      tool_fields: {}
     )
   end
 

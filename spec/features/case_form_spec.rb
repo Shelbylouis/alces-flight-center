@@ -77,4 +77,24 @@ RSpec.describe 'Case form', type: :feature, js: true do
 
     it_behaves_like 'it allows Case creation'
   end
+
+  describe 'motd tool' do
+    let! :tier do
+      create(:tier_with_tool, issue: issue, tool: :motd)
+    end
+
+    it 'allows creation of Case with associated ChangeMotdRequest' do
+      motd = 'My new MOTD'
+
+      visit new_case_path(as: user)
+      fill_in 'New MOTD', with: motd
+      expect do
+        click_button 'Create Case'
+      end.to change { cluster.reload.cases.length }.by(1)
+
+      new_case = cluster.cases.first
+      expect(new_case.fields).to be_nil
+      expect(new_case.change_motd_request.motd).to eq(motd)
+    end
+  end
 end
