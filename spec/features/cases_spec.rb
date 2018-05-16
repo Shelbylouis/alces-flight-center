@@ -119,6 +119,21 @@ RSpec.describe 'Case page' do
       data_text = all('td').map(&:text)
       expect(data_text).to include(field_value)
     end
+
+    it 'shows requested MOTD for Case with associated ChangeMotdRequest' do
+      motd = 'Some new MOTD'
+      kase = create(
+        :case,
+        fields: nil,
+        cluster: cluster,
+        change_motd_request: build(:change_motd_request, motd: motd),
+      )
+
+      visit case_path(kase, as: contact)
+
+      data_text = all('td').map(&:text)
+      expect(data_text).to include(motd)
+    end
   end
 
   describe 'events list' do
