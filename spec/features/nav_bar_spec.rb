@@ -10,12 +10,6 @@ RSpec.feature 'Navigation Bar', type: :feature do
   let :contact { create(:primary_contact, site: site) }
   let :cluster { create(:cluster, site: site) }
 
-  before :each do
-    # Prevent attempting to retrieve documents from S3 when Cluster page
-    # visited.
-    allow_any_instance_of(Cluster).to receive(:documents).and_return([])
-  end
-
   def visit_subject(path_helper)
     visit send(path_helper, subject, as: user)
   end

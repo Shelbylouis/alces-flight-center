@@ -100,10 +100,6 @@ RSpec.feature "Maintenance windows", type: :feature do
     # The only way I can get Capybara to use the correct URL; may be a better
     # way though.
     default_url_options[:host] = Rails.application.routes.default_url_options[:host]
-
-    # Prevent attempting to retrieve documents from S3 when Cluster page
-    # visited.
-    allow_any_instance_of(Cluster).to receive(:documents).and_return([])
   end
 
   def fill_in_datetime_selects(identifier, with:)
