@@ -94,4 +94,10 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
+
+  config.before :example do
+    # Prevent attempting to retrieve documents from S3 when Cluster page
+    # visited.
+    allow_any_instance_of(Cluster).to receive(:documents).and_return([])
+  end
 end

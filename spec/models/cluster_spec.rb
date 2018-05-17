@@ -116,6 +116,10 @@ RSpec.describe Cluster, type: :model do
         VCR.use_cassette(VcrCassettes::S3_READ_DOCUMENTS) do |cassette|
           Development::Utils.upload_document_fixtures_for(subject) if cassette.recording?
 
+          # This is the one place we actually want the original method to be called,
+          # so here we override our default return value of [] (set in spec_helper).
+          allow_any_instance_of(Cluster).to receive(:documents).and_call_original
+
           documents = subject.documents
 
           # `upload_document_fixtures_for` will upload 'folder' objects (S3

@@ -1,0 +1,13 @@
+<% content_for(:subtitle) { 'Documents' } %>
+<%= render 'partials/tabs', activate: :documents do %>
+  <ul class="list-group list-group-flush">
+    <% cluster.documents.each do |document| %>
+      <li class="list-group-item">
+        <%= link_to document.name, document.url, target: '_blank' %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+
+
+

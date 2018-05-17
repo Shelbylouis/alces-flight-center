@@ -15,6 +15,7 @@ class ClusterDecorator < ApplicationDecorator
   def tabs
     [
       tabs_builder.overview,
+      documents.empty? ? nil :{ id: :documents, path: h.cluster_documents_path(self) },
       tabs_builder.logs,
       tabs_builder.cases,
       tabs_builder.maintenance,
@@ -28,7 +29,7 @@ class ClusterDecorator < ApplicationDecorator
           }
         end.push(text: 'All', path: h.cluster_components_path(self))
       }
-    ]
+    ].compact
   end
 
   def case_form_json

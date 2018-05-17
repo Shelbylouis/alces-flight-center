@@ -141,6 +141,7 @@ Rails.application.routes.draw do
       resources :components, only: :index
       logs.call
       confirm_maintenance_form.call
+      get :documents
     end
 
     resources :components, only: :show do
