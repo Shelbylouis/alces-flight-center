@@ -36,6 +36,19 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def commenting_disabled?
-    current_user.contact? && !consultancy?
+    commenting_disabled_text.present?
+  end
+
+  def commenting_disabled_text
+    if !open?
+      "Commenting is disabled as this case is #{state}."
+    elsif current_user.contact? && !consultancy?
+      <<~TITLE.squish
+            This is a non-consultancy support case and so additional discussion is
+            not available. If you wish to request additional support please either
+            escalate this case (which may incur a charge), or open a
+            new support case.
+      TITLE
+    end
   end
 end
