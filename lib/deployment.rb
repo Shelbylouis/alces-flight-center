@@ -27,9 +27,9 @@ class Deployment
       abort unless input.downcase == 'y'
     end
 
-    import_production_backup_to_staging if staging?
-
     run "git push #{remote} -f #{current_branch}:master"
+
+    import_production_backup_to_staging if staging?
 
     dokku_run 'rake db:migrate', app: app_name
     dokku_run 'rake data:migrate', app: app_name
@@ -111,6 +111,8 @@ class Deployment
       STAGING_PASSWORD="#{Shellwords.escape(staging_password)}"
     COMMAND
     dokku_run obfuscate_dokku_command, app: STAGING_APP
+
+    dokku_start STAGING_APP
   end
 
   def output_manual_steps
@@ -175,6 +177,10 @@ class Deployment
 
   def dokku_stop(app)
     run dokku_command("ps:stop #{app}")
+  end
+
+  def dokku_start(app)
+    run dokku_command("ps:start #{app}")
   end
 
   def dokku_command(args)
