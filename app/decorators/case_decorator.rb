@@ -31,7 +31,7 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def commenting_disabled?
-    !open? || (current_user.contact? && !consultancy?)
+    commenting_disabled_text.present?
   end
 
   def commenting_disabled_text
