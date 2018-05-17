@@ -74,7 +74,7 @@ RSpec.describe Cluster, type: :model do
     end
 
     it 'returns all managed cluster components for cluster' do
-      result = subject.managed_components
+      result = subject.components.managed
       expect(result).to all be_a(Component)
       expect(result.length).to be 4
     end
@@ -91,7 +91,7 @@ RSpec.describe Cluster, type: :model do
     end
 
     it 'returns all advice cluster components for cluster' do
-      result = subject.advice_components
+      result = subject.components.advice
       expect(result).to all be_a(Component)
       expect(result.length).to eq 5
     end
