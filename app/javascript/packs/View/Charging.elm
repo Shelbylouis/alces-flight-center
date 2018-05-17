@@ -11,8 +11,10 @@ import Bootstrap.Modal as Modal
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
+import Markdown
 import Msg exposing (..)
 import State exposing (State)
+import String.Extra
 import Tier
 
 
@@ -60,16 +62,30 @@ infoModal state =
 
         chargingInfo =
             cluster.chargingInfo
-                |> Maybe.map text
-                |> Maybe.withDefault noChargingInfoAvailable
+                |> Maybe.withDefault defaultChargingInfoText
+                |> Markdown.toHtml []
 
-        noChargingInfoAvailable =
-            span []
-                [ text "No charging info has been provided by Alces Software for "
-                , strong [] [ text cluster.name ]
-                , text
-                    "; if you require clarification on what charges you may incur please contact support."
-                ]
+        defaultChargingInfoText =
+            -- Default charging info provided by Steve (at
+            -- https://alces.slack.com/archives/C72GT476Y/p1526552123000289);
+            -- if we regularly need to change this we should move it from being
+            -- embedded within the app.
+            String.Extra.unindent """
+                _Credit allocation to issues is based on total time spent on
+                the issue by our engineers:_
+
+                0 to 30m - 0 Credits
+
+                30m to 3h - 1 Credits
+
+                3h to 6h - 2 Credits
+
+                6h to 9h - 3 Credits
+
+                9h to 12h - 4 Credits
+
+                &gt; 12h - 5 Credits
+            """
     in
     Modal.config (ClusterChargingInfoModal Modal.hidden)
         |> Modal.h5 [] [ cluster.name ++ " charging info" |> text ]
