@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Component, type: :model do
   include_examples 'inheritable_support_type'
+  it_behaves_like 'it has scopes to get advice and managed parts'
 
   describe '#asset_record' do
     subject { create(:component) }
@@ -98,9 +99,5 @@ RSpec.describe Component, type: :model do
     it 'creates the component_expansions' do
       expect(subject.map(&:slot)).to include(*expansion_names)
     end
-  end
-
-  describe 'Advice based and managed components' do
-    it_behaves_like 'advice based and managed type'
   end
 end

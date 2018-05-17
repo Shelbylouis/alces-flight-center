@@ -2,8 +2,5 @@ require 'rails_helper'
 
 RSpec.describe Service, type: :model do
   include_examples 'inheritable_support_type'
-
-  describe 'Advice based and managed services' do
-    it_behaves_like 'advice based and managed type'
-  end
+  it_behaves_like 'it has scopes to get advice and managed parts'
 end

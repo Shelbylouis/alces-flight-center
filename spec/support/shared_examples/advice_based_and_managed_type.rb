@@ -1,8 +1,8 @@
 
-RSpec.shared_examples 'advice based and managed type' do
+RSpec.shared_examples 'it has scopes to get advice and managed parts' do
   ['advice', 'managed'].each do |support_type|
     let :part_type { described_class.to_s.downcase }
-    context "#{support_type.capitalize} #{described_class}" do
+    context "for #{support_type} scope" do
       subject do
         create(:cluster, support_type: support_type) do |cluster|
           3.times { create(part_type.to_sym, cluster: cluster, support_type: 'inherit' ) }
