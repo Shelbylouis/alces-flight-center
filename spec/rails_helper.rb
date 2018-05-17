@@ -63,9 +63,9 @@ end
 # https://stackoverflow.com/a/33898828/2620402).
 Capybara.register_driver :selenium do |app|
   profile = Selenium::WebDriver::Firefox::Profile.new
-  client = Selenium::WebDriver::Remote::Http::Default.new
-  client.timeout = 120 # Instead of default 60s timeout.
-  Capybara::Selenium::Driver.new(app, browser: :firefox, profile: profile, http_client: client)
+  client = Selenium::WebDriver::Remote::Http::Default.new(open_timeout: 120, read_timeout: 120)
+  options = Selenium::WebDriver::Firefox::Options.new(profile: profile)
+  Capybara::Selenium::Driver.new(app, browser: :firefox, options: options, http_client: client)
 end
 
 # Convenience function to use above.
