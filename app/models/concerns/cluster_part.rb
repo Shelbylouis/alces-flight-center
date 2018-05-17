@@ -15,6 +15,9 @@ module ClusterPart
     validates :internal, inclusion: {in: [true, false]}
 
     delegate :site, to: :cluster
+
+    scope :managed, -> { select(&:managed?) }
+    scope :advice, -> { select(&:advice?) }
   end
 
   # Automatically picked up by rails_admin so only these options displayed when
