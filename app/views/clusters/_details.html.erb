@@ -6,16 +6,19 @@
     <%= cluster.readable_support_type.capitalize %> cluster
     <%= cluster.cluster_part_icons %>
   </li>
-  <li class="list-group-item">
-    <%= cluster.managed_components.length %>
-    <%= SupportType::MANAGED_TEXT %>
-    <%= 'component'.pluralize(cluster.managed_components.length) %>
-  </li>
-  <li class="list-group-item">
-    <%= cluster.advice_components.length %>
-    <%= SupportType::ADVICE_TEXT %>
-    <%= 'component'.pluralize(cluster.advice_components.length) %>
-  </li>
+  <% [:component, :service].each do |part_type| %>
+    <% part_scope = @scope.public_send(part_type.to_s.pluralize) %>
+    <li class="list-group-item">
+      <%= part_scope.managed.size %>
+      <%= SupportType::MANAGED_TEXT %>
+      <%= part_type.to_s.pluralize(part_scope.managed.size) %>
+    </li>
+    <li class="list-group-item">
+      <%= part_scope.advice.size %>
+      <%= SupportType::ADVICE_TEXT %>
+      <%= part_type.to_s.pluralize(part_scope.advice.size) %>
+    </li>
+  <% end %>
   <li class="list-group-item">
     <h6>MOTD</h6>
     <%= simple_format(cluster.motd) %>

@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Component, type: :model do
   include_examples 'inheritable_support_type'
+  it_behaves_like 'it has scopes to get advice and managed parts'
 
   describe '#asset_record' do
     subject { create(:component) }
