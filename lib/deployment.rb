@@ -26,9 +26,9 @@ class Deployment
       abort unless input.downcase == 'y'
     end
 
-    import_production_backup_to_staging if staging?
-
     run "git push #{remote} -f #{current_branch}:master"
+
+    import_production_backup_to_staging if staging?
 
     dokku_run 'rake db:migrate', app: app_name
     dokku_run 'rake data:migrate', app: app_name
@@ -97,7 +97,7 @@ class Deployment
     # this to fail).
     dokku_stop STAGING_APP
     drop_database_command =
-      "psql -d #{database_server_url} -c 'drop database \"#{STAGING_APP}\"'"
+      "psql -d #{database_server_url} -c 'drop database if exists \"#{STAGING_APP}\"'"
     run drop_database_command
     dokku_run 'rake db:create', app: STAGING_APP
 
