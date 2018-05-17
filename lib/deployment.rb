@@ -95,7 +95,7 @@ class Deployment
     # this to fail).
     dokku_stop STAGING_APP
     drop_database_command =
-      "psql -d #{database_server_url} -c 'drop database \"#{STAGING_APP}\"'"
+      "psql -d #{database_server_url} -c 'drop database if exists \"#{STAGING_APP}\"'"
     run drop_database_command
     dokku_run 'rake db:create', app: STAGING_APP
 
