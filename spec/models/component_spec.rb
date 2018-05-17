@@ -99,4 +99,8 @@ RSpec.describe Component, type: :model do
       expect(subject.map(&:slot)).to include(*expansion_names)
     end
   end
+
+  describe 'Advice based and managed components' do
+    it_behaves_like 'advice based and managed type'
+  end
 end
