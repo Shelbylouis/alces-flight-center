@@ -64,39 +64,6 @@ RSpec.describe Cluster, type: :model do
     end
   end
 
-  describe '#managed_components' do
-    subject do
-      create(:cluster, support_type: 'managed') do |cluster|
-        3.times { create(:component, cluster: cluster, support_type: 'inherit') }
-        create(:component, cluster: cluster, support_type: 'managed')
-        create(:component, cluster: cluster, support_type: 'advice')
-      end
-    end
-
-    it 'returns all managed cluster components for cluster' do
-      result = subject.components.managed
-      expect(result).to all be_a(Component)
-      expect(result.length).to be 4
-    end
-  end
-
-  describe '#advice_components' do
-    subject do
-      create(:cluster, support_type: 'advice') do |cluster|
-        4.times { create(:component, cluster: cluster, support_type: 'inherit') }
-        create(:component, cluster: cluster, support_type: 'managed')
-        create(:component, cluster: cluster, support_type: 'advice')
-        cluster.reload
-      end
-    end
-
-    it 'returns all advice cluster components for cluster' do
-      result = subject.components.advice
-      expect(result).to all be_a(Component)
-      expect(result.length).to eq 5
-    end
-  end
-
   context 'cluster document tests' do
     subject { create(:cluster, name: 'Some Cluster', site: site) }
     let :site { create(:site, name: 'The Site') }
