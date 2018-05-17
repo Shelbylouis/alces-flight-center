@@ -56,7 +56,7 @@ RSpec.feature Log, type: :feature do
       expect(log.cases).to be_blank
     end
 
-    it 'can associate multiple tickets/cases with a log' do
+    it 'can associate multiple cases with a log' do
       fill_details_input
       log_cases = [subject.cases.first, subject.cases.last].each do |kase|
         select kase.decorate.case_select_details, from: case_select_id
@@ -65,7 +65,7 @@ RSpec.feature Log, type: :feature do
       expect(submit_log.cases).to contain_exactly(*log_cases)
     end
 
-    %w(resolved archived).each do |state|
+    %w(resolved closed).each do |state|
       it "cannot select #{state} Case for subject to associate" do
         case_attributes = {
             cluster: cluster,

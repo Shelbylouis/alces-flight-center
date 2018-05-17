@@ -6,7 +6,6 @@ FactoryBot.define do
     user
     fields [{name: 'Details', value: 'some_details'}]
     tier_level 3
-    sequence(:rt_ticket_id) { |n| n }
 
     factory :open_case do
       state 'open'
@@ -16,8 +15,8 @@ FactoryBot.define do
       state 'resolved'
     end
 
-    factory :archived_case do
-      state 'archived'
+    factory :closed_case do
+      state 'closed'
     end
 
     # Every Case requires a Cluster, so this is just the same as the standard

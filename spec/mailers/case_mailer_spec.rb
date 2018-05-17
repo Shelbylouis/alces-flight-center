@@ -118,14 +118,13 @@ RSpec.describe 'Case mailer', :type => :mailer do
   end
 
   it 'sends an email on initial case assignment' do
-    kase.assignee = another_user
-    mail = CaseMailer.change_assignee(kase, nil)
+    mail = CaseMailer.change_assignee(kase, another_user)
 
     expect(mail.to).to eq nil
-    expect(mail.cc).to match_array %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.cc).to match_array %w(another.user@somecluster.com)
     expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
-    expect(mail.body.encoded).to match('This case has been assigned to A Scientist.')
+    expect(mail.body.encoded).to match('This case has now been assigned to A Scientist.')
   end
 
   it 'sends an email on case assignment change' do
@@ -133,20 +132,10 @@ RSpec.describe 'Case mailer', :type => :mailer do
     mail = CaseMailer.change_assignee(kase, requestor)
 
     expect(mail.to).to eq nil
-    expect(mail.cc).to match_array %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
+    expect(mail.cc).to match_array %w(someuser@somecluster.com)
     expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
-    expect(mail.body.encoded).to match(/This case has been assigned to A Scientist \(previously\s+assigned to Some User\)\./)
-  end
-
-  it 'sends an email on case assignee removal' do
-    mail = CaseMailer.change_assignee(kase, another_user)
-
-    expect(mail.to).to eq nil
-    expect(mail.cc).to match_array %w(another.user@somecluster.com someuser@somecluster.com mailing-list@somecluster.com)
-    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
-
-    expect(mail.body.encoded).to match('This case is no longer assigned to A Scientist.')
+    expect(mail.body.encoded).to match(/This case has now been assigned to Some User\./)
   end
 
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180425134112) do
+ActiveRecord::Schema.define(version: 20180502104232) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -112,9 +112,11 @@ ActiveRecord::Schema.define(version: 20180425134112) do
     t.json "fields"
     t.text "state", default: "open", null: false
     t.bigint "assignee_id"
+    t.string "display_id"
     t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
+    t.index ["display_id"], name: "index_cases_on_display_id", unique: true
     t.index ["issue_id"], name: "index_cases_on_issue_id"
     t.index ["rt_ticket_id"], name: "index_cases_on_rt_ticket_id", unique: true
     t.index ["service_id"], name: "index_cases_on_service_id"
@@ -142,6 +144,9 @@ ActiveRecord::Schema.define(version: 20180425134112) do
     t.datetime "updated_at", null: false
     t.string "canonical_name", null: false
     t.string "charging_info"
+    t.string "shortcode"
+    t.integer "case_index", default: 0, null: false
+    t.index ["shortcode"], name: "index_clusters_on_shortcode", unique: true
     t.index ["site_id"], name: "index_clusters_on_site_id"
   end
 

@@ -6,7 +6,7 @@ RSpec.describe CaseStateTransition, type: :model do
     build(:case_state_transition, event: event, user: user)
   end
 
-  %w(resolve archive).each do |event|
+  %w(resolve close).each do |event|
     context "when `#{event}` event" do
       let(:event) { event }
       let(:user) { create(:admin) }

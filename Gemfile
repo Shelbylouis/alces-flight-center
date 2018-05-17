@@ -59,6 +59,10 @@ gem 'jbuilder', '~> 2.5'
 gem 'roadie-rails', '~> 1.0'
 gem 'sass'
 
+# For async emails
+gem 'resque'
+gem 'resque_mailer'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

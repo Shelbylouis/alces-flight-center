@@ -12,12 +12,12 @@ class CaseMailer < ApplicationMailer
     )
   end
 
-  def change_assignee(my_case, previous_assignee)
+  def change_assignee(my_case, new_assignee)
     @case = my_case
-    @previous = previous_assignee
+    @assignee = new_assignee
     mail(
-      cc: (@case.email_recipients + [@case.assignee&.email]).uniq, # Send to all including new assignee
-      subject: @case.email_subject
+      cc: new_assignee&.email, # Send to new assignee only
+      subject: @case.email_reply_subject
     )
   end
 

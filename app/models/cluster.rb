@@ -21,6 +21,7 @@ class Cluster < ApplicationRecord
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
   validates :canonical_name, presence: true
   validate :validate_all_components_advice, if: :advice?
+  validates :shortcode, presence: true, uniqueness: true
 
   before_validation CanonicalNameCreator.new, on: :create
 
@@ -92,6 +93,14 @@ class Cluster < ApplicationRecord
       .flat_map(&:unfinished)
       .sort_by(&:created_at)
       .reverse
+  end
+
+  def next_case_index
+    with_lock do  # Prevent concurrent reads of this record
+      self.case_index = case_index + 1
+      save!
+      case_index
+    end
   end
 
   private

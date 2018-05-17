@@ -1,3 +1,5 @@
+require 'resque/server'
+
 Rails.application.routes.draw do
   asset_record_alias = 'asset-record'
   component_expansions_alias = 'expansions'
@@ -51,26 +53,29 @@ Rails.application.routes.draw do
     end
   end
 
-  archive_cases = Proc.new do |**params, &block|
+  resolved_cases = Proc.new do |**params, &block|
     params[:only] = Array.wrap(params[:only]).concat [:new, :index]
     resources :cases, **params do
       collection do
-        get :archives
+        get :resolved
       end
       block.call if block
     end
   end
 
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
+
+    mount Resque::Server, at: '/resque'
+
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      archive_cases.call(only: :show)
+      resolved_cases.call(only: :show)
     end
 
     resources :cases, only: [] do
       member do
         post :resolve  # Only admins may resolve a case
-        post :archive  # Only admins may archive a case
+        post :close  # Only admins may close a case
         post :assign  # Only admins may (re)assign a case
       end
     end
@@ -119,12 +124,12 @@ Rails.application.routes.draw do
     root 'sites#show'
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
-    archive_cases.call(only: [:show, :create]) do
+    resolved_cases.call(only: [:show, :create]) do
       resources :case_comments, only: :create
     end
 
     resources :clusters, only: :show do
-      archive_cases.call
+      resolved_cases.call
       resources :services, only: :index
       resources :maintenance_windows, path: :maintenance, only: :index
       resources :components, only: :index
@@ -133,7 +138,7 @@ Rails.application.routes.draw do
     end
 
     resources :components, only: :show do
-      archive_cases.call
+      resolved_cases.call
       resources :component_expansions,
                 path: component_expansions_alias,
                 only: :index
@@ -149,7 +154,7 @@ Rails.application.routes.draw do
     end
 
     resources :services, only: :show do
-      archive_cases.call
+      resolved_cases.call
       confirm_maintenance_form.call
     end
 

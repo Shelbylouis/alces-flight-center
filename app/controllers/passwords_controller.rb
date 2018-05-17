@@ -24,7 +24,7 @@ class PasswordsController < Clearance::PasswordsController
     session[:password_reset_token] = nil
 
     PasswordsMailer.reset_password_complete(
-      user: user, password: new_password
+      user, new_password
     ).deliver_later
   end
 

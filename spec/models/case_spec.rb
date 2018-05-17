@@ -106,13 +106,13 @@ RSpec.describe Case, type: :model do
       subject.save!
     end
 
-    it 'saves generated ticket token to later use in mailto_url' do
+    it 'saves generated token' do
       subject.save!
-      created_ticket_token = subject.token
-      expect(created_ticket_token).to match(random_token_regex)
+      generated_token = subject.token
+      expect(generated_token).to match(random_token_regex)
       subject.reload
 
-      expect(subject.mailto_url).to include(created_ticket_token)
+      expect(subject.token).to eq(generated_token)
     end
   end
 
@@ -139,7 +139,7 @@ RSpec.describe Case, type: :model do
 
         expect(CaseMailer).to receive(:change_assignee).with(
           subject,
-          nil
+          assignee
         ).and_return(stub_mail)
 
         subject.save!
@@ -154,8 +154,19 @@ RSpec.describe Case, type: :model do
 
         expect(CaseMailer).to receive(:change_assignee).with(
           subject,
-          initial_assignee
+          assignee
         ).and_return(stub_mail)
+
+        subject.save!
+      end
+    end
+
+    context 'when being de-assigned' do
+      let(:initial_assignee) { create(:user, site: site) }
+      it 'does not send an email' do
+        subject.assignee = nil
+
+        expect(CaseMailer).not_to receive(:change_assignee)
 
         subject.save!
       end
@@ -166,25 +177,12 @@ RSpec.describe Case, type: :model do
     it 'returns all open Cases' do
       create(:case, subject: 'one', state: 'open')
       create(:case, subject: 'two', state: 'resolved')
-      create(:case, subject: 'three', state: 'archived')
+      create(:case, subject: 'three', state: 'closed')
       create(:case, subject: 'four', state: 'open')
 
       active_cases = Case.active
 
       expect(active_cases.map(&:subject)).to match_array(['one', 'four'])
-    end
-  end
-
-  describe '#mailto_url' do
-    it 'creates correct mailto URL' do
-      cluster = create(:cluster, name: 'somecluster')
-
-      support_case = create(:case, cluster: cluster, subject: 'somesubject', rt_ticket_id: 12345)
-
-      expected_subject =
-        /RE: \[helpdesk\.alces-software\.com #12345\] somecluster: somesubject \[#{random_token_regex}\]/
-      expected_mailto_url = /mailto:support@alces-software\.com\?subject=#{expected_subject}/
-      expect(support_case.mailto_url).to match expected_mailto_url
     end
   end
 
@@ -289,7 +287,6 @@ RSpec.describe Case, type: :model do
     let(:kase) {
       create(
         :case,
-        rt_ticket_id: 1138,
         created_at: Time.now,
         cluster: cluster,
         issue: issue,
@@ -312,7 +309,7 @@ RSpec.describe Case, type: :model do
         Issue: 'Crashed node',
         'Associated component': 'node01',
         'Associated service': 'Some service',
-        Tier: '3 (Consultancy)',
+        Tier: '3 (General Support)',
         Fields: {
           field1: 'value1',
           field2: 'value2',
@@ -352,6 +349,36 @@ RSpec.describe Case, type: :model do
       kase = create(:case, tier_level: 2)
 
       expect(kase).not_to be_consultancy
+    end
+  end
+
+  describe '#display_id' do
+    it "gives RT ticket ID with 'RT' prefix when RT ticket ID associated" do
+      kase = create(:case, rt_ticket_id: 12345)
+
+      expect(kase.display_id).to eq('RT12345')
+    end
+
+    it "gives cluster-specific unique ID when no RT ticket ID associated" do
+      kase = create(:case)
+
+      expect(kase.display_id).to eq("#{kase.cluster.shortcode}1")
+      expect(kase.cluster.case_index).to eq 1
+    end
+
+    it 'doesn\'t use up a case_index when case is invalid' do
+
+      cluster = create(:cluster)
+
+      expect(cluster.case_index).to eq 0
+
+      bad_case = build(:case, cluster: cluster, tier_level: 99)
+
+      expect do
+        bad_case.save!
+      end.to raise_error(ActiveRecord::RecordInvalid)
+
+      expect(cluster.case_index).to eq 0
     end
   end
 end

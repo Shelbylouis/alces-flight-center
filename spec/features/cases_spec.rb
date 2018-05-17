@@ -11,11 +11,11 @@ RSpec.describe 'Cases table', type: :feature do
   end
 
   let! :resolved_case do
-    create(:resolved_case, cluster: cluster, subject: 'Resolved case', completed_at: 1.days.ago, rt_ticket_id: nil)
+    create(:resolved_case, cluster: cluster, subject: 'Resolved case', completed_at: 1.days.ago)
   end
 
-  let! :archived_case do
-    create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
+  let! :closed_case do
+    create(:closed_case, cluster: cluster, subject: 'Closed case', completed_at: 2.days.ago)
   end
 
   RSpec.shared_examples 'open cases table rendered' do
@@ -25,13 +25,7 @@ RSpec.describe 'Cases table', type: :feature do
       cases = all('tr').map(&:text)
       expect(cases).to have_text('Open case')
       expect(cases).not_to have_text('Resolved case')
-      expect(cases).not_to have_text('Archived case')
-
-      headings = all('th').map(&:text)
-      expect(headings).to include('Contact support')
-
-      links = all('a').map { |a| a[:href] }
-      expect(links).to include(open_case.mailto_url)
+      expect(cases).not_to have_text('Closed case')
     end
   end
 
@@ -45,20 +39,13 @@ RSpec.describe 'Cases table', type: :feature do
     end
 
     context 'when visit archive cases page' do
-      it 'renders table of all Cases' do
-        visit archives_cases_path(as: user)
+      it 'renders table of all resolved or closed Cases' do
+        visit resolved_cases_path(as: user)
 
         cases = all('tr').map(&:text)
-        expect(cases).to have_text('Open case')
+        expect(cases).not_to have_text('Open case')
         expect(cases).to have_text('Resolved case')
-        expect(cases).to have_text('Archived case')
-
-        headings = all('th').map(&:text)
-        expect(headings).to include('Contact support')
-
-        links = all('a').map { |a| a[:href] }
-        expect(links).to include(open_case.mailto_url)
-
+        expect(cases).to have_text('Closed case')
       end
     end
   end
@@ -75,8 +62,8 @@ RSpec.describe 'Cases table', type: :feature do
     end
 
     context 'when visit archive cases page' do
-      it 'renders table of all Cases, without Contact-specific buttons/info' do
-        visit archives_site_cases_path(site, as: user)
+      it 'renders table of all resolved and closed Cases, without Contact-specific buttons/info' do
+        visit resolved_site_cases_path(site, as: user)
 
         headings = all('th').map(&:text)
         expect(headings).not_to include('Contact support')
@@ -114,8 +101,8 @@ RSpec.describe 'Case page' do
     create(:resolved_case, cluster: cluster, subject: 'Resolved case')
   end
 
-  let :archived_case do
-    create(:archived_case, cluster: cluster, subject: 'Archived case', completed_at: 2.days.ago)
+  let :closed_case do
+    create(:closed_case, cluster: cluster, subject: 'Closed case', completed_at: 2.days.ago)
   end
 
   let (:mw) { create(:maintenance_window, case: open_case) }
@@ -124,7 +111,7 @@ RSpec.describe 'Case page' do
   let :comment_button_text { 'Add new comment' }
 
   describe 'events list' do
-    it 'shows events in chronological order' do
+    it 'shows events in reverse chronological order' do
       create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
       create(
         :maintenance_window_state_transition,
@@ -143,12 +130,12 @@ RSpec.describe 'Case page' do
       event_cards = all('.event-card')
       expect(event_cards.size).to eq(4)
 
-      expect(event_cards[0].find('.card-body').text).to eq('First')
-      expect(event_cards[1].find('.card-body').text).to eq('Second')
-      expect(event_cards[2].find('.card-body').text).to match(
+      expect(event_cards[3].find('.card-body').text).to eq('First')
+      expect(event_cards[2].find('.card-body').text).to eq('Second')
+      expect(event_cards[1].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
-      expect(event_cards[3].find('.card-body').text).to eq(
+      expect(event_cards[0].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'
       )
     end
@@ -166,7 +153,7 @@ RSpec.describe 'Case page' do
       visit case_path(resolved_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
 
-      visit case_path(archived_case, as: contact)
+      visit case_path(closed_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
     end
 
@@ -181,7 +168,7 @@ RSpec.describe 'Case page' do
       visit case_path(resolved_case, as: admin)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
 
-      visit case_path(archived_case, as: admin)
+      visit case_path(closed_case, as: admin)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
     end
   end
@@ -194,7 +181,7 @@ RSpec.describe 'Case page' do
       visit case_path(resolved_case, as: contact)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-      visit case_path(archived_case, as: contact)
+      visit case_path(closed_case, as: contact)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
     end
 
@@ -204,9 +191,9 @@ RSpec.describe 'Case page' do
       expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
 
       visit case_path(resolved_case, as: admin)
-      expect(find('#case-state-controls').find('a').text).to eq 'Archive this case'
+      expect(find('#case-state-controls').find('a').text).to eq 'Close this case'
 
-      visit case_path(archived_case, as: admin)
+      visit case_path(closed_case, as: admin)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
     end
   end

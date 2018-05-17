@@ -5,27 +5,18 @@ class CaseDecorator < ApplicationDecorator
   # form app.
   TIER_DESCRIPTIONS = {
     1 => 'Tool',
-    2 => 'Support',
-    3 => 'Consultancy',
+    2 => 'Routine Maintenance',
+    3 => 'General Support',
   }.freeze
 
   def user_facing_state
     model.state.to_s.titlecase
   end
 
-  def hidden?
-    state == 'resolved' || state == 'archived'
-  end
-
-  def display_id
-    "##{object.id}"
-  end
-
   def case_select_details
     [
-      "RT ticket #{rt_ticket_id}",
+      "#{display_id} #{subject}",
       created_at.to_formatted_s(:long),
-      subject,
       associated_model.name,
       "Created by #{user.name}"
     ].join(' | ')
@@ -35,12 +26,8 @@ class CaseDecorator < ApplicationDecorator
     associated_model.decorate.links
   end
 
-  def rt_ticket_url
-    "http://helpdesk.alces-software.com/rt/Ticket/Display.html?id=#{rt_ticket_id}"
-  end
-
-  def ticket_link
-    h.link_to(rt_ticket_id, h.case_path(self))
+  def case_link
+    h.link_to(display_id, h.case_path(self))
   end
 
   def chargeable_symbol

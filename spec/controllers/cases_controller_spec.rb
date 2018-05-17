@@ -111,7 +111,7 @@ RSpec.describe CasesController, type: :controller do
         post :create, params: valid_params, format: :json
 
         expect(response).to have_http_status(:ok)
-        expect(response_json).to match({errors: ''})
+        expect(response_json).to match({redirect: /\/cases\/.+/})
         expect(flash[:success]).to match(/successfully created/)
         expect_case_created
       end
@@ -168,8 +168,8 @@ RSpec.describe CasesController, type: :controller do
       create(:resolved_case)
     }
 
-    let (:archived_case) {
-      create(:archived_case)
+    let (:closed_case) {
+      create(:closed_case)
     }
 
     let(:admin) { create(:admin) }
@@ -178,22 +178,22 @@ RSpec.describe CasesController, type: :controller do
 
     it 'resolves an open case' do
       post :resolve, params: { id: open_case.id }
-      expect(flash[:success]).to eq "Support case ##{open_case.id} resolved."
+      expect(flash[:success]).to eq "Support case #{open_case.display_id} resolved."
     end
 
-    it 'archives a resolved case' do
-      post :archive, params: { id: resolved_case.id }
-      expect(flash[:success]).to eq "Support case ##{resolved_case.id} archived."
+    it 'closes a resolved case' do
+      post :close, params: { id: resolved_case.id }
+      expect(flash[:success]).to eq "Support case #{resolved_case.display_id} closed."
     end
 
-    it 'does not resolve an archived case' do
-      post :resolve, params: { id: archived_case.id }
+    it 'does not resolve a closed case' do
+      post :resolve, params: { id: closed_case.id }
       expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "resolve"'
     end
 
-    it 'does not archive an open case' do
-      post :archive, params: { id: open_case.id }
-      expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "archive"'
+    it 'does not close an open case' do
+      post :close, params: { id: open_case.id }
+      expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "close"'
     end
   end
 end

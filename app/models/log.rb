@@ -24,7 +24,7 @@ class Log < ApplicationRecord
   def cases_belong_to_cluster
     cases.each do |kase|
       unless kase.cluster == cluster
-        msg = "ticket ##{kase.rt_ticket_id} is for a different cluster"
+        msg = "case #{kase.display_id} is for a different cluster"
         errors.add(:cases, msg)
       end
     end

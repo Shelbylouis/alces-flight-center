@@ -1,6 +1,6 @@
-<% manage_cases_page = current_user.admin? && @archive %>
+<% manage_cases_page = current_user.admin? && @show_resolved %>
 <%= content_for :subtitle do
-  "#{@archive ? 'All' : 'Open'} Cases"
+  "#{@show_resolved ? 'Resolved' : 'Open'} Cases"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
   <ul class='nav nav-tabs nav-justified' >
@@ -10,6 +10,7 @@ end %>
     <table class="table">
       <thead>
         <tr>
+          <th>ID</th>
           <th>Date</th>
           <th>State</th>
           <th>Creator</th>
@@ -18,8 +19,6 @@ end %>
           <th>Association</th>
           <% if manage_cases_page %>
             <th>Chargeable</th>
-          <% else %>
-            <th>Contact support</th>
           <% end %>
           <th>Credit charge</th>
         </tr>
@@ -27,11 +26,15 @@ end %>
 
       <tbody>
         <% @scope.cases.order(created_at: :desc).decorate.each do |c| %>
-          <% if @archive || c.open? %>
-            <% if c.hidden? && !manage_cases_page %>
+      <%
+        # If @show_resolved, show only non-open cases; if not @show_resolved, show only open cases.
+        # Hence logic simplifies to the below (!=)
+      %>
+          <% if @show_resolved != c.open?  %>
+            <% if (c.resolved? || c.closed?) && !manage_cases_page %>
               <tr
-                class="archived-case-row"
-                title="This support case has been archived; you should open a new support case if you wish to contact Alces Flight Support"
+                class="closed-case-row"
+                title="This support case has been resolved; you should open a new support case if you wish to contact Alces Flight Support"
               >
             <% elsif manage_cases_page && c.requires_credit_charge? %>
               <tr
@@ -41,20 +44,18 @@ end %>
             <% else %>
               <tr>
             <% end %>
-              <td
-                title="Support case created on <%= c.created_at.to_formatted_s(:long) %>"
-              >
-                <%= c.created_at.to_formatted_s(:short) %>
-              </td>
+              <td><%= link_to c.display_id, case_path(c) %></td>
+              <%= timestamp_td(
+                description:  'Support case created',
+                timestamp: c.created_at
+              ) %>
               <td><%= c.user_facing_state %></td>
-              <td><%= c.user.name %></td>
+              <td style="white-space: nowrap;"><%= c.user.name %></td>
               <td><%= link_to c.subject, case_path(c) %></td>
               <td><%= c.assignee&.name || 'Nobody' %></td>
               <td><%= c.association_info %></td>
               <% if manage_cases_page %>
                 <td><%= c.chargeable_symbol %></td>
-              <% else %>
-                <td><%= render 'cases/email_support_icon', support_case: c %></td>
               <% end %>
               <td>
                 <% if c.credit_charge_allowed? && manage_cases_page %>

@@ -39,14 +39,21 @@ class Case < ApplicationRecord
 
     state :open  # Open case, still work to do
     state :resolved  # Has been resolved but not yet accounted for commercially
-    state :archived  # Has been accounted for commercially, nothing more to do
+    state :closed  # Has been accounted for commercially, nothing more to do
 
     event(:resolve) { transition open: :resolved }  # Resolved cases cannot be reopened
-    event(:archive) { transition resolved: :archived }
+    event(:close) { transition resolved: :closed }
 
   end
 
   audited only: :assignee_id, on: [ :update ]
+
+  # XXX Remove if: display_id when we can do so
+  validates :display_id, uniqueness: true, if: :display_id
+
+  # XXX We want to enable this validation when we've migrated production over -
+  # otherwise historical migrations will fail :(
+  #validate :has_display_id_when_saved
 
   validates :token, presence: true
   validates :subject, presence: true
@@ -84,10 +91,23 @@ class Case < ApplicationRecord
 
   before_validation :assign_default_subject_if_unset
 
+  before_create :set_display_id
   after_create :send_new_case_email
   after_update :maybe_send_new_assignee_email
 
   scope :active, -> { where(state: 'open') }
+
+  def to_param
+    self.display_id.parameterize.upcase
+  end
+
+  def self.find_from_id!(id)
+    if /^[0-9]+$/.match(id)  # It's just a numeric ID
+      Case.find(id).decorate
+    else # It has non-digits in - let's assume it's a display ID
+      Case.find_by_display_id!(id&.upcase)
+    end
+  end
 
   # @deprecated - to be removed in next release
   def self.request_tracker
@@ -97,11 +117,6 @@ class Case < ApplicationRecord
     # which would then cause things to blow up (e.g. see
     # https://stackoverflow.com/a/23008837).
     @rt ||= Rails.configuration.rt_interface_class.constantize.new
-  end
-
-  def mailto_url
-    support_email = 'support@alces-software.com'
-    "mailto:#{support_email}?subject=#{email_reply_subject}"
   end
 
   # @deprecated - to be removed in next release
@@ -139,7 +154,7 @@ class Case < ApplicationRecord
   end
 
   def email_reply_subject
-    "RE: #{email_subject}"
+    "Re: #{email_subject}"
   end
 
   def events
@@ -151,7 +166,7 @@ class Case < ApplicationRecord
       maintenance_windows.map(&:transitions).flatten.select(&:event) +
       case_state_transitions +
       audits
-    ).sort_by(&:created_at)
+    ).sort_by(&:created_at).reverse!
   end
 
   def email_subject
@@ -162,19 +177,28 @@ class Case < ApplicationRecord
     if rt_ticket_id
       "[helpdesk.alces-software.com ##{rt_ticket_id}]"
     else
-      "[Alces Flight Center ##{id}]"
+      "[Alces Flight Center #{display_id}]"
     end
   end
 
   def ticket_subject
-    # NOTE: If the format used here ever changes then this may cause emails
-    # sent using the `mailto` links for existing Cases to not be threaded with
-    # previous emails related to that Case (see
+    # NOTE: If the format used here ever changes then this may cause new emails
+    # sent in relation to an existing Cases to not be threaded with previous
+    # emails related to that Case (see
     # https://github.com/alces-software/alces-flight-center/issues/37#issuecomment-358948462
     # for an explanation). If we want to change this format and avoid this
     # consequence then a solution would be to first add a new field for this
     # whole string, and save and use the existing format for existing Cases.
-    "#{cluster.name}: #{subject} [#{token}]"
+    #
+    # FSR using the conditional in `#email_identifier` rather than repeating it
+    # here causes Rails to Base64-encode the plain text part of the email, which
+    # causes some of our tests to fail...
+    if rt_ticket_id
+      "#{cluster.name}: #{subject} [#{token}]"
+    else
+      # With 'new' display IDs we have a cluster hint, so don't include it twice.
+      "#{subject} [#{token}]"
+    end
   end
 
   def email_properties
@@ -199,7 +223,6 @@ class Case < ApplicationRecord
   end
 
   def assignee=(new_assignee)
-    @old_assignee = assignee
     @assignee_changed = true
     super(new_assignee)
   end
@@ -247,11 +270,11 @@ class Case < ApplicationRecord
     user.email
   end
 
-  # We generate a short random token to identify each ticket within email
-  # clients and RT. Without this, similar but distinct tickets can be hard to
-  # distinguish in RT as they will have identical subjects, and many email
-  # clients will also collapse different tickets into the same thread due to
-  # their similar subjects (see
+  # We generate a short random token to identify each Case within email
+  # clients. Without this, similar but distinct Cases can be hard to
+  # distinguish in many email clients as they can have identical subjects, as
+  # many email clients will collapse different tickets into the same thread due
+  # to their similar subjects (see
   # https://github.com/alces-software/alces-flight-center/issues/41#issuecomment-361307971).
   #
   # We generate this token with alternating letters and digits to minimize the
@@ -274,12 +297,31 @@ class Case < ApplicationRecord
 
   def maybe_send_new_assignee_email
     return unless @assignee_changed
-    CaseMailer.change_assignee(self, @old_assignee).deliver_later
+    return if assignee.nil?
+    CaseMailer.change_assignee(self, assignee).deliver_later
   end
 
   def validates_user_assignment
     return if assignee.nil?
     errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
+  end
+
+  def set_display_id
+    return if self.display_id
+    # Note: this method is called `before_create`, which is AFTER validation is run.
+    # This ensures that the case is valid before we increment the cluster's
+    # `case_index` field. Otherwise display IDs could end up non-sequential.
+
+    if self.rt_ticket_id
+      self.display_id = "RT#{rt_ticket_id}"
+    else
+      self.display_id = "#{cluster.shortcode}#{cluster.next_case_index}"
+    end
+  end
+
+  def has_display_id_when_saved
+    # We want to be able to validate the case initially without a display id
+    errors.add(:display_id, 'must be present') unless !persisted? or display_id
   end
 
   def field_hash

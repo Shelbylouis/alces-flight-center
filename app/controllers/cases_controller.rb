@@ -3,19 +3,18 @@ class CasesController < ApplicationController
 
   decorates_assigned :site
 
-  def index(archive: false)
+  def index(show_resolved: false)
     @site = current_site
-    @archive = archive
-    current_site.cases.map(&:update_ticket_status!) if current_user.admin?
+    @show_resolved = show_resolved
   end
 
-  def archives
-    index(archive: true)
+  def resolved
+    index(show_resolved: true)
     render :index
   end
 
   def show
-    @case = Case.find(params[:id]).decorate
+    @case = case_from_params
     @comment = @case.case_comments.new
   end
 
@@ -37,7 +36,7 @@ class CasesController < ApplicationController
   end
 
   def create
-    @case = Case.new(case_params.merge(user: current_user)).decorate
+    @case = Case.new(case_params.merge(user: current_user))
 
     respond_to do |format|
       if @case.save
@@ -45,8 +44,8 @@ class CasesController < ApplicationController
 
         format.json do
           # Return no errors and success status to case form app; it will
-          # handle redirect appropriately.
-          render json: { errors: '' }
+          # redirect to the path we give it.
+          render json: { redirect: case_path(@case) }
         end
       else
         errors = format_errors(@case)
@@ -65,9 +64,9 @@ class CasesController < ApplicationController
     end
   end
 
-  def archive
-    change_action "Support case %s archived." do |kase|
-      kase.archive!(current_user)
+  def close
+    change_action "Support case %s closed." do |kase|
+      kase.close!(current_user)
     end
   end
 
@@ -104,7 +103,7 @@ class CasesController < ApplicationController
   end
 
   def change_action(success_flash, redirect_path: case_path, &block)
-    @case = Case.find(params[:id]).decorate
+    @case = case_from_params
     begin
       block.call(@case)
       @case.save!
@@ -113,5 +112,9 @@ class CasesController < ApplicationController
       flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
     redirect_to redirect_path
+  end
+
+  def case_from_params
+    Case.find_from_id!(params.require(:id)).decorate
   end
 end

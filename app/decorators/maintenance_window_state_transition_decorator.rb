@@ -10,7 +10,7 @@ class MaintenanceWindowStateTransitionDecorator < ApplicationDecorator
 
   def comment_text
     comment_template = "maintenance_windows/transitions/#{object.event}"
-    h.render comment_template, transition: self
+    h.render(comment_template, transition: self).squish
   end
 
   def associated_model
