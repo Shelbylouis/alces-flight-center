@@ -173,11 +173,15 @@ RSpec.describe 'Case page' do
       visit case_path(open_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
 
+      # Observe that case state overrides case tier in terms of why we report commenting
+      # being disabled.
       visit case_path(resolved_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+      expect(find('.card.bg-light').text).to match 'Commenting is disabled as this case is resolved.'
 
       visit case_path(closed_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+      expect(find('.card.bg-light').text).to match 'Commenting is disabled as this case is closed.'
     end
 
     it 'shows or hides add comment form for admins' do
@@ -197,9 +201,11 @@ RSpec.describe 'Case page' do
 
       visit case_path(resolved_case, as: admin)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+      expect(find('.card.bg-light').text).to match 'Commenting is disabled as this case is resolved.'
 
       visit case_path(closed_case, as: admin)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
+      expect(find('.card.bg-light').text).to match 'Commenting is disabled as this case is closed.'
     end
   end
 
