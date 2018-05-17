@@ -58,6 +58,16 @@ Capybara.add_selector(:test_element) do
   end
 end
 
+# Override Capybara Selenium driver with increased timeout, to (hopefully)
+# avoid intermittent failures on tiny CI server (see
+# https://stackoverflow.com/a/33898828/2620402).
+Capybara.register_driver :selenium do |app|
+  profile = Selenium::WebDriver::Firefox::Profile.new
+  client = Selenium::WebDriver::Remote::Http::Default.new
+  client.timeout = 120 # Instead of default 60s timeout.
+  Capybara::Selenium::Driver.new(app, browser: :firefox, profile: profile, http_client: client)
+end
+
 # Convenience function to use above.
 def test_element(data_test_value)
   find(:test_element, data_test_value)
