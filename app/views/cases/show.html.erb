@@ -17,7 +17,16 @@
       </tr>
       <tr>
         <th>Association</th>
-        <td><%= @case.association_info %></td>
+        <td>
+          <%= @case.association_info %>
+          <% if current_user.admin? && @case.open? %>
+            <%= link_to 'Request maintenance',
+                        @case.request_maintenance_path,
+                        class: 'btn btn-secondary ml-2 btn-sm',
+                        role: 'button'
+            %>
+          <% end %>
+        </td>
         <th>State</th>
         <td id="case-state-controls">
           <%= @case.user_facing_state %>

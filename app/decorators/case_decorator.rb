@@ -26,6 +26,11 @@ class CaseDecorator < ApplicationDecorator
     h.boolean_symbol(chargeable)
   end
 
+  def request_maintenance_path
+    assoc_class = model.associated_model.underscored_model_name
+    h.send("new_#{assoc_class}_maintenance_window_path", model.associated_model, case_id: model.id)
+  end
+
   def tier_description
     h.tier_description(tier_level)
   end

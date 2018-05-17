@@ -158,6 +158,10 @@ RSpec.feature "Maintenance windows", type: :feature do
       include_examples 'maintenance form error handling', 'request'
       include_examples 'maintenance form initially valid'
 
+      it 'displays the component for which maintenance is being requested' do
+        expect(find('h4').text).to eq "Requesting maintenance for #{component.name} (#{cluster.name})"
+      end
+
       it 'uses correct default values' do
         a_distant_friday = Time.zone.local(2025, 3, 7, 0, 0)
         following_monday_at_9 = a_distant_friday.advance(days: 3, hours: 9)
@@ -326,6 +330,14 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       expect(page).not_to have_button(extend_button_text)
     end
+
+    context 'when maintenance is for the entire cluster' do
+      it 'shows the entire-cluster-warning message' do
+        visit new_cluster_maintenance_window_path(cluster_id: cluster.id, as: user)
+
+        expect(find('p.alert-warning').text).to match 'Not what you want? Try selecting a component or a service from this cluster.'
+      end
+    end
   end
 
   context 'when user is contact' do
@@ -440,6 +452,24 @@ RSpec.feature "Maintenance windows", type: :feature do
       visit cluster_maintenance_windows_path(cluster, as: user)
 
       expect(page).not_to have_button(extend_button_text)
+    end
+
+    context 'when maintenance is for the entire cluster' do
+      subject do
+        create(
+            :requested_maintenance_window,
+            cluster: cluster,
+            case: support_case
+        )
+      end
+
+      it 'does not show the entire-cluster-warning message' do
+        visit confirm_cluster_maintenance_window_path(id: subject.id, cluster_id: cluster.id, as: user)
+
+        expect do
+          find('p.alert-warning')
+        end.to raise_error(Capybara::ElementNotFound)
+      end
     end
   end
 end
