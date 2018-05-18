@@ -472,12 +472,22 @@ RSpec.describe 'Case page' do
     context 'when user is admin' do
       let :user { create(:admin) }
 
+      it 'has warning-styled button' do
+        button = find_button(apply_button_text)
+        expect(button['class']).to include('btn-warning')
+      end
+
       it 'can use button to apply request' do
         assert_button_successfully_applies(apply_button_text)
       end
 
       context 'when request has already been applied' do
         let :request { create(:change_motd_request, state: :applied) }
+
+        it 'has danger-styled button' do
+          button = find_button(reapply_button_text)
+          expect(button['class']).to include('btn-danger')
+        end
 
         it 'can use button to re-apply request' do
           assert_button_successfully_applies(reapply_button_text)

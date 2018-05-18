@@ -25,15 +25,17 @@
       <%= simple_format(motd_request.motd) %>
       <% if current_user.admin? %>
         <%
-            button_text = if motd_request.unapplied?
-                            'Done &mdash; I have made this change within the cluster'
-                          else
-                            'Already applied &mdash; attempt to make this change again'
-                          end
+            button_class, button_text =
+              if motd_request.unapplied?
+                ['btn-warning', 'Done &mdash; I have made this change within the cluster']
+              else
+                ['btn-danger', 'Already applied &mdash; attempt to make this change again']
+              end
         %>
+
         <%= button_to raw(button_text),
           apply_change_motd_request_path(motd_request),
-          class: "btn btn-warning btn-sm",
+          class: "btn #{button_class} btn-sm",
           data: {
             confirm: <<~CONFIRM.squish
               This will update Flight Center's internal representation of the
