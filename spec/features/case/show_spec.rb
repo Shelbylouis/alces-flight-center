@@ -453,38 +453,34 @@ RSpec.describe 'Case page' do
     let :apply_button_text { 'Done' }
     let :reapply_button_text { 'Already applied' }
 
+    def assert_button_successfully_applies(button_text)
+      expect do
+        click_button button_text
+      end.to change { request.reload.transitions.length }.by(1)
+
+      expect(request).to be_applied
+      expect(current_path).to eq(case_path(subject))
+      expect(
+        find('.alert')
+      ).to have_text('The cluster has been updated to reflect this change.')
+    end
+
+    before :each do
+      visit path
+    end
+
     context 'when user is admin' do
       let :user { create(:admin) }
 
       it 'can use button to apply request' do
-        visit path
-
-        expect do
-          click_button apply_button_text
-        end.to change { request.reload.transitions.length }.by(1)
-
-        expect(request).to be_applied
-        expect(current_path).to eq(case_path(subject))
-        expect(
-          find('.alert')
-        ).to have_text('The cluster has been updated to reflect this change.')
+        assert_button_successfully_applies(apply_button_text)
       end
 
       context 'when request has already been applied' do
         let :request { create(:change_motd_request, state: :applied) }
 
         it 'can use button to re-apply request' do
-          visit path
-
-          expect do
-            click_button reapply_button_text
-          end.to change { request.reload.transitions.length }.by(1)
-
-          expect(request).to be_applied
-          expect(current_path).to eq(case_path(subject))
-          expect(
-            find('.alert')
-          ).to have_text('The cluster has been updated to reflect this change.')
+          assert_button_successfully_applies(reapply_button_text)
         end
       end
     end
@@ -493,8 +489,6 @@ RSpec.describe 'Case page' do
       let :user { create(:contact, site: subject.site) }
 
       it 'is not shown either button' do
-        visit path
-
         [apply_button_text, reapply_button_text].each do |button_text|
           expect(page).not_to have_button(button_text)
         end
