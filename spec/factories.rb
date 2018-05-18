@@ -21,30 +21,6 @@ FactoryBot.define do
     name 'Liverpool University'
   end
 
-  factory :user do
-    site
-    name 'A Scientist'
-    email
-    password 'definitely_encrypted'
-
-    factory :contact do
-      admin false
-
-      factory :primary_contact do
-        primary_contact true
-      end
-
-      factory :secondary_contact do
-        primary_contact false
-      end
-    end
-
-    factory :admin do
-      admin true
-      site nil
-    end
-  end
-
   factory :additional_contact do
     site
     email
@@ -81,25 +57,6 @@ FactoryBot.define do
 
   factory :category do
     name 'User management'
-  end
-
-  factory :tier do
-    issue
-    level 2
-    fields [{
-      type: 'input',
-      name: 'some_field',
-      value: 'some_value',
-    }]
-
-    factory :level_1_tier do
-      level 1
-
-      factory :tier_with_tool do
-        tool :motd
-        fields { nil }
-      end
-    end
   end
 
   factory :asset_record_field_definition, aliases: [:definition] do
