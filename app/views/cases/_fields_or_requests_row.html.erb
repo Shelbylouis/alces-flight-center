@@ -20,6 +20,19 @@
     </td>
   <% elsif kase.change_motd_request %>
     <th>Requested MOTD</th>
-    <td><%= simple_format(kase.change_motd_request.motd) %></td>
+    <td>
+      <%= simple_format(kase.change_motd_request.motd) %>
+      <%= button_to raw('Done &mdash; I have made this change within the cluster'),
+        apply_change_motd_request_path(kase.change_motd_request),
+        class: "btn btn-warning btn-sm",
+        data: {
+          confirm: <<~CONFIRM.squish
+            This will update Flight Center's internal representation of the
+            cluster to reflect this change; make sure the change has actually
+            been made within the real system before proceeding.
+          CONFIRM
+        }
+      %>
+    </td>
   <% end %>
 </tr>

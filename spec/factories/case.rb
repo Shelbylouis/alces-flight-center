@@ -20,6 +20,11 @@ FactoryBot.define do
       credit_charge 0
     end
 
+    factory :case_with_change_motd_request do
+      change_motd_request
+      fields nil
+    end
+
     # Every Case requires a Cluster, so this is just the same as the standard
     # `case` factory; this is useful though to allow us to handle creating a
     # Case requiring each type of part in the same way.
