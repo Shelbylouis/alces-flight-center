@@ -85,6 +85,12 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :change_motd_requests, only: [] do
+      member do
+        post :apply
+      end
+    end
+
     resources :clusters, only: []  do
       request_maintenance_form.call
       admin_logs.call

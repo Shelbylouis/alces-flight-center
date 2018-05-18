@@ -8,12 +8,24 @@ RSpec.describe ChangeMotdRequest, type: :model do
 
   describe 'states' do
     RSpec.shared_examples 'it can be applied' do
+      let :admin { create(:admin) }
+
+      subject do
+        create(:change_motd_request, state: state, motd: 'New MOTD 123')
+      end
+
       it 'can be applied' do
-        admin = create(:admin)
         subject.apply!(admin)
 
         expect(subject).to be_applied
         expect(subject.transitions.last.user).to eq admin
+      end
+
+      it 'updates associated Cluster with motd' do
+        subject.apply!(admin)
+
+        associated_cluster = subject.case.cluster
+        expect(associated_cluster.motd).to eq(subject.motd)
       end
     end
 
@@ -24,13 +36,13 @@ RSpec.describe ChangeMotdRequest, type: :model do
     end
 
     context 'when unapplied' do
-      subject { create(:change_motd_request, state: :unapplied) }
+      let :state { :unapplied }
 
       it_behaves_like 'it can be applied'
     end
 
     context 'when applied' do
-      subject { create(:change_motd_request, state: :applied) }
+      let :state { :applied }
 
       it_behaves_like 'it can be applied'
     end

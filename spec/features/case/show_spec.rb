@@ -438,4 +438,71 @@ RSpec.describe 'Case page' do
       end
     end
   end
+
+  describe 'applying requests' do
+    subject do
+      create(
+        :case_with_change_motd_request,
+        change_motd_request: request
+      )
+    end
+
+    let :request { create(:change_motd_request, state: :unapplied) }
+
+    let :path { case_path(subject, as: user) }
+    let :apply_button_text { 'Done' }
+    let :reapply_button_text { 'Already applied' }
+
+    def assert_button_successfully_applies(button_text)
+      expect do
+        click_button button_text
+      end.to change { request.reload.transitions.length }.by(1)
+
+      expect(request).to be_applied
+      expect(current_path).to eq(case_path(subject))
+      expect(
+        find('.alert')
+      ).to have_text('The cluster has been updated to reflect this change.')
+    end
+
+    before :each do
+      visit path
+    end
+
+    context 'when user is admin' do
+      let :user { create(:admin) }
+
+      it 'has warning-styled button' do
+        button = find_button(apply_button_text)
+        expect(button['class']).to include('btn-warning')
+      end
+
+      it 'can use button to apply request' do
+        assert_button_successfully_applies(apply_button_text)
+      end
+
+      context 'when request has already been applied' do
+        let :request { create(:change_motd_request, state: :applied) }
+
+        it 'has danger-styled button' do
+          button = find_button(reapply_button_text)
+          expect(button['class']).to include('btn-danger')
+        end
+
+        it 'can use button to re-apply request' do
+          assert_button_successfully_applies(reapply_button_text)
+        end
+      end
+    end
+
+    context 'when user is contact' do
+      let :user { create(:contact, site: subject.site) }
+
+      it 'is not shown either button' do
+        [apply_button_text, reapply_button_text].each do |button_text|
+          expect(page).not_to have_button(button_text)
+        end
+      end
+    end
+  end
 end
