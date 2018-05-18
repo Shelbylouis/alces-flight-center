@@ -445,14 +445,17 @@ RSpec.describe 'Case page' do
     end
     let :request { subject.change_motd_request }
 
+    let :path { case_path(subject, as: user) }
+    let :button_text { 'Done' }
+
     context 'when user is admin' do
       let :user { create(:admin) }
 
       it 'can use button to apply request' do
-        visit case_path(subject, as: user)
+        visit path
 
         expect do
-          click_button 'Done'
+          click_button button_text
         end.to change { request.reload.transitions.length }.by(1)
 
         expect(request).to be_applied
@@ -460,6 +463,16 @@ RSpec.describe 'Case page' do
         expect(
           find('.alert')
         ).to have_text('The cluster has been updated to reflect this change.')
+      end
+    end
+
+    context 'when user is contact' do
+      let :user { create(:contact, site: subject.site) }
+
+      it 'is not shown button' do
+        visit path
+
+        expect(page).not_to have_button(button_text)
       end
     end
   end
