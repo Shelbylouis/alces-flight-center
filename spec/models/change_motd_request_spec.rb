@@ -20,6 +20,13 @@ RSpec.describe ChangeMotdRequest, type: :model do
         expect(subject).to be_applied
         expect(subject.transitions.last.user).to eq admin
       end
+
+      it 'updates associated Cluster with motd' do
+        subject.apply!(admin)
+
+        associated_cluster = subject.case.cluster
+        expect(associated_cluster.motd).to eq(subject.motd)
+      end
     end
 
     it 'is initially in unapplied state' do
