@@ -1,0 +1,25 @@
+
+<tr>
+  <% if kase.fields %>
+    <th>Fields</th>
+    <td colspan="3">
+      <div class="table-responsive">
+        <table class="table table-sm table-striped table-bordered">
+          <% kase.fields.each do |field| %>
+            <tr>
+              <th scope="row" class="nowrap">
+                <%= field.fetch('name') %>
+              </th>
+              <td class="expand">
+                <%= simple_format(field.fetch('value')) %>
+              </td>
+            </tr>
+          <% end%>
+        </table>
+      </div>
+    </td>
+  <% elsif kase.change_motd_request %>
+    <th>Requested MOTD</th>
+    <td><%= simple_format(kase.change_motd_request.motd) %></td>
+  <% end %>
+</tr>
