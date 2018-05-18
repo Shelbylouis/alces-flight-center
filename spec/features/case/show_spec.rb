@@ -441,12 +441,17 @@ RSpec.describe 'Case page' do
 
   describe 'applying requests' do
     subject do
-      create(:case_with_change_motd_request)
+      create(
+        :case_with_change_motd_request,
+        change_motd_request: request
+      )
     end
-    let :request { subject.change_motd_request }
+
+    let :request { create(:change_motd_request, state: :unapplied) }
 
     let :path { case_path(subject, as: user) }
-    let :button_text { 'Done' }
+    let :apply_button_text { 'Done' }
+    let :reapply_button_text { 'Already applied' }
 
     context 'when user is admin' do
       let :user { create(:admin) }
@@ -455,7 +460,7 @@ RSpec.describe 'Case page' do
         visit path
 
         expect do
-          click_button button_text
+          click_button apply_button_text
         end.to change { request.reload.transitions.length }.by(1)
 
         expect(request).to be_applied
@@ -464,15 +469,35 @@ RSpec.describe 'Case page' do
           find('.alert')
         ).to have_text('The cluster has been updated to reflect this change.')
       end
+
+      context 'when request has already been applied' do
+        let :request { create(:change_motd_request, state: :applied) }
+
+        it 'can use button to re-apply request' do
+          visit path
+
+          expect do
+            click_button reapply_button_text
+          end.to change { request.reload.transitions.length }.by(1)
+
+          expect(request).to be_applied
+          expect(current_path).to eq(case_path(subject))
+          expect(
+            find('.alert')
+          ).to have_text('The cluster has been updated to reflect this change.')
+        end
+      end
     end
 
     context 'when user is contact' do
       let :user { create(:contact, site: subject.site) }
 
-      it 'is not shown button' do
+      it 'is not shown either button' do
         visit path
 
-        expect(page).not_to have_button(button_text)
+        [apply_button_text, reapply_button_text].each do |button_text|
+          expect(page).not_to have_button(button_text)
+        end
       end
     end
   end
