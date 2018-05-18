@@ -10,8 +10,9 @@ class MaintenanceWindowsController < ApplicationController
   end
 
   def create
-    event, action =
-      params[:mandatory] ? [:mandate, :schedule] : [:request] * 2
+    event = mandatory? ? :mandate : :request
+    action = mandatory? ? :schedule : :request
+
     handle_form_submission(action: action, template: :new) do
       @maintenance_window = MaintenanceWindow.new(request_maintenance_window_params)
       ActiveRecord::Base.transaction do
@@ -93,6 +94,10 @@ class MaintenanceWindowsController < ApplicationController
   def default_requested_start
     # Default is 9am on next business day.
     1.business_day.from_now.at_beginning_of_day.advance(hours: 9)
+  end
+
+  def mandatory?
+    !!params[:mandatory]
   end
 
   # XXX if we changed `request` to be accessed at `/request` (rather than
