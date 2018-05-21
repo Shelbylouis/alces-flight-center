@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe ComponentGroup, type: :model do
+  it_behaves_like 'it belongs to Cluster'
+
   describe '#genders_host_range=' do
     it 'causes any needed associated Components to be created on save, based on the expanded host range' do
       # Create an existing saved component associated with the group, with a

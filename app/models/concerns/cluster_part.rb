@@ -3,6 +3,7 @@ module ClusterPart
   extend ActiveSupport::Concern
 
   include HasSupportType
+  include BelongsToCluster
 
   SUPPORT_TYPES = SupportType::VALUES + ['inherit']
 
