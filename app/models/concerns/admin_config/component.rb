@@ -4,6 +4,10 @@ module AdminConfig::Component
 
   included do
     rails_admin do
+      object_label_method do
+        :namespaced_name
+      end
+
       show do
         configure :asset_record_view do
           label 'Asset record'

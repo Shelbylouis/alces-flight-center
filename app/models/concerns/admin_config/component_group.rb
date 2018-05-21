@@ -4,6 +4,10 @@ module AdminConfig::ComponentGroup
 
   included do
     rails_admin do
+      object_label_method do
+        :namespaced_name
+      end
+
       list do
         configure :genders_host_range do
           hide
