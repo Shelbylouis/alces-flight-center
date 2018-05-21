@@ -1,8 +1,8 @@
 <% content_for :subtitle { 'Pending Maintenance' } %>
 <%= render 'partials/tabs', activate: :maintenance do %>
-  <% if @scope.unfinished_related_maintenance_windows.empty? %>
-    <div style="text-align: center">No pending or requested maintenance</div>
-  <% else %>
+  <%= render 'partials/no_item_available',
+      collection: @scope.unfinished_related_maintenance_windows,
+      message: "No pending or requested maintenance" do %>
     <div class='table-responsive'>
       <table class="maintenance table">
         <thead>

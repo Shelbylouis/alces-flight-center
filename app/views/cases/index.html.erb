@@ -1,16 +1,15 @@
 <%
   cases = @show_resolved ? @scope.cases.inactive : @scope.cases.active
+  empty_message = "No #{@show_resolved ? 'resolved or closed' : 'open'} cases"
 %>
 <%= content_for :subtitle do
   "#{cases.length} #{@show_resolved ? 'Resolved' : 'Open'}
   #{'Case'.pluralize(cases.length)}"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
-  <% if cases.empty? %>
-    <div style="text-align: center">
-      No <%= @show_resolved? 'resolved or closed' : 'open' %> cases
-    </div>
-  <% else %>
+  <%= render 'partials/no_item_available',
+      collection: cases,
+      message: empty_message do %>
     <div class='table-responsive'>
       <table class="table">
         <thead>
