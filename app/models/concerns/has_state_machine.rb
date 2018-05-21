@@ -13,4 +13,10 @@ module HasStateMachine
       end
     end
   end
+
+  # Automatically picked up by rails_admin so only these options displayed when
+  # selecting state.
+  def state_enum
+    self.class.possible_states
+  end
 end

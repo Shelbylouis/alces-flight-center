@@ -13,6 +13,10 @@ RSpec.describe HasStateMachine do
     end
   end
 
+  subject do
+    MockStateMachineModel.new
+  end
+
   describe '#events' do
     it 'gives all possible events' do
       expect(MockStateMachineModel.events).to match_array([
@@ -28,6 +32,12 @@ RSpec.describe HasStateMachine do
         :first_state,
         :second_state,
       ])
+    end
+  end
+
+  describe '#state_enum' do
+    it 'gives possible states to be picked up by admin interface' do
+      expect(subject.state_enum).to eq(MockStateMachineModel.possible_states)
     end
   end
 end
