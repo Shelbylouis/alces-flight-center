@@ -5,6 +5,10 @@ module BelongsToCluster
   extend ActiveSupport::Concern
 
   def namespaced_name
-    "#{name} (#{cluster.name})"
+    if cluster
+      "#{name} (#{cluster.name})"
+    else
+      name
+    end
   end
 end
