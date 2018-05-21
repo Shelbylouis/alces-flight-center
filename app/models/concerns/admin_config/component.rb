@@ -40,6 +40,9 @@ module AdminConfig::Component
         configure :component_make do
           hide
         end
+        configure :logs do
+          hide
+        end
       end
     end
   end

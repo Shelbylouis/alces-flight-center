@@ -1,4 +1,5 @@
 class MaintenanceWindow < ApplicationRecord
+  include AdminConfig::MaintenanceWindow
   include HasStateMachine
 
   default_scope { order(created_at: :desc) }

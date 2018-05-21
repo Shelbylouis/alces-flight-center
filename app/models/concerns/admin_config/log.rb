@@ -1,17 +1,14 @@
 
-module AdminConfig::Issue
+module AdminConfig::Log
   extend ActiveSupport::Concern
 
   included do
     rails_admin do
       edit do
-        configure :identifier do
+        configure :site do
           hide
         end
         configure :cases do
-          hide
-        end
-        configure :tiers do
           hide
         end
       end
