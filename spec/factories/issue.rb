@@ -4,9 +4,6 @@ FactoryBot.define do
     name 'New user/group'
     requires_component false
 
-    factory :advice_issue do
-    end
-
     factory :issue_requiring_component do
       requires_component true
 
