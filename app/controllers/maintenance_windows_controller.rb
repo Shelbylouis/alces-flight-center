@@ -3,10 +3,8 @@ class MaintenanceWindowsController < ApplicationController
 
   def new
     @maintenance_window = MaintenanceWindow.new(
-        initial_maintenance_window_params
-    ).tap do |mw|
-      mw.associated_model = @scope
-    end
+      initial_maintenance_window_params
+    )
   end
 
   def create
@@ -77,6 +75,7 @@ class MaintenanceWindowsController < ApplicationController
 
   def initial_maintenance_window_params
     {
+      associated_model: @scope,
       case_id: params[:case_id],
       requested_start: default_requested_start,
       duration: 1,
