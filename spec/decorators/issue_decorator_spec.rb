@@ -10,8 +10,6 @@ RSpec.describe IssueDecorator do
         requires_component: false,
         requires_service: service_type.present?,
         service_type: service_type,
-        support_type: :managed,
-        chargeable: true,
         tiers: [tier]
       ).tap do |issue|
         # Issue creates a Tier by default on create, so remove any associated
@@ -30,8 +28,6 @@ RSpec.describe IssueDecorator do
         name: 'New user request',
         defaultSubject: 'New user request',
         requiresComponent: false,
-        supportType: 'managed',
-        chargeable: true,
         tiers: [tier.decorate.case_form_json]
       )
     end

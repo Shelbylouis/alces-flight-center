@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180521102158) do
+ActiveRecord::Schema.define(version: 20180521142349) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -95,7 +95,6 @@ ActiveRecord::Schema.define(version: 20180521102158) do
   end
 
   create_table "cases", force: :cascade do |t|
-    t.string "details"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "cluster_id", null: false
@@ -237,12 +236,9 @@ ActiveRecord::Schema.define(version: 20180521102158) do
     t.boolean "requires_component", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "details_template"
-    t.string "support_type", null: false
     t.string "identifier"
     t.boolean "requires_service", default: false, null: false
     t.bigint "service_type_id"
-    t.boolean "chargeable", default: false, null: false
     t.bigint "category_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["service_type_id"], name: "index_issues_on_service_type_id"

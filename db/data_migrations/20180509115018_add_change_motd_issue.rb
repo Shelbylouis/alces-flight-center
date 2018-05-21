@@ -4,9 +4,6 @@ class AddChangeMotdIssue < ActiveRecord::DataMigration
     hpc_environment_type = ServiceType.find_by_name!('HPC Environment')
     issue = end_user_assistance.issues.create!(
       name: 'Request change of MOTD',
-      # XXX Now junk field which is still required, will be able to be removed
-      # once current staging changes deployed.
-      support_type: 'managed',
       requires_service: true,
       service_type: hpc_environment_type,
     )
