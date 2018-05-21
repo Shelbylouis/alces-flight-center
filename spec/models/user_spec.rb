@@ -20,7 +20,7 @@ RSpec.describe User, type: :model do
 
   describe '#validates_primary_contact_assignment' do
     subject do
-      create(:user, primary_contact: true)
+      build(:user, primary_contact: true)
     end
 
     context 'with no primary contact' do
@@ -30,10 +30,10 @@ RSpec.describe User, type: :model do
     end
 
     context 'with an existing primary contact for the current site' do
-      let :primary_contact { create(:user, primary_contact: true, site: subject.site) }
+      let! :primary_contact { create(:user, primary_contact: true, site: subject.site) }
 
       it 'should error' do
-        expect{ primary_contact }.to raise_error(ActiveRecord::RecordInvalid)
+        expect(subject).not_to be_valid
       end
     end
   end
