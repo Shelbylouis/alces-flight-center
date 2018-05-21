@@ -42,7 +42,6 @@ class Issue < ApplicationRecord
 
   validates :name, presence: true
   validates :identifier, uniqueness: true, if: :identifier
-  validates :chargeable, inclusion: {in: [true, false]}
 
   validates :service_type,
             absence: {

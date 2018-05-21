@@ -19,7 +19,7 @@ class Case < ApplicationRecord
   has_many :case_state_transitions
   alias_attribute :transitions, :case_state_transitions
 
-  delegate :category, :chargeable, to: :issue
+  delegate :category, to: :issue
   delegate :site, to: :cluster, allow_nil: true
 
   state_machine initial: :open do
