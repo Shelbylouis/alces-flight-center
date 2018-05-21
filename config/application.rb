@@ -24,7 +24,11 @@ module AlcesFlightCenter
 
     config.active_job.queue_adapter = :resque
 
-    config.email_app_name = ENV['EMAIL_APP_NAME'] || 'Alces Flight Center'
+    config.email_from = if ENV['STAGING']
+                          'Alces Flight Center Staging <center+staging@alces-software.com>'
+                        else
+                          'Alces Flight Center <center@alces-software.com>'
+                        end
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

@@ -6,7 +6,7 @@ class ApplicationMailer < ActionMailer::Base
   include Roadie::Rails::Automatic
   extend Alces::Mailer::Resender
 
-  default from: "#{Rails.application.config.email_app_name} <center@alces-flight.com>"
+  default from: "#{Rails.application.config.email_from}"
   layout 'mailer'
   helper 'mailer'
   helper 'application'
