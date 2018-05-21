@@ -4,22 +4,6 @@ class Case < ApplicationRecord
 
   default_scope { order(created_at: :desc) }
 
-  # @deprecated - to be removed in next release
-  COMPLETED_RT_TICKET_STATUSES = [
-    'resolved',
-    'rejected',
-    'deleted',
-  ]
-
-  # @deprecated - to be removed in next release
-  RT_TICKET_STATUSES = (
-    [
-      'new',
-      'open',
-      'stalled',
-    ] + COMPLETED_RT_TICKET_STATUSES
-  ).freeze
-
   belongs_to :issue
   belongs_to :cluster
   belongs_to :component, required: false
@@ -87,10 +71,6 @@ class Case < ApplicationRecord
 
   validate :time_worked_not_changed_unless_allowed
 
-  # @deprecated - to be removed in next release
-  validates :last_known_ticket_status,
-    inclusion: {in: RT_TICKET_STATUSES}
-
   validates :credit_charge, numericality: {
       only_integer: true,
       greater_than_or_equal_to: 0
@@ -136,23 +116,6 @@ class Case < ApplicationRecord
     end
   end
 
-  # @deprecated - to be removed in next release
-  def self.request_tracker
-    # Note: `rt_interface_class` is a string which we `constantize`, rather
-    # than a constant directly, otherwise Rails autoloading in development
-    # could leave us holding a reference to an outdated version of the class,
-    # which would then cause things to blow up (e.g. see
-    # https://stackoverflow.com/a/23008837).
-    @rt ||= Rails.configuration.rt_interface_class.constantize.new
-  end
-
-  # @deprecated - to be removed in next release
-  def update_ticket_status!
-    return unless incomplete_rt_ticket?
-    self.last_known_ticket_status = associated_rt_ticket.status
-    save!
-  end
-
   def time_entry_allowed?
     # Allow if not persisted - e.g. allow time to be initially set for all states
     open? || !persisted?
@@ -164,11 +127,6 @@ class Case < ApplicationRecord
 
   def associated_model_type
     associated_model.readable_model_name
-  end
-
-  # @deprecated - to be removed in next release
-  def ticket_completed?
-    COMPLETED_RT_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
   def email_recipients
@@ -289,10 +247,6 @@ class Case < ApplicationRecord
     transition.args&.first
   end
 
-  def incomplete_rt_ticket?
-    rt_ticket_id && (!ticket_completed? || !self.completed_at)
-  end
-
   def assign_cluster_if_necessary
     return if cluster
     self.cluster = component.cluster if component
@@ -301,20 +255,6 @@ class Case < ApplicationRecord
 
   def assign_default_subject_if_unset
     self.subject ||= issue.default_subject
-  end
-
-  # @deprecated - to be removed in next release
-  def associated_rt_ticket
-    if rt_ticket_id
-      @associated_ticket ||= rt.show_ticket(rt_ticket_id)
-    else
-      nil
-    end
-  end
-
-  # @deprecated - to be removed in next release
-  def rt
-    self.class.request_tracker
   end
 
   def requestor_email

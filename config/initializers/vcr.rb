@@ -19,13 +19,6 @@ VCR.configure do |c|
   # prevent VCR from identifying cassettes as being for the same request in
   # different environments.
   [
-    'RT_PASSWORD',
-
-    # These are included in the URL in requests to RT so must be filtered so
-    # VCR identifies requests as the same.
-    'RT_USERNAME',
-    'RT_API_HOST',
-
     'AWS_ACCESS_KEY_ID',
   ].each do |env_var|
     c.filter_sensitive_data("<#{env_var}>") do
