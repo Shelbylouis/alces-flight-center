@@ -9,7 +9,6 @@ class IssueDecorator < ApplicationDecorator
       name: name,
       defaultSubject: default_subject,
       requiresComponent: requires_component,
-      supportType: support_type,
       chargeable: chargeable,
       tiers: tiers.map(&:case_form_json)
     }
