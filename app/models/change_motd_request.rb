@@ -1,4 +1,6 @@
 class ChangeMotdRequest < ApplicationRecord
+  include HasStateMachine
+
   validates_presence_of :motd, :state
   belongs_to :case
 
