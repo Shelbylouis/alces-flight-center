@@ -1,5 +1,5 @@
 
-class MaintenanceWindow
+class MaintenanceWindow < ApplicationRecord
   class Validator < ActiveModel::Validator
     def validate(record)
       @record = record
