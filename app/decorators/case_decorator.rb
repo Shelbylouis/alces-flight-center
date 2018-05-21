@@ -22,10 +22,6 @@ class CaseDecorator < ApplicationDecorator
     h.link_to(display_id, h.case_path(self), title: subject)
   end
 
-  def chargeable_symbol
-    h.boolean_symbol(chargeable)
-  end
-
   def request_maintenance_path
     assoc_class = model.associated_model.underscored_model_name
     h.send("new_#{assoc_class}_maintenance_window_path", model.associated_model, case_id: model.id)
