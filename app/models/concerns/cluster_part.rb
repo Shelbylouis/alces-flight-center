@@ -1,8 +1,13 @@
 
+# Concern to hold shared behaviour for models which together make up an entire
+# Cluster, and each is a single 'part' of the Cluster (rather than some
+# collection of other parts or constituents of a single part); currently just
+# used by Components and Services.
 module ClusterPart
   extend ActiveSupport::Concern
 
   include HasSupportType
+  include BelongsToCluster
 
   SUPPORT_TYPES = SupportType::VALUES + ['inherit']
 

@@ -2,6 +2,7 @@ class ComponentGroup < ApplicationRecord
   include AdminConfig::ComponentGroup
 
   include HasAssetRecord
+  include BelongsToCluster
 
   belongs_to :cluster
   has_one :site, through: :cluster

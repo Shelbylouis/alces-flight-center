@@ -521,38 +521,6 @@ RSpec.describe MaintenanceWindow, type: :model do
   describe 'class' do
     subject { described_class }
 
-    describe '#events' do
-      it 'gives all possible events' do
-        expect(subject.events).to match_array([
-          :auto_end,
-          :auto_expire,
-          :auto_start,
-          :cancel,
-          :confirm,
-          :end,
-          :extend_duration,
-          :mandate,
-          :reject,
-          :request,
-        ])
-      end
-    end
-
-    describe '#possible_states' do
-      it 'gives all possible states' do
-        expect(subject.possible_states).to match_array([
-          :cancelled,
-          :confirmed,
-          :ended,
-          :expired,
-          :new,
-          :rejected,
-          :requested,
-          :started,
-        ])
-      end
-    end
-
     describe '#unfinished' do
       it 'returns all windows which have not reached a finished state' do
         subject.possible_states.each do |state|

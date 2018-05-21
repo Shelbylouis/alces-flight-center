@@ -1,5 +1,6 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
+  include HasStateMachine
 
   default_scope { order(created_at: :desc) }
 

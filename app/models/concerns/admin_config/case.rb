@@ -17,6 +17,21 @@ module AdminConfig::Case
         configure :maintenance_windows do
           hide
         end
+        configure :display_id do
+          hide
+        end
+        configure :log do
+          hide
+        end
+        configure :case_comments do
+          hide
+        end
+        configure :case_state_transitions do
+          hide
+        end
+        configure :change_motd_request do
+          hide
+        end
       end
     end
   end

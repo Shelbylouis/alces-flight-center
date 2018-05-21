@@ -4,6 +4,10 @@ module AdminConfig::Service
 
   included do
     rails_admin do
+      object_label_method do
+        :namespaced_name
+      end
+
       edit do
         configure :cases do
           hide
