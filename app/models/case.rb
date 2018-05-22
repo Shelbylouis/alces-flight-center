@@ -143,7 +143,8 @@ class Case < ApplicationRecord
         # date. We clearly don't want to include that in the events stream.
       maintenance_windows.map(&:transitions).flatten.select(&:event) +
       case_state_transitions +
-      audits
+      audits +
+      logs
     ).sort_by(&:created_at).reverse!
   end
 

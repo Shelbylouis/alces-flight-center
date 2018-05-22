@@ -67,9 +67,9 @@ RSpec.describe 'Case page' do
       create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
       create(
         :maintenance_window_state_transition,
-        maintenance_window: mw,
-        user: admin,
-        event: :request
+      maintenance_window: mw,
+      user: admin,
+      event: :request
       )
       create(:case_comment, case: open_case, user: admin, created_at: 4.hours.ago, text: 'First')
 
@@ -81,24 +81,29 @@ RSpec.describe 'Case page' do
       open_case.tier_level = 3
       open_case.save
 
+      # And a log entry
+      create(:log, cases: [open_case], cluster: cluster, details: 'Loggy McLogface')
 
       visit case_path(open_case, as: admin)
 
       event_cards = all('.event-card')
-      expect(event_cards.size).to eq(6)
+      expect(event_cards.size).to eq(7)
 
-      expect(event_cards[5].find('.card-body').text).to eq('First')
-      expect(event_cards[4].find('.card-body').text).to eq('Second')
-      expect(event_cards[3].find('.card-body').text).to match(
+      expect(event_cards[6].find('.card-body').text).to eq('First')
+      expect(event_cards[5].find('.card-body').text).to eq('Second')
+      expect(event_cards[4].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
-      expect(event_cards[2].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
+      expect(event_cards[3].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
 
-      expect(event_cards[1].find('.card-body').text).to eq(
+      expect(event_cards[2].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'
       )
-      expect(event_cards[0].find('.card-body').text).to eq(
+      expect(event_cards[1].find('.card-body').text).to eq(
           'Escalated this case to tier 3 (General Support).'
+      )
+      expect(event_cards[0].find('.card-body').text).to eq(
+          'Loggy McLogface'
       )
     end
 
