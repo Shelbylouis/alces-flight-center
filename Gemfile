@@ -9,7 +9,7 @@ git_source(:github) do |repo_name|
 end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.1.4'
+gem 'rails', '~> 5.2'
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 0.18'
 # Use Puma as the app server
@@ -33,7 +33,12 @@ gem 'font-awesome-rails'
 gem 'request_store'
 gem 'bootsnap', require: false
 gem "sentry-raven"
-gem 'state_machines-activerecord'
+# Temporarily installed from GitHub as has been updated for Rails 5.2 (see
+# https://github.com/state-machines/state_machines-activerecord/pull/71) but
+# this is not yet in a tagged release.
+gem 'state_machines-activerecord',
+  github: 'state-machines/state_machines-activerecord',
+  ref: 'fed06d9fa64af1cba49d241f4a3ae79626946fe3'
 gem 'state_machines-audit_trail'
 gem 'business_time'
 gem "audited", "~> 4.7"
@@ -48,7 +53,7 @@ gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
 
 # For pretty emails
-gem 'roadie-rails', '~> 1.0'
+gem 'roadie-rails'
 gem 'sass'
 
 # For async emails
