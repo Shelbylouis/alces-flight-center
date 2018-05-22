@@ -34,6 +34,9 @@ RSpec.describe User, type: :model do
 
       it 'should error' do
         expect(subject).not_to be_valid
+        expect(subject.errors.messages).to match(
+          primary_contact: ['is already set for this site']
+        )
       end
     end
   end
