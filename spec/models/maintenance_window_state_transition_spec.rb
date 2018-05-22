@@ -44,8 +44,8 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
 
       admin_only_events.each do |event|
         context "when `#{event}` event" do
-          let :event { event }
-          let :user { create(:admin) }
+          let(:event) { event }
+          let(:user) { create(:admin) }
 
           it_behaves_like 'it must be initiated by an admin'
           it { is_expected.to validate_presence_of(:user) }
@@ -54,8 +54,8 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
 
       contact_only_events.each do |event|
         context "when `#{event}` event" do
-          let :event { event }
-          let :user { create(:contact) }
+          let(:event) { event }
+          let(:user) { create(:contact) }
 
           it_behaves_like 'it must be initiated by a site contact'
           it { is_expected.to validate_presence_of(:user) }
@@ -64,8 +64,8 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
 
       any_user_initiated_events.each do |event|
         context "when `#{event}` event" do
-          let :event { event }
-          let :user { create(:user) }
+          let(:event) { event }
+          let(:user) { create(:user) }
 
           it { is_expected.to validate_presence_of(:user) }
         end
@@ -73,8 +73,8 @@ RSpec.describe MaintenanceWindowStateTransition, type: :model do
 
       automatic_events.each do |event|
         context "when `#{event}` event" do
-          let :event { event }
-          let :user { nil }
+          let(:event) { event }
+          let(:user) { nil }
 
           it { is_expected.to validate_absence_of(:user) }
         end

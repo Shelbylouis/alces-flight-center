@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Case, type: :model do
-  let :random_token_regex { /[A-Z][0-9][A-Z][0-9][A-Z]/ }
+  let(:random_token_regex) { /[A-Z][0-9][A-Z][0-9][A-Z]/ }
 
   it { is_expected.to have_one(:change_motd_request).autosave(true) }
 
@@ -246,7 +246,7 @@ RSpec.describe Case, type: :model do
   end
 
   describe '#email_properties' do
-    let :site { create(:site) }
+    let(:site) { create(:site) }
 
     let :requestor do
       create(:user, name: 'Some User', email: 'someuser@somecluster.com', site: site)
@@ -276,7 +276,7 @@ RSpec.describe Case, type: :model do
         {name: 'field2', value: 'value2', optional: true},
       ]
     end
-    let :change_motd_request { nil }
+    let(:change_motd_request) { nil }
 
     let(:kase) {
       create(
@@ -330,9 +330,9 @@ RSpec.describe Case, type: :model do
     end
 
     context 'when Case has ChangeMotdRequest rather than fields' do
-      let :fields { nil }
+      let(:fields) { nil }
 
-      let :motd { 'My new MOTD' }
+      let(:motd) { 'My new MOTD' }
       let :change_motd_request do
         build(:change_motd_request, motd: motd)
       end
@@ -417,13 +417,13 @@ RSpec.describe Case, type: :model do
       build(:case, fields: nil)
     end
 
-    let :motd_tool_fields {
+    let :motd_tool_fields do
       {
         type: 'motd',
         motd: motd_field,
       }
-    }
-    let :motd_field { 'New MOTD' }
+    end
+    let(:motd_field) { 'New MOTD' }
 
 
     it 'also works when keys are strings' do

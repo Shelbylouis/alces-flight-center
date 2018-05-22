@@ -71,7 +71,7 @@ RSpec.describe AssetRecordFieldDefinition, type: :model do
 
   describe '#valid?' do
     context 'with a "foreign_data_type"' do
-      let :type { 'foreign_data_type' }
+      let(:type) { 'foreign_data_type' }
 
       subject do
         build(:asset_record_field_definition, data_type: type)

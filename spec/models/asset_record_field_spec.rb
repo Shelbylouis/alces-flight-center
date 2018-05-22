@@ -6,7 +6,7 @@ RSpec.describe AssetRecordField, type: :model do
       build(:unassociated_asset_record_field, definition: field_definition)
     end
 
-    let :field_definition { create(:asset_record_field_definition) }
+    let(:field_definition) { create(:asset_record_field_definition) }
 
     let :component_group do
       create(:component_group).tap do |group|

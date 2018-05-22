@@ -2,7 +2,7 @@
   cases = @show_resolved ? @scope.cases.inactive : @scope.cases.active
   empty_message = "No #{@show_resolved ? 'resolved or closed' : 'open'} cases"
 %>
-<%= content_for :subtitle do
+<%= content_for(:subtitle) do
   "#{cases.length} #{@show_resolved ? 'Resolved' : 'Open'}
   #{'Case'.pluralize(cases.length)}"
 end %>

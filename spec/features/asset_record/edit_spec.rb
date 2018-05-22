@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.feature 'Asset Record', type: :feature   do
-  let :admin { create(:admin) }
-  let :component { create(:component) }
-  let :component_group { create(:component_group) }
+  let(:admin) { create(:admin) }
+  let(:component) { create(:component) }
+  let(:component_group) { create(:component_group) }
 
   context 'with an invalid request' do
     it 'errors as a logged in non-admin user' do

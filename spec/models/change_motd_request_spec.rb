@@ -8,7 +8,7 @@ RSpec.describe ChangeMotdRequest, type: :model do
 
   describe 'states' do
     RSpec.shared_examples 'it can be applied' do
-      let :admin { create(:admin) }
+      let(:admin) { create(:admin) }
 
       subject do
         create(:change_motd_request, state: state, motd: 'New MOTD 123')
@@ -36,13 +36,13 @@ RSpec.describe ChangeMotdRequest, type: :model do
     end
 
     context 'when unapplied' do
-      let :state { :unapplied }
+      let(:state) { :unapplied }
 
       it_behaves_like 'it can be applied'
     end
 
     context 'when applied' do
-      let :state { :applied }
+      let(:state) { :applied }
 
       it_behaves_like 'it can be applied'
     end

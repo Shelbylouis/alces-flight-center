@@ -8,7 +8,7 @@ RSpec.describe MaintenanceWindowDecorator do
         .decorate
     end
 
-    let :requestor { create(:admin, name: 'Some User') }
+    let(:requestor) { create(:admin, name: 'Some User') }
 
     it 'gives string with info on transition to this state' do
       info = subject.transition_info(:requested)
@@ -50,7 +50,7 @@ RSpec.describe MaintenanceWindowDecorator do
     end
 
     context 'when started' do
-      let :state { :started }
+      let(:state) { :started }
 
       include_examples 'includes time range'
 
@@ -60,7 +60,7 @@ RSpec.describe MaintenanceWindowDecorator do
     end
 
     context 'when expired' do
-      let :state { :expired }
+      let(:state) { :expired }
 
       include_examples 'includes time range'
 
@@ -74,7 +74,7 @@ RSpec.describe MaintenanceWindowDecorator do
     other_states = MaintenanceWindow.possible_states - [:started, :expired]
     other_states.each do |state|
       context "when #{state}" do
-        let :state { state }
+        let(:state) { state }
 
         it 'just returns formatted time range for maintenance' do
           expect(subject.scheduled_period).to eq expected_time_range
@@ -92,7 +92,7 @@ RSpec.describe MaintenanceWindowDecorator do
     end
 
     context 'when associated model is cluster' do
-      let :associated_model { create(:cluster) }
+      let(:associated_model) { create(:cluster) }
 
       it do
         is_expected.to eq h.confirm_cluster_maintenance_window_path(
@@ -103,7 +103,7 @@ RSpec.describe MaintenanceWindowDecorator do
     end
 
     context 'when associated model is component' do
-      let :associated_model { create(:component) }
+      let(:associated_model) { create(:component) }
 
       it do
         is_expected.to eq h.confirm_component_maintenance_window_path(
@@ -114,7 +114,7 @@ RSpec.describe MaintenanceWindowDecorator do
     end
 
     context 'when associated model is service' do
-      let :associated_model { create(:service) }
+      let(:associated_model) { create(:service) }
 
       it do
         is_expected.to eq h.confirm_service_maintenance_window_path(

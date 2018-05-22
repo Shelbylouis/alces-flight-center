@@ -6,11 +6,11 @@ RSpec.shared_examples 'it validates dates cannot be in the past' do |date_fields
   # invalidated.
   valid_states = [:cancelled, :ended, :expired, :rejected, :started]
 
-  let :legacy_migration_mode { false }
+  let(:legacy_migration_mode) { false }
 
   valid_states.each do |state|
     context "when #{state}" do
-      let :state { state }
+      let(:state) { state }
 
       it { is_expected.to be_valid }
     end
@@ -20,7 +20,7 @@ RSpec.shared_examples 'it validates dates cannot be in the past' do |date_fields
 
   other_states.each do |state|
     context "when #{state}" do
-      let :state { state }
+      let(:state) { state }
 
       let :expected_errors do
         date_fields.map do |field|
@@ -36,12 +36,12 @@ RSpec.shared_examples 'it validates dates cannot be in the past' do |date_fields
   end
 
   context 'when `legacy_migration_mode` flag set on model' do
-    let :legacy_migration_mode { true }
+    let(:legacy_migration_mode) { true }
 
     # Should skip this validation and be valid in every state.
     MaintenanceWindow.possible_states.each do |state|
       context "when #{state}" do
-        let :state { state }
+        let(:state) { state }
 
         it { is_expected.to be_valid }
       end
@@ -60,12 +60,12 @@ RSpec.describe MaintenanceWindow, type: :model do
           service: service
         )
       end
-      let :cluster { nil }
-      let :component { nil }
-      let :service { nil }
+      let(:cluster) { nil }
+      let(:component) { nil }
+      let(:service) { nil }
 
       context 'when single associated model given' do
-        let :cluster { create(:cluster) }
+        let(:cluster) { create(:cluster) }
 
         it { is_expected.to be_valid }
       end
@@ -75,22 +75,22 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       context 'when both Cluster and Component associated' do
-        let :cluster { create(:cluster) }
-        let :component { create(:component) }
+        let(:cluster) { create(:cluster) }
+        let(:component) { create(:component) }
 
         it { is_expected.to be_invalid }
       end
 
       context 'when both Cluster and Service associated' do
-        let :cluster { create(:cluster) }
-        let :service { create(:service) }
+        let(:cluster) { create(:cluster) }
+        let(:service) { create(:service) }
 
         it { is_expected.to be_invalid }
       end
 
       context 'when both Component and Service associated' do
-        let :component { create(:component) }
-        let :service { create(:service) }
+        let(:component) { create(:component) }
+        let(:service) { create(:service) }
 
         it { is_expected.to be_invalid }
       end

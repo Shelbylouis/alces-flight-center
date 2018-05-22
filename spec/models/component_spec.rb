@@ -76,7 +76,7 @@ RSpec.describe Component, type: :model do
   end
 
   describe "create ComponentExpansion's from ComponentDefault's" do
-    let :expansion_names { (1..2).map { |i| "expansion#{i}" } }
+    let(:expansion_names) { (1..2).map { |i| "expansion#{i}" } }
     let :default_expansions do
       expansion_names.map { |slot| create(:default_expansion, slot: slot) }
     end

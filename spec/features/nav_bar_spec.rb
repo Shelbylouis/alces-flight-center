@@ -2,13 +2,13 @@
 require 'rails_helper'
 
 RSpec.feature 'Navigation Bar', type: :feature do
-  let :nav_bar { first('nav.product-bar') }
-  let :site_nav_bar { nav_bar.all('ul').first }
-  let :site_nav_items { site_nav_bar.all('li') }
+  let(:nav_bar) { first('nav.product-bar') }
+  let(:site_nav_bar) { nav_bar.all('ul').first }
+  let(:site_nav_items) { site_nav_bar.all('li') }
 
-  let :site { create(:site) }
-  let :contact { create(:primary_contact, site: site) }
-  let :cluster { create(:cluster, site: site) }
+  let(:site) { create(:site) }
+  let(:contact) { create(:primary_contact, site: site) }
+  let(:cluster) { create(:cluster, site: site) }
 
   def visit_subject(path_helper)
     visit send(path_helper, subject, as: user)
@@ -56,8 +56,8 @@ RSpec.feature 'Navigation Bar', type: :feature do
 
   shared_examples 'navigate to sites' do
     context 'when visiting the root site' do
-      let :expected_cluster_links { [] }
-      before :each { visit (root_path as: user) }
+      let(:expected_cluster_links) { [] }
+      before(:each) { visit (root_path as: user) }
       it_behaves_like 'a common navigation bar'
 
       it 'only has the root navigation link' do
@@ -67,8 +67,8 @@ RSpec.feature 'Navigation Bar', type: :feature do
 
     context 'when visiting a cluster page' do
       subject { cluster }
-      let :expected_cluster_links { [cluster_path(subject)] }
-      before :each { visit_subject :cluster_path }
+      let(:expected_cluster_links) { [cluster_path(subject)] }
+      before(:each) { visit_subject :cluster_path }
       it_behaves_like 'a cluster navigation bar'
     end
 
@@ -77,7 +77,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
       let :expected_cluster_links do
         [cluster_path(subject.cluster), component_group_path(subject)]
       end
-      before :each { visit_subject :component_group_path }
+      before(:each) { visit_subject :component_group_path }
       it_behaves_like 'a cluster navigation bar'
     end
 
@@ -88,7 +88,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
           component_group_path(subject.component_group),
           component_path(subject) ]
       end
-      before :each { visit_subject :component_path }
+      before(:each) { visit_subject :component_path }
       it_behaves_like 'a cluster navigation bar'
     end
 
@@ -97,7 +97,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
       let :expected_cluster_links do
         [ cluster_path(subject.cluster), service_path(subject) ]
       end
-      before :each { visit_subject :service_path }
+      before(:each) { visit_subject :service_path }
       it_behaves_like 'a cluster navigation bar'
     end
 
@@ -105,7 +105,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
       subject do
         create(:case_requiring_component, component: associated_model)
       end
-      let :associated_model { create(:component, cluster: cluster) }
+      let(:associated_model) { create(:component, cluster: cluster) }
 
       let :expected_cluster_links do
         [
@@ -115,13 +115,13 @@ RSpec.feature 'Navigation Bar', type: :feature do
         ]
       end
 
-      before :each { visit_subject :case_path }
+      before(:each) { visit_subject :case_path }
       it_behaves_like 'a cluster navigation bar'
     end
   end
 
   context 'with an admin logged in' do
-    let :user { create(:admin) }
+    let(:user) { create(:admin) }
     let :cluster_nav_items do
       return [] if site_nav_items.length < 2
       site_nav_items[2..-1]
@@ -130,14 +130,14 @@ RSpec.feature 'Navigation Bar', type: :feature do
 
     context 'when visiting the site page' do
       subject { site }
-      let :expected_cluster_links { [] }
-      before :each { visit_subject :site_path }
+      let(:expected_cluster_links) { [] }
+      before(:each) { visit_subject :site_path }
       it_behaves_like 'a cluster navigation bar'
     end
   end
 
   context 'with a regular user logged in' do
-    let :user { contact }
+    let(:user) { contact }
     let :cluster_nav_items do
       return [] if site_nav_items.length < 1
       site_nav_items[1..-1]

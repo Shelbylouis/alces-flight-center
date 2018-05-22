@@ -1,7 +1,7 @@
 
 RSpec.shared_examples 'it has scopes to get advice and managed parts' do
   ['advice', 'managed'].each do |support_type|
-    let :part_type { described_class.to_s.downcase }
+    let(:part_type) { described_class.to_s.downcase }
     context "for #{support_type} scope" do
       subject do
         create(:cluster, support_type: support_type) do |cluster|

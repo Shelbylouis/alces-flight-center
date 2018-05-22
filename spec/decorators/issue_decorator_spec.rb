@@ -19,8 +19,8 @@ RSpec.describe IssueDecorator do
       end.decorate
     end
 
-    let :service_type { create(:service_type) }
-    let :tier { create(:tier) }
+    let(:service_type) { create(:service_type) }
+    let(:tier) { create(:tier) }
 
     it 'gives correct JSON' do
       expect(subject.case_form_json).to eq(

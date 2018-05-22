@@ -84,17 +84,17 @@ RSpec.shared_examples 'confirmation form' do
 end
 
 RSpec.feature "Maintenance windows", type: :feature do
-  let :support_case { create(:case_with_component) }
-  let :component { support_case.component }
-  let :cluster { support_case.cluster }
-  let :site { support_case.site }
+  let(:support_case) { create(:case_with_component) }
+  let(:component) { support_case.component }
+  let(:cluster) { support_case.cluster }
+  let(:site) { support_case.site }
 
-  let :valid_requested_start { Time.zone.local(2022, 9, 10, 13, 0) }
+  let(:valid_requested_start) { Time.zone.local(2022, 9, 10, 13, 0) }
 
-  let :reject_button_text { 'Reject' }
-  let :end_button_text { 'End' }
-  let :cancel_button_text { 'Cancel' }
-  let :extend_button_text { 'Extend' }
+  let(:reject_button_text) { 'Reject' }
+  let(:end_button_text) { 'End' }
+  let(:cancel_button_text) { 'Cancel' }
+  let(:extend_button_text) { 'Extend' }
 
   before :each do
     # The only way I can get Capybara to use the correct URL; may be a better
@@ -119,11 +119,11 @@ RSpec.feature "Maintenance windows", type: :feature do
   end
 
   context 'when user is an admin' do
-    let :user_name { 'Steve User' }
-    let :user { create(:admin, name: user_name) }
+    let(:user_name) { 'Steve User' }
+    let(:user) { create(:admin, name: user_name) }
 
-    let :cluster { create(:cluster) }
-    let! :component { create(:component, cluster: cluster) }
+    let(:cluster) { create(:cluster) }
+    let!(:component) { create(:component, cluster: cluster) }
 
     let :component_maintenance_path do
       new_component_maintenance_window_path(component)
@@ -337,7 +337,7 @@ RSpec.feature "Maintenance windows", type: :feature do
   end
 
   context 'when user is contact' do
-    let :user_name { 'Some Customer' }
+    let(:user_name) { 'Some Customer' }
     let :user do
       create(:contact, name: user_name, site: site)
     end
@@ -368,7 +368,7 @@ RSpec.feature "Maintenance windows", type: :feature do
             case: support_case,
           )
         end
-        let :service { create(:service, cluster: cluster) }
+        let(:service) { create(:service, cluster: cluster) }
 
         include_examples 'confirmation form'
         include_examples 'maintenance form initially valid'
@@ -382,7 +382,7 @@ RSpec.feature "Maintenance windows", type: :feature do
             case: support_case,
           )
         end
-        let :service { create(:service, cluster: cluster) }
+        let(:service) { create(:service, cluster: cluster) }
 
         include_examples 'confirmation form'
 

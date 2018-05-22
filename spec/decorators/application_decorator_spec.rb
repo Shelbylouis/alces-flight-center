@@ -3,14 +3,14 @@ require 'rails_helper'
 RSpec.describe ApplicationDecorator do
   describe '#start_maintenance_request_link' do
     subject { component.decorate.start_maintenance_request_link }
-    let :component { create(:component) }
+    let(:component) { create(:component) }
 
     before :each do
       allow(h).to receive(:current_user).and_return(user)
     end
 
     context 'when admin' do
-      let :user { create(:admin) }
+      let(:user) { create(:admin) }
 
       it 'gives link to request maintenance page for object' do
         expect(subject).to eq(
@@ -22,7 +22,7 @@ RSpec.describe ApplicationDecorator do
     end
 
     context 'when contact' do
-      let :user { create(:contact) }
+      let(:user) { create(:contact) }
 
       it { is_expected.to be nil }
     end
@@ -50,7 +50,7 @@ RSpec.describe ApplicationDecorator do
           Draper::ViewContext.clear!
         end.cluster_part_icons
       end
-      let :component { create(:component, name: 'mycomponent') }
+      let(:component) { create(:component, name: 'mycomponent') }
 
       it 'includes correct icon when has requested maintenance window' do
         window = create(:requested_maintenance_window, component: component)

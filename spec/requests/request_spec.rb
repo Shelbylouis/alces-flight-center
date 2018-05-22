@@ -12,7 +12,7 @@ end
 # and corresponding `request_test` being defined.
 RSpec.describe Request, type: :request do
   describe '#current_user' do
-    let :user { create(:user) }
+    let(:user) { create(:user) }
 
     it 'returns current user when in request' do
       get request_test_path(as: user)

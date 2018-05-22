@@ -8,12 +8,12 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
     create(:"request_#{part_name}_becomes_advice_issue")
   end
 
-  let :request_self_management_text { 'Request self-management' }
-  let :request_alces_management_text { 'Request Alces management' }
+  let(:request_self_management_text) { 'Request self-management' }
+  let(:request_alces_management_text) { 'Request Alces management' }
 
-  let :site { create(:site) }
-  let :contact { create(:contact, site: site) }
-  let :cluster { create(:cluster, site: site) }
+  let(:site) { create(:site) }
+  let(:contact) { create(:contact, site: site) }
+  let(:cluster) { create(:cluster, site: site) }
 
   let :cluster_parts_path do
     send("cluster_#{part_name.to_s.pluralize}_path", cluster, as: contact)

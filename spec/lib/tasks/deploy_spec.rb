@@ -15,7 +15,7 @@ RSpec.describe 'alces:deploy:staging:obfuscate_user_data' do
     ENV['STAGING_PASSWORD'] = staging_password
   end
 
-  let :staging_password { 'password123' }
+  let(:staging_password) { 'password123' }
 
   it_behaves_like 'it has prerequisite', :environment
 

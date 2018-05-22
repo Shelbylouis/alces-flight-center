@@ -1,4 +1,4 @@
-<% content_for :subtitle do
+<% content_for(:subtitle) do
      'Components'.tap { |s| s << " - #{@type}" if @type.present? }
    end %>
 <%= render 'partials/tabs', activate: :components do %>

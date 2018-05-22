@@ -12,7 +12,7 @@ RSpec.describe Tier, type: :model do
   end
 
   describe '#valid?' do
-    let :issue { create(:issue) }
+    let(:issue) { create(:issue) }
 
     before :each do
       create(:tier, issue: issue, level: 1)

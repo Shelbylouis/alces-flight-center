@@ -88,7 +88,7 @@ RSpec.describe Cluster, type: :model do
 
   context 'cluster document tests' do
     subject { create(:cluster, name: 'Some Cluster', site: site) }
-    let :site { create(:site, name: 'The Site') }
+    let(:site) { create(:site, name: 'The Site') }
 
     before :each do
       ENV['AWS_DOCUMENTS_PREFIX'] = 'test-documents'

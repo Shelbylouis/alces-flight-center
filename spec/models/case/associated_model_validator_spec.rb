@@ -11,7 +11,7 @@ RSpec.shared_examples 'associated Cluster part validation' do |part_name|
       issue_attributes.merge!(requires_part_name => true)
     end
 
-    let :cluster { create(:cluster) }
+    let(:cluster) { create(:cluster) }
 
     context "when not associated with #{part_name}" do
       it 'should be invalid' do
@@ -21,12 +21,12 @@ RSpec.shared_examples 'associated Cluster part validation' do |part_name|
     end
 
     context "when associated with #{part_name} that is part of associated cluster" do
-      let :part { create(part_name, cluster: cluster) }
+      let(:part) { create(part_name, cluster: cluster) }
       it { is_expected.to be_valid }
     end
 
     context "when associated with #{part_name} that is not part of associated cluster" do
-      let :part { create(part_name, cluster: create(:cluster)) }
+      let(:part) { create(part_name, cluster: create(:cluster)) }
       it 'should be invalid' do
         expect(subject).not_to be_valid
         expect(subject.errors.messages).to include(part_name => [/not part of given cluster/])
@@ -65,13 +65,13 @@ RSpec.describe Case, type: :model do
       build(:case, **attributes)
     end
 
-    let :cluster { create(:cluster) }
-    let :component { nil }
-    let :service { nil }
-    let :part { nil }
+    let(:cluster) { create(:cluster) }
+    let(:component) { nil }
+    let(:service) { nil }
+    let(:part) { nil }
 
-    let :issue { create(:issue, **issue_attributes) }
-    let :issue_attributes { attributes_for(:issue) }
+    let(:issue) { create(:issue, **issue_attributes) }
+    let(:issue_attributes) { attributes_for(:issue) }
 
     include_examples 'associated Cluster part validation', :component
     include_examples 'associated Cluster part validation', :service
@@ -89,7 +89,7 @@ RSpec.describe Case, type: :model do
       end
 
       context 'when associated with component' do
-        let :component { create(:component) }
+        let(:component) { create(:component) }
 
         it 'should be invalid' do
           expect(subject).not_to be_valid
@@ -98,7 +98,7 @@ RSpec.describe Case, type: :model do
       end
 
       context 'when associated with service' do
-        let :service { create(:service) }
+        let(:service) { create(:service) }
 
         it 'should be invalid' do
           expect(subject).not_to be_valid

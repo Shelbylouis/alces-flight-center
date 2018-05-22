@@ -17,11 +17,11 @@ RSpec.describe 'renders the nav link', type: :view do
   end
 
   context 'with a contact user' do
-    let :user { create(:contact) }
+    let(:user) { create(:contact) }
 
     context 'with a model and a nil active link' do
-      let :model { create(:component) }
-      let :model_path { component_path(model) }
+      let(:model) { create(:component) }
+      let(:model_path) { component_path(model) }
 
       def render_model_link(**options)
         options.merge!(active: nil) unless options.key?(:active)
@@ -75,7 +75,7 @@ RSpec.describe 'renders the nav link', type: :view do
             { path: '/path3', text: 'text3' }
           ]
         end
-        let :menu { rendered.find('div.dropdown-menu') }
+        let(:menu) { rendered.find('div.dropdown-menu') }
 
         before :each do
           render_model_link(dropdown: dropdown_items)
