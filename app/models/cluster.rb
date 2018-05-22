@@ -18,8 +18,7 @@ class Cluster < ApplicationRecord
   validates :name, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
   validates :canonical_name, presence: true
-  validate :validate_all_components_advice, if: :advice?
-  validate :validate_all_services_advice, if: :advice?
+  validate :validate_all_cluster_parts_advice, if: :advice?
   validates :shortcode, presence: true, uniqueness: true
   # validates_presence_of :motd
 
@@ -76,17 +75,14 @@ class Cluster < ApplicationRecord
 
   private
 
-  def validate_all_components_advice
-    unless components.all?(&:advice?)
-      errors.add(:base, 'advice Cluster cannot be associated with managed Components')
+  def validate_all_cluster_parts_advice
+    ['components', 'services'].each do |cluster_part|
+      unless eval(cluster_part).all?(&:advice?)
+        errors.add(:base, "advice Cluster cannot be associated with managed #{cluster_part.capitalize}")
+      end
     end
   end
 
-  def validate_all_services_advice
-    unless services.all?(&:advice?)
-      errors.add(:base, 'advice Cluster cannot be associated with managed Services')
-    end
-  end
 
   def create_automatic_services
     ServiceType.automatic.each do |service_type|
