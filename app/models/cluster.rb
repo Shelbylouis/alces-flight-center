@@ -77,12 +77,11 @@ class Cluster < ApplicationRecord
 
   def validate_all_cluster_parts_advice
     ['components', 'services'].each do |cluster_part|
-      unless eval(cluster_part).all?(&:advice?)
+      unless self.public_send(cluster_part).all?(&:advice?)
         errors.add(:base, "advice Cluster cannot be associated with managed #{cluster_part.capitalize}")
       end
     end
   end
-
 
   def create_automatic_services
     ServiceType.automatic.each do |service_type|
