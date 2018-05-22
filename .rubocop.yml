@@ -16,7 +16,9 @@ Style/WordArray:
 # Do not preder trailing commas in multi-line hash/array literals - better as
 # when something is added to a literal the previous last line does not also
 # need to be changed, which also makes diffs smaller
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: comma
 
 # Do not require documentation for top-level classes or modules - seems
