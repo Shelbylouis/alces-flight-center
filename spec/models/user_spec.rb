@@ -17,4 +17,27 @@ RSpec.describe User, type: :model do
       it { is_expected.to be false }
     end
   end
+
+  describe '#validates_primary_contact_assignment' do
+    subject do
+      build(:user, primary_contact: true)
+    end
+
+    context 'with no primary contact' do
+      it 'should not error' do
+        expect(subject).to be_valid
+      end
+    end
+
+    context 'with an existing primary contact for the current site' do
+      let! :primary_contact { create(:user, primary_contact: true, site: subject.site) }
+
+      it 'should error' do
+        expect(subject).not_to be_valid
+        expect(subject.errors.messages).to match(
+          primary_contact: ['is already set for this site']
+        )
+      end
+    end
+  end
 end

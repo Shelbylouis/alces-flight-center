@@ -24,6 +24,8 @@ class User < ApplicationRecord
     inclusion: {in: [true, false], if: :contact?},
     absence: {if: :admin?}
   }
+  validate :validates_primary_contact_assignment
+
   alias_attribute :primary_contact?, :primary_contact
 
   alias_attribute :admin?, :admin
@@ -34,6 +36,12 @@ class User < ApplicationRecord
 
   def secondary_contact?
     contact? && !primary_contact?
+  end
+
+  def validates_primary_contact_assignment
+    return if site&.primary_contact.nil?
+    errors.add(:primary_contact, 'is already set for this site') if
+      primary_contact && site.primary_contact != self
   end
 
   def self.globally_available?
