@@ -33,6 +33,14 @@ RSpec.describe Cluster, type: :model do
 
         it { is_expected.to be_valid }
       end
+
+      context 'with managed service' do
+        before :each do
+          create(:managed_service, cluster: subject)
+        end
+
+        it { is_expected.to be_valid }
+      end
     end
 
     context 'when advice cluster' do
@@ -60,6 +68,20 @@ RSpec.describe Cluster, type: :model do
         end
 
         it { is_expected.to be_valid }
+      end
+
+      context 'with managed service' do
+        before :each do
+          create(:managed_service, cluster: subject)
+          subject.reload
+        end
+
+        it 'should be invalid' do
+          expect(subject).to be_invalid
+          expect(subject.errors.messages).to include(
+            base: [/advice Cluster cannot be associated with managed Services/]
+          )
+        end
       end
     end
   end
