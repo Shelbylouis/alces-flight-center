@@ -20,7 +20,7 @@ import SelectList
 import Service
 import State exposing (State)
 import Tier exposing (Tier)
-import Tier.DisplayWrapper
+import Tier.DisplayWrapper exposing (DisplayWrapper)
 import Tier.Field
 import Tier.Level as Level exposing (Level)
 import Types
@@ -62,7 +62,7 @@ issueDrillDownSection state =
             , maybeCategoriesField state
             , issuesField state |> Just
             , maybeComponentsField state
-            , tierSelectField state |> Just
+            , tierTabs state |> Just
             , Charging.chargeableAlert state
             ]
 
@@ -181,6 +181,53 @@ issuesField state =
         (always False)
         ChangeSelectedIssue
         state
+
+
+tierTabs : State -> Html Msg
+tierTabs state =
+    let
+        tabItems =
+            SelectList.mapBy displayWrapperToTab wrappedTiers
+                |> SelectList.toList
+
+        wrappedTiers =
+            State.selectedIssue state
+                |> Issue.tiers
+                |> Tier.DisplayWrapper.wrap
+    in
+    -- Tab support is available in elm-bootstrap, but we do not use it at the
+    -- moment as it is not really designed for a situation like ours, where the
+    -- tab state is derived and changed based on the rest of the model rather
+    -- than being an independent part of the model itself. Doing what we want
+    -- with it seemed difficult and convoluted, if not impossible, with the
+    -- current API.
+    ul [ class "nav nav-tabs" ] tabItems
+
+
+displayWrapperToTab : SelectList.Position -> DisplayWrapper -> Html Msg
+displayWrapperToTab position wrapper =
+    let
+        clickMsg =
+            Tier.DisplayWrapper.extractId wrapper
+                |> toString
+                |> ChangeSelectedTier
+
+        linkClasses =
+            [ ( "nav-link", True )
+            , ( "active", position == SelectList.Selected )
+            , ( "disabled", Tier.DisplayWrapper.isUnavailable wrapper )
+            ]
+
+        titleText =
+            if Tier.DisplayWrapper.isUnavailable wrapper then
+                "Tier unavailable for selected issue"
+            else
+                ""
+    in
+    li [ class "nav-item" ]
+        [ a [ classList linkClasses, onClick clickMsg, title titleText ]
+            [ text <| Tier.DisplayWrapper.description wrapper ]
+        ]
 
 
 tierSelectField : State -> Html Msg
