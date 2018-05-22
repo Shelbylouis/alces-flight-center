@@ -7,39 +7,35 @@
   #{'Case'.pluralize(cases.length)}"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
-  <%= render 'partials/no_item_available',
+  <%= render 'partials/table',
       collection: cases,
       message: empty_message do %>
-    <div class='table-responsive'>
-      <table class="table">
-        <thead>
-          <tr class="nowrap">
-            <th>ID</th>
-            <th>Date</th>
-            <th>State</th>
-            <th>Creator</th>
-            <th>Subject</th>
-            <th>Assigned to</th>
-            <th>Association</th>
-            <% if @show_resolved %>
-              <th>Credit usage</th>
-            <% end %>
-          </tr>
-        </thead>
+    <thead>
+      <tr class="nowrap">
+        <th>ID</th>
+        <th>Date</th>
+        <th>State</th>
+        <th>Creator</th>
+        <th>Subject</th>
+        <th>Assigned to</th>
+        <th>Association</th>
+        <% if @show_resolved %>
+          <th>Credit usage</th>
+        <% end %>
+      </tr>
+    </thead>
 
-        <tbody class="assigned-cases">
-          <% cases.assigned_to(current_user).decorate.each do |c| %>
-            <%= render 'partials/case_table_row', kase: c %>
-          <% end %>
-        </tbody>
+    <tbody class="assigned-cases">
+      <% cases.assigned_to(current_user).decorate.each do |c| %>
+        <%= render 'partials/case_table_row', kase: c %>
+      <% end %>
+    </tbody>
 
-        <tbody>
-          <% cases.not_assigned_to(current_user).decorate.each do |c| %>
-            <%= render 'partials/case_table_row', kase: c %>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
+    <tbody>
+      <% cases.not_assigned_to(current_user).decorate.each do |c| %>
+        <%= render 'partials/case_table_row', kase: c %>
+      <% end %>
+    </tbody>
   <% end %>
 <% end %>
 

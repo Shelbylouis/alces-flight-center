@@ -1,34 +1,30 @@
 <% content_for :subtitle { 'Logs' } %>
 <%= render 'partials/tabs', activate: :logs do %>
-  <%= render 'partials/no_item_available',
+  <%= render 'partials/table',
       collection: @logs,
       message: "No logs to display" do %>
-    <div class='table-responsive'>
-      <table class='table'>
-        <thead>
-          <th>Date Created</th>
-          <th>Engineer</th>
-          <th>Details</th>
-          <th>Associated Component</th>
-          <th>Related Case(s)</th>
-        </thead>
-        <% @logs.each do |log| %>
-          <tr>
-            <%= timestamp_td(description:  'Logged', timestamp: log.created_at) %>
-            <td class="nowrap"><%= log.engineer.name %></td>
-            <td><%= log.details %></td>
-            <td>
-              <%= log.component&.decorate&.link || raw("<em>None</em>") %>
-            </td>
-            <td>
-              <% log.cases.map(&:decorate).each do |kase| %>
-                <%= kase.case_link %>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-      </table>
-    </div>
+    <thead>
+      <th>Date Created</th>
+      <th>Engineer</th>
+      <th>Details</th>
+      <th>Associated Component</th>
+      <th>Related Case(s)</th>
+    </thead>
+    <% @logs.each do |log| %>
+      <tr>
+        <%= timestamp_td(description:  'Logged', timestamp: log.created_at) %>
+        <td class="nowrap"><%= log.engineer.name %></td>
+        <td><%= log.details %></td>
+        <td>
+          <%= log.component&.decorate&.link || raw("<em>None</em>") %>
+        </td>
+        <td>
+          <% log.cases.map(&:decorate).each do |kase| %>
+            <%= kase.case_link %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
   <% end %>
 <% end %>
 
