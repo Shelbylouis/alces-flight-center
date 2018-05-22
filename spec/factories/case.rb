@@ -28,7 +28,8 @@ FactoryBot.define do
     # Every Case requires a Cluster, so this is just the same as the standard
     # `case` factory; this is useful though to allow us to handle creating a
     # Case requiring each type of part in the same way.
-    factory :case_requiring_cluster {}
+    factory :case_requiring_cluster do
+    end
 
     factory :case_requiring_component do
       association :issue, factory: :issue_requiring_component

@@ -10,7 +10,7 @@ RSpec.describe CategoryDecorator do
       ).decorate
     end
 
-    let :service_type { create(:service_type) }
+    let(:service_type) { create(:service_type) }
 
     it 'gives correct JSON' do
       expect(subject.case_form_json).to eq(

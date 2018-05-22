@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.feature Log, type: :feature do
-  let :engineer { create(:admin) }
-  let :cluster { create(:cluster) }
+  let(:engineer) { create(:admin) }
+  let(:cluster) { create(:cluster) }
 
   # The following are ids for the view elements NOT the models
-  let :case_select_id { 'log_case_ids' }
-  let :details_input_id { 'log_details' }
-  let :component_select_id { 'log_component_id' }
+  let(:case_select_id) { 'log_case_ids' }
+  let(:details_input_id) { 'log_details' }
+  let(:component_select_id) { 'log_component_id' }
 
   # Create the components and cases for each spec
   before :each do

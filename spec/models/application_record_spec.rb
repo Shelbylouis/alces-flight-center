@@ -59,9 +59,9 @@ RSpec.describe ApplicationRecord, type: :model do
     end
 
     context 'when contact' do
-      let :user { create(:contact) }
-      let :user_site { user.site }
-      let :another_site { create(:site) }
+      let(:user) { create(:contact) }
+      let(:user_site) { user.site }
+      let(:another_site) { create(:site) }
 
       it 'cannot read model belonging to another Site' do
         model = create(:cluster, site: another_site)

@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe 'Navigation variable assignments', type: :request do
-  let :contact { create(:contact, site: site) }
-  let :admin { create(:admin) }
-  let :site { create(:site) }
-  let! :cluster { create(:cluster, site: site) }
-  let! :component_group { create(:component_group) }
+  let(:contact) { create(:contact, site: site) }
+  let(:admin) { create(:admin) }
+  let(:site) { create(:site) }
+  let!(:cluster) { create(:cluster, site: site) }
+  let!(:component_group) { create(:component_group) }
   let! :component do
     create(:component, component_group: component_group, cluster: cluster)
   end
-  let! :service { create(:service, cluster: cluster) }
+  let!(:service) { create(:service, cluster: cluster) }
 
   let :default_nav_variables do
     {
@@ -90,7 +90,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
   end
 
   context 'when user is site contact' do
-    let :user { contact }
+    let(:user) { contact }
 
     include_examples 'cluster and part variable assignment'
 
@@ -107,7 +107,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
   end
 
   context 'when user is admin' do
-    let :user { admin }
+    let(:user) { admin }
 
     include_examples 'cluster and part variable assignment'
 

@@ -17,7 +17,7 @@ RSpec.shared_examples 'it belongs to Cluster' do
     end
 
     context 'when cluster is nil' do
-      let :cluster { nil }
+      let(:cluster) { nil }
 
       it 'just gives name' do
         expect(subject.namespaced_name).to eq(subject.name)

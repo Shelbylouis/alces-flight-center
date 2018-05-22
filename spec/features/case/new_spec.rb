@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe 'Case form', type: :feature, js: true do
-  let! :cluster { create(:cluster) }
-  let! :user { create(:contact, site: cluster.site) }
-  let! :component { create(:component, cluster: cluster) }
-  let! :service { create(:service, cluster: cluster) }
-  let! :issue do
+  let!(:cluster) { create(:cluster) }
+  let!(:user) { create(:contact, site: cluster.site) }
+  let!(:component) { create(:component, cluster: cluster) }
+  let!(:service) { create(:service, cluster: cluster) }
+  let! (:issue) do
     create(
       :issue,
       requires_service: true,
@@ -55,31 +55,31 @@ RSpec.describe 'Case form', type: :feature, js: true do
   end
 
   context 'when accessed at `/cases/new`' do
-    let :path { new_case_path(as: user) }
+    let(:path) { new_case_path(as: user) }
 
     it_behaves_like 'it allows Case creation'
   end
 
   context 'when accessed at `/cluster/*/cases/new`' do
-    let :path { new_cluster_case_path(cluster, as: user) }
+    let(:path) { new_cluster_case_path(cluster, as: user) }
 
     it_behaves_like 'it allows Case creation'
   end
 
   context 'when accessed at `/service/*/cases/new`' do
-    let :path { new_service_case_path(service, as: user) }
+    let(:path) { new_service_case_path(service, as: user) }
 
     it_behaves_like 'it allows Case creation'
   end
 
   context 'when accessed at `/component/*/cases/new`' do
-    let :path { new_component_case_path(component, as: user) }
+    let(:path) { new_component_case_path(component, as: user) }
 
     it_behaves_like 'it allows Case creation'
   end
 
   describe 'motd tool' do
-    let! :tier do
+    let!(:tier) do
       create(:tier_with_tool, issue: issue, tool: :motd)
     end
 

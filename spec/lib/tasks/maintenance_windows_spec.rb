@@ -40,7 +40,7 @@ RSpec.describe 'alces:maintenance_windows:progress' do
   end
 
   describe 'logging' do
-    let :logger { Rails.logger }
+    let(:logger) { Rails.logger }
 
     before :each do
       expect(ActiveSupport::Logger).to receive(:new).with(

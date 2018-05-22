@@ -6,7 +6,7 @@ RSpec.describe AssetRecordField, type: :model do
       build(:unassociated_asset_record_field, definition: field_definition)
     end
 
-    let :field_definition { create(:asset_record_field_definition) }
+    let(:field_definition) { create(:asset_record_field_definition) }
 
     let :component_group do
       create(:component_group).tap do |group|
@@ -149,7 +149,7 @@ RSpec.describe AssetRecordField, type: :model do
         )
       end
     end
- 
+
     describe 'data type validation' do
       def expect_data_type_error(msg)
         expect(subject.errors.size).to be(1)

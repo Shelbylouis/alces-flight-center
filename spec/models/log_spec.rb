@@ -68,7 +68,7 @@ RSpec.describe Log, type: :model do
   end
 
   context 'with a component' do
-    let :cluster { create(:cluster) }
+    let(:cluster) { create(:cluster) }
 
     # This spec can not use a factory for creating a new component log
     # as it will implicitly set the cluster and cause the test to fail

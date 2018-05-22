@@ -2,10 +2,10 @@
 require 'rails_helper'
 
 RSpec.describe 'cluster tabs', type: :feature do
-  let :cluster { create(:cluster) }
+  let(:cluster) { create(:cluster) }
 
-  let :tabs { page.find('ul.nav-tabs') }
-  let :maintenance_tab { tabs.find('li', text: /Maintenance/) }
+  let(:tabs) { page.find('ul.nav-tabs') }
+  let(:maintenance_tab) { tabs.find('li', text: /Maintenance/) }
   let(:documents_tab) { tabs.find('li', text: /Documents/) }
   let(:user) { create(:contact, site: cluster.site) }
 
@@ -13,12 +13,12 @@ RSpec.describe 'cluster tabs', type: :feature do
 
     subject { cluster }
 
-    before :each {
+    before(:each) {
       visit cluster_path(subject, as: user)
     }
 
     context 'with an admin user' do
-      let :user { create(:admin) }
+      let(:user) { create(:admin) }
 
       it 'has a dropdown menu for maintenance tab' do
         expect(maintenance_tab).to match_css('.dropdown')

@@ -8,8 +8,8 @@ RSpec.describe HasStateMachine do
       state :first_state
       state :second_state
 
-      event :some_event { transition first_state: :second_state }
-      event :another_event { transition second_state: :first_state }
+      event(:some_event) { transition first_state: :second_state }
+      event(:another_event) { transition second_state: :first_state }
     end
   end
 

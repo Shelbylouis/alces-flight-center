@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Cases table', type: :feature do
-  let! :contact { create(:contact, site: site) }
-  let! :admin { create(:admin) }
-  let :site { create(:site, name: 'My Site') }
-  let :cluster { create(:cluster, site: site) }
+  let!(:contact) { create(:contact, site: site) }
+  let!(:admin) { create(:admin) }
+  let(:site) { create(:site, name: 'My Site') }
+  let(:cluster) { create(:cluster, site: site) }
 
   let! :open_case do
     create(:open_case, cluster: cluster, subject: 'Open case')
@@ -30,10 +30,10 @@ RSpec.describe 'Cases table', type: :feature do
   end
 
   context 'when user is contact' do
-    let :user { contact }
+    let(:user) { contact }
 
     context 'when visit site cases dashboard' do
-      let :path { cases_path(as: user) }
+      let(:path) { cases_path(as: user) }
 
       include_examples 'open cases table rendered'
     end
@@ -66,10 +66,10 @@ RSpec.describe 'Cases table', type: :feature do
   end
 
   context 'when user is admin' do
-    let :user { admin }
+    let(:user) { admin }
 
     context 'when visit site cases dashboard' do
-      let :path { site_cases_path(site, as: user) }
+      let(:path) { site_cases_path(site, as: user) }
 
       # At least for now, want to render open Cases table on Site dashboard the
       # same for both admins as contacts.

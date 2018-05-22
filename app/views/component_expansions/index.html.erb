@@ -1,4 +1,4 @@
-<% content_for :subtitle { 'Expansions' } %>
+<% content_for(:subtitle) { 'Expansions' } %>
 <%= render 'partials/tabs', activate: :expansions do %>
   <% if current_user.admin? %>
     <div class='nav nav-tabs nav-justified'>

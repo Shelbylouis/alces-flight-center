@@ -25,8 +25,8 @@ RSpec.describe 'Case page' do
 
   let (:mw) { create(:maintenance_window, case: open_case) }
 
-  let :comment_form_class { '#new_case_comment' }
-  let :comment_button_text { 'Add new comment' }
+  let(:comment_form_class) { '#new_case_comment' }
+  let(:comment_button_text) { 'Add new comment' }
 
   describe 'data display' do
     it 'shows table of fields for Case with fields' do
@@ -447,11 +447,11 @@ RSpec.describe 'Case page' do
       )
     end
 
-    let :request { create(:change_motd_request, state: :unapplied) }
+    let(:request) { create(:change_motd_request, state: :unapplied) }
 
-    let :path { case_path(subject, as: user) }
-    let :apply_button_text { 'Done' }
-    let :reapply_button_text { 'Already applied' }
+    let(:path) { case_path(subject, as: user) }
+    let(:apply_button_text) { 'Done' }
+    let(:reapply_button_text) { 'Already applied' }
 
     def assert_button_successfully_applies(button_text)
       expect do
@@ -470,7 +470,7 @@ RSpec.describe 'Case page' do
     end
 
     context 'when user is admin' do
-      let :user { create(:admin) }
+      let(:user) { create(:admin) }
 
       it 'has warning-styled button' do
         button = find_button(apply_button_text)
@@ -482,7 +482,7 @@ RSpec.describe 'Case page' do
       end
 
       context 'when request has already been applied' do
-        let :request { create(:change_motd_request, state: :applied) }
+        let(:request) { create(:change_motd_request, state: :applied) }
 
         it 'has danger-styled button' do
           button = find_button(reapply_button_text)
@@ -496,7 +496,7 @@ RSpec.describe 'Case page' do
     end
 
     context 'when user is contact' do
-      let :user { create(:contact, site: subject.site) }
+      let(:user) { create(:contact, site: subject.site) }
 
       it 'is not shown either button' do
         [apply_button_text, reapply_button_text].each do |button_text|

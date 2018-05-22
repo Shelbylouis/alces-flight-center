@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe HasAssetRecord, type: :model do
   context 'with basic mocked objects' do
-    let :overriden_index { 255 }
+    let(:overriden_index) { 255 }
 
     let :grand_parent do
       create_asset(

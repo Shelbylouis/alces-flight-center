@@ -1,14 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe CasesController, type: :controller do
-  let :site { create(:site) }
-  let :user { create(:contact, site: site) }
-  let! :first_cluster { create(:cluster, site: site, name: 'First cluster') }
-  let! :second_cluster { create(:cluster, site: site, name: 'Second cluster') }
-  let :first_cluster_component { create(:component, cluster: first_cluster) }
-  let! :first_cluster_service { create(:service, cluster: first_cluster) }
+  let(:site) { create(:site) }
+  let(:user) { create(:contact, site: site) }
+  let!(:first_cluster) { create(:cluster, site: site, name: 'First cluster') }
+  let!(:second_cluster) { create(:cluster, site: site, name: 'Second cluster') }
+  let(:first_cluster_component) { create(:component, cluster: first_cluster) }
+  let!(:first_cluster_service) { create(:service, cluster: first_cluster) }
 
-  before :each { sign_in_as(user) }
+  before(:each) { sign_in_as(user) }
 
   describe 'GET #new' do
     context 'from top-level route' do
@@ -125,7 +125,7 @@ RSpec.describe CasesController, type: :controller do
     end
 
     context 'when HTML request' do
-      let :expected_redirect_path { cluster_path(first_cluster) }
+      let(:expected_redirect_path) { cluster_path(first_cluster) }
 
       it 'creates Case and redirects given valid params' do
         post :create, params: valid_params, format: :html

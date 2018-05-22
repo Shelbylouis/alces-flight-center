@@ -1,4 +1,4 @@
-<% content_for :subtitle { 'Pending Maintenance' } %>
+<% content_for(:subtitle) { 'Pending Maintenance' } %>
 <%= render 'partials/tabs', activate: :maintenance do %>
   <%= render 'partials/table',
       collection: @scope.unfinished_related_maintenance_windows,

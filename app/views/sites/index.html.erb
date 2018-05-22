@@ -1,4 +1,4 @@
-<% content_for :subtitle { 'All Sites' } %>
+<% content_for(:subtitle) { 'All Sites' } %>
 <%= render 'partials/tabs', activate: :all_sites do %>
   <ul class="list-group list-group-flush">
     <% @sites.each do |site| %>

@@ -16,7 +16,7 @@ class ChangeMotdRequest < ApplicationRecord
     state :unapplied
     state :applied
 
-    event :apply { transition any => :applied }
+    event (:apply) { transition any => :applied }
 
     after_transition(on: :apply, &:handle_apply)
   end

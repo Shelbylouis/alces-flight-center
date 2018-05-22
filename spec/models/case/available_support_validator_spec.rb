@@ -13,16 +13,16 @@ RSpec.describe Case, type: :model do
         end
 
         context 'which is `advice`' do
-          let :part { create("advice_#{part_name}") }
+          let(:part) { create("advice_#{part_name}") }
 
           context 'when tier_level == 3' do
-            let :tier_level { 3 }
+            let(:tier_level) { 3 }
 
             it { is_expected.to be_valid }
           end
 
           context 'when tier_level < 3' do
-            let :tier_level { 2 }
+            let(:tier_level) { 2 }
 
             it 'should normally be invalid' do
               expect(subject).to be_invalid
@@ -40,10 +40,10 @@ RSpec.describe Case, type: :model do
         end
 
         context 'which is `managed`' do
-          let :part { create("managed_#{part_name}") }
+          let(:part) { create("managed_#{part_name}") }
 
           context 'when tier_level < 3' do
-            let :tier_level { 2 }
+            let(:tier_level) { 2 }
 
             it "should be valid when #{part_name} later switched to `advice`" do
               subject.save!

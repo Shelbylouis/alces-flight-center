@@ -30,7 +30,7 @@ RSpec.describe User, type: :model do
     end
 
     context 'with an existing primary contact for the current site' do
-      let! :primary_contact { create(:user, primary_contact: true, site: subject.site) }
+      let!(:primary_contact) { create(:user, primary_contact: true, site: subject.site) }
 
       it 'should error' do
         expect(subject).not_to be_valid

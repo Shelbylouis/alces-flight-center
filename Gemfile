@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-ruby '2.4.1'
+ruby File.read(File.join(File.dirname(__FILE__), '.ruby-version')).chomp
 
 git_source(:github) do |repo_name|
   repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?('/')
@@ -9,7 +9,7 @@ git_source(:github) do |repo_name|
 end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.1.4'
+gem 'rails', '~> 5.2'
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 0.18'
 # Use Puma as the app server
@@ -18,8 +18,6 @@ gem 'puma', '~> 3.7'
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
-# See https://github.com/rails/execjs#readme for more supported runtimes
-# gem 'therubyracer', platforms: :ruby
 
 gem 'aws-sdk-s3'
 gem 'clearance'
@@ -35,7 +33,12 @@ gem 'font-awesome-rails'
 gem 'request_store'
 gem 'bootsnap', require: false
 gem "sentry-raven"
-gem 'state_machines-activerecord'
+# Temporarily installed from GitHub as has been updated for Rails 5.2 (see
+# https://github.com/state-machines/state_machines-activerecord/pull/71) but
+# this is not yet in a tagged release.
+gem 'state_machines-activerecord',
+  github: 'state-machines/state_machines-activerecord',
+  ref: 'fed06d9fa64af1cba49d241f4a3ae79626946fe3'
 gem 'state_machines-audit_trail'
 gem 'business_time'
 gem "audited", "~> 4.7"
@@ -43,20 +46,14 @@ gem "audited", "~> 4.7"
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.
 
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
+# Turbolinks makes navigating your web application faster. Read more:
+# https://github.com/turbolinks/turbolinks
 gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.5'
-# Use Redis adapter to run Action Cable in production
-# gem 'redis', '~> 3.0'
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
-
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
 
 # For pretty emails
-gem 'roadie-rails', '~> 1.0'
+gem 'roadie-rails'
 gem 'sass'
 
 # For async emails
@@ -84,10 +81,12 @@ group :test do
 end
 
 group :development do
-  # Access an IRB console on exception pages or by using <%= console %> anywhere in the code.
+  # Access an IRB console on exception pages or by using <%= console %>
+  # anywhere in the code.
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'web-console', '>= 3.3.0'
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  # Spring speeds up development by keeping your application running in the
+  # background. Read more: https://github.com/rails/spring
   gem 'rubocop', require: false
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'

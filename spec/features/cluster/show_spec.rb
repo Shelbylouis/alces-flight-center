@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Cluster overview page', type: :feature do
-  let :site { create(:site) }
-  let :user { create(:contact, site: site) }
-  let :cluster { create(:cluster, support_type: 'managed', site: site) }
-  let :path { cluster_path(cluster, as: user) }
+  let(:site) { create(:site) }
+  let(:user) { create(:contact, site: site) }
+  let(:cluster) { create(:cluster, support_type: 'managed', site: site) }
+  let(:path) { cluster_path(cluster, as: user) }
 
   [:component, :service].each do |part_type|
     before :each do

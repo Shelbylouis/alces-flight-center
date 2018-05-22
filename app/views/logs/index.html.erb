@@ -1,4 +1,4 @@
-<% content_for :subtitle { 'Logs' } %>
+<% content_for(:subtitle) { 'Logs' } %>
 <%= render 'partials/tabs', activate: :logs do %>
   <%= render 'partials/table',
       collection: @logs,

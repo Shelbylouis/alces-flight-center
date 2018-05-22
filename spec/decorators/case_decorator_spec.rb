@@ -4,7 +4,7 @@ RSpec.describe CaseDecorator do
   # XXX Parts of these tests and corresponding code duplicated and adapted for
   # {Cluster,Component,Service}Decorator.
   describe '#association_info' do
-    let :cluster { subject.cluster }
+    let(:cluster) { subject.cluster }
 
     context 'when Case has Component' do
       subject do
@@ -13,7 +13,7 @@ RSpec.describe CaseDecorator do
         end
       end
 
-      let :component { subject.component }
+      let(:component) { subject.component }
 
       it 'includes link to Component' do
         expect(
@@ -39,7 +39,7 @@ RSpec.describe CaseDecorator do
         end
       end
 
-      let :service { subject.service }
+      let(:service) { subject.service }
 
       it 'includes link to Service' do
         expect(
