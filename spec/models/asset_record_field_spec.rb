@@ -149,7 +149,7 @@ RSpec.describe AssetRecordField, type: :model do
         )
       end
     end
- 
+
     describe 'data type validation' do
       def expect_data_type_error(msg)
         expect(subject.errors.size).to be(1)

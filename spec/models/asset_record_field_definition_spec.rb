@@ -48,12 +48,12 @@ RSpec.describe AssetRecordFieldDefinition, type: :model do
         expect(subject).to be_valid
       end
     end
-  
+
     context 'with the data_type db entry set to nil' do
       subject do
         create(:asset_record_field_definition, data_type: nil)
       end
-      
+
       it 'defaults to "short_text"' do
         expect(subject.data_type).to eq('short_text')
       end
