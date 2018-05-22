@@ -1,5 +1,5 @@
 <% if collection.empty? %>
-  <div style="text-align: center"><%= message %></div>
+  <div style="text-align: center"><em><%= message %></em></div>
 <% else %>
   <%= yield if block_given? %>
 <% end %>
