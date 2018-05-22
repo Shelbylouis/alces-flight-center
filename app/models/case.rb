@@ -12,7 +12,7 @@ class Case < ApplicationRecord
   belongs_to :assignee, class_name: 'User', required: false
 
   has_many :maintenance_windows
-  has_and_belongs_to_many :log
+  has_and_belongs_to_many :logs
   has_many :case_comments
   has_one :change_motd_request, required: false, autosave: true
 
