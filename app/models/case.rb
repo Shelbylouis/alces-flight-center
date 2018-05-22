@@ -36,12 +36,9 @@ class Case < ApplicationRecord
 
   audited only: [:assignee_id, :time_worked, :credit_charge, :tier_level], on: [ :update ]
 
-  # XXX Remove if: display_id when we can do so
-  validates :display_id, uniqueness: true, if: :display_id
+  validates :display_id, uniqueness: true
 
-  # XXX We want to enable this validation when we've migrated production over -
-  # otherwise historical migrations will fail :(
-  #validate :has_display_id_when_saved
+  validate :has_display_id_when_saved
 
   validates :token, presence: true
   validates :subject, presence: true
