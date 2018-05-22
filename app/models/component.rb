@@ -16,7 +16,8 @@ class Component < ApplicationRecord
 
   validates_associated :component_group,
                        :asset_record_fields,
-                       :component_expansions
+                       :component_expansions,
+                       :cluster
 
   after_create :create_component_expansions_from_defaults
 

@@ -6,4 +6,6 @@ class Service < ApplicationRecord
   belongs_to :cluster
 
   delegate :description, to: :service_type
+
+  validates_associated :cluster
 end
