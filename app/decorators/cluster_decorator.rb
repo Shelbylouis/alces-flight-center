@@ -22,7 +22,7 @@ class ClusterDecorator < ApplicationDecorator
       { id: :services, path: h.cluster_services_path(self) },
       {
         id: :components,
-        dropdown: self.component_groups_by_type.map(&:name).map do |t|
+        dropdown: self.available_component_group_types.map do |t|
           {
             text: t.pluralize,
             path: h.cluster_components_path(self, type: t)

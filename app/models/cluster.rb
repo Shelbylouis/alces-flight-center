@@ -44,16 +44,9 @@ class Cluster < ApplicationRecord
     @documents ||= DocumentsRetriever.retrieve(documents_path)
   end
 
-  def component_groups_by_type
-    component_groups.group_by do |group|
-      group.component_type
-    end.map do |component_type, groups|
-      {
-        name: component_type.name,
-        ordering: component_type.ordering,
-        component_groups: groups
-      }.to_struct
-    end.sort_by(&:ordering)
+  def available_component_group_types
+    component_groups.joins(:component_type).order('ordering')
+      .pluck("component_types.name").uniq
   end
 
   def unfinished_related_maintenance_windows
