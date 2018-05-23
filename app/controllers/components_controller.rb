@@ -21,14 +21,17 @@ class ComponentsController < ApplicationController
     if @scope.is_a? ComponentGroup
       [@scope]
     elsif type_param.blank?
-      @scope.component_groups.joins(:component_type).order('ordering')
+      all_groups
     else
-      @scope.component_groups.joins(:component_type).order('ordering')
-        .where({ component_types: { name: type_param[:type] } })
+      all_groups.where({ component_types: { name: type_param[:type] } })
     end
   end
 
   def type_param
     params.permit(:type)
+  end
+
+  def all_groups
+    @scope.component_groups.joins(:component_type).order('ordering')
   end
 end
