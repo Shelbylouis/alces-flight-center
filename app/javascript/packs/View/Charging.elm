@@ -41,9 +41,8 @@ chargeableAlert state =
             Alert.link
                 [ ClusterChargingInfoModal Modal.shown |> onClick
 
-                -- This makes this display as a normal link, but clicking on it
-                -- not reload the page. There may be a better way to do this;
-                -- `href="#"` does not work.
+                -- Make this display as a normal link, but clicking on it not
+                -- reload the page.
                 , href "javascript:void(0)"
                 ]
                 [ text "Click here for the charging details for this cluster." ]
