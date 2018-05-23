@@ -201,7 +201,14 @@ tierTabs state =
     -- than being an independent part of the model itself. Doing what we want
     -- with it seemed difficult and convoluted, if not impossible, with the
     -- current API.
-    ul [ class "nav nav-tabs" ] tabItems
+    div []
+        [ ul [ class "nav nav-tabs" ] tabItems
+
+        -- Need hidden field and accompanying `invalid-feedback` `div`, which
+        -- Bootstrap will use to decide whether to show any validation errors
+        -- for the selected Tier.
+        , Fields.hiddenFieldWithVisibleErrors Field.Tier state
+        ]
 
 
 displayWrapperToTab : SelectList.Position -> DisplayWrapper -> Html Msg
