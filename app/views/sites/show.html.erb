@@ -39,7 +39,6 @@
             <span>
               <%= link_to "Manage this cluster",
                           cluster_path(cluster),
-                          type: "button",
                           class: [
                             'btn',
                             'btn-primary'
@@ -47,7 +46,6 @@
               %>
               <%= link_to "View cases",
                           cluster_cases_path(cluster),
-                          type: "button",
                           class: [
                             'btn',
                             'btn-primary'
@@ -55,7 +53,6 @@
               %>
               <%= link_to "Create case",
                           new_cluster_case_path(cluster),
-                          type: "button",
                           class: [
                             'btn',
                             'btn-danger'
