@@ -4,14 +4,13 @@ require "rails"
 
 # Include just the parts of Rails we use. Should be similar to
 # https://github.com/rails/rails/blob/master/railties/lib/rails/all.rb, but
-# without `active_storage`.
+# without `active_storage` and `action_cable`.
 %w(
   active_record/railtie
   action_controller/railtie
   action_view/railtie
   action_mailer/railtie
   active_job/railtie
-  action_cable/engine
   rails/test_unit/railtie
   sprockets/railtie
 ).each do |railtie|
