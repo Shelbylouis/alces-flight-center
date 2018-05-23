@@ -40,8 +40,8 @@ class CaseDecorator < ApplicationDecorator
       "Commenting is disabled as this case is #{state}."
     elsif current_user.contact? && !consultancy?
       <<~TITLE.squish
-            This is a non-consultancy support case and so additional discussion is
-            not available. If you wish to request additional support please either
+            Additional discussion is not available for cases in the current
+            support tier. If you wish to request additional support please either
             escalate this case (which may incur a charge), or open a
             new support case.
       TITLE
