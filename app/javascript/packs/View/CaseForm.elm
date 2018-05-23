@@ -232,7 +232,16 @@ displayWrapperToTab position wrapper =
                 ""
     in
     li [ class "nav-item" ]
-        [ a [ classList linkClasses, onClick clickMsg, title titleText ]
+        [ a
+            [ classList linkClasses
+            , onClick clickMsg
+            , title titleText
+
+            -- A `href` is required for Bootstrap to style the tabs correctly,
+            -- and it needs this value as we don't want it to actually go
+            -- anywhere (apart from what we handle in `onClick`).
+            , href "javascript:void(0)"
+            ]
             [ text <| Tier.DisplayWrapper.description wrapper ]
         ]
 
