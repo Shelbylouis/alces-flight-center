@@ -21,12 +21,10 @@ class ComponentsController < ApplicationController
     if @scope.is_a? ComponentGroup
       [@scope]
     elsif type_param.blank?
-      @scope.component_groups
+      @scope.component_groups.joins(:component_type).order('ordering')
     else
-      @scope.component_groups_by_type.find do |group_type|
-        group_type.name == type_param[:type]
-      end.tap { |found_group| not_found unless found_group }
-         .component_groups
+      @scope.component_groups.joins(:component_type).order('ordering')
+        .where({ component_types: { name: type_param[:type] } })
     end
   end
 
