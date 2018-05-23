@@ -28,6 +28,7 @@ import Validation
 import View.Charging as Charging
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
+import View.Utils
 
 
 view : State -> Html Msg
@@ -40,12 +41,9 @@ view state =
                 StartSubmit
 
         formElements =
-            Maybe.Extra.values
-                [ Just <| issueDrillDownSection state
-                , maybeSubjectSection state
-                , Just <| dynamicFieldsSection state
-                ]
-                |> List.intersperse (hr [] [])
+            [ issueDrillDownSection state
+            , dynamicFieldsSection state
+            ]
     in
     Html.form [ onSubmit submitMsg ] formElements
 
@@ -63,25 +61,7 @@ issueDrillDownSection state =
             , issuesField state |> Just
             , maybeComponentsField state
             , tierTabs state |> Just
-            , Charging.chargeableAlert state
             ]
-
-
-maybeSubjectSection : State -> Maybe (Html Msg)
-maybeSubjectSection state =
-    let
-        selectedTier =
-            State.selectedTier state
-    in
-    case selectedTier.level of
-        Level.Zero ->
-            -- Does not make sense to display subject field when a level 0 Tier
-            -- is selected, since the form cannot be submitted and only
-            -- information is displayed.
-            Nothing
-
-        _ ->
-            Just <| section [] [ subjectField state ]
 
 
 dynamicFieldsSection : State -> Html Msg
@@ -100,7 +80,9 @@ dynamicFieldsSection state =
                     [ tierContentElements ]
 
                 _ ->
-                    [ tierContentElements
+                    [ subjectField state
+                    , hr [] []
+                    , tierContentElements
                     , submitButton state
                     ]
 
@@ -208,6 +190,8 @@ tierTabs state =
         -- Bootstrap will use to decide whether to show any validation errors
         -- for the selected Tier.
         , Fields.hiddenFieldWithVisibleErrors Field.Tier state
+        , Charging.chargeableAlert state
+            |> Maybe.withDefault View.Utils.nothing
         ]
 
 

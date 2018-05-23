@@ -8,6 +8,7 @@ module View.Charging
 import Bootstrap.Alert as Alert
 import Bootstrap.Button as Button
 import Bootstrap.Modal as Modal
+import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -48,7 +49,10 @@ chargeableAlert state =
                 [ text "Click here for the charging details for this cluster." ]
     in
     if isChargeable then
-        Just <| Alert.simpleWarning [] alertChildren
+        Just <|
+            Alert.simpleWarning
+                [ Spacing.mt2, Spacing.mb0 ]
+                alertChildren
     else
         Nothing
 
