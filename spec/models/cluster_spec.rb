@@ -5,6 +5,14 @@ RSpec.describe Cluster, type: :model do
   include_examples 'markdown_description'
 
   describe '#valid?' do
+    subject { create(:cluster) }
+
+    # XXX Add this back once current staging deployed and so `rake
+    # alces:data:import_and_migrate_production` should succeed with this set
+    # (failing right now due to multiple Cluster data migrations since last
+    # deploy).
+    # it { is_expected.to validate_presence_of(:motd) }
+
     context 'when managed cluster' do
       subject do
         create(:managed_cluster)
@@ -56,70 +64,6 @@ RSpec.describe Cluster, type: :model do
     end
   end
 
-  describe '#case_form_json' do
-    subject do
-      create(
-        :cluster,
-        id: 1,
-        name: 'Some Cluster',
-        support_type: :managed,
-        charging_info: '£1000'
-      ).tap do |cluster|
-        cluster.components = [create(:component, cluster: cluster)]
-        cluster.services = [create(:service, cluster: cluster)]
-        cluster.credit_deposits = [create(:credit_deposit, amount: 20)]
-        cluster.cases = [
-          create(:case, credit_charge: create(:credit_charge, amount: 3))
-        ]
-      end
-    end
-
-    it 'gives correct JSON' do
-      expect(subject.case_form_json).to eq(
-        id: 1,
-        name: 'Some Cluster',
-        components: subject.components.map(&:case_form_json),
-        services: subject.services.map(&:case_form_json),
-        supportType: 'managed',
-        chargingInfo: '£1000',
-        credits: 17 # Calculated by `credits` method as deposits - charges.
-      )
-    end
-  end
-
-  describe '#managed_components' do
-    subject do
-      create(:cluster, support_type: 'managed') do |cluster|
-        3.times { create(:component, cluster: cluster, support_type: 'inherit') }
-        create(:component, cluster: cluster, support_type: 'managed')
-        create(:component, cluster: cluster, support_type: 'advice')
-      end
-    end
-
-    it 'returns all managed cluster components for cluster' do
-      result = subject.managed_components
-      expect(result).to all be_a(Component)
-      expect(result.length).to be 4
-    end
-  end
-
-  describe '#advice_components' do
-    subject do
-      create(:cluster, support_type: 'advice') do |cluster|
-        4.times { create(:component, cluster: cluster, support_type: 'inherit') }
-        create(:component, cluster: cluster, support_type: 'managed')
-        create(:component, cluster: cluster, support_type: 'advice')
-        cluster.reload
-      end
-    end
-
-    it 'returns all advice cluster components for cluster' do
-      result = subject.advice_components
-      expect(result).to all be_a(Component)
-      expect(result.length).to eq 5
-    end
-  end
-
   context 'cluster document tests' do
     subject { create(:cluster, name: 'Some Cluster', site: site) }
     let :site { create(:site, name: 'The Site') }
@@ -138,6 +82,10 @@ RSpec.describe Cluster, type: :model do
       it 'returns needed data for each Cluster document' do
         VCR.use_cassette(VcrCassettes::S3_READ_DOCUMENTS) do |cassette|
           Development::Utils.upload_document_fixtures_for(subject) if cassette.recording?
+
+          # This is the one place we actually want the original method to be called,
+          # so here we override our default return value of [] (set in spec_helper).
+          allow_any_instance_of(Cluster).to receive(:documents).and_call_original
 
           documents = subject.documents
 
@@ -229,28 +177,6 @@ RSpec.describe Cluster, type: :model do
       type_names = subject.map(&:name)
       expect(type_names).to eq(['Another Type', 'Server'])
     end
-  end
-
-  describe '#credits' do
-    subject do
-      create(:cluster).tap do |cluster|
-        create(:credit_deposit, cluster: cluster, amount: 20)
-        create(:credit_deposit, cluster: cluster, amount: 2)
-
-        create(:case, cluster: cluster).tap do |case_|
-          create(:credit_charge, case: case_, amount: 5)
-        end
-
-        create(:case, cluster: cluster).tap do |case_|
-          create(:credit_charge, case: case_, amount: 2)
-        end
-
-        # Case without CreditCharge; should not effect total credits.
-        create(:case, cluster: cluster)
-      end.credits
-    end
-
-    it { is_expected.to eq 15 }
   end
 
   describe '#unfinished_related_maintenance_windows' do

@@ -1,5 +1,6 @@
 module View.CaseForm exposing (view)
 
+import Bootstrap.Alert as Alert
 import Bootstrap.Modal as Modal
 import Category
 import Cluster
@@ -8,6 +9,7 @@ import Dict
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Attributes.Extra
 import Html.Events exposing (onClick, onSubmit)
 import Issue
 import Issues
@@ -21,6 +23,7 @@ import Tier exposing (Tier)
 import Tier.DisplayWrapper
 import Tier.Field
 import Tier.Level as Level exposing (Level)
+import Types
 import Validation
 import View.Charging as Charging
 import View.Fields as Fields
@@ -37,16 +40,18 @@ view state =
                 StartSubmit
 
         formElements =
-            [ issueDrillDownFields state
-            , hr [] []
-            , dynamicFields state
-            ]
+            Maybe.Extra.values
+                [ Just <| issueDrillDownSection state
+                , maybeSubjectSection state
+                , Just <| dynamicFieldsSection state
+                ]
+                |> List.intersperse (hr [] [])
     in
     Html.form [ onSubmit submitMsg ] formElements
 
 
-issueDrillDownFields : State -> Html Msg
-issueDrillDownFields state =
+issueDrillDownSection : State -> Html Msg
+issueDrillDownSection state =
     -- These fields allow a user to drill down to identify the particular Issue
     -- and possible solutions (via different Tiers) to a problem they are
     -- having.
@@ -62,8 +67,25 @@ issueDrillDownFields state =
             ]
 
 
-dynamicFields : State -> Html Msg
-dynamicFields state =
+maybeSubjectSection : State -> Maybe (Html Msg)
+maybeSubjectSection state =
+    let
+        selectedTier =
+            State.selectedTier state
+    in
+    case selectedTier.level of
+        Level.Zero ->
+            -- Does not make sense to display subject field when a level 0 Tier
+            -- is selected, since the form cannot be submitted and only
+            -- information is displayed.
+            Nothing
+
+        _ ->
+            Just <| section [] [ subjectField state ]
+
+
+dynamicFieldsSection : State -> Html Msg
+dynamicFieldsSection state =
     -- These fields are very dynamic, and either appear/disappear entirely or
     -- have their content changed based on the currently selected Issue and
     -- Tier.
@@ -75,11 +97,10 @@ dynamicFields state =
                     -- any fields or submitting the form, and only show the rendered
                     -- Tier fields, which should include the relevant links to
                     -- documentation.
-                    [ tierFields ]
+                    [ tierContentElements ]
 
                 _ ->
-                    [ subjectField state
-                    , tierFields
+                    [ tierContentElements
                     , submitButton state
                     ]
 
@@ -97,8 +118,8 @@ dynamicFields state =
         selectedTier =
             State.selectedTier state
 
-        tierFields =
-            dynamicTierFields state
+        tierContentElements =
+            tierContent state
     in
     section attributes fields
 
@@ -228,26 +249,39 @@ subjectField state =
     let
         selectedIssue =
             State.selectedIssue state
+
+        textFieldConfig =
+            { fieldType = Types.Input
+            , field = Field.Subject
+            , toContent = Issue.subject
+            , inputMsg = ChangeSubject
+            , optional = False
+            , help = Nothing
+            }
     in
-    Fields.inputField Field.Subject
-        selectedIssue
-        Issue.subject
-        ChangeSubject
-        False
-        state
+    Fields.textField textFieldConfig state selectedIssue
 
 
-dynamicTierFields : State -> Html Msg
-dynamicTierFields state =
+tierContent : State -> Html Msg
+tierContent state =
     let
         tier =
             State.selectedTier state
 
+        content =
+            case tier.content of
+                Tier.Fields _ ->
+                    renderedFields
+
+                Tier.MotdTool _ ->
+                    currentMotdAlert state :: renderedFields
+
         renderedFields =
-            Dict.toList tier.fields
+            Tier.fields tier
+                |> Dict.toList
                 |> List.map (renderTierField state)
     in
-    div [] renderedFields
+    div [] content
 
 
 renderTierField : State -> ( Int, Tier.Field.Field ) -> Html Msg
@@ -257,13 +291,29 @@ renderTierField state ( index, field ) =
             Markdown.toHtml [] content
 
         Tier.Field.TextInput fieldData ->
-            Fields.textField fieldData.type_
-                (Field.TierField fieldData)
-                fieldData
-                .value
-                (ChangeTierField index)
-                fieldData.optional
-                state
+            let
+                textFieldConfig =
+                    { fieldType = fieldData.type_
+                    , field = Field.TierField fieldData
+                    , toContent = .value
+                    , inputMsg = ChangeTierField index
+                    , optional = fieldData.optional
+                    , help = fieldData.help
+                    }
+            in
+            Fields.textField textFieldConfig state fieldData
+
+
+currentMotdAlert : State -> Html msg
+currentMotdAlert state =
+    let
+        cluster =
+            State.selectedCluster state
+    in
+    Alert.simpleSecondary []
+        [ Alert.h5 [] [ text "Current MOTD" ]
+        , div [ Html.Attributes.Extra.innerHtml cluster.motdHtml ] []
+        ]
 
 
 submitButton : State -> Html Msg

@@ -25,13 +25,20 @@ type Issues
     | JustIssues (SelectList Issue)
 
 
-decoder : D.Decoder Issues
-decoder =
+decoder : String -> D.Decoder Issues
+decoder clusterMotd =
+    let
+        issueDecoder =
+            Issue.decoder clusterMotd
+
+        categoryDecoder =
+            Category.decoder clusterMotd
+    in
     D.oneOf
-        [ SelectList.Extra.orderedDecoder Issue.name Issue.decoder
+        [ SelectList.Extra.orderedDecoder Issue.name issueDecoder
             |> D.map JustIssues
             |> D.field "issues"
-        , SelectList.Extra.orderedDecoder .name Category.decoder
+        , SelectList.Extra.orderedDecoder .name categoryDecoder
             |> D.map CategorisedIssues
             |> D.field "categories"
         ]

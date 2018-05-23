@@ -12,8 +12,6 @@ class Cluster < ApplicationRecord
   has_many :services, dependent: :destroy
   has_many :cases
   has_many :maintenance_windows
-  has_many :credit_deposits
-  has_many :credit_charges, through: :cases
   has_many :logs, dependent: :destroy
 
   validates_associated :site
@@ -22,6 +20,7 @@ class Cluster < ApplicationRecord
   validates :canonical_name, presence: true
   validate :validate_all_components_advice, if: :advice?
   validates :shortcode, presence: true, uniqueness: true
+  # validates_presence_of :motd
 
   before_validation CanonicalNameCreator.new, on: :create
 
@@ -31,26 +30,6 @@ class Cluster < ApplicationRecord
   # selecting support type.
   def support_type_enum
     SUPPORT_TYPES
-  end
-
-  def case_form_json
-    {
-      id: id,
-      name: name,
-      components: components.map(&:case_form_json),
-      services: services.map(&:case_form_json),
-      supportType: support_type,
-      chargingInfo: charging_info,
-      credits: credits
-    }
-  end
-
-  def managed_components
-    components.select(&:managed?)
-  end
-
-  def advice_components
-    components.select(&:advice?)
   end
 
   def documents_path
@@ -75,15 +54,6 @@ class Cluster < ApplicationRecord
         component_groups: groups
       }.to_struct
     end.sort_by(&:ordering)
-  end
-
-  def credits
-    deposits = credit_deposits.reduce(0) do |total, deposit|
-      total += deposit.amount
-    end
-    credit_charges.reduce(deposits) do |total, charge|
-      total -= charge.amount
-    end
   end
 
   def unfinished_related_maintenance_windows

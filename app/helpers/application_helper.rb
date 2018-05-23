@@ -1,4 +1,12 @@
 module ApplicationHelper
+  # Note: These should match values used in `Tier.Level.description` in Case
+  # form app.
+  TIER_DESCRIPTIONS = {
+      1 => 'Tool',
+      2 => 'Routine Maintenance',
+      3 => 'General Support',
+  }.freeze
+
   def icon(name, interactive: false, inline: false, **args)
     classes = [
       (inline ? 'inline-icon' : 'fa-2x'),
@@ -14,7 +22,7 @@ module ApplicationHelper
   end
 
   def new_case_form(clusters:, single_part: nil)
-    clusters_json = json_map(clusters, :case_form_json)
+    clusters_json = json_map(clusters.map(&:decorate), :case_form_json)
     raw(
       <<~EOF
         <div
@@ -43,12 +51,24 @@ module ApplicationHelper
       <<~EOF.strip_heredoc
         <td
           title="#{description} on #{timestamp.to_formatted_s(:long)}"
-          style="white-space: nowrap;"
+          class="nowrap"
         >
           #{timestamp.to_formatted_s(:short)}
         </td>
       EOF
     )
+  end
+
+  def tier_description(tier_level)
+    unless TIER_DESCRIPTIONS.has_key?(tier_level)
+      raise "Unhandled tier_level: #{tier_level}"
+    end
+    description = TIER_DESCRIPTIONS[tier_level]
+    "#{tier_level} (#{description})"
+  end
+
+  def simple_format_if_needed(text)
+    text.include?("\n") ? simple_format(text) : text
   end
 
   private

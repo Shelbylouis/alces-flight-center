@@ -53,6 +53,10 @@ Rails.application.routes.draw do
     end
   end
 
+  maintenance_windows = Proc.new do
+    resources :maintenance_windows, path: :maintenance, only: :index
+  end
+
   resolved_cases = Proc.new do |**params, &block|
     params[:only] = Array.wrap(params[:only]).concat [:new, :index]
     resources :cases, **params do
@@ -77,6 +81,13 @@ Rails.application.routes.draw do
         post :resolve  # Only admins may resolve a case
         post :close  # Only admins may close a case
         post :assign  # Only admins may (re)assign a case
+        post :set_time
+      end
+    end
+
+    resources :change_motd_requests, only: [] do
+      member do
+        post :apply
       end
     end
 
@@ -112,8 +123,6 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :credit_charges, only: [:create, :update]
-
     # To display a working link to sign users out of the admin dashboard,
     # rails-admin expects a `logout_path` route helper to exist which will sign
     # them out; this declaration defines this.
@@ -126,19 +135,24 @@ Rails.application.routes.draw do
 
     resolved_cases.call(only: [:show, :create]) do
       resources :case_comments, only: :create
+      member do
+        post :escalate
+      end
     end
 
     resources :clusters, only: :show do
       resolved_cases.call
       resources :services, only: :index
-      resources :maintenance_windows, path: :maintenance, only: :index
+      maintenance_windows.call
       resources :components, only: :index
       logs.call
       confirm_maintenance_form.call
+      get :documents
     end
 
     resources :components, only: :show do
       resolved_cases.call
+      maintenance_windows.call
       resources :component_expansions,
                 path: component_expansions_alias,
                 only: :index
@@ -155,6 +169,7 @@ Rails.application.routes.draw do
 
     resources :services, only: :show do
       resolved_cases.call
+      maintenance_windows.call
       confirm_maintenance_form.call
     end
 

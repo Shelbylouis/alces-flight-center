@@ -8,16 +8,25 @@ module AdminConfig::Case
         configure :rt_ticket_id do
           hide
         end
-        configure :last_known_ticket_status do
-          hide
-        end
-        configure :credit_charge do
-          hide
-        end
         configure :token do
           hide
         end
         configure :maintenance_windows do
+          hide
+        end
+        configure :display_id do
+          hide
+        end
+        configure :log do
+          hide
+        end
+        configure :case_comments do
+          hide
+        end
+        configure :case_state_transitions do
+          hide
+        end
+        configure :change_motd_request do
           hide
         end
       end

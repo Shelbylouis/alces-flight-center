@@ -1,15 +1,15 @@
-<% manage_cases_page = current_user.admin? && @show_resolved %>
+<%
+  cases = @show_resolved ? @scope.cases.inactive : @scope.cases.active
+%>
 <%= content_for :subtitle do
-  "#{@show_resolved ? 'Resolved' : 'Open'} Cases"
+  "#{cases.length} #{@show_resolved ? 'Resolved' : 'Open'}
+  #{'Case'.pluralize(cases.length)}"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
-  <ul class='nav nav-tabs nav-justified' >
-    <%= @scope.decorate.case_form_button %>
-  </ul>
   <div class='table-responsive'>
     <table class="table">
       <thead>
-        <tr>
+        <tr class="nowrap">
           <th>ID</th>
           <th>Date</th>
           <th>State</th>
@@ -17,60 +17,21 @@ end %>
           <th>Subject</th>
           <th>Assigned to</th>
           <th>Association</th>
-          <% if manage_cases_page %>
-            <th>Chargeable</th>
+          <% if @show_resolved %>
+            <th>Credit usage</th>
           <% end %>
-          <th>Credit charge</th>
         </tr>
       </thead>
 
+      <tbody class="assigned-cases">
+        <% cases.assigned_to(current_user).decorate.each do |c| %>
+          <%= render 'partials/case_table_row', kase: c %>
+        <% end %>
+      </tbody>
+
       <tbody>
-        <% @scope.cases.order(created_at: :desc).decorate.each do |c| %>
-      <%
-        # If @show_resolved, show only non-open cases; if not @show_resolved, show only open cases.
-        # Hence logic simplifies to the below (!=)
-      %>
-          <% if @show_resolved != c.open?  %>
-            <% if (c.resolved? || c.closed?) && !manage_cases_page %>
-              <tr
-                class="closed-case-row"
-                title="This support case has been resolved; you should open a new support case if you wish to contact Alces Flight Support"
-              >
-            <% elsif manage_cases_page && c.requires_credit_charge? %>
-              <tr
-                class="credit-charge-required-case-row"
-                title="This support case is chargeable and has been completed, and needs some credits associated with it."
-              >
-            <% else %>
-              <tr>
-            <% end %>
-              <td><%= link_to c.display_id, case_path(c) %></td>
-              <%= timestamp_td(
-                description:  'Support case created',
-                timestamp: c.created_at
-              ) %>
-              <td><%= c.user_facing_state %></td>
-              <td style="white-space: nowrap;"><%= c.user.name %></td>
-              <td><%= link_to c.subject, case_path(c) %></td>
-              <td><%= c.assignee&.name || 'Nobody' %></td>
-              <td><%= c.association_info %></td>
-              <% if manage_cases_page %>
-                <td><%= c.chargeable_symbol %></td>
-              <% end %>
-              <td>
-                <% if c.credit_charge_allowed? && manage_cases_page %>
-                  <% credit_charge = c.credit_charge || CreditCharge.new(case: c) %>
-                  <%= form_for credit_charge, class: 'form-inline' do |f| %>
-                    <%= f.hidden_field :case_id %>
-                    <%= f.number_field :amount, class: 'form-control', required: true %>
-                    <%= f.submit '+', class: 'btn btn-success', style: 'width: 100%' %>
-                  <% end %>
-                <% else %>
-                  <%= c.credit_charge_info %>
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
+        <% cases.not_assigned_to(current_user).decorate.each do |c| %>
+          <%= render 'partials/case_table_row', kase: c %>
         <% end %>
       </tbody>
     </table>

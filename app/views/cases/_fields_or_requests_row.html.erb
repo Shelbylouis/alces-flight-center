@@ -1,0 +1,50 @@
+
+<tr>
+  <% if kase.fields %>
+    <th>Fields</th>
+    <td colspan="3">
+      <div class="table-responsive">
+        <table class="table table-sm table-striped table-bordered">
+          <% kase.fields.each do |field| %>
+            <tr>
+              <th scope="row" class="nowrap">
+                <%= field.fetch('name') %>
+              </th>
+              <td class="expand">
+                <%= simple_format(field.fetch('value')) %>
+              </td>
+            </tr>
+          <% end%>
+        </table>
+      </div>
+    </td>
+  <% elsif kase.change_motd_request %>
+    <% motd_request = kase.change_motd_request %>
+    <th>Requested MOTD</th>
+    <td>
+      <%= simple_format(motd_request.motd) %>
+      <% if current_user.admin? %>
+        <%
+            button_class, button_text =
+              if motd_request.unapplied?
+                ['btn-warning', 'Done &mdash; I have made this change within the cluster']
+              else
+                ['btn-danger', 'Already applied &mdash; attempt to make this change again']
+              end
+        %>
+
+        <%= button_to raw(button_text),
+          apply_change_motd_request_path(motd_request),
+          class: "btn #{button_class} btn-sm",
+          data: {
+            confirm: <<~CONFIRM.squish
+              This will update Flight Center's internal representation of the
+              cluster to reflect this change; make sure the change has actually
+              been made within the real system before proceeding.
+            CONFIRM
+          }
+        %>
+    <% end %>
+    </td>
+  <% end %>
+</tr>

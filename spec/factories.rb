@@ -21,30 +21,6 @@ FactoryBot.define do
     name 'Liverpool University'
   end
 
-  factory :user do
-    site
-    name 'A Scientist'
-    email
-    password 'definitely_encrypted'
-
-    factory :contact do
-      admin false
-
-      factory :primary_contact do
-        primary_contact true
-      end
-
-      factory :secondary_contact do
-        primary_contact false
-      end
-    end
-
-    factory :admin do
-      admin true
-      site nil
-    end
-  end
-
   factory :additional_contact do
     site
     email
@@ -83,20 +59,6 @@ FactoryBot.define do
     name 'User management'
   end
 
-  factory :tier do
-    issue
-    level 2
-    fields [{
-      type: 'input',
-      name: 'some_field',
-      value: 'some_value',
-    }]
-
-    factory :level_1_tier do
-      level 1
-    end
-  end
-
   factory :asset_record_field_definition, aliases: [:definition] do
     field_name 'Manufacturer/model name'
     level :group
@@ -111,21 +73,19 @@ FactoryBot.define do
     end
   end
 
-  factory :credit_deposit do
-    cluster
-    association :user, factory: :admin
-    amount 10
-  end
-
-  factory :credit_charge do
-    association :case # Avoid conflict with case keyword.
-    association :user, factory: :admin
-    amount 2
-  end
-
   factory :log do
     details 'I am the factory default details'
     cluster
     association :engineer, factory: :admin
+  end
+
+  factory :change_motd_request do
+    motd 'Some new MOTD'
+    association :case # Avoid conflict with case keyword.
+  end
+
+  factory :change_motd_request_state_transition do
+    change_motd_request
+    to :applied
   end
 end

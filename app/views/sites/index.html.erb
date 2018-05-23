@@ -1,22 +1,13 @@
 <% content_for :subtitle { 'All Sites' } %>
-<div class='card'>
-  <div class='card-header'>
-    <ul class="nav">
-      <li class="nav-item">
-        <span class="navbar-brand">
-          All Sites
-        </span>
-      </li>
-    </ul>
-  </div>
-
+<%= render 'partials/tabs', activate: :all_sites do %>
   <ul class="list-group list-group-flush">
     <% @sites.each do |site| %>
       <li class="list-group-item">
         <%= link_to site.name, site_path(site) %>
         &mdash;
-        <%= link_to 'Manage Support Cases', site_cases_path(site) %>
+        <%= link_to "Manage Support Cases (#{site.cases.active.size})",
+            site_cases_path(site) %>
       </li>
     <% end %>
   </ul>
-</div>
+<% end %>

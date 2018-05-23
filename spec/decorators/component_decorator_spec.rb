@@ -21,12 +21,21 @@ RSpec.describe ComponentDecorator do
     end
   end
 
-  describe '#case_form_button' do
-    subject { create(:component).decorate }
+  describe '#case_form_json' do
+    subject do
+      create(
+        :component,
+        id: 1,
+        name: 'Some Component',
+        support_type: :managed
+      ).decorate
+    end
 
-    it 'includes link to Component Case form' do
-      expect(subject.case_form_button).to include(
-        h.new_component_case_path(component_id: subject.id)
+    it 'gives correct JSON' do
+      expect(subject.case_form_json).to eq(
+        id: 1,
+        name: 'Some Component',
+        supportType: 'managed'
       )
     end
   end

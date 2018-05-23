@@ -1,5 +1,9 @@
 
 class Log < ApplicationRecord
+  include AdminConfig::Log
+
+  default_scope { order(created_at: :desc) }
+
   belongs_to :cluster
   belongs_to :component, optional: true
   has_one :site, through: :cluster

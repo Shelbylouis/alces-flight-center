@@ -1,5 +1,6 @@
 class ClusterDecorator < ApplicationDecorator
   delegate_all
+  decorates_association :components
   decorates_association :component_groups
   decorates_association :services
 
@@ -14,21 +15,10 @@ class ClusterDecorator < ApplicationDecorator
   def tabs
     [
       tabs_builder.overview,
-      { id: :logs, path: h.cluster_logs_path(self) },
+      documents.empty? ? nil :{ id: :documents, path: h.cluster_documents_path(self) },
+      tabs_builder.logs,
       tabs_builder.cases,
-      {
-        id: :maintenance,
-        path: h.cluster_maintenance_windows_path(self),
-        admin_dropdown: [
-          {
-            text: 'Pending',
-            path: h.cluster_maintenance_windows_path(self)
-          }, {
-            text: 'Request',
-            path: h.new_cluster_maintenance_window_path(self)
-          }
-        ]
-      },
+      tabs_builder.maintenance,
       { id: :services, path: h.cluster_services_path(self) },
       {
         id: :components,
@@ -39,6 +29,23 @@ class ClusterDecorator < ApplicationDecorator
           }
         end.push(text: 'All', path: h.cluster_components_path(self))
       }
-    ]
+    ].compact
+  end
+
+  def case_form_json
+    {
+      id: id,
+      name: name,
+      components: components.map(&:case_form_json),
+      services: services.map(&:case_form_json),
+      supportType: support_type,
+      chargingInfo: charging_info,
+      # Encode MOTD in two forms: the raw form, to be used as the initial value
+      # to be edited in the MOTD tool, and as sanitized, formatted HTML so the
+      # current value can be displayed as it will be on the Cluster and in the
+      # rest of Flight Center.
+      motd: motd,
+      motdHtml: h.simple_format(motd),
+    }
   end
 end

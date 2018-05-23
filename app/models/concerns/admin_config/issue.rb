@@ -8,6 +8,12 @@ module AdminConfig::Issue
         configure :identifier do
           hide
         end
+        configure :cases do
+          hide
+        end
+        configure :tiers do
+          hide
+        end
       end
     end
   end

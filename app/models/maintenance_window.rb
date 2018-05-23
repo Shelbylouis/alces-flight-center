@@ -1,4 +1,8 @@
 class MaintenanceWindow < ApplicationRecord
+  include AdminConfig::MaintenanceWindow
+  include HasStateMachine
+
+  default_scope { order(created_at: :desc) }
   belongs_to :case
   belongs_to :cluster, required: false
   belongs_to :component, required: false
@@ -47,14 +51,6 @@ class MaintenanceWindow < ApplicationRecord
   end
 
   class << self
-    def events
-      state_machine.events.keys
-    end
-
-    def possible_states
-      state_machine.states.keys
-    end
-
     # A maintenance window is 'finished' once it has reached a state which it
     # cannot transition out of.
     def finished_states

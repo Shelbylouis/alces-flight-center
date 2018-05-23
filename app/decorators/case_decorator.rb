@@ -1,14 +1,6 @@
 class CaseDecorator < ApplicationDecorator
   delegate_all
 
-  # Note: These should match values used in `Tier.Level.description` in Case
-  # form app.
-  TIER_DESCRIPTIONS = {
-    1 => 'Tool',
-    2 => 'Routine Maintenance',
-    3 => 'General Support',
-  }.freeze
-
   def user_facing_state
     model.state.to_s.titlecase
   end
@@ -27,32 +19,32 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def case_link
-    h.link_to(display_id, h.case_path(self))
+    h.link_to(display_id, h.case_path(self), title: subject)
   end
 
-  def chargeable_symbol
-    h.boolean_symbol(chargeable)
-  end
-
-  def credit_charge_info
-    if credit_charge
-      credit_charge.amount.to_s
-    elsif chargeable
-      'Pending'
-    else
-      'N/A'
-    end
+  def request_maintenance_path
+    assoc_class = model.associated_model.underscored_model_name
+    h.send("new_#{assoc_class}_maintenance_window_path", model.associated_model, case_id: model.id)
   end
 
   def tier_description
-    unless TIER_DESCRIPTIONS.has_key?(tier_level)
-      raise "Unhandled tier_level: #{tier_level}"
-    end
-    description = TIER_DESCRIPTIONS[tier_level]
-    "#{tier_level} (#{description})"
+    h.tier_description(tier_level)
   end
 
   def commenting_disabled?
-    current_user.contact? && !consultancy?
+    commenting_disabled_text.present?
+  end
+
+  def commenting_disabled_text
+    if !open?
+      "Commenting is disabled as this case is #{state}."
+    elsif current_user.contact? && !consultancy?
+      <<~TITLE.squish
+            This is a non-consultancy support case and so additional discussion is
+            not available. If you wish to request additional support please either
+            escalate this case (which may incur a charge), or open a
+            new support case.
+      TITLE
+    end
   end
 end

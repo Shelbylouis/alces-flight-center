@@ -100,10 +100,6 @@ RSpec.feature "Maintenance windows", type: :feature do
     # The only way I can get Capybara to use the correct URL; may be a better
     # way though.
     default_url_options[:host] = Rails.application.routes.default_url_options[:host]
-
-    # Prevent attempting to retrieve documents from S3 when Cluster page
-    # visited.
-    allow_any_instance_of(Cluster).to receive(:documents).and_return([])
   end
 
   def fill_in_datetime_selects(identifier, with:)
@@ -157,6 +153,10 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       include_examples 'maintenance form error handling', 'request'
       include_examples 'maintenance form initially valid'
+
+      it 'displays the component for which maintenance is being requested' do
+        expect(find('h4').text).to eq "Requesting maintenance for #{component.name} (#{cluster.name})"
+      end
 
       it 'uses correct default values' do
         a_distant_friday = Time.zone.local(2025, 3, 7, 0, 0)
@@ -234,10 +234,9 @@ RSpec.feature "Maintenance windows", type: :feature do
       %w(resolved closed).each do |state|
         it "cannot select #{state} Case for Cluster to associate" do
           my_case = create(
-            :case,
+            "#{state}_case".to_sym,
             cluster: cluster,
             subject: 'my_case',
-            state: state
           )
 
           # Revisit the page so given Case would be shown, if we do not
@@ -326,6 +325,14 @@ RSpec.feature "Maintenance windows", type: :feature do
       visit cluster_maintenance_windows_path(cluster, as: user)
 
       expect(page).not_to have_button(extend_button_text)
+    end
+
+    context 'when maintenance is for the entire cluster' do
+      it 'shows the entire-cluster-warning message' do
+        visit new_cluster_maintenance_window_path(cluster_id: cluster.id, as: user)
+
+        expect(find('p.alert-warning').text).to match 'Not what you want? Try selecting a component or a service from this cluster.'
+      end
     end
   end
 
@@ -441,6 +448,24 @@ RSpec.feature "Maintenance windows", type: :feature do
       visit cluster_maintenance_windows_path(cluster, as: user)
 
       expect(page).not_to have_button(extend_button_text)
+    end
+
+    context 'when maintenance is for the entire cluster' do
+      subject do
+        create(
+            :requested_maintenance_window,
+            cluster: cluster,
+            case: support_case
+        )
+      end
+
+      it 'does not show the entire-cluster-warning message' do
+        visit confirm_cluster_maintenance_window_path(id: subject.id, cluster_id: cluster.id, as: user)
+
+        expect do
+          find('p.alert-warning')
+        end.to raise_error(Capybara::ElementNotFound)
+      end
     end
   end
 end

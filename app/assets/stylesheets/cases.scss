@@ -1,12 +1,3 @@
-
-.closed-case-row {
-  opacity: 0.4;
-}
-
-.credit-charge-required-case-row {
-  background-color: lightgreen;
-}
-
 .case-form {
   hr {
     background-color: #777;
@@ -48,4 +39,8 @@
 
 .case-table th {
   text-align: right;
+}
+
+.assigned-cases {
+  background-color: rgba(39,148,216,0.1);
 }

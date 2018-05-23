@@ -1,8 +1,5 @@
 class Issue < ApplicationRecord
   include AdminConfig::Issue
-  include HasSupportType
-
-  SUPPORT_TYPES = SupportType::VALUES + ['advice-only']
 
   class << self
     def globally_available?
@@ -44,9 +41,7 @@ class Issue < ApplicationRecord
   has_many :tiers
 
   validates :name, presence: true
-  validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
   validates :identifier, uniqueness: true, if: :identifier
-  validates :chargeable, inclusion: {in: [true, false]}
 
   validates :service_type,
             absence: {
@@ -56,30 +51,8 @@ class Issue < ApplicationRecord
 
   after_create :create_standard_consultancy_tier
 
-  def advice_only?
-    support_type == 'advice-only'
-  end
-
-  # Automatically picked up by rails_admin so only these options displayed when
-  # selecting support type.
-  def support_type_enum
-    SUPPORT_TYPES
-  end
-
   def special?
     IDENTIFIER_NAMES.include?(identifier&.to_sym)
-  end
-
-  def case_form_json
-    {
-      id: id,
-      name: name,
-      defaultSubject: default_subject,
-      requiresComponent: requires_component,
-      supportType: support_type,
-      chargeable: chargeable,
-      tiers: tiers.map(&:case_form_json)
-    }
   end
 
   def default_subject

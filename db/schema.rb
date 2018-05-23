@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180502104232) do
+ActiveRecord::Schema.define(version: 20180521142349) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -95,7 +95,6 @@ ActiveRecord::Schema.define(version: 20180502104232) do
   end
 
   create_table "cases", force: :cascade do |t|
-    t.string "details"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "cluster_id", null: false
@@ -104,7 +103,6 @@ ActiveRecord::Schema.define(version: 20180502104232) do
     t.bigint "rt_ticket_id"
     t.integer "issue_id", null: false
     t.bigint "service_id"
-    t.string "last_known_ticket_status", default: "new"
     t.text "token", null: false
     t.text "subject", null: false
     t.datetime "completed_at"
@@ -113,6 +111,8 @@ ActiveRecord::Schema.define(version: 20180502104232) do
     t.text "state", default: "open", null: false
     t.bigint "assignee_id"
     t.string "display_id"
+    t.integer "time_worked", default: 0, null: false
+    t.integer "credit_charge"
     t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
@@ -135,6 +135,27 @@ ActiveRecord::Schema.define(version: 20180502104232) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "change_motd_request_state_transitions", force: :cascade do |t|
+    t.bigint "change_motd_request_id", null: false
+    t.string "namespace"
+    t.string "event"
+    t.string "from"
+    t.string "to", null: false
+    t.datetime "created_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["change_motd_request_id"], name: "index_cmrst_on_cmr_id"
+    t.index ["user_id"], name: "index_change_motd_request_state_transitions_on_user_id"
+  end
+
+  create_table "change_motd_requests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "motd", null: false
+    t.bigint "case_id", null: false
+    t.text "state", null: false
+    t.index ["case_id"], name: "index_change_motd_requests_on_case_id"
+  end
+
   create_table "clusters", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -146,6 +167,7 @@ ActiveRecord::Schema.define(version: 20180502104232) do
     t.string "charging_info"
     t.string "shortcode"
     t.integer "case_index", default: 0, null: false
+    t.text "motd"
     t.index ["shortcode"], name: "index_clusters_on_shortcode", unique: true
     t.index ["site_id"], name: "index_clusters_on_site_id"
   end
@@ -186,26 +208,6 @@ ActiveRecord::Schema.define(version: 20180502104232) do
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end
 
-  create_table "credit_charges", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "case_id", null: false
-    t.bigint "user_id", null: false
-    t.integer "amount", null: false
-    t.index ["case_id"], name: "index_credit_charges_on_case_id"
-    t.index ["user_id"], name: "index_credit_charges_on_user_id"
-  end
-
-  create_table "credit_deposits", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "cluster_id", null: false
-    t.bigint "user_id", null: false
-    t.integer "amount", null: false
-    t.index ["cluster_id"], name: "index_credit_deposits_on_cluster_id"
-    t.index ["user_id"], name: "index_credit_deposits_on_user_id"
-  end
-
   create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
   end
 
@@ -234,12 +236,9 @@ ActiveRecord::Schema.define(version: 20180502104232) do
     t.boolean "requires_component", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "details_template"
-    t.string "support_type", null: false
     t.string "identifier"
     t.boolean "requires_service", default: false, null: false
     t.bigint "service_type_id"
-    t.boolean "chargeable", default: false, null: false
     t.bigint "category_id"
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["service_type_id"], name: "index_issues_on_service_type_id"
@@ -319,8 +318,9 @@ ActiveRecord::Schema.define(version: 20180502104232) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "level", null: false
-    t.json "fields", null: false
+    t.json "fields"
     t.bigint "issue_id", null: false
+    t.text "tool"
     t.index ["issue_id"], name: "index_tiers_on_issue_id"
   end
 
@@ -356,15 +356,13 @@ ActiveRecord::Schema.define(version: 20180502104232) do
   add_foreign_key "cases", "services"
   add_foreign_key "cases", "users"
   add_foreign_key "cases", "users", column: "assignee_id"
+  add_foreign_key "change_motd_request_state_transitions", "change_motd_requests"
+  add_foreign_key "change_motd_request_state_transitions", "users"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"
   add_foreign_key "component_makes", "component_types"
   add_foreign_key "components", "component_groups"
-  add_foreign_key "credit_charges", "cases"
-  add_foreign_key "credit_charges", "users"
-  add_foreign_key "credit_deposits", "clusters"
-  add_foreign_key "credit_deposits", "users"
   add_foreign_key "expansions", "component_makes"
   add_foreign_key "expansions", "components"
   add_foreign_key "expansions", "expansion_types"

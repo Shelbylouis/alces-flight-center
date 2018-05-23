@@ -76,29 +76,6 @@ RSpec.describe CaseDecorator do
     end
   end
 
-  describe '#credit_charge_info' do
-    it 'gives credit charge amount when set' do
-      support_case = create(:case)
-      create(:credit_charge, case: support_case, amount: 5)
-
-      expect(support_case.decorate.credit_charge_info).to eq '5'
-    end
-
-    it "gives 'N/A' when issue is not chargeable" do
-      issue = create(:issue, chargeable: false)
-      support_case = create(:case, issue: issue)
-
-      expect(support_case.decorate.credit_charge_info).to eq 'N/A'
-    end
-
-    it "gives 'Pending' when issue is chargeable and no credit charge" do
-      issue = create(:issue, chargeable: true)
-      support_case = create(:case, issue: issue)
-
-      expect(support_case.decorate.credit_charge_info).to eq 'Pending'
-    end
-  end
-
   describe '#case_link' do
     it 'returns link to Case page with display_id as text' do
       kase = create(:case, rt_ticket_id: 12345)
@@ -107,7 +84,8 @@ RSpec.describe CaseDecorator do
         Draper::ViewContext.clear!
       end.case_link
 
-      expect(link).to eq h.link_to('RT12345', h.case_path(kase))
+      expect(link).to eq h
+        .link_to('RT12345', h.case_path(kase), title: kase.subject)
     end
   end
 

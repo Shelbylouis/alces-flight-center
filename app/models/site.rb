@@ -30,14 +30,6 @@ class Site < ApplicationRecord
     users.where(primary_contact: false).order(:id)
   end
 
-  def secondary_contacts_info
-    secondary_contacts.map(&:info).join(', ')
-  end
-
-  def additional_contacts_info
-    additional_contacts.map(&:email).join(', ')
-  end
-
   def managed_clusters
     clusters.select(&:managed?)
   end

@@ -19,6 +19,10 @@ module AdminConfig::Cluster
           html_attributes rows: 10, cols: 100
           help Constants::MARKDOWN_DESCRIPTION_EDIT_HELP
         end
+        configure :charging_info, :text do
+          html_attributes rows: 10, cols: 100
+          help Constants::MARKDOWN_DESCRIPTION_EDIT_HELP
+        end
 
         configure :canonical_name do
           hide
@@ -35,13 +39,13 @@ module AdminConfig::Cluster
         configure :services do
           hide
         end
-        configure :credit_charges do
-          hide
-        end
-        configure :credit_deposits do
-          hide
-        end
         configure :maintenance_windows do
+          hide
+        end
+        configure :case_index do
+          hide
+        end
+        configure :logs do
           hide
         end
       end

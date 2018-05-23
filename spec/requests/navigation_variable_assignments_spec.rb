@@ -11,11 +11,6 @@ RSpec.describe 'Navigation variable assignments', type: :request do
   end
   let! :service { create(:service, cluster: cluster) }
 
-  before :each do
-    # Avoid making any S3 requests for Cluster documents.
-    allow_any_instance_of(Cluster).to receive(:documents).and_return []
-  end
-
   let :default_nav_variables do
     {
       scope: subject,
@@ -117,7 +112,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     include_examples 'cluster and part variable assignment'
 
     describe "get '/'" do
-      subject { nil }
+      subject { AllSites.new }
       before :each do
         get root_path(as: user)
       end

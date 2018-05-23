@@ -182,8 +182,13 @@ RSpec.describe CasesController, type: :controller do
     end
 
     it 'closes a resolved case' do
-      post :close, params: { id: resolved_case.id }
+      post :close, params: { id: resolved_case.id, case: { credit_charge: 0 } }
       expect(flash[:success]).to eq "Support case #{resolved_case.display_id} closed."
+    end
+
+    it 'requires a credit charge to close a resolved case' do
+      post :close, params: { id: resolved_case.id }
+      expect(flash[:error]).to eq 'You must specify a credit charge to close this case.'
     end
 
     it 'does not resolve a closed case' do
@@ -192,8 +197,71 @@ RSpec.describe CasesController, type: :controller do
     end
 
     it 'does not close an open case' do
-      post :close, params: { id: open_case.id }
+      post :close, params: { id: open_case.id, case: { credit_charge: 0 } }
       expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "close"'
+    end
+  end
+
+  describe 'case time management' do
+
+    let(:some_case) { create(:open_case, time_worked: 0)}
+    let(:admin) { create(:admin) }
+
+    before(:each) { sign_in_as(admin) }
+
+    it 'converts from hours and minutes to minutes on a case' do
+      post :set_time, params: { id: some_case.id, time: { hours: 3, minutes: 21 }}
+      some_case.reload
+      expect(some_case.time_worked).to eq (3 * 60) + 21
+      expect(flash[:success]).to eq "Updated 'time worked' for support case #{some_case.display_id}."
+    end
+  end
+
+  describe 'POST #escalate' do
+    let (:open_case) {
+      create(:open_case, cluster: first_cluster, tier_level: 2)
+    }
+
+    let (:resolved_case) {
+      create(:resolved_case, cluster: first_cluster, tier_level: 2)
+    }
+
+    let (:closed_case) {
+      create(:closed_case, cluster: first_cluster, tier_level: 2)
+    }
+
+    let(:admin) { create(:admin) }
+
+    RSpec.shared_examples 'case escalation behaviour' do
+      it 'escalates an open case' do
+        post :escalate, params: { id: open_case.id }
+        expect(flash[:success]).to eq "Support case #{open_case.display_id} escalated."
+
+        open_case.reload
+
+        expect(open_case.tier_level).to eq 3
+      end
+
+      %w(resolved closed).each do |state|
+        it "does not escalate a #{state} case" do
+          kase = send("#{state}_case")
+          post :escalate, params: { id: kase.id }
+
+          expect(flash[:error]).to eq "Error updating support case: tier_level cannot be changed when a case is #{state}"
+          kase.reload
+          expect(open_case.tier_level).to eq 2
+        end
+      end
+    end
+
+    context 'as an admin' do
+      before(:each) { sign_in_as(admin) }
+      it_behaves_like 'case escalation behaviour'
+    end
+
+    context 'as a contact' do
+      before(:each) { sign_in_as(user) }
+      it_behaves_like 'case escalation behaviour'
     end
   end
 end

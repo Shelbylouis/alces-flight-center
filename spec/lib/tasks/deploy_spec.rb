@@ -4,7 +4,7 @@ RSpec.describe 'alces:deploy:staging:obfuscate_user_data' do
   include_context 'rake'
 
   let! :contact do
-    create(:contact, name: 'Some Contact', email: 'some.contact@example.com')
+    create(:contact, name: 'Some Contact', email: 'some.contact.email@example.com')
   end
 
   let! :admin do
@@ -19,10 +19,10 @@ RSpec.describe 'alces:deploy:staging:obfuscate_user_data' do
 
   it_behaves_like 'it has prerequisite', :environment
 
-  it 'changes contacts to have `@alces-software.com` emails' do
+  it 'changes contacts to have `center+${local_part}@alces-software.com` emails' do
     subject.invoke
 
-    expect(contact.reload.email).to eq 'some.contact@alces-software.com'
+    expect(contact.reload.email).to eq 'center+some.contact.email@alces-software.com'
   end
 
   it 'sets contact passwords to STAGING_PASSWORD environment variable' do

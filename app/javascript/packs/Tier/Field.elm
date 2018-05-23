@@ -31,6 +31,7 @@ type alias TextInputData =
     -- | RequiredTextInput TextInput
     -- | OptionalTextInput TextInput
     , optional : Bool
+    , help : Maybe String
     }
 
 
@@ -82,13 +83,14 @@ textInputDecoder type_ =
                 |> D.map (Maybe.withDefault False)
     in
     D.map TextInput <|
-        D.map5 TextInputData
+        D.map6 TextInputData
             (D.succeed type_)
             (D.field "name" D.string)
             initialValueDecoder
             -- Every field is initially untouched.
             (D.succeed Untouched)
             optionalDecoder
+            (D.maybe (D.field "help" D.string))
 
 
 encoder : Field -> Maybe E.Value
@@ -103,6 +105,7 @@ encoder field =
                     [ ( "type", textFieldTypeToString data.type_ |> E.string )
                     , ( "name", E.string data.name )
                     , ( "value", E.string data.value )
+                    , ( "help", Maybe.map E.string data.help |> Maybe.withDefault E.null )
                     , ( "optional", E.bool data.optional )
                     ]
 

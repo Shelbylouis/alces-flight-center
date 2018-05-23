@@ -13,11 +13,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Markdown
 import Msg exposing (..)
-import SelectList
 import State exposing (State)
 import String.Extra
 import Tier
-import View.Utils
 
 
 chargeableAlert : State -> Maybe (Html Msg)
@@ -60,7 +58,7 @@ infoModal : State -> Html Msg
 infoModal state =
     let
         cluster =
-            SelectList.selected state.clusters
+            State.selectedCluster state
 
         chargingInfo =
             cluster.chargingInfo

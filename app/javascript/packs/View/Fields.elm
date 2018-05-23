@@ -1,7 +1,6 @@
 module View.Fields
     exposing
-        ( inputField
-        , selectField
+        ( selectField
         , textField
         )
 
@@ -13,11 +12,13 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Json.Decode as D
 import Maybe.Extra
+import Msg exposing (Msg)
 import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import String.Extra
 import Types
 import Validation exposing (Error, ErrorMessage(..))
+import View.Utils
 
 
 selectField :
@@ -50,37 +51,28 @@ selectField field items toId toOptionLabel isDisabled changeMsg state =
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
         False
+        Nothing
         state
 
 
-inputField :
-    Field
-    -> a
-    -> (a -> String)
-    -> (String -> msg)
-    -> Bool
-    -> State
-    -> Html msg
-inputField =
-    textField Types.Input
+type alias TextFieldConfig a =
+    { fieldType : Types.TextField
+    , field : Field
+    , toContent : a -> String
+    , inputMsg : String -> Msg
+    , optional : Bool
+    , help : Maybe String
+    }
 
 
-textField :
-    Types.TextField
-    -> Field
-    -> a
-    -> (a -> String)
-    -> (String -> msg)
-    -> Bool
-    -> State
-    -> Html msg
-textField textFieldType field item toContent inputMsg optional state =
+textField : TextFieldConfig a -> State -> a -> Html Msg
+textField config state item =
     let
         content =
-            toContent item
+            config.toContent item
 
         ( element, additionalAttributes ) =
-            case textFieldType of
+            case config.fieldType of
                 Types.Input ->
                     ( input, [] )
 
@@ -88,17 +80,18 @@ textField textFieldType field item toContent inputMsg optional state =
                     ( textarea, [ rows 10 ] )
 
         attributes =
-            [ onInput inputMsg
+            [ onInput config.inputMsg
             , value content
             ]
                 ++ additionalAttributes
     in
-    formField field
+    formField config.field
         item
         element
         attributes
         []
-        optional
+        config.optional
+        config.help
         state
 
 
@@ -113,9 +106,10 @@ formField :
     -> List (Attribute msg)
     -> List (Html msg)
     -> Bool
+    -> Maybe String
     -> State
     -> Html msg
-formField field item htmlFn additionalAttributes children optional state =
+formField field item htmlFn additionalAttributes children optional help state =
     let
         fieldName =
             case field of
@@ -136,7 +130,7 @@ formField field item htmlFn additionalAttributes children optional state =
 
         requiredBadge =
             if optional then
-                text ""
+                View.Utils.nothing
             else
                 Badge.badgeLight [ Spacing.ml1 ] [ text "Required" ]
 
@@ -145,11 +139,25 @@ formField field item htmlFn additionalAttributes children optional state =
                 [ id identifier
                 , class (formControlClasses field errors)
                 , disabled fieldIsUnavailable
+                , attribute "aria-describedBy" helpIdentifier
                 ]
                 additionalAttributes
 
         formElement =
             htmlFn attributes children
+
+        helpElement =
+            case help of
+                Just helpText ->
+                    small
+                        [ id helpIdentifier, class "form-text text-muted" ]
+                        [ text helpText ]
+
+                Nothing ->
+                    View.Utils.nothing
+
+        helpIdentifier =
+            identifier ++ "-help"
 
         errors =
             Validation.validateField field state
@@ -160,6 +168,7 @@ formField field item htmlFn additionalAttributes children optional state =
             [ text fieldName ]
         , requiredBadge
         , formElement
+        , helpElement
         , validationFeedback errors
         ]
 

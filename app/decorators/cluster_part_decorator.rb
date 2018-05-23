@@ -7,6 +7,14 @@ class ClusterPartDecorator < ApplicationDecorator
     h.raw("#{self_link} (#{cluster.links})")
   end
 
+  def case_form_json
+    {
+      id: id,
+      name: name,
+      supportType: support_type,
+    }
+  end
+
   private
 
   def render_change_support_type_button(

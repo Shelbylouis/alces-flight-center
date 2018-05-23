@@ -1,8 +1,13 @@
 
+# Concern to hold shared behaviour for models which together make up an entire
+# Cluster, and each is a single 'part' of the Cluster (rather than some
+# collection of other parts or constituents of a single part); currently just
+# used by Components and Services.
 module ClusterPart
   extend ActiveSupport::Concern
 
   include HasSupportType
+  include BelongsToCluster
 
   SUPPORT_TYPES = SupportType::VALUES + ['inherit']
 
@@ -15,6 +20,9 @@ module ClusterPart
     validates :internal, inclusion: {in: [true, false]}
 
     delegate :site, to: :cluster
+
+    scope :managed, -> { select(&:managed?) }
+    scope :advice, -> { select(&:advice?) }
   end
 
   # Automatically picked up by rails_admin so only these options displayed when
@@ -27,11 +35,9 @@ module ClusterPart
     super == 'inherit' ? cluster.support_type : super
   end
 
-  def case_form_json
-    {
-      id: id,
-      name: name,
-      supportType: support_type,
-    }
+  def unfinished_related_maintenance_windows
+    maintenance_windows.unfinished
+      .sort_by(&:created_at)
+      .reverse
   end
 end

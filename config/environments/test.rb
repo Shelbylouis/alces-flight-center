@@ -49,7 +49,4 @@ Rails.application.configure do
 
   # Enable Clearance back door in feature and request specs.
   config.middleware.use Clearance::BackDoor
-
-  # Alces Flight Center custom config.
-  config.rt_interface_class = FakeRequestTrackerInterface.to_s
 end

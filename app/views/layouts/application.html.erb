@@ -28,43 +28,29 @@
     <div class='page-content'>
 
       <% if @title %>
-        <div class="jumbotron">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col"></div>
-              <div class="col-8">
-                <h1 class="display-4"><%= @title %></h1>
-                <p class="lead"><%= yield :subtitle %></p>
-              </div>
-              <div class="col"></div>
-            </div>
+          <div class="card title-card">
+            <div class="card-body">
+            <h1><%= @title %></h1>
+            <p class="lead" style="font-size: 18px;">
+              <%= yield :subtitle %>
+            </p>
           </div>
         </div>
       <% end %>
 
-      <div class="container-fluid page-container">
+      <div class="container page-container">
         <%= render 'partials/flash_alert', flash_key: :alert, alert_class: 'alert-danger' %>
         <%= render 'partials/flash_alert', flash_key: :error, alert_class: 'alert-danger' %>
         <%= render 'partials/flash_alert', flash_key: :success, alert_class: 'alert-success' %>
         <%= render 'partials/flash_alert', flash_key: :notice, alert_class: 'alert-info' %>
 
-        <% if signed_in? %>
-          <div class="row">
-            <div class="col"></div>
-            <div class="col-8">
-              <%= yield %>
-            </div>
-            <div class="col"></div>
-          </div>
-        <% else %>
-          <%= yield %>
-        <% end %>
+        <%= yield %>
       </div>
 
     </div>
 
     <div id='brand-footer'></div>
-    <script src='/flight-branding/flight-chrome.js'></script>
+    <script src='/flight-branding/flight-chrome.6cb3261b.js'></script>
   </body>
   <%= development_ribbon position: :left, color: :green if Rails.env.development? %>
 </html>

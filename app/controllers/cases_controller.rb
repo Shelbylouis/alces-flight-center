@@ -4,7 +4,6 @@ class CasesController < ApplicationController
   decorates_assigned :site
 
   def index(show_resolved: false)
-    @site = current_site
     @show_resolved = show_resolved
   end
 
@@ -65,9 +64,14 @@ class CasesController < ApplicationController
   end
 
   def close
+    charge = params.require(:case).require(:credit_charge).to_i
     change_action "Support case %s closed." do |kase|
+      kase.credit_charge = charge
       kase.close!(current_user)
     end
+  rescue ActionController::ParameterMissing
+    flash[:error] = 'You must specify a credit charge to close this case.'
+    redirect_to case_path
   end
 
   def assign
@@ -77,7 +81,7 @@ class CasesController < ApplicationController
                         "Support case %s assigned to #{new_assignee.name}."
                         : 'Support case %s unassigned.'
 
-    change_action success_flash, redirect_path: case_path do |kase|
+    change_action success_flash do |kase|
       kase.assignee = new_assignee
     end
   end
@@ -85,6 +89,21 @@ class CasesController < ApplicationController
   def resolve
     change_action "Support case %s resolved." do |kase|
       kase.resolve!(current_user)
+    end
+  end
+
+  def set_time
+    times = params.require(:time).permit(:hours, :minutes)
+    total_time = (times.require(:hours).to_i * 60) + times.require(:minutes).to_i
+
+    change_action "Updated 'time worked' for support case %s." do |kase|
+      kase.time_worked = total_time
+    end
+  end
+
+  def escalate
+    change_action "Support case %s escalated." do |kase|
+      kase.tier_level = 3
     end
   end
 
@@ -98,11 +117,12 @@ class CasesController < ApplicationController
       :service_id,
       :subject,
       :tier_level,
-      fields: [:type, :name, :value, :optional],
+      fields: [:type, :name, :value, :optional, :help],
+      tool_fields: {}
     )
   end
 
-  def change_action(success_flash, redirect_path: case_path, &block)
+  def change_action(success_flash, &block)
     @case = case_from_params
     begin
       block.call(@case)
@@ -111,7 +131,7 @@ class CasesController < ApplicationController
     rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
       flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
-    redirect_to redirect_path
+    redirect_to case_path(@case)
   end
 
   def case_from_params

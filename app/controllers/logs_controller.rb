@@ -2,8 +2,8 @@ class LogsController < ApplicationController
   def index
     @new_log = Log.new
     @scope = @component || @cluster
-    @logs = @scope.logs.order(created_at: :desc)
-    @cases = @scope.cases.order(created_at: :desc)
+    @logs = @scope.logs
+    @cases = @scope.cases
     @components = @scope.components if @scope.is_a? Cluster
   end
 

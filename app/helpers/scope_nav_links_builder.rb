@@ -7,50 +7,64 @@ class ScopeNavLinksBuilder
   end
 
   def build
-    scope_nav_link_procs = []
-
-    if h.current_user&.admin?
-      scope_nav_link_procs << nav_link_proc(text: 'All Sites',
-                                            path: h.root_path,
-                                            nav_icon: 'fa-globe')
-    end
-
-    if scope
-      site_obj = model_from_scope :site
-      path_for_site = if h.current_user.admin?
-                        site_obj
-                      else
-                        h.root_path
-                      end
-      scope_nav_link_procs << nav_link_proc(model: site_obj,
-                                            path: path_for_site,
-                                            nav_icon: 'fa-institution')
-
-      cluster_obj = model_from_scope :cluster
-      if cluster_obj
-        scope_nav_link_procs << nav_link_proc(model: cluster_obj,
-                                              nav_icon: 'fa-server')
-      end
-
-      component_group_obj = model_from_scope :component_group
-      if component_group_obj
-        scope_nav_link_procs << nav_link_proc(model: component_group_obj,
-                                              nav_icon: 'fa-cubes')
-      end
-
-      cluster_part = model_from_scope(:service) || model_from_scope(:component)
-      if cluster_part
-        scope_nav_link_procs << nav_link_proc(model: cluster_part,
-                                              nav_icon: 'fa-cube')
-      end
-    end
-
-    scope_nav_link_procs
+    [
+      all_sites_link,
+      site_link,
+      cluster_link,
+      component_group_link,
+      cluster_part_link,
+    ].compact
   end
 
   private
 
   attr_reader :scope
+
+  def all_sites_link
+    if h.current_user&.admin?
+      nav_link_proc(text: 'All Sites',
+                    path: h.root_path,
+                    nav_icon: 'fa-globe')
+    end
+  end
+
+  def site_link
+    site = model_from_scope :site
+    return nil unless site
+    path_for_site = if h.current_user.admin?
+                      site
+                    else
+                      h.root_path
+                    end
+    nav_link_proc(model: site,
+                  path: path_for_site,
+                  nav_icon: 'fa-institution')
+  end
+
+  def cluster_link
+    link_for_model(:cluster, nav_icon: 'fa-server')
+  end
+
+  def component_group_link
+    link_for_model(:component_group, nav_icon: 'fa-cubes')
+  end
+
+  def cluster_part_link
+    link_for_model([:service, :component], nav_icon: 'fa-cube')
+  end
+
+  def link_for_model(possible_types, nav_icon:)
+    model = first_model_from_scope(possible_types)
+    return nil unless model
+    nav_link_proc(model: model, nav_icon: nav_icon)
+  end
+
+  def first_model_from_scope(possible_types)
+    Array.wrap(possible_types)
+      .lazy
+      .map { |type| model_from_scope(type) }
+      .find(&:itself)
+  end
 
   def model_from_scope(type)
     if scope.respond_to? type

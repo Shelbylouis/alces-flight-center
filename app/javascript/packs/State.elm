@@ -4,6 +4,7 @@ module State
         , associatedModelTypeName
         , decoder
         , encoder
+        , selectedCluster
         , selectedComponent
         , selectedIssue
         , selectedService
@@ -162,7 +163,7 @@ encoder state =
             selectedIssue state
 
         cluster =
-            SelectList.selected state.clusters
+            selectedCluster state
 
         partIdValue =
             \required selected extractId ->
@@ -194,7 +195,7 @@ encoder state =
                 , ( "service_id", serviceIdValue )
                 , ( "subject", Issue.subject issue |> E.string )
                 , ( "tier_level", Tier.Level.asInt tier.level |> E.int )
-                , ( "fields", Tier.fieldsEncoder tier )
+                , Tier.encodeContentPair tier
                 ]
           )
         ]
@@ -207,16 +208,21 @@ selectedIssue state =
         |> Issues.selectedIssue
 
 
+selectedCluster : State -> Cluster
+selectedCluster state =
+    SelectList.selected state.clusters
+
+
 selectedComponent : State -> Component
 selectedComponent state =
-    SelectList.selected state.clusters
+    selectedCluster state
         |> .components
         |> SelectList.selected
 
 
 selectedService : State -> Service
 selectedService state =
-    SelectList.selected state.clusters
+    selectedCluster state
         |> .services
         |> SelectList.selected
 

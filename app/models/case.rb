@@ -1,21 +1,8 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
+  include HasStateMachine
 
-  # @deprecated - to be removed in next release
-  COMPLETED_RT_TICKET_STATUSES = [
-    'resolved',
-    'rejected',
-    'deleted',
-  ]
-
-  # @deprecated - to be removed in next release
-  RT_TICKET_STATUSES = (
-    [
-      'new',
-      'open',
-      'stalled',
-    ] + COMPLETED_RT_TICKET_STATUSES
-  ).freeze
+  default_scope { order(created_at: :desc) }
 
   belongs_to :issue
   belongs_to :cluster
@@ -23,15 +10,16 @@ class Case < ApplicationRecord
   belongs_to :service, required: false
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
-  has_one :credit_charge, required: false
+
   has_many :maintenance_windows
   has_and_belongs_to_many :log
   has_many :case_comments
+  has_one :change_motd_request, required: false, autosave: true
 
   has_many :case_state_transitions
   alias_attribute :transitions, :case_state_transitions
 
-  delegate :category, :chargeable, to: :issue
+  delegate :category, to: :issue
   delegate :site, to: :cluster, allow_nil: true
 
   state_machine initial: :open do
@@ -46,7 +34,7 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: :assignee_id, on: [ :update ]
+  audited only: [:assignee_id, :time_worked, :credit_charge, :tier_level], on: [ :update ]
 
   # XXX Remove if: display_id when we can do so
   validates :display_id, uniqueness: true, if: :display_id
@@ -58,7 +46,11 @@ class Case < ApplicationRecord
   validates :token, presence: true
   validates :subject, presence: true
   validates :rt_ticket_id, uniqueness: true, if: :rt_ticket_id
-  validates :fields, presence: true
+
+  validates :fields,
+    presence: {unless: :change_motd_request},
+    absence: {if: :change_motd_request}
+  validates_absence_of :change_motd_request, if: :fields
 
   validates :tier_level,
     presence: true,
@@ -70,10 +62,21 @@ class Case < ApplicationRecord
       greater_than_or_equal_to: 1,
       less_than_or_equal_to: 3,
     }
+  validate :validate_tier_level_changes
 
-  # @deprecated - to be removed in next release
-  validates :last_known_ticket_status,
-    inclusion: {in: RT_TICKET_STATUSES}
+  validates :time_worked, numericality: {
+      greater_than_or_equal_to: 0,
+      only_integer: true  # We store time worked as integer minutes.
+  }
+
+  validate :time_worked_not_changed_unless_allowed
+
+  validates :credit_charge, numericality: {
+      only_integer: true,
+      greater_than_or_equal_to: 0
+  }, if: :credit_charge  # Credit charge can be null (not set)
+
+  validates :credit_charge, presence: true,  if: :closed?
 
   # Only validate this type of support is available on create, as this is the
   # only point at which we should prevent users accessing support they are not
@@ -96,6 +99,10 @@ class Case < ApplicationRecord
   after_update :maybe_send_new_assignee_email
 
   scope :active, -> { where(state: 'open') }
+  scope :inactive, -> { where.not(state: 'open') }
+
+  scope :assigned_to, ->(user) { where(assignee: user) }
+  scope :not_assigned_to, ->(user) { where.not(assignee: user).or(where(assignee: nil)) }
 
   def to_param
     self.display_id.parameterize.upcase
@@ -109,30 +116,9 @@ class Case < ApplicationRecord
     end
   end
 
-  # @deprecated - to be removed in next release
-  def self.request_tracker
-    # Note: `rt_interface_class` is a string which we `constantize`, rather
-    # than a constant directly, otherwise Rails autoloading in development
-    # could leave us holding a reference to an outdated version of the class,
-    # which would then cause things to blow up (e.g. see
-    # https://stackoverflow.com/a/23008837).
-    @rt ||= Rails.configuration.rt_interface_class.constantize.new
-  end
-
-  # @deprecated - to be removed in next release
-  def update_ticket_status!
-    return unless incomplete_rt_ticket?
-    self.last_known_ticket_status = associated_rt_ticket.status
-    save!
-  end
-
-  def requires_credit_charge?
-    return false if credit_charge
-    credit_charge_allowed?
-  end
-
-  def credit_charge_allowed?
-    ticket_completed? && chargeable
+  def time_entry_allowed?
+    # Allow if not persisted - e.g. allow time to be initially set for all states
+    open? || !persisted?
   end
 
   def associated_model
@@ -141,11 +127,6 @@ class Case < ApplicationRecord
 
   def associated_model_type
     associated_model.readable_model_name
-  end
-
-  # @deprecated - to be removed in next release
-  def ticket_completed?
-    COMPLETED_RT_TICKET_STATUSES.include?(last_known_ticket_status)
   end
 
   def email_recipients
@@ -210,6 +191,7 @@ class Case < ApplicationRecord
       'Associated service': service&.name,
       Tier: decorate.tier_description,
       Fields: field_hash,
+      'Requested MOTD': change_motd_request&.motd
     }.reject { |_k, v| v.nil? }
   end
 
@@ -227,6 +209,33 @@ class Case < ApplicationRecord
     super(new_assignee)
   end
 
+  def time_worked=(new_time)
+    @time_worked_changed = (new_time != time_worked)
+    super(new_time)
+  end
+
+  def tier_level=(new_level)
+    @tier_level_changed = (new_level != tier_level)
+    super(new_level)
+  end
+
+  def save!
+    # Particularly in tests, rather than in normal controller operation, we might keep this object
+    # around after saving and do more things to it.
+    # So that the validation on these setters works properly, we need to reset the "changed" state
+    # of them all before continuing.
+    super
+    @assignee_changed = false
+    @time_worked_changed = false
+    @tier_level_changed = false
+  end
+
+  def tool_fields=(tool_hash)
+    tool_hash = tool_hash.deep_symbolize_keys
+    tool_type = tool_hash.fetch(:type).to_sym
+    handle_tool(tool_type, fields: tool_hash)
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
@@ -238,10 +247,6 @@ class Case < ApplicationRecord
     transition.args&.first
   end
 
-  def incomplete_rt_ticket?
-    rt_ticket_id && (!ticket_completed? || !self.completed_at)
-  end
-
   def assign_cluster_if_necessary
     return if cluster
     self.cluster = component.cluster if component
@@ -250,20 +255,6 @@ class Case < ApplicationRecord
 
   def assign_default_subject_if_unset
     self.subject ||= issue.default_subject
-  end
-
-  # @deprecated - to be removed in next release
-  def associated_rt_ticket
-    if rt_ticket_id
-      @associated_ticket ||= rt.show_ticket(rt_ticket_id)
-    else
-      nil
-    end
-  end
-
-  # @deprecated - to be removed in next release
-  def rt
-    self.class.request_tracker
   end
 
   def requestor_email
@@ -324,10 +315,32 @@ class Case < ApplicationRecord
     errors.add(:display_id, 'must be present') unless !persisted? or display_id
   end
 
+  def time_worked_not_changed_unless_allowed
+    error_condition = !time_entry_allowed? && @time_worked_changed
+    errors.add(:time_worked, "must not be changed when case is #{state}") unless !error_condition
+  end
+
+  def validate_tier_level_changes
+    error_condition = @tier_level_changed && persisted? && !open?
+    errors.add(:tier_level, "cannot be changed when a case is #{state}") if error_condition
+  end
+
   def field_hash
+    return nil unless fields
     fields.map do |f|
       f = f.with_indifferent_access
       [f.fetch(:name), f.fetch(:value)]
     end.to_h.symbolize_keys
+  end
+
+  def handle_tool(type, fields:)
+    case type
+    when :motd
+      self.build_change_motd_request(
+        fields.slice(:motd)
+      )
+    else
+      raise "Unknown type: '#{type}'"
+    end
   end
 end

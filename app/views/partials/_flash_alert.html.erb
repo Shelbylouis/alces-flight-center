@@ -1,8 +1,7 @@
 
 <% if flash[flash_key] %>
   <div class="row">
-    <div class="col"></div>
-    <div class="col-8">
+    <div class="col">
       <div class="alert <%= alert_class %> alert-dismissable fade show" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
           <span aria-hidden="true">&times;</span>
@@ -12,6 +11,5 @@
         <% end %>
       </div>
     </div>
-    <div class="col"></div>
   </div>
 <% end %>

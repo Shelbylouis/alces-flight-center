@@ -68,7 +68,12 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
 
   # Host to use when generating URls in emails.
-  config.action_mailer.default_url_options = { host: ENV.fetch('ACTION_MAILER_URL_OPTIONS_HOST', 'center.alces-flight.com') }
+  url_options_host = if ENV['STAGING']
+                       'staging.center.alces-flight.com'
+                     else
+                       'center.alces-flight.com'
+                     end
+  config.action_mailer.default_url_options = { host: url_options_host }
 
   config.roadie.url_options = config.action_mailer.default_url_options
 
@@ -104,7 +109,4 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
-
-  # Alces Flight Center custom config.
-  config.rt_interface_class = RequestTrackerInterface.to_s
 end

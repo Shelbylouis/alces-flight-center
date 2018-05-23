@@ -1,33 +1,70 @@
 <% content_for :subtitle { 'Overview' } %>
 
 <%= render 'partials/tabs', activate: :overview do %>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">
-      <%= site.rendered_description.html_safe %>
-    </li>
-    <li class="list-group-item">
-      Primary site contact: <%= site.primary_contact&.info || raw('<em>Unset</em>') %>
-    </li>
-    <li class="list-group-item">
-      Secondary site <%= 'contact'.pluralize(site.secondary_contacts.length) %>:
-      <%= site.secondary_contacts.present? ? site.secondary_contacts_info : raw('<em>None</em>') %>
-    </li>
-    <% if site.additional_contacts_info.present? %>
-      <li class="list-group-item">
-        Additional site contacts: <%= site.additional_contacts_info %>
-      </li>
-    <% end %>
-  </ul>
-  <% site.clusters.each do |cluster| %>
-    <%= link_to "#{cluster.name}: Manage this cluster",
-                cluster_path(cluster),
-                type: "button",
-                class: [
-                  'list-group-item',
-                  'list-group-item-action',
-                  'text-center',
-                  'text-primary'
-                ]
-    %>
-  <% end %>
+  <div class="card-body row">
+    <div class="col-6 card-text">
+      <h3><%= site.name %></h3>
+      <p><%= site.rendered_description.html_safe %></p>
+
+      <h4>Primary site contact</h4>
+      <ul><li><%= site.primary_contact&.decorate&.info || raw('<em>Unset</em>') %></li></ul>
+
+      <h4>Secondary site <%= 'contact'.pluralize(site.secondary_contacts.length) %></h4>
+      <% if site.secondary_contacts.present? %>
+        <ul>
+          <% site.secondary_contacts.map(&:decorate).each do |contact| %>
+            <li><%= contact.info %></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <em>None</em>
+      <% end %>
+
+      <% if site.additional_contacts.present? %>
+
+        <h4>Additional site contacts</h4>
+        <ul>
+          <% site.additional_contacts.each do |contact| %>
+            <li><a href="mailto:<%= contact.email %>"><%= contact.email %></a></li>
+          <% end %>
+        </ul>
+      <% end %>
+  </div>
+    <div class="col">
+      <h3>Clusters</h3>
+      <div class="list-group cluster-list">
+        <% site.clusters.each do |cluster| %>
+          <div class="list-group-item">
+            <h4><%= cluster.name %></h4>
+            <span>
+              <%= link_to "Manage this cluster",
+                          cluster_path(cluster),
+                          type: "button",
+                          class: [
+                            'btn',
+                            'btn-primary'
+                          ]
+              %>
+              <%= link_to "View cases",
+                          cluster_cases_path(cluster),
+                          type: "button",
+                          class: [
+                            'btn',
+                            'btn-primary'
+                          ]
+              %>
+              <%= link_to "Create case",
+                          new_cluster_case_path(cluster),
+                          type: "button",
+                          class: [
+                            'btn',
+                            'btn-danger'
+                          ]
+              %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
 <% end %>

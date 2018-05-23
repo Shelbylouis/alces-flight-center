@@ -4,10 +4,6 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
   part_class_name = part_name.to_s.titlecase
 
   before :each do
-    # Prevent attempting to retrieve documents from S3 when Cluster page
-    # visited.
-    allow_any_instance_of(Cluster).to receive(:documents).and_return([])
-
     create(:"request_#{part_name}_becomes_managed_issue")
     create(:"request_#{part_name}_becomes_advice_issue")
   end

@@ -17,13 +17,29 @@
       </tr>
       <tr>
         <th>Association</th>
-        <td><%= @case.association_info %></td>
+        <td>
+          <%= @case.association_info %>
+          <% if current_user.admin? && @case.open? %>
+            <%= link_to 'Request maintenance',
+                        @case.request_maintenance_path,
+                        class: 'btn btn-secondary ml-2 btn-sm',
+                        role: 'button'
+            %>
+          <% end %>
+        </td>
         <th>State</th>
         <td id="case-state-controls">
           <%= @case.user_facing_state %>
           <%= render 'cases/case_state_controls' %>
         </td>
       </tr>
+      <% if @case.credit_charge %>
+      <tr>
+        <td colspan="2"></td>
+        <th>Credit usage</th>
+        <td><%= pluralize(@case.credit_charge, 'credit') %></td>
+      </tr>
+      <% end %>
       <tr>
         <th>Category</th>
         <td><%= @case.category&.name || 'None' %></td>
@@ -32,29 +48,15 @@
       </tr>
       <tr>
         <th>Tier</th>
-        <td><%= @case.tier_description %>
+        <td>
+          <%= @case.tier_description %>
+          <%= render 'cases/escalation_controls' %>
+        </td>
         <th>Unique identifier</th>
         <td><%= @case.display_id %></td>
       </tr>
-      <tr>
-        <th>Fields</th>
-        <td colspan="3">
-          <div class="table-responsive">
-            <table class="table table-sm table-striped table-bordered">
-              <% @case.fields.each do |field| %>
-                <tr>
-                  <th scope="row">
-                    <%= field.fetch('name') %>
-                  </th>
-                  <td>
-                    <%= simple_format(field.fetch('value')) %>
-                  </td>
-                </tr>
-              <% end%>
-            </table>
-          </div>
-        </td>
-      </tr>
+      <%= render 'cases/fields_or_requests_row', kase: @case %>
+      <%= render 'cases/time_worked_row' %>
       <tr>
         <th>Case history</th>
         <td colspan="3">

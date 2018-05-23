@@ -14,18 +14,28 @@ module Audited
 
     private
 
+    ADMIN_ONLY_CARDS = %w(time_worked)
+
     def change_card(date, user, change)
       field = change[0]
       from, to = *change[1]
 
       type = send("#{field}_type")
       text = send("#{field}_text", from, to)
+      admin_only = ADMIN_ONLY_CARDS.include?(field)
 
-      render_card(date, user&.name || 'Flight Center', type, text)
+      if text
+        render_card(date, user&.name || 'Flight Center', type, text, admin_only)
+      end
     end
 
-    def render_card(date, name, type, text)
-      h.render 'cases/event', date: date, name: name, type: type, text: text
+    def render_card(date, name, type, text, admin_only)
+      h.render 'cases/event',
+               admin_only: admin_only,
+               date: date,
+               name: name,
+               text: text,
+               type: type
     end
 
     def assignee_id_text(from, to)
@@ -42,6 +52,49 @@ module Audited
 
     def assignee_id_type
       'user'
+    end
+
+    def time_worked_text(from, to)
+      "Changed time worked from #{format_minutes(from)} to #{format_minutes(to)}."
+    end
+
+    def time_worked_type
+      'hourglass-half'
+    end
+
+    def format_minutes(mins)
+      hours, minutes = mins.divmod(60)
+      if hours > 0
+        "#{hours}h #{minutes}m"
+      else
+        "#{minutes}m"
+      end
+    end
+
+    def credit_charge_text(from, to)
+      if from.nil?
+        "A charge of #{h.pluralize(to, 'credit')} was added for this case."
+      else
+        "The credit charge attached to this case was changed from #{from} to #{pluralize(to, 'credit')}"
+      end
+    end
+
+    def credit_charge_type
+      'usd'
+    end
+
+    def tier_level_text(from, to)
+      if to == 3 && from < 3
+        "Escalated this case to tier #{h.tier_description(to)}."
+      elsif from.nil?  # Hide initial transitions caused by data migration
+        nil
+      else
+        raise "Unsupported tier level transition #{from} => #{to}"
+      end
+    end
+
+    def tier_level_type
+      'chevron-circle-up'
     end
   end
 end
