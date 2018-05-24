@@ -50,6 +50,16 @@ class ClusterDecorator < ApplicationDecorator
     }
   end
 
+  def credit_balance_class
+    if credit_balance.negative? || credit_balance.zero?
+      'text-danger'
+    elsif credit_balance < 10
+      'text-warning'
+    else
+      'text-success'
+    end
+  end
+
   private
 
   def notes_tab
@@ -74,4 +84,5 @@ class ClusterDecorator < ApplicationDecorator
       }
     end
   end
+
 end
