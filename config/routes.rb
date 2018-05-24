@@ -58,7 +58,7 @@ Rails.application.routes.draw do
   end
 
   resolved_cases = Proc.new do |**params, &block|
-    params[:only] = Array.wrap(params[:only]).concat [:new, :index]
+    params[:only] = Array.wrap(params[:only]).concat [:show, :new, :index]
     resources :cases, **params do
       collection do
         get :resolved
@@ -73,7 +73,7 @@ Rails.application.routes.draw do
 
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      resolved_cases.call(only: :show)
+      resolved_cases.call
     end
 
     resources :cases, only: [] do
@@ -133,7 +133,7 @@ Rails.application.routes.draw do
     root 'sites#show'
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
-    resolved_cases.call(only: [:show, :create]) do
+    resolved_cases.call(only: [:create]) do
       resources :case_comments, only: :create
       member do
         post :escalate
