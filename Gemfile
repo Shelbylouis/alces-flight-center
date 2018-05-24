@@ -62,6 +62,7 @@ gem 'sass'
 # For async emails
 gem 'resque'
 gem 'resque_mailer'
+gem 'resque-sentry' # For Sentry integration; must be after `gem 'resque'`.
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
