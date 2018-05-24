@@ -255,15 +255,15 @@ RSpec.describe Cluster, type: :model do
 
       expect(subject.credit_balance).to eq 42
 
-      create(:closed_case, cluster: subject, credit_charge: 12)
-      create(:closed_case, cluster: subject, credit_charge: 6)
-      create(:closed_case, cluster: subject, credit_charge: 3)
+      create(:closed_case, cluster: subject, credit_charge: build(:credit_charge, amount: 12))
+      create(:closed_case, cluster: subject, credit_charge: build(:credit_charge, amount: 6))
+      create(:closed_case, cluster: subject, credit_charge: build(:credit_charge, amount: 3))
 
       expect(subject.credit_balance).to eq 21
     end
 
     it 'allows a negative balance' do
-      create(:closed_case, cluster: subject, credit_charge: 12)
+      create(:closed_case, cluster: subject, credit_charge: build(:credit_charge, amount: 12))
       expect(subject.credit_balance).to eq -12
     end
   end

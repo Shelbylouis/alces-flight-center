@@ -100,7 +100,6 @@ FactoryBot.define do
 
   factory :credit_charge do
     amount 1
-    association :case
     association :user, factory: :admin
-    end
+  end
 end

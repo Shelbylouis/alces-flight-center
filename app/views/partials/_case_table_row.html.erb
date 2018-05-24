@@ -16,6 +16,6 @@
   </td>
   <td><%= kase.association_info %></td>
   <% if kase.resolved? || kase.closed? %>
-    <td><%= kase.credit_charge %></td>
+    <td><%= kase.credit_charge&.amount %></td>
   <% end %>
 </tr>

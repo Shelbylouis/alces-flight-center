@@ -99,7 +99,11 @@ class Case < ApplicationRecord
   scope :assigned_to, ->(user) { where(assignee: user) }
   scope :not_assigned_to, ->(user) { where.not(assignee: user).or(where(assignee: nil)) }
 
-  scope :with_charge, -> { where(state: 'closed').where('credit_charge > ?', 0) }
+  scope :with_charge, -> {
+    where(state: 'closed')
+    .includes(:credit_charge)
+    .where.not(credit_charges: {id: nil})
+  }
 
   def to_param
     self.display_id.parameterize.upcase
@@ -213,12 +217,6 @@ class Case < ApplicationRecord
   def tier_level=(new_level)
     @tier_level_changed = (new_level != tier_level)
     super(new_level)
-  end
-
-  def credit_charge=(charge_amount)
-    unless credit_charge.present?
-      credit_charge.create(amount: charge_amount)
-    end
   end
 
   def save!

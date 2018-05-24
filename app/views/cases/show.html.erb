@@ -37,7 +37,7 @@
       <tr>
         <td colspan="2"></td>
         <th>Credit usage</th>
-        <td><%= pluralize(@case.credit_charge, 'credit') %></td>
+        <td><%= pluralize(@case.credit_charge.amount, 'credit') %></td>
       </tr>
       <% end %>
       <tr>

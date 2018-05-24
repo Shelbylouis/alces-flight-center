@@ -83,7 +83,7 @@ class Cluster < ApplicationRecord
     end
 
     charged_cases.reduce(deposits) do |total, kase|
-      total -= kase.credit_charge
+      total -= kase.credit_charge.amount
     end
   end
   

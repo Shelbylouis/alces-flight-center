@@ -17,7 +17,12 @@ FactoryBot.define do
 
     factory :closed_case do
       state 'closed'
-      credit_charge 0
+
+      before(:create) do |k|
+        if k.credit_charge.nil?
+          k.credit_charge = build(:credit_charge, case: k)
+        end
+      end
     end
 
     factory :case_with_change_motd_request do

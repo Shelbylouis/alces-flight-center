@@ -73,7 +73,7 @@ class CasesController < ApplicationController
   def close
     charge = params.require(:case).require(:credit_charge).to_i
     change_action "Support case %s closed." do |kase|
-      kase.credit_charge = charge
+      kase.create_credit_charge(amount: charge, user: current_user)
       kase.close!(current_user)
     end
   rescue ActionController::ParameterMissing
