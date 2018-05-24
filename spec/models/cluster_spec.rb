@@ -245,6 +245,10 @@ RSpec.describe Cluster, type: :model do
 
     let(:admin) { create(:admin) }
 
+    it 'is zero with no deposits or chargeable cases' do
+      expect(subject.credit_balance).to eq 0
+    end
+
     it 'calculates balance by summing deposits with charges on cases' do
       create(:credit_deposit, cluster: subject, amount: 36)
       create(:credit_deposit, cluster: subject, amount: 6)
