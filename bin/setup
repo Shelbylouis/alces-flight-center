@@ -62,19 +62,24 @@ chdir APP_ROOT do
   puts "\n== Next steps! =="
   next_steps += [
     <<~EOF,
-      Edit `.env` file as needed to use valid environment variables.
+      Edit `.env` file as needed to use valid environment variables (see
+      comments in that file for what is required).
     EOF
     <<~EOF,
       You will probably want to run `rails
       alces:data:import_and_migrate_production` to give you a local development
-      database as close to production as possible.
+      database as close to production as possible. This task depends on you
+      having the `aws-cli` setup, and a `~/.aws/credentials` file available
+      with a `[alces]` section containing AWS credentials with permission to
+      read from the `alces-flight-center` S3 bucket.
     EOF
     <<~EOF,
       You'll need a version of geckodriver
       (https://github.com/mozilla/geckodriver) to run Selenium tests which use
       this; you can install this via a package manager of your choice, or by
       running `rake alces:setup:geckodriver` if you have no other preference or
-      it is unavailable for your package manager.
+      it is unavailable for your package manager. Alternatively, running tests
+      with `rspec --tag '~js'` will just skip these tests.
     EOF
     <<~EOF,
       Update this script to document or fix anything which broke or you had
