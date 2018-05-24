@@ -27,13 +27,13 @@ end %>
 
     <tbody class="assigned-cases">
       <% cases.assigned_to(current_user).decorate.each do |c| %>
-        <%= render 'partials/case_table_row', kase: c %>
+        <%= render 'partials/case_table_row', kase: c, scope: @scope %>
       <% end %>
     </tbody>
 
     <tbody>
       <% cases.not_assigned_to(current_user).decorate.each do |c| %>
-        <%= render 'partials/case_table_row', kase: c %>
+        <%= render 'partials/case_table_row', kase: c, scope: @scope %>
       <% end %>
     </tbody>
   <% end %>

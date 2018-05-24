@@ -1,5 +1,5 @@
 <tr>
-  <td><%= link_to kase.display_id, case_path(kase) %></td>
+  <td><%= link_to kase.display_id, polymorphic_path([scope, kase]) %></td>
   <%= timestamp_td(
     description:  'Support case created',
     timestamp: kase.created_at
