@@ -32,7 +32,7 @@
     ```bash
     git clone git@github.com:alces-software/alces-flight-center.git
     cd alces-flight-center
-    bin/setup
+    bundle exec bin/setup
     ```
 
 6. Perform required/suggested additional manual setup steps output at the end
