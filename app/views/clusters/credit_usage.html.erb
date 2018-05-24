@@ -1,4 +1,29 @@
 <% content_for(:subtitle) { 'Credit usage' } %>
 <%= render 'partials/tabs', activate: :credit_usage do %>
-  SOON.
+  <div class="card-body row">
+    <div class="col-sm-12">
+      <h3><%= @cluster.name %> support credit usage</h3>
+    </div>
+    <div class="col-sm-12 card-deck">
+      <%= render 'clusters/credit_balance', cluster: @cluster.decorate %>
+      <div class="card">
+        <div class="card-body">
+          <h4>Viewing usage for:</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+      <p class="text-center text-success">
+        Total accrued this period: <%= pluralize(@accrued, 'credit') %>
+      </p>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+      <p class="text-center text-danger">
+        Total used this period: <%= pluralize(@used, 'credit') %>
+      </p>
+    </div>
+    <div class="col-sm-12">
+      Body
+    </div>
+  </div>
 <% end %>
