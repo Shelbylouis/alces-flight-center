@@ -20,7 +20,7 @@ import SelectList
 import Service
 import State exposing (State)
 import Tier exposing (Tier)
-import Tier.DisplayWrapper
+import Tier.DisplayWrapper exposing (DisplayWrapper)
 import Tier.Field
 import Tier.Level as Level exposing (Level)
 import Types
@@ -28,6 +28,7 @@ import Validation
 import View.Charging as Charging
 import View.Fields as Fields
 import View.PartsField as PartsField exposing (PartsFieldConfig(..))
+import View.Utils
 
 
 view : State -> Html Msg
@@ -40,12 +41,9 @@ view state =
                 StartSubmit
 
         formElements =
-            Maybe.Extra.values
-                [ Just <| issueDrillDownSection state
-                , maybeSubjectSection state
-                , Just <| dynamicFieldsSection state
-                ]
-                |> List.intersperse (hr [] [])
+            [ issueDrillDownSection state
+            , dynamicFieldsSection state
+            ]
     in
     Html.form [ onSubmit submitMsg ] formElements
 
@@ -62,26 +60,8 @@ issueDrillDownSection state =
             , maybeCategoriesField state
             , issuesField state |> Just
             , maybeComponentsField state
-            , tierSelectField state |> Just
-            , Charging.chargeableAlert state
+            , tierTabs state |> Just
             ]
-
-
-maybeSubjectSection : State -> Maybe (Html Msg)
-maybeSubjectSection state =
-    let
-        selectedTier =
-            State.selectedTier state
-    in
-    case selectedTier.level of
-        Level.Zero ->
-            -- Does not make sense to display subject field when a level 0 Tier
-            -- is selected, since the form cannot be submitted and only
-            -- information is displayed.
-            Nothing
-
-        _ ->
-            Just <| section [] [ subjectField state ]
 
 
 dynamicFieldsSection : State -> Html Msg
@@ -100,7 +80,9 @@ dynamicFieldsSection state =
                     [ tierContentElements ]
 
                 _ ->
-                    [ tierContentElements
+                    [ subjectField state
+                    , hr [] []
+                    , tierContentElements
                     , submitButton state
                     ]
 
@@ -181,6 +163,71 @@ issuesField state =
         (always False)
         ChangeSelectedIssue
         state
+
+
+tierTabs : State -> Html Msg
+tierTabs state =
+    let
+        tabItems =
+            SelectList.mapBy displayWrapperToTab wrappedTiers
+                |> SelectList.toList
+
+        wrappedTiers =
+            State.selectedIssue state
+                |> Issue.tiers
+                |> Tier.DisplayWrapper.wrap
+    in
+    -- Tab support is available in elm-bootstrap, but we do not use it at the
+    -- moment as it is not really designed for a situation like ours, where the
+    -- tab state is derived and changed based on the rest of the model rather
+    -- than being an independent part of the model itself. Doing what we want
+    -- with it seemed difficult and convoluted, if not impossible, with the
+    -- current API.
+    div []
+        [ ul [ class "nav nav-tabs" ] tabItems
+
+        -- Need hidden field and accompanying `invalid-feedback` `div`, which
+        -- Bootstrap will use to decide whether to show any validation errors
+        -- for the selected Tier.
+        , Fields.hiddenFieldWithVisibleErrors Field.Tier state
+        , Charging.chargeableAlert state
+            |> Maybe.withDefault View.Utils.nothing
+        ]
+
+
+displayWrapperToTab : SelectList.Position -> DisplayWrapper -> Html Msg
+displayWrapperToTab position wrapper =
+    let
+        clickMsg =
+            Tier.DisplayWrapper.extractId wrapper
+                |> toString
+                |> ChangeSelectedTier
+
+        linkClasses =
+            [ ( "nav-link", True )
+            , ( "active", position == SelectList.Selected )
+            , ( "disabled", Tier.DisplayWrapper.isUnavailable wrapper )
+            ]
+
+        titleText =
+            if Tier.DisplayWrapper.isUnavailable wrapper then
+                "Tier unavailable for selected issue"
+            else
+                ""
+    in
+    li [ class "nav-item" ]
+        [ a
+            [ classList linkClasses
+            , onClick clickMsg
+            , title titleText
+
+            -- A `href` is required for Bootstrap to style the tabs correctly,
+            -- and it needs this value as we don't want it to actually go
+            -- anywhere (apart from what we handle in `onClick`).
+            , href "javascript:void(0)"
+            ]
+            [ text <| Tier.DisplayWrapper.description wrapper ]
+        ]
 
 
 tierSelectField : State -> Html Msg

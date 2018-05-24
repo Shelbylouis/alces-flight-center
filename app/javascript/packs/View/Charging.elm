@@ -8,6 +8,7 @@ module View.Charging
 import Bootstrap.Alert as Alert
 import Bootstrap.Button as Button
 import Bootstrap.Modal as Modal
+import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -41,15 +42,17 @@ chargeableAlert state =
             Alert.link
                 [ ClusterChargingInfoModal Modal.shown |> onClick
 
-                -- This makes this display as a normal link, but clicking on it
-                -- not reload the page. There may be a better way to do this;
-                -- `href="#"` does not work.
+                -- Make this display as a normal link, but clicking on it not
+                -- reload the page.
                 , href "javascript:void(0)"
                 ]
                 [ text "Click here for the charging details for this cluster." ]
     in
     if isChargeable then
-        Just <| Alert.simpleWarning [] alertChildren
+        Just <|
+            Alert.simpleWarning
+                [ Spacing.mt2, Spacing.mb0 ]
+                alertChildren
     else
         Nothing
 

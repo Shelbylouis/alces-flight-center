@@ -1,6 +1,7 @@
 module View.Fields
     exposing
-        ( selectField
+        ( hiddenFieldWithVisibleErrors
+        , selectField
         , textField
         )
 
@@ -169,6 +170,24 @@ formField field item htmlFn additionalAttributes children optional help state =
         , requiredBadge
         , formElement
         , helpElement
+        , validationFeedback errors
+        ]
+
+
+hiddenFieldWithVisibleErrors : Field -> State -> Html msg
+hiddenFieldWithVisibleErrors field state =
+    let
+        errors =
+            Validation.validateField field state
+    in
+    div []
+        [ input
+            -- Bootstrap requires an input with appropriate classes as a
+            -- sibling in order to show an `invalid-feedback` `div`.
+            [ type_ "hidden"
+            , class <| formControlClasses field errors
+            ]
+            []
         , validationFeedback errors
         ]
 
