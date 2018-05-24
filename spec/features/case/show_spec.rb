@@ -229,7 +229,7 @@ RSpec.describe 'Case page' do
           find(comment_form_class)
         end.to raise_error(Capybara::ElementNotFound)
 
-        expect(find('.card.bg-light').text).to match 'This is a non-consultancy support case and so additional discussion is not available.'
+        expect(find('.card.bg-light').text).to match 'Additional discussion is not available for cases in the current support tier'
       end
     end
 
