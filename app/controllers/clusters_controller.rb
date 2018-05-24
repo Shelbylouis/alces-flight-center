@@ -3,14 +3,17 @@ class ClustersController < ApplicationController
 
   def credit_usage
 
-    @events = (charges + deposits).sort_by(&:created_at)
+    @events = (charges + deposits)
+              .sort_by(&:created_at)
+              .reverse!
+              .map(&:decorate)
 
     @accrued = deposits.reduce(0) do |total, deposit|
       total += deposit.amount
     end
 
     @used = charges.reduce(0) do |total, kase|
-      total += kase.credit_charge.amount
+      total += kase.amount
     end
 
   end
@@ -34,7 +37,7 @@ class ClustersController < ApplicationController
   end
 
   def charges
-    @cluster.cases.with_charge_in_period(start_date, end_date)
+    @cluster.cases.with_charge_in_period(start_date, end_date).map(&:credit_charge)
   end
 
   def deposits

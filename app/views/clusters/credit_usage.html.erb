@@ -23,7 +23,11 @@
       </p>
     </div>
     <div class="col-sm-12">
-      Body
+      <ul class="list-group">
+      <% @events.each do |event| %>
+        <%= event.credit_usage_card %>
+      <% end %>
+      </ul>
     </div>
   </div>
 <% end %>
