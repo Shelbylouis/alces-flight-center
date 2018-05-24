@@ -19,6 +19,8 @@ class Case < ApplicationRecord
   has_many :case_state_transitions
   alias_attribute :transitions, :case_state_transitions
 
+  has_one :credit_charge, required: false
+
   delegate :category, to: :issue
   delegate :email_recipients, to: :site
   delegate :site, to: :cluster, allow_nil: true
@@ -68,11 +70,6 @@ class Case < ApplicationRecord
   }
 
   validate :time_worked_not_changed_unless_allowed
-
-  validates :credit_charge, numericality: {
-      only_integer: true,
-      greater_than_or_equal_to: 0
-  }, if: :credit_charge  # Credit charge can be null (not set)
 
   validates :credit_charge, presence: true,  if: :closed?
 
@@ -216,6 +213,12 @@ class Case < ApplicationRecord
   def tier_level=(new_level)
     @tier_level_changed = (new_level != tier_level)
     super(new_level)
+  end
+
+  def credit_charge=(charge_amount)
+    unless credit_charge.present?
+      credit_charge.create(amount: charge_amount)
+    end
   end
 
   def save!

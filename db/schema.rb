@@ -112,8 +112,8 @@ ActiveRecord::Schema.define(version: 2018_06_11_103418) do
     t.bigint "assignee_id"
     t.string "display_id", null: false
     t.integer "time_worked", default: 0, null: false
-    t.integer "credit_charge"
     t.boolean "comments_enabled", default: false
+    t.integer "legacy_credit_charge"
     t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
     t.index ["component_id"], name: "index_cases_on_component_id"
@@ -207,6 +207,16 @@ ActiveRecord::Schema.define(version: 2018_06_11_103418) do
     t.string "support_type", default: "inherit", null: false
     t.boolean "internal", default: false
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
+  end
+
+  create_table "credit_charges", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "case_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "amount", null: false
+    t.index ["case_id"], name: "index_credit_charges_on_case_id"
+    t.index ["user_id"], name: "index_credit_charges_on_user_id"
   end
 
   create_table "credit_deposits", force: :cascade do |t|
@@ -383,6 +393,8 @@ ActiveRecord::Schema.define(version: 2018_06_11_103418) do
   add_foreign_key "component_groups", "component_makes"
   add_foreign_key "component_makes", "component_types"
   add_foreign_key "components", "component_groups"
+  add_foreign_key "credit_charges", "cases"
+  add_foreign_key "credit_charges", "users"
   add_foreign_key "credit_deposits", "clusters"
   add_foreign_key "credit_deposits", "users"
   add_foreign_key "expansions", "component_makes"
