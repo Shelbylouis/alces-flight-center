@@ -17,7 +17,9 @@ namespace :alces do
     EOF
     task :import_production do
       # Delegate out to the shell script which does all the work.
-      system('bin/import-production-data')
+      unless system('bin/import-production-data')
+        abort 'Production data import failed!'
+      end
     end
   end
 end
