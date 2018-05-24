@@ -239,4 +239,28 @@ RSpec.describe Cluster, type: :model do
       expect(results).to eq [1, 2, 3]
     end
   end
+
+  describe 'support credits' do
+    subject { create(:cluster) }
+
+    let(:admin) { create(:admin) }
+
+    it 'calculates balance by summing deposits with charges on cases' do
+      create(:credit_deposit, cluster: subject, amount: 36)
+      create(:credit_deposit, cluster: subject, amount: 6)
+
+      expect(subject.credit_balance).to eq 42
+
+      create(:closed_case, cluster: subject, credit_charge: 12)
+      create(:closed_case, cluster: subject, credit_charge: 6)
+      create(:closed_case, cluster: subject, credit_charge: 3)
+
+      expect(subject.credit_balance).to eq 21
+    end
+
+    it 'allows a negative balance' do
+      create(:closed_case, cluster: subject, credit_charge: 12)
+      expect(subject.credit_balance).to eq -12
+    end
+  end
 end
