@@ -168,6 +168,7 @@ Rails.application.routes.draw do
       confirm_maintenance_form.call
       get :documents
       notes.call(false)
+      get :credit_usage
     end
 
     resources :components, only: :show do
