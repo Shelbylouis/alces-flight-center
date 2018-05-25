@@ -21,16 +21,17 @@ class ComponentsController < ApplicationController
     if @scope.is_a? ComponentGroup
       [@scope]
     elsif type_param.blank?
-      @scope.component_groups
+      all_groups
     else
-      @scope.component_groups_by_type.find do |group_type|
-        group_type.name == type_param[:type]
-      end.tap { |found_group| not_found unless found_group }
-         .component_groups
+      all_groups.where({ component_types: { name: type_param[:type] } })
     end
   end
 
   def type_param
     params.permit(:type)
+  end
+
+  def all_groups
+    @scope.component_groups
   end
 end

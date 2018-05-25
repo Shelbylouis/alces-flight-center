@@ -147,33 +147,37 @@ RSpec.describe Cluster, type: :model do
     end
   end
 
-  describe '#component_groups_by_type' do
+  describe '#available_component_group_types' do
     subject do
       create(:cluster).tap do |cluster|
 
-        # 2 groups of servers.
-        server_make = create(:component_make, component_type: server_component_type)
+        server_make = create(
+          :component_make,
+          component_type: server_component_type
+        )
         cluster.component_groups.create!(
           name: 'Node group',
-          component_make: server_make,
-          genders_host_range: 'node[01-03]',
-        )
-        cluster.component_groups.create!(
-          name: 'Other node group',
-          component_make: server_make,
-          genders_host_range: 'othernodes[01-02]',
+          component_make: server_make
         )
 
-        another_make = create(:component_make, component_type: another_component_type)
+        another_make = create(
+          :component_make,
+          component_type: another_component_type
+        )
         cluster.component_groups.create!(
           name: 'Another group',
-          component_make: another_make,
-        ).tap do |group|
-          group.components.create!(
-            name: 'Single component'
-          )
-        end
-      end.component_groups_by_type
+          component_make: another_make
+        )
+
+        yet_another_make = create(
+          :component_make,
+          component_type: yet_another_component_type
+        )
+        cluster.component_groups.create!(
+          name: 'Yet another group',
+          component_make: yet_another_make
+        )
+      end.available_component_group_types
     end
 
     let! :server_component_type do
@@ -182,22 +186,16 @@ RSpec.describe Cluster, type: :model do
     let! :another_component_type do
       create(:component_type, name: 'Another Type', ordering: 1)
     end
+    let! :yet_another_component_type do
+      create(:component_type, name: 'Yet Another Type', ordering: 4)
+    end
     let! :unused_component_type do
-      create(:component_type, name: 'Unused')
+      create(:component_type, name: 'Unused Type', ordering: 3)
     end
 
-    it "returns cluster's component groups, with intermediate type-related object" do
-      server_group = subject.find {|type| type.name == 'Server'}
-      expect(server_group.component_groups.length).to eq 2
-
-      node_group = server_group.component_groups.first
-      expect(node_group.name).to eq 'Node group'
-      expect(node_group.components.length).to eq 3
-    end
-
-    it 'includes component types that has some components for, ordered by ordering' do
-      type_names = subject.map(&:name)
-      expect(type_names).to eq(['Another Type', 'Server'])
+    it 'returns the available component types' do
+      expect(subject).not_to include('Unused Type')
+      expect(subject).to eq(['Another Type', 'Server', 'Yet Another Type'])
     end
   end
 
