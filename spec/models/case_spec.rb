@@ -454,4 +454,27 @@ RSpec.describe Case, type: :model do
       end
     end
   end
+
+  describe '#potential_assignees' do
+    subject { kase.potential_assignees.map(&:name) }
+    let(:kase) { create(:case) }
+
+    it 'includes any admin' do
+      create(:admin, name: 'some_admin')
+
+      expect(subject).to include('some_admin')
+    end
+
+    it 'includes any contact for site of Case' do
+      create(:contact, name: 'some_contact', site: kase.site)
+
+      expect(subject).to include('some_contact')
+    end
+
+    it 'does not include unrelated contact' do
+      create(:contact, name: 'some_contact')
+
+      expect(subject).not_to include('some_contact')
+    end
+  end
 end
