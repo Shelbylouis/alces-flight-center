@@ -13,8 +13,8 @@ class CasesController < ApplicationController
   end
 
   def show
-    not_found unless @scope.cases.include? case_from_params
     @case = case_from_params
+    not_found unless @scope.cases.include? @case
     @comment = @case.case_comments.new
   end
 
