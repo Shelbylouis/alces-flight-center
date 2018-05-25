@@ -7,8 +7,18 @@ class Cluster < ApplicationRecord
   PART_NAMES = [:component, :service].freeze
 
   belongs_to :site
-  has_many :component_groups, dependent: :destroy
-  has_many :components, through: :component_groups, dependent: :destroy
+  has_many :component_groups,
+    # Associated ComponentGroups should be ordered by the `ordering` defined
+    # for their types (we always want VMs to appear first etc.).
+    -> {  joins(:component_type).order('ordering')  },
+    dependent: :destroy
+  has_many :components,
+    # Need to remove order scope defined for ComponentGroups above, as makes no
+    # sense and blows things up when just getting Components through the
+    # groups.
+    -> { unscope(:order) },
+    through: :component_groups,
+    dependent: :destroy
   has_many :services, dependent: :destroy
   has_many :cases
   has_many :maintenance_windows
@@ -45,8 +55,7 @@ class Cluster < ApplicationRecord
   end
 
   def available_component_group_types
-    component_groups.joins(:component_type).order('ordering')
-      .pluck("component_types.name").uniq
+    component_groups.pluck("component_types.name").uniq
   end
 
   def unfinished_related_maintenance_windows

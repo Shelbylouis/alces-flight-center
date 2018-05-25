@@ -32,6 +32,6 @@ class ComponentsController < ApplicationController
   end
 
   def all_groups
-    @scope.component_groups.joins(:component_type).order('ordering')
+    @scope.component_groups
   end
 end
