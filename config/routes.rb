@@ -57,7 +57,7 @@ Rails.application.routes.draw do
     resources :maintenance_windows, path: :maintenance, only: :index
   end
 
-  resolved_cases = Proc.new do |**params, &block|
+  cases = Proc.new do |**params, &block|
     params[:only] = Array.wrap(params[:only]).concat [:show, :new, :index]
     resources :cases, **params do
       collection do
@@ -73,7 +73,7 @@ Rails.application.routes.draw do
 
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      resolved_cases.call
+      cases.call
     end
 
     resources :cases, only: [] do
@@ -133,7 +133,7 @@ Rails.application.routes.draw do
     root 'sites#show'
     delete '/sign_out' => 'clearance/sessions#destroy', as: 'sign_out'
 
-    resolved_cases.call(only: [:create]) do
+    cases.call(only: [:create]) do
       resources :case_comments, only: :create
       member do
         post :escalate
@@ -141,7 +141,7 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: :show do
-      resolved_cases.call
+      cases.call
       resources :services, only: :index
       maintenance_windows.call
       resources :components, only: :index
@@ -151,7 +151,7 @@ Rails.application.routes.draw do
     end
 
     resources :components, only: :show do
-      resolved_cases.call
+      cases.call
       maintenance_windows.call
       resources :component_expansions,
                 path: component_expansions_alias,
@@ -168,7 +168,7 @@ Rails.application.routes.draw do
     end
 
     resources :services, only: :show do
-      resolved_cases.call
+      cases.call
       maintenance_windows.call
       confirm_maintenance_form.call
     end
