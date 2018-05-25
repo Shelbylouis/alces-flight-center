@@ -8,6 +8,7 @@ namespace :alces do
     task import_and_migrate_production: [
       'alces:data:import_production',
       'db:migrate:with_data',
+      'alces:data:obscure_users',
     ]
 
     desc <<~EOF.squish
