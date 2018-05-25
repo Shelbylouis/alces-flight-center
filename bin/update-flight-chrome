@@ -3,8 +3,8 @@ set -euo pipefail
 IFS=$'\n\t'
 
 ALCES_FLIGHT_WWW_PATH='../alces-flight-www'
-FLIGHT_CENTER_JS_PATH='public/flight-branding/flight-chrome.js'
-FLIGHT_CENTER_CSS_PATH='app/assets/stylesheets/flight-branding/flight-chrome.css'
+FLIGHT_CENTER_JS_PATH='public/flight-branding'
+FLIGHT_CENTER_CSS_PATH='app/assets/stylesheets/flight-branding'
 
 main() {
   local flight_chrome_path js_path css_path
@@ -24,11 +24,37 @@ main() {
   yarn build:center
   cd -
 
+  rm -f "$(current_js)"
+  rm -f "$(current_css)"
+
   mv "$js_path"/main.*.js "$FLIGHT_CENTER_JS_PATH"
   mv "$css_path"/main.*.css "$FLIGHT_CENTER_CSS_PATH"
 
   git add "$FLIGHT_CENTER_JS_PATH" "$FLIGHT_CENTER_CSS_PATH"
-  git commit -m "Update Flight Chrome"
+  git commit -m "Update Flight Chrome" || true
+
+  cat <<-EOF
+
+
+    You still need to update the references in
+    'app/views/layouts/application.html.erb' and
+    'config/initializers/assets.rb' to use the new Chrome!
+
+    New paths:
+
+      JS: $(current_js)
+      CSS: $(current_css)
+
+    Then you can amend the above commit.
+EOF
+}
+
+current_js() {
+  echo "$FLIGHT_CENTER_JS_PATH"/main.*.js
+}
+
+current_css() {
+  echo "$FLIGHT_CENTER_CSS_PATH"/main.*.css
 }
 
 main
