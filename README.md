@@ -132,6 +132,23 @@ user could do, even if they haven't yet).
 - and/or: document unclear/inaccurate/missing steps in above sections.
 
 
+### To update Flight Chrome for Flight Center
+
+Flight Chrome from
+[`alces-flight-www`](https://github.com/alces-software/alces-flight-www) is
+used for the header and footer of Flight Center, and may periodically need
+updating to support new features/content/styles etc. for these. To do this:
+
+1. Have `alces-flight-www` checked out as a sibling directory, named
+   `alces-flight-www`, of wherever you have cloned this repo.
+
+2. Make sure `alces-flight-www` is on the branch you want to build
+   `flight-chrome` from.
+
+3. Run `bin/update-flight-chrome`.
+
+4. Make the necessary manual updates output at the end of this script.
+
 ## Redis
 
 We require a Redis server to handle our asynchronous email queue. In
