@@ -23,10 +23,10 @@ class Site < ApplicationRecord
   end
 
   def primary_contact
-    users.find_by(primary_contact: true)
+    users.find_by(role: 'primary_contact')
   end
 
   def secondary_contacts
-    users.where(primary_contact: false)
+    users.where(role: 'secondary_contact')
   end
 end
