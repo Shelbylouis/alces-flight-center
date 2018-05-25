@@ -38,9 +38,10 @@ class User < ApplicationRecord
   end
 
   def validates_primary_contact_assignment
-    return if site&.primary_contact.nil?
-    errors.add(:primary_contact, 'is already set for this site') if
-      primary_contact && site.primary_contact != self
+    return unless site_primary_contact
+    if primary_contact? && site_primary_contact != self
+      errors.add(:role, 'primary contact is already set for this site')
+    end
   end
 
   def self.globally_available?
@@ -51,5 +52,9 @@ class User < ApplicationRecord
 
   def role_inquiry
     role&.inquiry
+  end
+
+  def site_primary_contact
+    @site_primary_contact ||= site&.primary_contact
   end
 end
