@@ -3,6 +3,9 @@
 require 'resque/tasks'
 require_relative 'config/application'
 
+# Always show error stack traces.
+Rake.application.options.trace = true
+
 task 'resque:setup' => :environment
 
 Rails.application.load_tasks
