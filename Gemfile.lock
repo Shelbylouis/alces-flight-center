@@ -121,6 +121,8 @@ GEM
     crass (1.0.4)
     css_parser (1.6.0)
       addressable
+    data_migrate (4.0.0)
+      rails (>= 4.2)
     development_ribbon (0.2.0)
     diff-lcs (1.3)
     domain_name (0.5.20180417)
@@ -262,8 +264,6 @@ GEM
       actionpack (~> 5.x, >= 5.0.1)
       actionview (~> 5.x, >= 5.0.1)
       activesupport (~> 5.x)
-    rails-data-migrations (1.1.0)
-      rails (>= 4.0.0)
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
@@ -447,6 +447,7 @@ DEPENDENCIES
   byebug
   capybara (~> 2.13)
   clearance
+  data_migrate
   development_ribbon
   dotenv-rails
   draper
@@ -464,7 +465,6 @@ DEPENDENCIES
   puma (~> 3.7)
   rails (~> 5.2)
   rails-controller-testing
-  rails-data-migrations
   rails_admin (~> 1.3)
   rails_email_preview (~> 2.0.4)
   request_store

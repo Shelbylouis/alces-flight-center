@@ -31,8 +31,7 @@ class Deployment
 
     import_production_backup_to_staging if staging?
 
-    dokku_run 'rake db:migrate', app: app_name
-    dokku_run 'rake data:migrate', app: app_name
+    dokku_run 'rake db:migrate:with_data', app: app_name
 
     run "git tag -f #{remote} #{current_branch}"
     run "git tag -f #{tag} #{current_branch}"

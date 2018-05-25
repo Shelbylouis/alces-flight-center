@@ -7,8 +7,7 @@ namespace :alces do
     EOF
     task import_and_migrate_production: [
       'alces:data:import_production',
-      'db:migrate',
-      'data:migrate',
+      'db:migrate:with_data',
     ]
 
     desc <<~EOF.squish
