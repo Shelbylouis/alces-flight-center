@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
+  it { is_expected.to validate_presence_of(:role) }
+  it do is_expected.to validate_inclusion_of(:role).in_array([
+    'admin', 'primary_contact', 'secondary_contact', 'viewer'
+  ])
+  end
+
   describe '#secondary_contact?' do
     context 'when User is primary contact' do
       subject { create(:primary_contact).secondary_contact? }

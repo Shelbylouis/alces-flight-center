@@ -4,6 +4,8 @@ class User < ApplicationRecord
   include Clearance::User
   include AdminConfig::User
 
+  ROLES = %w{admin primary_contact secondary_contact viewer}
+
   belongs_to :site, required: false
 
   validates_associated :site
@@ -12,6 +14,7 @@ class User < ApplicationRecord
             presence: true,
             email_format: { message: Constants::EMAIL_FORMAT_MESSAGE }
   validates :password, length: { minimum: 5 }, if: :password
+  validates :role, presence: true, inclusion: ROLES
 
   validates :site, {
     presence: {if: :contact?},
