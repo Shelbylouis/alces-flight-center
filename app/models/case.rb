@@ -190,7 +190,7 @@ class Case < ApplicationRecord
   end
 
   def potential_assignees
-    User.where(site: site).order(:name) +
+    User.where(site: site).where.not(role: :viewer).order(:name) +
         User.where(role: :admin).order(:name)
   end
 
