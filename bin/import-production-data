@@ -66,17 +66,7 @@ RUBY
 
 obfuscate_imported_data() {
   log_info "Obfuscating imported data to remove real emails and passwords..."
-
-  cat <<-RUBY | ruby
-    require './config/environment'
-    User.all.each do |user|
-      email_base = user.email.split('@').first
-      user.email = "#{email_base}@example.com"
-      user.password = 'password'
-      user.save!
-    end
-RUBY
-
+  rake alces:data:obscure_users
 }
 
 log_info() {

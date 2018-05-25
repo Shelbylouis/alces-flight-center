@@ -20,5 +20,14 @@ namespace :alces do
         abort 'Production data import failed!'
       end
     end
+
+    task obscure_users: :environment do
+      User.all.each do |user|
+        email_base = user.email.split('@').first
+        user.email = "#{email_base}@example.com"
+        user.password = 'password'
+        user.save!
+      end
+    end
   end
 end
