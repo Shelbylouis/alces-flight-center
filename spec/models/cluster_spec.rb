@@ -189,8 +189,12 @@ RSpec.describe Cluster, type: :model do
     let! :yet_another_component_type do
       create(:component_type, name: 'Yet Another Type', ordering: 4)
     end
+    let! :unused_component_type do
+      create(:component_type, name: 'Unused Type', ordering: 3)
+    end
 
-    it 'returns the component types' do
+    it 'returns the available component types' do
+      expect(subject).not_to include('Unused Type')
       expect(subject).to eq(['Another Type', 'Server', 'Yet Another Type'])
     end
   end
