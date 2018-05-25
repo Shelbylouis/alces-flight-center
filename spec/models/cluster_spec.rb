@@ -195,11 +195,6 @@ RSpec.describe Cluster, type: :model do
     end
   end
 
-  describe '#component_group_types' do
-    subject do
-    end
-  end
-
   describe '#unfinished_related_maintenance_windows' do
     subject { create(:cluster) }
 
