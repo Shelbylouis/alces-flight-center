@@ -34,7 +34,7 @@ class User < ApplicationRecord
     allow_nil: true
 
   def contact?
-    !admin?
+    primary_contact? || secondary_contact?
   end
 
   def validates_primary_contact_assignment
