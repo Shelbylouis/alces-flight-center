@@ -28,7 +28,7 @@ gem 'rails_email_preview', '~> 2.0.4'
 gem 'validates_email_format_of'
 gem 'webpacker', '~> 3.0'
 gem 'draper'
-gem 'rails-data-migrations'
+gem 'data_migrate'
 gem 'font-awesome-rails'
 gem 'request_store'
 gem 'bootsnap', require: false
