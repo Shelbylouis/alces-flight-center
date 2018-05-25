@@ -26,16 +26,15 @@ class User < ApplicationRecord
   }
   validate :validates_primary_contact_assignment
 
-  alias_attribute :primary_contact?, :primary_contact
-
-  alias_attribute :admin?, :admin
+  delegate :admin?,
+    :primary_contact?,
+    :secondary_contact?,
+    :viewer?,
+    to: :role_inquiry,
+    allow_nil: true
 
   def contact?
     !admin?
-  end
-
-  def secondary_contact?
-    contact? && !primary_contact?
   end
 
   def validates_primary_contact_assignment
@@ -46,5 +45,11 @@ class User < ApplicationRecord
 
   def self.globally_available?
     true
+  end
+
+  private
+
+  def role_inquiry
+    role&.inquiry
   end
 end
