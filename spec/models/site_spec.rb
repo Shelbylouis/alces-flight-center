@@ -22,14 +22,14 @@ RSpec.describe Site, type: :model do
 
   let(:additional_contact) { create(:additional_contact) }
 
-  describe '#all_contacts' do
-    subject { site.all_contacts }
+  describe '#email_recipients' do
+    subject { site.email_recipients }
 
-    it 'should give all contacts and additional contacts' do
+    it 'should give emails for all Site users and additional contacts' do
       expect(subject).to match_array([
-        primary_contact,
-        secondary_contact,
-        additional_contact,
+        primary_contact.email,
+        secondary_contact.email,
+        additional_contact.email,
       ])
     end
   end

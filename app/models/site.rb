@@ -18,8 +18,8 @@ class Site < ApplicationRecord
     self
   end
 
-  def all_contacts
-    users + additional_contacts
+  def email_recipients
+    (users + additional_contacts).map(&:email)
   end
 
   def primary_contact

@@ -20,6 +20,7 @@ class Case < ApplicationRecord
   alias_attribute :transitions, :case_state_transitions
 
   delegate :category, to: :issue
+  delegate :email_recipients, to: :site
   delegate :site, to: :cluster, allow_nil: true
 
   state_machine initial: :open do
@@ -124,11 +125,6 @@ class Case < ApplicationRecord
 
   def associated_model_type
     associated_model.readable_model_name
-  end
-
-  def email_recipients
-    site.all_contacts
-        .map(&:email)
   end
 
   def email_reply_subject
