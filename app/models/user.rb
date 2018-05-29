@@ -4,9 +4,6 @@ class User < ApplicationRecord
   include Clearance::User
   include AdminConfig::User
 
-  # If more fields need to be added to User which are just for contact or admin
-  # users (as well as site which is just for contacts), then we should split
-  # these out to new tables which are conditionally associated with users.
   belongs_to :site, required: false
 
   validates_associated :site
