@@ -18,7 +18,6 @@ main() {
 
   backup_file_path=$(bin/retrieve-production-backup)
   import_backup "$backup_file_path"
-  obfuscate_imported_data
   log_info 'Done!'
 }
 
@@ -62,21 +61,6 @@ load_dev_database_config_value() {
     config = YAML.load_file('$DATABASE_CONFIG_PATH')
     puts config['development']['$value_name']
 RUBY
-}
-
-obfuscate_imported_data() {
-  log_info "Obfuscating imported data to remove real emails and passwords..."
-
-  cat <<-RUBY | ruby
-    require './config/environment'
-    User.all.each do |user|
-      email_base = user.email.split('@').first
-      user.email = "#{email_base}@example.com"
-      user.password = 'password'
-      user.save!
-    end
-RUBY
-
 }
 
 log_info() {

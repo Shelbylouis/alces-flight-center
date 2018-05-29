@@ -11,7 +11,7 @@ class User < ApplicationRecord
   validates :email,
             presence: true,
             email_format: { message: Constants::EMAIL_FORMAT_MESSAGE }
-  validates :password, presence: true, length: { minimum: 5 }
+  validates :password, length: { minimum: 5 }, if: :password
 
   validates :site, {
     presence: {if: :contact?},

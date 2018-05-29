@@ -106,7 +106,7 @@ class Deployment
     # Obfuscate the imported production data for non-admin users to not use
     # real emails and to all use password passed as environment variable.
     obfuscate_dokku_command = <<~COMMAND.squish
-      rake alces:deploy:staging:obfuscate_user_data
+      rake alces:deploy:staging:obfuscate_users
       STAGING_PASSWORD="#{Shellwords.escape(staging_password)}"
     COMMAND
     dokku_run obfuscate_dokku_command, app: STAGING_APP

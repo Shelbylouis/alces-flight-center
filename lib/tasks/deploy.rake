@@ -32,7 +32,7 @@ namespace :alces do
     end
 
     namespace :staging do
-      task obfuscate_user_data: :environment do
+      task obfuscate_users: :environment do
         staging_password = Deployment::Staging.password
 
         User.where(admin: false).each do |user|

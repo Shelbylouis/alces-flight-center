@@ -8,6 +8,7 @@ namespace :alces do
     task import_and_migrate_production: [
       'alces:data:import_production',
       'db:migrate:with_data',
+      'alces:data:obfuscate_users',
     ]
 
     desc <<~EOF.squish
@@ -18,6 +19,14 @@ namespace :alces do
       # Delegate out to the shell script which does all the work.
       unless system('bin/import-production-data')
         abort 'Production data import failed!'
+      end
+    end
+
+    task obfuscate_users: :environment do
+      User.all.each do |user|
+        local_part = user.email.split('@').first
+        new_email =  "#{local_part}@example.com"
+        user.update!(email: new_email, password: 'password')
       end
     end
   end
