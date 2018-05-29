@@ -464,7 +464,7 @@ RSpec.describe 'Case page' do
       end.to change { request.reload.transitions.length }.by(1)
 
       expect(request).to be_applied
-      expect(current_path).to eq(case_path(subject))
+      expect(current_path).to eq(cluster_case_path(subject.cluster, subject))
       expect(
         find('.alert')
       ).to have_text('The cluster has been updated to reflect this change.')
@@ -508,6 +508,14 @@ RSpec.describe 'Case page' do
           expect(page).not_to have_button(button_text)
         end
       end
+    end
+  end
+
+  describe 'redirects' do
+    let (:kase) { create(:case, cluster: cluster) }
+    it 'to cluster dashboard case page when visiting /cases/:id' do
+      visit(case_path(kase, as: contact))
+      expect(current_path).to eq(cluster_case_path(kase.cluster, kase))
     end
   end
 end
