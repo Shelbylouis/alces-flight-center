@@ -7,62 +7,36 @@ RSpec.describe Site, type: :model do
   let :site do
     create(
       :site,
-      users: [primary_contact, secondary_contact, another_secondary_contact],
-      additional_contacts: [additional_contact_1, additional_contact_2]
+      users: [primary_contact, secondary_contact],
+      additional_contacts: [additional_contact]
     )
   end
 
   let :primary_contact do
-    create(
-      :primary_contact,
-      name: 'Some Contact',
-      email: 'some.contact@example.com'
-    )
+    create(:primary_contact, email: 'some.contact@example.com')
   end
+
   let :secondary_contact do
-    create(
-      :secondary_contact,
-      name: 'Another Contact',
-      email: 'another.contact@example.com'
-    )
-  end
-  let :another_secondary_contact do
-    create(
-      :secondary_contact,
-      name: 'Yet Another Contact',
-      email: 'yet.another.contact@example.com'
-    )
+    create(:secondary_contact, email: 'another.contact@example.com')
   end
 
-  let :additional_contact_1 do
-    create(
-      :additional_contact,
-      email: 'some.additional.contact@example.com'
-    )
-  end
-  let :additional_contact_2 do
-    create(
-      :additional_contact,
-      email: 'another.additional.contact@example.com'
-    )
-  end
+  let(:additional_contact) { create(:additional_contact) }
 
-  describe '#all_contacts' do
-    subject { site.all_contacts }
+  describe '#email_recipients' do
+    subject { site.email_recipients }
 
-    it 'should give all contacts and additional contacts' do
+    it 'should give emails for all Site users and additional contacts' do
       expect(subject).to match_array([
-        primary_contact,
-        secondary_contact,
-        another_secondary_contact,
-        additional_contact_1,
-        additional_contact_2,
+        primary_contact.email,
+        secondary_contact.email,
+        additional_contact.email,
       ])
     end
   end
 
   describe '#primary_contact' do
     subject { site.primary_contact }
+
     it 'gives Site primary contact' do
       expect(subject).to eq(primary_contact)
     end
@@ -70,23 +44,9 @@ RSpec.describe Site, type: :model do
 
   describe '#secondary_contacts' do
     subject { site.secondary_contacts }
+
     it 'gives Site secondary contacts' do
-      expect(subject).to eq([secondary_contact, another_secondary_contact])
-    end
-  end
-
-  describe '#managed_clusters' do
-    it 'gives all managed Clusters for Site' do
-      site = create(:site)
-      create(:managed_cluster, site: site, name: 'First managed')
-      create(:advice_cluster, site: site, name: 'Advice')
-      create(:managed_cluster, site: site, name: 'Second managed')
-
-      managed_cluster_names = site.managed_clusters.map(&:name)
-
-      expect(managed_cluster_names).to match_array(
-        ['First managed', 'Second managed']
-      )
+      expect(subject).to match_array([secondary_contact])
     end
   end
 end

@@ -18,8 +18,8 @@ class Site < ApplicationRecord
     self
   end
 
-  def all_contacts
-    users + additional_contacts
+  def email_recipients
+    (users + additional_contacts).map(&:email)
   end
 
   def primary_contact
@@ -27,10 +27,6 @@ class Site < ApplicationRecord
   end
 
   def secondary_contacts
-    users.where(primary_contact: false).order(:id)
-  end
-
-  def managed_clusters
-    clusters.select(&:managed?)
+    users.where(primary_contact: false)
   end
 end
