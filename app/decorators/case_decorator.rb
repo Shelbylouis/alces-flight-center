@@ -19,7 +19,11 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def case_link
-    h.link_to(display_id, h.case_path(self), title: subject)
+    h.link_to(
+      display_id,
+      h.cluster_case_path(self.cluster, self),
+      title: subject
+    )
   end
 
   def request_maintenance_path
