@@ -24,10 +24,9 @@ namespace :alces do
 
     task obscure_users: :environment do
       User.all.each do |user|
-        email_base = user.email.split('@').first
-        user.email = "#{email_base}@example.com"
-        user.password = 'password'
-        user.save!
+        local_part = user.email.split('@').first
+        new_email =  "#{local_part}@example.com"
+        user.update!(email: new_email, password: 'password')
       end
     end
   end
