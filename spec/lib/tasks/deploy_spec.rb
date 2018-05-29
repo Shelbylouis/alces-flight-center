@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'alces:deploy:staging:obfuscate_user_data' do
+RSpec.describe 'alces:deploy:staging:obfuscate_users' do
   include_context 'rake'
 
   let! :contact do

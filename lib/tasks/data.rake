@@ -8,7 +8,7 @@ namespace :alces do
     task import_and_migrate_production: [
       'alces:data:import_production',
       'db:migrate:with_data',
-      'alces:data:obscure_users',
+      'alces:data:obfuscate_users',
     ]
 
     desc <<~EOF.squish
@@ -22,7 +22,7 @@ namespace :alces do
       end
     end
 
-    task obscure_users: :environment do
+    task obfuscate_users: :environment do
       User.all.each do |user|
         local_part = user.email.split('@').first
         new_email =  "#{local_part}@example.com"
