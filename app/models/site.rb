@@ -27,6 +27,6 @@ class Site < ApplicationRecord
   end
 
   def secondary_contacts
-    users.where(primary_contact: false).order(:id)
+    users.where(primary_contact: false)
   end
 end
