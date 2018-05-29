@@ -29,8 +29,4 @@ class Site < ApplicationRecord
   def secondary_contacts
     users.where(primary_contact: false).order(:id)
   end
-
-  def managed_clusters
-    clusters.select(&:managed?)
-  end
 end
