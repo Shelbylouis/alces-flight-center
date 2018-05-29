@@ -8,6 +8,10 @@ class AllSitesDecorator < ApplicationDecorator
     ]
   end
 
+  def dashboard_case_path(kase)
+    Rails.application.routes.url_helpers.cluster_case_path(kase.cluster, kase)
+  end
+
   private
 
   def cases_tab
@@ -21,9 +25,5 @@ class AllSitesDecorator < ApplicationDecorator
   # We override these to generate the top level path names
   def scope_name_for_paths
     ''
-  end
-
-  def arguments_for_scope_path(*a)
-    a
   end
 end

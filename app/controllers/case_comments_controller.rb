@@ -17,10 +17,10 @@ class CaseCommentsController < ApplicationController
       flash[:error] = "Your comment was not added. #{new_comment.errors.full_messages.join('; ').strip}"
     end
 
-    redirect_to case_path(my_case)
+    redirect_back fallback_location: @scope.decorate.dashboard_case_path(my_case)
 
   rescue ActionController::ParameterMissing
     flash[:error] = 'Empty comments are not permitted.'
-    redirect_to case_path(my_case)
+    redirect_back fallback_location: @scope.decorate.dashboard_case_path(my_case)
   end
 end
