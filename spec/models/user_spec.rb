@@ -19,6 +19,12 @@ RSpec.describe User, type: :model do
 
       it { is_expected.to validate_presence_of(:site) }
     end
+
+    context 'as viewer' do
+      subject { create(:viewer) }
+
+      it { is_expected.to validate_presence_of(:site) }
+    end
   end
 
   roles = described_class::ROLES
