@@ -20,10 +20,6 @@ class User < ApplicationRecord
     presence: {if: :contact?},
     absence: {if: :admin?}
   }
-  validates :primary_contact, {
-    inclusion: {in: [true, false], if: :contact?},
-    absence: {if: :admin?}
-  }
   validate :validates_primary_contact_assignment
 
   delegate :admin?,
