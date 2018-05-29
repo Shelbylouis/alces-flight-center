@@ -6,7 +6,7 @@
             :assignee_id,
             @case.potential_assignees,
             :id,
-            Proc.new { |a| "#{a.admin ? '* ' : ''}#{a.name}"},
+            Proc.new { |a| "#{a.admin? ? '* ' : ''}#{a.name}"},
             {
               include_blank: 'Nobody',
             },
