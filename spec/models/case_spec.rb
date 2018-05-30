@@ -240,11 +240,6 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe '#associated_model_type' do
-    subject { create(:case_with_component).associated_model_type }
-    it { is_expected.to eq 'component' }
-  end
-
   describe '#email_properties' do
     let(:site) { create(:site) }
 
