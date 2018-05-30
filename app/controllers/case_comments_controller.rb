@@ -1,6 +1,4 @@
 class CaseCommentsController < ApplicationController
-  before_action :require_login
-
   def create
     my_case = Case.find_from_id!(params.require(:case_id))
 

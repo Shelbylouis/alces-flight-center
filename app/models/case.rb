@@ -123,10 +123,6 @@ class Case < ApplicationRecord
     component || service || cluster
   end
 
-  def associated_model_type
-    associated_model.readable_model_name
-  end
-
   def email_reply_subject
     "Re: #{email_subject}"
   end

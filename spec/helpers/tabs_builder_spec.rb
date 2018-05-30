@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe TabsHelper::TabsBuilder do
+RSpec.describe TabsBuilder do
   before :each do
     allow(helper).to receive(:current_user).and_return(user)
   end
-  let(:tab_builder) { TabsHelper::TabsBuilder.new(scope) }
+  let(:tab_builder) { TabsBuilder.new(scope) }
 
   describe '#cases' do
     subject { tab_builder.cases[:dropdown].map { |h| h[:path] } }
