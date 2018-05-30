@@ -33,6 +33,12 @@ class User < ApplicationRecord
     primary_contact? || secondary_contact?
   end
 
+  # Anyone who isn't just a viewer, i.e. who can perform some edits, is
+  # considered an editor.
+  def editor?
+    !viewer?
+  end
+
   def validates_primary_contact_assignment
     return unless site_primary_contact
     if primary_contact? && site_primary_contact != self

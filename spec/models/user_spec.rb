@@ -82,6 +82,36 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe '#editor?' do
+    subject do
+      build(:user, role: role).editor?
+    end
+
+    context "when role is 'primary_contact'" do
+      let (:role) { :primary_contact }
+
+      it { is_expected.to be true }
+    end
+
+    context "when role is 'secondary_contact'" do
+      let (:role) { :secondary_contact }
+
+      it { is_expected.to be true }
+    end
+
+    context "when role is 'admin'" do
+      let (:role) { :admin }
+
+      it { is_expected.to be true }
+    end
+
+    context "when role is 'viewer'" do
+      let (:role) { :viewer }
+
+      it { is_expected.to be false }
+    end
+  end
+
   describe '#validates_primary_contact_assignment' do
     subject do
       build(:user, role: 'primary_contact', site: site)
