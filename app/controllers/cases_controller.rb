@@ -1,6 +1,4 @@
 class CasesController < ApplicationController
-  before_action :require_login
-
   decorates_assigned :site
 
   def index(show_resolved: false)
