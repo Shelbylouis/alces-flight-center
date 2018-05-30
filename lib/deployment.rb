@@ -31,8 +31,6 @@ class Deployment
 
     import_production_backup_to_staging if staging?
 
-    dokku_run 'rake db:migrate:with_data', app: app_name
-
     run "git tag -f #{remote} #{current_branch}"
     run "git tag -f #{tag} #{current_branch}"
     run "git push --tags -f origin #{current_branch}"
@@ -102,6 +100,11 @@ class Deployment
     # staging database.
     production_backup_file = `#{'bin/retrieve-production-backup'}`
     run "psql -d #{staging_database_url} -f #{production_backup_file}"
+
+    # Run migrations since last deploy to production; needs to occur after
+    # production import and before obfuscating imported Users (to ensure
+    # running this task with migrated database).
+    dokku_run 'rake db:migrate:with_data', app: STAGING_APP
 
     # Obfuscate the imported production data for non-admin users to not use
     # real emails and to all use password passed as environment variable.
