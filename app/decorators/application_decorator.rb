@@ -117,12 +117,12 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   def new_maintenance_window_path
-    link_helper = "new_#{readable_model_name}_maintenance_window_path"
+    link_helper = "new_#{underscored_model_name}_maintenance_window_path"
     h.send(link_helper, self)
   end
 
   def id_key
-    "#{readable_model_name}_id".to_sym
+    "#{underscored_model_name}_id".to_sym
   end
 
   def tabs_builder
