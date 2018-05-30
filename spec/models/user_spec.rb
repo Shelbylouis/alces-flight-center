@@ -1,41 +1,89 @@
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  describe '#secondary_contact?' do
-    context 'when User is primary contact' do
-      subject { create(:primary_contact).secondary_contact? }
-      it { is_expected.to be false }
+  it { is_expected.to validate_presence_of(:role) }
+  it do is_expected.to validate_inclusion_of(:role).in_array([
+    'admin', 'primary_contact', 'secondary_contact', 'viewer'
+  ])
+  end
+
+  roles = described_class::ROLES
+  roles.each do |role|
+    role_query_method = role + '?'
+
+    describe "##{role_query_method}" do
+      subject do
+        build(:user, role: subject_role).public_send(role_query_method)
+      end
+
+      context "when role is '#{role}'" do
+        let(:subject_role) { role }
+
+        it { is_expected.to be true }
+      end
+
+      context "when role is not '#{role}'" do
+        another_role = roles.reject{|r| r == role}.sample
+
+        let(:subject_role) { another_role }
+
+        it { is_expected.to be false }
+      end
+    end
+  end
+
+  describe '#contact?' do
+    subject do
+      build(:user, role: role).contact?
     end
 
-    context 'when User is secondary contact' do
-      subject { create(:secondary_contact).secondary_contact? }
+    context "when role is 'primary_contact'" do
+      let (:role) { :primary_contact }
+
       it { is_expected.to be true }
     end
 
-    context 'when User is admin' do
-      subject { create(:admin).secondary_contact? }
+    context "when role is 'secondary_contact'" do
+      let (:role) { :secondary_contact }
+
+      it { is_expected.to be true }
+    end
+
+    context "when role is 'admin'" do
+      let (:role) { :admin }
+
+      it { is_expected.to be false }
+    end
+
+    context "when role is 'viewer'" do
+      let (:role) { :viewer }
+
       it { is_expected.to be false }
     end
   end
 
   describe '#validates_primary_contact_assignment' do
     subject do
-      build(:user, primary_contact: true)
+      build(:user, role: 'primary_contact', site: site)
     end
 
-    context 'with no primary contact' do
-      it 'should not error' do
+    let(:site) { create(:site) }
+
+    context 'with no existing primary contact for site' do
+      it 'should be valid' do
         expect(subject).to be_valid
       end
     end
 
-    context 'with an existing primary contact for the current site' do
-      let!(:primary_contact) { create(:user, primary_contact: true, site: subject.site) }
+    context 'with an existing primary contact for site' do
+      before :each do
+        create(:user, role: 'primary_contact', site: site)
+      end
 
-      it 'should error' do
+      it 'should be invalid' do
         expect(subject).not_to be_valid
         expect(subject.errors.messages).to match(
-          primary_contact: ['is already set for this site']
+          role: ['primary contact is already set for this site']
         )
       end
     end
