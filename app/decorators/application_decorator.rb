@@ -126,6 +126,6 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   def tabs_builder
-    @tabs_builder ||= TabsHelper::TabsBuilder.new(object)
+    @tabs_builder ||= TabsBuilder.new(object)
   end
 end
