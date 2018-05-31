@@ -34,8 +34,8 @@ class SlackNotifier
     notifier.ping attachments: case_note
   end
 
-  def assignee_notification(kase)
-    notification_text = "#{kase.assignee.name} has been assigned to #{kase.display_id}"
+  def assignee_notification(kase, assignee)
+    notification_text = "#{assignee.name} has been assigned to #{kase.display_id}"
     assignee_note = {
       fallback: notification_text,
       color: "#6e5494",
@@ -50,7 +50,7 @@ class SlackNotifier
         },
         {
           title: "Assigned to",
-          value: kase.assignee.name,
+          value: assignee.name,
           short: true
         }
       ]

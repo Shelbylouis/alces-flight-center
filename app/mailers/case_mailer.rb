@@ -21,7 +21,7 @@ class CaseMailer < ApplicationMailer
       cc: new_assignee&.email, # Send to new assignee only
       subject: @case.email_reply_subject
     )
-    slack.assignee_notification(@case)
+    slack.assignee_notification(@case, @assignee)
   end
 
   def comment(comment)
