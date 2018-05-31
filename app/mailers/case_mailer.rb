@@ -32,6 +32,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients.reject { |contact| contact == @comment.user.email }, # Exclude the user making the comment
       subject: @case.email_reply_subject,
     )
+    @slack.comment_notification(@case, @comment)
   end
 
   def maintenance(my_case, text)

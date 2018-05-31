@@ -12,7 +12,7 @@ class SlackNotifier
     notification_text = "New case created on #{kase.cluster.name}"
     case_note = {
       fallback: notification_text,
-      color: "#2794d8",
+      color: "#18bc9c",
       pretext: notification_text,
       author_name: kase.user.name,
       title: kase.subject,
@@ -28,7 +28,7 @@ class SlackNotifier
           value: kase.display_id,
           short: true
         },
-      ],
+      ]
     }
 
     notifier.ping attachments: case_note
@@ -37,7 +37,19 @@ class SlackNotifier
   def assignee
   end
 
-  def comment
+  def comment_notification(kase, comment)
+    notification_text = "New comment from #{comment.user.name} on #{kase.display_id}"
+    comment_note = {
+      fallback: notification_text,
+      color: "#2794d8",
+      pretext: notification_text,
+      author_name: comment.user.name,
+      title: kase.subject,
+      title_link: Rails.application.routes.url_helpers.cluster_case_url(kase.cluster, kase),
+      text: comment.text
+    }
+
+    notifier.ping attachments: comment_note
   end
 
   def maintenance
