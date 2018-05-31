@@ -11,7 +11,7 @@ class Deployment
   end
 
   def deploy
-    if production? && !current_branch.master?
+    if production? && !current_branch.master? && !dry_run?
       abort 'Must be on `master` branch to deploy to production!'
     end
 
