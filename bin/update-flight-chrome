@@ -32,7 +32,7 @@ main() {
   mv "$js_path"/*.chunk.js{,.map} "$FLIGHT_CENTER_JS_CHUNKS_PATH"
   mv "$css_path"/main.*.css{,.map} "$FLIGHT_CENTER_CSS_PATH"
 
-  git add "$FLIGHT_CENTER_JS_PATH" "$FLIGHT_CENTER_CSS_PATH"
+  git add "$FLIGHT_CENTER_JS_PATH" "$FLIGHT_CENTER_CSS_PATH" "$FLIGHT_CENTER_JS_CHUNKS_PATH"
   git commit -m "Update Flight Chrome" || true
 
   cat <<-EOF
