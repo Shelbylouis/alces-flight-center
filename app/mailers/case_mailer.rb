@@ -1,8 +1,11 @@
+require 'slack-notifier'
 class CaseMailer < ApplicationMailer
 
   layout 'case_mailer'
 
   default bcc: Rails.application.config.email_bcc_address
+
+  before_action { @slack = SlackNotifier.new }
 
   def new_case(my_case)
     @case = my_case
