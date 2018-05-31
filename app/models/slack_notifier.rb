@@ -31,7 +31,7 @@ class SlackNotifier
       ]
     }
 
-    notifier.ping attachments: case_note
+    send(case_note)
   end
 
   def assignee_notification(kase, assignee)
@@ -56,7 +56,7 @@ class SlackNotifier
       ]
     }
 
-    notifier.ping attachments: assignee_note
+    send(assignee_note)
   end
 
   def comment_notification(kase, comment)
@@ -71,7 +71,7 @@ class SlackNotifier
       text: comment.text
     }
 
-    notifier.ping attachments: comment_note
+    send(comment_note)
   end
 
   def maintenance_notification(kase, text)
@@ -89,7 +89,7 @@ class SlackNotifier
       ]
     }
 
-    notifier.ping attachments: maintenance_note
+    send(maintenance_note)
   end
 
   def log_notification(log)
@@ -109,6 +109,10 @@ class SlackNotifier
       footer: "<#{Rails.application.routes.url_helpers.cluster_logs_url(log.cluster)}|#{log.cluster.name} Logs>"
     }
 
-    notifier.ping attachments: log_note
+    send(log_note)
+  end
+
+  def send(note)
+    notifier.ping attachments: note
   end
 end
