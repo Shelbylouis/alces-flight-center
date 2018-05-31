@@ -20,6 +20,7 @@ import Issue exposing (Issue)
 import Issues
 import Json.Decode as D
 import Json.Decode.Pipeline as P
+import Maybe.Extra
 import SelectList exposing (Position(..), SelectList)
 import SelectList.Extra
 import Service exposing (Service)
@@ -62,7 +63,23 @@ decodeWithMotd motd =
         |> P.required "components" (SelectList.Extra.nameOrderedDecoder Component.decoder)
         |> P.required "services" (SelectList.Extra.nameOrderedDecoder serviceDecoder)
         |> P.required "supportType" SupportType.decoder
-        |> P.required "chargingInfo" (D.nullable D.string)
+        |> P.required "chargingInfo"
+            (D.nullable D.string
+                |> D.map
+                    -- If `chargingInfo` is an empty/just whitespace String,
+                    -- then we want to handle it in the same way as when it's
+                    -- null (i.e. display the default charging info), so
+                    -- convert it to be Nothing in these cases too.
+                    (Maybe.map
+                        (\chargingInfo ->
+                            if String.trim chargingInfo |> String.isEmpty then
+                                Nothing
+                            else
+                                Just chargingInfo
+                        )
+                        >> Maybe.Extra.join
+                    )
+            )
         |> P.hardcoded motd
         |> P.required "motdHtml" D.string
 
