@@ -100,4 +100,19 @@ RSpec.configure do |config|
     # visited.
     allow_any_instance_of(Cluster).to receive(:documents).and_return([])
   end
+
+  # Below ensures that the Slack integration with flight center doesn't cause
+  # issues with tests that monitor HTTP packets using VCR
+  class NoOpHTTPClient
+    def self.post uri, params={}
+    end
+  end
+
+  config.before do
+    allow(Slack::Notifier).to receive(:new).and_wrap_original do |m, *args|
+      m.call(*args) do
+        http_client NoOpHTTPClient
+      end
+    end
+  end
 end
