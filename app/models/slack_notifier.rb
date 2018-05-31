@@ -88,9 +88,27 @@ class SlackNotifier
         }
       ]
     }
+
     notifier.ping attachments: maintenance_note
   end
 
-  def log
+  def log_notification(log)
+    notification_text = "New log created by #{log.engineer.name} on " \
+      "#{log.cluster.name} #{log&.component ? 'for ' + log.component.name : nil }"
+    log_note = {
+      fallback: notification_text,
+      color: "#8daec2",
+      pretext: notification_text,
+      fields: [
+        {
+          title: "Details",
+          value: log.details,
+          short: false
+        }
+      ],
+      footer: "<#{Rails.application.routes.url_helpers.cluster_logs_url(log.cluster)}|#{log.cluster.name} Logs>"
+    }
+
+    notifier.ping attachments: log_note
   end
 end
