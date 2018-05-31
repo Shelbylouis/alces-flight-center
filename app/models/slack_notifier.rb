@@ -34,7 +34,29 @@ class SlackNotifier
     notifier.ping attachments: case_note
   end
 
-  def assignee
+  def assignee_notification(kase)
+    notification_text = "#{kase.assignee.name} has been assigned to #{kase.display_id}"
+    assignee_note = {
+      fallback: notification_text,
+      color: "#2c3e50",
+      pretext: notification_text,
+      title: kase.subject,
+      title_link: Rails.application.routes.url_helpers.cluster_case_url(kase.cluster, kase),
+      fields: [
+        {
+          title: "ID",
+          value: kase.display_id,
+          short: true
+        },
+        {
+          title: "Assigned to",
+          value: kase.assignee.name,
+          short: true
+        }
+      ]
+    }
+
+    notifier.ping attachments: assignee_note
   end
 
   def comment_notification(kase, comment)
