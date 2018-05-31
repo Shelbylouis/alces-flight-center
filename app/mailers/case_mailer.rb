@@ -41,6 +41,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
+    slack.maintenance_notification(@case, @text)
   end
 
   def slack
