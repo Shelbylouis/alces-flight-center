@@ -2,16 +2,10 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Running this script regularly on the Dokku host for the Alces Flight Center
-# app ensures we make regular backups of the Flight Center database to S3.  To
-# set this up, or update it if this script is changed, the following manual
-# steps are currently required:
-#
-# 1. locally: run
-# `scp bin/backup-database ubuntu@apps.alces-flight.com:/home/ubuntu/flight-center-backup-database`;
-#
-# 2. on server: ensure crontab contains a line to run this script, as specified
-# in docs/release-process.md.
+# Running this script on the Dokku host for the Alces Flight Center app ensures
+# we make regular backups of the Flight Center database to S3; installing this
+# is handled as needed by the `rake alces:deploy:*` tasks, and running it is
+# handled by the app server crontab.
 
 APP_NAME='flight-center'
 BACKUPS_S3_URL='s3://alces-flight-center/backups'
