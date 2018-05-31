@@ -13,6 +13,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients.reject { |contact| contact == @case.user.email }, # Exclude the user raising the case
       subject: @case.email_subject
     )
+    @slack.case_notification(@case)
   end
 
   def change_assignee(my_case, new_assignee)
