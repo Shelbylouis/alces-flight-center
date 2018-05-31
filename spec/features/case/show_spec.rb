@@ -511,11 +511,23 @@ RSpec.describe 'Case page' do
     end
   end
 
-  describe 'redirects' do
+  describe 'redirection' do
     let (:kase) { create(:case, cluster: cluster) }
-    it 'to cluster dashboard case page when visiting /cases/:id' do
-      visit(case_path(kase, as: contact))
-      expect(current_path).to eq(cluster_case_path(kase.cluster, kase))
+
+    context 'as contact' do
+      it 'redirects from site dashboard to cluster dashboard case page' \
+        ' when visiting /cases/:id' do
+        visit(case_path(kase, as: contact))
+        expect(current_path).to eq(cluster_case_path(kase.cluster, kase))
+      end
+    end
+
+    context 'as admin' do
+      it 'redirects from all sites dashboard to cluster dashboard case page' \
+        ' when visiting /cases/:id' do
+        visit(case_path(kase, as: admin))
+        expect(current_path).to eq(cluster_case_path(kase.cluster, kase))
+      end
     end
   end
 end
