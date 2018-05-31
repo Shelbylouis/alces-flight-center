@@ -26,4 +26,8 @@ class AllSitesDecorator < ApplicationDecorator
   def scope_name_for_paths
     ''
   end
+
+  def arguments_for_scope_path(*a)
+    a
+  end
 end
