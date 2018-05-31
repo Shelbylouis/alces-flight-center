@@ -5,15 +5,13 @@ class CaseMailer < ApplicationMailer
 
   default bcc: Rails.application.config.email_bcc_address
 
-  before_action { @slack = SlackNotifier.new }
-
   def new_case(my_case)
     @case = my_case
     mail(
       cc: @case.email_recipients.reject { |contact| contact == @case.user.email }, # Exclude the user raising the case
       subject: @case.email_subject
     )
-    @slack.case_notification(@case)
+    slack.case_notification(@case)
   end
 
   def change_assignee(my_case, new_assignee)
@@ -32,7 +30,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients.reject { |contact| contact == @comment.user.email }, # Exclude the user making the comment
       subject: @case.email_reply_subject,
     )
-    @slack.comment_notification(@case, @comment)
+    slack.comment_notification(@case, @comment)
   end
 
   def maintenance(my_case, text)
@@ -42,5 +40,9 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
+  end
+
+  def slack
+    @slack ||= SlackNotifier.new
   end
 end
