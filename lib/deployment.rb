@@ -11,7 +11,7 @@ class Deployment
   end
 
   def deploy
-    if production? && !current_branch.master?
+    if production? && !current_branch.master? && !dry_run?
       abort 'Must be on `master` branch to deploy to production!'
     end
 
@@ -34,6 +34,8 @@ class Deployment
     run "git tag -f #{remote} #{current_branch}"
     run "git tag -f #{tag} #{current_branch}"
     run "git push --tags -f origin #{current_branch}"
+
+    scp_database_backup_script
 
     output_manual_steps
   end
@@ -115,6 +117,19 @@ class Deployment
     dokku_run obfuscate_dokku_command, app: STAGING_APP
 
     dokku_start STAGING_APP
+  end
+
+  def scp_database_backup_script
+    # Staging database is just imported and migrated production backup, so
+    # don't need to install this script (and don't want to, in case it has
+    # changed and we do not want the changes running in production yet)
+    return unless production?
+
+    command = <<~COMMAND.squish
+      scp bin/backup-database
+      ubuntu@apps.alces-flight.com:/home/ubuntu/flight-center-backup-database
+    COMMAND
+    sh command
   end
 
   def output_manual_steps
