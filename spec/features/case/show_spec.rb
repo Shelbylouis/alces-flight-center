@@ -513,11 +513,26 @@ RSpec.describe 'Case page' do
 
   describe 'redirection' do
     let (:kase) { create(:case, cluster: cluster) }
+    let (:another_kase) { create(:case, cluster: another_cluster) }
+    let (:another_site) { create(:site, name: 'Not My Site') }
+    let (:another_cluster) { create(:cluster, site: another_site) }
+
 
     RSpec.shared_examples 'redirect examples' do
       it "redirects to the cluster dashboard case page from /cases/:id" do
         visit(case_path(kase, as: user))
         expect(current_path).to eq(cluster_case_path(kase.cluster, kase))
+      end
+
+      it 'correctly visits the case page for an associated case' do
+        visit(cluster_case_path(cluster, kase, as: user))
+        expect(page).to have_http_status(200)
+      end
+
+      it 'returns a routing error when visiting an unassociated case page' do
+        expect do
+          visit(cluster_case_path(cluster, another_kase, as: user))
+        end.to raise_error(ActionController::RoutingError)
       end
     end
 
