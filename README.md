@@ -27,7 +27,17 @@
 
 4. Have [`yarn`](https://yarnpkg.com/lang/en/) installed.
 
-5. Clone and setup this repo:
+5. Clone and setup [`flight-sso`](https://github.com/alces-software/flight-sso)
+   repo, following the instructions at
+   https://github.com/alces-software/flight-sso#development. This can be done
+   anywhere, but currently for the `alces:data:create_sso_accounts` Rake task
+   to work correctly this and the `alces-flight-center` repo should be sibling
+   directories of each other (this task is used by
+   `alces:data:import_and_migrate_production`, where we import recent
+   production data, so you will probably want to use it unless you know what
+   you're doing).
+
+6. Clone and setup this repo:
 
     ```bash
     git clone git@github.com:alces-software/alces-flight-center.git
@@ -35,7 +45,7 @@
     bundle exec bin/setup
     ```
 
-6. Perform required/suggested additional manual setup steps output at the end
+7. Perform required/suggested additional manual setup steps output at the end
    of `bin/setup` script.
 
 
@@ -45,12 +55,33 @@ In separate shells:
 
 - `bin/rails server`;
 
-- `bin/webpack-dev-server` (compiles new Case form Elm app; must be running to
-  use new Case form in development);
+- `cd ../flight-sso && docker-compose up` (to run
+  [`flight-sso`](https://github.com/alces-software/flight-sso) server, required
+  to sign in).
+
+- `bin/webpack-dev-server` (to compile new Case form Elm app; must be running
+  to use new Case form in development);
 
 - `bin/start-docker-redis` (to run Redis server Docker container, which handles
   our asynchronous email queue; not normally required in development). Note:
   `bin/stop-docker-redis` stops this again.
+
+
+### To access Flight Center in development
+
+By default the `flight-sso` server will listen on `localhost` port `4000`, so
+the SSO root URL will be `http://accounts.alces-flight.lvh.me:4000`.
+
+Accessing SSO, and SSO-authenticated services, does not work via `localhost`,
+so you'll have to access your local Flight Center through
+`http://center.alces-flight.lvh.me:3000` (or whatever port you're running it
+on).
+
+Flight Center doesn't need to access the SSO server directly, so you should be
+fine if you're running Center in a VM as long as your browser can access both.
+It does, however, need to have a shared secret with the SSO server, passed in
+either via `secrets.yml` (in development) or the `JSON_WEB_TOKEN_SECRET`
+environment variable in production.
 
 
 ### To update development environment
@@ -81,10 +112,19 @@ Re-run `bin/setup` script; it should safely be able to be run multiple times.
 rake alces:data:import_and_migrate_production
 ```
 
-This will import the latest production database backup, modify this to remove
-real user emails and passwords, and then run all Rails and
-[data](https://github.com/OffgridElectric/rails-data-migrations) migrations on
-top of this.
+This will:
+
+- import the latest production database backup;
+
+- run all Rails and [data](https://github.com/ilyakatz/data-migrate) migrations
+  on top of this;
+
+- modify this to remove real user emails and passwords;
+
+- create an SSO `Account` in your local `flight-sso` environment for each
+  Flight Center `User`, where this does not already exist. Note: Flight Center
+  `User`s are matched with SSO `Account`s by email address, and both must exist
+  to sign in to Flight Center as a `User`.
 
 This is useful for checking whether recent migrations of both kinds will
 cleanly apply when we next deploy to production, as well as generally allowing
@@ -96,16 +136,36 @@ user could do, even if they haven't yet).
 
 ### To sign in as a user in development
 
-1. Take the email for a user which existed in production at the time you last
-   ran `rake alces:data:import_and_migrate_production`, and split off the local
-   part (e.g. `bob.whitelock@alces-software.com` -> `bob.whitelock`);
+As described above, Flight Center `User`s are matched with SSO `Account`s by
+email address, and both must exist to sign in to Flight Center as a `User`.
+Normally this should be transparent in development, and after running `rake
+alces:data:import_and_migrate_production` you should be able to sign in as any
+`User` by the following process:
 
-2. Sign in with following credentials:
+1. Take the email for a `User` which existed in production at the time you last
+   ran `rake alces:data:import_and_migrate_production`, split off the local
+   part, and remove any non-alphanumeric characters (e.g.
+   `bob.whitelock@alces-software.com` -> `bobwhitelock`);
 
-    - username: `${local_part}@example.com`;
+2. Sign in with the following credentials:
+
+    - username: `$username`, as found above;
 
     - password: `password`.
 
+Alternatively, a Flight Center `User` and corresponding Flight SSO account can
+be created by the following process:
+
+- Via `rails console` in Flight SSO, or via the website registration form,
+  create yourself a Flight SSO account using any email address. Be sure to
+  confirm the account (either the web method or with `Account#confirm()` in the
+  console)
+- Via `rails console` in Flight Center, create yourself a Flight Center account
+  using the same email address (and don't forget `admin: true`)
+- Log in via SSO. Enjoy admin powers responsibly.
+
+The process is the same in production except that you probably already have a
+Flight SSO account there.
 
 ### To develop feature
 
@@ -149,60 +209,13 @@ updating to support new features/content/styles etc. for these. To do this:
 
 4. Make the necessary manual updates output at the end of this script.
 
-## Old SSO docs (need to combine with above)
-
-### Required environment variables
-- `SSO_BASE_URL` - base URL for SSO server. In production, should be
-`https://accounts.alces-flight.com`. This is passed through into the generated
-HTML.
-- `JSON_WEB_TOKEN_SECRET` - Shared secret for verifying SSO token signatures. This
-should be the same value as that for `flight-sso` in the environment you're
-running in.
-
-### Running SSO in development
-
-In order to log in to Flight Center in development you'll need a locally-running
-copy of `flight-sso`, which you can check out from
-`https://github.com/alces-software/flight-sso`.
-
-By default (`docker-compose up` to start it) it'll listen on `localhost` port
-`4000`, so the SSO root URL will be `http://accounts.alces-flight.lvh.me:4000`.
-
-Accessing SSO, and SSO-authenticated services, does not work via `localhost`,
-so you'll have to access your local Flight Center through
-`http://center.alces-flight.lvh.me:3000` (or whatever port you're running it on).
-
-Flight Center doesn't need to access the SSO server directly, so you should be
-fine if you're running Center in a VM as long as your browser can access both.
-It does, however, need to have a shared secret with the SSO server, passed in
-either via `secrets.yml` (in development) or the
-`JSON_WEB_TOKEN_SECRET` environment variable in production.
-
-### Creating user accounts
-
-User accounts created in Flight Center are matched with SSO accounts by email
-address.
-
-#### Creating yourself an admin account in development
-
-- Via `rails console` in Flight SSO, or via the website registration form,
-create yourself a Flight SSO account using any email address. Be sure to
-confirm the account (either the web method or with `Account#confirm()` in the
-console)
-- Via `rails console` in Flight Center, create yourself a Flight Center account
-using the same email address (and don't forget `admin: true`)
-- Log in via SSO. Enjoy admin powers responsibly.
-
-The process is the same in production except that you probably already have a
-Flight SSO account there.
-
-#### Creating accounts for customers
+## Creating accounts for customers
 
 - If they don't have a Flight SSO account, they should register for one first.
 - Get them to give you the email address they used for their Flight SSO account
-(possibly double-check against the SSO database just to make sure).
+  (possibly double-check against the SSO database just to make sure).
 - Create them a Flight Center account in the appropriate site, using the email
-address of their Flight SSO account.
+  address of their Flight SSO account.
 
 ## Redis
 
