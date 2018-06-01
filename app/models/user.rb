@@ -29,6 +29,12 @@ class User < ApplicationRecord
     to: :role_inquiry,
     allow_nil: true
 
+  # Automatically picked up by rails_admin so only these options displayed when
+  # selecting role.
+  def role_enum
+    ROLES
+  end
+
   def contact?
     primary_contact? || secondary_contact?
   end
