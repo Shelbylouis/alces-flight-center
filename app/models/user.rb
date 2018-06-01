@@ -56,7 +56,8 @@ class User < ApplicationRecord
   end
 
   def remember_token
-    # This is only here for testing purposes
+    # This is only here for testing purposes (see
+    # https://github.com/alces-software/alces-flight-center/pull/152#discussion_r180035530).
     ::JsonWebToken.encode(
       { 'email' => email }
     )

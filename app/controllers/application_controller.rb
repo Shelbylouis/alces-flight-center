@@ -22,7 +22,10 @@ class ApplicationController < ActionController::Base
 
   def sign_out
     clearance_session.sign_out
-    cookies.delete('flight_sso', domain: request.host[request.host.index('alces')..-1])
+    # Matches both `*.alces-flight.com` (for production/staging) and
+    # `*.alces-flight.lvh.me` (for development).
+    domain = request.host[request.host.index('alces')..-1]
+    cookies.delete('flight_sso', domain: domain)
   end
 
   private
