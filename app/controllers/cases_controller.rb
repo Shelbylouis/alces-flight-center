@@ -1,6 +1,9 @@
 class CasesController < ApplicationController
   decorates_assigned :site
 
+  # Ensure actions authorize the resource they operate on (using Pundit).
+  after_action :verify_authorized
+
   def index
     index_action(show_resolved: false)
   end
@@ -20,6 +23,7 @@ class CasesController < ApplicationController
   end
 
   def new
+    authorize Case
     cluster_id = params[:cluster_id]
     component_id = params[:component_id]
     service_id = params[:service_id]
@@ -38,6 +42,7 @@ class CasesController < ApplicationController
 
   def create
     @case = Case.new(case_params.merge(user: current_user))
+    authorize @case
 
     respond_to do |format|
       if @case.save
@@ -124,6 +129,7 @@ class CasesController < ApplicationController
   end
 
   def index_action(show_resolved:)
+    authorize Case
     @show_resolved = show_resolved
     render :index
   end
@@ -141,6 +147,8 @@ class CasesController < ApplicationController
   end
 
   def case_from_params
-    Case.find_from_id!(params.require(:id)).decorate
+    Case.find_from_id!(params.require(:id))
+      .tap { |c| authorize c }
+      .decorate
   end
 end
