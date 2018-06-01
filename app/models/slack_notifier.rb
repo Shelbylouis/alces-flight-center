@@ -10,25 +10,22 @@ class SlackNotifier
 
   def case_notification(kase)
     notification_text = "New case created on #{kase.cluster.name}"
+
+    kase.fields.each do |field|
+      (@notification_details ||= "*Tier #{kase.tier_level}*") << "\n*#{field["name"]}*"\
+        "\n#{restrict_text_length(field["value"])}"
+    end
+
     case_note = {
       fallback: notification_text,
       color: "#18bc9c",
       pretext: notification_text,
       author_name: kase.user.name,
-      title: kase.subject,
-      title_link: Rails.application.routes.url_helpers.cluster_case_url(kase.cluster, kase),
-      fields: [
-        {
-          title: "Tier",
-          value: kase.tier_level,
-          short: true
-        },
-        {
-          title: "ID",
-          value: kase.display_id,
-          short: true
-        },
-      ]
+      title: subject_and_id_title(kase),
+      title_link: url_helpers('cluster_case_url', kase.cluster, kase),
+      text: @notification_details,
+      mrkdwn: true,
+      footer: "<#{url_helpers('cluster_cases_url', kase.cluster)}|#{kase.cluster.name} Cases>"
     }
 
     send(case_note)
@@ -36,18 +33,14 @@ class SlackNotifier
 
   def assignee_notification(kase, assignee)
     notification_text = "#{assignee.name} has been assigned to #{kase.display_id}"
+
     assignee_note = {
       fallback: notification_text,
       color: "#6e5494",
       pretext: notification_text,
-      title: kase.subject,
-      title_link: Rails.application.routes.url_helpers.cluster_case_url(kase.cluster, kase),
+      title: subject_and_id_title(kase),
+      title_link: url_helpers('cluster_case_url', kase.cluster, kase),
       fields: [
-        {
-          title: "ID",
-          value: kase.display_id,
-          short: true
-        },
         {
           title: "Assigned to",
           value: assignee.name,
@@ -66,8 +59,8 @@ class SlackNotifier
       color: "#2794d8",
       pretext: notification_text,
       author_name: comment.user.name,
-      title: kase.subject,
-      title_link: Rails.application.routes.url_helpers.cluster_case_url(kase.cluster, kase),
+      title: subject_and_id_title(kase),
+      title_link: url_helpers('cluster_case_url', kase.cluster, kase),
       text: comment.text
     }
 
@@ -78,15 +71,16 @@ class SlackNotifier
     maintenance_note = {
       fallback: text,
       color: "#000000",
-      title: "#{kase.subject} (#{kase.display_id})",
-      title_link: Rails.application.routes.url_helpers.cluster_case_url(kase.cluster, kase),
+      title: subject_and_id_title(kase),
+      title_link: url_helpers('cluster_case_url', kase.cluster, kase),
       fields: [
         {
           title: "Maintenance Info",
           value: text,
           short: false
         }
-      ]
+      ],
+      footer: "<#{url_helpers('cluster_maintenance_windows_url', kase.cluster)}|#{kase.cluster.name} Maintenance>"
     }
 
     send(maintenance_note)
@@ -95,24 +89,38 @@ class SlackNotifier
   def log_notification(log)
     notification_text = "New log created by #{log.engineer.name} on " \
       "#{log.cluster.name} #{log&.component ? 'for ' + log.component.name : nil }"
+
+    logs_url = url_helpers('cluster_logs_url', log.cluster)
+
     log_note = {
       fallback: notification_text,
       color: "#8daec2",
       pretext: notification_text,
-      fields: [
-        {
-          title: "Details",
-          value: log.details,
-          short: false
-        }
-      ],
-      footer: "<#{Rails.application.routes.url_helpers.cluster_logs_url(log.cluster)}|#{log.cluster.name} Logs>"
+      title: "Details",
+      title_link: logs_url,
+      text: restrict_text_length(log.details),
+      mrkdwn: true,
+      footer: "<#{logs_url}|#{log.cluster.name} Logs>"
     }
 
     send(log_note)
   end
 
+  private
+
   def send(note)
     notifier.ping attachments: note
+  end
+
+  def restrict_text_length(text)
+    text.length > 80 ? text[0, 80] + '...' : text
+  end
+
+  def subject_and_id_title(kase)
+    "#{kase.subject} - #{kase.display_id}"
+  end
+
+  def url_helpers(helper, *args)
+    Rails.application.routes.url_helpers.public_send(helper, *args)
   end
 end
