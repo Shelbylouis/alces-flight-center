@@ -82,6 +82,10 @@ chdir APP_ROOT do
       with `rspec --tag '~js'` will just skip these tests.
     EOF
     <<~EOF,
+      You'll need a local SSO server running before you can log in - see
+      README.md for details.
+    EOF
+    <<~EOF,
       Update this script to document or fix anything which broke or you had
       trouble with.
     EOF

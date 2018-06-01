@@ -11,12 +11,21 @@ class ApplicationController < ActionController::Base
   before_action :assign_title
 
   rescue_from ReadPermissionsError, with: :not_found
+  rescue_from JWT::DecodeError, with: :not_found
 
   def error_flash_models(models, header)
     flash[:error] = header + "\n" + models.map do |model|
       prefix = block_given? ? ((yield model).to_s + ': ') : ''
       prefix + model.errors.full_messages.to_s
     end.join("\n")
+  end
+
+  def sign_out
+    clearance_session.sign_out
+    # Matches both `*.alces-flight.com` (for production/staging) and
+    # `*.alces-flight.lvh.me` (for development).
+    domain = request.host[request.host.index('alces')..-1]
+    cookies.delete('flight_sso', domain: domain)
   end
 
   private

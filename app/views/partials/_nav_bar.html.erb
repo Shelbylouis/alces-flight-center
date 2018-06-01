@@ -31,11 +31,6 @@
       <% end %>
 
       <span class="navbar-text text-light"><%= current_user.name %></span>
-      <%= button_to 'Sign out',
-        sign_out_path,
-        method: :delete,
-        class: ['btn', 'btn-light']
-      %>
     <% end %>
   </div>
 </nav>

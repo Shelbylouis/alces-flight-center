@@ -50,7 +50,13 @@
     </div>
 
     <div id='brand-footer'></div>
-    <script src='/flight-branding/main.38bd27ee.js'></script>
+    <script>
+      window.__SSO_BASE_URL__ = '<%= Rails.application.config.sso_base_url %>';
+      window.__REFRESH_AFTER_LOGIN__ = true;
+      window.__REFRESH_AFTER_LOGOUT__ = true;
+      window.__ENABLE_CENTER_SSO__ = true;
+    </script>
+    <script src='/flight-branding/main.daf98c54.js'></script>
   </body>
   <%= development_ribbon position: :left, color: :green if Rails.env.development? %>
 </html>

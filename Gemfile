@@ -42,6 +42,7 @@ gem 'state_machines-activerecord',
 gem 'state_machines-audit_trail'
 gem 'business_time'
 gem "audited", "~> 4.7"
+gem 'jwt'
 
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.

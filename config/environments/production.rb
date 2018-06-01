@@ -109,4 +109,6 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+  
+  config.sso_base_url = ENV.fetch('SSO_BASE_URL')
 end
