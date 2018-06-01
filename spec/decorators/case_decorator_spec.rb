@@ -85,7 +85,7 @@ RSpec.describe CaseDecorator do
       end.case_link
 
       expect(link).to eq h
-        .link_to('RT12345', h.case_path(kase), title: kase.subject)
+        .link_to('RT12345', h.cluster_case_path(kase.cluster, kase), title: kase.subject)
     end
   end
 

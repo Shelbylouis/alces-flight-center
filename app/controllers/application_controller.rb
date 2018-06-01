@@ -66,19 +66,6 @@ class ApplicationController < ActionController::Base
              when /^\/services/
                id = scope_id_param(:service_id)
                @service = @cluster_part = Service.find(id)
-             when /^\/cases/
-               begin
-                 id = scope_id_param(:case_id)
-                 Case.find_from_id!(id).associated_model
-               rescue ActiveRecord::RecordNotFound
-                 # There are various routes which begin `/cases/` but are not
-                 # the route for a particular Case; if we can't find the Case
-                 # we must either be in one of these, or we are trying to find
-                 # a Case which actually doesn't exist. Either way assign the
-                 # Site scope rather than blow up, then carry on and let
-                 # specific controller we are in handle this as normal.
-                 assign_site_scope
-               end
              else
                assign_site_scope
              end

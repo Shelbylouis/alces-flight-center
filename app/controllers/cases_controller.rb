@@ -12,7 +12,12 @@ class CasesController < ApplicationController
 
   def show
     @case = case_from_params
-    @comment = @case.case_comments.new
+    if [AllSites, Site].include? @scope.class
+      redirect_to cluster_case_path(@case.cluster, @case)
+    else
+      not_found unless @scope.cases.include? @case
+      @comment = @case.case_comments.new
+    end
   end
 
   def new
@@ -42,7 +47,7 @@ class CasesController < ApplicationController
         format.json do
           # Return no errors and success status to case form app; it will
           # redirect to the path we give it.
-          render json: { redirect: case_path(@case) }
+          render json: { redirect: cluster_case_path(@case.cluster, @case) }
         end
       else
         errors = format_errors(@case)
@@ -55,8 +60,7 @@ class CasesController < ApplicationController
 
       format.html do
         flash[:error] = "Error creating support case: #{errors}." if errors
-        redirect_path = @case.cluster ? cluster_path(@case.cluster) : root_path
-        redirect_to redirect_path
+        redirect_back fallback_location: @case.cluster ? cluster_path(@case.cluster) : root_path
       end
     end
   end
@@ -69,7 +73,7 @@ class CasesController < ApplicationController
     end
   rescue ActionController::ParameterMissing
     flash[:error] = 'You must specify a credit charge to close this case.'
-    redirect_to case_path
+    redirect_to @scope.decorate.dashboard_case_path(case_from_params)
   end
 
   def assign
@@ -129,7 +133,7 @@ class CasesController < ApplicationController
     rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
       flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
-    redirect_to case_path(@case)
+    redirect_to @scope.decorate.dashboard_case_path(@case)
   end
 
   def case_from_params

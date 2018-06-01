@@ -464,7 +464,7 @@ RSpec.describe 'Case page' do
       end.to change { request.reload.transitions.length }.by(1)
 
       expect(request).to be_applied
-      expect(current_path).to eq(case_path(subject))
+      expect(current_path).to eq(cluster_case_path(subject.cluster, subject))
       expect(
         find('.alert')
       ).to have_text('The cluster has been updated to reflect this change.')
@@ -508,6 +508,42 @@ RSpec.describe 'Case page' do
           expect(page).not_to have_button(button_text)
         end
       end
+    end
+  end
+
+  describe 'redirection' do
+    let (:kase) { create(:case, cluster: cluster) }
+    let (:another_kase) { create(:case, cluster: another_cluster) }
+    let (:another_site) { create(:site, name: 'Not My Site') }
+    let (:another_cluster) { create(:cluster, site: another_site) }
+
+
+    RSpec.shared_examples 'redirect examples' do
+      it "redirects to the cluster dashboard case page from /cases/:id" do
+        visit(case_path(kase, as: user))
+        expect(current_path).to eq(cluster_case_path(kase.cluster, kase))
+      end
+
+      it 'correctly visits the case page for an associated case' do
+        visit(cluster_case_path(cluster, kase, as: user))
+        expect(page).to have_http_status(200)
+      end
+
+      it 'returns a routing error when visiting an unassociated case page' do
+        expect do
+          visit(cluster_case_path(cluster, another_kase, as: user))
+        end.to raise_error(ActionController::RoutingError)
+      end
+    end
+
+    context 'as contact' do
+      let (:user) { contact }
+      include_examples 'redirect examples'
+    end
+
+    context 'as admin' do
+      let (:user) { admin }
+      include_examples 'redirect examples'
     end
   end
 end
