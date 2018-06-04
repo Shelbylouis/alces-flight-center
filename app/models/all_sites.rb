@@ -11,4 +11,8 @@ class AllSites
   def ==(other_object)
     other_object.is_a?(AllSites)
   end
+
+  def dashboard_case_path(kase)
+    Rails.application.routes.url_helpers.cluster_case_path(kase.cluster, kase)
+  end
 end
