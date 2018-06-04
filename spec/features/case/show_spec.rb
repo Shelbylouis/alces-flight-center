@@ -211,6 +211,17 @@ RSpec.describe 'Case page' do
       expect(options).to eq(['Nobody', 'A Scientist', '* A Scientist'])
     end
 
+    it 'changes assigned user when assignee is selected' do
+      user = create(:admin, name: 'Jerry')
+
+      visit case_path(open_case, as: admin)
+      find('#case-assignment').select(user.name)
+      click_button('Change assignment')
+      open_case.reload
+
+      expect(open_case.assignee).to eq(user)
+    end
+
     context 'when a case has an assignee' do
       let(:assignee) { contact }
       it 'preselects the current assignee' do
