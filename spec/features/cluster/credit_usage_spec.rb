@@ -19,10 +19,10 @@ RSpec.describe 'Cluster credit usage', type: :feature do
 
     expect(events.length).to eq 4
 
-    expect(events[3].text).to match /#{c1.display_id}.*-1 credits$/
-    expect(events[2].text).to match /#{c2.display_id}.*-2 credits$/
-    expect(events[1].text).to match /#{c3.display_id}.*-4 credits$/
-    expect(events[0].text).to match /Credits added.* 10 credits$/
+    expect(events[3].text).to match(/#{c1.display_id}.*-1 credits$/)
+    expect(events[2].text).to match(/#{c2.display_id}.*-2 credits$/)
+    expect(events[1].text).to match(/#{c3.display_id}.*-4 credits$/)
+    expect(events[0].text).to match(/Credits added.* 10 credits$/)
 
     expect(find('.credit-balance').text).to eq '3 credits'
   end
