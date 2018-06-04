@@ -41,7 +41,7 @@
     </div>
     <div class="col-sm-12">
       <% if @events.empty? %>
-        <p class="text-center">No credit usage or accrual in this period.</p>
+        <p class="text-center no-events-message">No credit usage or accrual in this period.</p>
       <% else %>
         <ul class="list-group">
           <% @events.each do |event| %>
