@@ -86,9 +86,7 @@ RSpec.describe MaintenanceWindowDecorator do
   describe '#confirm_path' do
     subject { window.decorate.confirm_path }
     let :window do
-      create(:maintenance_window, associated_model: associated_model).tap do
-        Draper::ViewContext.clear!
-      end
+      create(:maintenance_window, associated_model: associated_model)
     end
 
     context 'when associated model is cluster' do
