@@ -7,7 +7,9 @@ class CaseComment < ApplicationRecord
   validates :user, presence: true
   validates :case, presence: true
 
-  validates :text, length: { minimum: 2}
+  validates :text,
+    presence: {message: 'Empty comments are not permitted'},
+    length: { minimum: 2}
 
   validate :valid_user, on: :create
 
