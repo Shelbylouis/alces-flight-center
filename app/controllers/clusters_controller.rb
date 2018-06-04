@@ -23,6 +23,16 @@ class ClustersController < ApplicationController
   end
 
   def deposit
+
+    amount = params.require(:credit_deposit).permit(:amount).require(:amount).to_i
+
+    begin
+      @cluster.credit_deposits.create!(amount: amount, user: current_user)
+      flash[:success] = "#{view_context.pluralize(amount, 'credit')} added to cluster #{@cluster.name}."
+    rescue
+      flash[:error] = 'Error while trying to deposit credits for this cluster.'
+    end
+
     redirect_to cluster_credit_usage_path(@cluster)
   end
 

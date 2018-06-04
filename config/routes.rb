@@ -109,7 +109,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :clusters, only: []  do
+    resources :clusters, only: [] do
       request_maintenance_form.call
       admin_logs.call
       notes.call(true)
