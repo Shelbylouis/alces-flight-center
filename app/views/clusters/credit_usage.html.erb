@@ -41,9 +41,13 @@
     </div>
     <div class="col-sm-12">
       <ul class="list-group">
-      <% @events.each do |event| %>
-        <%= event.credit_usage_card %>
-      <% end %>
+        <% if @events.empty? %>
+          <p class="text-center">No credit usage or accrual in this period.</p>
+        <% else %>
+          <% @events.each do |event| %>
+            <%= event.credit_usage_card %>
+          <% end %>
+        <% end %>
       </ul>
     </div>
   </div>
