@@ -4,38 +4,37 @@
     <div class="col-sm-12">
       <h3><%= @cluster.name %> support credit usage</h3>
     </div>
-    <div class="col-sm-6">
-      <%= render 'clusters/credit_balance', cluster: @cluster.decorate %>
-    </div>
-    <div class="col-sm-6">
-      <div class="card">
-        <div class="card-body">
-          <h4>Viewing usage for <%= quarter_display_name(@start_date) %></h4>
-          <form action="<%= cluster_credit_usage_path(@cluster) %>" class="form" method="get">
-            <div class="input-group">
-              <%= select_tag(
-                    :start_date,
-                    options_for_select(
-                      @all_quarter_start_dates.map { |q|
-                        [quarter_display_name(q), q.strftime('%Y-%m-%d')]
-                      },
-                      @start_date
-                    ),
-                    class: 'form-control',
-                    onchange: 'this.form.submit()',
-                    style: 'flex-grow: 1;' # Our version of Bootstrap seems to be missing flex-grow-* classes
-                  )
-              %>
-              <div class="input-group-append">
-                <input type="submit" class="btn btn-primary" value="View" />
+    <div class="col-sm-12">
+      <div class="card-deck mb-2">
+        <%= render 'clusters/credit_balance', cluster: @cluster.decorate %>
+        <div class="card">
+          <div class="card-body">
+            <h4>Viewing usage for <%= quarter_display_name(@start_date) %></h4>
+            <form action="<%= cluster_credit_usage_path(@cluster) %>" class="form" method="get">
+              <div class="input-group">
+                <%= select_tag(
+                      :start_date,
+                      options_for_select(
+                        @all_quarter_start_dates.map { |q|
+                          [quarter_display_name(q), q.strftime('%Y-%m-%d')]
+                        },
+                        @start_date
+                      ),
+                      class: 'form-control',
+                      onchange: 'this.form.submit()'
+                    )
+                %>
+                <div class="input-group-append">
+                  <input type="submit" class="btn btn-primary" value="View" />
+                </div>
               </div>
+            </form>
+            <div class="text-center text-success">
+              Total accrued this period: <%= pluralize(@accrued, 'credit') %>
             </div>
-          </form>
-          <div class="text-center text-success">
-            Total accrued this period: <%= pluralize(@accrued, 'credit') %>
-          </div>
-          <div class="text-center text-danger">
-            Total used this period: <%= pluralize(@used, 'credit') %>
+            <div class="text-center text-danger">
+              Total used this period: <%= pluralize(@used, 'credit') %>
+            </div>
           </div>
         </div>
       </div>
