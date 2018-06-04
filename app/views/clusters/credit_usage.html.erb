@@ -40,6 +40,9 @@
             <div class="text-center text-warning">
               Total used this period: <%= pluralize(@used, 'credit') %>
             </div>
+            <p class="text-center">
+              Cases closed without charge this period: <%= @free_of_charge %>
+            </p>
           </div>
         </div>
       </div>

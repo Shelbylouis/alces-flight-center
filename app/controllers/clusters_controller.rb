@@ -18,6 +18,8 @@ class ClustersController < ApplicationController
 
     @all_quarter_start_dates = all_quarter_start_dates
 
+    @free_of_charge = charges.where(amount: 0).count
+
   end
 
   private
