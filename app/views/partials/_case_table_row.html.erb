@@ -1,5 +1,5 @@
 <tr>
-  <td><%= link_to kase.display_id, scope.decorate.dashboard_case_path(kase) %></td>
+  <td><%= link_to kase.display_id, scope.dashboard_case_path(kase) %></td>
   <%= timestamp_td(
     description:  'Support case created',
     timestamp: kase.created_at
