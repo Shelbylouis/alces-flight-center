@@ -1,9 +1,17 @@
 class AssetRecordsController < ApplicationController
+
+  # Ensure actions authorize the resource they operate on (using Pundit).
+  after_action :verify_authorized
+
   def edit
+    authorize :asset_record, :edit?
+
     @asset = asset
   end
 
   def update
+    authorize :asset_record, :update?
+
     update_component_make if asset.is_a? ComponentGroup
     failed_updates = update_asset_record.reject(&:nil?)
                                         .reject(&:valid?)
