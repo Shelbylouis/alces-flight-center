@@ -30,26 +30,7 @@ RSpec.describe ApplicationDecorator do
 
   describe '#cluster_part_icons' do
     describe 'maintenance icons' do
-      subject do
-        component.decorate.tap do
-          # Need to clear the Draper view context before calling the needed
-          # method on the decorator; this determines which helper methods
-          # should be available within this example group under `h`.
-          #
-          # This is needed as the act of creating this Component with some
-          # MaintenanceWindows causes these to be transitioned to the correct
-          # state (which is needed to create the corresponding transition
-          # model); this transition in turn triggers MaintenanceNotifier to
-          # attempt to send emails, which renders these emails, and this
-          # changes the view context from what it should be in these tests to
-          # the mailer context. This is all a bit convoluted, but uncomment
-          # this line to see what I mean.
-          #
-          # Related discussion: https://alces.slack.com/archives/C72GT476Y/p1523613894000429
-          # Somewhat related issue: https://github.com/drapergem/draper/issues/814
-          Draper::ViewContext.clear!
-        end.cluster_part_icons
-      end
+      subject { component.decorate.cluster_part_icons }
       let(:component) { create(:component, name: 'mycomponent') }
 
       it 'includes correct icon when has requested maintenance window' do
