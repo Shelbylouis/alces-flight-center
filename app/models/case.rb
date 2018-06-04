@@ -227,6 +227,10 @@ class Case < ApplicationRecord
     handle_tool(tool_type, fields: tool_hash)
   end
 
+  def commenting_enabled_for?(user)
+    !CaseCommenting.new(self, user).disabled?
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and

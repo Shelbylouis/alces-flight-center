@@ -1,8 +1,12 @@
 class CaseCommentsController < ApplicationController
+  # Ensure actions authorize the resource they operate on (using Pundit).
+  after_action :verify_authorized
+
   def create
     my_case = Case.find_from_id!(params.require(:case_id))
 
     new_comment = my_case.case_comments.new(comment_params)
+    authorize new_comment
 
     if new_comment.save
       flash[:notice] = 'New comment added.'
