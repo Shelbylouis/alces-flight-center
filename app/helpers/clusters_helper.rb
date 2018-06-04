@@ -9,7 +9,7 @@ module ClustersHelper
   end
 
   def quarter_display_name(start)
-    "Q#{((start.month - 1) / 3) + 1} (#{start.strftime('%d %b')} - #{start.end_of_quarter.strftime('%d %b')}) #{start.year}"
+    "#{start.year} Q#{((start.month - 1) / 3) + 1} (#{start.strftime('%d %b')} - #{start.end_of_quarter.strftime('%d %b')})"
   end
 
 end
