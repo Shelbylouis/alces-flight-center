@@ -1,4 +1,4 @@
-<% content_for(:subtitle) { 'Credit usage' } %>
+<% content_for(:subtitle) { "Credit usage for #{quarter_display_name(@start_date)}" } %>
 <%= render 'partials/tabs', activate: :credit_usage do %>
   <div class="card-body row">
     <div class="col-sm-12">
