@@ -99,43 +99,74 @@ RSpec.describe 'Case mailer', :type => :mailer do
         end
       end
     end
+
+    it 'sends a notification to Slack' do
+      expect(SlackNotifier).to receive(:case_notification).with(kase)
+      subject
+    end
   end
 
-  it 'sends an email on case comment being added' do
-    comment = create(:case_comment,
-      case: kase,
-      user: another_user,
-      text: 'I can haz comment'
-    )
+  describe 'Comment email' do
+    subject { CaseMailer.comment(comment) }
 
-    mail = CaseMailer.comment(comment)
+    let (:comment) {
+      create(:case_comment,
+             case: kase,
+             user: another_user,
+             text: 'I can haz comment'
+            )
+    }
 
-    expect(mail.to).to eq nil
-    expect(mail.cc).to match_array %w(someuser@somecluster.com mailing-list@somecluster.com)
-    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
+    it 'sends an email on case comment being added' do
+      expect(subject.to).to eq nil
+      expect(subject.cc).to match_array %w(someuser@somecluster.com mailing-list@somecluster.com)
+      expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
-    expect(mail.body.encoded).to match('I can haz comment')
+      expect(subject.body.encoded).to match('I can haz comment')
+    end
+
+    it 'sends a notification to Slack' do
+      expect(SlackNotifier).to receive(:comment_notification).with(kase, comment)
+      subject
+    end
   end
 
-  it 'sends an email on initial case assignment' do
-    mail = CaseMailer.change_assignee(kase, another_user)
+  describe 'Case assignment email' do
+    subject { CaseMailer.change_assignee(kase, another_user) }
 
-    expect(mail.to).to eq nil
-    expect(mail.cc).to match_array %w(another.user@somecluster.com)
-    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
+    it 'sends an email on initial case assignment' do
+      expect(subject.to).to eq nil
+      expect(subject.cc).to match_array %w(another.user@somecluster.com)
+      expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
-    expect(mail.body.encoded).to match('This case has now been assigned to A Scientist.')
+      expect(subject.body.encoded).to match('This case has now been assigned to A Scientist.')
+    end
+
+    it 'sends an email on case assignment change' do
+      kase.assignee = another_user
+      mail = CaseMailer.change_assignee(kase, requestor)
+
+      expect(mail.to).to eq nil
+      expect(mail.cc).to match_array %w(someuser@somecluster.com)
+      expect(mail.bcc).to match_array(['tickets@alces-software.com'])
+
+      expect(mail.body.encoded).to match(/This case has now been assigned to Some User\./)
+    end
+
+    it 'sends a notification to Slack' do
+      expect(SlackNotifier).to receive(:assignee_notification).with(kase, another_user)
+      subject
+    end
   end
 
-  it 'sends an email on case assignment change' do
-    kase.assignee = another_user
-    mail = CaseMailer.change_assignee(kase, requestor)
+  describe 'Maintenance email' do
+    subject { CaseMailer.maintenance(kase, text) }
 
-    expect(mail.to).to eq nil
-    expect(mail.cc).to match_array %w(someuser@somecluster.com)
-    expect(mail.bcc).to match_array(['tickets@alces-software.com'])
+    let (:text) { "Doesn't look like anything to me" }
 
-    expect(mail.body.encoded).to match(/This case has now been assigned to Some User\./)
+    it 'sends a notification to Slack' do
+      expect(SlackNotifier).to receive(:maintenance_notification).with(kase, text)
+      subject
+    end
   end
-
 end
