@@ -16,6 +16,8 @@ class ClustersController < ApplicationController
       total += kase.amount
     end
 
+    @all_quarter_start_dates = all_quarter_start_dates
+
   end
 
   private
@@ -42,5 +44,18 @@ class ClustersController < ApplicationController
 
   def deposits
     @cluster.credit_deposits.in_period(start_date, end_date)
+  end
+
+  def all_quarter_start_dates
+    first_quarter = @cluster.created_at.beginning_of_quarter
+    last_quarter = Date.today.beginning_of_quarter
+
+    [].tap do |qs|
+      curr_quarter = last_quarter
+      while curr_quarter >= first_quarter
+        qs << curr_quarter
+        curr_quarter -= 3.months
+      end
+    end
   end
 end

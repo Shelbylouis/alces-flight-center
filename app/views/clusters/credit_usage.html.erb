@@ -10,7 +10,27 @@
     <div class="col-sm-6">
       <div class="card">
         <div class="card-body">
-          <h4>Viewing usage for:</h4>
+          <h4>Viewing usage for <%= quarter_display_name(@start_date) %></h4>
+          <form action="<%= cluster_credit_usage_path(@cluster) %>" class="form" method="get">
+            <div class="input-group">
+              <%= select_tag(
+                    :start_date,
+                    options_for_select(
+                      @all_quarter_start_dates.map { |q|
+                        [quarter_display_name(q), q.strftime('%Y-%m-%d')]
+                      },
+                      @start_date
+                    ),
+                    class: 'form-control',
+                    onchange: 'this.form.submit()',
+                    style: 'flex-grow: 1;' # Our version of Bootstrap seems to be missing flex-grow-* classes
+                  )
+              %>
+              <div class="input-group-append">
+                <input type="submit" class="btn btn-primary" value="View" />
+              </div>
+            </div>
+          </form>
           <div class="text-center text-success">
             Total accrued this period: <%= pluralize(@accrued, 'credit') %>
           </div>
