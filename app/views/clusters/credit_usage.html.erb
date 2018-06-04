@@ -10,7 +10,12 @@
         <div class="card">
           <div class="card-body">
             <h4>Viewing usage for <%= quarter_display_name(@start_date) %></h4>
-            <form action="<%= cluster_credit_usage_path(@cluster) %>" class="form" method="get">
+            <form
+              action="<%= cluster_credit_usage_path(@cluster) %>"
+              class="form"
+              id="credit-quarter-selection"
+              method="get"
+            >
               <div class="input-group">
                 <%= select_tag(
                       :start_date,

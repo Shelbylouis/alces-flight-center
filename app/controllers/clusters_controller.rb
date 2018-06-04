@@ -39,16 +39,22 @@ class ClustersController < ApplicationController
   end
 
   def charges
-    @cluster.cases.with_charge_in_period(start_date, end_date).map(&:credit_charge)
+    @cluster.cases.with_charge_in_period(
+      Time.zone.local_to_utc(start_date.to_datetime),
+      Time.zone.local_to_utc(end_date.to_datetime)
+    ).map(&:credit_charge)
   end
 
   def deposits
-    @cluster.credit_deposits.in_period(start_date, end_date)
+    @cluster.credit_deposits.in_period(
+      Time.zone.local_to_utc(start_date.to_datetime),
+      Time.zone.local_to_utc(end_date.to_datetime)
+    )
   end
 
   def all_quarter_start_dates
     first_quarter = @cluster.created_at.beginning_of_quarter
-    last_quarter = Date.today.beginning_of_quarter
+    last_quarter =  Date.today.beginning_of_quarter.to_datetime
 
     [].tap do |qs|
       curr_quarter = last_quarter
