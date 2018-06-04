@@ -11,9 +11,11 @@ class SlackNotifier
   def case_notification(kase)
     notification_text = "New case created on #{kase.cluster.name}"
 
+    case_url = url_helpers('cluster_case_url', kase.cluster, kase)
+
     kase.fields.each do |field|
       (@notification_details ||= "*Tier #{kase.tier_level}*") << "\n*#{field["name"]}*"\
-        "\n#{restrict_text_length(field["value"])}"
+        "\n#{restrict_text_length(field["value"], case_url)}"
     end
 
     case_note = {
@@ -22,7 +24,7 @@ class SlackNotifier
       pretext: notification_text,
       author_name: kase.user.name,
       title: subject_and_id_title(kase),
-      title_link: url_helpers('cluster_case_url', kase.cluster, kase),
+      title_link: case_url,
       text: @notification_details,
       mrkdwn: true,
       footer: "<#{url_helpers('cluster_cases_url', kase.cluster)}|#{kase.cluster.name} Cases>"
@@ -37,7 +39,6 @@ class SlackNotifier
     assignee_note = {
       fallback: notification_text,
       color: "#6e5494",
-      pretext: notification_text,
       title: subject_and_id_title(kase),
       title_link: url_helpers('cluster_case_url', kase.cluster, kase),
       fields: [
@@ -57,7 +58,6 @@ class SlackNotifier
     comment_note = {
       fallback: notification_text,
       color: "#2794d8",
-      pretext: notification_text,
       author_name: comment.user.name,
       title: subject_and_id_title(kase),
       title_link: url_helpers('cluster_case_url', kase.cluster, kase),
@@ -98,7 +98,7 @@ class SlackNotifier
       pretext: notification_text,
       title: "Details",
       title_link: logs_url,
-      text: restrict_text_length(log.details),
+      text: restrict_text_length(log.details, logs_url),
       mrkdwn: true,
       footer: "<#{logs_url}|#{log.cluster.name} Logs>"
     }
@@ -112,8 +112,8 @@ class SlackNotifier
     notifier.ping attachments: note
   end
 
-  def restrict_text_length(text)
-    text.length > 80 ? text[0, 80] + '...' : text
+  def restrict_text_length(text, url)
+    text.length > 80 ? text[0, 80] + "<#{url}|...>" : text
   end
 
   def subject_and_id_title(kase)
