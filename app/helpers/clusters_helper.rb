@@ -2,7 +2,7 @@ module ClustersHelper
 
   def credit_value_class(value)
     if value.negative? || value.zero?
-      'text-danger'
+      'text-warning'
     else
       'text-success'
     end
