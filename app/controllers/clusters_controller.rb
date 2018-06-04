@@ -22,6 +22,10 @@ class ClustersController < ApplicationController
 
   end
 
+  def deposit
+    redirect_to cluster_credit_usage_path(@cluster)
+  end
+
   private
 
   def start_date

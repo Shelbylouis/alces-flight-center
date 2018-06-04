@@ -113,6 +113,7 @@ Rails.application.routes.draw do
       request_maintenance_form.call
       admin_logs.call
       notes.call(true)
+      post :deposit
     end
 
     resources :components, only: []  do

@@ -6,7 +6,9 @@
     </div>
     <div class="col-sm-12">
       <div class="card-deck mb-2">
-        <%= render 'clusters/credit_balance', cluster: @cluster.decorate %>
+        <%= render 'clusters/credit_balance', cluster: @cluster.decorate do %>
+         <%= render 'clusters/deposit_form', cluster: @cluster %>
+        <% end %>
         <div class="card">
           <div class="card-body">
             <h4>Usage for <%= quarter_display_name(@start_date) %>:</h4>
