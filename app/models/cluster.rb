@@ -25,6 +25,7 @@ class Cluster < ApplicationRecord
   has_many :logs, dependent: :destroy
   has_many :notes, dependent: :destroy
   has_many :credit_deposits
+  has_many :credit_charges, through: :cases
 
   validates_associated :site
   validates :name, presence: true
@@ -82,8 +83,8 @@ class Cluster < ApplicationRecord
       total += deposit.amount
     end
 
-    charged_cases.reduce(deposits) do |total, kase|
-      total -= kase.credit_charge.amount
+    credit_charges.reduce(deposits) do |total, kase|
+      total -= kase.amount
     end
   end
   

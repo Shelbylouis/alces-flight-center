@@ -1,8 +1,10 @@
 module ClustersHelper
 
   def credit_value_class(value)
-    if value.negative? || value.zero?
+    if value.negative?
       'text-warning'
+    elsif value.zero?
+      'text-muted'
     else
       'text-success'
     end

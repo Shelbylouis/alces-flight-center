@@ -39,10 +39,10 @@ class ClustersController < ApplicationController
   end
 
   def charges
-    @cluster.cases.with_charge_in_period(
+    @cluster.credit_charges.in_period(
       Time.zone.local_to_utc(start_date.to_datetime),
       Time.zone.local_to_utc(end_date.to_datetime)
-    ).map(&:credit_charge)
+    )
   end
 
   def deposits
