@@ -8,10 +8,6 @@ class AllSitesDecorator < ApplicationDecorator
     ]
   end
 
-  def dashboard_case_path(kase)
-    h.cluster_case_path(kase.cluster, kase)
-  end
-
   private
 
   def cases_tab

@@ -59,10 +59,6 @@ class ApplicationDecorator < Draper::Decorator
     s.match?(/\A(.+_)?scope_(.+_)?path\Z/) ? :scope_path : super
   end
 
-  def dashboard_case_path(kase)
-    h.polymorphic_path([self, kase])
-  end
-
   private
 
   def convert_scope_path(s)
