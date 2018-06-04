@@ -105,14 +105,6 @@ class Case < ApplicationRecord
       .where.not(credit_charges: { id: nil })
   }
 
-  scope :with_charge_in_period, lambda { |start_date, end_date|
-    with_charge.includes(:credit_charge)
-               .where('credit_charges.created_at BETWEEN ? AND ?',
-                      start_date,
-                      end_date
-               )
-  }
-
   def to_param
     self.display_id.parameterize.upcase
   end
