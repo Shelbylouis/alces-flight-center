@@ -19,6 +19,10 @@ class ApplicationRecord < ActiveRecord::Base
     self.class.to_s.foreign_key.to_sym
   end
 
+  def dashboard_case_path(kase)
+    Rails.application.routes.url_helpers.polymorphic_path([self, kase])
+  end
+
   class << self
     # Every model in app is assumed to be related to a specific Site, unless it
     # is explicitly defined as global by overriding this method.

@@ -73,7 +73,7 @@ class CasesController < ApplicationController
     end
   rescue ActionController::ParameterMissing
     flash[:error] = 'You must specify a credit charge to close this case.'
-    redirect_to @scope.decorate.dashboard_case_path(case_from_params)
+    redirect_to @scope.dashboard_case_path(case_from_params)
   end
 
   def assign
@@ -133,7 +133,7 @@ class CasesController < ApplicationController
     rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
       flash[:error] = "Error updating support case: #{format_errors(@case)}"
     end
-    redirect_to @scope.decorate.dashboard_case_path(@case)
+    redirect_to @scope.dashboard_case_path(@case)
   end
 
   def case_from_params
