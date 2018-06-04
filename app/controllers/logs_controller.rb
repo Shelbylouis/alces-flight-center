@@ -16,7 +16,7 @@ class LogsController < ApplicationController
     else
       error_flash_models [new_log], 'Could not add log entry'
     end
-    slack.log_notification(new_log)
+    SlackNotifier.log_notification(new_log)
     redirect_back fallback_location: @cluster
   end
 
@@ -26,10 +26,6 @@ class LogsController < ApplicationController
     params.require(:log)
           .permit(:details, :component_id, case_ids: [])
           .merge(engineer: current_user)
-  end
-
-  def slack
-    @slack ||= SlackNotifier.new
   end
 end
 
