@@ -34,8 +34,11 @@ Rails.application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
-  # Host to use when generating URLs in emails.
-  config.action_mailer.default_url_options = { host: 'localhost:3000' }
+  # Host to use when generating URLs in emails (same as in production for
+  # clearer failures).
+  config.action_mailer.default_url_options = {
+    host: 'center.alces-flight.com'
+  }
 
   # Required so emails always appear in `ActionMailer::Base.deliveries` even if
   # `deliver_later` is used.
