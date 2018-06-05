@@ -1,6 +1,7 @@
 class Note < ApplicationRecord
   include MarkdownDescription
   include BelongsToCluster
+  include AdminConfig::Note
 
   FLAVOURS = ['customer', 'engineering'].freeze
 
