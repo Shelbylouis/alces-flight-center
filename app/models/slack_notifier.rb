@@ -54,7 +54,13 @@ class SlackNotifier
         author_name: comment.user.name,
         title: subject_and_id_title(kase),
         title_link: url_helpers('cluster_case_url', kase.cluster, kase),
-        text: comment.text
+        fields: [
+          {
+            title: "New comment",
+            value: comment.text,
+            short: false
+          }
+        ]
       }
 
       send(comment_note)
