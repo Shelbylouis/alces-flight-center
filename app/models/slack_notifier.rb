@@ -9,7 +9,7 @@ class SlackNotifier
       kase.fields.each do |field|
         (@notification_details ||= "*Tier #{kase.tier_level}*") << "\n*#{field["name"]}*"\
           "\n#{restrict_text_length(field["value"], case_url)}"
-      end
+      end unless kase.fields.nil?
 
       case_note = {
         fallback: notification_text,
