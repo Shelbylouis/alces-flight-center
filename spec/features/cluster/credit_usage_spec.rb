@@ -86,4 +86,26 @@ RSpec.describe 'Cluster credit usage', type: :feature do
       expect(events.length).to eq 0
     end
   end
+
+  describe 'credit deposits' do
+    context 'as an admin' do
+      it 'shows credit deposit form' do
+        visit cluster_credit_usage_path(cluster, as: admin)
+
+        expect do
+          find('#credit-deposit-form')
+        end.not_to raise_error
+      end
+    end
+
+    context 'as a non-admin' do
+      it 'does not show credit deposit form' do
+        visit cluster_credit_usage_path(cluster, as: user)
+
+        expect do
+          find('#credit-deposit-form')
+        end.to raise_error(Capybara::ElementNotFound)
+      end
+    end
+  end
 end
