@@ -102,12 +102,14 @@ class SlackNotifier
     private
 
     def notifier
-      @notifier = Slack::Notifier.new "https://hooks.slack.com/services/" \
-    "T025J03QZ/BAV4MH1SM/pKlzYfY1efTsl0bFWGtKg8bQ"
+      Slack::Notifier.new Rails.application.config.slack_webhook_url
     end
 
     def send(note)
-      notifier.ping attachments: note
+      return unless Rails.application.config.slack_webhook_url
+      notifier.ping channel: Rails.application.config.slack_channel,
+        username: Rails.application.config.slack_username,
+        attachments: note
     end
 
     def restrict_text_length(text, url)
