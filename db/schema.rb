@@ -156,6 +156,16 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.index ["case_id"], name: "index_change_motd_requests_on_case_id"
   end
 
+  create_table "change_requests", force: :cascade do |t|
+    t.bigint "case_id"
+    t.string "state", default: "draft", null: false
+    t.string "details", null: false
+    t.integer "credit_charge", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["case_id"], name: "index_change_requests_on_case_id"
+  end
+
   create_table "clusters", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -388,6 +398,7 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
   add_foreign_key "cases", "users", column: "assignee_id"
   add_foreign_key "change_motd_request_state_transitions", "change_motd_requests"
   add_foreign_key "change_motd_request_state_transitions", "users"
+  add_foreign_key "change_requests", "cases"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"

@@ -15,6 +15,7 @@ class Case < ApplicationRecord
   has_and_belongs_to_many :logs
   has_many :case_comments
   has_one :change_motd_request, required: false, autosave: true
+  has_one :change_request, required: false
 
   has_many :case_state_transitions
   alias_attribute :transitions, :case_state_transitions
