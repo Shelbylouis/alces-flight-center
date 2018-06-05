@@ -99,12 +99,6 @@ class Case < ApplicationRecord
   scope :assigned_to, ->(user) { where(assignee: user) }
   scope :not_assigned_to, ->(user) { where.not(assignee: user).or(where(assignee: nil)) }
 
-  scope :with_charge, lambda {
-    where(state: 'closed')
-      .includes(:credit_charge)
-      .where.not(credit_charges: { id: nil })
-  }
-
   def to_param
     self.display_id.parameterize.upcase
   end

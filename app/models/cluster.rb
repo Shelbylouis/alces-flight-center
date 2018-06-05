@@ -87,13 +87,8 @@ class Cluster < ApplicationRecord
       total -= kase.amount
     end
   end
-  
-  def charged_cases
-    cases.with_charge
-  end
 
   private
-
 
   def validate_all_cluster_parts_advice
     ['components', 'services'].each do |cluster_part|
