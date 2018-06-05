@@ -5,11 +5,7 @@
         <% if note.persisted? %>
             <%= note.rendered_description.html_safe %>
         <% else %>
-            <% if current_user.admin? %>
-                No <%= note.flavour %> notes have been addded yet.
-            <% else %>
-                No notes have been addded yet.
-            <% end %>
+            <%= note.not_found_message %>
         <% end %>
     </div>
 <% end %>
