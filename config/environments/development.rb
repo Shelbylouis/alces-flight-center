@@ -66,4 +66,8 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   config.sso_base_url = ENV['SSO_BASE_URL'] || 'http://accounts.alces-flight.lvh.me:4000'
+
+  config.slack_webhook_url = ENV['SLACK_WEBHOOK_URL']
+  config.slack_channel = ENV['SLACK_CHANNEL']
+  config.slack_username = ENV['SLACK_USERNAME']
 end

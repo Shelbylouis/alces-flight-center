@@ -51,4 +51,8 @@ Rails.application.configure do
   config.middleware.use Clearance::BackDoor
 
   config.sso_base_url = 'http://example.com/sso_base_url'
+
+  config.slack_webhook_url = 'http://example.com/slack'
+  config.slack_channel = '#test'
+  config.slack_username = 'test'
 end

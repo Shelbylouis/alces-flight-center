@@ -109,6 +109,20 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
-  
+
   config.sso_base_url = ENV.fetch('SSO_BASE_URL')
+
+  config.slack_webhook_url = ENV.fetch('SLACK_WEBHOOK_URL')
+  config.slack_channel, config.slack_username =
+    if ENV['STAGING']
+      [
+        '#alces-flight-center',
+        'Alces Flight Center [Staging]'
+      ]
+    else
+      [
+        '#support',
+        'Alces Flight Center'
+      ]
+    end
 end
