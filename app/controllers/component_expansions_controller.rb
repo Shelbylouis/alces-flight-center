@@ -1,8 +1,8 @@
 class ComponentExpansionsController < ApplicationController
   def create
     expansion = @cluster_part.component_expansions
-                             .create create_expansion_param
-    if expansion.valid?
+                             .new create_expansion_params
+    if expansion.save
       msg = "Successfully added the: #{expansion.expansion_type.name}"
       flash[:success] = msg
     else
@@ -14,7 +14,7 @@ class ComponentExpansionsController < ApplicationController
 
   def update
     @cluster_part.component_expansions.each do |expansion|
-      new_params = update_expansion_param expansion
+      new_params = update_expansion_params expansion
       unless expansion.update new_params
         expansion_errors.push expansion
       end
@@ -23,7 +23,7 @@ class ComponentExpansionsController < ApplicationController
   end
 
   def destroy
-    if component_expansion_param.destroy
+    if component_expansion_from_param.destroy
       flash[:success] = 'Successfully deleted expansion'
     else
       flash[:error] = 'Failed to delete expansion'
@@ -53,21 +53,21 @@ class ComponentExpansionsController < ApplicationController
     @errors_in_component_expansion_form_data ||= []
   end
 
-  def create_expansion_param
+  def create_expansion_params
     params.require(:component_expansion).permit([:slot, :ports]).tap do |x|
       type_id = params.require(:expansion_type).require(:id)
       x.merge!(expansion_type: ExpansionType.find_by_id(type_id))
     end
   end
 
-  def update_expansion_param(expansion)
+  def update_expansion_params(expansion)
     id = expansion.id
     params.permit([:"slot#{id}", :"ports#{id}"]).to_h.map do |k, v|
       [k.to_s.chomp(id.to_s).to_sym, v]
     end.to_h
   end
 
-  def component_expansion_param
+  def component_expansion_from_param
     ComponentExpansion.find_by_id params.require(:id)
   end
 end
