@@ -8,15 +8,9 @@ class ClustersController < ApplicationController
               .reverse!
               .map(&:decorate)
 
-    @accrued = deposits.reduce(0) do |total, deposit|
-      total += deposit.amount
-    end
+    @accrued = add_up(deposits)
 
-    @used = charges.reduce(0) do |total, kase|
-      total += kase.amount
-    end
-
-    @all_quarter_start_dates = all_quarter_start_dates
+    @used = add_up(charges)
 
     @free_of_charge = charges.where(amount: 0).count
 
@@ -38,6 +32,12 @@ class ClustersController < ApplicationController
 
   private
 
+  def add_up(things)
+    things.reduce(0) do |total, thing|
+      total += thing.amount
+    end
+  end
+
   def start_date
     @start_date ||= begin
       parse_start_date.beginning_of_quarter
@@ -55,29 +55,17 @@ class ClustersController < ApplicationController
   end
 
   def charges
-    @cluster.credit_charges.in_period(
+    @charges ||= @cluster.credit_charges.in_period(
       Time.zone.local_to_utc(start_date.to_datetime),
       Time.zone.local_to_utc(end_date.to_datetime)
     )
   end
 
   def deposits
-    @cluster.credit_deposits.in_period(
+    @deposits ||= @cluster.credit_deposits.in_period(
       Time.zone.local_to_utc(start_date.to_datetime),
       Time.zone.local_to_utc(end_date.to_datetime)
     )
   end
 
-  def all_quarter_start_dates
-    first_quarter = @cluster.created_at.beginning_of_quarter
-    last_quarter =  Date.today.beginning_of_quarter.to_datetime
-
-    [].tap do |qs|
-      curr_quarter = last_quarter
-      while curr_quarter >= first_quarter
-        qs << curr_quarter
-        curr_quarter -= 3.months
-      end
-    end
-  end
 end

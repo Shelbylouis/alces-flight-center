@@ -61,6 +61,21 @@ class ClusterDecorator < ApplicationDecorator
     end
   end
 
+  # List the first day of each quarter since this cluster was created, including
+  # the current quarter (as defined by `Date.today`).
+  def all_quarter_start_dates
+    first_quarter = model.created_at.beginning_of_quarter
+    last_quarter =  Date.today.beginning_of_quarter.to_datetime
+
+    [].tap do |qs|
+      curr_quarter = last_quarter
+      while curr_quarter >= first_quarter
+        qs << curr_quarter
+        curr_quarter -= 3.months
+      end
+    end
+  end
+
   private
 
   def notes_tab
@@ -85,5 +100,4 @@ class ClusterDecorator < ApplicationDecorator
       }
     end
   end
-
 end

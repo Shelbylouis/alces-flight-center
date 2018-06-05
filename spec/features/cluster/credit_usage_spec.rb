@@ -24,7 +24,7 @@ RSpec.describe 'Cluster credit usage', type: :feature do
     expect(events[1].text).to match(/#{c3.display_id}.*-4 credits$/)
     expect(events[0].text).to match(/Credits added.* 10 credits$/)
 
-    expect(find('.credit-balance').text).to eq '5 credits'
+    expect(find('p.credit-balance').text).to eq '5 credits'
   end
 
   it 'shows a friendly message with no credit events' do
@@ -53,7 +53,7 @@ RSpec.describe 'Cluster credit usage', type: :feature do
       travel_to Time.zone.local(2018, 6, 1) do
         visit cluster_credit_usage_path(cluster, as: user)
 
-        expect(find('.credit-balance').text).to eq '1 credit'
+        expect(find('p.credit-balance').text).to eq '1 credit'
         expect(find('.no-events-message').text).to eq 'No credit usage or accrual in this period.'
 
         form = find('#credit-quarter-selection')

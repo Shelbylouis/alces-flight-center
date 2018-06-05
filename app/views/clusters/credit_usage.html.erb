@@ -2,12 +2,12 @@
 <%= render 'partials/tabs', activate: :credit_usage do %>
   <div class="card-body row">
     <div class="col-sm-12">
-      <h3><%= @cluster.name %> support credit usage</h3>
+      <h3><%= cluster.name %> support credit usage</h3>
     </div>
     <div class="col-sm-12">
       <div class="card-deck mb-2">
-        <%= render 'clusters/credit_balance', cluster: @cluster.decorate do %>
-         <%= render 'clusters/deposit_form', cluster: @cluster %>
+        <%= render 'clusters/credit_balance', cluster: cluster do %>
+         <%= render 'clusters/deposit_form', cluster: cluster %>
         <% end %>
         <div class="card">
           <div class="card-body">
@@ -27,7 +27,7 @@
               </tr>
             </table>
             <form
-              action="<%= cluster_credit_usage_path(@cluster) %>"
+              action="<%= cluster_credit_usage_path(cluster) %>"
               class="form"
               id="credit-quarter-selection"
               method="get"
@@ -39,7 +39,7 @@
                 <%= select_tag(
                         :start_date,
                         options_for_select(
-                            @all_quarter_start_dates.map {|q|
+                            cluster.all_quarter_start_dates.map {|q|
                               [quarter_display_name(q), q.strftime('%Y-%m-%d')]
                             },
                             @start_date
