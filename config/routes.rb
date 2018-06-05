@@ -86,6 +86,12 @@ Rails.application.routes.draw do
     resources :clusters, only: []  do
       request_maintenance_form.call
       admin_logs.call
+      resource :notes, only: [] do
+        member do
+          get :engineering
+          get :customer
+        end
+      end
     end
 
     resources :components, only: []  do
@@ -140,6 +146,11 @@ Rails.application.routes.draw do
       logs.call
       confirm_maintenance_form.call
       get :documents
+      resource :notes, only: [] do
+        member do
+          get :customer
+        end
+      end
     end
 
     resources :components, only: :show do

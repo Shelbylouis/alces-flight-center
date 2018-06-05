@@ -1,0 +1,15 @@
+<% content_for(:subtitle) { note.subtitle } %>
+
+<%= render 'partials/tabs', activate: :notes do %>
+    <div class="card-body">
+        <% if note.persisted? %>
+            <%= note.rendered_description.html_safe %>
+        <% else %>
+            <% if current_user.admin? %>
+                No <%= note.flavour %> notes have been addded yet.
+            <% else %>
+                No notes have been addded yet.
+            <% end %>
+        <% end %>
+    </div>
+<% end %>

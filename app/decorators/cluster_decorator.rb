@@ -15,7 +15,7 @@ class ClusterDecorator < ApplicationDecorator
   def tabs
     [
       tabs_builder.overview,
-      documents.empty? ? nil :{ id: :documents, path: h.cluster_documents_path(self) },
+      documents.empty? ? nil : { id: :documents, path: h.cluster_documents_path(self) },
       tabs_builder.logs,
       tabs_builder.cases,
       tabs_builder.maintenance,
@@ -28,7 +28,8 @@ class ClusterDecorator < ApplicationDecorator
             path: h.cluster_components_path(self, type: t)
           }
         end.push(text: 'All', path: h.cluster_components_path(self))
-      }
+      },
+      notes_tab,
     ].compact
   end
 
@@ -47,5 +48,30 @@ class ClusterDecorator < ApplicationDecorator
       motd: motd,
       motdHtml: h.simple_format(motd),
     }
+  end
+
+  private
+
+  def notes_tab
+    if current_user.admin?
+      {
+        id: :notes,
+        dropdown: [
+          {
+            text: 'Engineering',
+            path: h.engineering_cluster_notes_path(self),
+          },
+          {
+            text: 'Customer',
+            path: h.customer_cluster_notes_path(self),
+          },
+        ]
+      }
+    else
+      {
+        id: :notes,
+        path: h.customer_cluster_notes_path(self),
+      }
+    end
   end
 end
