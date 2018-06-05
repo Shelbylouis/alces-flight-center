@@ -1,8 +1,6 @@
 class CasePolicy < ApplicationPolicy
-  def index?
-    true
-  end
-  alias_method :resolved?, :index?
+  alias_method :index?, :anyone?
+  alias_method :resolved?, :anyone?
 
   alias_method :create?, :editor?
   alias_method :escalate?, :editor?
