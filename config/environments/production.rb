@@ -67,7 +67,7 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   config.action_mailer.raise_delivery_errors = true
 
-  # Host to use when generating URls in emails.
+  # Host to use when generating URLs in emails.
   url_options_host = if ENV['STAGING']
                        'staging.center.alces-flight.com'
                      else

@@ -35,7 +35,7 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
-  # Host to use when generating URls in emails.
+  # Host to use when generating URLs in emails.
   config.action_mailer.default_url_options = { host: 'localhost:3000' }
 
   # Do not send emails in development.
