@@ -1,7 +1,19 @@
 class ComponentExpansionsController < ApplicationController
+  # Ensure actions authorize the resource they operate on (using Pundit).
+  after_action :verify_authorized
+
+  def index
+    authorize ComponentExpansion
+  end
+
+  def edit
+    authorize ComponentExpansion
+  end
+
   def create
     expansion = @cluster_part.component_expansions
                              .new create_expansion_params
+    authorize expansion
     if expansion.save
       msg = "Successfully added the: #{expansion.expansion_type.name}"
       flash[:success] = msg
@@ -14,6 +26,7 @@ class ComponentExpansionsController < ApplicationController
 
   def update
     @cluster_part.component_expansions.each do |expansion|
+      authorize expansion
       new_params = update_expansion_params expansion
       unless expansion.update new_params
         expansion_errors.push expansion
@@ -23,7 +36,9 @@ class ComponentExpansionsController < ApplicationController
   end
 
   def destroy
-    if component_expansion_from_param.destroy
+    expansion = component_expansion_from_param
+    authorize expansion
+    if expansion.destroy
       flash[:success] = 'Successfully deleted expansion'
     else
       flash[:error] = 'Failed to delete expansion'
