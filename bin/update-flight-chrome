@@ -25,8 +25,9 @@ main() {
   yarn build:center
   cd -
 
-  rm -f "$(current_js)"
-  rm -f "$(current_css)"
+  rm -f "${FLIGHT_CENTER_JS_PATH}"/main.*.js{,.map}
+  rm -f "${FLIGHT_CENTER_JS_CHUNKS_PATH}"/*.chunk.js{,.map}
+  rm -f "${FLIGHT_CENTER_CSS_PATH}"/main.*.css{,.map}
 
   mv "$js_path"/main.*.js{,.map} "$FLIGHT_CENTER_JS_PATH"
   mv "$js_path"/*.chunk.js{,.map} "$FLIGHT_CENTER_JS_CHUNKS_PATH"
@@ -44,18 +45,18 @@ main() {
 
     New paths:
 
-      JS: $(current_js)
-      CSS: $(current_css)
+      JS: $(current_main_js)
+      CSS: $(current_main_css)
 
     Then you can amend the above commit.
 EOF
 }
 
-current_js() {
+current_main_js() {
   echo "$FLIGHT_CENTER_JS_PATH"/main.*.js
 }
 
-current_css() {
+current_main_css() {
   echo "$FLIGHT_CENTER_CSS_PATH"/main.*.css
 }
 
