@@ -42,6 +42,10 @@ module AlcesFlightCenter
                           'Alces Flight Center <center@alces-flight.com>'
                         end
 
+    # Handle Pundit authorization failure as 403 (forbidden) - see
+    # https://github.com/varvet/pundit/blob/dc7095118c47faca1fbea213f8b82d4d0b2616a0/README.md#rescuing-a-denied-authorization-in-rails.
+    config.action_dispatch.rescue_responses['Pundit::NotAuthorizedError'] = :forbidden
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
