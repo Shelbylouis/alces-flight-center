@@ -20,7 +20,7 @@ class NotesController < ApplicationController
   end
 
   def edit
-    @note = Note.find(params[:id])
+    @note = note_from_params
   end
 
   def create
@@ -29,28 +29,32 @@ class NotesController < ApplicationController
     if @note.save
       flash[:success] = 'Notes created'
     else
-      error_flash_models [@note], "Your notes were not created. #{@note.errors.full_messages.join('; ').strip}"
+      flash[:error] = "Your notes were not created: #{format_errors(@note)}"
     end
     redirect_back fallback_location: cluster
   end
 
   def update
-    @note = Note.find(params[:id])
+    @note = note_from_params
     if @note.update_attributes(note_params)
       flash[:success] = 'Notes updated'
       redirect_to send("#{@note.flavour}_cluster_notes_path", @note.cluster)
     else
-      error_flash_models [@note], "Your notes were not updated. #{@note.errors.full_messages.join('; ').strip}"
+      flash[:error] = "Your notes were not updated: #{format_errors(@note)}"
       render :edit
     end
   end
 
   private
 
-  def note_from_params(flavour)
-    cluster = cluster_from_params
-    note = cluster.notes.send(flavour).first || cluster.notes.new(flavour: flavour)
-    @note = note.decorate
+  def note_from_params(flavour=nil)
+    if params[:id]
+      note = Note.find(params[:id])
+    else 
+      cluster = cluster_from_params
+      note = cluster.notes.send(flavour).first || cluster.notes.new(flavour: flavour)
+    end
+    note.decorate
   end
 
   def cluster_from_params
