@@ -26,6 +26,12 @@ class ChangeRequestsController < ApplicationController
     @cr = @case.change_request.decorate
   end
 
+  def propose
+    change_action 'Change request %s has been submitted for customer authorization' do |cr|
+      cr.propose!(current_user)
+    end
+  end
+
   private
 
   def assign_case
@@ -34,6 +40,18 @@ class ChangeRequestsController < ApplicationController
 
   def cr_params
     params.require(:change_request).permit(:details, :credit_charge)
+  end
+
+  def change_action(success_flash)
+    cr = @case.change_request
+    begin
+      yield(cr)
+      cr.save!
+      flash[:success] = success_flash % cr.case.display_id
+    rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
+      flash[:error] = "Error updating change request: #{format_errors(cr)}"
+    end
+    redirect_to cluster_case_change_request_path(@case.cluster, @case, cr)
   end
 
 end
