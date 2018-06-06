@@ -136,8 +136,9 @@ class Case < ApplicationRecord
       case_state_transitions +
       audits +
       logs +
-      [ credit_charge ].compact
-    ).sort_by(&:created_at).reverse!
+      [ credit_charge ] +
+      change_request&.transitions
+    ).compact.sort_by(&:created_at).reverse!
   end
 
   def email_subject

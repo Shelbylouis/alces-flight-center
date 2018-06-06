@@ -1,6 +1,9 @@
 class ChangeRequest < ApplicationRecord
   belongs_to :case
 
+  has_many :change_request_state_transitions
+  alias_attribute :transitions, :change_request_state_transitions
+
   delegate :site, to: :case
 
   after_create :ensure_case_is_tier_4
