@@ -11,11 +11,10 @@ class SlackNotifier
 
       case_url = url_helpers('cluster_case_url', kase.cluster, kase)
 
-      notification_details = "*Tier #{kase.tier_level}*"
-      kase.fields.each do |field|
-        notification_details << "\n*#{field["name"]}*"\
-          "\n#{restrict_text_length(field["value"], case_url)}"
-      end unless kase.fields.nil?
+      notification_details = [
+          "*Tier #{kase.tier_level}*",
+          *format_fields(kase.email_properties, case_url)
+      ].join("\n")
 
       case_note = {
         fallback: notification_text,
@@ -132,8 +131,14 @@ class SlackNotifier
       "#{kase.subject} - #{kase.display_id}"
     end
 
-    def url_helpers(helper, *args)
-      Rails.application.routes.url_helpers.public_send(helper, *args)
+    def format_fields(hash, url)
+      hash.map do |key, value|
+        if value.is_a?(Hash)
+          format_fields(value, url)
+        else
+          "*#{key}*\n#{restrict_text_length(value, url)}"
+        end
+      end.flatten
     end
   end
 end
