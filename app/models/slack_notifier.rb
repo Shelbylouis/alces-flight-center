@@ -128,7 +128,7 @@ class SlackNotifier
     end
 
     def subject_and_id_title(kase)
-      "#{kase.subject} - #{kase.display_id}"
+      "[#{kase.display_id}] #{kase.subject}"
     end
 
     def format_fields(hash, url)
