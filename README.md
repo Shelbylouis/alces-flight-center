@@ -209,6 +209,23 @@ updating to support new features/content/styles etc. for these. To do this:
 
 4. Make the necessary manual updates output at the end of this script.
 
+### To set up Slack notifications for your development environment
+
+There are two environment variables that need to be set in your .env file
+before Slack notifications will work within your development environment,
+`SLACK_CHANNEL` and `SLACK_WEBHOOK_URL`.
+
+The former refers to the channel that the notifier will send all notifications
+to. Therefore if you wish to receive all Slack notfications via private messages
+you will need to set this to `@<your_slack_username_here>`.
+
+The latter however is vital to making the notifier function properly and should
+be kept secret. This URL can be found within the `Incoming WebHooks` section
+of our Slack workspace. From there you need to navigate to the `Alces Flight
+Center` configuration which will display the URL for you in its configuration
+page. Once you copy this URL to its respective environment variable you should
+be able to send notfications to Slack from your development environment.
+
 ## Creating accounts for customers
 
 - If they don't have a Flight SSO account, they should register for one first.
