@@ -2,6 +2,8 @@ require 'exceptions'
 
 class ApplicationController < ActionController::Base
   include Clearance::Controller
+  include Pundit
+
   protect_from_forgery with: :exception
   decorates_assigned :site
 
@@ -9,6 +11,13 @@ class ApplicationController < ActionController::Base
   before_action :assign_current_user
   before_action :assign_scope
   before_action :assign_title
+
+  # Ensure actions authorize the resource they operate on (using Pundit). These
+  # read-only actions are skipped as, for now at least, whether a User is able
+  # to read a record is checked at the model level, and handled as a 404 if
+  # they are forbidden; see `ApplicationRecord#check_read_permissions`.
+  NO_AUTH_ACTIONS = [:show, :index]
+  after_action :verify_authorized, except: NO_AUTH_ACTIONS
 
   rescue_from ReadPermissionsError, with: :not_found
   rescue_from JWT::DecodeError, with: :not_found

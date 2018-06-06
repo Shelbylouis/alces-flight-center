@@ -11,6 +11,7 @@ class LogsController < ApplicationController
   def create
     @scope = @component || @cluster # TODO: Generalise this
     new_log = @scope.logs.build(log_params)
+    authorize new_log
     if new_log.save
       flash[:success] = 'Added new log entry'
     else

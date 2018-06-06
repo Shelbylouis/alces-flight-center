@@ -478,4 +478,18 @@ RSpec.describe Case, type: :model do
       expect(subject).not_to include('some_viewer')
     end
   end
+
+  describe '#commenting_enabled_for?' do
+    it 'returns inverse of what CaseCommenting#disabled? would give' do
+      user = build_stubbed(:user)
+      kase = build_stubbed(:case)
+      stub_case_commenting = CaseCommenting.new(kase, user)
+      allow(stub_case_commenting).to receive(:disabled?).and_return true
+      allow(
+        CaseCommenting
+      ).to receive(:new).with(kase, user).and_return(stub_case_commenting)
+
+      expect(kase.commenting_enabled_for?(user)).to eq(false)
+    end
+  end
 end
