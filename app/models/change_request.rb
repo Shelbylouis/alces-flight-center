@@ -6,6 +6,8 @@ class ChangeRequest < ApplicationRecord
   after_create :ensure_case_is_tier_4
 
   state_machine initial: :draft do
+    audit_trail context: [:requesting_user], initial: false
+
     state :draft
     state :awaiting_authorisation
     state :declined
@@ -31,6 +33,10 @@ class ChangeRequest < ApplicationRecord
   validates :details, presence: true
 
   private
+
+  def requesting_user(transition)
+    transition.args&.first
+  end
 
   def ensure_case_is_tier_4
     self.case.tier_level = 4
