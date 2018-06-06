@@ -171,6 +171,7 @@ Rails.application.routes.draw do
         member do
           post :authorise
           post :decline
+          post :complete
         end
       end
     end

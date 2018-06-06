@@ -1,0 +1,15 @@
+<% if current_user.admin? %>
+  <p>
+    This change request is awaiting customer approval.
+  </p>
+<% else %>
+  <%= link_to 'Approve work and close CR',
+              complete_case_change_request_path(cr.case, cr),
+              class: 'btn btn-success form-control mb-2',
+              data: {
+                  confirm: 'Are you sure you want to approve and close this change request?'
+              },
+              method: 'post',
+              role: 'button'
+  %>
+<% end %>

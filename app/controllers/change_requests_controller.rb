@@ -32,6 +32,12 @@ class ChangeRequestsController < ApplicationController
     end
   end
 
+  def decline
+    change_action 'Change request %s declined.' do |cr|
+      cr.decline!(current_user)
+    end
+  end
+
   def authorise
     change_action 'Change request %s authorised.' do |cr|
       cr.authorise!(current_user)
@@ -41,6 +47,12 @@ class ChangeRequestsController < ApplicationController
   def handover
     change_action 'Change request %s handed over for customer approval.' do |cr|
       cr.handover!(current_user)
+    end
+  end
+
+  def complete
+    change_action 'Change request %s completed.' do |cr|
+      cr.complete!(current_user)
     end
   end
 
