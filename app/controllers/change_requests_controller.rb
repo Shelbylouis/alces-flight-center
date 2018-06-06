@@ -7,8 +7,19 @@ class ChangeRequestsController < ApplicationController
   end
 
   def create
-    @case.create_change_request!(cr_params)
-    redirect_to case_path(@case.display_id)
+    cr = @case.build_change_request(cr_params)
+
+    if cr.save
+      flash[:success] = "Created change request for case #{@case.display_id}."
+      redirect_to case_path(@case.display_id)
+    else
+      errors = format_errors(cr)
+      flash[:error] = "Error creating change request: #{errors}." if errors
+      # Show the form again, with the data previously entered.
+      @cr = cr
+      render 'change_requests/new'
+    end
+
   end
 
   private
