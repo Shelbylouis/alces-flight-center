@@ -1,1 +1,25 @@
 <% content_for(:subtitle) { "Create new change request for case #{@case.display_id}" } %>
+
+<h2>New change request for <%= @case.display_id %>: <%= @case.subject %></h2>
+
+<%= form_for @cr, url: {action: :create}, html: {class: 'form'} do |f| %>
+  <div class="form-group row">
+    <label class="col-sm-3 col-form-label" for="change_request_details">
+      Describe this change in as much detail as possible. Include proposed changes,
+      prerequisites, dependencies and relevant technical information.
+    </label>
+    <div class="col-sm-9">
+      <%= f.text_area :details, rows: 15, class: 'form-control' %>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-3 col-form-label" for="change_request_credit_charge">
+      Credit charge for this CR:
+    </label>
+    <div class="col-sm-9">
+      <%= f.number_field :credit_charge, class: 'form-control' %>
+    </div>
+  </div>
+  <%= f.submit "Create", class: 'btn btn-primary' %>
+<% end %>
