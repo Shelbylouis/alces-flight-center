@@ -13,9 +13,9 @@ class NoteDecorator < ApplicationDecorator
 
   def not_found_message
     if current_user.admin?
-      "No #{flavour} notes have been addded yet."
+      "No #{flavour} notes have been added yet."
     else
-      "No notes have been addded yet."
+      "No notes have been added yet."
     end
   end
 end
