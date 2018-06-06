@@ -173,6 +173,13 @@ Rails.application.routes.draw do
       member do
         post :escalate
       end
+
+      resource :change_request, only: [] do
+        member do
+          post :authorise
+          post :decline
+        end
+      end
     end
 
     resources :clusters, only: :show do

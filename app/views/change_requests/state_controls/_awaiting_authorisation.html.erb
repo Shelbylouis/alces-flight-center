@@ -1,0 +1,26 @@
+<% if current_user.admin? %>
+  <p>
+    This change request is awaiting authorisation from the customer.
+  </p>
+<% else %>
+  <%= link_to 'Authorise',
+              authorise_case_change_request_path(cr.case, cr),
+              class: 'btn btn-success form-control mb-2',
+              data: {
+                  confirm: 'Are you sure you want to authorise this change request?'
+              },
+              method: 'post',
+              role: 'button'
+  %>
+  <%= link_to 'Decline',
+              decline_case_change_request_path(cr.case, cr),
+              class: 'btn btn-danger form-control',
+              data: {
+                  confirm: 'Are you sure you want to decline this change
+                            request? You may still be charged for work carried
+                            out up to this point.'.squish
+              },
+              method: 'post',
+              role: 'button'
+  %>
+<% end %>

@@ -32,6 +32,12 @@ class ChangeRequestsController < ApplicationController
     end
   end
 
+  def authorise
+    change_action 'Change request %s authorised.' do |cr|
+      cr.authorise!(current_user)
+    end
+  end
+
   private
 
   def assign_case
