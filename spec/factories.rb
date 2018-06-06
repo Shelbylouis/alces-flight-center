@@ -102,4 +102,10 @@ FactoryBot.define do
     amount 1
     association :user, factory: :admin
   end
+
+  factory :change_request do
+    association :case
+    details 'Change request details text'
+    credit_charge 1
+  end
 end
