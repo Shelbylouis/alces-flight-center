@@ -28,7 +28,7 @@ class SlackNotifier
         footer: "<#{url_helpers('cluster_cases_url', kase.cluster)}|#{kase.cluster.name} Cases>"
       }
 
-      send(case_note)
+      send_notification(case_note)
     end
 
     def assignee_notification(kase, assignee)
@@ -48,7 +48,7 @@ class SlackNotifier
         ]
       }
 
-      send(assignee_note)
+      send_notification(assignee_note)
     end
 
     def comment_notification(kase, comment)
@@ -68,7 +68,7 @@ class SlackNotifier
         ]
       }
 
-      send(comment_note)
+      send_notification(comment_note)
     end
 
     def maintenance_notification(kase, text)
@@ -87,7 +87,7 @@ class SlackNotifier
         footer: "<#{url_helpers('cluster_maintenance_windows_url', kase.cluster)}|#{kase.cluster.name} Maintenance>"
       }
 
-      send(maintenance_note)
+      send_notification(maintenance_note)
     end
 
     def log_notification(log)
@@ -107,7 +107,7 @@ class SlackNotifier
         footer: "<#{logs_url}|#{log.cluster.name} Logs>"
       }
 
-      send(log_note)
+      send_notification(log_note)
     end
 
     private
@@ -116,7 +116,7 @@ class SlackNotifier
       Slack::Notifier.new slack_webhook_url
     end
 
-    def send(note)
+    def send_notification(note)
       return unless slack_webhook_url
       notifier.ping channel: slack_channel,
         username: slack_username,
