@@ -22,6 +22,10 @@ class ChangeRequestsController < ApplicationController
 
   end
 
+  def show
+    @cr = @case.change_request.decorate
+  end
+
   private
 
   def assign_case

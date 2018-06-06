@@ -1,0 +1,45 @@
+<% content_for(:subtitle) { "Change request for #{@case.display_id}: #{@case.subject}" } %>
+<div class="card">
+  <div class="card-body row">
+    <div class="col-12">
+      <a name="cr-top"></a>
+      <h2>Change request <%= @case.display_id %>: <%= @case.subject %></h2>
+    </div>
+    <div class="col-sm-12">
+      <div class="card-deck mb-2">
+        <div class="card">
+          <div class="card-body">
+            <table class="table">
+              <tr>
+                <th>State</th>
+                <td><%= @cr.user_facing_state %></td>
+              </tr>
+              <tr>
+                <th>Credit charge</th>
+                <td><%= pluralize(@cr.credit_charge, 'credit') %></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <%= render "change_requests/state_controls/#{@cr.state}", cr: @cr %>
+            <hr />
+            <%=
+              link_to 'Return to case',
+                      cluster_case_path(@case.cluster, @case),
+                      class: 'btn btn-primary form-control',
+                      role: 'button'
+            %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
+      <h3>Details</h3>
+      <%= @cr.details %>
+      <hr />
+      <a href="#cr-top">Back to top</a>
+    </div>
+  </div>
+</div>
