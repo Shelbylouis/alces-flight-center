@@ -49,3 +49,17 @@ RSpec.shared_examples 'it is available only to admins' do
     expect(subject).not_to permit(site_viewer, record)
   end
 end
+
+RSpec.shared_examples 'it is available only to contacts' do
+  it 'denies access to admin' do
+    expect(subject).not_to permit(admin, record)
+  end
+
+  it 'grants access to site contact' do
+    expect(subject).to permit(site_contact, record)
+  end
+
+  it 'denies access to site viewer' do
+    expect(subject).not_to permit(site_viewer, record)
+  end
+end

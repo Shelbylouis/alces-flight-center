@@ -1,10 +1,14 @@
 class MaintenanceWindowsController < ApplicationController
+  # Ensure actions authorize the resource they operate on (using Pundit).
+  after_action :verify_authorized, except: :index
+
   decorates_assigned :maintenance_window
 
   def new
     @maintenance_window = MaintenanceWindow.new(
       initial_maintenance_window_params
     )
+    authorize @maintenance_window
   end
 
   def create
@@ -13,6 +17,7 @@ class MaintenanceWindowsController < ApplicationController
 
     handle_form_submission(action: action, template: :new) do
       @maintenance_window = MaintenanceWindow.new(request_maintenance_window_params)
+      authorize @maintenance_window
       ActiveRecord::Base.transaction do
         @maintenance_window.save!
         @maintenance_window.send("#{event}!", current_user)
@@ -22,6 +27,7 @@ class MaintenanceWindowsController < ApplicationController
 
   def confirm
     @maintenance_window = MaintenanceWindow.find(params[:id])
+    authorize @maintenance_window
 
     # Validate window as if it was confirmed without changes up front, so can
     # display any invalid fields which will require changing on initial page
@@ -32,6 +38,7 @@ class MaintenanceWindowsController < ApplicationController
   def confirm_submit
     handle_form_submission(action: :confirm, template: :confirm) do
       @maintenance_window = MaintenanceWindow.find(params[:id])
+      authorize @maintenance_window
       @maintenance_window.assign_attributes(confirm_maintenance_window_params)
       @maintenance_window.confirm!(current_user)
     end
@@ -119,6 +126,7 @@ class MaintenanceWindowsController < ApplicationController
 
   def transition_window(event, new_state_message: nil)
     window = MaintenanceWindow.find(params[:id])
+    authorize window
     previous_user_facing_state = window.user_facing_state
     cluster = window.associated_cluster
 
