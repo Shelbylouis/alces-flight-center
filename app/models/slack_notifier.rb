@@ -11,8 +11,9 @@ class SlackNotifier
 
       case_url = url_helpers('cluster_case_url', kase.cluster, kase)
 
+      notification_details = "*Tier #{kase.tier_level}*"
       kase.fields.each do |field|
-        (@notification_details ||= "*Tier #{kase.tier_level}*") << "\n*#{field["name"]}*"\
+        notification_details << "\n*#{field["name"]}*"\
           "\n#{restrict_text_length(field["value"], case_url)}"
       end unless kase.fields.nil?
 
@@ -23,7 +24,7 @@ class SlackNotifier
         author_name: kase.user.name,
         title: subject_and_id_title(kase),
         title_link: case_url,
-        text: @notification_details,
+        text: notification_details,
         mrkdwn: true,
         footer: "<#{url_helpers('cluster_cases_url', kase.cluster)}|#{kase.cluster.name} Cases>"
       }
