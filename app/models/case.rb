@@ -61,7 +61,7 @@ class Case < ApplicationRecord
       # providing access to documentation without any action needing to be
       # taken by Alces admins.
       greater_than_or_equal_to: 1,
-      less_than_or_equal_to: 3,
+      less_than_or_equal_to: 4,
     }
   validate :validate_tier_level_changes
 

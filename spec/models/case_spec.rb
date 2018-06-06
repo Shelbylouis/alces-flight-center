@@ -15,7 +15,7 @@ RSpec.describe Case, type: :model do
       is_expected.to validate_numericality_of(:tier_level)
         .only_integer
         .is_greater_than_or_equal_to(1)
-        .is_less_than_or_equal_to(3)
+        .is_less_than_or_equal_to(4)
     end
 
     describe 'fields validation' do
