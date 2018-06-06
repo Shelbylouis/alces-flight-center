@@ -11,7 +11,7 @@ class SlackNotifier
     def case_notification(kase)
       notification_text = "New case created on #{kase.cluster.name}"
 
-      case_url = cluster_case_url.(kase.cluster, kase)
+      case_url = cluster_case_url(kase.cluster, kase)
 
       notification_details = [
           "*Tier #{kase.tier_level}*",
@@ -26,8 +26,7 @@ class SlackNotifier
         title: subject_and_id_title(kase),
         title_link: case_url,
         text: notification_details,
-        mrkdwn: true,
-        footer: "<#{cluster_cases_url(kase.cluster)}|#{kase.cluster.name} Cases>"
+        mrkdwn: true
       }
 
       send_notification(case_note)
@@ -85,9 +84,7 @@ class SlackNotifier
             value: text,
             short: false
           }
-        ],
-        footer: "<#{cluster_maintenance_windows_url(kase.cluster)}|#{kase
-          .cluster.name} Maintenance>"
+        ]
       }
 
       send_notification(maintenance_note)
@@ -107,8 +104,7 @@ class SlackNotifier
         title: "Details",
         title_link: logs_url,
         text: restrict_text_length(log.details, logs_url),
-        mrkdwn: true,
-        footer: "<#{logs_url}|#{log.cluster.name} Logs>"
+        mrkdwn: true
       }
 
       send_notification(log_note)
