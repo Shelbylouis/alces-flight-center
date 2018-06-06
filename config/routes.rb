@@ -89,7 +89,6 @@ Rails.application.routes.draw do
       resource :notes, only: [] do
         member do
           get :engineering
-          get :customer
         end
       end
     end
@@ -146,11 +145,12 @@ Rails.application.routes.draw do
       logs.call
       confirm_maintenance_form.call
       get :documents
-      resource :notes, only: [] do
+      resource :notes, only: [:create] do
         member do
           get :customer
         end
       end
+      resources :notes, only: [:edit, :update]
     end
 
     resources :components, only: :show do

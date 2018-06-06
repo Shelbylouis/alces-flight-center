@@ -2,10 +2,11 @@
 
 <%= render 'partials/tabs', activate: :notes do %>
     <div class="card-body">
-        <% if note.persisted? %>
-            <%= note.rendered_description.html_safe %>
-        <% else %>
-            <%= note.not_found_message %>
-        <% end %>
+        <%= note.rendered_description.html_safe %>
     </div>
+    <%= link_to 'Edit notes',
+        note.edit_path,
+        class: 'btn btn-secondary m-2 btn-sm',
+        role: 'button'
+    %>
 <% end %>

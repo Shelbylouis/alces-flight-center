@@ -18,4 +18,8 @@ class NoteDecorator < ApplicationDecorator
       "No notes have been added yet."
     end
   end
+
+  def edit_path
+    h.edit_cluster_note_path(cluster, object)
+  end
 end
