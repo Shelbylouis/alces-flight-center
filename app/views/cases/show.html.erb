@@ -17,7 +17,7 @@
               </span>
 
               <%= link_to verb,
-                          case_change_request_path(@case.change_request),
+                          cluster_case_change_request_path(@case.cluster, @case, @case.change_request),
                           class: 'btn btn-primary',
                           role: 'button'
               %>
