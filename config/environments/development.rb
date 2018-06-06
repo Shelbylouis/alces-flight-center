@@ -35,8 +35,10 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
-  # Host to use when generating URls in emails.
-  config.action_mailer.default_url_options = { host: 'localhost:3000' }
+  # Host to use when generating URLs in emails.
+  config.action_mailer.default_url_options = {
+    host: 'center.alces-flight.lvh.me:3000'
+  }
 
   # Do not send emails in development.
   config.action_mailer.perform_deliveries = false
@@ -66,4 +68,8 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   config.sso_base_url = ENV['SSO_BASE_URL'] || 'http://accounts.alces-flight.lvh.me:4000'
+
+  config.slack_webhook_url = ENV['SLACK_WEBHOOK_URL']
+  config.slack_channel = ENV['SLACK_CHANNEL']
+  config.slack_username = 'Alces Flight Center [Development]'
 end

@@ -182,7 +182,7 @@ class Case < ApplicationRecord
       Tier: decorate.tier_description,
       Fields: field_hash,
       'Requested MOTD': change_motd_request&.motd
-    }.reject { |_k, v| v.nil? }
+    }.compact
   end
 
   def consultancy?

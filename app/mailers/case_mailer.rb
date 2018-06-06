@@ -1,3 +1,4 @@
+require 'slack-notifier'
 class CaseMailer < ApplicationMailer
 
   layout 'case_mailer'
@@ -10,6 +11,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients.reject { |contact| contact == @case.user.email }, # Exclude the user raising the case
       subject: @case.email_subject
     )
+    SlackNotifier.case_notification(@case)
   end
 
   def change_assignee(my_case, new_assignee)
@@ -19,6 +21,7 @@ class CaseMailer < ApplicationMailer
       cc: new_assignee&.email, # Send to new assignee only
       subject: @case.email_reply_subject
     )
+    SlackNotifier.assignee_notification(@case, @assignee)
   end
 
   def comment(comment)
@@ -28,6 +31,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients.reject { |contact| contact == @comment.user.email }, # Exclude the user making the comment
       subject: @case.email_reply_subject,
     )
+    SlackNotifier.comment_notification(@case, @comment)
   end
 
   def maintenance(my_case, text)
@@ -37,5 +41,6 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
+    SlackNotifier.maintenance_notification(@case, @text)
   end
 end

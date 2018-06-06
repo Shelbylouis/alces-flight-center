@@ -96,12 +96,6 @@ RSpec.feature "Maintenance windows", type: :feature do
   let(:cancel_button_text) { 'Cancel' }
   let(:extend_button_text) { 'Extend' }
 
-  before :each do
-    # The only way I can get Capybara to use the correct URL; may be a better
-    # way though.
-    default_url_options[:host] = Rails.application.routes.default_url_options[:host]
-  end
-
   def fill_in_datetime_selects(identifier, with:)
     select with.year.to_s, from: "#{identifier}-datetime-select-year"
     month_name = with.strftime('%B')

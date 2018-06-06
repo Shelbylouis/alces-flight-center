@@ -88,6 +88,12 @@ RSpec.feature Log, type: :feature do
         end.to raise_error(Capybara::ElementNotFound)
       end
     end
+
+    it 'sends a notification to slack' do
+      submit_log do |log|
+        expect(SlackNotifier).to receive(:log_notification).with(log)
+      end
+    end
   end
 
   context 'when visiting the cluster log' do

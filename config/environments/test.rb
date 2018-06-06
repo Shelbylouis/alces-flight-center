@@ -34,8 +34,11 @@ Rails.application.configure do
   # ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
-  # Host to use when generating URls in emails.
-  config.action_mailer.default_url_options = { host: 'localhost:3000' }
+  # Host to use when generating URLs in emails (same as in production for
+  # clearer failures).
+  config.action_mailer.default_url_options = {
+    host: 'center.alces-flight.com'
+  }
 
   # Required so emails always appear in `ActionMailer::Base.deliveries` even if
   # `deliver_later` is used.
@@ -51,4 +54,8 @@ Rails.application.configure do
   config.middleware.use Clearance::BackDoor
 
   config.sso_base_url = 'http://example.com/sso_base_url'
+
+  config.slack_webhook_url = 'http://example.com/slack'
+  config.slack_channel = '#test'
+  config.slack_username = 'test'
 end
