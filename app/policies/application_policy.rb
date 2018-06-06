@@ -8,12 +8,6 @@ class ApplicationPolicy
     @record = record
   end
 
-  # Method analogous to `admin?` and `editor?`, but to use when any User can
-  # perform the action.
-  def anyone?
-    true
-  end
-
   def index?
     false
   end

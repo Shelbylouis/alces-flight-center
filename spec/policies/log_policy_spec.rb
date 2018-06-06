@@ -5,10 +5,6 @@ RSpec.describe LogPolicy do
 
   let(:record) { nil }
 
-  permissions :index? do
-    it_behaves_like 'it is available to anyone'
-  end
-
   permissions :create?, :new? do
     it_behaves_like 'it is available only to admins'
   end

@@ -1,5 +1,4 @@
 class ComponentExpansionPolicy < ApplicationPolicy
-  alias_method :index?, :anyone?
   alias_method :create?, :admin?
   alias_method :update?, :admin?
   alias_method :destroy?, :admin?

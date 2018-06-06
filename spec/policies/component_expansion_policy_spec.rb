@@ -5,10 +5,6 @@ RSpec.describe ComponentExpansionPolicy do
 
   let(:record) { nil }
 
-  permissions :index? do
-    it_behaves_like 'it is available to anyone'
-  end
-
   permissions :create?, :update?, :destroy? do
     it_behaves_like 'it is available only to admins'
   end
