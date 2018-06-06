@@ -30,7 +30,9 @@
         </ul>
       <% end %>
 
-      <span class="navbar-text text-light"><%= current_user.name %></span>
+      <span class="navbar-text text-light">
+        <%= current_user.name %> (<em><%= current_user.role.titlecase %></em>)
+      </span>
     <% end %>
   </div>
 </nav>
