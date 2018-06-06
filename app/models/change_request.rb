@@ -28,6 +28,8 @@ class ChangeRequest < ApplicationRecord
                 minimum: 0
             }
 
+  validates :details, presence: true
+
   private
 
   def ensure_case_is_tier_4
