@@ -17,7 +17,7 @@ class User < ApplicationRecord
   validates :role, presence: true, inclusion: ROLES
 
   validates :site, {
-    presence: {if: :contact?},
+    presence: {unless: :admin?},
     absence: {if: :admin?}
   }
   validate :validates_primary_contact_assignment
@@ -29,8 +29,20 @@ class User < ApplicationRecord
     to: :role_inquiry,
     allow_nil: true
 
+  # Automatically picked up by rails_admin so only these options displayed when
+  # selecting role.
+  def role_enum
+    ROLES
+  end
+
   def contact?
     primary_contact? || secondary_contact?
+  end
+
+  # Anyone who isn't just a viewer, i.e. who can perform some edits, is
+  # considered an editor.
+  def editor?
+    !viewer?
   end
 
   def validates_primary_contact_assignment

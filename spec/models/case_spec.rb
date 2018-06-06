@@ -471,5 +471,11 @@ RSpec.describe Case, type: :model do
 
       expect(subject).not_to include('some_contact')
     end
+
+    it 'does not include viewer for site of Case' do
+      create(:viewer, name: 'some_viewer', site: kase.site)
+
+      expect(subject).not_to include('some_viewer')
+    end
   end
 end

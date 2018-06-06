@@ -12,6 +12,19 @@ RSpec.describe CaseCommenting do
     end
   end
 
+  RSpec.shared_examples 'commenting disabled for viewer' do
+    context 'for viewer' do
+      let(:user) { create(:viewer) }
+
+      it 'should have commenting disabled' do
+        expect(subject).to be_disabled
+        expect(subject.disabled_text).to eq(
+          'As a viewer you cannot comment on cases.'
+        )
+      end
+    end
+  end
+
   context 'when Case is not open' do
     let(:state) { :resolved }
 
@@ -23,6 +36,8 @@ RSpec.describe CaseCommenting do
         )
       end
     end
+
+    include_examples 'commenting disabled for viewer'
 
     context 'for admin' do
       let(:user) { create(:admin) }
@@ -45,6 +60,8 @@ RSpec.describe CaseCommenting do
         allow(kase).to receive(:consultancy?).and_return(true)
       end
 
+      include_examples 'commenting disabled for viewer'
+
       context 'for admin' do
         let(:user) { create(:admin) }
 
@@ -62,6 +79,8 @@ RSpec.describe CaseCommenting do
       before :each do
         allow(kase).to receive(:consultancy?).and_return(false)
       end
+
+      include_examples 'commenting disabled for viewer'
 
       context 'for admin' do
         let(:user) { create(:admin) }

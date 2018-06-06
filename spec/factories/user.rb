@@ -7,6 +7,10 @@ FactoryBot.define do
     password 'definitely_encrypted'
     role :secondary_contact
 
+    factory :viewer do
+      role :viewer
+    end
+
     factory :contact do
       role :primary_contact
 

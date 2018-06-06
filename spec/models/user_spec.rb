@@ -19,6 +19,12 @@ RSpec.describe User, type: :model do
 
       it { is_expected.to validate_presence_of(:site) }
     end
+
+    context 'as viewer' do
+      subject { create(:viewer) }
+
+      it { is_expected.to validate_presence_of(:site) }
+    end
   end
 
   roles = described_class::ROLES
@@ -67,6 +73,36 @@ RSpec.describe User, type: :model do
       let (:role) { :admin }
 
       it { is_expected.to be false }
+    end
+
+    context "when role is 'viewer'" do
+      let (:role) { :viewer }
+
+      it { is_expected.to be false }
+    end
+  end
+
+  describe '#editor?' do
+    subject do
+      build(:user, role: role).editor?
+    end
+
+    context "when role is 'primary_contact'" do
+      let (:role) { :primary_contact }
+
+      it { is_expected.to be true }
+    end
+
+    context "when role is 'secondary_contact'" do
+      let (:role) { :secondary_contact }
+
+      it { is_expected.to be true }
+    end
+
+    context "when role is 'admin'" do
+      let (:role) { :admin }
+
+      it { is_expected.to be true }
     end
 
     context "when role is 'viewer'" do
