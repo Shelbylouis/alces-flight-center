@@ -14,4 +14,8 @@ class Note < ApplicationRecord
   FLAVOURS.each do |flavour|
     scope flavour, ->{ where(flavour: flavour) }
   end
+
+  def flavour_enum
+    FLAVOURS
+  end
 end
