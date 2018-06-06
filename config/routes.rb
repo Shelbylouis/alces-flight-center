@@ -84,6 +84,9 @@ Rails.application.routes.draw do
       collection do
         get :resolved
       end
+      resource :change_request, only: [:show] do
+        # We'll want some more routes here soon™
+      end
       block.call if block
     end
   end
@@ -105,6 +108,7 @@ Rails.application.routes.draw do
         post :set_time
         post :set_commenting
       end
+      resource :change_request, only: [:new, :create, :edit]
     end
 
     resources :change_motd_requests, only: [] do

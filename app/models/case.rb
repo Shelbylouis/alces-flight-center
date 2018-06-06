@@ -195,6 +195,10 @@ class Case < ApplicationRecord
     open? && !consultancy?
   end
 
+  def can_create_change_request
+    tier_level == 3 && change_request.nil?
+  end
+
   def potential_assignees
     site.users.where.not(role: :viewer)
       .or(User.where(role: :admin))
