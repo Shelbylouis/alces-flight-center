@@ -1,6 +1,8 @@
 class ChangeRequest < ApplicationRecord
   belongs_to :case
 
+  delegate :site, to: :case
+
   state_machine initial: :draft do
     state :draft
     state :awaiting_authorisation
