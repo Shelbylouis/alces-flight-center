@@ -1,6 +1,8 @@
 require 'slack-notifier'
 class SlackNotifier
   class << self
+    include Rails.application.routes.url_helpers
+
     delegate :slack_webhook_url,
       :slack_channel,
       :slack_username,
@@ -9,7 +11,7 @@ class SlackNotifier
     def case_notification(kase)
       notification_text = "New case created on #{kase.cluster.name}"
 
-      case_url = url_helpers('cluster_case_url', kase.cluster, kase)
+      case_url = cluster_case_url.(kase.cluster, kase)
 
       notification_details = [
           "*Tier #{kase.tier_level}*",
@@ -25,7 +27,7 @@ class SlackNotifier
         title_link: case_url,
         text: notification_details,
         mrkdwn: true,
-        footer: "<#{url_helpers('cluster_cases_url', kase.cluster)}|#{kase.cluster.name} Cases>"
+        footer: "<#{cluster_cases_url(kase.cluster)}|#{kase.cluster.name} Cases>"
       }
 
       send_notification(case_note)
@@ -38,7 +40,7 @@ class SlackNotifier
         fallback: notification_text,
         color: "#6e5494",
         title: subject_and_id_title(kase),
-        title_link: url_helpers('cluster_case_url', kase.cluster, kase),
+        title_link: cluster_case_url(kase.cluster, kase),
         fields: [
           {
             title: "Assigned to",
@@ -58,7 +60,7 @@ class SlackNotifier
         color: "#2794d8",
         author_name: comment.user.name,
         title: subject_and_id_title(kase),
-        title_link: url_helpers('cluster_case_url', kase.cluster, kase),
+        title_link: cluster_case_url(kase.cluster, kase),
         fields: [
           {
             title: "New comment",
@@ -76,7 +78,7 @@ class SlackNotifier
         fallback: text,
         color: "#000000",
         title: subject_and_id_title(kase),
-        title_link: url_helpers('cluster_case_url', kase.cluster, kase),
+        title_link: cluster_case_url(kase.cluster, kase),
         fields: [
           {
             title: "Maintenance Info",
@@ -84,7 +86,8 @@ class SlackNotifier
             short: false
           }
         ],
-        footer: "<#{url_helpers('cluster_maintenance_windows_url', kase.cluster)}|#{kase.cluster.name} Maintenance>"
+        footer: "<#{cluster_maintenance_windows_url(kase.cluster)}|#{kase
+          .cluster.name} Maintenance>"
       }
 
       send_notification(maintenance_note)
@@ -94,7 +97,7 @@ class SlackNotifier
       notification_text = "New log created by #{log.engineer.name} on " \
         "#{log.cluster.name} #{log&.component ? 'for ' + log.component.name : nil }"
 
-      logs_url = url_helpers('cluster_logs_url', log.cluster)
+      logs_url = cluster_logs_url(log.cluster)
 
       log_note = {
         fallback: notification_text,
