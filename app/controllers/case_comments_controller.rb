@@ -1,25 +1,24 @@
 class CaseCommentsController < ApplicationController
   def create
     my_case = Case.find_from_id!(params.require(:case_id))
-    fallback_location = @scope.dashboard_case_path(my_case)
 
-    new_comment = my_case.case_comments.create(
-        user: current_user,
-        text: params.require(:case_comment)
-                  .permit(:text)
-                  .require(:text)
-    )
+    new_comment = my_case.case_comments.new(comment_params)
 
-    if new_comment.persisted?
+    if new_comment.save
       flash[:notice] = 'New comment added.'
     else
       flash[:error] = "Your comment was not added. #{new_comment.errors.full_messages.join('; ').strip}"
     end
 
+    fallback_location = @scope.dashboard_case_path(my_case)
     redirect_back fallback_location: fallback_location
+  end
 
-  rescue ActionController::ParameterMissing
-    flash[:error] = 'Empty comments are not permitted.'
-    redirect_back fallback_location: fallback_location
+  private
+
+  def comment_params
+    params.require(:case_comment)
+      .permit(:text)
+      .merge(user: current_user)
   end
 end

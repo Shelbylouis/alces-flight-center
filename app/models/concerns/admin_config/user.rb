@@ -5,6 +5,9 @@ module AdminConfig::User
   included do
     rails_admin do
       edit do
+        configure :password do
+          hide
+        end
         configure :password_confirmation do
           hide
         end

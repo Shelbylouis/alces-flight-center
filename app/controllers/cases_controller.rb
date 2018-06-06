@@ -1,13 +1,12 @@
 class CasesController < ApplicationController
   decorates_assigned :site
 
-  def index(show_resolved: false)
-    @show_resolved = show_resolved
+  def index
+    index_action(show_resolved: false)
   end
 
   def resolved
-    index(show_resolved: true)
-    render :index
+    index_action(show_resolved: true)
   end
 
   def show
@@ -122,6 +121,11 @@ class CasesController < ApplicationController
       fields: [:type, :name, :value, :optional, :help],
       tool_fields: {}
     )
+  end
+
+  def index_action(show_resolved:)
+    @show_resolved = show_resolved
+    render :index
   end
 
   def change_action(success_flash, &block)

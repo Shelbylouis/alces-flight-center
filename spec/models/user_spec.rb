@@ -7,6 +7,20 @@ RSpec.describe User, type: :model do
   ])
   end
 
+  describe '#valid?' do
+    context 'as admin' do
+      subject { create(:admin) }
+
+      it { is_expected.to validate_absence_of(:site) }
+    end
+
+    context 'as contact' do
+      subject { create(:contact) }
+
+      it { is_expected.to validate_presence_of(:site) }
+    end
+  end
+
   roles = described_class::ROLES
   roles.each do |role|
     role_query_method = role + '?'
