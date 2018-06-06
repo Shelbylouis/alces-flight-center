@@ -164,6 +164,17 @@ Rails.application.routes.draw do
     delete :logout, to: 'sso_sessions#destroy'
   end
 
+  constraints(Clearance::Constraints::SignedIn.new { |user| !user.admin? }) do
+    resources :cases, only: [] do
+      resource :change_request, only: [] do
+        member do
+          post :authorise
+          post :decline
+        end
+      end
+    end
+  end
+
   constraints Clearance::Constraints::SignedIn.new do
     root 'sites#show'
     delete '/sign_out' => 'sso_sessions#destroy', as: 'sign_out'  # Keeping this one around as it's correctly coupled to SSO
@@ -172,13 +183,6 @@ Rails.application.routes.draw do
       resources :case_comments, only: :create
       member do
         post :escalate
-      end
-
-      resource :change_request, only: [] do
-        member do
-          post :authorise
-          post :decline
-        end
       end
     end
 
