@@ -38,6 +38,12 @@ class ChangeRequestsController < ApplicationController
     end
   end
 
+  def handover
+    change_action 'Change request %s handed over for customer approval.' do |cr|
+      cr.handover!(current_user)
+    end
+  end
+
   private
 
   def assign_case

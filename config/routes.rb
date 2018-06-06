@@ -111,6 +111,7 @@ Rails.application.routes.draw do
       resource :change_request, only: [:new, :create, :edit] do
         member do
           post :propose
+          post :handover
         end
       end
     end
