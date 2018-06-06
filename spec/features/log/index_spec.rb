@@ -90,8 +90,9 @@ RSpec.feature Log, type: :feature do
     end
 
     it 'sends a notification to slack' do
-      expect(SlackNotifier).to receive(:log_notification)
-      submit_log
+      submit_log do |log|
+        expect(SlackNotifier).to receive(:log_notification).with(log)
+      end
     end
   end
 
