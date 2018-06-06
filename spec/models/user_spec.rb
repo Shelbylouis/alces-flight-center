@@ -52,34 +52,33 @@ RSpec.describe User, type: :model do
     end
   end
 
+  RSpec.shared_examples 'test every role' do |role_value_hash|
+    role_value_hash.stringify_keys!
+    unhandled_roles = User::ROLES - role_value_hash.keys
+    if unhandled_roles.present?
+      raise "Unhandled roles: #{unhandled_roles.join(', ')}"
+    end
+
+    role_value_hash.each do |role, value|
+      context "when role is '#{role}'" do
+        let(:role) { role }
+
+        it { is_expected.to eq value }
+      end
+    end
+  end
+
   describe '#contact?' do
     subject do
       build(:user, role: role).contact?
     end
 
-    context "when role is 'primary_contact'" do
-      let (:role) { :primary_contact }
-
-      it { is_expected.to be true }
-    end
-
-    context "when role is 'secondary_contact'" do
-      let (:role) { :secondary_contact }
-
-      it { is_expected.to be true }
-    end
-
-    context "when role is 'admin'" do
-      let (:role) { :admin }
-
-      it { is_expected.to be false }
-    end
-
-    context "when role is 'viewer'" do
-      let (:role) { :viewer }
-
-      it { is_expected.to be false }
-    end
+    include_examples 'test every role', {
+      admin: false,
+      primary_contact: true,
+      secondary_contact: true,
+      viewer: false,
+    }
   end
 
   describe '#editor?' do
@@ -87,29 +86,12 @@ RSpec.describe User, type: :model do
       build(:user, role: role).editor?
     end
 
-    context "when role is 'primary_contact'" do
-      let (:role) { :primary_contact }
-
-      it { is_expected.to be true }
-    end
-
-    context "when role is 'secondary_contact'" do
-      let (:role) { :secondary_contact }
-
-      it { is_expected.to be true }
-    end
-
-    context "when role is 'admin'" do
-      let (:role) { :admin }
-
-      it { is_expected.to be true }
-    end
-
-    context "when role is 'viewer'" do
-      let (:role) { :viewer }
-
-      it { is_expected.to be false }
-    end
+    include_examples 'test every role', {
+      admin: true,
+      primary_contact: true,
+      secondary_contact: true,
+      viewer: false,
+    }
   end
 
   describe '#validates_primary_contact_assignment' do
