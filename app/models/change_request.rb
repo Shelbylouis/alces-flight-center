@@ -21,6 +21,13 @@ class ChangeRequest < ApplicationRecord
 
   end
 
+  validates :credit_charge,
+            presence: true,
+            numericality: {
+                only_integer: true,
+                minimum: 0
+            }
+
   private
 
   def ensure_case_is_tier_4
