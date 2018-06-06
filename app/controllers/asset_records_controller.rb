@@ -1,8 +1,4 @@
 class AssetRecordsController < ApplicationController
-
-  # Ensure actions authorize the resource they operate on (using Pundit).
-  after_action :verify_authorized
-
   def edit
     authorize :asset_record, :edit?
 

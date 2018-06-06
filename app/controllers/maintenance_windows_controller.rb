@@ -1,7 +1,4 @@
 class MaintenanceWindowsController < ApplicationController
-  # Ensure actions authorize the resource they operate on (using Pundit).
-  after_action :verify_authorized, except: :index
-
   decorates_assigned :maintenance_window
 
   def new

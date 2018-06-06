@@ -1,7 +1,4 @@
 class ChangeMotdRequestsController < ApplicationController
-  # Ensure actions authorize the resource they operate on (using Pundit).
-  after_action :verify_authorized
-
   def apply
     change_motd_request = ChangeMotdRequest.find(params[:id])
     authorize change_motd_request

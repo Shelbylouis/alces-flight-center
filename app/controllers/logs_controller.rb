@@ -1,11 +1,7 @@
 require 'slack-notifier'
 class LogsController < ApplicationController
-  # Ensure actions authorize the resource they operate on (using Pundit).
-  after_action :verify_authorized
-
   def index
     @new_log = Log.new
-    authorize @new_log
     @scope = @component || @cluster
     @logs = @scope.logs
     @cases = @scope.cases

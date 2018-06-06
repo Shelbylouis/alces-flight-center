@@ -1,11 +1,4 @@
 class ComponentExpansionsController < ApplicationController
-  # Ensure actions authorize the resource they operate on (using Pundit).
-  after_action :verify_authorized
-
-  def index
-    authorize ComponentExpansion
-  end
-
   def edit
     authorize ComponentExpansion
   end

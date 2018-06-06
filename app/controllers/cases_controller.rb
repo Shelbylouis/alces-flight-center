@@ -1,8 +1,9 @@
 class CasesController < ApplicationController
   decorates_assigned :site
 
-  # Ensure actions authorize the resource they operate on (using Pundit).
-  after_action :verify_authorized
+  # Authorization also not required for `resolved` here, since this is
+  # effectively the same as `index` just with different Cases listed.
+  after_action :verify_authorized, except: NO_AUTH_ACTIONS + [:resolved]
 
   def index
     index_action(show_resolved: false)
@@ -129,7 +130,6 @@ class CasesController < ApplicationController
   end
 
   def index_action(show_resolved:)
-    authorize Case
     @show_resolved = show_resolved
     render :index
   end

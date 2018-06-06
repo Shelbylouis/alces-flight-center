@@ -1,7 +1,4 @@
 class CaseCommentsController < ApplicationController
-  # Ensure actions authorize the resource they operate on (using Pundit).
-  after_action :verify_authorized
-
   def create
     my_case = Case.find_from_id!(params.require(:case_id))
 
