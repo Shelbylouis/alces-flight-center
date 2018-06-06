@@ -1,6 +1,11 @@
 require 'slack-notifier'
 class SlackNotifier
   class << self
+    delegate :slack_webhook_url,
+      :slack_channel,
+      :slack_username,
+      to: 'Rails.application.config'
+
     def case_notification(kase)
       notification_text = "New case created on #{kase.cluster.name}"
 
@@ -108,13 +113,13 @@ class SlackNotifier
     private
 
     def notifier
-      Slack::Notifier.new Rails.application.config.slack_webhook_url
+      Slack::Notifier.new slack_webhook_url
     end
 
     def send(note)
-      return unless Rails.application.config.slack_webhook_url
-      notifier.ping channel: Rails.application.config.slack_channel,
-        username: Rails.application.config.slack_username,
+      return unless slack_webhook_url
+      notifier.ping channel: slack_channel,
+        username: slack_username,
         attachments: note
     end
 
