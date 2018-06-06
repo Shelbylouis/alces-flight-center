@@ -122,6 +122,9 @@ Rails.application.routes.draw do
       admin_logs.call
       notes.call(true)
       post :deposit
+      cases.call do
+        resource :change_request, only: [:new, :create, :edit]
+      end
     end
 
     resources :components, only: []  do
