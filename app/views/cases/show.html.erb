@@ -3,6 +3,28 @@
 <%= render 'partials/tabs', activate: :cases do %>
   <div class='table-responsive'>
     <table class="table case-table">
+      <% if @case.change_request.present? %>
+        <% verb = @case.change_request.draft? && current_user.admin? ? 'View / Edit' : 'View' %>
+        <tr>
+          <td colspan="4">
+            <div class="alert alert-info alert-cr-info">
+              <span>
+                This case has an attached change request.
+              </span>
+
+              <span>
+                CR state: <b><%= @case.change_request.state.titleize %></b>
+              </span>
+
+              <%= link_to verb,
+                          case_change_request_path(@case.change_request),
+                          class: 'btn btn-primary',
+                          role: 'button'
+              %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
       <tr style="width: 100%;">
         <th>Created</th>
         <td>
