@@ -94,8 +94,8 @@ class SlackNotifier
     end
 
     def log_notification(log)
-      notification_text = "New log created by #{log.engineer.name} on " \
-        "#{log.cluster.name} #{log&.component ? 'for ' + log.component.name : nil }"
+      notification_text = "New log created on #{log.cluster.name}" \
+        " #{log&.component ? 'for ' + log.component.name : nil }"
 
       logs_url = cluster_logs_url(log.cluster)
 
@@ -103,6 +103,7 @@ class SlackNotifier
         fallback: notification_text,
         color: "#8daec2",
         pretext: notification_text,
+        author_name: log.engineer.name,
         title: "Details",
         title_link: logs_url,
         text: restrict_text_length(log.details, logs_url),
