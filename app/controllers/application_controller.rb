@@ -1,10 +1,8 @@
 require 'exceptions'
 
-class ApplicationController < ActionController::Base
-  include Clearance::Controller
+class ApplicationController < RootController
   include Pundit
 
-  protect_from_forgery with: :exception
   decorates_assigned :site
 
   before_action :set_sentry_raven_context
