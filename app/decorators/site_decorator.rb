@@ -6,6 +6,12 @@ class SiteDecorator < ApplicationDecorator
     [tabs_builder.overview, all_cases_tab]
   end
 
+  def secondary_contacts_list
+    h.raw(
+      [secondary_contacts_title, secondary_contacts_ul].join
+    )
+  end
+
   private
 
   # Handles the dynamic naming of paths when a contact is logged in
@@ -21,6 +27,21 @@ class SiteDecorator < ApplicationDecorator
   def all_cases_tab
     tabs_builder.cases.tap do |tab|
       tab[:text] = 'All site cases'
+    end
+  end
+
+  def secondary_contacts_title
+    "<h4>Secondary site #{'contact'.pluralize(secondary_contacts.length)}</h4>"
+  end
+
+  def secondary_contacts_ul
+    if secondary_contacts.present?
+      items = secondary_contacts.map(&:decorate).map do |contact|
+        "<li>#{contact.info}</li>"
+      end.join
+      "<ul>#{items}</ul>"
+    else
+      "<em>None</em>"
     end
   end
 end

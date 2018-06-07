@@ -9,16 +9,7 @@
       <h4>Primary site contact</h4>
       <ul><li><%= site.primary_contact&.decorate&.info || raw('<em>Unset</em>') %></li></ul>
 
-      <h4>Secondary site <%= 'contact'.pluralize(site.secondary_contacts.length) %></h4>
-      <% if site.secondary_contacts.present? %>
-        <ul>
-          <% site.secondary_contacts.map(&:decorate).each do |contact| %>
-            <li><%= contact.info %></li>
-          <% end %>
-        </ul>
-      <% else %>
-        <em>None</em>
-      <% end %>
+      <%= site.secondary_contacts_list %>
 
       <% if site.additional_contacts.present? %>
 
