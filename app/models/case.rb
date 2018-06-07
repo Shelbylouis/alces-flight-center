@@ -86,6 +86,8 @@ class Case < ApplicationRecord
 
   validate :validates_user_assignment
 
+  validate :validate_not_resolved_with_open_cr
+
   after_initialize :assign_cluster_if_necessary
   after_initialize :generate_token, on: :create
 
@@ -198,6 +200,11 @@ class Case < ApplicationRecord
 
   def can_create_change_request
     tier_level == 3 && change_request.nil?
+  end
+
+  def resolvable?
+    state_transitions.map(&:to_name).include?(:resolved) &&
+        (!change_request.present? || change_request.finalised?)
   end
 
   def potential_assignees
@@ -329,6 +336,11 @@ class Case < ApplicationRecord
   def validate_tier_level_changes
     error_condition = @tier_level_changed && persisted? && !open?
     errors.add(:tier_level, "cannot be changed when a case is #{state}") if error_condition
+  end
+
+  def validate_not_resolved_with_open_cr
+    error_condition = resolved? && change_request.present? && !change_request.finalised?
+    errors.add(:state, 'cannot be resolved with an open change request') if error_condition
   end
 
   def field_hash

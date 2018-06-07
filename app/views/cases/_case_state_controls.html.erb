@@ -1,16 +1,21 @@
 
-<% if policy(@case).resolve? && @case.can_resolve? %>
-  <%= link_to 'Resolve this case',
-              resolve_case_path(@case.id),
-              class: 'btn btn-secondary ml-2 btn-sm',
-              method: :post,
-              role: 'button',
-              title: 'Resolve this support case if it has been completed or is no longer relevant',
-              data: {
-                  confirm: 'Are you sure you want to resolve this support case?'
-              }
-  %>
+<% if policy(@case).resolve? %>
+  <% if @case.resolvable? %>
+    <%= link_to 'Resolve this case',
+                resolve_case_path(@case.id),
+                class: 'btn btn-secondary ml-2 btn-sm',
+                method: :post,
+                role: 'button',
+                title: 'Resolve this support case if it has been completed or is no longer relevant',
+                data: {
+                    confirm: 'Are you sure you want to resolve this support case?'
+                }
+    %>
+  <% elsif @case.open? && !@case.change_request&.finalised? %>
+    <p class="small">This case cannot be resolved as the change request is incomplete.</p>
+  <% end %>
 <% end %>
+
 <% if policy(@case).close? && @case.can_close? %>
   <%= form_tag({controller: 'cases', action: 'close'},
                method: :post,

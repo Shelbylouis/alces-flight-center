@@ -492,4 +492,24 @@ RSpec.describe Case, type: :model do
       expect(kase.commenting_enabled_for?(user)).to eq(false)
     end
   end
+
+  describe '#resolve!' do
+    let(:kase) { create(:open_case, tier_level: 4) }
+
+    it 'is unresolvable with an outstanding change request' do
+      create(:change_request, case: kase, state: :awaiting_authorisation)
+
+      expect(kase.resolvable?).to eq false
+
+      expect do
+        kase.resolve!
+      end.to raise_error StateMachines::InvalidTransition
+
+      expect(kase.errors.messages).to eq(
+        state: ['cannot be resolved with an open change request']
+      )
+    end
+
+
+  end
 end

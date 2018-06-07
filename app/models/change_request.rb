@@ -37,6 +37,10 @@ class ChangeRequest < ApplicationRecord
 
   validates :description, presence: true
 
+  def finalised?
+    completed? || declined?
+  end
+
   private
 
   def requesting_user(transition)
