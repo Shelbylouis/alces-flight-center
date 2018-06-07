@@ -5,4 +5,18 @@ class ChangeRequestStateTransition < ApplicationRecord
   delegate :site, to: :change_request
 
   alias_attribute :requesting_user, :user
+
+  validates_presence_of :user
+  validate :validate_user_can_initiate
+
+  private
+
+  def validate_user_can_initiate
+    case event&.to_sym
+    when :propose, :handover
+      errors.add(:user, 'must be an admin') unless user&.admin?
+    when :authorise, :decline, :complete
+      errors.add(:user, 'must not be an admin') if user&.admin?
+    end
+  end
 end

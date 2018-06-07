@@ -108,4 +108,11 @@ FactoryBot.define do
     details 'Change request details text'
     credit_charge 1
   end
+
+  factory :change_request_state_transition do
+    association :change_request
+    event 'propose'
+    from 'draft'
+    to 'awaiting_authorisation'
+  end
 end
