@@ -56,4 +56,13 @@ class CaseMailer < ApplicationMailer
     SlackNotifier.maintenance_ending_soon_notification(@case, @text)
     window.set_maintenance_ending_soon_email_flag
   end
+
+  def change_request(my_case, text)
+    @case = my_case
+    @text = text
+    mail(
+      cc: @case.email_recipients,
+      subject: @case.email_reply_subject
+    )
+  end
 end
