@@ -28,7 +28,7 @@ class NotesController < ApplicationController
     @note = note_from_params
     if @note.update_attributes(note_params)
       flash[:success] = 'Notes updated'
-      redirect_to cluster_note_path(@note.cluster, flavour: @note.flavour)
+      redirect_to @note.path
     else
       flash[:error] = "Your notes were not updated: #{format_errors(@note)}"
       render :edit
