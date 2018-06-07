@@ -1,42 +1,47 @@
 require 'rails_helper'
 
 RSpec.describe SiteDecorator do
-  describe '#secondary_contacts_list' do
+  let(:site) { create(:site) }
+
+  RSpec.shared_examples 'Site users list' do |args|
+    role = args.fetch(:role)
+    title = args.fetch(:title)
+
     it 'indicates what is displayed' do
-      site = create(:site)
-
-      expect(
-        site.decorate.secondary_contacts_list
-      ).to include(
-        '<h4>Secondary site contacts</h4>'
+      expect(subject).to include(
+        "<h4>#{title}s</h4>"
       )
     end
 
-    it 'indicates when only single contact to display' do
-      site = create(:site, users: [create(:secondary_contact)])
+    it 'indicates when only single user to display' do
+      site.users = [create(role)]
 
-      expect(
-        site.decorate.secondary_contacts_list
-      ).to include(
-        '<h4>Secondary site contact</h4>'
+      expect(subject).to include(
+        "<h4>#{title}</h4>"
       )
     end
 
-    it 'gives list including each secondary contact' do
-      secondary_contact = create(:secondary_contact, name: 'Some User')
-      site = create(:site, users: [secondary_contact])
+    it 'gives list including each applicable user' do
+      user = create(role, name: 'Some User')
+      site.users = [user]
 
-      expect(
-        site.decorate.secondary_contacts_list
-      ).to match(/<ul><li>#{secondary_contact.name}.*<\/li><\/ul>/)
+      expect(subject).to match(
+        /<ul><li>#{user.name}.*<\/li><\/ul>/
+      )
     end
 
-    it 'indicates when no secondary contacts' do
-      site = create(:site)
-
-      expect(
-        site.decorate.secondary_contacts_list
-      ).to include('<em>None</em>')
+    it 'indicates when no applicable users' do
+      expect(subject).to include('<em>None</em>')
     end
+  end
+
+  describe '#secondary_contacts_list' do
+    subject do
+      site.decorate.secondary_contacts_list
+    end
+
+    it_behaves_like 'Site users list',
+      role: :secondary_contact,
+      title: 'Secondary site contact'
   end
 end
