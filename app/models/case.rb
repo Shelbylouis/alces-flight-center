@@ -137,7 +137,7 @@ class Case < ApplicationRecord
       audits +
       logs +
       [ credit_charge ] +
-      change_request&.transitions
+      (change_request&.transitions || [])
     ).compact.sort_by(&:created_at).reverse!
   end
 
