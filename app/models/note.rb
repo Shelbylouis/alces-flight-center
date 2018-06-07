@@ -18,4 +18,8 @@ class Note < ApplicationRecord
   def flavour_enum
     FLAVOURS
   end
+
+  def to_param
+    flavour
+  end
 end

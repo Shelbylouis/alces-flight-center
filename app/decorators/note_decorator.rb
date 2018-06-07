@@ -20,6 +20,10 @@ class NoteDecorator < ApplicationDecorator
   end
 
   def edit_path
-    h.edit_cluster_note_path(cluster, object, flavour: flavour)
+    h.edit_cluster_note_path(cluster, object)
+  end
+
+  def form_path
+    [note.cluster, note]
   end
 end

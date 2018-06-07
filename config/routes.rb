@@ -41,13 +41,9 @@ Rails.application.routes.draw do
   notes = Proc.new do |admin|
     constraints NoteFlavourConstraint.new(admin: admin) do
       prefix = admin ? '' : 'prevent_named_route_clash_'
-      resource :note, only: [] do
-        member do
-          get ':flavour' => 'notes#show', as: prefix
-          get ':flavour/edit' => 'notes#edit', as: "#{prefix}edit"
-          post ':flavour' => 'notes#create'
-          patch ':flavour' => 'notes#update'
-          put ':flavour' => 'notes#update'
+      resources :notes, param: :flavour, except: [:new, :create, :index] do
+        collection do
+          post ':flavour' => 'notes#create', as: prefix
         end
       end
     end
