@@ -45,6 +45,10 @@ class User < ApplicationRecord
     !viewer?
   end
 
+  def site_user?
+    !admin?
+  end
+
   def validates_primary_contact_assignment
     return unless site_primary_contact
     if primary_contact? && site_primary_contact != self

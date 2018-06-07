@@ -94,6 +94,19 @@ RSpec.describe User, type: :model do
     }
   end
 
+  describe '#site_user?' do
+    subject do
+      build(:user, role: role).site_user?
+    end
+
+    include_examples 'test every role', {
+      admin: false,
+      primary_contact: true,
+      secondary_contact: true,
+      viewer: true,
+    }
+  end
+
   describe '#validates_primary_contact_assignment' do
     subject do
       build(:user, role: 'primary_contact', site: site)
