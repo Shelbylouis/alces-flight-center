@@ -27,7 +27,7 @@ class ChangeRequestsController < ApplicationController
   end
 
   def propose
-    change_action 'Change request %s has been submitted for customer authorization' do |cr|
+    change_action 'Change request %s has been submitted for customer authorisation.' do |cr|
       cr.propose!(current_user)
     end
   end

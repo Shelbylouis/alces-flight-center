@@ -65,4 +65,49 @@ RSpec.describe 'Change request view', type: :feature do
     expect(states.sort).to eq EXPECTED_BUTTONS.keys.sort
   end
 
+  def as(whom)
+    visit cluster_case_change_request_path(
+              cluster, kase, subject,
+              as: whom
+          )
+    yield
+  end
+
+  it 'transitions a CR through states successfully' do
+
+    cr = create(:change_request, state: :draft, case: kase)
+
+    as(admin) { click_link('Submit for authorisation') }
+    cr.reload
+    expect(cr.state).to eq 'awaiting_authorisation'
+    expect(find('.alert').text).to have_text("Change request #{kase.display_id} has been submitted for customer authorisation.")
+
+
+    as(contact) { click_link('Authorise') }
+    cr.reload
+    expect(cr.state).to eq 'in_progress'
+    expect(find('.alert').text).to have_text("Change request #{kase.display_id} authorised.")
+
+
+    as(admin) { click_link('Begin handover') }
+    cr.reload
+    expect(cr.state).to eq 'in_handover'
+    expect(find('.alert').text).to have_text("Change request #{kase.display_id} handed over for customer approval.")
+
+
+    as(contact) { click_link('Approve work and close CR') }
+    cr.reload
+    expect(cr.state).to eq 'completed'
+    expect(find('.alert').text).to have_text("Change request #{kase.display_id} completed.")
+  end
+
+  it 'transitions to :declined as a final state' do
+    cr = create(:change_request, state: :awaiting_authorisation, case: kase)
+
+    as(contact) { click_link('Decline') }
+    cr.reload
+    expect(cr.state).to eq 'declined'
+    expect(find('.alert').text).to have_text("Change request #{kase.display_id} declined.")
+  end
+
 end
