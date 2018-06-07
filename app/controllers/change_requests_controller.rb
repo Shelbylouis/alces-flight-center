@@ -26,6 +26,16 @@ class ChangeRequestsController < ApplicationController
     @cr = @case.change_request.decorate
   end
 
+  def edit
+    @cr = @case.change_request.decorate
+  end
+
+  def update
+    change_action 'Change request %s updated.' do |cr|
+      cr.assign_attributes(cr_params)
+    end
+  end
+
   def propose
     change_action 'Change request %s has been submitted for customer authorisation.' do |cr|
       cr.propose!(current_user)

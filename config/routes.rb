@@ -108,7 +108,7 @@ Rails.application.routes.draw do
         post :set_time
         post :set_commenting
       end
-      resource :change_request, only: [:new, :create, :edit] do
+      resource :change_request, only: [:new, :create, :edit, :update] do
         member do
           post :propose
           post :handover
