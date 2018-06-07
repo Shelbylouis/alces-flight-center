@@ -7,8 +7,16 @@ class SiteDecorator < ApplicationDecorator
   end
 
   def secondary_contacts_list
-    h.raw(
-      [secondary_contacts_title, secondary_contacts_ul].join
+    users_list(
+      users.secondary_contacts,
+      title: 'Secondary site contact'
+    )
+  end
+
+  def viewers_list
+    users_list(
+      users.viewers,
+      title: 'Site viewer'
     )
   end
 
@@ -30,22 +38,23 @@ class SiteDecorator < ApplicationDecorator
     end
   end
 
-  def secondary_contacts_title
-    "<h4>Secondary site #{'contact'.pluralize(secondary_contacts.length)}</h4>"
+  def users_list(users, title:)
+    h.raw(
+      [
+        "<h4>#{title.pluralize(users.length)}</h4>",
+        users_ul(users),
+      ].join
+    )
   end
 
-  def secondary_contacts_ul
-    if secondary_contacts.present?
-      items = secondary_contacts.map(&:decorate).map do |contact|
-        "<li>#{contact.info}</li>"
+  def users_ul(users)
+    if users.present?
+      items = users.map(&:decorate).map do |user|
+        "<li>#{user.info}</li>"
       end.join
       "<ul>#{items}</ul>"
     else
       "<em>None</em>"
     end
-  end
-
-  def secondary_contacts
-    @secondary_contacts ||= users.secondary_contacts
   end
 end

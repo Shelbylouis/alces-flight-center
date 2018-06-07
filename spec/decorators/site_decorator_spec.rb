@@ -44,4 +44,14 @@ RSpec.describe SiteDecorator do
       role: :secondary_contact,
       title: 'Secondary site contact'
   end
+
+  describe '#viewers_list' do
+    subject do
+      site.decorate.viewers_list
+    end
+
+    it_behaves_like 'Site users list',
+      role: :viewer,
+      title: 'Site viewer'
+  end
 end
