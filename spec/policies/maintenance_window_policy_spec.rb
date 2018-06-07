@@ -9,7 +9,11 @@ RSpec.describe MaintenanceWindowPolicy do
     it_behaves_like 'it is available only to admins'
   end
 
-  permissions :confirm?, :confirm_submit?, :reject? do
+  permissions :confirm?, :confirm_submit? do
+    it_behaves_like 'it is available only to editors'
+  end
+
+  permissions :reject? do
     it_behaves_like 'it is available only to contacts'
   end
 end
