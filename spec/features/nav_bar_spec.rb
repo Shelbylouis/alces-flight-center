@@ -7,7 +7,6 @@ RSpec.feature 'Navigation Bar', type: :feature do
   let(:site_nav_items) { site_nav_bar.all('li') }
 
   let(:site) { create(:site) }
-  let(:contact) { create(:primary_contact, site: site) }
   let(:cluster) { create(:cluster, site: site) }
 
   def visit_subject(path_helper)
@@ -119,7 +118,7 @@ RSpec.feature 'Navigation Bar', type: :feature do
   end
 
   context 'with a regular user logged in' do
-    let(:user) { contact }
+    let(:user) { create(:primary_contact, site: site) }
     let :cluster_nav_items do
       return [] if site_nav_items.length < 1
       site_nav_items[1..-1]
