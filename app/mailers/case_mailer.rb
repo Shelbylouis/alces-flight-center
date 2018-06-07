@@ -41,6 +41,22 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
-    SlackNotifier.maintenance_notification(@case, @text)
+    SlackNotifier.maintenance_notification(@case, @text, false)
+  end
+
+  def maintenance_ending_soon(my_case, text)
+    @case = my_case
+    @text = text
+    admin_emails = []
+
+    User.admins.each do |admin|
+      admin_emails << admin.email
+    end
+
+    mail(
+      cc: admin_emails,
+      subject: @case.email_reply_subject
+    )
+    SlackNotifier.maintenance_notification(@case, @text, true)
   end
 end
