@@ -1,8 +1,9 @@
 
 RailsAdmin.config do |config|
-  # Required so ApplicationController methods, such as `current_user`,
-  # available within `authorize_with` block.
-  config.parent_controller = ApplicationController.to_s
+  # Inherit RailsAdmin controllers from a common root controller with our app;
+  # in particular required so methods from Clearance, like `current_user`, are
+  # available to RailsAdmin.
+  config.parent_controller = RootController.to_s
 
   # Prevent access to admin interface unless current user is an admin.
   config.authorize_with do
