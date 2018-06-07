@@ -1,6 +1,7 @@
 
 ProgressMaintenanceWindow = Struct.new(:window) do
   def progress
+    check_remaining_time
     if required_transition_event
       transition_state(required_transition_event)
     else
@@ -64,5 +65,17 @@ ProgressMaintenanceWindow = Struct.new(:window) do
 
   def format_datetime(datetime)
     datetime.to_formatted_s(:short)
+  end
+
+  def check_remaining_time
+    return unless 1.hour.from_now >= window.expected_end
+    CaseMailer.maintenance_ending_soon(
+      window.case,
+      <<-EOF.squish
+        Maintenance for #{window.associated_model.name} is scheduled to
+        end at #{window.expected_end.to_formatted_s(:short)}. You have
+        less than an hour to make any final changes
+      EOF
+    )
   end
 end
