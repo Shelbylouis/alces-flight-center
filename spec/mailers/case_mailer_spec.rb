@@ -165,7 +165,8 @@ RSpec.describe 'Case mailer', :type => :mailer do
     let (:text) { "Doesn't look like anything to me" }
 
     it 'sends a notification to Slack' do
-      expect(SlackNotifier).to receive(:maintenance_notification).with(kase, text)
+      expect(SlackNotifier).to receive(:maintenance_notification)
+        .with(kase, text, false)
       subject
     end
   end
