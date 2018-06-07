@@ -2,10 +2,11 @@
 
 <%= render 'partials/tabs', activate: :notes do %>
     <div class="card-body">
+        <p>
+        <%= note.edit_form_intro %>
+        </p>
         <%= form_for note.form_path do |f| %>
             <div class="form-group">
-                <%= f.label :description, 'Edit your notes for this cluster below.' %>
-                <span class="badge badge-light ml-1">Required</span>
                 <%= f.text_area :description, class: 'form-control', rows: 10 %>
             </div>
             <div class="form-group" style="overflow: hidden;">

@@ -2,20 +2,27 @@ class NoteDecorator < ApplicationDecorator
   delegate_all
 
   def subtitle
-    if !persisted?
-      not_found_message
-    elsif current_user.admin?
+    if current_user.admin?
       "#{flavour.capitalize} notes"
     else
-      "Notes"
+      "Cluster notes"
     end
   end
 
-  def not_found_message
+  def new_form_intro
     if current_user.admin?
-      "No #{flavour} notes have been added yet."
+      "No #{flavour} notes have been added for this cluster yet. You may add
+      them below."
     else
-      "No notes have been added yet."
+      "No cluster notes have been added yet. You may add them below."
+    end
+  end
+
+  def edit_form_intro
+    if current_user.admin?
+      "Edit the #{flavour} notes for this cluster below."
+    else
+      'Edit your cluster notes below.'
     end
   end
 
