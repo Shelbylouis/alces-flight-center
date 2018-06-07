@@ -1,5 +1,21 @@
 require 'rails_helper'
 
+RSpec.shared_examples 'test every role' do |role_value_hash|
+  role_value_hash.stringify_keys!
+  unhandled_roles = User::ROLES - role_value_hash.keys
+  if unhandled_roles.present?
+    raise "Unhandled roles: #{unhandled_roles.join(', ')}"
+  end
+
+  role_value_hash.each do |role, value|
+    context "when role is '#{role}'" do
+      let(:role) { role }
+
+      it { is_expected.to eq value }
+    end
+  end
+end
+
 RSpec.describe User, type: :model do
   it { is_expected.to validate_presence_of(:role) }
   it do is_expected.to validate_inclusion_of(:role).in_array([
@@ -28,43 +44,22 @@ RSpec.describe User, type: :model do
   end
 
   roles = described_class::ROLES
-  roles.each do |role|
-    role_query_method = role + '?'
+  roles.each do |role_under_test|
+    role_query_method = role_under_test + '?'
 
     describe "##{role_query_method}" do
       subject do
-        build(:user, role: subject_role).public_send(role_query_method)
+        build(:user, role: role).public_send(role_query_method)
       end
 
-      context "when role is '#{role}'" do
-        let(:subject_role) { role }
+      expected_results = {
+        admin: false,
+        primary_contact: false,
+        secondary_contact: false,
+        viewer: false,
+      }.merge(role_under_test.to_sym => true)
 
-        it { is_expected.to be true }
-      end
-
-      context "when role is not '#{role}'" do
-        another_role = roles.reject{|r| r == role}.sample
-
-        let(:subject_role) { another_role }
-
-        it { is_expected.to be false }
-      end
-    end
-  end
-
-  RSpec.shared_examples 'test every role' do |role_value_hash|
-    role_value_hash.stringify_keys!
-    unhandled_roles = User::ROLES - role_value_hash.keys
-    if unhandled_roles.present?
-      raise "Unhandled roles: #{unhandled_roles.join(', ')}"
-    end
-
-    role_value_hash.each do |role, value|
-      context "when role is '#{role}'" do
-        let(:role) { role }
-
-        it { is_expected.to eq value }
-      end
+      include_examples 'test every role', expected_results
     end
   end
 
