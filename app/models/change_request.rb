@@ -1,4 +1,6 @@
 class ChangeRequest < ApplicationRecord
+  include MarkdownDescription
+
   belongs_to :case
 
   has_many :change_request_state_transitions
@@ -33,7 +35,7 @@ class ChangeRequest < ApplicationRecord
                 minimum: 0
             }
 
-  validates :details, presence: true
+  validates :description, presence: true
 
   private
 

@@ -171,7 +171,7 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
   create_table "change_requests", force: :cascade do |t|
     t.bigint "case_id"
     t.string "state", default: "draft", null: false
-    t.string "details", null: false
+    t.string "description", null: false
     t.integer "credit_charge", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

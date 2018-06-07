@@ -37,7 +37,7 @@
     </div>
     <div class="col-12">
       <h3>Details</h3>
-      <%= @cr.details %>
+      <%= @cr.rendered_description.html_safe %>
       <hr />
       <a href="#cr-top">Back to top</a>
     </div>

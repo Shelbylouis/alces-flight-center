@@ -63,7 +63,7 @@ class ChangeRequestsController < ApplicationController
   end
 
   def cr_params
-    params.require(:change_request).permit(:details, :credit_charge)
+    params.require(:change_request).permit(:description, :credit_charge)
   end
 
   def change_action(success_flash)
