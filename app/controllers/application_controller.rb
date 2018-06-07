@@ -90,9 +90,8 @@ class ApplicationController < ActionController::Base
   end
 
   def assign_site_scope
-    if current_user.contact?
-      # For a Site contact, the Site in scope is always the Site they belong
-      # to.
+    if current_user.site_user?
+      # For a Site user, the Site in scope is always the Site they belong to.
       @site = current_user.site
     elsif request.path =~ /^\/sites/
       # For an admin viewing the pages for a particular Site, that is the Site
@@ -108,12 +107,15 @@ class ApplicationController < ActionController::Base
   end
 
   def assign_title
-    if @scope
-      @title = <<~EOF.squish
-        #{@scope.readable_model_name.split.map(&:capitalize).join(' ')}
-        Dashboard#{@scope.respond_to?(:name) ? ": #{@scope.name}" : ''}
-      EOF
-    end
+    @title = scope_dashboard_title if @scope
+  end
+
+  def scope_dashboard_title
+    [
+      @scope.readable_model_name.titlecase,
+      ' Dashboard',
+      @scope.respond_to?(:name) ? ": #{@scope.name}" : '',
+    ].join
   end
 
   def format_errors(model)

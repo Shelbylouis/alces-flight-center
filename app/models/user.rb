@@ -17,7 +17,7 @@ class User < ApplicationRecord
   validates :role, presence: true, inclusion: ROLES
 
   validates :site, {
-    presence: {unless: :admin?},
+    presence: {if: :site_user?},
     absence: {if: :admin?}
   }
   validate :validates_primary_contact_assignment
@@ -43,6 +43,10 @@ class User < ApplicationRecord
   # considered an editor.
   def editor?
     !viewer?
+  end
+
+  def site_user?
+    !admin?
   end
 
   def validates_primary_contact_assignment

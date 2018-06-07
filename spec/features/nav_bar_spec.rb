@@ -7,7 +7,6 @@ RSpec.feature 'Navigation Bar', type: :feature do
   let(:site_nav_items) { site_nav_bar.all('li') }
 
   let(:site) { create(:site) }
-  let(:contact) { create(:primary_contact, site: site) }
   let(:cluster) { create(:cluster, site: site) }
 
   def visit_subject(path_helper)
@@ -57,7 +56,9 @@ RSpec.feature 'Navigation Bar', type: :feature do
   shared_examples 'navigate to sites' do
     context 'when visiting the root site' do
       let(:expected_cluster_links) { [] }
+
       before(:each) { visit (root_path as: user) }
+
       it_behaves_like 'a common navigation bar'
 
       it 'only has the root navigation link' do
@@ -67,64 +68,87 @@ RSpec.feature 'Navigation Bar', type: :feature do
 
     context 'when visiting a cluster page' do
       subject { cluster }
+
       let(:expected_cluster_links) { [cluster_path(subject)] }
+
       before(:each) { visit_subject :cluster_path }
+
       it_behaves_like 'a cluster navigation bar'
     end
 
     context 'when visiting a component_group' do
       subject { create(:component_group, cluster: cluster) }
+
       let :expected_cluster_links do
         [cluster_path(subject.cluster), component_group_path(subject)]
       end
+
       before(:each) { visit_subject :component_group_path }
+
       it_behaves_like 'a cluster navigation bar'
     end
 
     context 'when visiting a component' do
       subject { create(:component, cluster: cluster) }
+
       let :expected_cluster_links do
         [ cluster_path(subject.cluster),
           component_group_path(subject.component_group),
           component_path(subject) ]
       end
+
       before(:each) { visit_subject :component_path }
+
       it_behaves_like 'a cluster navigation bar'
     end
 
     context 'when visiting a service' do
       subject { create(:service, cluster: cluster) }
+
       let :expected_cluster_links do
         [ cluster_path(subject.cluster), service_path(subject) ]
       end
+
       before(:each) { visit_subject :service_path }
+
       it_behaves_like 'a cluster navigation bar'
     end
   end
 
   context 'with an admin logged in' do
     let(:user) { create(:admin) }
+
     let :cluster_nav_items do
       return [] if site_nav_items.length < 2
       site_nav_items[2..-1]
     end
+
     include_examples 'navigate to sites'
 
     context 'when visiting the site page' do
       subject { site }
+
       let(:expected_cluster_links) { [] }
+
       before(:each) { visit_subject :site_path }
+
       it_behaves_like 'a cluster navigation bar'
     end
   end
 
-  context 'with a regular user logged in' do
-    let(:user) { contact }
-    let :cluster_nav_items do
-      return [] if site_nav_items.length < 1
-      site_nav_items[1..-1]
+  non_admin_roles = User::ROLES - ['admin']
+
+  non_admin_roles.each do |role|
+    context "with a #{role} logged in" do
+      let(:user) { create(role, site: site) }
+
+      let :cluster_nav_items do
+        return [] if site_nav_items.length < 1
+        site_nav_items[1..-1]
+      end
+
+      include_examples 'navigate to sites'
     end
-    include_examples 'navigate to sites'
   end
 end
 
