@@ -25,8 +25,4 @@ class Site < ApplicationRecord
   def primary_contact
     users.find_by(role: 'primary_contact')
   end
-
-  def secondary_contacts
-    users.where(role: 'secondary_contact')
-  end
 end

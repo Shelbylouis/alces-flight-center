@@ -7,6 +7,10 @@ class User < ApplicationRecord
 
   ROLES = %w{admin primary_contact secondary_contact viewer}
 
+  ROLES.each do |role|
+    scope role.pluralize, -> { where(role: role) }
+  end
+
   belongs_to :site, required: false
 
   validates_associated :site

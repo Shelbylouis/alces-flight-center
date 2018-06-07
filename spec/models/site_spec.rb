@@ -41,12 +41,4 @@ RSpec.describe Site, type: :model do
       expect(subject).to eq(primary_contact)
     end
   end
-
-  describe '#secondary_contacts' do
-    subject { site.secondary_contacts }
-
-    it 'gives Site secondary contacts' do
-      expect(subject).to match_array([secondary_contact])
-    end
-  end
 end

@@ -44,4 +44,8 @@ class SiteDecorator < ApplicationDecorator
       "<em>None</em>"
     end
   end
+
+  def secondary_contacts
+    @secondary_contacts ||= users.secondary_contacts
+  end
 end
