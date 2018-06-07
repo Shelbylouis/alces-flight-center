@@ -105,7 +105,7 @@ FactoryBot.define do
 
   factory :change_request do
     association :case
-    details 'Change request details text'
+    description 'Change request details text'
     credit_charge 1
   end
 
