@@ -117,13 +117,19 @@ RSpec.feature 'Navigation Bar', type: :feature do
     end
   end
 
-  context 'with a regular user logged in' do
-    let(:user) { create(:primary_contact, site: site) }
-    let :cluster_nav_items do
-      return [] if site_nav_items.length < 1
-      site_nav_items[1..-1]
+  non_admin_roles = User::ROLES - ['admin']
+
+  non_admin_roles.each do |role|
+    context "with a #{role} logged in" do
+      let(:user) { create(role, site: site) }
+
+      let :cluster_nav_items do
+        return [] if site_nav_items.length < 1
+        site_nav_items[1..-1]
+      end
+
+      include_examples 'navigate to sites'
     end
-    include_examples 'navigate to sites'
   end
 end
 
