@@ -1,5 +1,6 @@
 
 class Log < ApplicationRecord
+  include MarkdownColumn(:details)
   include AdminConfig::Log
 
   default_scope { order(created_at: :desc) }

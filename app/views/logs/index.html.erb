@@ -14,7 +14,7 @@
       <tr>
         <%= timestamp_td(description:  'Logged', timestamp: log.created_at) %>
         <td class="nowrap"><%= log.engineer.name %></td>
-        <td><%= log.details %></td>
+        <td><%= log.rendered_details.html_safe %></td>
         <td>
           <%= log.component&.decorate&.link || raw("<em>None</em>") %>
         </td>
