@@ -17,7 +17,7 @@ class User < ApplicationRecord
   validates :role, presence: true, inclusion: ROLES
 
   validates :site, {
-    presence: {unless: :admin?},
+    presence: {if: :site_user?},
     absence: {if: :admin?}
   }
   validate :validates_primary_contact_assignment
