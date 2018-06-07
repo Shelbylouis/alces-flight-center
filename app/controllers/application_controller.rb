@@ -109,7 +109,7 @@ class ApplicationController < ActionController::Base
   def assign_title
     if @scope
       @title = <<~EOF.squish
-        #{@scope.readable_model_name.split.map(&:capitalize).join(' ')}
+        #{@scope.readable_model_name.titlecase}
         Dashboard#{@scope.respond_to?(:name) ? ": #{@scope.name}" : ''}
       EOF
     end
