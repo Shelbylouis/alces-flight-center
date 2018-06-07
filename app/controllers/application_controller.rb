@@ -107,12 +107,15 @@ class ApplicationController < ActionController::Base
   end
 
   def assign_title
-    if @scope
-      @title = <<~EOF.squish
-        #{@scope.readable_model_name.titlecase}
-        Dashboard#{@scope.respond_to?(:name) ? ": #{@scope.name}" : ''}
-      EOF
-    end
+    @title = scope_dashboard_title if @scope
+  end
+
+  def scope_dashboard_title
+    [
+      @scope.readable_model_name.titlecase,
+      ' Dashboard',
+      @scope.respond_to?(:name) ? ": #{@scope.name}" : '',
+    ].join
   end
 
   def format_errors(model)
