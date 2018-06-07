@@ -1,17 +1,8 @@
 class NotesController < ApplicationController
   decorates_assigned :note
 
-  def engineering
-    @note = note_from_params(:engineering)
-    if @note.persisted?
-      render :show
-    else
-      render :new
-    end
-  end
-
-  def customer
-    @note = note_from_params(:customer)
+  def show
+    @note = note_from_params
     if @note.persisted?
       render :show
     else
@@ -24,21 +15,20 @@ class NotesController < ApplicationController
   end
 
   def create
-    cluster = cluster_from_params
-    @note = cluster.notes.build(note_params)
-    if @note.save
+    @note = note_from_params
+    if @note.update_attributes(note_params)
       flash[:success] = 'Notes created'
     else
       flash[:error] = "Your notes were not created: #{format_errors(@note)}"
     end
-    redirect_back fallback_location: cluster
+    redirect_back fallback_location: @note.cluster
   end
 
   def update
     @note = note_from_params
     if @note.update_attributes(note_params)
       flash[:success] = 'Notes updated'
-      redirect_to send("#{@note.flavour}_cluster_notes_path", @note.cluster)
+      redirect_to cluster_note_path(@note.cluster, flavour: @note.flavour)
     else
       flash[:error] = "Your notes were not updated: #{format_errors(@note)}"
       render :edit
@@ -47,13 +37,10 @@ class NotesController < ApplicationController
 
   private
 
-  def note_from_params(flavour=nil)
-    if params[:id]
-      note = Note.find(params[:id])
-    else 
-      cluster = cluster_from_params
-      note = cluster.notes.send(flavour).first || cluster.notes.new(flavour: flavour)
-    end
+  def note_from_params
+    cluster = cluster_from_params
+    flavour = params.require(:flavour)
+    note = cluster.notes.send(flavour).first || cluster.notes.new(flavour: flavour)
     note.decorate
   end
 
@@ -62,6 +49,6 @@ class NotesController < ApplicationController
   end
 
   def note_params
-    params.require(:note).permit(:description, :flavour)
+    params.require(:note).permit(:description)
   end
 end

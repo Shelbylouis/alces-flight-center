@@ -5,8 +5,7 @@
         <p>
         <%= note.not_found_message %>
         </p>
-        <%= form_for [note.cluster, note] do |f| %>
-            <%= f.hidden_field :flavour %>
+        <%= form_for [note.cluster, note], url: { action: 'create' } do |f| %>
             <div class="form-group">
                 <%= f.label :description, 'You may create notes for this cluster below.' %>
                 <span class="badge badge-light ml-1">Required</span>

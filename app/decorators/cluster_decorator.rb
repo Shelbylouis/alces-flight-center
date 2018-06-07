@@ -59,18 +59,18 @@ class ClusterDecorator < ApplicationDecorator
         dropdown: [
           {
             text: 'Engineering',
-            path: h.engineering_cluster_notes_path(self),
+            path: h.cluster_note_path(self, flavour: :engineering),
           },
           {
             text: 'Customer',
-            path: h.customer_cluster_notes_path(self),
+            path: h.cluster_note_path(self, flavour: :customer),
           },
         ]
       }
     else
       {
         id: :notes,
-        path: h.customer_cluster_notes_path(self),
+        path: h.cluster_note_path(self, flavour: :customer),
       }
     end
   end
