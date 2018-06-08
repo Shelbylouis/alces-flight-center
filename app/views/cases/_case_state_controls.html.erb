@@ -1,5 +1,5 @@
 <% if current_user.admin? %>
-  <% if @case.state == 'open' %>
+  <% if @case.can_resolve? %>
     <%= link_to 'Resolve this case',
                 resolve_case_path(@case.id),
                 class: 'btn btn-secondary ml-2 btn-sm',
@@ -10,7 +10,8 @@
                     confirm: 'Are you sure you want to resolve this support case?'
                 }
     %>
-  <% elsif @case.state == 'resolved' %>
+  <% end %>
+  <% if @case.can_close? %>
     <%= form_tag({controller: 'cases', action: 'close'},
                  method: :post,
                  class: 'form-inline',
