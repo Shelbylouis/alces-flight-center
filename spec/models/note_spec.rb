@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Note, type: :model do
+  include_examples 'markdown_column', test_nil: false
+
   describe '#valid?' do
     shared_examples 'note validations' do
       it { is_expected.to validate_presence_of(:flavour) }
@@ -19,21 +21,6 @@ RSpec.describe Note, type: :model do
       subject { create(:engineering_note) }
       include_examples 'note validations'
     end
-  end
-
-  describe 'markdown_description' do
-    # The shared markdown_description examples don't work for notes, so we'll
-    # define our own examples.
-
-    subject do
-      create(
-        :note,
-        description: '- some bullet point'
-      ).rendered_description
-    end
-
-    it { is_expected.to include('<li>some bullet point</li>') }
-
   end
 
   describe 'funky routing using `flavour` instead of `id`' do

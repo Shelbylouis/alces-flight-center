@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Site, type: :model do
   include_examples 'canonical_name'
-  include_examples 'markdown_description'
+  include_examples 'markdown_column'
 
   let :site do
     create(

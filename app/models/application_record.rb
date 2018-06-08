@@ -1,4 +1,5 @@
 require 'exceptions'
+require 'markdown_description'
 
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true

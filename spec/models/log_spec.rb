@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Log, type: :model do
+  include_examples 'markdown_column', column: :details, test_nil: false
+
   def expect_single_error(model, error_text)
     expect(model).not_to be_valid
     expect(model.errors.size).to eq(1)
