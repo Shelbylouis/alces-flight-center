@@ -12,11 +12,45 @@ RSpec.shared_examples 'markdown_column' do |options={}|
       subject do
         create(
           class_factory_identifier,
-          {}.tap {|attrs| attrs[markdown_column] = '- some bullet point' }
+          {}.tap {|attrs| attrs[markdown_column] = markdown_text}
         ).send("rendered_#{markdown_column}")
       end
 
-      it { is_expected.to include('<li>some bullet point</li>') }
+      let(:markdown_text) do
+        <<~EOF
+        # Title
+
+        Paragraph
+
+         - List item 1
+         - List item 2
+
+        <script>alert('I am hakz you now')</script>
+        EOF
+      end
+
+      let(:html_text) do
+        <<~EOF
+        <h1 id="title">Title</h1>
+
+        <p>Paragraph</p>
+
+        <ul>
+          <li>List item 1</li>
+          <li>List item 2</li>
+        </ul>
+        EOF
+      end
+
+      it "renders markdown" do
+        expect(subject.rstrip).to eq(html_text.rstrip)
+      end
+
+      it "strips html tags" do
+        expect(subject).not_to include("<script>")
+        expect(subject).not_to include("alert")
+        expect(subject).not_to include("I am hakz you now")
+      end
     end
 
     if test_nil
