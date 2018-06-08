@@ -30,6 +30,7 @@ class ChangeRequestsController < ApplicationController
 
   def edit
     @cr = @case.change_request.decorate
+    authorize @cr
   end
 
   def update

@@ -1,5 +1,8 @@
 class ChangeRequestPolicy < ApplicationPolicy
 
+  alias_method :create?, :admin?
+  alias_method :edit?, :admin?
+  alias_method :update?, :admin?
   alias_method :propose?, :admin?
   alias_method :handover?, :admin?
 
