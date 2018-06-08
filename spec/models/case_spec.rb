@@ -505,11 +505,23 @@ RSpec.describe Case, type: :model do
         kase.resolve!
       end.to raise_error StateMachines::InvalidTransition
 
-      expect(kase.errors.messages).to eq(
+      expect(kase.errors.messages).to include(
         state: ['cannot be resolved with an open change request']
       )
     end
+  end
 
+  describe '#credit_charge' do
+    it 'cannot have a charge less than that of an attached change request' do
+      kase = build(:closed_case, tier_level: 4, credit_charge: 41)
+      build(:change_request, case: kase, credit_charge: 42)
 
+      expect do
+        kase.save!
+      end.to raise_error ActiveRecord::RecordInvalid
+      expect(kase.errors.messages).to include(
+        credit_charge: ['cannot be less than attached CR charge of 42']
+      )
+    end
   end
 end

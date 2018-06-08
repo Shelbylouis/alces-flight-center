@@ -74,6 +74,7 @@ class Case < ApplicationRecord
 
   validates :credit_charge, presence: true,  if: :closed?
   validates_associated :credit_charge
+  validate :validate_minimum_credit_charge
 
   # Only validate this type of support is available on create, as this is the
   # only point at which we should prevent users accessing support they are not
@@ -341,6 +342,14 @@ class Case < ApplicationRecord
   def validate_not_resolved_with_open_cr
     error_condition = resolved? && change_request.present? && !change_request.finalised?
     errors.add(:state, 'cannot be resolved with an open change request') if error_condition
+  end
+
+  def validate_minimum_credit_charge
+    error_condition = closed? && change_request.present? && (
+      credit_charge.nil? || credit_charge < change_request.credit_charge
+    )
+
+    errors.add(:credit_charge, "cannot be less than attached CR charge of #{change_request.credit_charge}") if error_condition
   end
 
   def field_hash
