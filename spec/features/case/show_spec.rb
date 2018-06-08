@@ -456,6 +456,38 @@ RSpec.describe 'Case page', type: :feature do
         subject.reload
         expect(subject.tier_level).to eq 3
       end
+
+      context 'for viewer' do
+        let(:viewer) do
+          create(:viewer, site: subject.site)
+        end
+
+        it 'has disabled escalate button' do
+          visit case_path(subject, as: viewer)
+
+          button = find('button', text: escalate_button_text)
+
+          expect(button).to be_disabled
+          expect(button[:title]).to eq(
+            'As a viewer you cannot escalate a case'
+          )
+        end
+      end
+
+      context 'for non-viewer' do
+        let(:contact) do
+          create(:contact, site: subject.site)
+        end
+
+        it 'does not have disabled escalate button' do
+          visit case_path(subject, as: contact)
+
+          button = find('button', text: escalate_button_text)
+
+          expect(button).not_to be_disabled
+          expect(button[:title]).to be nil
+        end
+      end
     end
 
     RSpec.shared_examples 'for inapplicable cases' do

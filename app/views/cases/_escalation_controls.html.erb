@@ -2,6 +2,10 @@
   <%
       modal_id = 'escalateModal'
       modal_label = 'escalateModalLabel'
+
+      user_can_escalate = policy(@case).escalate?
+      disabled = !user_can_escalate
+      title = disabled ? "As a #{current_user.role} you cannot escalate a case" : nil
   %>
 
   <%= button_tag 'Escalate',
@@ -10,7 +14,9 @@
       data: {
         toggle: 'modal',
         target: "##{modal_id}",
-      }
+      },
+      disabled: disabled,
+      title: title,
     }
   %>
 
