@@ -1,19 +1,24 @@
 <% if @case.open? && !@case.consultancy? %>
+  <%
+      modal_id = 'escalateModal'
+      modal_label = 'escalateModalLabel'
+  %>
+
   <%= button_tag 'Escalate',
     {
       class: 'btn btn-warning btn-sm ml-2',
       data: {
         toggle: 'modal',
-        target: '#escalateModal',
+        target: "##{modal_id}",
       }
     }
   %>
 
-  <div class="modal fade" id="escalateModal" tabindex="-1" role="dialog" aria-labelledby="escalateModalLabel" aria-hidden="true">
+  <div class="modal fade" id="<%= modal_id %>" tabindex="-1" role="dialog" aria-labelledby="<%= modal_label %>" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="escalateModalLabel">Escalating this support case may incur charges</h5>
+          <h5 class="modal-title" id="<%= modal_label %>">Escalating this support case may incur charges</h5>
           <button class="close" data-dismiss="modal">×</button>
         </div>
         <div class="modal-body">
