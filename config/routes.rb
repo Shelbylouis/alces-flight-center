@@ -84,9 +84,6 @@ Rails.application.routes.draw do
       collection do
         get :resolved
       end
-      resource :change_request, only: [:show] do
-        # We'll want some more routes here soon™
-      end
       block.call if block
     end
   end
@@ -167,7 +164,7 @@ Rails.application.routes.draw do
 
   constraints(Clearance::Constraints::SignedIn.new { |user| !user.admin? }) do
     resources :cases, only: [] do
-      resource :change_request, only: [] do
+      resource :change_request, only: [:show] do
         member do
           post :authorise
           post :decline
@@ -189,7 +186,9 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: :show do
-      cases.call
+      cases.call do
+        resource :change_request, only: [:show]
+      end
       resources :services, only: :index
       maintenance_windows.call
       resources :components, only: :index
