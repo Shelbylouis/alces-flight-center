@@ -20,7 +20,7 @@ RSpec.describe TabsBuilder do
         end
       end
 
-      context 'with an contact user' do
+      context 'with a contact user' do
         let(:user) { create(:contact) }
 
         it 'contains a link to the cases page' do
