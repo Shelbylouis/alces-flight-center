@@ -8,6 +8,7 @@ RSpec.feature Log, type: :feature do
   let(:case_select_id) { 'log_case_ids' }
   let(:details_input_id) { 'log_details' }
   let(:component_select_id) { 'log_component_id' }
+  let(:logs_selector) { 'table tr' }
 
   # Create the components and cases for each spec
   before :each do
@@ -31,7 +32,15 @@ RSpec.feature Log, type: :feature do
   end
 
   def fill_details_input
-    'I am the details for the log'.tap do |details|
+    <<~EOF.rstrip
+    I am the details for the log.
+
+     - Do *work*!
+     - Add log entry
+     - ???
+     - Profit
+    EOF
+      .tap do |details|
       fill_in details_input_id, with: details
     end
   end
@@ -51,9 +60,18 @@ RSpec.feature Log, type: :feature do
       log = submit_log
 
       expect(log).not_to be_nil
-      expect(log.details).to eq(log_details)
+      expect(log.details.gsub(/\r\n/, "\n")).to eq(log_details)
       expect(log.engineer).to eq(engineer)
       expect(log.cases).to be_blank
+    end
+
+    it "log's details are rendered as markdown" do
+      log_details = fill_details_input
+      submit_log
+      visit current_path
+      log_row_html = page.find(logs_selector).native.inner_html
+
+      expect(log_row_html).to include(MarkdownRenderer.render(log_details))
     end
 
     it 'can associate multiple cases with a log' do
