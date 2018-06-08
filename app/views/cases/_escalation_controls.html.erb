@@ -1,7 +1,14 @@
 <% if @case.open? && !@case.consultancy? %>
-  <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#escalateModal">
-    Escalate
-  </button>
+  <%= button_tag 'Escalate',
+    {
+      class: 'btn btn-warning btn-sm ml-2',
+      data: {
+        toggle: 'modal',
+        target: '#escalateModal',
+      }
+    }
+  %>
+
   <div class="modal fade" id="escalateModal" tabindex="-1" role="dialog" aria-labelledby="escalateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
