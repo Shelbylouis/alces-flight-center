@@ -47,6 +47,13 @@ body {
   // if this changes to cross threshold where scrollbar would be needed while
   // using app.
   overflow-y: scroll;
+
+  // Override Bootstrap setting `pointer-events: none` on disabled button links
+  // (see https://github.com/twbs/bootstrap/issues/17703), so title text on
+  // these links is shown and cursor changes appropriately.
+  a.btn.disabled {
+    pointer-events: auto;
+  }
 }
 
 .elm-overlay {
