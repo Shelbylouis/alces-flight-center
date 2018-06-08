@@ -55,17 +55,22 @@ RSpec.describe 'scope_path decorator methods' do
 
     context 'when in a site scope' do
       let(:scope) { create(:site) }
+      let(:user) { create(:user) }
 
-      context 'when a contact is signed in' do
-        let(:user) { create(:contact) }
+      context 'when a Site user is signed in' do
+        before :each do
+          allow(user).to receive(:site_user?).and_return(true)
+        end
 
         it 'returns the root path' do
           expect(subject).to eq(helper.root_path)
         end
       end
 
-      context 'when an admin is signed in' do
-        let(:user) { create(:admin) }
+      context 'when a non-Site user is signed in' do
+        before :each do
+          allow(user).to receive(:site_user?).and_return(false)
+        end
 
         it 'returns the site path' do
           expect(subject).to eq(h.site_path(scope))
