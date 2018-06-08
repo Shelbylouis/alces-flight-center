@@ -81,6 +81,7 @@ group :test do
   gem 'email_spec'
   gem 'rails-controller-testing'
   gem 'shoulda-matchers'
+  gem 'rspec-retry'
 end
 
 group :development do

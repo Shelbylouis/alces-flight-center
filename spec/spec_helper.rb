@@ -13,6 +13,9 @@
 # it.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+require 'rspec/retry'
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
@@ -94,6 +97,19 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
+
+  # `rspec-retry` settings.
+  # Show retry status in spec process.
+  config.verbose_retry = true
+  # Show exception that triggers a retry (if `verbose_retry` is also true).
+  config.display_try_failure_messages = true
+
+  # Feature tests which run JS are always going to be flaky for reasons
+  # unrelated to the actual correctness of the test, so retry these a few times
+  # if they fail.
+  config.around :each, :js do |example|
+    example.run_with_retry retry: 3
+  end
 
   config.before :example do
     # Prevent attempting to retrieve documents from S3 when Cluster page
