@@ -14,8 +14,8 @@ class TabsBuilder
       id: :cases, path: scope.scope_cases_path,
       dropdown: [
         new_case_entry,
-        { text: "Current (#{scope.cases.active.size})", path: scope.scope_cases_path },
-        { text: 'Resolved', path: scope.resolved_scope_cases_path }
+        current_cases_entry,
+        resolved_cases_entry,
       ].compact
     }
   end
@@ -55,5 +55,19 @@ class TabsBuilder
         path: scope.new_scope_case_path,
       }
     end
+  end
+
+  def current_cases_entry
+    {
+      text: "Current (#{scope.cases.active.size})",
+      path: scope.scope_cases_path,
+    }
+  end
+
+  def resolved_cases_entry
+    {
+      text: 'Resolved',
+      path: scope.resolved_scope_cases_path,
+    }
   end
 end
