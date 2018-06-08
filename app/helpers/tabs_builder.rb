@@ -1,6 +1,7 @@
 
 class TabsBuilder
-  def initialize(scope)
+  def initialize(user:, scope:)
+    @user = user
     @scope = scope.decorate
   end
 
@@ -12,10 +13,10 @@ class TabsBuilder
     {
       id: :cases, path: scope.scope_cases_path,
       dropdown: [
-        { text: 'Create', path: scope.new_scope_case_path },
+        new_case_entry,
         { text: "Current (#{scope.cases.active.size})", path: scope.scope_cases_path },
         { text: 'Resolved', path: scope.resolved_scope_cases_path }
-      ]
+      ].compact
     }
   end
 
@@ -45,5 +46,14 @@ class TabsBuilder
 
   private
 
-  attr_reader :scope
+  attr_reader :user, :scope
+
+  def new_case_entry
+    if user.editor?
+      {
+        text: 'Create',
+        path: scope.new_scope_case_path,
+      }
+    end
+  end
 end
