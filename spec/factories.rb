@@ -11,6 +11,10 @@ FactoryBot.define do
     association :user, factory: :admin
     association :case # Avoid conflict with case keyword.
     text 'This is a comment'
+
+    factory :case_comment_with_markdown_text do
+      text "# Text title\n\nText body\n\n - Text list item 1\n"
+    end
   end
 
   sequence :email do |n|
