@@ -11,7 +11,7 @@ class ApplicationDecorator < Draper::Decorator
   #   end
 
   def start_maintenance_request_link
-    return unless h.current_user.admin?
+    return unless Pundit.policy!(h.current_user, MaintenanceWindow).create?
 
     title = "Start request for maintenance of this #{readable_model_name}"
     h.link_to(

@@ -25,7 +25,7 @@
           <%= window.transition_info(:confirmed) ||
             render('maintenance_windows/unconfirmed_buttons', window: window) %>
 
-          <% if window.can_end? && current_user.admin? %>
+          <% if window.can_end? && policy(window).end? %>
             <%= button_to 'End ongoing maintenance',
               end_maintenance_window_path(window),
               class: ['btn', 'btn-danger', 'btn-block'],
@@ -37,7 +37,7 @@
             %>
           <% end %>
 
-          <% if window.can_extend_duration? && current_user.admin? %>
+          <% if window.can_extend_duration? && policy(window).extend? %>
             <%= form_tag(
               extend_maintenance_window_path(window),
               class: 'form-inline'

@@ -6,7 +6,7 @@
 )
 %>
 
-<% if current_user.admin? %>
+<% if policy(window).cancel? %>
   <%= button_to 'Cancel request for maintenance',
     cancel_maintenance_window_path(window),
     class: ['btn', 'btn-warning', 'btn-block'],

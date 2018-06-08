@@ -1,4 +1,4 @@
-<% if current_user.admin? %>
+<% if policy(cluster).deposit? %>
   <%= form_tag({controller: 'clusters', action: 'deposit'},
                method: :post,
                class: 'form',
