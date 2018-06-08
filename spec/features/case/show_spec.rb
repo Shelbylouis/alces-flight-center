@@ -434,18 +434,21 @@ RSpec.describe 'Case page', type: :feature do
   end
 
   describe 'escalation' do
+    let(:escalate_button_text) { 'Escalate' }
+
     context 'for open tier 2 case' do
       subject do
-        create(:open_case, tier_level:2)
+        create(:open_case, tier_level: 2)
       end
-      it 'shows escalate button' do
+
+      it 'can be escalated using button' do
         visit case_path(subject, as: admin)
 
         expect do
-          find_button 'Escalate'
+          find_button escalate_button_text
         end.not_to raise_error
 
-        click_button 'Escalate'
+        click_button escalate_button_text
 
         # Using find(...).click instead of click_button waits for modal to appear
         find('#confirm-escalate-button').click
@@ -460,7 +463,7 @@ RSpec.describe 'Case page', type: :feature do
         visit case_path(subject, as: admin)
 
         expect do
-          find_button 'Escalate'
+          find_button escalate_button_text
         end.to raise_error(Capybara::ElementNotFound)
       end
     end
@@ -469,6 +472,7 @@ RSpec.describe 'Case page', type: :feature do
       subject do
         create(:open_case, tier_level: 3)
       end
+
       it_behaves_like 'for inapplicable cases'
     end
 
@@ -476,6 +480,7 @@ RSpec.describe 'Case page', type: :feature do
       subject do
         create(:resolved_case, tier_level: 2)
       end
+
       it_behaves_like 'for inapplicable cases'
     end
 
@@ -483,6 +488,7 @@ RSpec.describe 'Case page', type: :feature do
       subject do
         create(:closed_case, tier_level: 2)
       end
+
       it_behaves_like 'for inapplicable cases'
     end
   end
