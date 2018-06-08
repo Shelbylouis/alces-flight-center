@@ -77,6 +77,10 @@ FactoryBot.define do
     details 'I am the factory default details'
     cluster
     association :engineer, factory: :admin
+
+    factory :log_with_markdown_details do
+      details "# Details title\n\nDetails body\n\n - Details list item 1\n"
+    end
   end
 
   factory :change_motd_request do
