@@ -1,41 +1,40 @@
-<% if current_user.admin? %>
-  <% if @case.can_resolve? %>
-    <%= link_to 'Resolve this case',
-                resolve_case_path(@case.id),
-                class: 'btn btn-secondary ml-2 btn-sm',
-                method: :post,
-                role: 'button',
-                title: 'Resolve this support case if it has been completed or is no longer relevant',
-                data: {
-                    confirm: 'Are you sure you want to resolve this support case?'
-                }
-    %>
-  <% end %>
-  <% if @case.can_close? %>
-    <%= form_tag({controller: 'cases', action: 'close'},
-                 method: :post,
-                 class: 'form-inline',
-                 id: 'case-close-form'
-        ) do %>
-      <div class="form-group">
-        <div class="input-group">
-          <%= number_field :credit_charge,
-                           :amount,
-                           class: 'form-control',
-                           min: 0,
-                           value: 0,
-                           required: 'required'
+
+<% if policy(@case).resolve? && @case.can_resolve? %>
+  <%= link_to 'Resolve this case',
+              resolve_case_path(@case.id),
+              class: 'btn btn-secondary ml-2 btn-sm',
+              method: :post,
+              role: 'button',
+              title: 'Resolve this support case if it has been completed or is no longer relevant',
+              data: {
+                  confirm: 'Are you sure you want to resolve this support case?'
+              }
+  %>
+<% end %>
+<% if policy(@case).close? && @case.can_close? %>
+  <%= form_tag({controller: 'cases', action: 'close'},
+               method: :post,
+               class: 'form-inline',
+               id: 'case-close-form'
+      ) do %>
+    <div class="form-group">
+      <div class="input-group">
+        <%= number_field :credit_charge,
+                         :amount,
+                         class: 'form-control',
+                         min: 0,
+                         value: 0,
+                         required: 'required'
+        %>
+        <div class="input-group-append">
+          <%= submit_tag 'Set charge and close case',
+                         class: 'form-control btn btn-primary',
+                         data: {
+                             confirm: 'Are you sure you want to close this support case?'
+                         }
           %>
-          <div class="input-group-append">
-            <%= submit_tag 'Set charge and close case',
-                           class: 'form-control btn btn-primary',
-                           data: {
-                               confirm: 'Are you sure you want to close this support case?'
-                           }
-            %>
-          </div>
         </div>
       </div>
-    <% end %>
+    </div>
   <% end %>
 <% end %>
