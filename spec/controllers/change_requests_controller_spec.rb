@@ -13,17 +13,17 @@ RSpec.describe ChangeRequestsController, type: :controller do
   let(:contact) { create(:contact, site: site) }
   let(:kase) { create(:open_case, tier_level: 4, cluster: cluster)}
 
-  EXPECTED_BEHAVIOURS = [ # initial_state, action, message, next_state
-    [:draft, :propose, 'has been proposed and is awaiting customer authorisation.', :awaiting_authorisation],
-    [:awaiting_authorisation, :authorise, 'has been authorised.', :in_progress],
-    [:awaiting_authorisation, :decline, 'has been declined.', :declined],
-    [:in_progress, :handover, 'is ready for handover.', :in_handover],
-    [:in_handover, :complete, 'is now complete.', :completed],
+  EXPECTED_BEHAVIOURS = [ # initial_state, action, user, message, next_state
+    [:draft, :propose, :admin, 'has been proposed and is awaiting customer authorisation.', :awaiting_authorisation],
+    [:awaiting_authorisation, :authorise, :contact, 'has been authorised.', :in_progress],
+    [:awaiting_authorisation, :decline, :contact, 'has been declined.', :declined],
+    [:in_progress, :handover, :admin, 'is ready for handover.', :in_handover],
+    [:in_handover, :complete, :contact, 'is now complete.', :completed],
   ].freeze
 
   describe 'state transition methods' do
 
-    EXPECTED_BEHAVIOURS.each do |initial_state, action, message, next_state|
+    EXPECTED_BEHAVIOURS.each do |initial_state, action, user, message, next_state|
       it "transitions from #{initial_state} to #{next_state}" do
 
         cr = create(:change_request, case: kase, state: initial_state)
@@ -33,6 +33,7 @@ RSpec.describe ChangeRequestsController, type: :controller do
           message
         ).and_return(stub_mail)
 
+        sign_in_as(send(user))
         post action, params: { case_id: kase.id }
 
         cr.reload
@@ -44,6 +45,7 @@ RSpec.describe ChangeRequestsController, type: :controller do
     it 'does not allow illegal state transitions' do
       cr = create(:change_request, case: kase, state: :draft)
 
+      sign_in_as(contact)
       post :complete, params: { case_id: kase.id }
 
       cr.reload

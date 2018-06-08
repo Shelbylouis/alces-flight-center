@@ -3,11 +3,13 @@ class ChangeRequestsController < ApplicationController
   before_action :assign_case
 
   def new
+    authorize ChangeRequest
     @cr = ChangeRequest.new
   end
 
   def create
     cr = @case.build_change_request(cr_params)
+    authorize cr
 
     if cr.save
       flash[:success] = "Created change request for case #{@case.display_id}."
@@ -79,6 +81,7 @@ class ChangeRequestsController < ApplicationController
   def change_action(success_flash)
     cr = @case.change_request
     begin
+      authorize cr
       yield(cr)
       cr.save!
       flash[:success] = success_flash % cr.case.display_id
