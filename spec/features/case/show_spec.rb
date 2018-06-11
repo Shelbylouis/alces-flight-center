@@ -270,6 +270,23 @@ RSpec.describe 'Case page' do
 
         expect(find('.card.bg-light').text).to match 'Additional discussion is not available for cases in the current support tier'
       end
+
+      it 'enables commenting for site contact if comments_enabled is true' do
+        subject.comments_enabled = true
+        subject.save
+
+        visit case_path(subject, as: contact)
+
+        fill_in 'case_comment_text', with: 'This is a test comment'
+        click_button 'Add new comment'
+
+        subject.reload
+
+        expect(subject.case_comments.count).to be 1
+        expect(find('.event-card').find('.card-body').text).to eq('This is a test comment')
+        expect(find('.alert')).to have_text('New comment added')
+
+      end
     end
 
     it 'allows a comment to be added' do
