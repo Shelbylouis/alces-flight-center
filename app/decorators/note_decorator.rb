@@ -11,10 +11,10 @@ class NoteDecorator < ApplicationDecorator
 
   def new_form_intro
     if current_user.admin?
-      "No #{flavour} notes have been added for this cluster yet. You may add
+      "There are currently no #{flavour} notes for this cluster. You may add
       them below."
     else
-      "No cluster notes have been added yet. You may add them below."
+      "There are currently no notes for this cluster. You may add them below."
     end
   end
 
