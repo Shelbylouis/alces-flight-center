@@ -82,6 +82,50 @@ RSpec.describe NotesController, type: :request do
     end
   end
 
+  describe 'creating a note' do
+    let(:flavour) { 'engineering' }
+    let(:params) { {note: {description: 'My description'}} }
+    let(:path) { cluster_note_path(cluster_without_notes, flavour: flavour, as: user) }
+    let(:user) { admin }
+
+    it 'creates the note' do
+      expect do
+        post path, params: params
+      end.to change { Note.count }.by(1)
+    end
+
+    it 'creates the note for the given cluster' do
+      expect(Note.count).to eq(0)
+      post path, params: params
+      expect(Note.first.cluster).to eq(cluster_without_notes)
+    end
+
+    it 'creates the note with the given description' do
+      expect(Note.count).to eq(0)
+      post path, params: params
+      expect(Note.first.description).to eq('My description')
+    end
+
+    it 'creates the note with the given flavour' do
+      expect(Note.count).to eq(0)
+      post path, params: params
+      expect(Note.first.flavour).to eq(flavour)
+    end
+  end
+
+  describe 'updating a note' do
+    let(:note) { engineering_note }
+    let(:params) { {note: {description: 'My new description'}} }
+    let(:path) { cluster_note_path(note.cluster, note, as: user) }
+    let(:user) { admin }
+
+    it 'updates the notes description' do
+      expect do
+        patch path, params: params
+      end.to change { Note.find(note.id).description }.to('My new description')
+    end
+  end
+
   describe 'deleting a note' do
     let(:user) { admin }
     it 'when the description is empty it deletes the note' do
