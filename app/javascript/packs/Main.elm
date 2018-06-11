@@ -1,12 +1,15 @@
 module Main exposing (..)
 
 import Html exposing (Html)
+import Task exposing (Task)
 import Json.Decode as D
 import Msg exposing (..)
 import State exposing (State)
 import State.Update
 import State.View
 import View.Utils
+import Maybe
+import Result
 
 
 -- MODEL
@@ -37,8 +40,36 @@ decodeInitialModel value =
 
 init : D.Value -> ( Model, Cmd Msg )
 init flags =
-    decodeInitialModel flags ! []
+    decodeInitialModel flags ! [
+       maybeSendMsg ChangeSelectedIssue "selectedIssue" flags,
+       maybeSendMsg ChangeSelectedCategory "selectedCategory" flags
+    ]
 
+
+maybeSendMsg : (String -> msg) -> String -> D.Value -> Cmd msg
+maybeSendMsg msg fieldName flags =
+    let
+        getFieldId : Maybe String
+        getFieldId =
+            case decodeField of
+                Result.Ok v -> v
+                Result.Err e -> Nothing
+
+        decodeField : Result String (Maybe String)
+        decodeField =
+            D.decodeValue (D.maybe (D.field fieldName D.string)) flags
+
+        send : msg -> Cmd msg
+        send msg =
+            Task.succeed msg
+            |> Task.perform identity
+
+    in
+        case getFieldId of
+            Just fieldId ->
+                send (msg fieldId)
+            Nothing ->
+                Cmd.none
 
 
 -- VIEW
