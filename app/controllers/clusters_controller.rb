@@ -1,6 +1,9 @@
 class ClustersController < ApplicationController
   decorates_assigned :cluster
 
+  # :credit_usage is a read-only action so should not require authorization.
+  after_action :verify_authorized, except: NO_AUTH_ACTIONS + [:credit_usage]
+
   def credit_usage
 
     @events = (charges + deposits)
@@ -17,6 +20,8 @@ class ClustersController < ApplicationController
   end
 
   def deposit
+
+    authorize @cluster
 
     deposit_params = params.require(:credit_deposit)
                            .permit(:amount)
