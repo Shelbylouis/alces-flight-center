@@ -12,10 +12,12 @@ class NotesController < ApplicationController
 
   def edit
     @note = note_from_params
+    authorize @note
   end
 
   def create
     @note = note_from_params
+    authorize @note
     if @note.update_attributes(note_params)
       flash[:success] = 'Notes created'
     else
@@ -26,9 +28,10 @@ class NotesController < ApplicationController
 
   def update
     @note = note_from_params
+    authorize @note
     if @note.update_attributes(note_params)
       flash[:success] = 'Notes updated'
-      redirect_to @note.path
+      redirect_to @note.decorate.path
     else
       flash[:error] = "Your notes were not updated: #{format_errors(@note)}"
       render :edit
@@ -40,8 +43,7 @@ class NotesController < ApplicationController
   def note_from_params
     cluster = cluster_from_params
     flavour = params.require(:flavour)
-    note = cluster.notes.send(flavour).first || cluster.notes.new(flavour: flavour)
-    note.decorate
+    cluster.notes.send(flavour).first || cluster.notes.new(flavour: flavour)
   end
 
   def cluster_from_params
