@@ -8,7 +8,8 @@
       <div class="input-group">
         <%= number_field :credit_deposit,
                          :amount,
-                         class: 'form-control'
+                         class: 'form-control',
+                         min: 1
         %>
         <div class="input-group-append">
           <%= submit_tag 'Add credits',
