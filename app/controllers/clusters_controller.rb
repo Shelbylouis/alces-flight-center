@@ -18,11 +18,13 @@ class ClustersController < ApplicationController
 
   def deposit
 
-    amount = params.require(:credit_deposit).permit(:amount).require(:amount).to_i
+    deposit_params = params.require(:credit_deposit)
+                           .permit(:amount)
+                           .merge(user: current_user)
 
     begin
-      @cluster.credit_deposits.create!(amount: amount, user: current_user)
-      flash[:success] = "#{view_context.pluralize(amount, 'credit')} added to cluster #{@cluster.name}."
+      deposit = @cluster.credit_deposits.create!(deposit_params)
+      flash[:success] = "#{view_context.pluralize(deposit.amount, 'credit')} added to cluster #{@cluster.name}."
     rescue
       flash[:error] = 'Error while trying to deposit credits for this cluster.'
     end
