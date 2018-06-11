@@ -1,0 +1,15 @@
+<% if current_user.admin? && !@case.consultancy? %>
+  <div class="alert alert-info d-flex justify-content-between align-items-center">
+    <i class="fa fa-info fa-2x mr-2"></i>
+    <span style="flex-grow: 1">
+      Commenting by site contacts is currently <%= @case.comments_enabled ? 'enabled' : 'disabled' %>.
+    </span>
+
+    <% verb = @case.comments_enabled ? 'Disable' : 'Enable' %>
+    <%=
+      link_to verb, set_commenting_case_path(@case, params: { comments_enabled: !@case.comments_enabled }),
+              method: 'post',
+              class: 'btn btn-primary'
+    %>
+  </div>
+<% end %>

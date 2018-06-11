@@ -99,6 +99,7 @@ Rails.application.routes.draw do
         post :close  # Only admins may close a case
         post :assign  # Only admins may (re)assign a case
         post :set_time
+        post :set_commenting
       end
     end
 

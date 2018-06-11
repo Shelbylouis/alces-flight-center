@@ -114,6 +114,15 @@ class CasesController < ApplicationController
     end
   end
 
+  def set_commenting
+    enabled = params.require(:comments_enabled)
+    verb = enabled == 'true' ? 'enabled' : 'disabled'
+
+    change_action "Commenting #{verb} for contacts on case %s" do |kase|
+      kase.comments_enabled = enabled
+    end
+  end
+
   private
 
   def case_params
