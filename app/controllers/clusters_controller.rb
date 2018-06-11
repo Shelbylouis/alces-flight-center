@@ -5,15 +5,14 @@ class ClustersController < ApplicationController
   after_action :verify_authorized, except: NO_AUTH_ACTIONS + [:credit_usage]
 
   def credit_usage
+    credit_events = ClusterCreditEvents.new(@cluster, start_date, end_date)
 
-    @events = @cluster.credit_events_in_period(start_date, end_date)
-                      .map(&:decorate)
+    @events = credit_events.events.map(&:decorate)
 
-    @accrued = @cluster.total_accrual_in_period(start_date, end_date)
-    @used = @cluster.total_charges_in_period(start_date, end_date)
+    @accrued = credit_events.total_accrual
+    @used = credit_events.total_charges
 
-    @free_of_charge = @cluster.cases_closed_free_in_period(start_date, end_date)
-
+    @free_of_charge = credit_events.cases_closed_without_charge
   end
 
   def deposit
