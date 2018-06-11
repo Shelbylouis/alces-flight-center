@@ -81,4 +81,16 @@ RSpec.describe NotesController, type: :request do
       end
     end
   end
+
+  describe 'deleting a note' do
+    let(:user) { admin }
+    it 'when the description is empty it deletes the note' do
+      note = engineering_note
+      cluster = note.cluster
+      path = cluster_note_path(note.cluster, note, as: user)
+      expect do
+        patch path, params: {note: {description: nil}}
+      end.to change { cluster.reload.notes.length }.by(-1)
+    end
+  end
 end

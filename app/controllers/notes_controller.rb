@@ -25,7 +25,11 @@ class NotesController < ApplicationController
   def update
     @note = note_from_params
     authorize @note
-    if @note.update_attributes(note_params)
+    if note_params[:description].blank?
+      @note.destroy
+      flash[:success] = 'Notes removed'
+      redirect_to cluster_path(@note.cluster)
+    elsif @note.update_attributes(note_params)
       flash[:success] = 'Notes updated'
       redirect_to @note.decorate.path
     else
