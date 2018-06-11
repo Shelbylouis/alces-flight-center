@@ -287,6 +287,27 @@ RSpec.describe 'Case page' do
         expect(find('.alert')).to have_text('New comment added')
 
       end
+
+      it 'allows admin to enable commenting when disabled' do
+        visit case_path(subject, as: admin)
+        click_link 'Enable'
+
+        subject.reload
+        expect(subject.comments_enabled).to eq true
+        expect(find('.alert-success')).to have_text "Commenting enabled for contacts on case #{subject.display_id}"
+      end
+
+      it 'allows admin to disable commenting when enabled' do
+        subject.comments_enabled = true
+        subject.save
+
+        visit case_path(subject, as: admin)
+        click_link 'Disable'
+
+        subject.reload
+        expect(subject.comments_enabled).to eq false
+        expect(find('.alert-success')).to have_text "Commenting disabled for contacts on case #{subject.display_id}"
+      end
     end
 
     it 'allows a comment to be added' do
@@ -299,7 +320,7 @@ RSpec.describe 'Case page' do
 
       expect(open_case.case_comments.count).to be 1
       expect(find('.event-card').find('.card-body').text).to eq('This is a test comment')
-      expect(find('.alert')).to have_text('New comment added')
+      expect(find('.alert-success')).to have_text('New comment added')
     end
 
     it 'does not allow empty comments' do
@@ -311,7 +332,7 @@ RSpec.describe 'Case page' do
       open_case.reload
 
       expect(open_case.case_comments.count).to be 0
-      expect(find('.alert')).to have_text('Empty comments are not permitted')
+      expect(find('.alert-danger')).to have_text('Empty comments are not permitted')
     end
 
     %w(resolved closed).each do |state|

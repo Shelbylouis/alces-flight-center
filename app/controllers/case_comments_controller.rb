@@ -6,7 +6,7 @@ class CaseCommentsController < ApplicationController
     authorize new_comment
 
     if new_comment.save
-      flash[:notice] = 'New comment added.'
+      flash[:success] = 'New comment added.'
     else
       flash[:error] = "Your comment was not added. #{new_comment.errors.full_messages.join('; ').strip}"
     end
