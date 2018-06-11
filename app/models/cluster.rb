@@ -88,7 +88,46 @@ class Cluster < ApplicationRecord
     end
   end
 
+  def credit_events_in_period(start_date, end_date)
+    (
+      charges_in_period(start_date, end_date) + deposits_in_period(start_date, end_date)
+    ).sort_by(&:created_at)
+      .reverse!
+  end
+
+  def total_accrual_in_period(start_date, end_date)
+    add_up deposits_in_period(start_date, end_date)
+  end
+
+  def total_charges_in_period(start_date, end_date)
+    add_up charges_in_period(start_date, end_date)
+  end
+
+  def deposits_in_period(start_date, end_date)
+    credit_deposits.in_period(
+        Time.zone.local_to_utc(start_date.to_datetime),
+        Time.zone.local_to_utc(end_date.to_datetime)
+    )
+  end
+
+  def charges_in_period(start_date, end_date)
+    credit_charges.in_period(
+        Time.zone.local_to_utc(start_date.to_datetime),
+        Time.zone.local_to_utc(end_date.to_datetime)
+    )
+  end
+
+  def cases_closed_free_in_period(start_date, end_date)
+    charges_in_period(start_date, end_date).where(amount: 0).count
+  end
+
   private
+
+  def add_up(things)
+    things.reduce(0) do |total, thing|
+      total += thing.amount
+    end
+  end
 
   def validate_all_cluster_parts_advice
     ['components', 'services'].each do |cluster_part|

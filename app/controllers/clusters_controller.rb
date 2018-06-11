@@ -6,16 +6,13 @@ class ClustersController < ApplicationController
 
   def credit_usage
 
-    @events = (charges + deposits)
-              .sort_by(&:created_at)
-              .reverse!
-              .map(&:decorate)
+    @events = @cluster.credit_events_in_period(start_date, end_date)
+                      .map(&:decorate)
 
-    @accrued = add_up(deposits)
+    @accrued = @cluster.total_accrual_in_period(start_date, end_date)
+    @used = @cluster.total_charges_in_period(start_date, end_date)
 
-    @used = add_up(charges)
-
-    @free_of_charge = charges.where(amount: 0).count
+    @free_of_charge = @cluster.cases_closed_free_in_period(start_date, end_date)
 
   end
 
@@ -39,12 +36,6 @@ class ClustersController < ApplicationController
 
   private
 
-  def add_up(things)
-    things.reduce(0) do |total, thing|
-      total += thing.amount
-    end
-  end
-
   def start_date
     @start_date ||= begin
       parse_start_date.beginning_of_quarter
@@ -60,19 +51,4 @@ class ClustersController < ApplicationController
   def parse_start_date
     Date.parse(params[:start_date])
   end
-
-  def charges
-    @charges ||= @cluster.credit_charges.in_period(
-      Time.zone.local_to_utc(start_date.to_datetime),
-      Time.zone.local_to_utc(end_date.to_datetime)
-    )
-  end
-
-  def deposits
-    @deposits ||= @cluster.credit_deposits.in_period(
-      Time.zone.local_to_utc(start_date.to_datetime),
-      Time.zone.local_to_utc(end_date.to_datetime)
-    )
-  end
-
 end
