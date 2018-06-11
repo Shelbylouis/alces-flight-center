@@ -13,6 +13,7 @@ FactoryBot.define do
       level 1
 
       factory :tier_with_tool do
+        association :issue, factory: :issue_with_category
         tool :motd
         fields { nil }
       end

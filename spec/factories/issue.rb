@@ -4,6 +4,11 @@ FactoryBot.define do
     name 'New user/group'
     requires_component false
 
+    factory :issue_with_category do
+      name 'Motd change request'
+      category
+    end
+
     factory :issue_requiring_component do
       requires_component true
 

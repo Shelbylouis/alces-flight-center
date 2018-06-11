@@ -69,6 +69,33 @@ RSpec.describe CasesController, type: :controller do
         end.to raise_error(ActionController::RoutingError)
       end
     end
+
+    context 'when given a tool' do
+      it 'assigns the correct category and issue' do
+        create(:tier)
+        create(:level_1_tier)
+        tier_with_tool = create(:tier_with_tool)
+
+        get :new, params: { tool: 'motd' }
+
+        expect(assigns(:selected)).to eq({
+          category: tier_with_tool.issue.category.id,
+          issue: tier_with_tool.issue.id,
+        })
+      end
+    end
+
+    context 'when not given a tool' do
+      it 'does not assign a category or issue' do
+        create(:tier)
+        create(:level_1_tier)
+        create(:tier_with_tool)
+
+        get :new, params: { tool: nil }
+
+        expect(assigns(:selected)).to eq({})
+      end
+    end
   end
 
   describe 'POST #create' do
