@@ -1,7 +1,6 @@
 module Main exposing (..)
 
 import Html exposing (Html)
-import Task exposing (Task)
 import Json.Decode as D
 import Msg exposing (..)
 import State exposing (State)
@@ -10,6 +9,7 @@ import State.View
 import View.Utils
 import Maybe
 import Result
+import List
 
 
 -- MODEL
@@ -40,14 +40,28 @@ decodeInitialModel value =
 
 init : D.Value -> ( Model, Cmd Msg )
 init flags =
-    decodeInitialModel flags ! [
-       maybeSendMsg ChangeSelectedIssue "selectedIssue" flags,
-       maybeSendMsg ChangeSelectedCategory "selectedCategory" flags
-    ]
+    let
+        model = decodeInitialModel flags
+
+        mmsgs = [
+            maybeToolMessage ChangeSelectedIssue "selectedIssue" flags,
+            maybeToolMessage ChangeSelectedCategory "selectedCategory" flags
+        ]
+
+        updateCollectingCmds mmsg (m1, cs1) =
+            case mmsg of
+                Just msg ->
+                    let
+                        (m2, cs2) = update msg m1
+                    in
+                        (m2 ! [cs1, cs2])
+                Nothing -> (m1 ! [cs1])
+    in
+        List.foldr updateCollectingCmds (model ! []) mmsgs
 
 
-maybeSendMsg : (String -> msg) -> String -> D.Value -> Cmd msg
-maybeSendMsg msg fieldName flags =
+maybeToolMessage : (String -> msg) -> String -> D.Value -> Maybe msg
+maybeToolMessage msg fieldName flags =
     let
         getFieldId : Maybe String
         getFieldId =
@@ -59,17 +73,8 @@ maybeSendMsg msg fieldName flags =
         decodeField =
             D.decodeValue (D.maybe (D.field fieldName D.string)) flags
 
-        send : msg -> Cmd msg
-        send msg =
-            Task.succeed msg
-            |> Task.perform identity
-
     in
-        case getFieldId of
-            Just fieldId ->
-                send (msg fieldId)
-            Nothing ->
-                Cmd.none
+        Maybe.map msg getFieldId
 
 
 -- VIEW
