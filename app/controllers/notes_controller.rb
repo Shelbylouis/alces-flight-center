@@ -37,13 +37,8 @@ class NotesController < ApplicationController
   private
 
   def note_from_params
-    cluster = cluster_from_params
     flavour = params.require(:flavour)
-    cluster.notes.send(flavour).first || cluster.notes.new(flavour: flavour)
-  end
-
-  def cluster_from_params
-    Cluster.find(params.require(:cluster_id))
+    @cluster.notes.send(flavour).first || @cluster.notes.new(flavour: flavour)
   end
 
   def note_params
