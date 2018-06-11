@@ -3,11 +3,7 @@ class NotesController < ApplicationController
 
   def show
     @note = note_from_params
-    if @note.persisted?
-      render :show
-    else
-      render :new
-    end
+    render :new unless @note.persisted?
   end
 
   def edit
