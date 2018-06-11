@@ -39,6 +39,15 @@ class CasesController < ApplicationController
                 else
                   current_site.clusters
                 end
+    @selected = if params[:tool].present?
+                  tool = Tier.find_by(tool: params[:tool])
+                  {
+                    issue: tool.issue_id,
+                    category: tool.issue.category_id
+                  }
+                else
+                  {}
+                end
   end
 
   def create
