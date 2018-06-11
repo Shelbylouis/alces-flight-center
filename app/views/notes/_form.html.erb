@@ -1,0 +1,13 @@
+<div class="card-body">
+    <p>
+    <%= intro_text %>
+    </p>
+    <%= form_for note.form_path do |f| %>
+        <div class="form-group">
+            <%= f.text_area :description, class: 'form-control', rows: 10 %>
+        </div>
+        <div class="form-group" style="overflow: hidden;">
+            <%= f.submit button_text, class: dark_button_classes %>
+        </div>
+    <% end %>
+</div>
