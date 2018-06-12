@@ -4,7 +4,7 @@
   <div class="card-body row">
     <div class="col-6 card-text">
       <h3><%= site.name %></h3>
-      <p><%= site.rendered_description.html_safe %></p>
+      <p><%= site.rendered_description %></p>
 
       <h4>Primary site contact</h4>
       <ul><li><%= site.primary_contact&.decorate&.info || raw('<em>Unset</em>') %></li></ul>

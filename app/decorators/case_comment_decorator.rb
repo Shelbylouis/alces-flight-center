@@ -4,7 +4,7 @@ class CaseCommentDecorator < ApplicationDecorator
     h.render 'cases/event',
              name: object.user.name,
              date: object.created_at,
-             text: object.rendered_text.html_safe,
+             text: object.rendered_text,
              formatted: true,
              type: 'comment-o'
   end

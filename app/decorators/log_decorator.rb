@@ -3,7 +3,7 @@ class LogDecorator < ApplicationDecorator
     h.render 'cases/event',
              name: object.engineer.name,
              date: object.created_at,
-             text: object.rendered_details.html_safe,
+             text: object.rendered_details,
              formatted: true,
              type: 'pencil-square-o'
   end

@@ -15,7 +15,7 @@ def MarkdownColumn(column)
     extend ActiveSupport::Concern
 
     define_method "rendered_#{column}" do
-      MarkdownRenderer.render(send(column) || '')
+      MarkdownRenderer.render(send(column) || '').html_safe
     end
   end
 end
