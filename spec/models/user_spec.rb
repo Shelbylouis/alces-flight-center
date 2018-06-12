@@ -133,4 +133,23 @@ RSpec.describe User, type: :model do
       end
     end
   end
+
+  describe '#from_jwt-token' do
+    let(:email_address) { 'some.user@example.com' }
+    let!(:user) { create(:contact, email: email_address) }
+
+    let(:valid_token) {
+      ::JsonWebToken.encode(email: email_address)
+    }
+
+    it 'returns user from valid token' do
+      expect(User.from_jwt_token(valid_token)).to eq user
+    end
+
+    it 'returns nil from invalid token' do
+      # A primitive way of invalidating the token but it works...
+      invalid_token = valid_token << 'F'
+      expect(User.from_jwt_token(invalid_token)).to eq nil
+    end
+  end
 end

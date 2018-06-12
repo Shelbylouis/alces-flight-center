@@ -73,6 +73,11 @@ class User < ApplicationRecord
       #  u.name = claims.fetch('username')
       #  u.save
     end
+  rescue JWT::DecodeError
+    # Either the token isn't syntactically valid (not Base64-encoded valid JSON)
+    # or else signature verification failed (fraudulent token, or staging token
+    # being used in production or vice versa).
+    nil
   end
 
   def remember_token
