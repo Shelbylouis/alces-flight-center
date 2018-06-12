@@ -41,12 +41,18 @@ class CasesController < ApplicationController
                 end
     @selected = if params[:tool].present?
                   tool = Tier.find_by(tool: params[:tool])
-                  tool.nil? ?
-                    {} :
+                  if tool.nil?
+                    {}
+                  else
+                    issue = tool.issue
+                    service = issue.service_type.services.find_by(cluster_id: cluster_id)
                     {
-                      issue: tool.issue_id,
-                      category: tool.issue.category_id
+                      category: issue.category_id,
+                      issue: issue.id,
+                      service: service.id,
+                      tier: tool.level,
                     }
+                  end
                 else
                   {}
                 end

@@ -45,8 +45,10 @@ init flags =
             decodeInitialModel flags
 
         mmsgs =
-            [ maybeToolMessage ChangeSelectedIssue "selectedIssue" flags
+            [ maybeToolMessage ChangeSelectedTier "selectedTier" flags
+            , maybeToolMessage ChangeSelectedIssue "selectedIssue" flags
             , maybeToolMessage ChangeSelectedCategory "selectedCategory" flags
+            , maybeToolMessage ChangeSelectedService "selectedService" flags
             ]
 
         updateCollectingCmds mmsg ( m1, cs1 ) =

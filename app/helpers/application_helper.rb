@@ -31,6 +31,8 @@ module ApplicationHelper
           #{single_part_data_attr(single_part)}
           #{selected_data_attr(:category, selected)}
           #{selected_data_attr(:issue, selected)}
+          #{selected_data_attr(:service, selected)}
+          #{selected_data_attr(:tier, selected)}
         ></div>
       EOF
     )
