@@ -18,6 +18,7 @@ const initializeFormApp = () => {
       selectedIssue: loadAttributeJson('data-selected-issue'),
       selectedService: loadAttributeJson('data-selected-service'),
       selectedTier: loadAttributeJson('data-selected-tier'),
+      selectedTool: loadAttributeJson('data-selected-tool'),
     };
 
     Elm.Main.embed(target, flags);

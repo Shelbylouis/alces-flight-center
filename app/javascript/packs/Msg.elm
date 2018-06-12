@@ -18,3 +18,4 @@ type Msg
     | ClearError
     | ClusterChargingInfoModal Modal.Visibility
     | ChargeablePreSubmissionModal Modal.Visibility
+    | SelectTool String

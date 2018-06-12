@@ -2,8 +2,10 @@ module Issue
     exposing
         ( Id(..)
         , Issue
+        , data
         , decoder
         , extractId
+        , findTier
         , name
         , requiresComponent
         , sameId
@@ -158,3 +160,8 @@ data issue =
 sameId : Id -> Issue -> Bool
 sameId id issue =
     data issue |> Utils.sameId id
+
+
+findTier : (Tier -> Bool) -> Issue -> Maybe Tier
+findTier predicate issue =
+    SelectList.Extra.find predicate (issue |> data |> .tiers)

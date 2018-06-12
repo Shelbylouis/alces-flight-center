@@ -1,6 +1,6 @@
 module Issues
     exposing
-        ( Issues
+        ( Issues(..)
         , availableIssues
         , categories
         , decoder

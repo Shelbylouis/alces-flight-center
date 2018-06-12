@@ -79,6 +79,9 @@ update msg state =
         ChargeablePreSubmissionModal modalState ->
             Just ({ state | chargeablePreSubmissionModal = modalState } ! [])
 
+        SelectTool toolName ->
+            Just (handleSelectTool state toolName)
+
 
 stringToId : (Int -> id) -> String -> Maybe id
 stringToId constructor idString =
@@ -156,6 +159,48 @@ handleChangeTierField state index value =
             Cluster.updateSelectedIssue state.clusters
                 (Issue.updateSelectedTierField index value)
     }
+
+
+handleSelectTool : State -> String -> ( State, Cmd Msg )
+handleSelectTool state toolName =
+    let
+        services =
+            state
+                |> .clusters
+                |> SelectList.selected
+                |> .services
+
+        isWantedTier : Tier.Tier -> Bool
+        isWantedTier tier =
+            case tier.content of
+                Tier.Fields fields ->
+                    False
+
+                Tier.MotdTool fields ->
+                    toolName == "motd"
+
+        maybeSetCategory mcategory clusters =
+            case mcategory of
+                Just category ->
+                    Cluster.setSelectedCategory clusters category.id
+
+                Nothing ->
+                    clusters
+    in
+    case Service.findTierAndAncestors isWantedTier services of
+        Just ( service, mcategory, issue, tier ) ->
+            { state
+                | clusters =
+                    state.clusters
+                        |> flip Cluster.setSelectedService service.id
+                        |> maybeSetCategory mcategory
+                        |> flip Cluster.setSelectedIssue (issue |> Issue.data |> .id)
+                        |> flip Cluster.setSelectedTier tier.id
+            }
+                ! []
+
+        Nothing ->
+            state ! []
 
 
 submitForm : State -> Cmd Msg

@@ -49,6 +49,7 @@ init flags =
             , maybeToolMessage ChangeSelectedIssue "selectedIssue" flags
             , maybeToolMessage ChangeSelectedCategory "selectedCategory" flags
             , maybeToolMessage ChangeSelectedService "selectedService" flags
+            , maybeToolMessage SelectTool "selectedTool" flags
             ]
 
         updateCollectingCmds mmsg ( m1, cs1 ) =

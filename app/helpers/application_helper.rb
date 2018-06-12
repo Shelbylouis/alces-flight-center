@@ -33,6 +33,7 @@ module ApplicationHelper
           #{selected_data_attr(:issue, selected)}
           #{selected_data_attr(:service, selected)}
           #{selected_data_attr(:tier, selected)}
+          #{selected_data_attr(:tool, selected)}
         ></div>
       EOF
     )
