@@ -120,6 +120,29 @@ RSpec.describe 'Case page' do
         find('.event-card')
       end.to raise_error(Capybara::ElementNotFound) # ...but we don't show it
     end
+
+    it 'renders comments and logs as markdown' do
+      create(:case_comment,
+             case: open_case,
+             user: admin,
+             created_at: 4.hours.ago,
+             text: '**Commenty** *McCommentface*')
+      create(:log,
+             cases: [open_case],
+             cluster: cluster,
+             details: '*Loggy* **McLogface**')
+
+      visit case_path(open_case, as: admin)
+
+      event_cards = all('.event-card')
+      expect(event_cards.size).to eq(2)
+
+      log_html = event_cards[0].find('.card-body').native.inner_html
+      case_comment_html = event_cards[1].find('.card-body').native.inner_html
+
+      expect(log_html.strip).to eq('<p><em>Loggy</em> <strong>McLogface</strong></p>')
+      expect(case_comment_html.strip).to eq('<p><strong>Commenty</strong> <em>McCommentface</em></p>')
+    end
   end
 
   describe 'comments form' do

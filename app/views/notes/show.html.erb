@@ -2,7 +2,7 @@
 
 <%= render 'partials/tabs', activate: :notes do %>
     <div class="card-body">
-        <%= note.rendered_description.html_safe %>
+        <%= note.rendered_description %>
     </div>
     <%= link_to 'Edit notes',
         note.edit_path,

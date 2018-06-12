@@ -11,6 +11,10 @@ FactoryBot.define do
     association :user, factory: :admin
     association :case # Avoid conflict with case keyword.
     text 'This is a comment'
+
+    factory :case_comment_with_markdown_text do
+      text "# Text title\n\nText body\n\n - Text list item 1\n"
+    end
   end
 
   sequence :email do |n|
@@ -77,6 +81,10 @@ FactoryBot.define do
     details 'I am the factory default details'
     cluster
     association :engineer, factory: :admin
+
+    factory :log_with_markdown_details do
+      details "# Details title\n\nDetails body\n\n - Details list item 1\n"
+    end
   end
 
   factory :change_motd_request do

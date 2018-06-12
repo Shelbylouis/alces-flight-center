@@ -5,7 +5,11 @@
       <%= icon(type) %>
     </div>
     <div class="card-body">
-      <%= simple_format(text) %>
+        <% if local_assigns.fetch(:formatted, false) %>
+            <%= text %>
+        <% else %>
+            <%= simple_format(text) %>
+        <% end %>
     </div>
   </div>
 <% end %>

@@ -1,4 +1,5 @@
 class CaseComment < ApplicationRecord
+  include MarkdownColumn(:text)
   belongs_to :user
   belongs_to :case
 
