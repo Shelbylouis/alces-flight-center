@@ -49,7 +49,7 @@ class CasesController < ApplicationController
                     {
                       category: issue.category_id,
                       issue: issue.id,
-                      service: service.id,
+                      service: service.present? ? service.id : nil,
                       tier: tool.level,
                     }
                   end

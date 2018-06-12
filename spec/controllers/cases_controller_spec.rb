@@ -30,6 +30,71 @@ RSpec.describe CasesController, type: :controller do
           get :new, params: { cluster_id: another_cluster.id }
         end.to raise_error(ActionController::RoutingError)
       end
+
+      context 'case form tool pre-poulation' do
+        before(:each) do
+          # Add additional tools and services so that we can be confident we
+          # are selecting the correct items, and not just selecting the only
+          # items that are in the database.
+          create(:tier)
+          create(:level_1_tier)
+          create(:category)
+          create(:service, service_type: create(:service_type), cluster: first_cluster)
+        end
+
+        let(:category) { create(:category) }
+        let(:tier) { create(:tier_with_tool, issue: issue) }
+        let(:service_type) { create(:service_type) }
+        let!(:service) do
+          create(:service, service_type: service_type, cluster: first_cluster)
+        end
+
+        context 'when given a tool within a category' do
+          let(:issue) do
+            create(:issue_requiring_service, service_type: service_type, category: category)
+          end
+
+          it 'assigns the correct items to @selected' do
+            get :new, params: { tool: tier.tool, cluster_id: first_cluster.id }
+
+            expect(assigns(:selected)).to eq({
+              category: issue.category.id,
+              issue: issue.id,
+              tier: tier.level,
+              service: service.id,
+            })
+          end
+        end
+
+        context 'when given a tool without a category' do
+          let(:issue) do
+            create(:issue_requiring_service, service_type: service_type)
+          end
+
+          it 'assigns the correct items to @selected' do
+            get :new, params: { tool: tier.tool, cluster_id: first_cluster.id }
+
+            expect(assigns(:selected)).to eq({
+              category: nil,
+              issue: issue.id,
+              tier: tier.level,
+              service: service.id,
+            })
+          end
+        end
+
+        context 'when not given a tool' do
+          it 'does not assign anything meaningful to @selected' do
+            create(:tier)
+            create(:level_1_tier)
+            create(:tier_with_tool)
+
+            get :new, params: { tool: nil, cluster_id: first_cluster.id }
+
+            expect(assigns(:selected)).to eq({})
+          end
+        end
+      end
     end
 
     context 'from component-level route' do
@@ -67,33 +132,6 @@ RSpec.describe CasesController, type: :controller do
         expect do
           get :new, params: { service_id: another_service.id }
         end.to raise_error(ActionController::RoutingError)
-      end
-    end
-
-    context 'when given a tool' do
-      it 'assigns the correct category and issue' do
-        create(:tier)
-        create(:level_1_tier)
-        tier_with_tool = create(:tier_with_tool)
-
-        get :new, params: { tool: 'motd' }
-
-        expect(assigns(:selected)).to eq({
-          category: tier_with_tool.issue.category.id,
-          issue: tier_with_tool.issue.id,
-        })
-      end
-    end
-
-    context 'when not given a tool' do
-      it 'does not assign a category or issue' do
-        create(:tier)
-        create(:level_1_tier)
-        create(:tier_with_tool)
-
-        get :new, params: { tool: nil }
-
-        expect(assigns(:selected)).to eq({})
       end
     end
   end
