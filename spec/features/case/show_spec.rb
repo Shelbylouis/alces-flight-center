@@ -143,6 +143,11 @@ RSpec.describe 'Case page', type: :feature do
       expect(log_html.strip).to eq('<p><em>Loggy</em> <strong>McLogface</strong></p>')
       expect(case_comment_html.strip).to eq('<p><strong>Commenty</strong> <em>McCommentface</em></p>')
     end
+
+    it 'shows a card for creation of CreditCharge' do
+      visit case_path(closed_case, as: admin)
+      expect(find('.event-card').find('.card-body')).to have_text 'A charge of 1 credit was added for this case.'
+    end
   end
 
   describe 'comments form' do

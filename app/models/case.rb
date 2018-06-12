@@ -37,7 +37,7 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: [:assignee_id, :time_worked, :credit_charge, :tier_level], on: [ :update ]
+  audited only: [:assignee_id, :time_worked, :tier_level], on: [ :update ]
 
   validates :display_id, uniqueness: true
 
@@ -134,7 +134,8 @@ class Case < ApplicationRecord
       maintenance_windows.map(&:transitions).flatten.select(&:event) +
       case_state_transitions +
       audits +
-      logs
+      logs +
+      [ credit_charge ].compact
     ).sort_by(&:created_at).reverse!
   end
 
