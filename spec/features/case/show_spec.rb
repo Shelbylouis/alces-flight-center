@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Case page' do
+RSpec.describe 'Case page', type: :feature do
   let! (:contact) { create(:contact, site: site) }
   let! (:admin) { create(:admin) }
   let (:site) { create(:site, name: 'My Site') }

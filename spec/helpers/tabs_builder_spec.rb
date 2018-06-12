@@ -10,18 +10,18 @@ RSpec.describe TabsBuilder do
     subject { tab_builder.cases[:dropdown].map { |h| h[:path] } }
 
     context 'when within the site scope' do
-      let(:scope) { create(:site) }
+      let(:scope) { build_stubbed(:site) }
 
       context 'with an admin user' do
-        let(:user) { create(:admin) }
+        let(:user) { build_stubbed(:admin) }
 
         it 'contains a link to the site cases' do
           expect(subject).to include(site_cases_path(scope))
         end
       end
 
-      context 'with an contact user' do
-        let(:user) { create(:contact) }
+      context 'with a contact user' do
+        let(:user) { build_stubbed(:contact) }
 
         it 'contains a link to the cases page' do
           expect(subject).to include(cases_path)
