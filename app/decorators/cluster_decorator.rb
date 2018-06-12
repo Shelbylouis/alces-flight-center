@@ -16,6 +16,7 @@ class ClusterDecorator < ApplicationDecorator
     [
       tabs_builder.overview,
       documents.empty? ? nil : { id: :documents, path: h.cluster_documents_path(self) },
+      { id: :credit_usage, path: h.cluster_credit_usage_path(self) },
       tabs_builder.logs,
       tabs_builder.cases,
       tabs_builder.maintenance,
@@ -48,6 +49,31 @@ class ClusterDecorator < ApplicationDecorator
       motd: motd,
       motdHtml: h.simple_format(motd),
     }
+  end
+
+  def credit_balance_class
+    if credit_balance.negative? || credit_balance.zero?
+      'text-danger'
+    elsif credit_balance < 10
+      'text-warning'
+    else
+      'text-success'
+    end
+  end
+
+  # List the first day of each quarter since this cluster was created, including
+  # the current quarter (as defined by `Date.today`).
+  def all_quarter_start_dates
+    first_quarter = model.created_at.beginning_of_quarter
+    last_quarter =  Date.today.beginning_of_quarter.to_datetime
+
+    [].tap do |qs|
+      curr_quarter = last_quarter
+      while curr_quarter >= first_quarter
+        qs << curr_quarter
+        curr_quarter -= 3.months
+      end
+    end
   end
 
   private

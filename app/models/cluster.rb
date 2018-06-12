@@ -24,6 +24,8 @@ class Cluster < ApplicationRecord
   has_many :maintenance_windows
   has_many :logs, dependent: :destroy
   has_many :notes, dependent: :destroy
+  has_many :credit_deposits
+  has_many :credit_charges, through: :cases
 
   validates_associated :site
   validates :name, presence: true
@@ -73,6 +75,16 @@ class Cluster < ApplicationRecord
       self.case_index = case_index + 1
       save!
       case_index
+    end
+  end
+
+  def credit_balance
+    deposits = credit_deposits.reduce(0) do |total, deposit|
+      total += deposit.amount
+    end
+
+    credit_charges.reduce(deposits) do |total, kase|
+      total -= kase.amount
     end
   end
 

@@ -19,6 +19,8 @@ class Case < ApplicationRecord
   has_many :case_state_transitions
   alias_attribute :transitions, :case_state_transitions
 
+  has_one :credit_charge, required: false
+
   delegate :category, to: :issue
   delegate :email_recipients, to: :site
   delegate :site, to: :cluster, allow_nil: true
@@ -35,7 +37,7 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: [:assignee_id, :time_worked, :credit_charge, :tier_level], on: [ :update ]
+  audited only: [:assignee_id, :time_worked, :tier_level], on: [ :update ]
 
   validates :display_id, uniqueness: true
 
@@ -69,12 +71,8 @@ class Case < ApplicationRecord
 
   validate :time_worked_not_changed_unless_allowed
 
-  validates :credit_charge, numericality: {
-      only_integer: true,
-      greater_than_or_equal_to: 0
-  }, if: :credit_charge  # Credit charge can be null (not set)
-
   validates :credit_charge, presence: true,  if: :closed?
+  validates_associated :credit_charge
 
   # Only validate this type of support is available on create, as this is the
   # only point at which we should prevent users accessing support they are not
@@ -136,7 +134,8 @@ class Case < ApplicationRecord
       maintenance_windows.map(&:transitions).flatten.select(&:event) +
       case_state_transitions +
       audits +
-      logs
+      logs +
+      [ credit_charge ].compact
     ).sort_by(&:created_at).reverse!
   end
 

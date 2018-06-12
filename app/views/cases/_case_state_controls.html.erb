@@ -18,11 +18,12 @@
         ) do %>
       <div class="form-group">
         <div class="input-group">
-          <%= number_field :case,
-                           :credit_charge,
+          <%= number_field :credit_charge,
+                           :amount,
                            class: 'form-control',
                            min: 0,
-                           value: 0
+                           value: 0,
+                           required: 'required'
           %>
           <div class="input-group-append">
             <%= submit_tag 'Set charge and close case',

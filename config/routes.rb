@@ -109,10 +109,11 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :clusters, only: []  do
+    resources :clusters, only: [] do
       request_maintenance_form.call
       admin_logs.call
       notes.call(true)
+      post :deposit
     end
 
     resources :components, only: []  do
@@ -168,6 +169,7 @@ Rails.application.routes.draw do
       confirm_maintenance_form.call
       get :documents
       notes.call(false)
+      get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
     end
 
     resources :components, only: :show do

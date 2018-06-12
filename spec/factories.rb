@@ -1,5 +1,6 @@
 
 FactoryBot.define do
+
   factory :case_state_transition do
     association :case
     event 'resolve'
@@ -95,5 +96,10 @@ FactoryBot.define do
   factory :change_motd_request_state_transition do
     change_motd_request
     to :applied
+  end
+
+  factory :credit_charge do
+    amount 1
+    association :user, factory: :admin
   end
 end

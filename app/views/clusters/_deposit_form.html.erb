@@ -1,0 +1,25 @@
+<% if current_user.admin? %>
+  <%= form_tag({controller: 'clusters', action: 'deposit'},
+               method: :post,
+               class: 'form',
+               id: 'credit-deposit-form'
+      ) do %>
+    <div class="form-group">
+      <div class="input-group">
+        <%= number_field :credit_deposit,
+                         :amount,
+                         class: 'form-control',
+                         min: 1
+        %>
+        <div class="input-group-append">
+          <%= submit_tag 'Add credits',
+                         class: 'form-control btn btn-primary',
+                         data: {
+                             confirm: 'Are you sure you want to add support credits to this cluster?'
+                         }
+          %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

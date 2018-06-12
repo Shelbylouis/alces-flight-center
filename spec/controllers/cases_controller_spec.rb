@@ -182,7 +182,7 @@ RSpec.describe CasesController, type: :controller do
     end
 
     it 'closes a resolved case' do
-      post :close, params: { id: resolved_case.id, case: { credit_charge: 0 } }
+      post :close, params: { id: resolved_case.id, credit_charge: { amount: 0 } }
       expect(flash[:success]).to eq "Support case #{resolved_case.display_id} closed."
     end
 
@@ -197,7 +197,7 @@ RSpec.describe CasesController, type: :controller do
     end
 
     it 'does not close an open case' do
-      post :close, params: { id: open_case.id, case: { credit_charge: 0 } }
+      post :close, params: { id: open_case.id, credit_charge: { amount: 0 } }
       expect(flash[:error]).to eq 'Error updating support case: state cannot transition via "close"'
     end
   end

@@ -1,0 +1,14 @@
+<li class="list-group-item credit-charge-entry <%= credit_value_class(amount) %>">
+  <span>
+    <i class="fa fa-circle mr-2" aria-hidden="true"></i>
+  </span>
+  <span title="<%= date.to_formatted_s(:long) %>">
+    <%= date.to_formatted_s(:day_only) %>
+  </span>
+  <span class="text">
+    <%= yield %>
+  </span>
+  <span>
+    <%= pluralize(amount, 'credit') %>
+  </span>
+</li>

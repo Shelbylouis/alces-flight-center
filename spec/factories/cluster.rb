@@ -20,4 +20,10 @@ FactoryBot.define do
       support_type :advice
     end
   end
+
+  factory :credit_deposit do
+    association :cluster
+    association :user, factory: :admin
+    amount 10
+  end
 end

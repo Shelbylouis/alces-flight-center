@@ -15,7 +15,12 @@ RSpec.describe 'Cases table', type: :feature do
   end
 
   let! :closed_case do
-    create(:closed_case, cluster: cluster, subject: 'Closed case', completed_at: 2.days.ago, credit_charge: 1138)
+    create(:closed_case,
+           cluster: cluster,
+           subject: 'Closed case',
+           completed_at: 2.days.ago,
+           credit_charge: build(:credit_charge, amount: 1138)
+    )
   end
 
   RSpec.shared_examples 'open cases table rendered' do

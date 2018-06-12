@@ -1,0 +1,77 @@
+<% content_for(:subtitle) { "Credit usage for #{quarter_display_name(@start_date)}" } %>
+<%= render 'partials/tabs', activate: :credit_usage do %>
+  <div class="card-body row">
+    <div class="col-sm-12">
+      <h3><%= cluster.name %> support credit usage</h3>
+    </div>
+    <div class="col-sm-12">
+      <div class="card-deck mb-2">
+        <%= render 'clusters/credit_balance', cluster: cluster do %>
+         <%= render 'clusters/deposit_form', cluster: cluster %>
+        <% end %>
+        <div class="card">
+          <div class="card-body">
+            <h4>Usage for <%= quarter_display_name(@start_date) %>:</h4>
+            <table class="table table-sm">
+              <tr class="text-success">
+                <th>Total accrued</th>
+                <td><%= pluralize(@accrued, 'credit') %></td>
+              </tr>
+              <tr class="text-warning">
+                <th>Total used</th>
+                <td><%= pluralize(@used, 'credit') %></td>
+              </tr>
+              <tr>
+                <th>Cases closed without charge</th>
+                <td><%= @free_of_charge %></td>
+              </tr>
+            </table>
+            <form
+              action="<%= cluster_credit_usage_path(cluster) %>"
+              class="form"
+              id="credit-quarter-selection"
+              method="get"
+            >
+              <script type="text/javascript">
+                function viewCreditPeriod(date) {
+                  window.location.href = "<%= cluster_credit_usage_path(cluster) %>/" + date;
+                }
+              </script>
+              <label for="start_date">
+                View a different period:
+              </label>
+              <div class="input-group">
+                <%= select_tag(
+                        :start_date,
+                        options_for_select(
+                            cluster.all_quarter_start_dates.map {|q|
+                              [quarter_display_name(q), q.strftime('%Y-%m-%d')]
+                            },
+                            @start_date
+                        ),
+                        class: 'form-control',
+                        onchange: 'viewCreditPeriod(this.value)'
+                    )
+                %>
+                <div class="input-group-append">
+                  <input type="submit" class="btn btn-primary" value="View"/>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12">
+      <% if @events.empty? %>
+        <p class="text-center no-events-message">No credit usage or accrual in this period.</p>
+      <% else %>
+        <ul class="list-group">
+          <% @events.each do |event| %>
+            <%= event.credit_usage_card %>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  </div>
+<% end %>
