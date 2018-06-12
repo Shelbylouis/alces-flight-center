@@ -2,14 +2,14 @@ module Main exposing (..)
 
 import Html exposing (Html)
 import Json.Decode as D
+import List
+import Maybe
 import Msg exposing (..)
+import Result
 import State exposing (State)
 import State.Update
 import State.View
 import View.Utils
-import Maybe
-import Result
-import List
 
 
 -- MODEL
@@ -41,23 +41,27 @@ decodeInitialModel value =
 init : D.Value -> ( Model, Cmd Msg )
 init flags =
     let
-        model = decodeInitialModel flags
+        model =
+            decodeInitialModel flags
 
-        mmsgs = [
-            maybeToolMessage ChangeSelectedIssue "selectedIssue" flags,
-            maybeToolMessage ChangeSelectedCategory "selectedCategory" flags
-        ]
+        mmsgs =
+            [ maybeToolMessage ChangeSelectedIssue "selectedIssue" flags
+            , maybeToolMessage ChangeSelectedCategory "selectedCategory" flags
+            ]
 
-        updateCollectingCmds mmsg (m1, cs1) =
+        updateCollectingCmds mmsg ( m1, cs1 ) =
             case mmsg of
                 Just msg ->
                     let
-                        (m2, cs2) = update msg m1
+                        ( m2, cs2 ) =
+                            update msg m1
                     in
-                        (m2 ! [cs1, cs2])
-                Nothing -> (m1 ! [cs1])
+                    m2 ! [ cs1, cs2 ]
+
+                Nothing ->
+                    m1 ! [ cs1 ]
     in
-        List.foldr updateCollectingCmds (model ! []) mmsgs
+    List.foldr updateCollectingCmds (model ! []) mmsgs
 
 
 maybeToolMessage : (String -> msg) -> String -> D.Value -> Maybe msg
@@ -66,15 +70,18 @@ maybeToolMessage msg fieldName flags =
         getFieldId : Maybe String
         getFieldId =
             case decodeField of
-                Result.Ok v -> v
-                Result.Err e -> Nothing
+                Result.Ok v ->
+                    v
+
+                Result.Err e ->
+                    Nothing
 
         decodeField : Result String (Maybe String)
         decodeField =
             D.decodeValue (D.maybe (D.field fieldName D.string)) flags
-
     in
-        Maybe.map msg getFieldId
+    Maybe.map msg getFieldId
+
 
 
 -- VIEW
