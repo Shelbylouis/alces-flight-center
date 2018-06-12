@@ -169,7 +169,7 @@ Rails.application.routes.draw do
       confirm_maintenance_form.call
       get :documents
       notes.call(false)
-      get '/credit_usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
+      get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
     end
 
     resources :components, only: :show do

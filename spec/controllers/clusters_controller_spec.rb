@@ -26,7 +26,7 @@ RSpec.describe ClustersController, type: :controller do
         post :deposit, params: params
 
         expect(response).to have_http_status(:found)
-        expect(response.headers['Location']).to match(/\/clusters\/#{cluster.id}\/credit_usage$/)
+        expect(response.headers['Location']).to match(/\/clusters\/#{cluster.id}\/credit-usage$/)
         expect(flash[:success]).to eq '4 credits added to cluster Some Cluster.'
 
         cluster.reload
