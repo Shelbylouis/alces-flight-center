@@ -472,37 +472,11 @@ RSpec.feature "Maintenance windows", type: :feature do
       )
     end
 
-    context 'for viewer' do
-      let :user do
-        create(:viewer, site: site)
-      end
-
-      it 'has disabled confirm maintenance button' do
-        visit cluster_maintenance_windows_path(cluster, as: user)
-
-        button = find('a', text: confirm_button_link_text)
-
-        expect(button).to be_disabled
-        expect(button[:class]).to include('disabled')
-        expect(button[:title]).to eq(
-          'As a viewer you cannot confirm maintenance'
-        )
-      end
-    end
-
-    context 'for non-viewer' do
-      let(:user) do
-        create(:contact, site: site)
-      end
-
-      it 'does not have disabled confirm maintenance button' do
-        visit cluster_maintenance_windows_path(cluster, as: user)
-
-        button = find('a', text: confirm_button_link_text)
-
-        expect(button).not_to be_disabled
-        expect(button[:class]).not_to include('disabled')
-        expect(button[:title]).to be nil
+    it_behaves_like 'button is disabled for viewers', button_tag: 'a' do
+      let(:path) { cluster_maintenance_windows_path(cluster, as: user) }
+      let(:button_text) { confirm_button_link_text }
+      let(:disabled_button_title) do
+        'As a viewer you cannot confirm maintenance'
       end
     end
   end
