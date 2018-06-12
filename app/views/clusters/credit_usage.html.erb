@@ -32,6 +32,11 @@
               id="credit-quarter-selection"
               method="get"
             >
+              <script type="text/javascript">
+                function viewCreditPeriod(date) {
+                  window.location.href = "<%= cluster_credit_usage_path(cluster) %>/" + date;
+                }
+              </script>
               <label for="start_date">
                 View a different period:
               </label>
@@ -45,7 +50,7 @@
                             @start_date
                         ),
                         class: 'form-control',
-                        onchange: 'this.form.submit()'
+                        onchange: 'viewCreditPeriod(this.value)'
                     )
                 %>
                 <div class="input-group-append">
