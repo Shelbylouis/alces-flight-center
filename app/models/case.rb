@@ -72,6 +72,7 @@ class Case < ApplicationRecord
   validate :time_worked_not_changed_unless_allowed
 
   validates :credit_charge, presence: true,  if: :closed?
+  validates_associated :credit_charge
 
   # Only validate this type of support is available on create, as this is the
   # only point at which we should prevent users accessing support they are not

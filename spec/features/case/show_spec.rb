@@ -216,6 +216,16 @@ RSpec.describe 'Case page', type: :feature do
       visit case_path(closed_case, as: admin)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
     end
+
+    it 'requires a charge to be specified to close a case' do
+      visit case_path(resolved_case, as: admin)
+      fill_in 'credit_charge_amount', with: ''
+      click_button 'Set charge and close case'
+
+      resolved_case.reload
+      expect(resolved_case.state).to eq 'resolved'
+      expect(find('.alert')).to have_text 'Error updating support case: credit_charge is invalid'
+    end
   end
 
   describe 'case assignment' do
