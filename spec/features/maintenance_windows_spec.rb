@@ -91,6 +91,7 @@ RSpec.feature "Maintenance windows", type: :feature do
 
   let(:valid_requested_start) { Time.zone.local(2022, 9, 10, 13, 0) }
 
+  let(:confirm_button_link_text) { 'Unconfirmed' }
   let(:reject_button_text) { 'Reject' }
   let(:end_button_text) { 'End' }
   let(:cancel_button_text) { 'Cancel' }
@@ -344,8 +345,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       )
 
       visit cluster_maintenance_windows_path(component.cluster, as: user)
-      button_link_text = 'Unconfirmed'
-      click_link(button_link_text)
+      click_link(confirm_button_link_text)
 
       expected_path = confirm_component_maintenance_window_path(
         window, component_id: component
@@ -459,6 +459,50 @@ RSpec.feature "Maintenance windows", type: :feature do
         expect do
           find('p.alert-warning')
         end.to raise_error(Capybara::ElementNotFound)
+      end
+    end
+  end
+
+  context 'when maintenance is requested' do
+    let! :window do
+      create(
+        :requested_maintenance_window,
+        cluster: cluster,
+        case: support_case
+      )
+    end
+
+    context 'for viewer' do
+      let :user do
+        create(:viewer, site: site)
+      end
+
+      it 'has disabled confirm maintenance button' do
+        visit cluster_maintenance_windows_path(cluster, as: user)
+
+        button = find('a', text: confirm_button_link_text)
+
+        expect(button).to be_disabled
+        expect(button[:class]).to include('disabled')
+        expect(button[:title]).to eq(
+          'As a viewer you cannot confirm maintenance'
+        )
+      end
+    end
+
+    context 'for non-viewer' do
+      let(:user) do
+        create(:contact, site: site)
+      end
+
+      it 'does not have disabled confirm maintenance button' do
+        visit cluster_maintenance_windows_path(cluster, as: user)
+
+        button = find('a', text: confirm_button_link_text)
+
+        expect(button).not_to be_disabled
+        expect(button[:class]).not_to include('disabled')
+        expect(button[:title]).to be nil
       end
     end
   end
