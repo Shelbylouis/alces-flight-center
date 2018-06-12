@@ -22,14 +22,16 @@ class SiteDecorator < ApplicationDecorator
 
   private
 
-  # Handles the dynamic naming of paths when a contact is logged in
+  # When a Site user is signed in we don't want/need the `/sites/:site_id`
+  # prefix to Site URLs, otherwise we do.
   def scope_name_for_paths
-    h.current_user.contact? ? '' : super
+    h.current_user.site_user? ? '' : super
   end
 
-  # The site model is not required when a contact is logged in
+  # Similarly to above, we don't want/need to pass the Site as the first
+  # argument to the scope path helper (as `super` does) for Site users.
   def arguments_for_scope_path(*a)
-    h.current_user.contact? ? a : super
+    h.current_user.site_user? ? a : super
   end
 
   def all_cases_tab
