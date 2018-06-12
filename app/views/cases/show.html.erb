@@ -60,6 +60,7 @@
       <tr>
         <th>Case history</th>
         <td colspan="3">
+          <%= render 'case_comment_toggle_controls' %>
           <%= render 'case_comments/form' %>
           <% @case.events.each do |event| %>
             <%= event.decorate.event_card %>

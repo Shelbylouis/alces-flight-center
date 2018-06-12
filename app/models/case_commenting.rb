@@ -14,7 +14,7 @@ class CaseCommenting
       viewer_cannot_comment_message
     elsif !kase.open?
       not_open_message
-    elsif user.contact? && !kase.consultancy?
+    elsif user.contact? && kase.comments_could_be_enabled? && !kase.comments_enabled
       non_consultancy_message
     else
       ''

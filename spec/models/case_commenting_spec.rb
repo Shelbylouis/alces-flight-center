@@ -97,6 +97,14 @@ RSpec.describe CaseCommenting do
             'Additional discussion is not available'
           )
         end
+
+        context 'when commenting explicitly enabled' do
+          before :each do
+            allow(kase).to receive(:comments_enabled).and_return(true)
+          end
+
+          include_examples 'commenting enabled'
+        end
       end
     end
   end

@@ -189,6 +189,12 @@ class Case < ApplicationRecord
     tier_level >= 3
   end
 
+  def comments_could_be_enabled?
+    # If this condition is met then comments by contacts are enabled iff
+    # comments_enabled is true.
+    open? && !consultancy?
+  end
+
   def potential_assignees
     site.users.where.not(role: :viewer)
       .or(User.where(role: :admin))
