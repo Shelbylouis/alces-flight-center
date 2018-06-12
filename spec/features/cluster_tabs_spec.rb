@@ -7,6 +7,7 @@ RSpec.describe 'cluster tabs', type: :feature do
   let(:tabs) { page.find('ul.nav-tabs') }
   let(:maintenance_tab) { tabs.find('li', text: /Maintenance/) }
   let(:documents_tab) { tabs.find('li', text: /Documents/) }
+  let(:notes_tab) { tabs.find('li', text: /Notes/) }
   let(:user) { create(:contact, site: cluster.site) }
 
   context 'when visiting the cluster page' do
@@ -40,6 +41,22 @@ RSpec.describe 'cluster tabs', type: :feature do
           documents_tab
         end.to raise_error(Capybara::ElementNotFound)
       end
+
+      it 'has a dropdown menu for notes tab' do
+        expect(notes_tab).to match_css('.dropdown')
+        expect(notes_tab.first('div')).to match_css('.dropdown-menu')
+      end
+
+      it 'has a link to the engineering notes' do
+        path = cluster_note_path(cluster, flavour: 'engineering')
+        expect(notes_tab).to have_link(href: path)
+      end
+
+      it 'has a link to the customer notes' do
+        path = cluster_note_path(cluster, flavour: 'customer')
+        expect(notes_tab).to have_link(href: path)
+      end
+
     end
 
     context 'with a contact user' do
@@ -62,6 +79,15 @@ RSpec.describe 'cluster tabs', type: :feature do
         expect do
           documents_tab
         end.to raise_error(Capybara::ElementNotFound)
+      end
+
+      it 'does not have dropdown menu for notes tab' do
+        expect(notes_tab).not_to match_css('.dropdown')
+      end
+
+      it 'has a link to the customer notes' do
+        path = cluster_note_path(cluster, flavour: 'customer')
+        expect(notes_tab).to have_link(href: path)
       end
     end
 

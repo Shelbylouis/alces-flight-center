@@ -1,5 +1,20 @@
 require 'resque/server'
 
+class NoteFlavourConstraint
+  def initialize(admin:)
+    @admin = admin
+  end
+
+  def matches?(request)
+    flavour = request.env['action_dispatch.request.path_parameters'][:flavour]
+    if @admin
+      Note::FLAVOURS.include?(flavour)
+    else
+      flavour == 'customer'
+    end
+  end
+end
+
 Rails.application.routes.draw do
   asset_record_alias = 'asset-record'
   component_expansions_alias = 'expansions'
@@ -22,6 +37,16 @@ Rails.application.routes.draw do
   end
   admin_logs = Proc.new do
     resources :logs, only: :create
+  end
+  notes = Proc.new do |admin|
+    constraints NoteFlavourConstraint.new(admin: admin) do
+      prefix = admin ? '' : 'prevent_named_route_clash_'
+      resources :notes, param: :flavour, except: [:new, :create, :index] do
+        collection do
+          post ':flavour' => 'notes#create', as: prefix
+        end
+      end
+    end
   end
 
   request_maintenance_form = Proc.new do
@@ -86,6 +111,7 @@ Rails.application.routes.draw do
     resources :clusters, only: []  do
       request_maintenance_form.call
       admin_logs.call
+      notes.call(true)
     end
 
     resources :components, only: []  do
@@ -140,6 +166,7 @@ Rails.application.routes.draw do
       logs.call
       confirm_maintenance_form.call
       get :documents
+      notes.call(false)
     end
 
     resources :components, only: :show do

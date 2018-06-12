@@ -67,12 +67,17 @@ namespace :alces do
         new_account_username = email_local_part.gsub(/[^0-9a-z]/i, '')
 
         <<~RUBY.strip_heredoc
-          Account.create!(
-            username: '#{new_account_username}',
-            email: '#{user.email}',
-            password: 'password',
-            terms: true
-          ).confirm unless Account.find_by_username('#{new_account_username}')
+          if Account.find_by_username('#{new_account_username}') || Account.find_by_email('#{user.email}')
+            puts "Skipping account #{new_account_username}"
+          else
+            puts "Creating account username: #{new_account_username}, email: #{user.email}"
+            Account.create!(
+              username: '#{new_account_username}',
+              email: '#{user.email}',
+              password: 'password',
+              terms: true
+            ).confirm
+          end
         RUBY
       end.join("\n")
     end

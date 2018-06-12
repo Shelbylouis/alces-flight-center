@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_25_175459) do
+ActiveRecord::Schema.define(version: 2018_06_05_135005) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -286,6 +286,16 @@ ActiveRecord::Schema.define(version: 2018_05_25_175459) do
     t.index ["service_id"], name: "index_maintenance_windows_on_service_id"
   end
 
+  create_table "notes", force: :cascade do |t|
+    t.text "description", null: false
+    t.string "flavour", limit: 64, null: false
+    t.bigint "cluster_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cluster_id"], name: "index_notes_on_cluster_id"
+    t.index ["flavour", "cluster_id"], name: "index_notes_on_flavour_and_cluster_id", unique: true
+  end
+
   create_table "service_types", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
@@ -374,6 +384,7 @@ ActiveRecord::Schema.define(version: 2018_05_25_175459) do
   add_foreign_key "maintenance_windows", "clusters"
   add_foreign_key "maintenance_windows", "components"
   add_foreign_key "maintenance_windows", "services"
+  add_foreign_key "notes", "clusters"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
   add_foreign_key "users", "sites"

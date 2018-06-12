@@ -23,6 +23,7 @@ class Cluster < ApplicationRecord
   has_many :cases
   has_many :maintenance_windows
   has_many :logs, dependent: :destroy
+  has_many :notes, dependent: :destroy
 
   validates_associated :site
   validates :name, presence: true
