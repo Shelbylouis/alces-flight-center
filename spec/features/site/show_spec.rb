@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Site page', type: :feature do
-  it_behaves_like 'button is disabled for viewers', button_tag: 'a' do
+  it_behaves_like 'button is disabled for viewers', button_link: true do
     let(:site) { create(:site) }
     let!(:cluster) { create(:cluster, site: site) }
 

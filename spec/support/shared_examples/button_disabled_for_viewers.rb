@@ -1,11 +1,19 @@
 
 RSpec.shared_examples 'button is disabled for viewers' do |args|
   args ||= {}
-  button_tag = args.fetch(:button_tag, 'button')
+  button_link = args.fetch(:button_link, false)
 
   let :button do
     visit path
-    find(button_tag, text: button_text)
+
+    if button_link
+      # Just find the link, `disabled` attribute does not do anything by
+      # default to `a` tags and is not a supported argument to `find_link`.
+      find_link(button_text)
+    else
+      # Find the button, whether or not it is `disabled`.
+      find_button(button_text, disabled: :all)
+    end
   end
 
   context 'for viewer' do

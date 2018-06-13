@@ -472,7 +472,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       )
     end
 
-    it_behaves_like 'button is disabled for viewers', button_tag: 'a' do
+    it_behaves_like 'button is disabled for viewers', button_link: true do
       let(:path) { cluster_maintenance_windows_path(cluster, as: user) }
       let(:button_text) { confirm_button_link_text }
       let(:disabled_button_title) do
