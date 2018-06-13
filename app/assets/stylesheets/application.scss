@@ -98,13 +98,3 @@ table {
 [onclick] {
   cursor: pointer;
 }
-
-.dim { opacity: 1; transition: opacity .15s ease-in; }
-.dim:hover, .dim:focus {
-  opacity: .6;
-  transition: opacity .15s ease-in;
-  background-color: #f7f7f7;
-  outline: 2px ridge #dee2e6;
-}
-.dim:active { opacity: .8; transition: opacity .15s ease-out; }
-
