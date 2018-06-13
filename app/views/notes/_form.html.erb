@@ -2,36 +2,34 @@
 
 <% can_create_note = policy(note).create? %>
 
-<%= render 'partials/tabs', activate: :notes do %>
-  <div class="card-body">
-    <p>
-      <%= intro_text %>
-    </p>
-    <%= form_for note.form_path do |f| %>
-      <% if can_create_note %>
-        <div class="form-group">
-          <%= f.text_area :description, class: 'form-control', rows: 10 %>
-        </div>
-        <p class="form-text text-muted">
-          Styling with markdown is supported
-        </p>
-      <% end %>
-      <div class="form-group" style="overflow: hidden;">
-        <%#
-            This page is only rendered in the `new` case when the
-            `current_user` can't perform the action of the form, since users
-            who cannot edit cannot access the edit page. If this ever changes
-            then we may want to adjust the create-specific stuff below.
-        %>
-        <%= f.submit button_text,
-          PolicyDependentOptions.wrap(
-            {class: dark_button_classes},
-            policy: can_create_note,
-            action_description: 'create cluster notes',
-            user: current_user
-        )
-        %>
+<div class="card-body">
+  <p>
+    <%= intro_text %>
+  </p>
+  <%= form_for note.form_path do |f| %>
+    <% if can_create_note %>
+      <div class="form-group">
+        <%= f.text_area :description, class: 'form-control', rows: 10 %>
       </div>
+      <p class="form-text text-muted">
+        Styling with markdown is supported
+      </p>
     <% end %>
-  </div>
-<% end %>
+    <div class="form-group" style="overflow: hidden;">
+      <%#
+          This page is only rendered in the `new` case when the
+          `current_user` can't perform the action of the form, since users
+          who cannot edit cannot access the edit page. If this ever changes
+          then we may want to adjust the create-specific stuff below.
+      %>
+      <%= f.submit button_text,
+        PolicyDependentOptions.wrap(
+          {class: dark_button_classes},
+          policy: can_create_note,
+          action_description: 'create cluster notes',
+          user: current_user
+      )
+      %>
+    </div>
+  <% end %>
+</div>

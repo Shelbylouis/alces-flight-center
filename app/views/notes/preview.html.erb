@@ -1,0 +1,20 @@
+<%
+    content_for(:subtitle) { note.subtitle }
+    intro_text = note.persisted? ? note.edit_form_intro : note.new_form_intro
+    button_text = note.persisted? ? 'Update notes' : 'Create notes'
+%>
+
+<%= render 'partials/tabs', activate: :notes do %>
+    <%= render 'partials/markdown_editor_layout',
+        activate: 'preview',
+        button_text: button_text,
+        intro_text: intro_text,
+        form_path: note.form_path do |f| %>
+
+        <%= f.hidden_field :description %>
+        <div class="border-bottom p-2">
+            <%= note.rendered_description.html_safe %>
+        </div>
+
+    <% end %>
+<% end %>

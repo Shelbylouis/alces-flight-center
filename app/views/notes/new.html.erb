@@ -1,1 +1,11 @@
-<%= render 'form', intro_text: note.new_form_intro, button_text: 'Create notes' %>
+<%= render 'partials/tabs', activate: :notes do %>
+    <%= render 'partials/markdown_editor_layout',
+        activate: 'write',
+        button_text: 'Create notes',
+        intro_text: note.new_form_intro,
+        form_path: note.form_path do |f| %>
+
+        <%= render 'form', form_builder: f %>
+
+    <% end %>
+<% end %>

@@ -1,0 +1,32 @@
+<div class="card-body">
+    <p>
+    <%= intro_text %>
+    </p>
+    <%= form_for form_path do |f| %>
+        <ul class="nav nav-tabs">
+            <li class='nav-item <%= 'nav-link--active' if activate == 'write' %>'>
+                <%= f.button 'Write',
+                    class: 'btn btn-link',
+                    name: 'commit',
+                    value: MarkdownPreview::WRITE_COMMIT_VALUE
+                %>
+            </li>
+            <li class='nav-item <%= 'nav-link--active' if activate == 'preview' %>'>
+                <%= f.button 'Preview',
+                    class: 'btn btn-link',
+                    name: 'commit',
+                    value: MarkdownPreview::PREVIEW_COMMIT_VALUE
+                %>
+            </li>
+        </ul>
+
+        <%= yield f if block_given? %>
+
+        <p class="form-text text-muted">
+        Styling with markdown is supported
+        </p>
+        <div class="form-group" style="overflow: hidden;">
+            <%= f.submit button_text, class: dark_button_classes %>
+        </div>
+    <% end %>
+</div>
