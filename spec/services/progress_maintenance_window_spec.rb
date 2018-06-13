@@ -119,5 +119,44 @@ RSpec.describe ProgressMaintenanceWindow do
       other_states = MaintenanceWindow.possible_states - [:started, :confirmed, :new, :requested]
       include_examples 'does not progress', other_states
     end
+
+    describe 'maintenance is nearing completion' do
+      let(:requested_start) { 23.hours.ago }
+
+      context 'when maintenance has started' do
+        it 'sends notifications that maintenance is ending soon' do
+          window = build_window(state: :started)
+
+          expect(CaseMailer).to receive(:maintenance_ending_soon)
+
+          described_class.new(window).progress
+        end
+      end
+
+      context 'when maintenance_ending_soon_email_sent is true' do
+        it 'does not send notifications' do
+          window = build_window(state: :started)
+
+          window.update!(maintenance_ending_soon_email_sent: true)
+
+          expect(CaseMailer).not_to receive(:maintenance_ending_soon)
+
+          described_class.new(window).progress
+        end
+      end
+
+      other_states = MaintenanceWindow.possible_states - [:started]
+      other_states.each do |state|
+        context "when state is '#{state}'" do
+          it 'does not send notifications' do
+            window = build_window(state: state)
+
+            expect(CaseMailer).not_to receive(:maintenance_ending_soon)
+
+            described_class.new(window).progress
+          end
+        end
+      end
+    end
   end
 end
