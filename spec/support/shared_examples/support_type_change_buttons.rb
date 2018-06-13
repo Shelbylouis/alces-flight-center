@@ -26,7 +26,7 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
 
     it 'can request self-management' do
       visit cluster_parts_path
-      click_button 'Request self-management'
+      click_button request_self_management_text
 
       created_case = part.cases.first
       expect(created_case.send(part_name)).to eq(part)
