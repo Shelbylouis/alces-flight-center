@@ -230,6 +230,15 @@ RSpec.describe MaintenanceWindow, type: :model do
 
         subject.extend_duration!(create(:admin))
       end
+
+      it 'resets the maintence nearing completion email sent flag' do
+        admin = create(:admin)
+
+        subject.update!(maintenance_ending_soon_email_sent: true)
+        subject.extend_duration!(admin)
+
+        expect(subject.maintenance_ending_soon_email_sent).to eq(false)
+      end
     end
 
     RSpec.shared_examples 'it can be auto-ended' do
