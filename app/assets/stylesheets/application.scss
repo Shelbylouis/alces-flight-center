@@ -62,6 +62,14 @@ a.btn.disabled {
   }
 }
 
+button.btn.disabled {
+  // Do not change text color of disabled buttons on hover, since this implies
+  // they could be interacted with.
+  &:hover {
+    color: inherit;
+  }
+}
+
 .elm-overlay {
   // So Elm debugger always appears on top in development.
   z-index: 10000;
