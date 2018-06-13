@@ -1,19 +1,20 @@
-<tr class='dim', onclick="window.location.href='<%= scope.dashboard_case_path(kase) %>'">
-  <td><%= link_to kase.display_id, scope.dashboard_case_path(kase) %></td>
-  <%= timestamp_td(
-    description:  'Support case created',
-    timestamp: kase.created_at
-  ) %>
-  <td><%= kase.user_facing_state %></td>
-  <td style="white-space: nowrap;"><%= kase.user.name %></td>
-  <td><%= kase.subject %></td>
-  <td>
-    <% if current_user == kase.assignee %>
-      <%= raw('<strong>Me</strong>') %>
-    <% else %>
-      <%= kase.assignee&.name || 'Nobody' %>
-    <% end %>
-  </td>
+<tr class='case-highlight'
+  onclick="window.location.href='<%= scope.dashboard_case_path(kase) %>'">
+    <td><%= link_to kase.display_id, scope.dashboard_case_path(kase) %></td>
+    <%= timestamp_td(
+      description:  'Support case created',
+      timestamp: kase.created_at
+    ) %>
+    <td><%= kase.user_facing_state %></td>
+    <td style="white-space: nowrap;"><%= kase.user.name %></td>
+    <td><%= kase.subject %></td>
+    <td>
+      <% if current_user == kase.assignee %>
+        <%= raw('<strong>Me</strong>') %>
+      <% else %>
+        <%= kase.assignee&.name || 'Nobody' %>
+      <% end %>
+    </td>
   <td onclick='event.stopPropagation();'><%= kase.association_info %></td>
   <% if kase.resolved? || kase.closed? %>
     <td><%= kase.credit_charge&.amount %></td>
