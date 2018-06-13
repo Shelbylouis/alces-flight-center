@@ -1,4 +1,4 @@
-<tr>
+<tr class='dim', onclick="window.location.href='<%= scope.dashboard_case_path(kase) %>'">
   <td><%= link_to kase.display_id, scope.dashboard_case_path(kase) %></td>
   <%= timestamp_td(
     description:  'Support case created',
