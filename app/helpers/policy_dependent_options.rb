@@ -20,6 +20,10 @@ class PolicyDependentOptions
   end
 
   def disabled_options
+    # `disabled` attribute is all that is needed to appropriately disable real
+    # buttons; `disabled` class is needed to style button links like disabled
+    # buttons, and this `onclick` attribute is also needed to prevent normal
+    # click handling on button links.
     options.merge(
       disabled: true,
       onclick: 'return false;',
