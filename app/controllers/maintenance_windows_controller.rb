@@ -58,6 +58,7 @@ class MaintenanceWindowsController < ApplicationController
       :extend_duration,
       new_state_message: 'duration extended'
     ) do |window|
+      window.toggle!(:maintenance_ending_soon_email_sent)
       window.duration += params[:additional_days].to_i
     end
   end
