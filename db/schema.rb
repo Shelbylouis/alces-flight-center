@@ -300,6 +300,7 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.text "state", default: "new", null: false
     t.datetime "requested_start", null: false
     t.integer "duration", null: false
+    t.boolean "maintenance_ending_soon_email_sent", default: false
     t.index ["case_id"], name: "index_maintenance_windows_on_case_id"
     t.index ["cluster_id"], name: "index_maintenance_windows_on_cluster_id"
     t.index ["component_id"], name: "index_maintenance_windows_on_component_id"
