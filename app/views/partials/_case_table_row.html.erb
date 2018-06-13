@@ -1,6 +1,6 @@
 <tr class='case-highlight'
   onclick="window.location.href='<%= scope.dashboard_case_path(kase) %>'">
-    <td><%= link_to kase.display_id, scope.dashboard_case_path(kase) %></td>
+    <td><%= kase.display_id %></td>
     <%= timestamp_td(
       description:  'Support case created',
       timestamp: kase.created_at
