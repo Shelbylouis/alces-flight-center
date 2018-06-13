@@ -79,11 +79,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
           less than an hour to make any final changes
         EOF
       )
-      toggle_near_completion_email_state
+      window.toggle!(:maintenance_ending_soon_email_sent)
     end
-  end
-
-  def toggle_near_completion_email_state
-    window.toggle!(:maintenance_ending_soon_email_sent)
   end
 end
