@@ -22,13 +22,20 @@
 <% else %>
   <%= button_to 'Reject request for maintenance',
     reject_maintenance_window_path(window),
-    class: ['btn', 'btn-danger', 'btn-block'],
-    data: {
-      confirm: <<~EOF.squish
-        Are you sure you want to reject this requested maintenance? Alces
-        Software engineers will not be able to perform this maintenance until
-        you have confirmed it.
-      EOF
-    }
+    PolicyDependentOptions.wrap(
+      {
+        class: ['btn', 'btn-danger', 'btn-block'],
+        data: {
+          confirm: <<~EOF.squish
+            Are you sure you want to reject this requested maintenance? Alces
+            Software engineers will not be able to perform this maintenance
+            until you have confirmed it.
+          EOF
+        }
+      },
+      policy: policy(window).reject?,
+      action_description: 'reject maintenance',
+      user: current_user
+    )
   %>
 <% end %>

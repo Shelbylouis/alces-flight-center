@@ -472,11 +472,19 @@ RSpec.feature "Maintenance windows", type: :feature do
       )
     end
 
+    let(:path) { cluster_maintenance_windows_path(cluster, as: user) }
+
     it_behaves_like 'button is disabled for viewers', button_link: true do
-      let(:path) { cluster_maintenance_windows_path(cluster, as: user) }
       let(:button_text) { confirm_button_link_text }
       let(:disabled_button_title) do
         'As a viewer you cannot confirm maintenance'
+      end
+    end
+
+    it_behaves_like 'button is disabled for viewers' do
+      let(:button_text) { reject_button_text }
+      let(:disabled_button_title) do
+        'As a viewer you cannot reject maintenance'
       end
     end
   end
