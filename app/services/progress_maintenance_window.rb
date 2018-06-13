@@ -79,7 +79,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
           less than an hour to make any final changes
         EOF
       )
-      window.toggle!(:maintenance_ending_soon_email_sent)
+      window.update!(maintenance_ending_soon_email_sent: true)
     end
   end
 end
