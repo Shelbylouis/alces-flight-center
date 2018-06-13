@@ -1,10 +1,11 @@
 
 ProgressMaintenanceWindow = Struct.new(:window) do
   def progress
-    check_remaining_time
     if required_transition_event
+      check_remaining_time
       transition_state(required_transition_event)
     else
+      check_remaining_time
       unprogressed_message
     end
   end
@@ -68,14 +69,21 @@ ProgressMaintenanceWindow = Struct.new(:window) do
   end
 
   def check_remaining_time
-    return unless 1.hour.from_now >= window.expected_end
-    CaseMailer.maintenance_ending_soon(
-      window.case,
-      <<-EOF.squish
-        Maintenance for #{window.associated_model.name} is scheduled to
-        end at #{window.expected_end.to_formatted_s(:short)}. You have
-        less than an hour to make any final changes
-      EOF
-    )
+    unless window.maintenance_ending_soon_email_sent
+      return unless 1.hour.from_now >= window.expected_end && started?
+      CaseMailer.maintenance_ending_soon(
+        window.case,
+        <<-EOF.squish
+          Maintenance for #{window.associated_model.name} is scheduled to
+          end at #{window.expected_end.to_formatted_s(:short)}. You have
+          less than an hour to make any final changes
+        EOF
+      )
+      toggle_near_completion_email_state
+    end
+  end
+
+  def toggle_near_completion_email_state
+    window.toggle!(:maintenance_ending_soon_email_sent)
   end
 end
