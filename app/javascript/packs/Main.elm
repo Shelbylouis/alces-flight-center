@@ -45,11 +45,11 @@ init flags =
             decodeInitialModel flags
 
         mmsgs =
-            [ maybeToolMessage ChangeSelectedTier "selectedTier" flags
-            , maybeToolMessage ChangeSelectedIssue "selectedIssue" flags
-            , maybeToolMessage ChangeSelectedCategory "selectedCategory" flags
-            , maybeToolMessage ChangeSelectedService "selectedService" flags
-            , maybeToolMessage SelectTool "selectedTool" flags
+            [ maybeMsgFromFlag ChangeSelectedTier "selectedTier" flags
+            , maybeMsgFromFlag ChangeSelectedIssue "selectedIssue" flags
+            , maybeMsgFromFlag ChangeSelectedCategory "selectedCategory" flags
+            , maybeMsgFromFlag ChangeSelectedService "selectedService" flags
+            , maybeMsgFromFlag SelectTool "selectedTool" flags
             ]
 
         updateCollectingCmds mmsg ( m1, cs1 ) =
@@ -67,8 +67,8 @@ init flags =
     List.foldr updateCollectingCmds (model ! []) mmsgs
 
 
-maybeToolMessage : (String -> msg) -> String -> D.Value -> Maybe msg
-maybeToolMessage msg fieldName flags =
+maybeMsgFromFlag : (String -> msg) -> String -> D.Value -> Maybe msg
+maybeMsgFromFlag msg fieldName flags =
     let
         getFieldId : Maybe String
         getFieldId =
