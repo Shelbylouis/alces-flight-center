@@ -14,7 +14,7 @@
       <%= kase.assignee&.name || 'Nobody' %>
     <% end %>
   </td>
-  <td><%= kase.association_info %></td>
+  <td onclick='event.stopPropagation();'><%= kase.association_info %></td>
   <% if kase.resolved? || kase.closed? %>
     <td><%= kase.credit_charge&.amount %></td>
   <% end %>
