@@ -45,25 +45,14 @@
                           ]
               %>
 
-              <%
-                  user_can_create_case = policy(Case).create?
-                  disabled_class = user_can_create_case ? '' : 'disabled'
-                  disabled = !user_can_create_case
-                  title = if user_can_create_case
-                            nil
-                          else
-                            "As a #{current_user.role} you cannot create a case"
-                          end
-              %>
               <%= link_to "Create case",
                           new_cluster_case_path(cluster),
-                          class: [
-                            'btn',
-                            'btn-danger',
-                            disabled_class,
-                          ],
-                          disabled: disabled,
-                          title: title
+                          PolicyDependentOptions.wrap(
+                            {class: ['btn', 'btn-danger']},
+                            policy: policy(Case).create?,
+                            action_description: 'create a case',
+                            user: current_user
+                          )
               %>
             </span>
           </div>

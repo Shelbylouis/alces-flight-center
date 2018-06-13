@@ -1,21 +1,13 @@
 
-<%
-  user_can_confirm_maintenance = policy(window).confirm?
-  confirm_disabled_class = user_can_confirm_maintenance ? '' : 'disabled'
-  confirm_disabled = !user_can_confirm_maintenance
-  confirm_title = if user_can_confirm_maintenance
-                    nil
-                  else
-                    "As a #{current_user.role} you cannot confirm maintenance"
-                  end
-%>
-
 <%= link_to(
   raw('Unconfirmed &mdash; click to confirm'),
   window.confirm_path,
-  class: ['btn', 'btn-success', 'btn-block', confirm_disabled_class],
-  disabled: confirm_disabled,
-  title: confirm_title
+  PolicyDependentOptions.wrap(
+    {class: ['btn', 'btn-success', 'btn-block']},
+    policy: policy(window).confirm?,
+    action_description: 'confirm maintenance',
+    user: current_user
+  )
 )
 %>
 
