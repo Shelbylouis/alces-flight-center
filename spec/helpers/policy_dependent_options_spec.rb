@@ -22,6 +22,10 @@ RSpec.describe PolicyDependentOptions do
         expect(subject[:disabled]).to be true
       end
 
+      it 'adds `onclick` attribute to options' do
+        expect(subject[:onclick]).to eq('return false;')
+      end
+
       it 'creates and adds `title` attribute to options' do
         role = 'squirrel'
         allow(user).to receive(:role).and_return(role)

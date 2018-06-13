@@ -22,6 +22,7 @@ class PolicyDependentOptions
   def disabled_options
     options.merge(
       disabled: true,
+      onclick: 'return false;',
       title: "As a #{user.role} you cannot #{action_description}",
       class: disabled_classes
     )
