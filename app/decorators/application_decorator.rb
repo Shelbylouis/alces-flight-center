@@ -11,7 +11,7 @@ class ApplicationDecorator < Draper::Decorator
   #   end
 
   def start_maintenance_request_link
-    return unless Pundit.policy!(h.current_user, MaintenanceWindow).create?
+    return unless policy(MaintenanceWindow).create?
 
     title = "Start request for maintenance of this #{readable_model_name}"
     h.link_to(
@@ -60,6 +60,12 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   private
+
+  # Method with same signature as `policy` method provided by Pundit in views,
+  # so can use `policy(Foo).bar?` in decorators in the same way as in views.
+  def policy(record_or_class)
+    Pundit.policy!(h.current_user, record_or_class)
+  end
 
   def convert_scope_path(s)
     name_for_path = scope_name_for_paths.dup.tap do |name|
