@@ -29,10 +29,14 @@ class Case < ApplicationRecord
     audit_trail context: [:requesting_user], initial: false
 
     state :open  # Open case, still work to do
+    state :pending_acceptance
     state :resolved  # Has been resolved but not yet accounted for commercially
     state :closed  # Has been accounted for commercially, nothing more to do
 
-    event(:resolve) { transition open: :resolved }  # Resolved cases cannot be reopened
+    event(:resolve) { transition open: :pending_acceptance }
+    event(:accept) { transition pending_acceptance: :resolved }
+    event(:auto_accept) { transition pending_acceptance: :resolved }
+    event(:reject) { transition pending_acceptance: :open }
     event(:close) { transition resolved: :closed }
 
   end
