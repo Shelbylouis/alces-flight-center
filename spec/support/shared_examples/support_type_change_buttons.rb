@@ -12,11 +12,11 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
   let(:request_alces_management_text) { 'Request Alces management' }
 
   let(:site) { create(:site) }
-  let(:contact) { create(:contact, site: site) }
+  let(:user) { create(:contact, site: site) }
   let(:cluster) { create(:cluster, site: site) }
 
-  let :cluster_parts_path do
-    send("cluster_#{part_name.to_s.pluralize}_path", cluster, as: contact)
+  let :path do
+    send("cluster_#{part_name.to_s.pluralize}_path", cluster, as: user)
   end
 
   context "when #{part_class_name} is managed" do
@@ -24,9 +24,17 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
       create("managed_#{part_name}", cluster: cluster)
     end
 
+    let(:button_text) { request_self_management_text }
+
+    it_behaves_like 'button is disabled for viewers' do
+      let :disabled_button_title do
+        "As a viewer you cannot request self-management of a #{part_name}"
+      end
+    end
+
     it 'can request self-management' do
-      visit cluster_parts_path
-      click_button request_self_management_text
+      visit path
+      click_button button_text
 
       created_case = part.cases.first
       expect(created_case.send(part_name)).to eq(part)
@@ -43,9 +51,17 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
       create("advice_#{part_name}", cluster: cluster)
     end
 
+    let(:button_text) { request_alces_management_text }
+
+    it_behaves_like 'button is disabled for viewers' do
+      let :disabled_button_title do
+        "As a viewer you cannot request Alces management of a #{part_name}"
+      end
+    end
+
     it "can request Alces management" do
-      visit cluster_parts_path
-      click_button request_alces_management_text
+      visit path
+      click_button button_text
 
       created_case = part.cases.first
       expect(created_case.send(part_name)).to eq(part)
@@ -63,7 +79,7 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
     end
 
     it 'displays no buttons' do
-      visit cluster_parts_path
+      visit path
       # Sanity check that part itself is actually being displayed.
       expect(page).to have_text(part.name)
 

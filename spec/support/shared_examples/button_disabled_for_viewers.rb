@@ -36,7 +36,7 @@ RSpec.shared_examples 'button is disabled for viewers' do |args|
     it 'does not have disabled button' do
       expect(button).not_to be_disabled
       expect(button[:class]).not_to include('disabled')
-      expect(button[:title]).to be nil
+      expect(button[:title]).not_to eq(disabled_button_title)
     end
   end
 end

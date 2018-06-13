@@ -66,8 +66,7 @@ class ClusterPartDecorator < ApplicationDecorator
       "Are you sure you want to request #{change_description} of #{name}?"
     confirm_text = [confirm_question, change_details.squish].join("\n\n")
 
-    h.button_to "Request #{change_description}",
-      h.cases_path,
+    default_html_options = {
       class: "btn #{button_class} support-type-button",
       title: issue.name,
       params: {
@@ -80,5 +79,16 @@ class ClusterPartDecorator < ApplicationDecorator
         }
       },
       data: { confirm: confirm_text }
+    }
+
+    action_description = "request #{change_description} of a #{readable_model_name}"
+    html_options = PolicyDependentOptions.wrap(
+      default_html_options,
+      policy: policy(Case).create?,
+      action_description: action_description,
+      user: h.current_user
+    )
+
+    h.button_to "Request #{change_description}", h.cases_path, html_options
   end
 end
