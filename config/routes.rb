@@ -49,6 +49,10 @@ Rails.application.routes.draw do
         collection do
           post ':flavour' => 'notes#create', as: prefix
         end
+        member do
+          post 'preview' => 'notes#preview'
+          post 'write' => 'notes#write'
+        end
       end
     end
   end

@@ -1,32 +1,24 @@
-<div class="card-body">
-    <p>
-    <%= intro_text %>
+<div id="markdown-editor">
+    <ul class="nav nav-tabs">
+        <li class='nav-item <%= 'nav-link--active' if activate == 'write' %>'>
+            <%= form_builder.button 'Write',
+                class: 'btn btn-link',
+                id: 'markdown-write-button',
+                'data-write-url': write_path
+            %>
+        </li>
+        <li class='nav-item <%= 'nav-link--active' if activate == 'preview' %>'>
+            <%= form_builder.button 'Preview',
+                class: 'btn btn-link',
+                id: 'markdown-preview-button',
+                'data-preview-url': preview_path
+            %>
+        </li>
+    </ul>
+
+    <%= yield if block_given? %>
+
+    <p class="form-text text-muted">
+    Styling with markdown is supported
     </p>
-    <%= form_for form_path do |f| %>
-        <ul class="nav nav-tabs">
-            <li class='nav-item <%= 'nav-link--active' if activate == 'write' %>'>
-                <%= f.button 'Write',
-                    class: 'btn btn-link',
-                    name: 'commit',
-                    value: MarkdownPreview::WRITE_COMMIT_VALUE
-                %>
-            </li>
-            <li class='nav-item <%= 'nav-link--active' if activate == 'preview' %>'>
-                <%= f.button 'Preview',
-                    class: 'btn btn-link',
-                    name: 'commit',
-                    value: MarkdownPreview::PREVIEW_COMMIT_VALUE
-                %>
-            </li>
-        </ul>
-
-        <%= yield f if block_given? %>
-
-        <p class="form-text text-muted">
-        Styling with markdown is supported
-        </p>
-        <div class="form-group" style="overflow: hidden;">
-            <%= f.submit button_text, class: dark_button_classes %>
-        </div>
-    <% end %>
 </div>

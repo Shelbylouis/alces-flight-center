@@ -4,13 +4,10 @@
 %>
 
 <%= render 'partials/markdown_editor_layout',
-    activate: 'preview',
+    activate: 'write',
     form_builder: form_builder,
     preview_path: note.preview_path,
     write_path: note.write_path do %>
 
-    <%= form_builder.hidden_field :description, 'data-markdown-content': true %>
-    <div class="border-bottom p-2">
-        <%= note.rendered_description.html_safe %>
-    </div>
+    <%= render 'markdown_content', form_builder: form_builder %>
 <% end %>

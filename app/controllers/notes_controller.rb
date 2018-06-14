@@ -1,5 +1,4 @@
 class NotesController < ApplicationController
-  include MarkdownPreview
   decorates_assigned :note
 
   def show
@@ -16,8 +15,6 @@ class NotesController < ApplicationController
     @note = note_from_params
     authorize @note
 
-    handle_markdown_preview(@note, :description, note_params) and return
-
     if @note.update_attributes(note_params)
       flash[:success] = 'Notes created'
     else
@@ -30,8 +27,6 @@ class NotesController < ApplicationController
     @note = note_from_params
     authorize @note
 
-    handle_markdown_preview(@note, :description, note_params) and return
-
     if note_params[:description].blank?
       @note.destroy
       flash[:success] = 'Notes removed'
@@ -43,6 +38,22 @@ class NotesController < ApplicationController
       flash[:error] = "Your notes were not updated: #{format_errors(@note)}"
       render :edit
     end
+  end
+
+  def preview
+    @note = note_from_params
+    authorize @note, @note.persisted? ? :edit? : :new?
+    @note.description = note_params[:description]
+
+    render layout: false
+  end
+
+  def write
+    @note = note_from_params
+    authorize @note, @note.persisted? ? :edit? : :new?
+    @note.description = note_params[:description]
+
+    render layout: false
   end
 
   private

@@ -42,6 +42,14 @@ class NoteDecorator < ApplicationDecorator
     h.edit_cluster_note_path(cluster, self)
   end
 
+  def preview_path
+    h.preview_cluster_note_path(cluster, self)
+  end
+
+  def write_path
+    h.write_cluster_note_path(cluster, self)
+  end
+
   def form_path
     [note.cluster, note]
   end

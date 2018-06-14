@@ -8,12 +8,14 @@
   </p>
   <%= form_for note.form_path do |f| %>
     <% if can_create_note %>
-      <div class="form-group">
-        <%= f.text_area :description, class: 'form-control', rows: 10 %>
-      </div>
-      <p class="form-text text-muted">
-        Styling with markdown is supported
-      </p>
+      <%= render 'partials/markdown_editor_layout',
+            activate: 'write',
+            form_builder: f,
+            preview_path: note.preview_path,
+            write_path: note.write_path do %>
+
+        <%= render 'markdown_content', form_builder: f %>
+      <% end %>
     <% end %>
     <div class="form-group" style="overflow: hidden;">
       <%#
