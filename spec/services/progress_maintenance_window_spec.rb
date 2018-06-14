@@ -124,19 +124,15 @@ RSpec.describe ProgressMaintenanceWindow do
       let(:requested_start) { 23.hours.ago }
 
       context 'when maintenance has started' do
-        it 'sends notifications that maintenance is ending soon' do
-          window = build_window(state: :started)
+        let(:window) { build_window(state: :started) }
 
+        it 'sends notifications that maintenance is ending soon' do
           expect(CaseMailer).to receive(:maintenance_ending_soon)
 
           described_class.new(window).progress
         end
-      end
 
-      context 'when maintenance_ending_soon_email_sent is true' do
-        it 'does not send notifications' do
-          window = build_window(state: :started)
-
+        it 'does not send notifications if already sent' do
           window.update!(maintenance_ending_soon_email_sent: true)
 
           expect(CaseMailer).not_to receive(:maintenance_ending_soon)
