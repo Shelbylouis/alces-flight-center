@@ -159,15 +159,27 @@ RSpec.describe 'Case mailer', :type => :mailer do
     end
   end
 
-  describe 'Maintenance email' do
-    subject { CaseMailer.maintenance_state_transition(kase, text) }
-
+  describe 'Maintenance emails' do
     let (:text) { "Doesn't look like anything to me" }
 
-    it 'sends a notification to Slack' do
-      expect(SlackNotifier).to receive(:maintenance_notification)
-        .with(kase, text, '#000000')
-      subject
+    context 'state transition' do
+      subject { CaseMailer.maintenance_state_transition(kase, text) }
+
+      it 'sends a notification to Slack' do
+        expect(SlackNotifier).to receive(:maintenance_state_transition_notification)
+          .with(kase, text)
+        subject
+      end
+    end
+
+    context 'ending soon' do
+      subject { CaseMailer.maintenance_ending_soon(kase, text) }
+
+      it 'sends a notification to Slack' do
+        expect(SlackNotifier).to receive(:maintenance_ending_soon_notification)
+          .with(kase, text)
+        subject
+      end
     end
   end
 end
