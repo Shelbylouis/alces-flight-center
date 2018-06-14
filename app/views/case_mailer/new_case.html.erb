@@ -2,7 +2,7 @@
 
 <h3><%= @case.display_id %> <%= @case.ticket_subject %></h3>
 
-<blockquote>
+<div class="blockquote">
   <% @case.email_properties.each do |key, value| %>
     <strong><%= key %>:</strong>
     <% if value.is_a?(Hash) %>
@@ -20,4 +20,4 @@
     <br/>
   <% end %>
   <cite><%= @case.created_at.to_formatted_s(:long) %> - <b><%= @case.user.name %></b></cite>
-</blockquote>
+</div>
