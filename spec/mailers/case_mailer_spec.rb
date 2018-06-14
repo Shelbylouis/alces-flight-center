@@ -166,7 +166,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
     it 'sends a notification to Slack' do
       expect(SlackNotifier).to receive(:maintenance_notification)
-        .with(kase, text, false)
+        .with(kase, text, '#000000')
       subject
     end
   end

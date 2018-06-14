@@ -72,10 +72,18 @@ class SlackNotifier
       send_notification(comment_note)
     end
 
-    def maintenance_notification(kase, text, ending_soon)
+    def maintenance_state_transition_notification(kase, text)
+      maintenance_notification(kase, text, "#000000")
+    end
+
+    def maintenance_ending_soon_notification(kase, text)
+      maintenance_notification(kase, text, 'warning')
+    end
+
+    def maintenance_notification(kase, text, colour)
       maintenance_note = {
         fallback: text,
-        color: ending_soon ? "warning" : "#000000",
+        color: colour,
         title: subject_and_id_title(kase),
         title_link: cluster_case_url(kase.cluster, kase),
         fields: [

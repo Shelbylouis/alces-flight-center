@@ -41,7 +41,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
-    SlackNotifier.maintenance_notification(@case, @text, false)
+    SlackNotifier.maintenance_state_transition_notification(@case, @text)
   end
 
   def maintenance_ending_soon(my_case, text)
@@ -57,6 +57,6 @@ class CaseMailer < ApplicationMailer
       cc: admin_emails,
       subject: @case.email_reply_subject
     )
-    SlackNotifier.maintenance_notification(@case, @text, true)
+    SlackNotifier.maintenance_ending_soon_notification(@case, @text)
   end
 end
