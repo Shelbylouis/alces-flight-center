@@ -39,8 +39,6 @@ class User < ApplicationRecord
     ROLES
   end
 
-  scope :admins, -> { where(role: 'admin') }
-
   def contact?
     primary_contact? || secondary_contact?
   end
