@@ -16,6 +16,10 @@ class NoteFlavourConstraint
 end
 
 Rails.application.routes.draw do
+
+  match '/404', to: 'errors#not_found', via: :all
+  match '/500', to: 'errors#internal_server_error', via: :all
+
   asset_record_alias = 'asset-record'
   component_expansions_alias = 'expansions'
   component_groups_alias = 'component-groups'
