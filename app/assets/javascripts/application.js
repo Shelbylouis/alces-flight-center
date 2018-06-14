@@ -16,3 +16,10 @@
 //= require popper
 //= require bootstrap-sprockets
 //= require_tree .
+//
+
+function enable_tooltips () {
+  $('[data-toggle="tooltip"]').tooltip()
+}
+
+document.addEventListener('turbolinks:load', enable_tooltips);
