@@ -1,11 +1,10 @@
 
 ProgressMaintenanceWindow = Struct.new(:window) do
   def progress
+    check_remaining_time
     if required_transition_event
-      check_remaining_time
       transition_state(required_transition_event)
     else
-      check_remaining_time
       unprogressed_message
     end
   end
