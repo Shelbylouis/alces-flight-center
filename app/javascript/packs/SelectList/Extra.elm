@@ -1,6 +1,7 @@
 module SelectList.Extra
     exposing
         ( find
+        , findValueBy
         , fromList
         , mapSelected
         , nameOrderedDecoder
@@ -11,6 +12,7 @@ module SelectList.Extra
 
 import Json.Decode as D
 import List.Extra
+import Maybe.Extra
 import SelectList exposing (Position(..), SelectList)
 
 
@@ -143,3 +145,19 @@ find :
     -> Maybe a
 find predicate selectList =
     List.Extra.find predicate (SelectList.toList selectList)
+
+
+{-|
+
+    Return the first result for which applying `fn` returns `Just`.
+
+-}
+findValueBy :
+    (a -> Maybe b)
+    -> SelectList a
+    -> Maybe b
+findValueBy fn selectList =
+    selectList
+        |> SelectList.map fn
+        |> find Maybe.Extra.isJust
+        |> Maybe.Extra.join

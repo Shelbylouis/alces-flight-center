@@ -91,10 +91,7 @@ findTierAndAncestors predicate services =
                 findTierAddingIssue issue =
                     Maybe.map ((,) issue) (Issue.findTier predicate issue)
             in
-            issues
-                |> SelectList.map findTierAddingIssue
-                |> SelectList.Extra.find Maybe.Extra.isJust
-                |> Maybe.Extra.join
+            SelectList.Extra.findValueBy findTierAddingIssue issues
 
         findCategoryIssueAndTier :
             (Tier -> Bool)
@@ -110,10 +107,7 @@ findTierAndAncestors predicate services =
                         Nothing ->
                             Nothing
             in
-            categories
-                |> SelectList.map findIssueAddingCategory
-                |> SelectList.Extra.find Maybe.Extra.isJust
-                |> Maybe.Extra.join
+            SelectList.Extra.findValueBy findIssueAddingCategory categories
 
         findServiceCategoryIssueAndTier :
             Service
@@ -136,7 +130,4 @@ findTierAndAncestors predicate services =
                         _ ->
                             Nothing
     in
-    services
-        |> SelectList.map findServiceCategoryIssueAndTier
-        |> SelectList.Extra.find Maybe.Extra.isJust
-        |> Maybe.Extra.join
+    SelectList.Extra.findValueBy findServiceCategoryIssueAndTier services

@@ -165,10 +165,7 @@ handleSelectTool : State -> String -> ( State, Cmd Msg )
 handleSelectTool state toolName =
     let
         services =
-            state
-                |> .clusters
-                |> SelectList.selected
-                |> .services
+            State.selectedCluster state |> .services
 
         isWantedTier : Tier.Tier -> Bool
         isWantedTier tier =
@@ -194,7 +191,7 @@ handleSelectTool state toolName =
                     state.clusters
                         |> flip Cluster.setSelectedService service.id
                         |> maybeSetCategory mcategory
-                        |> flip Cluster.setSelectedIssue (issue |> Issue.data |> .id)
+                        |> flip Cluster.setSelectedIssue (Issue.id issue)
                         |> flip Cluster.setSelectedTier tier.id
             }
                 ! []

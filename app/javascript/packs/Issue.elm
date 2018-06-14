@@ -2,10 +2,10 @@ module Issue
     exposing
         ( Id(..)
         , Issue
-        , data
         , decoder
         , extractId
         , findTier
+        , id
         , name
         , requiresComponent
         , sameId
@@ -86,6 +86,11 @@ requiresComponent issue =
 
         StandardIssue _ ->
             False
+
+
+id : Issue -> Id
+id issue =
+    data issue |> .id
 
 
 name : Issue -> String
