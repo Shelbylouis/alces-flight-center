@@ -19,7 +19,7 @@
 //
 
 function enable_tooltips () {
-  $('[data-toggle="tooltip"]').tooltip()
+  $('[title]').tooltip()
 }
 
 document.addEventListener('turbolinks:load', enable_tooltips);
