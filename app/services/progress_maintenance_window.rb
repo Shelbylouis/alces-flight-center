@@ -1,7 +1,7 @@
 
 ProgressMaintenanceWindow = Struct.new(:window) do
   def progress
-    check_remaining_time
+    should_maintenance_ending_soon_email_be_sent?
     if required_transition_event
       transition_state(required_transition_event)
     else
@@ -67,18 +67,28 @@ ProgressMaintenanceWindow = Struct.new(:window) do
     datetime.to_formatted_s(:short)
   end
 
-  def check_remaining_time
-    unless window.maintenance_ending_soon_email_sent
-      return unless 1.hour.from_now >= window.expected_end && started?
-      CaseMailer.maintenance_ending_soon(
-        window.case,
-        <<-EOF.squish
-          Maintenance for #{window.associated_model.name} is scheduled to
-          end at #{window.expected_end.to_formatted_s(:short)}. You have
-          less than an hour to make any final changes.
-        EOF
-      )
-      window.update!(maintenance_ending_soon_email_sent: true)
-    end
+  def should_maintenance_ending_soon_email_be_sent?
+    return unless email_not_sent_yet? && less_than_an_hour_left? && started?
+    send_maintenance_ending_soon_email
+  end
+
+  def email_not_sent_yet?
+    window.maintenance_ending_soon_email_sent ? false : true
+  end
+
+  def less_than_an_hour_left?
+    1.hour.from_now >= window.expected_end
+  end
+
+  def send_maintenance_ending_soon_email
+    CaseMailer.maintenance_ending_soon(
+      window.case,
+      <<-EOF.squish
+        Maintenance for #{window.associated_model.name} is scheduled to
+        end at #{window.expected_end.to_formatted_s(:short)}. You have
+        less than an hour to make any final changes.
+      EOF
+    )
+    window.update!(maintenance_ending_soon_email_sent: true)
   end
 end
