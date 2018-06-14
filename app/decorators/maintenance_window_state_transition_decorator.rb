@@ -5,7 +5,8 @@ class MaintenanceWindowStateTransitionDecorator < ApplicationDecorator
              date: object.created_at,
              name: object.user&.name || 'Flight Center',
              text: comment_text,
-             type: 'wrench'
+             type: 'wrench',
+             details: 'Maintenance Information'
   end
 
   def comment_text

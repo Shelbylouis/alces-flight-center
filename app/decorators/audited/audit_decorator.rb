@@ -22,20 +22,22 @@ module Audited
 
       type = send("#{field}_type")
       text = send("#{field}_text", from, to)
+      details = send("#{field}_details")
       admin_only = ADMIN_ONLY_CARDS.include?(field)
 
       if text
-        render_card(date, user&.name || 'Flight Center', type, text, admin_only)
+        render_card(date, user&.name || 'Flight Center', type, text, details, admin_only)
       end
     end
 
-    def render_card(date, name, type, text, admin_only)
+    def render_card(date, name, type, text, details, admin_only)
       h.render 'cases/event',
                admin_only: admin_only,
                date: date,
                name: name,
                text: text,
-               type: type
+               type: type,
+               details: details
     end
 
     def assignee_id_text(from, to)
@@ -54,12 +56,20 @@ module Audited
       'user'
     end
 
+    def assignee_id_details
+      'Assignee Change'
+    end
+
     def time_worked_text(from, to)
       "Changed time worked from #{format_minutes(from)} to #{format_minutes(to)}."
     end
 
     def time_worked_type
       'hourglass-half'
+    end
+
+    def time_worked_details
+      'Time Added'
     end
 
     def format_minutes(mins)
@@ -83,6 +93,10 @@ module Audited
 
     def tier_level_type
       'chevron-circle-up'
+    end
+
+    def tier_level_details
+      'Tier Change'
     end
   end
 end

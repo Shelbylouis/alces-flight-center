@@ -6,7 +6,8 @@ class CaseCommentDecorator < ApplicationDecorator
              date: object.created_at,
              text: object.rendered_text,
              formatted: true,
-             type: 'comment-o'
+             type: 'comment-o',
+             details: 'Comment'
   end
 
 end
