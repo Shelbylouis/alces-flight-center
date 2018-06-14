@@ -2,7 +2,10 @@ module Main exposing (..)
 
 import Html exposing (Html)
 import Json.Decode as D
+import List
+import Maybe
 import Msg exposing (..)
+import Result
 import State exposing (State)
 import State.Update
 import State.View
@@ -37,7 +40,50 @@ decodeInitialModel value =
 
 init : D.Value -> ( Model, Cmd Msg )
 init flags =
-    decodeInitialModel flags ! []
+    let
+        model =
+            decodeInitialModel flags
+
+        mmsgs =
+            [ maybeMsgFromFlag ChangeSelectedTier "selectedTier" flags
+            , maybeMsgFromFlag ChangeSelectedIssue "selectedIssue" flags
+            , maybeMsgFromFlag ChangeSelectedCategory "selectedCategory" flags
+            , maybeMsgFromFlag ChangeSelectedService "selectedService" flags
+            , maybeMsgFromFlag SelectTool "selectedTool" flags
+            ]
+
+        updateCollectingCmds mmsg ( m1, cs1 ) =
+            case mmsg of
+                Just msg ->
+                    let
+                        ( m2, cs2 ) =
+                            update msg m1
+                    in
+                    m2 ! [ cs1, cs2 ]
+
+                Nothing ->
+                    m1 ! [ cs1 ]
+    in
+    List.foldr updateCollectingCmds (model ! []) mmsgs
+
+
+maybeMsgFromFlag : (String -> msg) -> String -> D.Value -> Maybe msg
+maybeMsgFromFlag msg fieldName flags =
+    let
+        getFieldId : Maybe String
+        getFieldId =
+            case decodeField of
+                Result.Ok v ->
+                    v
+
+                Result.Err e ->
+                    Nothing
+
+        decodeField : Result String (Maybe String)
+        decodeField =
+            D.decodeValue (D.maybe (D.field fieldName D.string)) flags
+    in
+    Maybe.map msg getFieldId
 
 
 

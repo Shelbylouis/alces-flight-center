@@ -8,6 +8,7 @@ import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import SupportType exposing (SupportType)
+import Tier exposing (Tier)
 
 
 type alias Service =
@@ -67,3 +68,66 @@ setSelectedCategory : Category.Id -> Service -> Service
 setSelectedCategory categoryId service =
     Issues.selectCategory categoryId service.issues
         |> asIssuesIn service
+
+
+{-|
+
+    Find the first Tier matching the given predicate and return a tuple
+    containing it and all of its ancestors.
+
+-}
+findTierAndAncestors :
+    (Tier -> Bool)
+    -> SelectList Service
+    -> Maybe ( Service, Maybe Category, Issue, Tier )
+findTierAndAncestors predicate services =
+    let
+        findIssueAndTier :
+            (Tier -> Bool)
+            -> SelectList Issue
+            -> Maybe ( Issue, Tier )
+        findIssueAndTier predicate issues =
+            let
+                findTierAddingIssue issue =
+                    Maybe.map ((,) issue) (Issue.findTier predicate issue)
+            in
+            SelectList.Extra.findValueBy findTierAddingIssue issues
+
+        findCategoryIssueAndTier :
+            (Tier -> Bool)
+            -> SelectList Category
+            -> Maybe ( Category, Issue, Tier )
+        findCategoryIssueAndTier predicate categories =
+            let
+                findIssueAddingCategory cat =
+                    case findIssueAndTier predicate cat.issues of
+                        Just ( issue, tier ) ->
+                            Just ( cat, issue, tier )
+
+                        Nothing ->
+                            Nothing
+            in
+            SelectList.Extra.findValueBy findIssueAddingCategory categories
+
+        findServiceCategoryIssueAndTier :
+            Service
+            -> Maybe ( Service, Maybe Category, Issue, Tier )
+        findServiceCategoryIssueAndTier service =
+            case service.issues of
+                Issues.CategorisedIssues categories ->
+                    case findCategoryIssueAndTier predicate categories of
+                        Just ( category, issue, tier ) ->
+                            Just ( service, Just category, issue, tier )
+
+                        _ ->
+                            Nothing
+
+                Issues.JustIssues issues ->
+                    case findIssueAndTier predicate issues of
+                        Just ( issue, tier ) ->
+                            Just ( service, Nothing, issue, tier )
+
+                        _ ->
+                            Nothing
+    in
+    SelectList.Extra.findValueBy findServiceCategoryIssueAndTier services

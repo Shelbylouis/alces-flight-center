@@ -21,7 +21,7 @@ module ApplicationHelper
     raw(condition ? '&check;' : '&cross;')
   end
 
-  def new_case_form(clusters:, single_part: nil)
+  def new_case_form(clusters:, single_part: nil, pre_selected: {})
     clusters_json = json_map(clusters.map(&:decorate), :case_form_json)
     raw(
       <<~EOF
@@ -29,6 +29,11 @@ module ApplicationHelper
           id='new-case-form'
           data-clusters='#{clusters_json}'
           #{single_part_data_attr(single_part)}
+          #{selected_data_attr(:category, pre_selected)}
+          #{selected_data_attr(:issue, pre_selected)}
+          #{selected_data_attr(:service, pre_selected)}
+          #{selected_data_attr(:tier, pre_selected)}
+          #{selected_data_attr(:tool, pre_selected)}
         ></div>
       EOF
     )
@@ -90,5 +95,12 @@ module ApplicationHelper
     }.to_json
 
     "data-single-part=#{single_part_json}"
+  end
+
+  def selected_data_attr(item_name, selected_items)
+    item = selected_items.fetch(item_name, nil)
+    return nil if item.nil?
+
+    return "data-selected-#{item_name}='\"#{item}\"'"
   end
 end

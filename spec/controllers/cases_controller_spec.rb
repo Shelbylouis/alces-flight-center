@@ -30,6 +30,88 @@ RSpec.describe CasesController, type: :controller do
           get :new, params: { cluster_id: another_cluster.id }
         end.to raise_error(ActionController::RoutingError)
       end
+
+      context 'case form pre-population' do
+        before(:each) do
+          # Add additional tools and services so that we can be confident we
+          # are selecting the correct items, and not just selecting the only
+          # items that are in the database.
+          create(:tier)
+          create(:level_1_tier)
+          create(:category)
+          create(:service, service_type: create(:service_type), cluster: first_cluster)
+        end
+
+        let(:category) { create(:category, name: 'My category name') }
+        let(:tier) { create(:tier_with_tool, issue: issue) }
+        let(:service_type) { create(:service_type) }
+        let!(:service) do
+          create(:service, service_type: service_type, cluster: first_cluster, name: 'My service name')
+        end
+        let!(:issue) do
+          create(:issue_requiring_service, service_type: service_type, category: category, name: 'My issue name')
+        end
+
+
+        context 'when given a tool' do
+          it 'assigns the correct tool to @pre_selected' do
+            get :new, params: { tool: tier.tool, cluster_id: first_cluster.id }
+
+            expect(assigns(:pre_selected)).to eq({
+              tool: tier.tool
+            })
+          end
+        end
+
+        context 'when given a service' do
+          it 'assigns the correct service id to @pre_selected' do
+            get :new, params: { service: service.name, cluster_id: first_cluster.id }
+
+            expect(assigns(:pre_selected)).to eq({
+              service: service.id,
+            })
+          end
+        end
+
+        context 'when given a category' do
+          it 'assigns the correct category id to @pre_selected' do
+            issue = category.issues.first
+            service = issue.present? ?
+              Service.find_by(service_type: issue.service_type, cluster: first_cluster) :
+              nil
+
+            get :new, params: { category: category.name, cluster_id: first_cluster.id }
+
+            expect(assigns(:pre_selected)).to eq({
+              category: category.id,
+              service: service.present? ? service.id : nil,
+            })
+          end
+        end
+
+        context 'when given a issue' do
+          it 'assigns the correct service, category, issue and tier to @pre_selected' do
+            service = Service.find_by(service_type: issue.service_type, cluster: first_cluster)
+
+            get :new, params: { issue: issue.name, cluster_id: first_cluster.id }
+
+            expect(assigns(:pre_selected)).to eq({
+              category: issue.category.id,
+              issue: issue.id,
+              service: service.id,
+              tier: issue.tiers.first.id,
+            })
+          end
+        end
+
+        context 'when given no pre-populations' do
+          it 'does not assign anything to @pre_selected' do
+            get :new, params: { cluster_id: first_cluster.id }
+
+            expect(assigns(:pre_selected)).to eq({})
+          end
+        end
+      end
     end
 
     context 'from component-level route' do

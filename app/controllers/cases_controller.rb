@@ -39,6 +39,7 @@ class CasesController < ApplicationController
                 else
                   current_site.clusters
                 end
+    @pre_selected = get_pre_selections
   end
 
   def create
@@ -162,5 +163,60 @@ class CasesController < ApplicationController
     Case.find_from_id!(params.require(:id))
       .tap { |c| authorize c }
       .decorate
+  end
+
+  def get_pre_selections
+    if params[:tool].present?
+      {
+        tool: params[:tool],
+      }
+
+    elsif params[:issue].present?
+      issue_name = params[:issue]
+      issue = Issue.find_by(name: issue_name)
+      tier = if issue.present? && !issue.tiers.empty?
+               issue.tiers.order(:level).first
+             end
+      category = issue.category
+      service = if issue.service_type.present?
+                  Service.find_by(service_type: issue.service_type, cluster: @clusters.first)
+                elsif params[:service].present?
+                  Service.find_by(name: params[:service], cluster: @clusters.first)
+                end
+
+      {}.tap do |h|
+        h[:category] = category.id if category.present?
+        h[:issue] = issue.id if issue.present?
+        h[:service] = service.id if service.present?
+        h[:tier] = tier.id if tier.present?
+      end
+
+    elsif params[:category].present?
+      category_name = params[:category]
+      category = Category.find_by(name: category_name)
+      if category.present?
+        issue = category.issues.first
+        service = if issue.present? && issue.service_type.present?
+                    Service.find_by(service_type: issue.service_type, cluster: @clusters.first)
+                  elsif params[:service].present?
+                    Service.find_by(name: params[:service], cluster: @clusters.first)
+                  end
+      end
+
+      {}.tap do |h|
+        h[:category] = category.id if category.present?
+        h[:service] = service.id if service.present?
+      end
+
+    elsif params[:service].present?
+      service_name = params[:service]
+      service = Service.find_by(name: service_name, cluster: @clusters.first)
+
+      {}.tap do |h|
+        h[:service] = service.id if service.present?
+      end
+    else
+      {}
+    end
   end
 end

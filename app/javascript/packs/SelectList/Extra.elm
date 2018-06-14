@@ -1,6 +1,8 @@
 module SelectList.Extra
     exposing
-        ( fromList
+        ( find
+        , findValueBy
+        , fromList
         , mapSelected
         , nameOrderedDecoder
         , nestedSelect
@@ -9,6 +11,8 @@ module SelectList.Extra
         )
 
 import Json.Decode as D
+import List.Extra
+import Maybe.Extra
 import SelectList exposing (Position(..), SelectList)
 
 
@@ -127,3 +131,33 @@ updateNested selectList getNested asNestedIn transform =
                     |> asNestedIn item
     in
     mapSelected updateNested selectList
+
+
+{-|
+
+    Find the first element in the given select list matching the given
+    predicate.
+
+-}
+find :
+    (a -> Bool)
+    -> SelectList a
+    -> Maybe a
+find predicate selectList =
+    List.Extra.find predicate (SelectList.toList selectList)
+
+
+{-|
+
+    Return the first result for which applying `fn` returns `Just`.
+
+-}
+findValueBy :
+    (a -> Maybe b)
+    -> SelectList a
+    -> Maybe b
+findValueBy fn selectList =
+    selectList
+        |> SelectList.map fn
+        |> find Maybe.Extra.isJust
+        |> Maybe.Extra.join

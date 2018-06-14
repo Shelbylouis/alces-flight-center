@@ -28,6 +28,11 @@
       <li class="list-group-item">
         <h6>MOTD</h6>
         <%= simple_format(cluster.motd) %>
+        <%= link_to "Request change",
+            new_cluster_case_path(@cluster, tool: 'motd'),
+            role: 'button',
+            class: "btn btn-secondary"
+        %>
       </li>
     </ul>
   </div>
@@ -39,4 +44,3 @@
     <% end %>
   </div>
 </div>
-

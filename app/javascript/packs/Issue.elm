@@ -4,6 +4,8 @@ module Issue
         , Issue
         , decoder
         , extractId
+        , findTier
+        , id
         , name
         , requiresComponent
         , sameId
@@ -86,6 +88,11 @@ requiresComponent issue =
             False
 
 
+id : Issue -> Id
+id issue =
+    data issue |> .id
+
+
 name : Issue -> String
 name issue =
     data issue |> .name
@@ -158,3 +165,8 @@ data issue =
 sameId : Id -> Issue -> Bool
 sameId id issue =
     data issue |> Utils.sameId id
+
+
+findTier : (Tier -> Bool) -> Issue -> Maybe Tier
+findTier predicate issue =
+    SelectList.Extra.find predicate (issue |> data |> .tiers)
