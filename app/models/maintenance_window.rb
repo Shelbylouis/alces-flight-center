@@ -111,6 +111,10 @@ class MaintenanceWindow < ApplicationRecord
     TransitionQuery.parse(symbol)
   end
 
+  def set_maintenance_ending_soon_email_flag
+    self.update!(maintenance_ending_soon_email_sent: true)
+  end
+
   def reset_maintenance_ending_soon_email_flag
     self.update!(maintenance_ending_soon_email_sent: false)
   end

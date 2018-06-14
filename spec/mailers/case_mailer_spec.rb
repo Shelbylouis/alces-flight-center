@@ -161,6 +161,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
   describe 'Maintenance emails' do
     let (:text) { "Doesn't look like anything to me" }
+    let(:window) { build(:maintenance_window) }
 
     context 'state transition' do
       subject { CaseMailer.maintenance_state_transition(kase, text) }
@@ -173,12 +174,17 @@ RSpec.describe 'Case mailer', :type => :mailer do
     end
 
     context 'ending soon' do
-      subject { CaseMailer.maintenance_ending_soon(kase, text) }
+      subject { CaseMailer.maintenance_ending_soon(window, text) }
 
       it 'sends a notification to Slack' do
         expect(SlackNotifier).to receive(:maintenance_ending_soon_notification)
-          .with(kase, text)
+          .with(window.case, text)
         subject
+      end
+
+      it 'sets the maintenance_ending_soon_email_sent flag' do
+        subject
+        expect(window.maintenance_ending_soon_email_sent).to eq(true)
       end
     end
   end

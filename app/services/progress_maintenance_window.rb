@@ -82,13 +82,12 @@ ProgressMaintenanceWindow = Struct.new(:window) do
 
   def send_maintenance_ending_soon_email
     CaseMailer.maintenance_ending_soon(
-      window.case,
+      window,
       <<-EOF.squish
         Maintenance for #{window.associated_model.name} is scheduled to
         end at #{window.expected_end.to_formatted_s(:short)}. You have
         less than an hour to make any final changes.
       EOF
     )
-    window.update!(maintenance_ending_soon_email_sent: true)
   end
 end
