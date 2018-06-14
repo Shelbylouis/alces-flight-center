@@ -139,6 +139,16 @@ RSpec.describe ProgressMaintenanceWindow do
 
           described_class.new(window).progress
         end
+
+        context 'but has more than an hour left' do
+          let(:requested_start) { 20.hours.ago }
+
+          it 'does not send notifications' do
+            expect(CaseMailer).not_to receive(:maintenance_ending_soon)
+
+            described_class.new(window).progress
+          end
+        end
       end
 
       other_states = MaintenanceWindow.possible_states - [:started]
