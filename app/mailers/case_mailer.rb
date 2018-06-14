@@ -47,11 +47,7 @@ class CaseMailer < ApplicationMailer
   def maintenance_ending_soon(my_case, text)
     @case = my_case
     @text = text
-    admin_emails = []
-
-    User.admins.each do |admin|
-      admin_emails << admin.email
-    end
+    admin_emails = User.admins.map(&:email)
 
     mail(
       cc: admin_emails,
