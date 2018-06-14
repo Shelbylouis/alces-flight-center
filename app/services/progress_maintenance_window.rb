@@ -75,7 +75,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
         <<-EOF.squish
           Maintenance for #{window.associated_model.name} is scheduled to
           end at #{window.expected_end.to_formatted_s(:short)}. You have
-          less than an hour to make any final changes
+          less than an hour to make any final changes.
         EOF
       )
       window.update!(maintenance_ending_soon_email_sent: true)
