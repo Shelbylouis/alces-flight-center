@@ -14,7 +14,7 @@ FactoryBot.define do
 
       factory :tier_with_tool do
         association :issue, factory: :issue_with_category
-        tool 'motd'
+        tool :motd
         fields { nil }
       end
     end
