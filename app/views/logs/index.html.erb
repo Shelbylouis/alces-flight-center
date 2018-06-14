@@ -35,10 +35,17 @@
     <div class='card-body table-responsive'>
       <% log_type = (@component ? :component : :cluster) %>
       <%= form_for [log_type, @new_log] do |f| %>
-        <div class='form-group'>
-          <%= f.label :details, 'Details'%>
-          <%= f.text_area :details, class: 'form-control'%>
-        </div>
+
+        <%= f.label :details, 'Details'%>
+        <%= render 'partials/markdown_editor_layout',
+            activate: 'write',
+            form_builder: f,
+            preview_path: @new_log.decorate.preview_path,
+            write_path: @new_log.decorate.write_path do %>
+
+            <%= render 'markdown_content', form_builder: f %>
+        <% end %>
+
         <% if @components %>
           <div class='form-group'>
             <%= f.label :component, 'Component (optional)' %>

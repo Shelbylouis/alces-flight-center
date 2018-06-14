@@ -40,7 +40,12 @@ Rails.application.routes.draw do
     resources :logs, only: :index
   end
   admin_logs = Proc.new do
-    resources :logs, only: :create
+    resources :logs, only: :create do
+      collection do
+        post 'preview' => 'logs#preview'
+        post 'write' => 'logs#write'
+      end
+    end
   end
   notes = Proc.new do |admin|
     constraints NoteFlavourConstraint.new(admin: admin) do
