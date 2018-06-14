@@ -10,15 +10,7 @@
         This page may only be available to signed-in users, so you can try signing in.
       </p>
 
-      <p class="text-center">
-        <button
-          class="btn btn-success sign-in-button"
-          onclick="window.__showFlightSSOLogin();"
-        >
-          <span aria-hidden="true" class="fa fa-user"></span>
-          Sign in
-        </button>
-      </p>
+    <%= render 'partials/sso_sign_in_button' %>
 
     <% end %>
 
