@@ -34,7 +34,7 @@ class CaseMailer < ApplicationMailer
     SlackNotifier.comment_notification(@case, @comment)
   end
 
-  def maintenance(my_case, text)
+  def maintenance_state_transition(my_case, text)
     @case = my_case
     @text = text
     mail(

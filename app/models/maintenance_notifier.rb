@@ -89,7 +89,7 @@ MaintenanceNotifier = Struct.new(:window) do
   end
 
   def send_email(text)
-    CaseMailer.maintenance(window.case, text).deliver_later
+    CaseMailer.maintenance_state_transition(window.case, text).deliver_later
   end
 
   def cluster_dashboard_url

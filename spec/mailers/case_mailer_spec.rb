@@ -160,7 +160,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
   end
 
   describe 'Maintenance email' do
-    subject { CaseMailer.maintenance(kase, text) }
+    subject { CaseMailer.maintenance_state_transition(kase, text) }
 
     let (:text) { "Doesn't look like anything to me" }
 
