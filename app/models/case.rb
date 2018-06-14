@@ -346,7 +346,7 @@ class Case < ApplicationRecord
 
   def validate_minimum_credit_charge
     error_condition = closed? && change_request.present? && (
-      credit_charge.nil? || credit_charge < change_request.credit_charge
+      credit_charge.nil? || credit_charge.amount < change_request.credit_charge
     )
 
     errors.add(:credit_charge, "cannot be less than attached CR charge of #{change_request.credit_charge}") if error_condition

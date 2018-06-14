@@ -513,7 +513,7 @@ RSpec.describe Case, type: :model do
 
   describe '#credit_charge' do
     it 'cannot have a charge less than that of an attached change request' do
-      kase = build(:closed_case, tier_level: 4, credit_charge: 41)
+      kase = build(:closed_case, tier_level: 4, credit_charge: build(:credit_charge, amount: 41))
       build(:change_request, case: kase, credit_charge: 42)
 
       expect do
