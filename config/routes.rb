@@ -105,7 +105,7 @@ Rails.application.routes.draw do
         post :set_time
         post :set_commenting
       end
-      resource :change_request, only: [:new, :create, :edit, :update] do
+      resource :change_request, only: [:new, :create, :edit, :update], path: 'change-request' do
         member do
           post :propose
           post :handover
@@ -125,7 +125,7 @@ Rails.application.routes.draw do
       notes.call(true)
       post :deposit
       cases.call do
-        resource :change_request, only: [:new, :create, :edit]
+        resource :change_request, only: [:new, :create, :edit], path: 'change-request'
       end
     end
 
@@ -171,7 +171,7 @@ Rails.application.routes.draw do
       member do
         post :escalate
       end
-      resource :change_request, only: [:show] do
+      resource :change_request, only: [:show], path: 'change-request' do
         member do
           post :authorise
           post :decline
@@ -182,7 +182,7 @@ Rails.application.routes.draw do
 
     resources :clusters, only: :show do
       cases.call do
-        resource :change_request, only: [:show]
+        resource :change_request, only: [:show], path: 'change-request'
       end
       resources :services, only: :index
       maintenance_windows.call
