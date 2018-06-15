@@ -16,13 +16,15 @@ RSpec.describe NotesController, type: :request do
       it 'does not permit access to engineering notes' do
         note = engineering_note
         path = cluster_note_path(note.cluster, note, as: user)
-        expect{get(path)}.to raise_error(ActionController::RoutingError)
+        get(path)
+        expect(response).to have_http_status(:not_found)
       end
 
       it 'does not permit access to customer notes' do
         note = customer_note
         path = cluster_note_path(note.cluster, note, as: user)
-        expect{get(path)}.to raise_error(ActionController::RoutingError)
+        get(path)
+        expect(response).to have_http_status(:not_found)
       end
     end
 
@@ -32,7 +34,8 @@ RSpec.describe NotesController, type: :request do
       it 'does not permit access to engineering notes' do
         note = engineering_note
         path = cluster_note_path(note.cluster, note, as: user)
-        expect{get(path)}.to raise_error(ActionController::RoutingError)
+        get(path)
+        expect(response).to have_http_status(:not_found)
       end
 
       it 'permits access to customer notes' do

@@ -12,17 +12,16 @@ RSpec.describe 'Cluster credit deposits' do
 
   context 'as a non-admin' do
     it 'returns 404 when attempting to deposit' do
-      expect do
-        post cluster_deposit_path(cluster, as: user), params: params
-      end.to raise_error(ActionController::RoutingError)
+      post cluster_deposit_path(cluster, as: user), params: params
+      expect(response).to have_http_status(:not_found)
     end
   end
 
   context 'as an admin' do
     it 'allows a deposit' do
-      expect do
-        post cluster_deposit_path(cluster, as: admin), params: params
-      end.not_to raise_error
+      post cluster_deposit_path(cluster, as: admin), params: params
+      # Expect :found and not :ok since it redirects
+      expect(response).to have_http_status(:found)
     end
   end
 end

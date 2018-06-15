@@ -1,0 +1,18 @@
+<div class='card'>
+  <div class="card-body">
+    <p>
+      The page you were looking for cannot be found.
+    </p>
+
+    <% unless current_user.present? %>
+
+      <p>
+        This page may only be available to signed-in users, so you can try signing in.
+      </p>
+
+    <%= render 'partials/sso_sign_in_button' %>
+
+    <% end %>
+
+  </div>
+</div>

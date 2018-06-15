@@ -105,3 +105,13 @@ h6 {
     /*  text-transform: uppercase; */
     font-weight: 700 !important;
   }
+
+.btn.sign-in-button {
+  font-size: 120%;
+  border-radius: 25px;
+  text-transform: uppercase;
+  font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  padding: 1rem;
+  line-height: 20px;
+}
