@@ -44,3 +44,23 @@
 .assigned-cases {
   background-color: rgba(39,148,216,0.1);
 }
+
+.case-highlight {
+  opacity: 1;
+  transition: opacity .15s ease-in;
+  &:hover, &:focus {
+    opacity: .6;
+    transition: opacity .15s ease-in;
+    background-color: #f7f7f7;
+    outline: 2px ridge #dee2e6;
+  }
+  &:active {
+    opacity: .8;
+    transition: opacity .15s ease-out;
+  }
+  a {
+    &:hover, &:focus, &:active {
+      color: black;
+    }
+  }
+}
