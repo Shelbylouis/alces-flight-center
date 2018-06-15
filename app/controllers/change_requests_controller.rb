@@ -19,7 +19,7 @@ class ChangeRequestsController < ApplicationController
       flash[:error] = "Error creating change request: #{errors}." if errors
       # Show the form again, with the data previously entered.
       @cr = cr
-      render 'change_requests/new'
+      render :new
     end
 
   end
