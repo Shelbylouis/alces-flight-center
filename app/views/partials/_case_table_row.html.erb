@@ -1,5 +1,5 @@
 <tr class='case-highlight'
-  onclick="window.location.href='<%= scope.dashboard_case_path(kase) %>'">
+  onclick="Turbolinks.visit('<%= scope.dashboard_case_path(kase) %>')">
     <td><%= kase.display_id %></td>
     <%= timestamp_td(
       description:  'Support case created',
