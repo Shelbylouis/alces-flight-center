@@ -14,7 +14,7 @@
               </span>
 
               <span>
-                CR state: <b><%= @case.change_request.state.titleize %></b>
+                CR state: <b><%= @case.change_request.user_facing_state %></b>
               </span>
 
               <%= link_to verb,
