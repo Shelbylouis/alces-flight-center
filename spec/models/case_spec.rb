@@ -512,9 +512,9 @@ RSpec.describe Case, type: :model do
   end
 
   describe '#credit_charge' do
-    it 'cannot have a charge less than that of an attached change request' do
+    it 'cannot have a charge less than that of an attached completed change request' do
       kase = build(:closed_case, tier_level: 4, credit_charge: build(:credit_charge, amount: 41))
-      build(:change_request, case: kase, credit_charge: 42)
+      build(:change_request, case: kase, credit_charge: 42, state: 'completed')
 
       expect do
         kase.save!
@@ -522,6 +522,15 @@ RSpec.describe Case, type: :model do
       expect(kase.errors.messages).to include(
         credit_charge: ['cannot be less than attached CR charge of 42']
       )
+    end
+
+    it 'does not restrict charge of attached declined change request' do
+      kase = build(:closed_case, tier_level: 4, credit_charge: build(:credit_charge, amount: 41))
+      build(:change_request, case: kase, credit_charge: 42, state: 'declined')
+
+      expect do
+        kase.save!
+      end.not_to raise_error
     end
   end
 
