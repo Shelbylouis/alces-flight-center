@@ -80,24 +80,6 @@ class SlackNotifier
       maintenance_notification(kase, text, 'warning')
     end
 
-    def maintenance_notification(kase, text, colour)
-      maintenance_note = {
-        fallback: text,
-        color: colour,
-        title: subject_and_id_title(kase),
-        title_link: cluster_case_url(kase.cluster, kase),
-        fields: [
-          {
-            title: "Maintenance Info",
-            value: text,
-            short: false
-          }
-        ]
-      }
-
-      send_notification(maintenance_note)
-    end
-
     def log_notification(log)
       notification_text = "New log created on #{log.cluster.name}" \
         " #{log&.component ? 'for ' + log.component.name : nil }"
@@ -122,6 +104,24 @@ class SlackNotifier
 
     def notifier
       Slack::Notifier.new slack_webhook_url
+    end
+
+    def maintenance_notification(kase, text, colour)
+      maintenance_note = {
+        fallback: text,
+        color: colour,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        fields: [
+          {
+            title: "Maintenance Info",
+            value: text,
+            short: false
+          }
+        ]
+      }
+
+      send_notification(maintenance_note)
     end
 
     def send_notification(note)
