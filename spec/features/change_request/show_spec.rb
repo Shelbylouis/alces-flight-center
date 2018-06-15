@@ -33,7 +33,7 @@ RSpec.describe 'Change request view', type: :feature do
   let(:admin) { create(:admin) }
   let(:contact) { create(:contact, site: site) }
   let(:cluster) { create(:cluster, site: site) }
-  let(:kase) { create(:open_case, tier_level: 4, cluster: cluster) }
+  let(:kase) { build(:open_case, tier_level: 4, cluster: cluster) }
 
 
   EXPECTED_BUTTONS.keys.each do |state|

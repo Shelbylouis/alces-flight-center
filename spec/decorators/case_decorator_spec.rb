@@ -83,7 +83,7 @@ RSpec.describe CaseDecorator do
       4 => 'Change request',
     }.each do |level, expected_description|
       it "gives correct text for level #{level} Tier" do
-        kase = create(:case, tier_level: level).decorate
+        kase = build(:case, tier_level: level).decorate
 
         expect(kase.tier_description).to eq("#{level} (#{expected_description})")
       end

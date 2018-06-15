@@ -11,7 +11,7 @@ RSpec.describe ChangeRequestsController, type: :controller do
   let(:cluster) { create(:cluster, site: site) }
   let(:admin) { create(:admin) }
   let(:contact) { create(:contact, site: site) }
-  let(:kase) { create(:open_case, tier_level: 4, cluster: cluster)}
+  let(:kase) { build(:open_case, tier_level: 4, cluster: cluster)}
 
   EXPECTED_BEHAVIOURS = [ # initial_state, action, user, message, next_state
     [:draft, :propose, :admin, 'has been proposed and is awaiting customer authorisation.', :awaiting_authorisation],

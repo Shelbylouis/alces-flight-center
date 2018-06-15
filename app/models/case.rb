@@ -88,6 +88,7 @@ class Case < ApplicationRecord
   validate :validates_user_assignment
 
   validate :validate_not_resolved_with_open_cr
+  validate :validate_cr_iff_tier_4
 
   after_initialize :assign_cluster_if_necessary
   after_initialize :generate_token, on: :create
@@ -342,6 +343,11 @@ class Case < ApplicationRecord
   def validate_not_resolved_with_open_cr
     error_condition = resolved? && change_request.present? && !change_request.finalised?
     errors.add(:state, 'cannot be resolved with an open change request') if error_condition
+  end
+
+  def validate_cr_iff_tier_4
+    error_condition = (tier_level == 4) != (change_request.present?)
+    errors.add(:change_request, 'must be present if and only if case is tier 4') if error_condition
   end
 
   def validate_minimum_credit_charge

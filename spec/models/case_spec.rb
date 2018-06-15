@@ -494,7 +494,7 @@ RSpec.describe Case, type: :model do
   end
 
   describe '#resolve!' do
-    let(:kase) { create(:open_case, tier_level: 4) }
+    let(:kase) { build(:open_case, tier_level: 4) }
 
     it 'is unresolvable with an outstanding change request' do
       create(:change_request, case: kase, state: :awaiting_authorisation)
@@ -521,6 +521,30 @@ RSpec.describe Case, type: :model do
       end.to raise_error ActiveRecord::RecordInvalid
       expect(kase.errors.messages).to include(
         credit_charge: ['cannot be less than attached CR charge of 42']
+      )
+    end
+  end
+
+  describe '#change_request' do
+    it 'cannot be present if tier_level is less than 4' do
+      kase = build(:open_case, tier_level: 3)
+      build(:change_request, case: kase)
+
+      expect do
+        kase.save!
+      end.to raise_error ActiveRecord::RecordInvalid
+      expect(kase.errors.messages).to include(
+        change_request: ['must be present if and only if case is tier 4']
+      )
+    end
+    it 'must be present if tier_level is 4' do
+      kase = build(:open_case, tier_level: 4)
+
+      expect do
+        kase.save!
+      end.to raise_error ActiveRecord::RecordInvalid
+      expect(kase.errors.messages).to include(
+        change_request: ['must be present if and only if case is tier 4']
       )
     end
   end
