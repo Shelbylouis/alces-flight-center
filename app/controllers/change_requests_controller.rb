@@ -9,10 +9,13 @@ class ChangeRequestsController < ApplicationController
   end
 
   def create
-    cr = @case.build_change_request(cr_params)
+    authorize @case
+    @case.tier_level = 4
+
+    cr = @case.create_change_request(cr_params)
     authorize cr
 
-    if cr.save
+    if @case.save
       flash[:success] = "Created change request for case #{@case.display_id}."
       redirect_to case_path(@case.display_id)
     else

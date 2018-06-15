@@ -8,8 +8,6 @@ class ChangeRequest < ApplicationRecord
 
   delegate :site, to: :case
 
-  after_create :ensure_case_is_tier_4
-
   state_machine initial: :draft do
     audit_trail context: [:requesting_user], initial: false
 
@@ -45,11 +43,6 @@ class ChangeRequest < ApplicationRecord
 
   def requesting_user(transition)
     transition.args&.first
-  end
-
-  def ensure_case_is_tier_4
-    self.case.tier_level = 4
-    self.case.save!
   end
 
 end
