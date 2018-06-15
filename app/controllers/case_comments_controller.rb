@@ -15,6 +15,24 @@ class CaseCommentsController < ApplicationController
     redirect_back fallback_location: fallback_location
   end
 
+  def preview
+    my_case = Case.find_from_id!(params.require(:case_id))
+
+    @comment = my_case.case_comments.new(comment_params).decorate
+    authorize @comment, :create?
+
+    render layout: false
+  end
+
+  def write
+    my_case = Case.find_from_id!(params.require(:case_id))
+
+    @comment = my_case.case_comments.new(comment_params).decorate
+    authorize @comment, :create?
+
+    render layout: false
+  end
+
   private
 
   def comment_params

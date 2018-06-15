@@ -176,7 +176,12 @@ Rails.application.routes.draw do
     delete '/sign_out' => 'sso_sessions#destroy', as: 'sign_out'  # Keeping this one around as it's correctly coupled to SSO
 
     cases.call(only: [:create]) do
-      resources :case_comments, only: :create
+      resources :case_comments, only: :create do
+        collection do
+          post :preview
+          post :write
+        end
+      end
       member do
         post :escalate
       end
