@@ -1,6 +1,7 @@
 class ChangeRequestsController < ApplicationController
 
   before_action :assign_case
+  decorates_assigned :cr
 
   def new
     authorize ChangeRequest
@@ -25,11 +26,11 @@ class ChangeRequestsController < ApplicationController
   end
 
   def show
-    @cr = @case.change_request.decorate
+    assign_cr
   end
 
   def edit
-    @cr = @case.change_request.decorate
+    assign_cr
     authorize @cr
   end
 
@@ -73,6 +74,10 @@ class ChangeRequestsController < ApplicationController
 
   def assign_case
     @case = Case.find_from_id!(params.require(:case_id)).decorate
+  end
+
+  def assign_cr
+    @cr = @case.change_request || not_found
   end
 
   def cr_params

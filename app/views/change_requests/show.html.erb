@@ -12,18 +12,18 @@
             <table class="table">
               <tr>
                 <th>State</th>
-                <td><%= @cr.user_facing_state %></td>
+                <td><%= cr.user_facing_state %></td>
               </tr>
               <tr>
                 <th>Credit charge</th>
-                <td><%= pluralize(@cr.credit_charge, 'credit') %></td>
+                <td><%= pluralize(cr.credit_charge, 'credit') %></td>
               </tr>
             </table>
           </div>
         </div>
         <div class="card">
           <div class="card-body state-controls">
-            <%= render "change_requests/state_controls/#{@cr.state}", cr: @cr %>
+            <%= render "change_requests/state_controls/#{cr.state}", cr: cr %>
             <hr />
             <%=
               link_to 'Return to case',
@@ -37,7 +37,7 @@
     </div>
     <div class="col-12">
       <h3>Details</h3>
-      <%= @cr.rendered_description.html_safe %>
+      <%= cr.rendered_description.html_safe %>
       <hr />
       <a href="#cr-top">Back to top</a>
     </div>

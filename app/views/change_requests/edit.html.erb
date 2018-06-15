@@ -2,4 +2,4 @@
 
 <h2>Editing change request for <%= @case.display_id %>: <%= @case.subject %></h2>
 
-<%= render 'change_requests/form', action: :update, submit_text: 'Save' %>
+<%= render 'change_requests/form', action: :update, cr: cr, submit_text: 'Save' %>

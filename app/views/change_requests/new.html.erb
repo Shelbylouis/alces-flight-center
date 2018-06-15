@@ -2,7 +2,7 @@
 
 <h2>New change request for <%= @case.display_id %>: <%= @case.subject %></h2>
 
-<%= render 'change_requests/form', action: :create, submit_text: 'Create' do %>
+<%= render 'change_requests/form', action: :create, cr: cr, submit_text: 'Create' do %>
   <div class="alert alert-info col-sm-9">
     <i class="fa fa-info-circle fa-2x float-left mr-2" aria-hidden="true"></i>
     Creating this CR will escalate the associated case to support tier 4.
