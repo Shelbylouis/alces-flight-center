@@ -616,10 +616,9 @@ RSpec.describe 'Case page', type: :feature do
         expect(page).to have_http_status(200)
       end
 
-      it 'returns a routing error when visiting an unassociated case page' do
-        expect do
-          visit(cluster_case_path(cluster, another_kase, as: user))
-        end.to raise_error(ActionController::RoutingError)
+      it 'returns a 404 when visiting an unassociated case page' do
+        visit(cluster_case_path(cluster, another_kase, as: user))
+        expect(page).to have_http_status(404)
       end
     end
 

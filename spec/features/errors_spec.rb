@@ -2,16 +2,6 @@ require 'rails_helper'
 
 RSpec.describe 'Error handling', type: :feature do
 
-  before(:all) do
-    Rails.application.config.consider_all_requests_local = false
-    Rails.application.config.action_dispatch.show_exceptions = true
-  end
-
-  after(:all) do
-    Rails.application.config.consider_all_requests_local = true
-    Rails.application.config.action_dispatch.show_exceptions = false
-  end
-
   let(:cluster) { create(:cluster) }
   let(:user) { create(:contact) }
 
@@ -22,6 +12,8 @@ RSpec.describe 'Error handling', type: :feature do
       it 'shows SSO login button' do
         visit cluster_path(cluster)
 
+        expect(page).to have_http_status(404)
+
         card_body = find('.page-container .card-body')
         expect(card_body.find('.sign-in-button')).to have_text 'Sign in'
       end
@@ -31,6 +23,8 @@ RSpec.describe 'Error handling', type: :feature do
     context 'when contact signed in' do
       it 'does not show SSO login button' do
         visit cluster_path(cluster, as: user)
+
+        expect(page).to have_http_status(404)
 
         card_body = find('.page-container .card-body')
         expect do
