@@ -16,3 +16,10 @@
 //= require popper
 //= require bootstrap-sprockets
 //= require_tree .
+//
+
+function enableTooltips() {
+  $('[title]').tooltip({delay: {show: 500, hide: 100}, placement: 'left'});
+}
+
+document.addEventListener('turbolinks:load', enableTooltips);

@@ -5,7 +5,8 @@ class CaseStateTransitionDecorator < ApplicationDecorator
        name: object.user.name,
        date: object.created_at,
        text: text,
-       type: icon
+       type: icon,
+       details: 'Case Transition'
   end
 
   private

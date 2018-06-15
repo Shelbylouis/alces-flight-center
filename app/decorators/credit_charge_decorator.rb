@@ -18,6 +18,7 @@ class CreditChargeDecorator < ApplicationDecorator
              date: created_at,
              name: user.name,
              text:  "A charge of #{h.pluralize(amount, 'credit')} was added for this case.",
-             type: 'usd'
+             type: 'usd',
+             details: 'Credit Charge'
   end
 end
