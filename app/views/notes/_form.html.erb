@@ -10,7 +10,14 @@
             Styling with markdown is supported
         </p>
         <div class="form-group" style="overflow: hidden;">
-            <%= f.submit button_text, class: dark_button_classes %>
+            <%= f.submit button_text,
+                PolicyDependentOptions.wrap(
+                    {class: dark_button_classes},
+                    policy: policy(note).create?,
+                    action_description: 'create cluster notes',
+                    user: current_user
+            )
+            %>
         </div>
     <% end %>
 </div>
