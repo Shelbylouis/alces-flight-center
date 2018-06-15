@@ -1,12 +1,14 @@
 <% content_for(:subtitle) { note.subtitle } %>
 
+<% can_create_note = policy(note).create? %>
+
 <%= render 'partials/tabs', activate: :notes do %>
   <div class="card-body">
     <p>
       <%= intro_text %>
     </p>
     <%= form_for note.form_path do |f| %>
-      <% if policy(note).create? %>
+      <% if can_create_note %>
         <div class="form-group">
           <%= f.text_area :description, class: 'form-control', rows: 10 %>
         </div>
@@ -24,7 +26,7 @@
         <%= f.submit button_text,
           PolicyDependentOptions.wrap(
             {class: dark_button_classes},
-            policy: policy(note).create?,
+            policy: can_create_note,
             action_description: 'create cluster notes',
             user: current_user
         )
