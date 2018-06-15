@@ -259,6 +259,10 @@ class Case < ApplicationRecord
     cr_charge_applies? ? change_request.credit_charge : 0
   end
 
+  def cr_in_progress?
+    change_request.present? && !change_request.finalised?
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
@@ -349,7 +353,7 @@ class Case < ApplicationRecord
   end
 
   def validate_not_resolved_with_open_cr
-    error_condition = resolved? && change_request.present? && !change_request.finalised?
+    error_condition = resolved? && cr_in_progress?
     errors.add(:state, 'cannot be resolved with an open change request') if error_condition
   end
 
