@@ -39,13 +39,15 @@ RSpec.describe 'Change request view', type: :feature do
   EXPECTED_BUTTONS.keys.each do |state|
     context "for #{state} CR" do
 
-      subject { create(:change_request, state: state, case: kase) }
+      before(:each) do
+        create(:change_request, state: state, case: kase)
+      end
 
       EXPECTED_BUTTONS[state].keys.each do |user_type|
 
         it "shows #{user_type} expected buttons" do
           visit cluster_case_change_request_path(
-            cluster, kase, subject,
+            cluster, kase,
             as: send(user_type)
           )
 
@@ -59,7 +61,7 @@ RSpec.describe 'Change request view', type: :feature do
   end
 
   it 'has test coverage for all possible CR states' do
-    cr = create(:change_request)
+    cr = create(:change_request, case: kase)
     states = cr.state_paths(from: :draft).flatten.map(&:to_name).uniq << :draft
 
     expect(states.sort).to eq EXPECTED_BUTTONS.keys.sort
@@ -67,7 +69,7 @@ RSpec.describe 'Change request view', type: :feature do
 
   def as(whom)
     visit cluster_case_change_request_path(
-              cluster, kase, subject,
+              cluster, kase,
               as: whom
           )
     yield

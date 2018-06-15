@@ -1,6 +1,6 @@
 <% if current_user.admin? %>
   <%= link_to 'Begin handover',
-              handover_case_change_request_path(cr.case, cr),
+              handover_case_change_request_path(cr.case),
               class: 'btn btn-danger form-control mb-2',
               data: {
                   confirm: 'Are you sure you want to mark work on this CR as complete?'

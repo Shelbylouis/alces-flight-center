@@ -89,7 +89,7 @@ class ChangeRequestsController < ApplicationController
     rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
       flash[:error] = "Error updating change request: #{format_errors(cr)}"
     end
-    redirect_to cluster_case_change_request_path(@case.cluster, @case, cr)
+    redirect_to cluster_case_change_request_path(@case.cluster, @case)
   end
 
   def change_action_and_email(success_flash)

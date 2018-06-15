@@ -32,8 +32,7 @@ class ChangeRequestStateTransitionDecorator < ApplicationDecorator
        'View change request',
        h.cluster_case_change_request_path(
          kase.cluster,
-         kase,
-         object.change_request
+         kase
        ),
        class: 'btn btn-secondary float-right'
     )
