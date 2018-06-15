@@ -19,7 +19,7 @@
 //
 
 function enable_tooltips () {
-  $('[title]').tooltip()
+  $('[title]').tooltip({ delay: { show: 500, hide: 100 }})
 }
 
 document.addEventListener('turbolinks:load', enable_tooltips);
