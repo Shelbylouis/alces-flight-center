@@ -102,10 +102,6 @@ class SlackNotifier
 
     private
 
-    def notifier
-      Slack::Notifier.new slack_webhook_url
-    end
-
     def maintenance_notification(kase, text, colour)
       maintenance_note = {
         fallback: text,
@@ -129,6 +125,10 @@ class SlackNotifier
       notifier.ping channel: slack_channel,
         username: slack_username,
         attachments: note
+    end
+
+    def notifier
+      Slack::Notifier.new slack_webhook_url
     end
 
     def restrict_text_length(text, url)
