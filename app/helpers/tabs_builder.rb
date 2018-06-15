@@ -49,7 +49,7 @@ class TabsBuilder
   attr_reader :user, :scope
 
   def new_case_entry
-    if user.editor?
+    if Pundit.policy!(user, Case).create?
       {
         text: 'Create',
         path: scope.new_scope_case_path,
