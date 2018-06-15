@@ -200,7 +200,7 @@ class Case < ApplicationRecord
     open? && !consultancy?
   end
 
-  def can_create_change_request
+  def can_create_change_request?
     tier_level == 3 && change_request.nil?
   end
 
