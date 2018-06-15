@@ -62,11 +62,14 @@ a.btn.disabled {
   }
 }
 
-button.btn.disabled {
-  // Do not change text color of disabled buttons on hover, since this implies
-  // they could be interacted with.
-  &:hover {
-    color: inherit;
+// Do not change text colour of disabled buttons/button links on hover, since
+// this implies they could be interacted with. This is not completely ideal as
+// this overrides the non-disabled button text colour, but I couldn't find
+// another way to do this which consistently works across every button type
+// (`button`/`a`/`input`) and style (`btn-primary`/`btn-warning` etc.).
+.btn.disabled {
+  &, &:hover {
+    color: white !important;
   }
 }
 
