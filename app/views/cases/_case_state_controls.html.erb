@@ -22,7 +22,7 @@
                class: 'form-inline',
                id: 'case-close-form'
       ) do %>
-      <% if @case.change_request.present? %>
+      <% if @case.cr_charge_applies? %>
         <p class="small">
           Charge below should include <%= pluralize(@case.change_request.credit_charge, 'credit') %> from attached CR
         </p>
@@ -32,9 +32,9 @@
           <%= number_field :credit_charge,
                            :amount,
                            class: 'form-control',
-                           min: 0,
+                           min: @case.minimum_credit_charge,
                            required: 'required',
-                           value: @case.change_request&.credit_charge
+                           value: @case.minimum_credit_charge
         %>
         <div class="input-group-append">
           <%= submit_tag 'Set charge and close case',

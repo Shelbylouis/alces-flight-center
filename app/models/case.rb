@@ -251,6 +251,14 @@ class Case < ApplicationRecord
     !CaseCommenting.new(self, user).disabled?
   end
 
+  def cr_charge_applies?
+    change_request.present? && change_request.completed?
+  end
+
+  def minimum_credit_charge
+    cr_charge_applies? ? change_request.credit_charge : 0
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
@@ -352,8 +360,7 @@ class Case < ApplicationRecord
 
   def validate_minimum_credit_charge
     error_condition = closed? &&
-                      change_request.present? &&
-                      change_request.completed? &&
+                      cr_charge_applies? &&
                       (
                         credit_charge.nil? ||
                         credit_charge.amount < change_request.credit_charge
