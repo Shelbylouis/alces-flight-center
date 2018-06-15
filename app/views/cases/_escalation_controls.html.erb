@@ -1,12 +1,46 @@
+
+<%#
+  This is the same logic as `Case#comments_could_be_enabled?` although the
+  purpose is different - possibly there's some underlying shared concept for
+  when both these should be toggled that we should extract? Not sure if this is
+  just conincidental though and they could later independently change, which is
+  why I've not done this yet.
+%>
 <% if @case.open? && !@case.consultancy? %>
-  <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#escalateModal">
-    Escalate
-  </button>
-  <div class="modal fade" id="escalateModal" tabindex="-1" role="dialog" aria-labelledby="escalateModalLabel" aria-hidden="true">
+  <%
+      modal_id = 'escalateModal'
+      modal_label = 'escalateModalLabel'
+  %>
+
+  <%= button_tag 'Escalate',
+    PolicyDependentOptions.wrap(
+      {
+        class: "btn btn-warning btn-sm ml-2",
+        data: {
+          toggle: 'modal',
+          target: "##{modal_id}",
+        },
+      },
+      policy: policy(@case).escalate?,
+      action_description: 'escalate a case',
+      user: current_user
+  )
+  %>
+
+  <div
+    class="modal fade"
+    id="<%= modal_id %>"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="<%= modal_label %>"
+    aria-hidden="true"
+  >
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="escalateModalLabel">Escalating this support case may incur charges</h5>
+          <h5 class="modal-title" id="<%= modal_label %>">
+            Escalating this support case may incur charges
+          </h5>
           <button class="close" data-dismiss="modal">×</button>
         </div>
         <div class="modal-body">
@@ -15,7 +49,9 @@
           <p>Do you wish to continue?</p>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
+          <button class="btn btn-outline-primary" data-dismiss="modal">
+            Cancel
+          </button>
           <%= link_to 'Escalate',
                       escalate_case_path(@case.id),
                       class: 'btn btn-outline-warning',

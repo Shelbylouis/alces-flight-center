@@ -2,7 +2,7 @@ class NoteDecorator < ApplicationDecorator
   delegate_all
 
   def subtitle
-    if current_user.admin?
+    if h.current_user.admin?
       "#{flavour.capitalize} notes"
     else
       "Cluster notes"
@@ -10,19 +10,27 @@ class NoteDecorator < ApplicationDecorator
   end
 
   def new_form_intro
-    if current_user.admin?
+    if h.current_user.admin?
       "There are currently no #{flavour} notes for this cluster. You may add
-      them below."
-    else
+      them below.".squish
+    elsif h.current_user.contact?
       "There are currently no notes for this cluster. You may add them below."
+    elsif h.current_user.viewer?
+      "There are currently no notes for this cluster."
+    else
+      raise_as_unhandled
     end
   end
 
   def edit_form_intro
-    if current_user.admin?
+    if h.current_user.admin?
       "Edit the #{flavour} notes for this cluster below."
-    else
+    elsif h.current_user.contact?
       'Edit your cluster notes below.'
+    else
+      # Viewers are the only other role at the moment, and they cannot access
+      # the edit notes page.
+      raise_as_unhandled
     end
   end
 
@@ -36,5 +44,11 @@ class NoteDecorator < ApplicationDecorator
 
   def form_path
     [note.cluster, note]
+  end
+
+  private
+
+  def raise_as_unhandled
+    raise "Don't know how to handle this user"
   end
 end

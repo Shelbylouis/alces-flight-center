@@ -12,7 +12,7 @@ FactoryBot.define do
     end
 
     factory :contact do
-      role :primary_contact
+      role :secondary_contact
 
       factory :primary_contact do
         role :primary_contact

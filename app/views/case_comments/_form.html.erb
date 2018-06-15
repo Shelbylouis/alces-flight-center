@@ -1,15 +1,4 @@
-<% if @case.commenting_disabled? %>
-
- <div class="card bg-light">
-   <div class="card-body">
-     <span class="float-left mr-3">
-       <%= icon('info') %>
-     </span>
-     <%= @case.commenting_disabled_text %>
-   </div>
- </div>
-
-<% else %>
+<% if policy(@comment).create? %>
 
   <%= form_for [@case, @comment] do |f| %>
     <div class="form-group">
@@ -24,5 +13,16 @@
       %>
     </div>
   <% end %>
+
+<% else %>
+
+ <div class="card bg-light">
+   <div class="card-body">
+     <span class="float-left mr-3">
+       <%= icon('info') %>
+     </span>
+     <%= @case.commenting_disabled_text %>
+   </div>
+ </div>
 
 <% end %>

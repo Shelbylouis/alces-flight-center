@@ -49,6 +49,30 @@ body {
   overflow-y: scroll;
 }
 
+// Override Bootstrap setting `pointer-events: none` on disabled button links
+// (see https://github.com/twbs/bootstrap/issues/17703), so title text on these
+// links is shown and cursor changes appropriately.
+a.btn.disabled {
+  pointer-events: auto !important;
+
+  // Prevent default Bootstrap styling of focused button link (so should appear
+  // same as if unfocused).
+  &:focus {
+    box-shadow: none !important;
+  }
+}
+
+// Do not change text colour of disabled buttons/button links on hover, since
+// this implies they could be interacted with. This is not completely ideal as
+// this overrides the non-disabled button text colour, but I couldn't find
+// another way to do this which consistently works across every button type
+// (`button`/`a`/`input`) and style (`btn-primary`/`btn-warning` etc.).
+.btn.disabled {
+  &, &:hover {
+    color: white !important;
+  }
+}
+
 .elm-overlay {
   // So Elm debugger always appears on top in development.
   z-index: 10000;

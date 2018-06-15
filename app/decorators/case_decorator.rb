@@ -35,10 +35,6 @@ class CaseDecorator < ApplicationDecorator
     h.tier_description(tier_level)
   end
 
-  def commenting_disabled?
-    commenting.disabled?
-  end
-
   def commenting_disabled_text
     commenting.disabled_text
   end

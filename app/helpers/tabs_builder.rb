@@ -1,6 +1,7 @@
 
 class TabsBuilder
-  def initialize(scope)
+  def initialize(user:, scope:)
+    @user = user
     @scope = scope.decorate
   end
 
@@ -12,10 +13,10 @@ class TabsBuilder
     {
       id: :cases, path: scope.scope_cases_path,
       dropdown: [
-        { text: 'Create', path: scope.new_scope_case_path },
-        { text: "Current (#{scope.cases.active.size})", path: scope.scope_cases_path },
-        { text: 'Resolved', path: scope.resolved_scope_cases_path }
-      ]
+        new_case_entry,
+        current_cases_entry,
+        resolved_cases_entry,
+      ].compact
     }
   end
 
@@ -45,5 +46,28 @@ class TabsBuilder
 
   private
 
-  attr_reader :scope
+  attr_reader :user, :scope
+
+  def new_case_entry
+    if Pundit.policy!(user, Case).create?
+      {
+        text: 'Create',
+        path: scope.new_scope_case_path,
+      }
+    end
+  end
+
+  def current_cases_entry
+    {
+      text: "Current (#{scope.cases.active.size})",
+      path: scope.scope_cases_path,
+    }
+  end
+
+  def resolved_cases_entry
+    {
+      text: 'Resolved',
+      path: scope.resolved_scope_cases_path,
+    }
+  end
 end

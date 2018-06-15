@@ -29,7 +29,7 @@
 <% end %>
 
 
-<% if current_user.admin? %>
+<% if policy(@new_log).create? %>
   <div class='card'>
     <%= render 'partials/card_header_nav', title: 'Add Log' %>
     <div class='card-body table-responsive'>

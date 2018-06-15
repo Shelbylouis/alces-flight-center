@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.feature 'Asset Record', type: :feature   do
+RSpec.feature 'Asset Record', type: :feature do
   let(:admin) { create(:admin) }
   let(:component) { create(:component) }
   let(:component_group) { create(:component_group) }

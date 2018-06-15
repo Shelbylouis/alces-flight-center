@@ -23,7 +23,7 @@
     <th>Requested MOTD</th>
     <td>
       <%= simple_format(motd_request.motd) %>
-      <% if current_user.admin? %>
+      <% if policy(motd_request).apply? %>
         <%
             button_class, button_text =
               if motd_request.unapplied?

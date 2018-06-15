@@ -30,8 +30,15 @@
         <%= simple_format(cluster.motd) %>
         <%= link_to "Request change",
             new_cluster_case_path(@cluster, tool: 'motd'),
-            role: 'button',
-            class: "btn btn-secondary"
+            PolicyDependentOptions.wrap(
+              {
+                role: 'button',
+                class: "btn btn-secondary",
+              },
+              policy: policy(Case).create?,
+              action_description: 'request a change to the MOTD',
+              user: current_user
+            )
         %>
       </li>
     </ul>

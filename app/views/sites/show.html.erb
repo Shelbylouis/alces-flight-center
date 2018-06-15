@@ -44,12 +44,15 @@
                             'btn-primary'
                           ]
               %>
+
               <%= link_to "Create case",
                           new_cluster_case_path(cluster),
-                          class: [
-                            'btn',
-                            'btn-danger'
-                          ]
+                          PolicyDependentOptions.wrap(
+                            {class: ['btn', 'btn-danger']},
+                            policy: policy(Case).create?,
+                            action_description: 'create a case',
+                            user: current_user
+                          )
               %>
             </span>
           </div>

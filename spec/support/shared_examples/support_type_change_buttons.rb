@@ -12,51 +12,79 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
   let(:request_alces_management_text) { 'Request Alces management' }
 
   let(:site) { create(:site) }
-  let(:contact) { create(:contact, site: site) }
+  let(:user) { create(:contact, site: site) }
   let(:cluster) { create(:cluster, site: site) }
 
-  let :cluster_parts_path do
-    send("cluster_#{part_name.to_s.pluralize}_path", cluster, as: contact)
+  let :path do
+    send("cluster_#{part_name.to_s.pluralize}_path", cluster, as: user)
   end
 
-  it "can request self-management of a managed #{part_class_name}" do
-    part = create("managed_#{part_name}", cluster: cluster)
+  context "when #{part_class_name} is managed" do
+    let! :part do
+      create("managed_#{part_name}", cluster: cluster)
+    end
 
-    visit cluster_parts_path
-    click_button 'Request self-management'
+    let(:button_text) { request_self_management_text }
 
-    created_case = part.cases.first
-    expect(created_case.send(part_name)).to eq(part)
-    issue = Issue.send("request_#{part_name}_becomes_advice_issue")
-    expect(created_case.issue).to eq(issue)
-    tier = issue.tiers.first
-    expect(created_case.fields).to eq(tier.fields)
-    expect(created_case.tier_level).to eq(tier.level)
+    it_behaves_like 'button is disabled for viewers' do
+      let :disabled_button_title do
+        "As a viewer you cannot request self-management of a #{part_name}"
+      end
+    end
+
+    it 'can request self-management' do
+      visit path
+      click_button button_text
+
+      created_case = part.cases.first
+      expect(created_case.send(part_name)).to eq(part)
+      issue = Issue.send("request_#{part_name}_becomes_advice_issue")
+      expect(created_case.issue).to eq(issue)
+      tier = issue.tiers.first
+      expect(created_case.fields).to eq(tier.fields)
+      expect(created_case.tier_level).to eq(tier.level)
+    end
   end
 
-  it "can request Alces management of an advice-only #{part_class_name}" do
-    part = create("advice_#{part_name}", cluster: cluster)
+  context "when #{part_class_name} is advice-only" do
+    let! :part do
+      create("advice_#{part_name}", cluster: cluster)
+    end
 
-    visit cluster_parts_path
-    click_button request_alces_management_text
+    let(:button_text) { request_alces_management_text }
 
-    created_case = part.cases.first
-    expect(created_case.send(part_name)).to eq(part)
-    issue = Issue.send("request_#{part_name}_becomes_managed_issue")
-    expect(created_case.issue).to eq(issue)
-    tier = issue.tiers.first
-    expect(created_case.fields).to eq(tier.fields)
-    expect(created_case.tier_level).to eq(tier.level)
+    it_behaves_like 'button is disabled for viewers' do
+      let :disabled_button_title do
+        "As a viewer you cannot request Alces management of a #{part_name}"
+      end
+    end
+
+    it "can request Alces management" do
+      visit path
+      click_button button_text
+
+      created_case = part.cases.first
+      expect(created_case.send(part_name)).to eq(part)
+      issue = Issue.send("request_#{part_name}_becomes_managed_issue")
+      expect(created_case.issue).to eq(issue)
+      tier = issue.tiers.first
+      expect(created_case.fields).to eq(tier.fields)
+      expect(created_case.tier_level).to eq(tier.level)
+    end
   end
 
-  it "displays no buttons for internal #{part_class_name}" do
-    part = create(part_name, internal: true, cluster: cluster)
+  context "when #{part_class_name} is internal" do
+    let! :part do
+      create(part_name, internal: true, cluster: cluster)
+    end
 
-    visit cluster_parts_path
-    # Sanity check that part itself is actually being displayed.
-    expect(page).to have_text(part.name)
+    it 'displays no buttons' do
+      visit path
+      # Sanity check that part itself is actually being displayed.
+      expect(page).to have_text(part.name)
 
-    expect(page).not_to have_button(request_self_management_text)
-    expect(page).not_to have_button(request_alces_management_text)
+      expect(page).not_to have_button(request_self_management_text)
+      expect(page).not_to have_button(request_alces_management_text)
+    end
   end
 end
