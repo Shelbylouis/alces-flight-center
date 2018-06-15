@@ -14,7 +14,7 @@ class CaseMailerPreview < ApplicationMailerPreview
   end
 
   def maintenance
-    CaseMailer.maintenance(
+    CaseMailer.maintenance_state_transition(
       get_case,
       'This text will be replaced with the text from MaintenanceNotifier'
     )

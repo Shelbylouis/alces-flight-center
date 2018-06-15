@@ -48,6 +48,8 @@ class MaintenanceWindow < ApplicationRecord
       # Use send so can keep method private.
       model.send(:add_transition_comment, transition.event)
     end
+
+    after_transition on: :extend_duration, do: :reset_maintenance_ending_soon_email_flag
   end
 
   class << self
@@ -107,6 +109,14 @@ class MaintenanceWindow < ApplicationRecord
 
   def respond_to_missing?(symbol, include_all=false)
     TransitionQuery.parse(symbol)
+  end
+
+  def set_maintenance_ending_soon_email_flag
+    self.update!(maintenance_ending_soon_email_sent: true)
+  end
+
+  def reset_maintenance_ending_soon_email_flag
+    self.update!(maintenance_ending_soon_email_sent: false)
   end
 
   private

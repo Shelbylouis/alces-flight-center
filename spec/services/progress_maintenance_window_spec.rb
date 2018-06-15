@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe ProgressMaintenanceWindow do
+  include ActiveSupport::Testing::TimeHelpers
+
   describe '#progress' do
     RSpec.shared_examples 'progresses' do |args|
       from = args[:from]
@@ -82,6 +84,21 @@ RSpec.describe ProgressMaintenanceWindow do
       expect(message).to eq full_expected_message
     end
 
+    around :each do |example|
+      # Run every test starting at defined time, to make things more
+      # deterministic and reduce chance of running into issues due to what the
+      # real time is (in particular we calculate the `expected_end` using
+      # business days so the date and time of day the tests were run at could
+      # change whether they pass or fail).
+      travel_to last_tuesday_at_2 do
+        example.call
+      end
+    end
+
+    let :last_tuesday_at_2 do
+      Time.zone.local(2018, 6, 12, 14)
+    end
+
     let :component do
       create(:component, name: 'somenode')
     end
@@ -118,6 +135,51 @@ RSpec.describe ProgressMaintenanceWindow do
 
       other_states = MaintenanceWindow.possible_states - [:started, :confirmed, :new, :requested]
       include_examples 'does not progress', other_states
+    end
+
+    describe 'maintenance is nearing completion' do
+      let(:requested_start) { 23.hours.ago }
+
+      context 'when maintenance has started' do
+        let(:window) { build_window(state: :started) }
+
+        it 'sends notifications that maintenance is ending soon' do
+          expect(CaseMailer).to receive(:maintenance_ending_soon)
+
+          described_class.new(window).progress
+        end
+
+        it 'does not send notifications if already sent' do
+          window.update!(maintenance_ending_soon_email_sent: true)
+
+          expect(CaseMailer).not_to receive(:maintenance_ending_soon)
+
+          described_class.new(window).progress
+        end
+
+        context 'but has more than an hour left' do
+          let(:requested_start) { 20.hours.ago }
+
+          it 'does not send notifications' do
+            expect(CaseMailer).not_to receive(:maintenance_ending_soon)
+
+            described_class.new(window).progress
+          end
+        end
+      end
+
+      other_states = MaintenanceWindow.possible_states - [:started]
+      other_states.each do |state|
+        context "when state is '#{state}'" do
+          it 'does not send notifications' do
+            window = build_window(state: state)
+
+            expect(CaseMailer).not_to receive(:maintenance_ending_soon)
+
+            described_class.new(window).progress
+          end
+        end
+      end
     end
   end
 end

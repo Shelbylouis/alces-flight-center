@@ -72,22 +72,12 @@ class SlackNotifier
       send_notification(comment_note)
     end
 
-    def maintenance_notification(kase, text)
-      maintenance_note = {
-        fallback: text,
-        color: "#000000",
-        title: subject_and_id_title(kase),
-        title_link: cluster_case_url(kase.cluster, kase),
-        fields: [
-          {
-            title: "Maintenance Info",
-            value: text,
-            short: false
-          }
-        ]
-      }
+    def maintenance_state_transition_notification(kase, text)
+      maintenance_notification(kase, text, "#000000")
+    end
 
-      send_notification(maintenance_note)
+    def maintenance_ending_soon_notification(kase, text)
+      maintenance_notification(kase, text, 'warning')
     end
 
     def log_notification(log)
@@ -112,8 +102,22 @@ class SlackNotifier
 
     private
 
-    def notifier
-      Slack::Notifier.new slack_webhook_url
+    def maintenance_notification(kase, text, colour)
+      maintenance_note = {
+        fallback: text,
+        color: colour,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        fields: [
+          {
+            title: "Maintenance Info",
+            value: text,
+            short: false
+          }
+        ]
+      }
+
+      send_notification(maintenance_note)
     end
 
     def send_notification(note)
@@ -121,6 +125,10 @@ class SlackNotifier
       notifier.ping channel: slack_channel,
         username: slack_username,
         attachments: note
+    end
+
+    def notifier
+      Slack::Notifier.new slack_webhook_url
     end
 
     def restrict_text_length(text, url)

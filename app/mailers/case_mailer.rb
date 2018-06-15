@@ -34,13 +34,26 @@ class CaseMailer < ApplicationMailer
     SlackNotifier.comment_notification(@case, @comment)
   end
 
-  def maintenance(my_case, text)
+  def maintenance_state_transition(my_case, text)
     @case = my_case
     @text = text
     mail(
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
-    SlackNotifier.maintenance_notification(@case, @text)
+    SlackNotifier.maintenance_state_transition_notification(@case, @text)
+  end
+
+  def maintenance_ending_soon(window, text)
+    @case = window.case
+    @text = text
+    admin_emails = User.admins.map(&:email)
+
+    mail(
+      cc: admin_emails,
+      subject: @case.email_reply_subject
+    )
+    SlackNotifier.maintenance_ending_soon_notification(@case, @text)
+    window.set_maintenance_ending_soon_email_flag
   end
 end

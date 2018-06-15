@@ -28,7 +28,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         user = create(:admin, name: 'some_user')
 
         expect(CaseMailer).to receive(
-          :maintenance
+          :maintenance_state_transition
         ).with(
           subject.case,
           /Request for maintenance of some_component cancelled by some_user/
@@ -58,7 +58,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           start.*#{expected_start}.*rescheduled.*confirmed.*#{expected_cluster_dashboard_url}
         REGEX
         expect(CaseMailer).to receive(
-          :maintenance
+          :maintenance_state_transition
         ).with(subject.case, text_regex).and_return(stub_mail)
 
         subject.auto_expire!
@@ -89,7 +89,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           some_user.*must be confirmed.*#{expected_cluster_dashboard_url}
         REGEX
         expect(CaseMailer).to receive(
-          :maintenance
+          :maintenance_state_transition
         ).with(subject.case, text_regex)
         .and_return(stub_mail)
 
@@ -117,7 +117,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           some_user.*scheduled.*#{expected_start}.*#{expected_end}
         REGEX
         expect(CaseMailer).to receive(
-          :maintenance
+          :maintenance_state_transition
         ).with(subject.case, text_regex)
         .and_return(stub_mail)
 
@@ -145,7 +145,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           #{expected_end} by.*some_admin.*mandatory
         EOF
         expect(CaseMailer).to receive(
-          :maintenance
+          :maintenance_state_transition
         ).with(subject.case, text_regex)
         .and_return(stub_mail)
 
@@ -166,7 +166,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         user = create(:user, name: 'some_user')
 
         expect(CaseMailer).to receive(
-          :maintenance
+          :maintenance_state_transition
         ).with(
           subject.case,
           /maintenance.*some_component.*rejected by some_user/
@@ -192,7 +192,7 @@ RSpec.describe MaintenanceWindow, type: :model do
           maintenance until #{expected_end}
         REGEX
         expect(CaseMailer).to receive(
-          :maintenance
+          :maintenance_state_transition
         ).with(subject.case, text_regex)
         .and_return(stub_mail)
 
@@ -224,11 +224,20 @@ RSpec.describe MaintenanceWindow, type: :model do
           until #{expected_end}
         REGEX
         expect(CaseMailer).to receive(
-          :maintenance
+          :maintenance_state_transition
         ).with(subject.case, text_regex)
         .and_return(stub_mail)
 
         subject.extend_duration!(create(:admin))
+      end
+
+      it 'resets the maintenance nearing completion email sent flag' do
+        admin = create(:admin)
+
+        subject.update!(maintenance_ending_soon_email_sent: true)
+        subject.extend_duration!(admin)
+
+        expect(subject.maintenance_ending_soon_email_sent).to eq(false)
       end
     end
 
@@ -242,7 +251,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       it 'generates an email when auto-ended' do
         subject.component = create(:component, name: 'some_component')
 
-        expect(CaseMailer).to receive(:maintenance).with(
+        expect(CaseMailer).to receive(:maintenance_state_transition).with(
           subject.case,
           /maintenance of some_component .* ended/
         ).and_return(stub_mail)
@@ -264,7 +273,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         admin = create(:admin, name: 'some_admin')
         subject.component = create(:component, name: 'some_component')
 
-        expect(CaseMailer).to receive(:maintenance).with(
+        expect(CaseMailer).to receive(:maintenance_state_transition).with(
           subject.case,
           /maintenance of some_component ended by some_admin/i
         ).and_return(stub_mail)
@@ -326,7 +335,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       window = create(:maintenance_window, state: :started)
       window.legacy_migration_mode = true
 
-      expect(CaseMailer).not_to receive(:maintenance)
+      expect(CaseMailer).not_to receive(:maintenance_state_transition)
 
       window.auto_end!
     end
