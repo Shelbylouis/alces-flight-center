@@ -1,7 +1,7 @@
 
 ProgressMaintenanceWindow = Struct.new(:window) do
   def progress
-    should_maintenance_ending_soon_email_be_sent?
+    maybe_send_maintenance_ending_soon_email
     if required_transition_event
       transition_state(required_transition_event)
     else
@@ -67,13 +67,18 @@ ProgressMaintenanceWindow = Struct.new(:window) do
     datetime.to_formatted_s(:short)
   end
 
-  def should_maintenance_ending_soon_email_be_sent?
-    return unless email_not_sent_yet? && less_than_an_hour_left? && started?
-    send_maintenance_ending_soon_email
+  def maybe_send_maintenance_ending_soon_email
+    if should_send_maintenance_ending_soon_email?
+      send_maintenance_ending_soon_email
+    end
+  end
+
+  def should_send_maintenance_ending_soon_email?
+    email_not_sent_yet? && less_than_an_hour_left? && started?
   end
 
   def email_not_sent_yet?
-    window.maintenance_ending_soon_email_sent ? false : true
+    !window.maintenance_ending_soon_email_sent
   end
 
   def less_than_an_hour_left?
