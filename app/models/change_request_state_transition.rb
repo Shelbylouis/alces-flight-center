@@ -16,7 +16,7 @@ class ChangeRequestStateTransition < ApplicationRecord
     when :propose, :handover
       errors.add(:user, 'must be an admin') unless user&.admin?
     when :authorise, :decline, :complete
-      errors.add(:user, 'must not be an admin') if user&.admin?
+      errors.add(:user, 'must be a contact') unless user&.contact?
     end
   end
 end

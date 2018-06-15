@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-RSpec.shared_examples 'it must be initiated by a non-admin' do
-  it 'can be initiated by non-admin' do
+RSpec.shared_examples 'it must be initiated by a contact' do
+  it 'can be initiated by contact' do
     subject.user = create(:contact)
 
     expect(subject).to be_valid
@@ -11,7 +11,14 @@ RSpec.shared_examples 'it must be initiated by a non-admin' do
     subject.user = create(:admin)
 
     expect(subject).not_to be_valid
-    expect(subject.errors.messages).to include user: [/must not be an admin/]
+    expect(subject.errors.messages).to include user: [/must be a contact/]
+  end
+
+  it 'cannot be initiated by viewer' do
+    subject.user = create(:viewer)
+
+    expect(subject).not_to be_valid
+    expect(subject.errors.messages).to include user: [/must be a contact/]
   end
 end
 
@@ -41,7 +48,7 @@ RSpec.describe ChangeRequestStateTransition, type: :model do
     context "when `#{event}` event" do
       let(:event) { event }
 
-      it_behaves_like 'it must be initiated by a non-admin'
+      it_behaves_like 'it must be initiated by a contact'
     end
   end
 
