@@ -38,6 +38,16 @@ RSpec.describe NoteDecorator do
         )
       end
     end
+
+    context 'as a viewer' do
+      let(:current_user) { build_stubbed(:viewer) }
+
+      it do
+        is_expected.to eq(
+          'There are currently no notes for this cluster.'
+        )
+      end
+    end
   end
 
   describe '#edit_form_intro' do
@@ -59,6 +69,16 @@ RSpec.describe NoteDecorator do
       it do
         is_expected.to eq(
           'Edit your cluster notes below.'
+        )
+      end
+    end
+
+    context 'as a viewer' do
+      let(:current_user) { build_stubbed(:viewer) }
+
+      it "is unhandled as Users can't edit" do
+        expect { subject }.to raise_error(
+          "Don't know how to handle this user"
         )
       end
     end
