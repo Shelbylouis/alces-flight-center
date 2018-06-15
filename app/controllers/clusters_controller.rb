@@ -1,8 +1,9 @@
 class ClustersController < ApplicationController
   decorates_assigned :cluster
 
-  # :credit_usage is a read-only action so should not require authorization.
-  after_action :verify_authorized, except: NO_AUTH_ACTIONS + [:credit_usage]
+  additional_read_only_actions = [:credit_usage, :documents]
+  after_action :verify_authorized,
+    except: NO_AUTH_ACTIONS + additional_read_only_actions
 
   def credit_usage
     credit_events = ClusterCreditEvents.new(@cluster, start_date, end_date)
