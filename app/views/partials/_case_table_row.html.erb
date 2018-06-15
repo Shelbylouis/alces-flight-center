@@ -15,6 +15,8 @@
         <%= kase.assignee&.name || 'Nobody' %>
       <% end %>
     </td>
+    <%# The below onclick makes sure that the onlick event within the row does
+      not get triggered when clicking the link within this column. %>
   <td onclick='event.stopPropagation();'><%= kase.association_info %></td>
   <% if kase.resolved? || kase.closed? %>
     <td><%= kase.credit_charge&.amount %></td>
