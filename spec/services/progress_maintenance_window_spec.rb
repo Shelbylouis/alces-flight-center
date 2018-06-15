@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe ProgressMaintenanceWindow do
+  include ActiveSupport::Testing::TimeHelpers
+
   describe '#progress' do
     RSpec.shared_examples 'progresses' do |args|
       from = args[:from]
@@ -80,6 +82,21 @@ RSpec.describe ProgressMaintenanceWindow do
         #{end_date}): #{expected}
       EOF
       expect(message).to eq full_expected_message
+    end
+
+    around :each do |example|
+      # Run every test starting at defined time, to make things more
+      # deterministic and reduce chance of running into issues due to what the
+      # real time is (in particular we calculate the `expected_end` using
+      # business days so the date and time of day the tests were run at could
+      # change whether they pass or fail).
+      travel_to last_tuesday_at_2 do
+        example.call
+      end
+    end
+
+    let :last_tuesday_at_2 do
+      Time.zone.local(2018, 6, 12, 14)
     end
 
     let :component do
