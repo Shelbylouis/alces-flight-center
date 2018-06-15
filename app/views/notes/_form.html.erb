@@ -1,23 +1,27 @@
-<div class="card-body">
-  <p>
-    <%= intro_text %>
-  </p>
-  <%= form_for note.form_path do |f| %>
-    <div class="form-group">
-      <%= f.text_area :description, class: 'form-control', rows: 10 %>
-    </div>
-    <p class="form-text text-muted">
-      Styling with markdown is supported
+<% content_for(:subtitle) { note.subtitle } %>
+
+<%= render 'partials/tabs', activate: :notes do %>
+  <div class="card-body">
+    <p>
+      <%= intro_text %>
     </p>
-    <div class="form-group" style="overflow: hidden;">
-      <%= f.submit button_text,
-        PolicyDependentOptions.wrap(
-          {class: dark_button_classes},
-          policy: policy(note).create?,
-          action_description: 'create cluster notes',
-          user: current_user
-      )
-      %>
-    </div>
-  <% end %>
-</div>
+    <%= form_for note.form_path do |f| %>
+      <div class="form-group">
+        <%= f.text_area :description, class: 'form-control', rows: 10 %>
+      </div>
+      <p class="form-text text-muted">
+        Styling with markdown is supported
+      </p>
+      <div class="form-group" style="overflow: hidden;">
+        <%= f.submit button_text,
+          PolicyDependentOptions.wrap(
+            {class: dark_button_classes},
+            policy: policy(note).create?,
+            action_description: 'create cluster notes',
+            user: current_user
+        )
+        %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
