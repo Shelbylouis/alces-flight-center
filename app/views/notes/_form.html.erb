@@ -13,6 +13,12 @@
         Styling with markdown is supported
       </p>
       <div class="form-group" style="overflow: hidden;">
+        <%#
+            This page is only rendered in the `new` case when the
+            `current_user` can't perform the action of the form, since users
+            who cannot edit cannot access the edit page. If this ever changes
+            then we may want to adjust the create-specific stuff below.
+        %>
         <%= f.submit button_text,
           PolicyDependentOptions.wrap(
             {class: dark_button_classes},
