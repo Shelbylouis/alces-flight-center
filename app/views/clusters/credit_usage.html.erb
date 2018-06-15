@@ -34,7 +34,8 @@
             >
               <script type="text/javascript">
                 function viewCreditPeriod(date) {
-                  window.location.href = "<%= cluster_credit_usage_path(cluster) %>/" + date;
+                  var url = "<%= cluster_credit_usage_path(cluster) %>/" + date;
+                  Turbolinks.visit(url);
                 }
               </script>
               <label for="start_date">
