@@ -6,7 +6,14 @@
   </div>
   <%= link_to 'Edit notes',
     note.edit_path,
-    class: 'btn btn-secondary m-2 btn-sm',
-    role: 'button'
+    PolicyDependentOptions.wrap(
+      {
+        class: 'btn btn-secondary m-2 btn-sm',
+        role: 'button',
+      },
+      policy: policy(note).edit?,
+      action_description: 'edit cluster notes',
+      user: current_user
+    )
   %>
 <% end %>
