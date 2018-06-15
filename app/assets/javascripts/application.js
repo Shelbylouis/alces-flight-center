@@ -18,8 +18,8 @@
 //= require_tree .
 //
 
-function enable_tooltips() {
+function enableTooltips() {
   $('[title]').tooltip({delay: {show: 500, hide: 100}, placement: 'left'});
 }
 
-document.addEventListener('turbolinks:load', enable_tooltips);
+document.addEventListener('turbolinks:load', enableTooltips);
