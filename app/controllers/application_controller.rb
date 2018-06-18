@@ -1,9 +1,12 @@
 require 'exceptions'
+require 'json_web_token'
 
 class ApplicationController < RootController
   include Pundit
 
   decorates_assigned :site
+
+  helper_method :signed_in_without_account?
 
   before_action :set_sentry_raven_context
   before_action :assign_current_user
@@ -35,7 +38,25 @@ class ApplicationController < RootController
     cookies.delete('flight_sso', domain: domain)
   end
 
+  def signed_in_without_account?
+    # A Flight SSO account does not necessarily correspond to a Flight Center
+    # account. If someone is logged in to Flight SSO but does not have access to
+    # Flight Center then current_user will be nil but they will have a
+    # `flight-sso` cookie.
+    # We want to identify this scenario so that we can use more appropriate
+    # language e.g. don't tell them to "log in" again.
+    current_user.nil? && valid_sso_token?
+  end
+
   private
+
+  def valid_sso_token?
+    # This method checks that the token itself is valid (and verifies the
+    # signature), not that it corresponds to a User.
+    cookies['flight_sso'] && JsonWebToken.decode(cookies['flight_sso'])
+  rescue JWT::DecodeError
+    false
+  end
 
   def set_sentry_raven_context
     if current_user
