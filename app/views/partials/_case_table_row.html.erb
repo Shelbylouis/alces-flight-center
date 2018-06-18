@@ -1,23 +1,30 @@
-<tr class='case-highlight'
-  onclick="Turbolinks.visit('<%= scope.dashboard_case_path(kase) %>')">
-    <td><%= kase.display_id %></td>
-    <%= timestamp_td(
-      description:  'Support case created',
-      timestamp: kase.created_at
-    ) %>
-    <td><%= kase.user_facing_state %></td>
-    <td style="white-space: nowrap;"><%= kase.user.name %></td>
-    <td><%= kase.subject %></td>
-    <td>
-      <% if current_user == kase.assignee %>
-        <%= raw('<strong>Me</strong>') %>
-      <% else %>
-        <%= kase.assignee&.name || 'Nobody' %>
-      <% end %>
+<tr class='case-highlight'>
+  <td><a class="td-link" href=<%= scope.dashboard_case_path(kase) %>>
+      <div><%= kase.display_id %></div></a></td>
+  <%= timestamp_td(
+    description:  'Support case created',
+    timestamp: kase.created_at
+  ) do |content|
+    "<a class='td-link' href='#{scope.dashboard_case_path(kase)}'>
+   #{content}
+  </a>"
+   end %>
+    <td><a class="td-link" href="<%= scope.dashboard_case_path(kase) %>">
+        <%= kase.user_facing_state %></a></td>
+    <td><a class="td-link" href="<%= scope.dashboard_case_path(kase) %>">
+        <%= kase.user.name %></a></td>
+    <td><a class="td-link" href=<%= scope.dashboard_case_path(kase) %>>
+        <%= kase.subject %></a></td>
+    <td><a class="td-link" href=<%= scope.dashboard_case_path(kase) %>>
+        <% if current_user == kase.assignee %>
+          <%= raw('<strong>Me</strong>') %>
+        <% else %>
+          <%= kase.assignee&.name || 'Nobody' %>
+        <% end %>
+      </a>
     </td>
-    <%# The below onclick makes sure that the onlick event within the row does
-      not get triggered when clicking the link within this column. %>
-  <td onclick='event.stopPropagation();'><%= kase.association_info %></td>
+    <td><a class="td-link" href=<%= scope.dashboard_case_path(kase) %>>
+        <%= kase.association_info %></a></td>
   <% if kase.resolved? || kase.closed? %>
     <td><%= kase.credit_charge&.amount %></td>
   <% end %>
