@@ -29,10 +29,6 @@ module ApplicationHelper
           id='new-case-form'
           data-clusters='#{clusters_json}'
           #{single_part_data_attr(single_part)}
-          #{selected_data_attr(:category, pre_selected)}
-          #{selected_data_attr(:issue, pre_selected)}
-          #{selected_data_attr(:service, pre_selected)}
-          #{selected_data_attr(:tier, pre_selected)}
           #{selected_data_attr(:tool, pre_selected)}
         ></div>
       EOF

@@ -63,47 +63,6 @@ RSpec.describe CasesController, type: :controller do
           end
         end
 
-        context 'when given a service' do
-          it 'assigns the correct service id to @pre_selected' do
-            get :new, params: { service: service.name, cluster_id: first_cluster.id }
-
-            expect(assigns(:pre_selected)).to eq({
-              service: service.id,
-            })
-          end
-        end
-
-        context 'when given a category' do
-          it 'assigns the correct category id to @pre_selected' do
-            issue = category.issues.first
-            service = issue.present? ?
-              Service.find_by(service_type: issue.service_type, cluster: first_cluster) :
-              nil
-
-            get :new, params: { category: category.name, cluster_id: first_cluster.id }
-
-            expect(assigns(:pre_selected)).to eq({
-              category: category.id,
-              service: service.present? ? service.id : nil,
-            })
-          end
-        end
-
-        context 'when given a issue' do
-          it 'assigns the correct service, category, issue and tier to @pre_selected' do
-            service = Service.find_by(service_type: issue.service_type, cluster: first_cluster)
-
-            get :new, params: { issue: issue.name, cluster_id: first_cluster.id }
-
-            expect(assigns(:pre_selected)).to eq({
-              category: issue.category.id,
-              issue: issue.id,
-              service: service.id,
-              tier: issue.tiers.first.id,
-            })
-          end
-        end
-
         context 'when given no pre-populations' do
           it 'does not assign anything to @pre_selected' do
             get :new, params: { cluster_id: first_cluster.id }
