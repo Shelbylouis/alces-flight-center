@@ -34,7 +34,7 @@ RSpec.describe 'Navigation variable assignments', type: :request do
     describe "get '/cluster/*'" do
       subject { cluster }
       before :each do
-        get cluster_path(cluster.shortcode, as: user)
+        get cluster_path(cluster, as: user)
       end
 
       it 'assigns correct navigation variables' do
