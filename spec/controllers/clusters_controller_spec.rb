@@ -10,7 +10,7 @@ RSpec.describe ClustersController, type: :controller do
   describe 'POST #deposit' do
 
     let(:params) {
-      { cluster_id: cluster.id, credit_deposit: { amount: 4 } }
+      { cluster_id: cluster.shortcode, credit_deposit: { amount: 4 } }
     }
 
     context 'as an admin' do
@@ -26,7 +26,8 @@ RSpec.describe ClustersController, type: :controller do
         post :deposit, params: params
 
         expect(response).to have_http_status(:found)
-        expect(response.headers['Location']).to match(/\/clusters\/#{cluster.id}\/credit-usage$/)
+        expect(response.headers['Location'])
+          .to match(/\/clusters\/#{cluster.shortcode}\/credit-usage$/)
         expect(flash[:success]).to eq '4 credits added to cluster Some Cluster.'
 
         cluster.reload
@@ -37,7 +38,7 @@ RSpec.describe ClustersController, type: :controller do
         expect(cluster.credit_balance).to eq 8
 
         # This demonstrates that we do intentionally permit negative "deposits"
-        post :deposit, params: { cluster_id: cluster.id, credit_deposit: { amount: -6 } }
+        post :deposit, params: { cluster_id: cluster.shortcode, credit_deposit: { amount: -6 } }
         cluster.reload
         expect(cluster.credit_balance).to eq 2
       end

@@ -88,6 +88,10 @@ class Cluster < ApplicationRecord
     end
   end
 
+  def to_param
+    shortcode
+  end
+
   private
 
   def validate_all_cluster_parts_advice
