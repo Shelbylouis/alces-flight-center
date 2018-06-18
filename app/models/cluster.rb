@@ -89,7 +89,7 @@ class Cluster < ApplicationRecord
   end
 
   def to_param
-    shortcode
+    shortcode.parameterize.upcase
   end
 
   private
