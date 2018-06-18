@@ -234,6 +234,40 @@ be able to send notfications to Slack from your development environment.
 - Create them a Flight Center account in the appropriate site, using the email
   address of their Flight SSO account.
 
+
+## Design
+
+### Authorisation
+
+A brief overview of how we're currently altering the UI based on what the
+`current_user` is authorised to do:
+
+- Whenever we do conditional logic on the role of the current user, e.g. `if
+  current_user.admin?`, we should instead switch using the Pundit policy for
+  the record and action we are considering, e.g. `if policy(@case).create?`
+  (the user is implicit when doing this in a view). This avoids duplicating
+  authorisation logic in various places in views/decorators etc., which avoids
+  the possibility of this getting out-of-sync with the actual auth logic in the
+  policy.
+
+- When buttons etc. are admin-only, they should not be shown at all to other
+  types of users.
+
+- When buttons etc. are contact-only, they should not be shown to admins.
+
+- Any button that will change the state of the system, rather than just being
+  for navigation or querying purposes, should not be available to viewers, and
+  this should be both enforced server-side and indicated client-side (either by
+  making the buttons unavailable or disabled as appropriate).
+
+- Viewer users should be able to see (but not alter) all information across the
+  site which should be available to contacts.
+
+- When a button is available to contacts but should not be available to
+  viewers, this should be indicated by disabling the button and indicating why
+  this is the case - this can be done in a consistent way across the site using
+  the `PolicyDependentOptions` class.
+
 ## Redis
 
 We require a Redis server to handle our asynchronous email queue. In
