@@ -14,10 +14,6 @@ const initializeFormApp = () => {
     const flags = {
       clusters: loadAttributeJson('data-clusters'),
       singlePart: loadAttributeJson('data-single-part'),
-      selectedCategory: loadAttributeJson('data-selected-category'),
-      selectedIssue: loadAttributeJson('data-selected-issue'),
-      selectedService: loadAttributeJson('data-selected-service'),
-      selectedTier: loadAttributeJson('data-selected-tier'),
       selectedTool: loadAttributeJson('data-selected-tool'),
     };
 
