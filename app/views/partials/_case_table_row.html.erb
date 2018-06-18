@@ -1,30 +1,24 @@
+<% url = scope.dashboard_case_path(kase) %>
 <tr class='case-highlight'>
-  <td><a class="td-link" href=<%= scope.dashboard_case_path(kase) %>>
-      <div><%= kase.display_id %></div></a></td>
+  <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.display_id %></td>
   <%= timestamp_td(
     description:  'Support case created',
     timestamp: kase.created_at
   ) do |content|
-    "<a class='td-link' href='#{scope.dashboard_case_path(kase)}'>
-   #{content}
-  </a>"
-   end %>
-    <td><a class="td-link" href="<%= scope.dashboard_case_path(kase) %>">
-        <%= kase.user_facing_state %></a></td>
-    <td><a class="td-link" href="<%= scope.dashboard_case_path(kase) %>">
-        <%= kase.user.name %></a></td>
-    <td><a class="td-link" href=<%= scope.dashboard_case_path(kase) %>>
-        <%= kase.subject %></a></td>
-    <td><a class="td-link" href=<%= scope.dashboard_case_path(kase) %>>
-        <% if current_user == kase.assignee %>
-          <%= raw('<strong>Me</strong>') %>
-        <% else %>
-          <%= kase.assignee&.name || 'Nobody' %>
-        <% end %>
-      </a>
-    </td>
-    <td><a class="td-link" href=<%= scope.dashboard_case_path(kase) %>>
-        <%= kase.association_info %></a></td>
+    render 'partials/table_cell_link', url: url, cell_content: content
+  end %>
+  <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.user_facing_state %></td>
+  <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.user.name %></td>
+  <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.subject %></td>
+  <td><%= render 'partials/table_cell_link',
+    url: url,
+    cell_content: if current_user == kase.assignee
+                    raw('<strong>Me</strong>')
+                  else
+                    kase.assignee&.name || 'Nobody'
+                  end
+    %></td>
+  <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.association_info %></td>
   <% if kase.resolved? || kase.closed? %>
     <td><%= kase.credit_charge&.amount %></td>
   <% end %>
