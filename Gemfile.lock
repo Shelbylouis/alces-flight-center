@@ -376,6 +376,8 @@ GEM
       faraday (>= 0.7.6, < 1.0)
     shoulda-matchers (3.1.2)
       activesupport (>= 4.0.0)
+    show_me_the_cookies (4.0.0)
+      capybara (>= 2, < 4)
     sinatra (2.0.3)
       mustermann (~> 1.0)
       rack (~> 2.0)
@@ -490,6 +492,7 @@ DEPENDENCIES
   selenium-webdriver
   sentry-raven
   shoulda-matchers
+  show_me_the_cookies
   slack-notifier
   spring
   spring-watcher-listen (~> 2.0.0)
