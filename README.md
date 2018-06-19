@@ -307,6 +307,9 @@ Some notes on using these:
   jobs (via `crontab -e` on the apps server) before deploying to staging, and
   then un-commenting these again post-deploy.
 
+- See [`docs/hotfix-release-policy.md`](./docs/hotfix-release-policy.md) for
+  when we should consider making a hotfix vs a normal release.
+
 
 ## Creating accounts for customers
 
