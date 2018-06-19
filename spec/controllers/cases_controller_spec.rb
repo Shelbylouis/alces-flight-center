@@ -20,14 +20,14 @@ RSpec.describe CasesController, type: :controller do
 
     context 'from cluster-level route' do
       it 'assigns just given cluster to @clusters' do
-        get :new, params: { cluster_id: first_cluster.id }
+        get :new, params: { cluster_id: first_cluster }
         expect(assigns(:clusters)).to eq([first_cluster])
       end
 
       it 'gives 404 if cluster does not belong to user site' do
         another_cluster = create(:cluster)
         expect do
-          get :new, params: { cluster_id: another_cluster.id }
+          get :new, params: { cluster_id: another_cluster }
         end.to raise_error(ActionController::RoutingError)
       end
 
@@ -55,7 +55,7 @@ RSpec.describe CasesController, type: :controller do
 
         context 'when given a tool' do
           it 'assigns the correct tool to @pre_selected' do
-            get :new, params: { tool: tier.tool, cluster_id: first_cluster.id }
+            get :new, params: { tool: tier.tool, cluster_id: first_cluster }
 
             expect(assigns(:pre_selected)).to eq({
               tool: tier.tool
@@ -65,7 +65,7 @@ RSpec.describe CasesController, type: :controller do
 
         context 'when given no pre-populations' do
           it 'does not assign anything to @pre_selected' do
-            get :new, params: { cluster_id: first_cluster.id }
+            get :new, params: { cluster_id: first_cluster }
 
             expect(assigns(:pre_selected)).to eq({})
           end
