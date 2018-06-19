@@ -1,11 +1,4 @@
 
-<%#
-  This is the same logic as `Case#comments_could_be_enabled?` although the
-  purpose is different - possibly there's some underlying shared concept for
-  when both these should be toggled that we should extract? Not sure if this is
-  just conincidental though and they could later independently change, which is
-  why I've not done this yet.
-%>
 <% if @case.open? %>
   <% if @case.tier_level < 3 %>
     <%
