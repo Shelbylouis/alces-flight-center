@@ -254,6 +254,60 @@ hopefully won't get out of date):
 - https://github.com/alces-software/alces-flight-center/pull/346#pullrequestreview-127604799
   (in particular response to second quote).
 
+### To deploy changes to staging/production
+
+The following Rake tasks are available to deploy local changes to
+staging/production:
+
+```bash
+$ rake -T | grep alces:deploy
+[...]
+rake alces:deploy:production                   # Deploy to production
+rake alces:deploy:production:dry_run           # Output what will happen on deploy to production, without doing anything
+rake alces:deploy:production:hotfix            # Deploy hotfix release to production
+rake alces:deploy:production:hotfix:dry_run    # Output what will happen on hotfix deploy to production, without doing anything
+rake alces:deploy:staging                      # Deploy to staging
+rake alces:deploy:staging:dry_run              # Output what will happen on deploy to staging, without doing anything
+```
+
+Some notes on using these:
+
+- Each command should just work, and will fail fast and safely if any necessary
+  pre-conditions are not met; the non-`dry_run` commands also ask for
+  confirmation first before doing anything.
+
+- Each command will output any needed additional manual steps at the end of
+  running it.
+
+- The commands to deploy to production require you to be on the `master` branch
+  before running.
+
+- The commands to deploy to staging expects a `STAGING_PASSWORD` environment
+  variable to be set when run, e.g. `rake alces:deploy:staging
+  STAGING_PASSWORD='foo'`, which previously was used to modify the production
+  data imported in staging to allow signing in as site users using this
+  password.
+
+  This is still done but no longer has any effect, since Flight Center now uses
+  [`flight-sso`](https://github.com/alces-software/flight-sso) which has its
+  own password management; however the code to do this has still been kept for
+  now, in case we later want to perform similar changes to the
+  `flight-sso-staging` instance on deploy (see
+  https://trello.com/c/p2UsFby4/206-consider-creating-modifying-flight-sso-staging-users-for-imported-production-users-on-deploy-to-staging).
+
+- On deploy to staging we import the latest production backup so we can try
+  things out with real data; when this is done the staging database is dropped
+  and then recreated afresh and the new data imported. I have noticed that, if
+  you are unlucky with when things get run, a cron job could attempt to connect
+  to the database at the point when the import script attempts to drop it; if
+  there are any ongoing connections the production import will then fail,
+  causing the whole deploy to abort.
+
+  To avoid any chance of this happening, I suggest commenting the staging cron
+  jobs (via `crontab -e` on the apps server) before deploying to staging, and
+  then un-commenting these again post-deploy.
+
+
 ## Creating accounts for customers
 
 - If they don't have a Flight SSO account, they should register for one first.
