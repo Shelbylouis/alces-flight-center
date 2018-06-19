@@ -4,7 +4,7 @@ class CreditCharge < CreditEvent
   attr_readonly :case
 
   validates :amount, numericality: {
-    minimum: 0,
+    greater_than_or_equal_to: 0,
     only_integer: true,
   }
 end
