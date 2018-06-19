@@ -4,7 +4,7 @@ class CreditDeposit < CreditEvent
   attr_readonly :cluster
 
   validates :amount, numericality: {
-    minimum: 1,
+    greater_than_or_equal_to: 1,
     only_integer: true,
   }
 end
