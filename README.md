@@ -296,6 +296,16 @@ A brief overview of how we're currently altering the UI based on what the
   this is the case - this can be done in a consistent way across the site using
   the `PolicyDependentOptions` class.
 
+### When to consider implementing admin-only features outside `rails_admin` interface
+
+For basic CRUD of data by admins we have an auto-generated
+[`rails_admin`](https://github.com/sferik/rails_admin) interface. Using this,
+with minor customizations, saves time developing basic admin-only functionality
+that would be better spent elsewhere. Refer to response to point 3 at
+https://github.com/alces-software/alces-flight-center/pull/334#pullrequestreview-126343497
+for when we should consider going beyond this.
+
+
 ## Redis
 
 We require a Redis server to handle our asynchronous email queue. In
