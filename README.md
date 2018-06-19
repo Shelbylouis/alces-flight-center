@@ -226,6 +226,34 @@ Center` configuration which will display the URL for you in its configuration
 page. Once you copy this URL to its respective environment variable you should
 be able to send notfications to Slack from your development environment.
 
+### To develop new Case form app
+
+The Case form app is written in Elm. See http://elm-lang.org/docs for various
+documentation related to working with this, and in particular see
+https://guide.elm-lang.org/install.html#configure-your-editor for how to
+improve the Elm editing experience for your editor.
+
+Running `bin/webpack-dev-server`, as described above, should be sufficient to
+re-compile the Case form app when any relevant files are changed.
+
+We use the latest (experimental) version of
+[`elm-format`](https://github.com/avh4/elm-format#experimental-version) to
+format our Elm code, which ensures the code is all consistently formatted and
+minimizes the time we need to spend caring about how it is formatted. This can
+be installed with `yarn global add elm-format@exp`, and should ideally be run
+across every Elm source file prior to committing any changes - all major Elm
+editor plugins should support doing this automatically on file save; this may
+require toggling an option to enable.
+
+Also, some possibly relevant comments related to aspects of the architecture of
+the Case form app, which could be relevant to refer back to in future (and
+hopefully won't get out of date):
+
+- https://github.com/alces-software/alces-flight-center/pull/346#discussion_r194493189
+  (point 2);
+- https://github.com/alces-software/alces-flight-center/pull/346#pullrequestreview-127604799
+  (in particular response to second quote).
+
 ## Creating accounts for customers
 
 - If they don't have a Flight SSO account, they should register for one first.
