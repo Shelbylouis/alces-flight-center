@@ -208,7 +208,7 @@ class Case < ApplicationRecord
 
   def resolvable?
     state_transitions.map(&:to_name).include?(:resolved) &&
-        (!change_request.present? || change_request.finalised?)
+      !cr_in_progress?
   end
 
   def potential_assignees
