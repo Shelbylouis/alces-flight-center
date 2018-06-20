@@ -52,7 +52,6 @@ FactoryBot.define do
       end
     end
 
-    # XXX Very similar to above for Services.
     factory :case_requiring_service do
       association :issue, factory: :issue_requiring_service
 

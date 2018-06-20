@@ -46,8 +46,6 @@ module Alces
         def deliver_now
           super
         rescue ::Net::SMTPError => e
-          # XXX Also catch pipe errors and other problems that could occurr when
-          # communicating with the SMTP server.
           # We immediately try sending again as the problem could be temporary
           # and already resolved.
           begin

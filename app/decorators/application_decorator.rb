@@ -1,7 +1,3 @@
-
-# XXX Nothing in here is applicable to every decorated model in the app, it's
-# just a bit of a dumping ground. At some point should pull things out to
-# better places.
 class ApplicationDecorator < Draper::Decorator
   # Define methods for all decorated objects.
   # Helpers are accessed through `helpers` (aka `h`). For example:

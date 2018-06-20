@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe CaseDecorator do
-  # XXX Parts of these tests and corresponding code duplicated and adapted for
-  # {Cluster,Component,Service}Decorator.
   describe '#association_info' do
     let(:cluster) { subject.cluster }
 
@@ -41,7 +39,6 @@ RSpec.describe CaseDecorator do
         )
       end
 
-      # XXX Same as test for Component.
       it 'includes link to Cluster' do
         expect(
           subject.association_info

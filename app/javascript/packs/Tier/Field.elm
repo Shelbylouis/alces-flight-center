@@ -27,9 +27,6 @@ type alias TextInputData =
     -- Whether this field has been touched yet by a user.
     , touched : Touched
 
-    -- XXX Could encode `optional` in `Field` type like:
-    -- | RequiredTextInput TextInput
-    -- | OptionalTextInput TextInput
     , optional : Bool
     , help : Maybe String
     }

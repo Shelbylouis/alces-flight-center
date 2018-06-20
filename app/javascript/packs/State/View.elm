@@ -10,11 +10,6 @@ import State exposing (State)
 import View.CaseForm as CaseForm
 import View.Charging as Charging
 
-
--- XXX Refactor functions in here and in `View.*` modules to use
--- `elm-bootstrap`.
-
-
 view : State -> Html Msg
 view state =
     div [ class "case-form" ]
@@ -34,9 +29,6 @@ submitErrorAlert state =
     let
         displayError =
             \error ->
-                -- XXX Update this to use new `Alert.dismissable` or
-                -- `Alert/dismissableWithAnimation` function from
-                -- elm-bootstrap, rather than handling dismissing ourselves.
                 Alert.simpleDanger
                     []
                     [ button

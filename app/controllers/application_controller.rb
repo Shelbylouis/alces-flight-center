@@ -117,9 +117,6 @@ class ApplicationController < RootController
   end
 
   def format_errors(model)
-    # XXX Improve error handling - for now we just return a formatted string of
-    # all errors; could be worth returning JSON which can be decoded and
-    # displayed inline with fields in app.
     model.errors.messages.map do |field, messages|
       "#{field} #{messages.join(', ')}"
     end.join('; ')
