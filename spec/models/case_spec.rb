@@ -543,7 +543,7 @@ RSpec.describe Case, type: :model do
         kase.save!
       end.to raise_error ActiveRecord::RecordInvalid
       expect(kase.errors.messages).to include(
-        change_request: ['must be present if and only if case is tier 4']
+        change_request: ['must be blank']
       )
     end
     it 'must be present if tier_level is 4' do
@@ -553,7 +553,7 @@ RSpec.describe Case, type: :model do
         kase.save!
       end.to raise_error ActiveRecord::RecordInvalid
       expect(kase.errors.messages).to include(
-        change_request: ['must be present if and only if case is tier 4']
+        change_request: ['can\'t be blank']
       )
     end
   end
