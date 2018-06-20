@@ -20,6 +20,13 @@ class CaseMailerPreview < ApplicationMailerPreview
     )
   end
 
+  def change_request
+    CaseMailer.change_request(
+      get_case,
+      'has text to be replaced with the text from ChangeRequestStateTransitionDecorator.'
+    )
+  end
+
   private
 
   def get_case

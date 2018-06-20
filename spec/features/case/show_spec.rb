@@ -231,6 +231,43 @@ RSpec.describe 'Case page', type: :feature do
       expect(resolved_case.state).to eq 'resolved'
       expect(find('.alert')).to have_text 'Error updating support case: credit_charge is invalid'
     end
+
+    let(:cr_case) {
+      create(:resolved_case, tier_level: 4, change_request: cr)
+    }
+
+    context 'with a declined change request' do
+      let(:cr) {
+        build(
+          :change_request,
+          credit_charge: 42,
+          state: 'declined'
+        )
+      }
+
+      it 'does not use CR charge as a minimum' do
+        visit case_path(cr_case, as: admin)
+
+        expect(find('#credit_charge_amount').value).to eq "0"
+      end
+    end
+
+    context 'with a completed change request' do
+      let!(:cr) {
+        build(
+          :change_request,
+          credit_charge: 42,
+          state: 'completed'
+        )
+      }
+
+      it 'uses CR charge as a minimum' do
+        visit case_path(cr_case, as: admin)
+
+        expect(find('#credit_charge_amount').value).to eq "42"
+        expect(find('#case-state-controls')).to have_text 'Charge below should include 42 credits from attached CR'
+      end
+    end
   end
 
   describe 'case assignment' do

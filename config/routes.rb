@@ -105,6 +105,12 @@ Rails.application.routes.draw do
         post :set_time
         post :set_commenting
       end
+      resource :change_request, only: [:new, :create, :edit, :update], path: 'change-request' do
+        member do
+          post :propose
+          post :handover
+        end
+      end
     end
 
     resources :change_motd_requests, only: [] do
@@ -118,6 +124,9 @@ Rails.application.routes.draw do
       admin_logs.call
       notes.call(true)
       post :deposit
+      cases.call do
+        resource :change_request, only: [:new, :create, :edit], path: 'change-request'
+      end
     end
 
     resources :components, only: []  do
@@ -162,10 +171,19 @@ Rails.application.routes.draw do
       member do
         post :escalate
       end
+      resource :change_request, only: [:show], path: 'change-request' do
+        member do
+          post :authorise
+          post :decline
+          post :complete
+        end
+      end
     end
 
     resources :clusters, only: :show do
-      cases.call
+      cases.call do
+        resource :change_request, only: [:show], path: 'change-request'
+      end
       resources :services, only: :index
       maintenance_windows.call
       resources :components, only: :index

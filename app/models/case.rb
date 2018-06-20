@@ -15,6 +15,7 @@ class Case < ApplicationRecord
   has_and_belongs_to_many :logs
   has_many :case_comments
   has_one :change_motd_request, required: false, autosave: true
+  has_one :change_request, required: false, validate: true
 
   has_many :case_state_transitions
   alias_attribute :transitions, :case_state_transitions
@@ -60,7 +61,7 @@ class Case < ApplicationRecord
       # providing access to documentation without any action needing to be
       # taken by Alces admins.
       greater_than_or_equal_to: 1,
-      less_than_or_equal_to: 3,
+      less_than_or_equal_to: 4,
     }
   validate :validate_tier_level_changes
 
@@ -73,6 +74,7 @@ class Case < ApplicationRecord
 
   validates :credit_charge, presence: true,  if: :closed?
   validates_associated :credit_charge
+  validate :validate_minimum_credit_charge
 
   # Only validate this type of support is available on create, as this is the
   # only point at which we should prevent users accessing support they are not
@@ -84,6 +86,11 @@ class Case < ApplicationRecord
   validates_with AssociatedModelValidator
 
   validate :validates_user_assignment
+
+  validate :validate_not_resolved_with_open_cr
+  validates :change_request,
+            presence: { if: proc { |k| k.tier_level == 4 } },
+            absence: { unless: proc { |k| k.tier_level == 4 } }
 
   after_initialize :assign_cluster_if_necessary
   after_initialize :generate_token, on: :create
@@ -135,8 +142,9 @@ class Case < ApplicationRecord
       case_state_transitions +
       audits +
       logs +
-      [ credit_charge ].compact
-    ).sort_by(&:created_at).reverse!
+      [ credit_charge ] +
+      (change_request&.transitions || [])
+    ).compact.sort_by(&:created_at).reverse!
   end
 
   def email_subject
@@ -194,6 +202,15 @@ class Case < ApplicationRecord
     open? && !consultancy?
   end
 
+  def can_create_change_request?
+    tier_level == 3 && change_request.nil?
+  end
+
+  def resolvable?
+    state_transitions.map(&:to_name).include?(:resolved) &&
+      !cr_in_progress?
+  end
+
   def potential_assignees
     site.users.where.not(role: :viewer)
       .or(User.where(role: :admin))
@@ -234,6 +251,18 @@ class Case < ApplicationRecord
 
   def commenting_enabled_for?(user)
     !CaseCommenting.new(self, user).disabled?
+  end
+
+  def cr_charge_applies?
+    change_request.present? && change_request.completed?
+  end
+
+  def minimum_credit_charge
+    cr_charge_applies? ? change_request.credit_charge : 0
+  end
+
+  def cr_in_progress?
+    change_request.present? && !change_request.finalised?
   end
 
   private
@@ -323,6 +352,22 @@ class Case < ApplicationRecord
   def validate_tier_level_changes
     error_condition = @tier_level_changed && persisted? && !open?
     errors.add(:tier_level, "cannot be changed when a case is #{state}") if error_condition
+  end
+
+  def validate_not_resolved_with_open_cr
+    error_condition = resolved? && cr_in_progress?
+    errors.add(:state, 'cannot be resolved with an open change request') if error_condition
+  end
+
+  def validate_minimum_credit_charge
+    error_condition = closed? &&
+                      cr_charge_applies? &&
+                      (
+                        credit_charge.nil? ||
+                        credit_charge.amount < change_request.credit_charge
+                      )
+
+    errors.add(:credit_charge, "cannot be less than attached CR charge of #{change_request.credit_charge}") if error_condition
   end
 
   def field_hash

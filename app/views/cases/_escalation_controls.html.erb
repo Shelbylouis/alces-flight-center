@@ -1,31 +1,25 @@
 
-<%#
-  This is the same logic as `Case#comments_could_be_enabled?` although the
-  purpose is different - possibly there's some underlying shared concept for
-  when both these should be toggled that we should extract? Not sure if this is
-  just conincidental though and they could later independently change, which is
-  why I've not done this yet.
-%>
-<% if @case.open? && !@case.consultancy? %>
-  <%
-      modal_id = 'escalateModal'
-      modal_label = 'escalateModalLabel'
-  %>
+<% if @case.open? %>
+  <% if @case.tier_level < 3 %>
+    <%
+        modal_id = 'escalateModal'
+        modal_label = 'escalateModalLabel'
+    %>
 
-  <%= button_tag 'Escalate',
-    PolicyDependentOptions.wrap(
-      {
-        class: "btn btn-warning btn-sm ml-2",
-        data: {
-          toggle: 'modal',
-          target: "##{modal_id}",
+    <%= button_tag 'Escalate',
+      PolicyDependentOptions.wrap(
+        {
+          class: "btn btn-warning btn-sm ml-2",
+          data: {
+            toggle: 'modal',
+            target: "##{modal_id}",
+          },
         },
-      },
-      policy: policy(@case).escalate?,
-      action_description: 'escalate a case',
-      user: current_user
-  )
-  %>
+        policy: policy(@case).escalate?,
+        action_description: 'escalate a case',
+        user: current_user
+    )
+    %>
 
   <div
     class="modal fade"
@@ -62,6 +56,12 @@
         </div>
       </div>
     </div>
-  </div>
-
+  <% elsif @case.can_create_change_request? && current_user.admin? %>
+    <%= link_to 'Create change request',
+                new_cluster_case_change_request_path(@case.cluster.id, @case.display_id),
+                class: 'btn btn-sm btn-warning',
+                id: 'create-cr-button',
+                role: 'button'
+    %>
+  <% end %>
 <% end %>

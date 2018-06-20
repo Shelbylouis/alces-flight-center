@@ -5,6 +5,7 @@ module ApplicationHelper
       1 => 'Tool',
       2 => 'Routine Maintenance',
       3 => 'General Support',
+      4 => 'Change request'
   }.freeze
 
   def icon(name, interactive: false, inline: false, **args)

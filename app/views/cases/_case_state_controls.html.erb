@@ -1,30 +1,40 @@
 
-<% if policy(@case).resolve? && @case.can_resolve? %>
-  <%= link_to 'Resolve this case',
-              resolve_case_path(@case.id),
-              class: 'btn btn-secondary ml-2 btn-sm',
-              method: :post,
-              role: 'button',
-              title: 'Resolve this support case if it has been completed or is no longer relevant',
-              data: {
-                  confirm: 'Are you sure you want to resolve this support case?'
-              }
-  %>
+<% if policy(@case).resolve? %>
+  <% if @case.resolvable? %>
+    <%= link_to 'Resolve this case',
+                resolve_case_path(@case.id),
+                class: 'btn btn-secondary ml-2 btn-sm',
+                method: :post,
+                role: 'button',
+                title: 'Resolve this support case if it has been completed or is no longer relevant',
+                data: {
+                    confirm: 'Are you sure you want to resolve this support case?'
+                }
+    %>
+  <% elsif @case.open? && @case.cr_in_progress? %>
+    <p class="small">This case cannot be resolved as the change request is incomplete.</p>
+  <% end %>
 <% end %>
+
 <% if policy(@case).close? && @case.can_close? %>
   <%= form_tag({controller: 'cases', action: 'close'},
                method: :post,
                class: 'form-inline',
                id: 'case-close-form'
       ) do %>
-    <div class="form-group">
-      <div class="input-group">
-        <%= number_field :credit_charge,
-                         :amount,
-                         class: 'form-control',
-                         min: 0,
-                         value: 0,
-                         required: 'required'
+      <% if @case.cr_charge_applies? %>
+        <p class="small">
+          Charge below should include <%= pluralize(@case.change_request.credit_charge, 'credit') %> from attached CR
+        </p>
+      <% end %>
+      <div class="form-group">
+        <div class="input-group">
+          <%= number_field :credit_charge,
+                           :amount,
+                           class: 'form-control',
+                           min: @case.minimum_credit_charge,
+                           required: 'required',
+                           value: @case.minimum_credit_charge
         %>
         <div class="input-group-append">
           <%= submit_tag 'Set charge and close case',
