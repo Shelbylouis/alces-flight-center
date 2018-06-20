@@ -102,4 +102,17 @@ FactoryBot.define do
     amount 1
     association :user, factory: :admin
   end
+
+  factory :change_request do
+    association :case
+    description 'Change request details text'
+    credit_charge 1
+  end
+
+  factory :change_request_state_transition do
+    association :change_request
+    event 'propose'
+    from 'draft'
+    to 'awaiting_authorisation'
+  end
 end

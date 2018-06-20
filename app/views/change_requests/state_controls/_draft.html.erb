@@ -1,0 +1,23 @@
+<% if current_user.admin? %>
+  <%= link_to 'Edit',
+              edit_cluster_case_change_request_path(cr.case.cluster, cr.case),
+              class: 'btn btn-primary form-control mb-2',
+              role: 'button'
+  %>
+  <%= link_to 'Submit for authorisation',
+              propose_case_change_request_path(cr.case),
+              class: 'btn btn-danger form-control',
+              data: {
+                  confirm: 'Are you sure you want to finalise this CR and submit
+                  it for customer authorization? You will not be able to make
+                  further changes once you have done so.'.squish
+              },
+              method: 'post',
+              role: 'button'
+  %>
+<% else %>
+<p>
+  This CR is in draft. When it has been completed you will be able to authorize or
+  decline it.
+</p>
+<% end %>

@@ -15,7 +15,7 @@ RSpec.describe Case, type: :model do
       is_expected.to validate_numericality_of(:tier_level)
         .only_integer
         .is_greater_than_or_equal_to(1)
-        .is_less_than_or_equal_to(3)
+        .is_less_than_or_equal_to(4)
     end
 
     describe 'fields validation' do
@@ -490,6 +490,71 @@ RSpec.describe Case, type: :model do
       ).to receive(:new).with(kase, user).and_return(stub_case_commenting)
 
       expect(kase.commenting_enabled_for?(user)).to eq(false)
+    end
+  end
+
+  describe '#resolve!' do
+    let(:kase) { build(:open_case, tier_level: 4) }
+
+    it 'is unresolvable with an outstanding change request' do
+      create(:change_request, case: kase, state: :awaiting_authorisation)
+
+      expect(kase.resolvable?).to eq false
+
+      expect do
+        kase.resolve!
+      end.to raise_error StateMachines::InvalidTransition
+
+      expect(kase.errors.messages).to include(
+        state: ['cannot be resolved with an open change request']
+      )
+    end
+  end
+
+  describe '#credit_charge' do
+    it 'cannot have a charge less than that of an attached completed change request' do
+      kase = build(:closed_case, tier_level: 4, credit_charge: build(:credit_charge, amount: 41))
+      build(:change_request, case: kase, credit_charge: 42, state: 'completed')
+
+      expect do
+        kase.save!
+      end.to raise_error ActiveRecord::RecordInvalid
+      expect(kase.errors.messages).to include(
+        credit_charge: ['cannot be less than attached CR charge of 42']
+      )
+    end
+
+    it 'does not restrict charge of attached declined change request' do
+      kase = build(:closed_case, tier_level: 4, credit_charge: build(:credit_charge, amount: 41))
+      build(:change_request, case: kase, credit_charge: 42, state: 'declined')
+
+      expect do
+        kase.save!
+      end.not_to raise_error
+    end
+  end
+
+  describe '#change_request' do
+    it 'cannot be present if tier_level is less than 4' do
+      kase = build(:open_case, tier_level: 3)
+      build(:change_request, case: kase)
+
+      expect do
+        kase.save!
+      end.to raise_error ActiveRecord::RecordInvalid
+      expect(kase.errors.messages).to include(
+        change_request: ['must be blank']
+      )
+    end
+    it 'must be present if tier_level is 4' do
+      kase = build(:open_case, tier_level: 4)
+
+      expect do
+        kase.save!
+      end.to raise_error ActiveRecord::RecordInvalid
+      expect(kase.errors.messages).to include(
+        change_request: ['can\'t be blank']
+      )
     end
   end
 end

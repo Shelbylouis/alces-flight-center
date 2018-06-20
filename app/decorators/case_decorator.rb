@@ -1,5 +1,6 @@
 class CaseDecorator < ApplicationDecorator
   delegate_all
+  decorates_association :change_request
 
   def user_facing_state
     model.state.to_s.titlecase

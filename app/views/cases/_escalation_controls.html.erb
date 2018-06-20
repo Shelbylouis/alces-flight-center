@@ -1,67 +1,68 @@
 
-<%#
-  This is the same logic as `Case#comments_could_be_enabled?` although the
-  purpose is different - possibly there's some underlying shared concept for
-  when both these should be toggled that we should extract? Not sure if this is
-  just conincidental though and they could later independently change, which is
-  why I've not done this yet.
-%>
-<% if @case.open? && !@case.consultancy? %>
-  <%
-      modal_id = 'escalateModal'
-      modal_label = 'escalateModalLabel'
-  %>
+<% if @case.open? %>
+  <% if @case.tier_level < 3 %>
+    <%
+        modal_id = 'escalateModal'
+        modal_label = 'escalateModalLabel'
+    %>
 
-  <%= button_tag 'Escalate',
-    PolicyDependentOptions.wrap(
-      {
-        class: "btn btn-warning btn-sm ml-2",
-        data: {
-          toggle: 'modal',
-          target: "##{modal_id}",
+    <%= button_tag 'Escalate',
+      PolicyDependentOptions.wrap(
+        {
+          class: "btn btn-warning btn-sm ml-2",
+          data: {
+            toggle: 'modal',
+            target: "##{modal_id}",
+          },
         },
-      },
-      policy: policy(@case).escalate?,
-      action_description: 'escalate a case',
-      user: current_user
-  )
-  %>
+        policy: policy(@case).escalate?,
+        action_description: 'escalate a case',
+        user: current_user
+    )
+    %>
 
-  <div
-    class="modal fade"
-    id="<%= modal_id %>"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="<%= modal_label %>"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="<%= modal_label %>">
-            Escalating this support case may incur charges
-          </h5>
-          <button class="close" data-dismiss="modal">×</button>
-        </div>
-        <div class="modal-body">
-          <p>Escalating a support case means that the case becomes potentially
-            chargeable, and may incur a charge of support credits.</p>
-          <p>Do you wish to continue?</p>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-outline-primary" data-dismiss="modal">
-            Cancel
-          </button>
-          <%= link_to 'Escalate',
-                      escalate_case_path(@case.id),
-                      class: 'btn btn-outline-warning',
-                      id: 'confirm-escalate-button',
-                      method: :post,
-                      role: 'button'
-          %>
+    <div
+      class="modal fade"
+      id="<%= modal_id %>"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="<%= modal_label %>"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="<%= modal_label %>">
+              Escalating this support case may incur charges
+            </h5>
+            <button class="close" data-dismiss="modal">×</button>
+          </div>
+          <div class="modal-body">
+            <p>Escalating a support case means that the case becomes potentially
+              chargeable, and may incur a charge of support credits.</p>
+            <p>Do you wish to continue?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline-primary" data-dismiss="modal">
+              Cancel
+            </button>
+            <%= link_to 'Escalate',
+                        escalate_case_path(@case.id),
+                        class: 'btn btn-outline-warning',
+                        id: 'confirm-escalate-button',
+                        method: :post,
+                        role: 'button'
+            %>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
+  <% elsif @case.can_create_change_request? && current_user.admin? %>
+    <%= link_to 'Create change request',
+                new_cluster_case_change_request_path(@case.cluster.id, @case.display_id),
+                class: 'btn btn-sm btn-warning',
+                id: 'create-cr-button',
+                role: 'button'
+    %>
+  <% end %>
 <% end %>
