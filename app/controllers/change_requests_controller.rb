@@ -12,7 +12,7 @@ class ChangeRequestsController < ApplicationController
     authorize @case
     @case.tier_level = 4
 
-    cr = @case.create_change_request(cr_params)
+    cr = @case.build_change_request(cr_params)
     authorize cr
 
     if @case.save
