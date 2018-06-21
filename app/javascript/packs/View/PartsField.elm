@@ -67,9 +67,6 @@ maybePartsField field partsFieldConfig toId state changeMsg =
             -- We're creating a Case for a specific part => don't want to allow
             -- selection of another part, but do still want to display any
             -- error between this part and selected Issue.
-            -- XXX Do nothing for this case for now (there are currently no
-            -- part validations in any case); add something appropriate back
-            -- once Tiers implemented.
             Nothing
 
         NotRequired ->

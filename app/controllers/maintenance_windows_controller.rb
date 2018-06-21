@@ -103,9 +103,6 @@ class MaintenanceWindowsController < ApplicationController
     !!params[:mandatory]
   end
 
-  # XXX if we changed `request` to be accessed at `/request` (rather than
-  # `/new`) then we wouldn't need to pass `template` here as it would be the
-  # same as `action`.
   def handle_form_submission(action:, template:)
     yield
 

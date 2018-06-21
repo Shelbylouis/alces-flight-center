@@ -33,7 +33,7 @@ class Cluster < ApplicationRecord
   validates :canonical_name, presence: true
   validate :validate_all_cluster_parts_advice, if: :advice?
   validates :shortcode, presence: true, uniqueness: true
-  # validates_presence_of :motd
+  validates_presence_of :motd
 
   before_validation CanonicalNameCreator.new, on: :create
 

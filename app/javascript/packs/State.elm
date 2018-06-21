@@ -44,9 +44,6 @@ decoder =
     let
         createInitialState =
             \( clusters, mode ) ->
-                -- XXX Change state structure/how things are passed in to Elm
-                -- app to make invalid states in 'single component mode'
-                -- impossible?
                 let
                     initialState =
                         { clusters = clusters
