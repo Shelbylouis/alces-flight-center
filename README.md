@@ -226,6 +226,91 @@ Center` configuration which will display the URL for you in its configuration
 page. Once you copy this URL to its respective environment variable you should
 be able to send notfications to Slack from your development environment.
 
+### To develop new Case form app
+
+The Case form app is written in Elm. See http://elm-lang.org/docs for various
+documentation related to working with this, and in particular see
+https://guide.elm-lang.org/install.html#configure-your-editor for how to
+improve the Elm editing experience for your editor.
+
+Running `bin/webpack-dev-server`, as described above, should be sufficient to
+re-compile the Case form app when any relevant files are changed.
+
+We use the latest (experimental) version of
+[`elm-format`](https://github.com/avh4/elm-format#experimental-version) to
+format our Elm code, which ensures the code is all consistently formatted and
+minimizes the time we need to spend caring about how it is formatted. This can
+be installed with `yarn global add elm-format@exp`, and should ideally be run
+across every Elm source file prior to committing any changes - all major Elm
+editor plugins should support doing this automatically on file save; this may
+require toggling an option to enable.
+
+Also, some possibly relevant comments related to aspects of the architecture of
+the Case form app, which could be relevant to refer back to in future (and
+hopefully won't get out of date):
+
+- https://github.com/alces-software/alces-flight-center/pull/346#discussion_r194493189
+  (point 2);
+- https://github.com/alces-software/alces-flight-center/pull/346#pullrequestreview-127604799
+  (in particular response to second quote).
+
+### To deploy changes to staging/production
+
+The following Rake tasks are available to deploy local changes to
+staging/production:
+
+```bash
+$ rake -T | grep alces:deploy
+[...]
+rake alces:deploy:production                   # Deploy to production
+rake alces:deploy:production:dry_run           # Output what will happen on deploy to production, without doing anything
+rake alces:deploy:production:hotfix            # Deploy hotfix release to production
+rake alces:deploy:production:hotfix:dry_run    # Output what will happen on hotfix deploy to production, without doing anything
+rake alces:deploy:staging                      # Deploy to staging
+rake alces:deploy:staging:dry_run              # Output what will happen on deploy to staging, without doing anything
+```
+
+Some notes on using these:
+
+- Each command should just work, and will fail fast and safely if any necessary
+  pre-conditions are not met; the non-`dry_run` commands also ask for
+  confirmation first before doing anything.
+
+- Each command will output any needed additional manual steps at the end of
+  running it.
+
+- The commands to deploy to production require you to be on the `master` branch
+  before running.
+
+- The commands to deploy to staging expects a `STAGING_PASSWORD` environment
+  variable to be set when run, e.g. `rake alces:deploy:staging
+  STAGING_PASSWORD='foo'`, which previously was used to modify the production
+  data imported in staging to allow signing in as site users using this
+  password.
+
+  This is still done but no longer has any effect, since Flight Center now uses
+  [`flight-sso`](https://github.com/alces-software/flight-sso) which has its
+  own password management; however the code to do this has still been kept for
+  now, in case we later want to perform similar changes to the
+  `flight-sso-staging` instance on deploy (see
+  https://trello.com/c/p2UsFby4/206-consider-creating-modifying-flight-sso-staging-users-for-imported-production-users-on-deploy-to-staging).
+
+- On deploy to staging we import the latest production backup so we can try
+  things out with real data; when this is done the staging database is dropped
+  and then recreated afresh and the new data imported. I have noticed that, if
+  you are unlucky with when things get run, a cron job could attempt to connect
+  to the database at the point when the import script attempts to drop it; if
+  there are any ongoing connections the production import will then fail,
+  causing the whole deploy to abort.
+
+  To avoid any chance of this happening, I suggest commenting the staging cron
+  jobs (via `crontab -e` on the apps server) before deploying to staging, and
+  then un-commenting these again post-deploy.
+
+- See [`docs/hotfix-release-policy.md`](./docs/hotfix-release-policy.md) for
+  when we should consider making a hotfix vs a normal release.
+
+
 ## Creating accounts for customers
 
 - If they don't have a Flight SSO account, they should register for one first.
@@ -233,6 +318,50 @@ be able to send notfications to Slack from your development environment.
   (possibly double-check against the SSO database just to make sure).
 - Create them a Flight Center account in the appropriate site, using the email
   address of their Flight SSO account.
+
+
+## Design
+
+### Authorisation
+
+A brief overview of how we're currently altering the UI based on what the
+`current_user` is authorised to do:
+
+- Whenever we do conditional logic on the role of the current user, e.g. `if
+  current_user.admin?`, we should instead switch using the Pundit policy for
+  the record and action we are considering, e.g. `if policy(@case).create?`
+  (the user is implicit when doing this in a view). This avoids duplicating
+  authorisation logic in various places in views/decorators etc., which avoids
+  the possibility of this getting out-of-sync with the actual auth logic in the
+  policy.
+
+- When buttons etc. are admin-only, they should not be shown at all to other
+  types of users.
+
+- When buttons etc. are contact-only, they should not be shown to admins.
+
+- Any button that will change the state of the system, rather than just being
+  for navigation or querying purposes, should not be available to viewers, and
+  this should be both enforced server-side and indicated client-side (either by
+  making the buttons unavailable or disabled as appropriate).
+
+- Viewer users should be able to see (but not alter) all information across the
+  site which should be available to contacts.
+
+- When a button is available to contacts but should not be available to
+  viewers, this should be indicated by disabling the button and indicating why
+  this is the case - this can be done in a consistent way across the site using
+  the `PolicyDependentOptions` class.
+
+### When to consider implementing admin-only features outside `rails_admin` interface
+
+For basic CRUD of data by admins we have an auto-generated
+[`rails_admin`](https://github.com/sferik/rails_admin) interface. Using this,
+with minor customizations, saves time developing basic admin-only functionality
+that would be better spent elsewhere. Refer to response to point 3 at
+https://github.com/alces-software/alces-flight-center/pull/334#pullrequestreview-126343497
+for when we should consider going beyond this.
+
 
 ## Redis
 
