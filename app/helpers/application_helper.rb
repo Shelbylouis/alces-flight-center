@@ -52,13 +52,15 @@ module ApplicationHelper
   end
 
   def timestamp_td(description:, timestamp:)
+    ts = timestamp.to_formatted_s(:short)
+    content = block_given? ? (yield ts) : ts
     raw(
       <<~EOF.strip_heredoc
         <td
           title="#{description} on #{timestamp.to_formatted_s(:long)}"
           class="nowrap"
         >
-          #{timestamp.to_formatted_s(:short)}
+          #{content}
         </td>
       EOF
     )
