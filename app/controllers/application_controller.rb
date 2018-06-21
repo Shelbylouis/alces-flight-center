@@ -72,11 +72,7 @@ class ApplicationController < RootController
     @scope = case request.path
              when /^\/clusters/
                id = scope_id_param(:cluster_id).upcase
-               @cluster = if /^[0-9]+$/.match(id)
-                            Cluster.find(id)
-                          else
-                            Cluster.find_by_shortcode!(id)
-                          end
+               @cluster = Cluster.find_from_id!(id)
              when /^\/components/
                id = scope_id_param(:component_id)
                @component = @cluster_part = Component.find(id)

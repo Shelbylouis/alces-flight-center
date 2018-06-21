@@ -92,6 +92,14 @@ class Cluster < ApplicationRecord
     shortcode.parameterize.upcase
   end
 
+  def self.find_from_id!(id)
+    if /^[0-9]+$/.match(id)
+      Cluster.find(id)
+    else
+      Cluster.find_by_shortcode!(id)
+    end
+  end
+
   private
 
   def validate_all_cluster_parts_advice
