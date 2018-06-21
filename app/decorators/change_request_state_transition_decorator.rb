@@ -5,7 +5,8 @@ class ChangeRequestStateTransitionDecorator < ApplicationDecorator
              name: object.user.name,
              date: object.created_at,
              text: text,
-             type: 'cog'
+             type: 'cog',
+             details: 'Change Request Event'
   end
 
   def text_for_event
