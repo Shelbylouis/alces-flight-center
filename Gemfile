@@ -69,6 +69,7 @@ group :development, :test do
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
+  gem 'show_me_the_cookies'  # Cookies helpers for Capybara
 
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
