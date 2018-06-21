@@ -29,7 +29,7 @@ class CasesController < ApplicationController
     component_id = params[:component_id]
     service_id = params[:service_id]
     @clusters = if cluster_id
-                  [Cluster.find(cluster_id)]
+                  [Cluster.find_from_id!(cluster_id)]
                 elsif component_id
                   @single_part = Component.find(component_id)
                   [@single_part.cluster]

@@ -71,8 +71,8 @@ class ApplicationController < RootController
 
     @scope = case request.path
              when /^\/clusters/
-               id = scope_id_param(:cluster_id)
-               @cluster = Cluster.find(id)
+               id = scope_id_param(:cluster_id).upcase
+               @cluster = Cluster.find_from_id!(id)
              when /^\/components/
                id = scope_id_param(:component_id)
                @component = @cluster_part = Component.find(id)
