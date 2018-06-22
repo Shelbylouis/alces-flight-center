@@ -188,4 +188,16 @@ RSpec.describe 'Case mailer', :type => :mailer do
       end
     end
   end
+
+  describe 'Change Request emails' do
+    let (:text) { "Request to change please" }
+    context 'change request event' do
+      subject { CaseMailer.change_request(kase, text, requestor) }
+      it 'sends a notification to Slack' do
+        expect(SlackNotifier).to receive(:change_request_notification)
+          .with(kase, text, requestor)
+        subject
+      end
+    end
+  end
 end
