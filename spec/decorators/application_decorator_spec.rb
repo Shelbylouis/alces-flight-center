@@ -118,4 +118,21 @@ RSpec.describe ApplicationDecorator do
       end
     end
   end
+
+  describe 'event cards' do
+
+      Dir[File.join(Rails.root, 'app/decorators/*.rb')].each { |f| load f }
+
+      ApplicationDecorator.descendants.each do |decorator|
+        if decorator.instance_methods.include? :event_card
+          context decorator.name do
+            it 'renders event card' do
+              obj = create(decorator.object_class_name.underscore.to_sym)
+              obj.decorate.event_card
+            end
+          end
+        end
+      end
+
+  end
 end

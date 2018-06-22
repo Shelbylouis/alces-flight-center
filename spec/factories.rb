@@ -3,6 +3,7 @@ FactoryBot.define do
 
   factory :case_state_transition do
     association :case
+    association :user, factory: :admin
     event 'resolve'
     from 'open'
     to 'resolved'
@@ -101,6 +102,7 @@ FactoryBot.define do
   factory :credit_charge do
     amount 1
     association :user, factory: :admin
+    association :case
   end
 
   factory :change_request do
@@ -111,6 +113,7 @@ FactoryBot.define do
 
   factory :change_request_state_transition do
     association :change_request
+    association :user, factory: :admin
     event 'propose'
     from 'draft'
     to 'awaiting_authorisation'

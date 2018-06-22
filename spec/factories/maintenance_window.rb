@@ -58,5 +58,7 @@ FactoryBot.define do
   factory :maintenance_window_state_transition do
     maintenance_window
     to :requested
+    event :request
+    association :user, factory: :admin
   end
 end
