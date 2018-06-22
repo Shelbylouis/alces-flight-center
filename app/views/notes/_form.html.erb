@@ -17,10 +17,11 @@
     <% end %>
     <div class="form-group" style="overflow: hidden;">
       <%#
-          This page is only rendered in the `new` case when the
-          `current_user` can't perform the action of the form, since users
-          who cannot edit cannot access the edit page. If this ever changes
-          then we may want to adjust the create-specific stuff below.
+          The only time this should be rendered with a `policy` of `false` is
+          in the `new` case when the `current_user` can't perform the action of
+          the form, since users who cannot edit cannot access the edit page. If
+          this ever changes then we may want to adjust the create-specific text
+          below.
       %>
       <%= f.submit button_text,
         PolicyDependentOptions.wrap(
