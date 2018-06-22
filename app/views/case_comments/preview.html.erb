@@ -1,0 +1,17 @@
+<%
+    form_builder = nil
+    form_for(@comment.form_path) do |f| form_builder = f end
+%>
+
+<%= render 'partials/markdown_editor_layout',
+    activate: 'preview',
+    form_builder: form_builder,
+    preview_path: @comment.preview_path,
+    write_path: @comment.write_path do %>
+
+    <%= form_builder.hidden_field :text, 'data-markdown-content': true %>
+    <div class="border-bottom p-2">
+        <%= @comment.rendered_text.html_safe %>
+    </div>
+<% end %>
+

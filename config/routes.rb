@@ -40,7 +40,12 @@ Rails.application.routes.draw do
     resources :logs, only: :index
   end
   admin_logs = Proc.new do
-    resources :logs, only: :create
+    resources :logs, only: :create do
+      collection do
+        post 'preview' => 'logs#preview'
+        post 'write' => 'logs#write'
+      end
+    end
   end
   notes = Proc.new do |admin|
     constraints NoteFlavourConstraint.new(admin: admin) do
@@ -48,6 +53,10 @@ Rails.application.routes.draw do
       resources :notes, param: :flavour, except: [:new, :create, :index] do
         collection do
           post ':flavour' => 'notes#create', as: prefix
+        end
+        member do
+          post 'preview' => 'notes#preview'
+          post 'write' => 'notes#write'
         end
       end
     end
@@ -167,7 +176,12 @@ Rails.application.routes.draw do
     delete '/sign_out' => 'sso_sessions#destroy', as: 'sign_out'  # Keeping this one around as it's correctly coupled to SSO
 
     cases.call(only: [:create]) do
-      resources :case_comments, only: :create
+      resources :case_comments, only: :create do
+        collection do
+          post :preview
+          post :write
+        end
+      end
       member do
         post :escalate
       end

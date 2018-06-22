@@ -1,0 +1,13 @@
+<%
+    form_builder = nil
+    form_for(note.form_path) do |f| form_builder = f end
+%>
+
+<%= render 'partials/markdown_editor_layout',
+    activate: 'write',
+    form_builder: form_builder,
+    preview_path: note.preview_path,
+    write_path: note.write_path do %>
+
+    <%= render 'markdown_content', form_builder: form_builder %>
+<% end %>
