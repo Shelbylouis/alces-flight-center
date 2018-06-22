@@ -84,26 +84,33 @@ RSpec.describe 'Case page', type: :feature do
       # And a log entry
       create(:log, cases: [open_case], cluster: cluster, details: 'Loggy McLogface')
 
+      # And a change request
+      cr = create(:change_request, case: open_case, state: 'draft')
+      create(:change_request_state_transition, event: 'propose', user: admin, change_request: cr)
+
       visit case_path(open_case, as: admin)
 
       event_cards = all('.event-card')
-      expect(event_cards.size).to eq(7)
+      expect(event_cards.size).to eq(8)
 
-      expect(event_cards[6].find('.card-body').text).to eq('First')
-      expect(event_cards[5].find('.card-body').text).to eq('Second')
-      expect(event_cards[4].find('.card-body').text).to match(
+      expect(event_cards[7].find('.card-body').text).to eq('First')
+      expect(event_cards[6].find('.card-body').text).to eq('Second')
+      expect(event_cards[5].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
-      expect(event_cards[3].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
+      expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
 
-      expect(event_cards[2].find('.card-body').text).to eq(
+      expect(event_cards[3].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'
       )
-      expect(event_cards[1].find('.card-body').text).to eq(
+      expect(event_cards[2].find('.card-body').text).to eq(
           'Escalated this case to tier 3 (General Support).'
       )
-      expect(event_cards[0].find('.card-body').text).to eq(
+      expect(event_cards[1].find('.card-body').text).to eq(
           'Loggy McLogface'
+      )
+      expect(event_cards[0].find('.card-body').text).to eq(
+        'Change request has been proposed and is awaiting customer authorisation. View change request'
       )
     end
 
