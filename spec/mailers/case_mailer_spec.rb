@@ -60,8 +60,19 @@ RSpec.describe 'Case mailer', :type => :mailer do
     site.additional_contacts = [additional_contact]
   end
 
+  RSpec.shared_examples 'Slack' do
+    it 'sends a notification to Slack' do
+      expect(SlackNotifier).to receive(notification_method)
+        .with(*args)
+      subject
+    end
+  end
+
   describe 'Case creation email' do
     subject { CaseMailer.new_case(kase) }
+
+    let (:notification_method) { :case_notification }
+    let (:args) { kase }
 
     it 'has correct subject' do
       expect(
@@ -100,10 +111,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
       end
     end
 
-    it 'sends a notification to Slack' do
-      expect(SlackNotifier).to receive(:case_notification).with(kase)
-      subject
-    end
+    include_examples 'Slack'
   end
 
   describe 'Comment email' do
@@ -116,6 +124,8 @@ RSpec.describe 'Case mailer', :type => :mailer do
              text: 'I can haz comment'
             )
     }
+    let (:notification_method) { :comment_notification }
+    let (:args) { [kase, comment] }
 
     it 'sends an email on case comment being added' do
       expect(subject.to).to eq nil
@@ -125,14 +135,14 @@ RSpec.describe 'Case mailer', :type => :mailer do
       expect(subject.body.encoded).to match('I can haz comment')
     end
 
-    it 'sends a notification to Slack' do
-      expect(SlackNotifier).to receive(:comment_notification).with(kase, comment)
-      subject
-    end
+    include_examples 'Slack'
   end
 
   describe 'Case assignment email' do
     subject { CaseMailer.change_assignee(kase, another_user) }
+
+    let (:notification_method) { :assignee_notification }
+    let (:args) { [kase, another_user] }
 
     it 'sends an email on initial case assignment' do
       expect(subject.to).to eq nil
@@ -153,51 +163,46 @@ RSpec.describe 'Case mailer', :type => :mailer do
       expect(mail.body.encoded).to match(/This case has now been assigned to Some User\./)
     end
 
-    it 'sends a notification to Slack' do
-      expect(SlackNotifier).to receive(:assignee_notification).with(kase, another_user)
-      subject
-    end
+    include_examples 'Slack'
   end
 
   describe 'Maintenance emails' do
     let (:text) { "Doesn't look like anything to me" }
-    let(:window) { build(:maintenance_window) }
+    let (:window) { build(:maintenance_window) }
 
     context 'state transition' do
       subject { CaseMailer.maintenance_state_transition(kase, text) }
 
-      it 'sends a notification to Slack' do
-        expect(SlackNotifier).to receive(:maintenance_state_transition_notification)
-          .with(kase, text)
-        subject
-      end
+      let (:notification_method) { :maintenance_state_transition_notification }
+      let (:args) { [kase, text] }
+
+      include_examples 'Slack'
     end
 
     context 'ending soon' do
       subject { CaseMailer.maintenance_ending_soon(window, text) }
 
-      it 'sends a notification to Slack' do
-        expect(SlackNotifier).to receive(:maintenance_ending_soon_notification)
-          .with(window.case, text)
-        subject
-      end
+      let (:notification_method) { :maintenance_ending_soon_notification }
+      let (:args) { [window.case, text] }
 
       it 'sets the maintenance_ending_soon_email_sent flag' do
         subject
         expect(window.maintenance_ending_soon_email_sent).to eq(true)
       end
+
+      include_examples 'Slack'
     end
   end
 
   describe 'Change Request emails' do
-    let (:text) { "Request to change please" }
     context 'change request event' do
       subject { CaseMailer.change_request(kase, text, requestor) }
-      it 'sends a notification to Slack' do
-        expect(SlackNotifier).to receive(:change_request_notification)
-          .with(kase, text, requestor)
-        subject
-      end
+
+      let (:text) { "Request to change please" }
+      let (:notification_method) { :change_request_notification }
+      let (:args) { [kase, text, requestor] }
+
+      include_examples 'Slack'
     end
   end
 end
