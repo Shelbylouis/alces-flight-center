@@ -1,9 +1,12 @@
-<% if current_user.admin? %>
+<% my_policy = policy(cr) %>
+<% if my_policy.edit? %>
   <%= link_to 'Edit',
               edit_cluster_case_change_request_path(cr.case.cluster, cr.case),
               class: 'btn btn-primary form-control mb-2',
               role: 'button'
   %>
+<% end %>
+<% if my_policy.propose? %>
   <%= link_to 'Submit for authorisation',
               propose_case_change_request_path(cr.case),
               class: 'btn btn-danger form-control',
@@ -15,7 +18,9 @@
               method: 'post',
               role: 'button'
   %>
-<% else %>
+<% end %>
+
+<% if !my_policy.edit? && !my_policy.propose? %>
 <p>
   This CR is in draft. When it has been completed you will be able to authorize or
   decline it.

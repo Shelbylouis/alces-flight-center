@@ -1,4 +1,3 @@
-
 <% if @case.open? %>
   <% if @case.tier_level < 3 %>
     <%
@@ -57,7 +56,7 @@
         </div>
       </div>
     </div>
-  <% elsif @case.can_create_change_request? && current_user.admin? %>
+  <% elsif @case.can_create_change_request? && policy(ChangeRequest).create? %>
     <%= link_to 'Create change request',
                 new_cluster_case_change_request_path(@case.cluster.id, @case.display_id),
                 class: 'btn btn-sm btn-warning',
