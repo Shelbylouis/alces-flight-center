@@ -6,32 +6,39 @@ RSpec.describe 'Change request view', type: :feature do
     draft: {
       admin: ['Edit', 'Submit for authorisation'],
       contact: [],
+      viewer: [],
     },
     awaiting_authorisation: {
       admin: [],
       contact: ['Authorise', 'Decline'],
+      viewer: [],
     },
     declined: {
       admin: [],
       contact: [],
+      viewer: [],
     },
     in_progress: {
       admin: ['Begin handover'],
       contact: [],
+      viewer: [],
     },
     in_handover: {
       admin: [],
       contact: ['Approve work and close CR'],
+      viewer: [],
     },
     completed: {
       admin: [],
       contact: [],
+      viewer: [],
     }
   }.freeze
 
   let(:site) { create(:site) }
   let(:admin) { create(:admin) }
   let(:contact) { create(:contact, site: site) }
+  let(:viewer) { create(:viewer, site: site) }
   let(:cluster) { create(:cluster, site: site) }
   let(:kase) { build(:open_case, tier_level: 4, cluster: cluster) }
 
