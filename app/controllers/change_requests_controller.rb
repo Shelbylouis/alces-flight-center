@@ -109,7 +109,11 @@ class ChangeRequestsController < ApplicationController
       # the record to the database (or raised an exception). Hence we can be
       # certain that, if we reach this point, the model is saved and valid, so
       # it's safe to send the email.
-      CaseMailer.change_request(cr.case, cr.transitions.last.decorate.text_for_event).deliver_later
+      CaseMailer.change_request(
+        cr.case,
+        cr.transitions.last.decorate.text_for_event,
+        current_user
+      ).deliver_later
     end
   end
 
