@@ -6,8 +6,11 @@ class Deployment
   include Rake::DSL
 
   def initialize(type, version_name, dry_run: false)
-    @remote, @tag = version_name
+    @remote = type
+    @tag = version_name
     @dry_run = dry_run
+
+    abort "Must set ENV['VERSION'] within command!" if @tag.nil?
   end
 
   def deploy
