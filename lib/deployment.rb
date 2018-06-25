@@ -5,8 +5,8 @@ require 'erb'
 class Deployment
   include Rake::DSL
 
-  def initialize(type, dry_run: false)
-    @remote, @tag = parse_deploy_type(type)
+  def initialize(type, version_name, dry_run: false)
+    @remote, @tag = version_name
     @dry_run = dry_run
   end
 
@@ -59,23 +59,6 @@ class Deployment
 
   PRODUCTION_APP = 'flight-center'
   STAGING_APP = 'flight-center-staging'
-
-  def parse_deploy_type(type)
-    case type
-    when :production
-      [:production, today]
-    when :hotfix
-      [:production, "#{today}-hotfix"]
-    when :staging
-      [:staging, "#{today}-staging"]
-    else
-      raise "Unknown deployment type: '#{type}'"
-    end
-  end
-
-  def today
-    Date.today.iso8601
-  end
 
   def current_branch
     @current_branch ||= `git rev-parse --abbrev-ref HEAD`.strip.inquiry
