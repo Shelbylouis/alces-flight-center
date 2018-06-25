@@ -35,6 +35,8 @@ class Deployment
     run "git tag -f #{tag} #{current_branch}"
     run "git push --tags -f origin #{current_branch}"
 
+    dokku_config_set('VERSION', tag, app: app_name)
+
     scp_database_backup_script
 
     output_manual_steps
@@ -173,6 +175,10 @@ class Deployment
   def dokku_config_get(env_var, app:)
     command = dokku_command("config:get #{app} #{env_var}")
     `#{command}`.strip
+  end
+
+  def dokku_config_set(key, value, app:)
+    run dokku_command("config:set #{app} #{key}=#{value}")
   end
 
   def dokku_stop(app)
