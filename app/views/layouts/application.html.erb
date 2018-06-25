@@ -50,8 +50,8 @@
 
     </div>
 
-    <p class="version"> 2018.4 <%= 'Daydreaming Dickcissel' unless Rails.env.production? %></p>
     <div id='brand-footer'></div>
+    <p class="version"><%= Rails.application.config.version %></p>
     <script>
       window.__SSO_BASE_URL__ = '<%= Rails.application.config.sso_base_url %>';
       window.__REFRESH_AFTER_LOGIN__ = true;
