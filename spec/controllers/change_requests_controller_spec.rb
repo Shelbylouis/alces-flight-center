@@ -30,7 +30,8 @@ RSpec.describe ChangeRequestsController, type: :controller do
 
         expect(CaseMailer).to receive(:change_request).with(
           kase,
-          message
+          message,
+          send(user)
         ).and_return(stub_mail)
 
         sign_in_as(send(user))

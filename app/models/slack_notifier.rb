@@ -26,7 +26,7 @@ class SlackNotifier
         title: subject_and_id_title(kase),
         title_link: case_url,
         text: notification_details,
-        mrkdwn: true
+        mrkdwn: false
       }
 
       send_notification(case_note)
@@ -34,7 +34,6 @@ class SlackNotifier
 
     def assignee_notification(kase, assignee)
       notification_text = "#{assignee.name} has been assigned to #{kase.display_id}"
-
       assignee_note = {
         fallback: notification_text,
         color: "#6e5494",
@@ -98,6 +97,20 @@ class SlackNotifier
       }
 
       send_notification(log_note)
+    end
+
+    def change_request_notification(kase, text, user)
+      text = "The change request for this case #{text}"
+      change_request_note = {
+        fallback: text,
+        color: '#f44192',
+        author_name: user.name,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: "*<#{case_change_request_url(kase)}|Change Request Event>*\n#{text}",
+      }
+
+      send_notification(change_request_note)
     end
 
     private
