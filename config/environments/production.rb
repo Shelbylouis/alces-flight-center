@@ -125,4 +125,6 @@ Rails.application.configure do
         'Alces Flight Center'
       ]
     end
+
+  config.version = ENV['VERSION']
 end
