@@ -6,13 +6,13 @@ namespace :alces do
     [:production, :staging].each do |deploy_type|
       desc "Deploy to #{deploy_type}"
       task deploy_type do
-        deploy(deploy_type)
+        deploy(deploy_type, ENV['VERSION'])
       end
 
       namespace deploy_type do
         desc "Output what will happen on deploy to #{deploy_type}, without doing anything"
         task :dry_run do
-          deploy(deploy_type, dry_run: true)
+          deploy(deploy_type, ENV['VERSION'], dry_run: true)
         end
       end
     end
@@ -20,13 +20,13 @@ namespace :alces do
     namespace :production do
       desc "Deploy hotfix release to production"
       task :hotfix do
-        deploy(:hotfix)
+        deploy(:hotfix, ENV['VERSION'])
       end
 
       namespace :hotfix do
         desc 'Output what will happen on hotfix deploy to production, without doing anything'
         task :dry_run do
-          deploy(:hotfix, dry_run: true)
+          deploy(:hotfix, ENV['VERSION'], dry_run: true)
         end
       end
     end

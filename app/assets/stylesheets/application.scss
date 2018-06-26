@@ -126,3 +126,16 @@ table {
 .alert a.btn {
   text-decoration: none;
 }
+
+.version {
+  font-size: 13px;
+  color: white;
+  margin-bottom: 0; // Remove default margin from p element
+
+  // This should push the text to the bottom right of the page within the
+  // footer
+  position: relative;
+  float: right;
+  top: -2.2em;
+  right: 1em;
+}

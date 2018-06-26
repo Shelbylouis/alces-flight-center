@@ -72,4 +72,6 @@ Rails.application.configure do
   config.slack_webhook_url = ENV['SLACK_WEBHOOK_URL']
   config.slack_channel = ENV['SLACK_CHANNEL']
   config.slack_username = 'Alces Flight Center [Development]'
+
+  config.version = 'Development'
 end

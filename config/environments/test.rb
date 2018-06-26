@@ -58,4 +58,6 @@ Rails.application.configure do
   config.slack_webhook_url = 'http://example.com/slack'
   config.slack_channel = '#test'
   config.slack_username = 'test'
+
+  config.version = 'vTest.Test'
 end

@@ -5,9 +5,12 @@ require 'erb'
 class Deployment
   include Rake::DSL
 
-  def initialize(type, dry_run: false)
-    @remote, @tag = parse_deploy_type(type)
+  def initialize(type, version_name, dry_run: false)
+    @remote = type
+    @tag = version_name
     @dry_run = dry_run
+
+    abort "Must set ENV['VERSION'] within command!" if @tag.nil?
   end
 
   def deploy
@@ -27,6 +30,7 @@ class Deployment
       abort unless input.downcase == 'y'
     end
 
+    dokku_config_set('VERSION', tag, app: app_name, restart: false)
     run "git push #{remote} -f #{current_branch}:master"
 
     import_production_backup_to_staging if staging?
@@ -59,23 +63,6 @@ class Deployment
 
   PRODUCTION_APP = 'flight-center'
   STAGING_APP = 'flight-center-staging'
-
-  def parse_deploy_type(type)
-    case type
-    when :production
-      [:production, today]
-    when :hotfix
-      [:production, "#{today}-hotfix"]
-    when :staging
-      [:staging, "#{today}-staging"]
-    else
-      raise "Unknown deployment type: '#{type}'"
-    end
-  end
-
-  def today
-    Date.today.iso8601
-  end
 
   def current_branch
     @current_branch ||= `git rev-parse --abbrev-ref HEAD`.strip.inquiry
@@ -190,6 +177,10 @@ class Deployment
   def dokku_config_get(env_var, app:)
     command = dokku_command("config:get #{app} #{env_var}")
     `#{command}`.strip
+  end
+
+  def dokku_config_set(key, value, app:, restart: true)
+    run dokku_command("config:set #{restart ? '' : '--no-restart'} #{app} #{key}=#{value}")
   end
 
   def dokku_stop(app)
