@@ -88,7 +88,7 @@ Rails.application.routes.draw do
   end
 
   cases = Proc.new do |**params, &block|
-    params[:only] = Array.wrap(params[:only]).concat [:show, :new, :index]
+    params[:only] = Array.wrap(params[:only]).concat [:index]
     resources :cases, **params do
       collection do
         get :resolved
@@ -103,10 +103,10 @@ Rails.application.routes.draw do
 
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      cases.call
+      cases.call(only: [:index, :new])
     end
 
-    resources :cases, only: [] do
+    cases.call(only: []) do
       member do
         post :resolve  # Only admins may resolve a case
         post :close  # Only admins may close a case
@@ -114,7 +114,7 @@ Rails.application.routes.draw do
         post :set_time
         post :set_commenting
       end
-      resource :change_request, only: [:new, :create, :edit, :update], path: 'change-request' do
+      resource :change_request, only: [:create, :update], path: 'change-request' do
         member do
           post :propose
           post :handover
@@ -129,13 +129,13 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: [] do
+      cases.call(only: []) do
+        resource :change_request, only: [:new, :edit], path: 'change-request'
+      end
       request_maintenance_form.call
       admin_logs.call
       notes.call(true)
       post :deposit
-      cases.call do
-        resource :change_request, only: [:new, :create, :edit], path: 'change-request'
-      end
     end
 
     resources :components, only: []  do
@@ -175,16 +175,11 @@ Rails.application.routes.draw do
     root 'sites#show'
     delete '/sign_out' => 'sso_sessions#destroy', as: 'sign_out'  # Keeping this one around as it's correctly coupled to SSO
 
-    cases.call(only: [:create]) do
-      resources :case_comments, only: :create do
-        collection do
-          post :preview
-          post :write
-        end
-      end
+    cases.call(only: [:new, :create, :index]) do
       member do
         post :escalate
       end
+
       resource :change_request, only: [:show], path: 'change-request' do
         member do
           post :authorise
@@ -192,11 +187,18 @@ Rails.application.routes.draw do
           post :complete
         end
       end
+
+      resources :case_comments, only: :create do
+        collection do
+          post :preview
+          post :write
+        end
+      end
     end
 
     resources :clusters, only: :show do
-      cases.call do
-        resource :change_request, only: [:show], path: 'change-request'
+      cases.call(only: [:show, :create, :index, :new]) do
+         resource :change_request, only: [:show], path: 'change-request'
       end
       resources :services, only: :index
       maintenance_windows.call
@@ -209,7 +211,6 @@ Rails.application.routes.draw do
     end
 
     resources :components, only: :show do
-      cases.call
       maintenance_windows.call
       resources :component_expansions,
                 path: component_expansions_alias,
@@ -226,7 +227,6 @@ Rails.application.routes.draw do
     end
 
     resources :services, only: :show do
-      cases.call
       maintenance_windows.call
       confirm_maintenance_form.call
     end

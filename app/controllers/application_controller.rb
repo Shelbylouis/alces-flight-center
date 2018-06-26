@@ -7,6 +7,7 @@ class ApplicationController < RootController
   decorates_assigned :site
 
   helper_method :signed_in_without_account?
+  helper_method :case_url
 
   before_action :set_sentry_raven_context
   before_action :assign_current_user
@@ -46,6 +47,14 @@ class ApplicationController < RootController
     # We want to identify this scenario so that we can use more appropriate
     # language e.g. don't tell them to "log in" again.
     current_user.nil? && valid_sso_token?
+  end
+
+  def case_url(kase)
+    cluster_case_url(kase.cluster, kase)
+  end
+
+  def case_path(kase)
+    cluster_case_path(kase.cluster, kase)
   end
 
   private
