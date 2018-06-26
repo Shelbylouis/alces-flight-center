@@ -30,6 +30,7 @@ class Deployment
       abort unless input.downcase == 'y'
     end
 
+    dokku_config_set('VERSION', tag, app: app_name, restart: false)
     run "git push #{remote} -f #{current_branch}:master"
 
     import_production_backup_to_staging if staging?
@@ -37,8 +38,6 @@ class Deployment
     run "git tag -f #{remote} #{current_branch}"
     run "git tag -f #{tag} #{current_branch}"
     run "git push --tags -f origin #{current_branch}"
-
-    dokku_config_set('VERSION', tag, app: app_name)
 
     scp_database_backup_script
 
@@ -180,8 +179,8 @@ class Deployment
     `#{command}`.strip
   end
 
-  def dokku_config_set(key, value, app:)
-    run dokku_command("config:set #{app} #{key}=#{value}")
+  def dokku_config_set(key, value, app:, restart: true)
+    run dokku_command("config:set #{restart ? '' : '--no-restart'} #{app} #{key}=#{value}")
   end
 
   def dokku_stop(app)
