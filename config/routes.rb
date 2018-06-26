@@ -169,6 +169,9 @@ Rails.application.routes.draw do
     # rails-admin expects a `logout_path` route helper to exist which will sign
     # them out; this declaration defines this.
     delete :logout, to: 'sso_sessions#destroy'
+
+    # Support legacy case URLs
+    get '/sites/:site_id/cases/:id', to: 'cases#redirect_to_canonical_path'
   end
 
   constraints Clearance::Constraints::SignedIn.new do
@@ -236,6 +239,11 @@ Rails.application.routes.draw do
         post :reject
       end
     end
+
+    # Support legacy case URLs
+    get '/cases/:id', to: 'cases#redirect_to_canonical_path'
+    get '/services/:service_id/cases/:id', to: 'cases#redirect_to_canonical_path'
+    get '/components/:component_id/cases/:id', to: 'cases#redirect_to_canonical_path'
   end
 
   constraints Clearance::Constraints::SignedOut.new do
