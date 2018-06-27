@@ -35,9 +35,9 @@ class CaseCommenting
 
   def non_consultancy_message
     <<~MESSAGE.squish
-      Additional discussion is not available for cases in the current support
-      tier. If you wish to request additional support please either escalate
-      this case (which may incur a charge), or open a new support case.
+      Additional discussion is not available for this case. If you wish to
+      request additional support please either escalate this case, or open a
+      new support case.
     MESSAGE
   end
 end
