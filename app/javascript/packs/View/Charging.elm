@@ -113,7 +113,7 @@ chargeablePreSubmissionModal state =
             ]
     in
     Modal.config (ChargeablePreSubmissionModal Modal.hidden)
-        |> Modal.h5 [] [ text "This support case may incur charges" ]
+        |> Modal.h5 [] [ text "Please note" ]
         |> Modal.body [] bodyContent
         |> Modal.footer []
             [ Button.button
@@ -134,5 +134,6 @@ chargeablePreSubmissionModal state =
 
 potentiallyChargeableText : Html Msg
 potentiallyChargeableText =
-    text """Creating a support case at this tier is potentially
-    chargeable, and may incur a charge of support credits."""
+    text """Creating a support case at this tier means that you
+    authorise potential use of available account credit to help
+    resolve your issue."""
