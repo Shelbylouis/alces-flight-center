@@ -327,7 +327,7 @@ RSpec.describe 'Case page', type: :feature do
           find(comment_form_class)
         end.to raise_error(Capybara::ElementNotFound)
 
-        expect(find('.card.bg-light').text).to match 'Additional discussion is not available for cases in the current support tier'
+        expect(find('.card.bg-light').text).to match 'Additional discussion is not available for this case'
       end
 
       it 'enables commenting for site contact if comments_enabled is true' do
