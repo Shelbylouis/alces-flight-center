@@ -136,5 +136,4 @@ potentiallyChargeableText : Html Msg
 potentiallyChargeableText =
     text """Creating a support case at this tier means that you
     authorise potential use of available account credit to help
-    resolve your issue. Click here for the credit usage details
-    for this cluster."""
+    resolve your issue."""
