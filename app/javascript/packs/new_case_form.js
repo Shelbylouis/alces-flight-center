@@ -1,4 +1,4 @@
-import Elm from './Main';
+import Elm from 'Main';
 
 const initializeFormApp = () => {
   const target = document.getElementById('new-case-form');
