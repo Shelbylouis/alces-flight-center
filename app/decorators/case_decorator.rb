@@ -22,7 +22,7 @@ class CaseDecorator < ApplicationDecorator
   def case_link
     h.link_to(
       display_id,
-      h.cluster_case_path(self.cluster, self),
+      h.case_path(self),
       title: subject
     )
   end

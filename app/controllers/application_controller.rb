@@ -8,6 +8,7 @@ class ApplicationController < RootController
 
   helper_method :signed_in_without_account?
   helper_method :case_url
+  helper_method :case_path
 
   before_action :set_sentry_raven_context
   before_action :assign_current_user

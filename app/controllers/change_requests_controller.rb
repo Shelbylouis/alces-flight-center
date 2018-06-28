@@ -17,7 +17,7 @@ class ChangeRequestsController < ApplicationController
 
     if @case.save
       flash[:success] = "Created change request for case #{@case.display_id}."
-      redirect_to cluster_case_path(@case.cluster, @case)
+      redirect_to case_path(@case)
     else
       errors = format_errors(cr)
       flash[:error] = "Error creating change request: #{errors}." if errors

@@ -56,7 +56,7 @@ class CasesController < ApplicationController
         format.json do
           # Return no errors and success status to case form app; it will
           # redirect to the path we give it.
-          render json: { redirect: cluster_case_path(@case.cluster, @case) }
+          render json: { redirect: case_path(@case) }
         end
       else
         errors = format_errors(@case)
@@ -132,7 +132,7 @@ class CasesController < ApplicationController
 
   def redirect_to_canonical_path
     kase = case_from_params
-    redirect_to cluster_case_path(kase.cluster, kase)
+    redirect_to case_path(kase)
   end
 
   private
