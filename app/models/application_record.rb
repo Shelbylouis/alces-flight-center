@@ -21,7 +21,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def dashboard_case_path(kase)
-    Rails.application.routes.url_helpers.polymorphic_path([self, kase])
+    Rails.application.routes.url_helpers.cluster_case_path(kase.cluster, kase)
   end
 
   class << self

@@ -105,6 +105,10 @@ Re-run `bin/setup` script; it should safely be able to be run multiple times.
 
 - Specific tests: see `rspec -h`
 
+- To get Rails to throw exceptions rather than render fancy error pages, set
+  `EXCEPTIONS=true` when running `rspec`. This will cause some otherwise-passing
+  tests to fail!
+
 
 ### To develop with latest production data
 

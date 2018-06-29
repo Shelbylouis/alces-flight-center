@@ -25,12 +25,4 @@ class Site < ApplicationRecord
   def primary_contact
     users.find_by(role: 'primary_contact')
   end
-
-  def dashboard_case_path(kase)
-    if current_user.site_user?
-      Rails.application.routes.url_helpers.cluster_case_path(kase.cluster, kase)
-    else
-      Rails.application.routes.url_helpers.polymorphic_path([self, kase])
-    end
-  end
 end

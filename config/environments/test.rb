@@ -22,8 +22,10 @@ Rails.application.configure do
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = false
 
-  # Raise exceptions instead of rendering exception templates.
-  config.action_dispatch.show_exceptions = true
+  # If false, raise exceptions instead of rendering exception templates.
+  # Set EXCEPTIONS=true when running rspec to get useful exceptions out of
+  # test failures rather than have Capybara happily load the pretty error page.
+  config.action_dispatch.show_exceptions = !ENV.fetch('EXCEPTIONS', false)
 
   # Disable request forgery protection in test environment.
   config.action_controller.allow_forgery_protection = false

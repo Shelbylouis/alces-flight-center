@@ -107,7 +107,7 @@ class SlackNotifier
         author_name: user.name,
         title: subject_and_id_title(kase),
         title_link: cluster_case_url(kase.cluster, kase),
-        text: "*<#{case_change_request_url(kase)}|Change Request Event>*\n#{text}",
+        text: "*<#{cluster_case_change_request_url(kase.cluster, kase)}|Change Request Event>*\n#{text}",
       }
 
       send_notification(change_request_note)

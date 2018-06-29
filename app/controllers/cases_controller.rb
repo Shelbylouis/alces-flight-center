@@ -3,7 +3,10 @@ class CasesController < ApplicationController
 
   # Authorization also not required for `resolved` here, since this is
   # effectively the same as `index` just with different Cases listed.
-  after_action :verify_authorized, except: NO_AUTH_ACTIONS + [:resolved]
+  after_action :verify_authorized, except: NO_AUTH_ACTIONS + [
+    :resolved,
+    :redirect_to_canonical_path,
+  ]
 
   def index
     index_action(show_resolved: false)
@@ -53,7 +56,7 @@ class CasesController < ApplicationController
         format.json do
           # Return no errors and success status to case form app; it will
           # redirect to the path we give it.
-          render json: { redirect: cluster_case_path(@case.cluster, @case) }
+          render json: { redirect: case_path(@case) }
         end
       else
         errors = format_errors(@case)
@@ -125,6 +128,11 @@ class CasesController < ApplicationController
     change_action "Commenting #{verb} for contacts on case %s" do |kase|
       kase.comments_enabled = enabled
     end
+  end
+
+  def redirect_to_canonical_path
+    kase = case_from_params
+    redirect_to case_path(kase)
   end
 
   private
