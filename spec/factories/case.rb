@@ -40,14 +40,15 @@ FactoryBot.define do
       association :issue, factory: :issue_requiring_component
 
       after :build do |instance|
-        instance.cluster = instance.component&.cluster
+        unless instance.components.empty?
+          instance.cluster = instance.components.first.cluster
+        end
       end
 
       factory :case_with_component do
-        component
 
         after :build do |instance|
-          instance.cluster = instance.component.cluster
+          instance.components << build(:component, cluster: instance.cluster)
         end
       end
     end
@@ -56,14 +57,16 @@ FactoryBot.define do
       association :issue, factory: :issue_requiring_service
 
       after :build do |instance|
-        instance.cluster = instance.service&.cluster
+        unless instance.services.empty?
+          instance.cluster = instance.services.first.cluster
+        end
       end
 
       factory :case_with_service do
         service
 
         after :build do |instance|
-          instance.cluster = instance.service.cluster
+          instance.cluster = instance.services[0].cluster
         end
       end
     end

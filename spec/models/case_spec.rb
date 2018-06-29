@@ -214,32 +214,6 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe '#associated_model' do
-    context 'when Case with Component' do
-      subject { create(:case_with_component) }
-
-      it 'gives Component' do
-        expect(subject.associated_model).to eq(subject.component)
-      end
-    end
-
-    context 'when Case with Service' do
-      subject { create(:case_with_service) }
-
-      it 'gives Service' do
-        expect(subject.associated_model).to eq(subject.service)
-      end
-    end
-
-    context 'when Case with just Cluster' do
-      subject { create(:case) }
-
-      it 'gives Cluster' do
-        expect(subject.associated_model).to eq(subject.cluster)
-      end
-    end
-  end
-
   describe '#email_properties' do
     let(:site) { create(:site) }
 
@@ -279,8 +253,8 @@ RSpec.describe Case, type: :model do
         created_at: Time.now,
         cluster: cluster,
         issue: issue,
-        component: component,
-        service: service,
+        components: component ? [component] : [],
+        services: service ? [service] : [],
         user: requestor,
         subject: 'my_subject',
         tier_level: 3,
@@ -294,8 +268,8 @@ RSpec.describe Case, type: :model do
         Cluster: 'somecluster',
         Category: 'Hardware issue',
         Issue: 'Crashed node',
-        'Associated component': 'node01',
-        'Associated service': 'Some service',
+        'Associated components': 'node01',
+        'Associated services': 'Some service',
         Tier: '3 (General Support)',
         Fields: {
           field1: 'value1',

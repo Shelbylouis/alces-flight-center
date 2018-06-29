@@ -1,66 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe CaseDecorator do
-  describe '#association_info' do
-    let(:cluster) { subject.cluster }
-
-    context 'when Case has Component' do
-      subject { create(:case_with_component).decorate }
-
-      let(:component) { subject.component }
-
-      it 'includes link to Component' do
-        expect(
-          subject.association_info
-        ).to include(
-          h.link_to(component.name, h.component_path(component))
-        )
-      end
-
-      it 'includes link to Cluster' do
-        expect(
-          subject.association_info
-        ).to include(
-          h.link_to(cluster.name, h.cluster_path(cluster))
-        )
-      end
-    end
-
-    context 'when Case has Service' do
-      subject { create(:case_with_service).decorate }
-
-      let(:service) { subject.service }
-
-      it 'includes link to Service' do
-        expect(
-          subject.association_info
-        ).to include(
-          h.link_to(service.name, h.service_path(service))
-        )
-      end
-
-      it 'includes link to Cluster' do
-        expect(
-          subject.association_info
-        ).to include(
-          h.link_to(cluster.name, h.cluster_path(cluster))
-        )
-      end
-    end
-
-    context 'when Case has no Component or Service' do
-      subject { create(:case).decorate }
-
-      it 'returns link to Cluster' do
-        expect(
-          subject.association_info
-        ).to eq(
-          h.link_to(cluster.name, h.cluster_path(cluster))
-        )
-      end
-    end
-  end
-
   describe '#case_link' do
     it 'returns link to Case page with display_id as text' do
       kase = create(:case, rt_ticket_id: 12345)

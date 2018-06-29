@@ -201,8 +201,8 @@ class Case < ApplicationRecord
       Cluster: cluster.name,
       Category: category&.name,
       'Issue': issue.name,
-      'Associated component': component&.name,
-      'Associated service': service&.name,
+      'Associated components': components.empty? ? nil : components.map(&:name).join(', '),
+      'Associated services': services.empty? ? nil : services.map(&:name).join(', '),
       Tier: decorate.tier_description,
       Fields: field_hash,
       'Requested MOTD': change_motd_request&.motd

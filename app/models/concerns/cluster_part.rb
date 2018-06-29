@@ -12,7 +12,9 @@ module ClusterPart
   SUPPORT_TYPES = SupportType::VALUES + ['inherit']
 
   included do
-    has_many :cases
+    has_many :case_associations, as: :associated_element
+    has_many :cases, through: :case_associations
+
     has_many :maintenance_windows
 
     validates :name, presence: true
