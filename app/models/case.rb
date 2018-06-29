@@ -8,6 +8,23 @@ class Case < ApplicationRecord
   belongs_to :cluster
   belongs_to :component, required: false
   belongs_to :service, required: false
+
+  has_many :case_associations
+  has_many :services,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Service'
+
+  has_many :components,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Component'
+
+  has_many :component_groups,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'ComponentGroup'
+
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
 

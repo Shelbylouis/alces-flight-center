@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_06_12_161101) do
+ActiveRecord::Schema.define(version: 2018_06_29_094101) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,6 +70,15 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.index ["created_at"], name: "index_audits_on_created_at"
     t.index ["request_uuid"], name: "index_audits_on_request_uuid"
     t.index ["user_id", "user_type"], name: "user_index"
+  end
+
+  create_table "case_associations", force: :cascade do |t|
+    t.bigint "case_id"
+    t.string "associated_element_type"
+    t.bigint "associated_element_id"
+    t.index ["associated_element_type", "associated_element_id"], name: "index_case_associations_by_assoc_element"
+    t.index ["case_id", "associated_element_id", "associated_element_type"], name: "index_case_associations_uniqueness", unique: true
+    t.index ["case_id"], name: "index_case_associations_on_case_id"
   end
 
   create_table "case_comments", force: :cascade do |t|
