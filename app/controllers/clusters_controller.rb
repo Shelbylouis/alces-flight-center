@@ -1,7 +1,7 @@
 class ClustersController < ApplicationController
   decorates_assigned :cluster
 
-  additional_read_only_actions = [:credit_usage, :documents]
+  additional_read_only_actions = [:credit_usage, :documents, :checks]
   after_action :verify_authorized,
     except: NO_AUTH_ACTIONS + additional_read_only_actions
 
@@ -32,6 +32,9 @@ class ClustersController < ApplicationController
     end
 
     redirect_to cluster_credit_usage_path(@cluster)
+  end
+
+  def checks
   end
 
   private
