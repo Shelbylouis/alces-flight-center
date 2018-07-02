@@ -222,6 +222,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resource :terminal_services, only: [:show]
+
     # Support legacy case URLs
     get '/cases/:id', to: 'cases#redirect_to_canonical_path'
     get '/services/:service_id/cases/:id', to: 'cases#redirect_to_canonical_path'

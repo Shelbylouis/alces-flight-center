@@ -278,6 +278,15 @@ ActiveRecord::Schema.define(version: 2018_07_10_181058) do
     t.index ["expansion_type_id"], name: "index_expansions_on_expansion_type_id"
   end
 
+  create_table "flight_directory_configs", force: :cascade do |t|
+    t.string "hostname", limit: 255, null: false
+    t.string "username", limit: 255, null: false
+    t.bigint "site_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["site_id"], name: "index_flight_directory_configs_on_site_id"
+  end
+
   create_table "issues", force: :cascade do |t|
     t.string "name", null: false
     t.boolean "requires_component", default: false, null: false
@@ -432,6 +441,7 @@ ActiveRecord::Schema.define(version: 2018_07_10_181058) do
   add_foreign_key "expansions", "component_makes"
   add_foreign_key "expansions", "components"
   add_foreign_key "expansions", "expansion_types"
+  add_foreign_key "flight_directory_configs", "sites"
   add_foreign_key "issues", "categories"
   add_foreign_key "issues", "service_types"
   add_foreign_key "logs", "components"
