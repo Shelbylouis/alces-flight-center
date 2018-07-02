@@ -1,0 +1,5 @@
+<ul class="fa-ul">
+  <% kase.associations.map(&:decorate).each do |item| %>
+    <%= render 'cases/associations/cluster_part', item: item %>
+  <% end %>
+</ul>

@@ -145,6 +145,10 @@ class Case < ApplicationRecord
     component || service || cluster
   end
 
+  def associations
+    services + component_groups + components
+  end
+
   def email_reply_subject
     "Re: #{email_subject}"
   end
