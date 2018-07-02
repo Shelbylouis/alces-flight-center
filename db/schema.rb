@@ -183,6 +183,36 @@ ActiveRecord::Schema.define(version: 2018_07_26_120909) do
     t.index ["case_id"], name: "index_change_requests_on_case_id"
   end
 
+  create_table "check_categories", force: :cascade do |t|
+    t.string "name", null: false
+  end
+
+  create_table "check_results", force: :cascade do |t|
+    t.bigint "cluster_check_id", null: false
+    t.date "date", null: false
+    t.bigint "user_id", null: false
+    t.string "result", null: false
+    t.string "comment"
+    t.bigint "log_id"
+    t.index ["cluster_check_id"], name: "index_check_results_on_cluster_check_id"
+    t.index ["log_id"], name: "index_check_results_on_log_id"
+    t.index ["user_id"], name: "index_check_results_on_user_id"
+  end
+
+  create_table "checks", force: :cascade do |t|
+    t.bigint "check_category_id", null: false
+    t.string "name", null: false
+    t.string "command"
+    t.index ["check_category_id"], name: "index_checks_on_check_category_id"
+  end
+
+  create_table "cluster_checks", id: false, force: :cascade do |t|
+    t.bigint "cluster_id", null: false
+    t.bigint "check_id", null: false
+    t.index ["check_id"], name: "index_cluster_checks_on_check_id"
+    t.index ["cluster_id"], name: "index_cluster_checks_on_cluster_id"
+  end
+
   create_table "clusters", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
