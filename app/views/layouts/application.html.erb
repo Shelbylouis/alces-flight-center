@@ -31,10 +31,12 @@
       <% if @title %>
           <div class="card title-card">
             <div class="card-body">
-            <h1><%= @title %></h1>
-            <p class="lead" style="font-size: 18px;">
-              <%= yield :subtitle %>
-            </p>
+              <h1><%= @title %></h1>
+              <% if content_for? :subtitle %>
+                <p class="lead" style="font-size: 18px;">
+                  <%= yield :subtitle %>
+                </p>
+            <% end %>
           </div>
         </div>
       <% end %>

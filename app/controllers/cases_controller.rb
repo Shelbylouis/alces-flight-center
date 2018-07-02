@@ -23,6 +23,7 @@ class CasesController < ApplicationController
     else
       not_found unless @scope.cases.include? @case
       @comment = @case.case_comments.new
+      @title = "#{@case.display_id}: #{@case.subject}"
     end
   end
 
