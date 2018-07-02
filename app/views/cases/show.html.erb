@@ -37,7 +37,7 @@
         </td>
       </tr>
       <tr>
-        <th rowspan="<%= @case.credit_charge ? 4 : 3 %>">Affected members</th>
+        <th rowspan="<%= @case.credit_charge ? 4 : 3 %>">Affected components</th>
         <td rowspan="<%= @case.credit_charge ? 4 : 3 %>">
           <%= render 'cases/associations/association_info', kase: @case %>
           <% if policy(MaintenanceWindow).create? && @case.open? %>
