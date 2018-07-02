@@ -40,7 +40,7 @@
       </tr>
       <tr>
         <th>Association</th>
-        <td>
+        <td rowspan="<%= @case.credit_charge ? 4 : 3 %>">
           <%= @case.association_info %>
           <% if policy(MaintenanceWindow).create? && @case.open? %>
             <%= link_to 'Request maintenance',
@@ -58,25 +58,23 @@
       </tr>
       <% if @case.credit_charge %>
       <tr>
-        <td colspan="2"></td>
+        <td></td>
         <th>Credit usage</th>
         <td><%= pluralize(@case.credit_charge.amount, 'credit') %></td>
       </tr>
       <% end %>
       <tr>
-        <th>Category</th>
-        <td><%= @case.category&.name || 'None' %></td>
-        <th>Issue</th>
-        <td><%= @case.issue.name %></td>
+        <td></td>
+        <th>Issue type</th>
+        <td><%= @case.issue_type_text %></td>
       </tr>
       <tr>
+        <td></td>
         <th>Tier</th>
         <td>
           <%= @case.tier_description %>
           <%= render 'cases/escalation_controls' %>
         </td>
-        <th>Unique identifier</th>
-        <td><%= @case.display_id %></td>
       </tr>
       <%= render 'cases/fields_or_requests_row', kase: @case %>
       <%= render 'cases/time_worked_row' %>

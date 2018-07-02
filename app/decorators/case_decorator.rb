@@ -19,6 +19,10 @@ class CaseDecorator < ApplicationDecorator
     associated_model.decorate.links
   end
 
+  def issue_type_text
+    "#{category_text}#{model.issue.name}"
+  end
+
   def case_link
     h.link_to(
       display_id,
@@ -44,5 +48,9 @@ class CaseDecorator < ApplicationDecorator
 
   def commenting
     @commenting ||= CaseCommenting.new(self, current_user)
+  end
+
+  def category_text
+    model.category ? "#{model.category.name}: " : ''
   end
 end
