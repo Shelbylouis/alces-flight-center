@@ -21,6 +21,10 @@ class ServiceDecorator < ClusterPartDecorator
     super.merge(issues_json)
   end
 
+  def fa_icon
+    'fa-gears'
+  end
+
   private
 
   class IssuesJsonBuilder
