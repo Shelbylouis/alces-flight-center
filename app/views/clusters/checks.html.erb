@@ -37,15 +37,18 @@
                   <td class="nowrap">
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
                       <label class="btn btn-primary">
-                        <input type="radio" id="success" autocomplete="off" required>
+                        <input type="radio" name=<%= "#{index}-result" %>
+                      id="success" autocomplete="off" required>
                         <i class="fa fa-check" style="color: #18bcb0;"></i>
                       </label>
                       <label class="btn btn-primary">
-                        <input type="radio" id="failure" autocomplete="off">
+                        <input type="radio" name=<%= "#{index}-result" %>
+                      id="failure" autocomplete="off">
                         <i class="fa fa-remove" style="color: red;"></i>
                       </label>
                       <label class="btn btn-primary">
-                        <input type="radio" id="na" autocomplete="off"> N/A
+                        <input type="radio" name=<%= "#{index}-result" %>
+                      id="na" autocomplete="off"> N/A
                       </label>
                     </div>
                   </td>
