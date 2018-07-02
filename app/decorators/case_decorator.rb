@@ -15,10 +15,6 @@ class CaseDecorator < ApplicationDecorator
     ].join(' | ')
   end
 
-  def association_info
-    model.associations.first.decorate.links + extra_association_text
-  end
-
   def issue_type_text
     "#{category_text}#{model.issue.name}"
   end
@@ -53,9 +49,4 @@ class CaseDecorator < ApplicationDecorator
     model.category ? "#{model.category.name}: " : ''
   end
 
-  def extra_association_text
-    if model.associations.length > 1
-      " + #{model.associations.length - 1} more"
-    end
-  end
 end

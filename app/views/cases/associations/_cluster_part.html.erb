@@ -2,7 +2,9 @@
   <i class="fa-li fa <%= item.fa_icon %>" title="<%= item.type_name %>"></i>
   <%= link_to item.name, item.path %> (<%= item.type_name %>)
   <% if item.respond_to? :components %>
-    <% contents = render 'cases/associations/group_contents', group: item %>
+    <% contents = render 'cases/associations/group_contents', items: item.components do %>
+      <p>The <%= item.name %> group includes the following components:</p>
+    <% end %>
     <i
       class="fa fa-sitemap float-right"
       data-html="true"
