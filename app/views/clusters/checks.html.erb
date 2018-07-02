@@ -31,13 +31,19 @@
                 </td>
                 <td style="width: 40%;"><input type="text" style="width: 100%"/></td>
                 <td class="nowrap">
-                  <button class="btn btn-primary">
-                    <i class="fa fa-check" style="color: #18bcb0;"></i>
-                  </button>
-                  <button class="btn btn-primary">
-                    <i class="fa fa-remove" style="color: red;"></i>
-                  </button>
-                  <button class="btn btn-primary">N/A</button>
+                  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                    <label class="btn btn-primary">
+                      <input type="radio" name="result" id="success" autocomplete"off">
+                      <i class="fa fa-check" style="color: #18bcb0;"></i>
+                    </label>
+                    <label class="btn btn-primary">
+                      <input type="radio" name="result" id="failure" autocomplete"off">
+                      <i class="fa fa-remove" style="color: red;"></i>
+                    </label>
+                    <label class="btn btn-primary">
+                      <input type="radio" name="result" id="n/a" autocomplete"off"> N/A
+                    </label>
+                  </div>
                 </td>
               </tr>
             <% end %>
