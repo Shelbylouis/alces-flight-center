@@ -76,6 +76,10 @@ class ClusterDecorator < ApplicationDecorator
     end
   end
 
+  def fa_icon
+    'fa-server'
+  end
+
   private
 
   def notes_tab

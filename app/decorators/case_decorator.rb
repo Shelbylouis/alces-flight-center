@@ -10,13 +10,13 @@ class CaseDecorator < ApplicationDecorator
     [
       "#{display_id} #{subject}",
       created_at.to_formatted_s(:long),
-      associated_model.name,
+      h.pluralize(model.associations.length, 'associated member'),
       "Created by #{user.name}"
     ].join(' | ')
   end
 
   def association_info
-    associated_model.decorate.links
+    model.associations.first.decorate.links + extra_association_text
   end
 
   def issue_type_text
@@ -32,8 +32,7 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def request_maintenance_path
-    assoc_class = model.associated_model.underscored_model_name
-    h.send("new_#{assoc_class}_maintenance_window_path", model.associated_model, case_id: model.id)
+    h.new_cluster_maintenance_window_path model.cluster, case_id: model.id
   end
 
   def tier_description
@@ -52,5 +51,11 @@ class CaseDecorator < ApplicationDecorator
 
   def category_text
     model.category ? "#{model.category.name}: " : ''
+  end
+
+  def extra_association_text
+    if model.associations.length > 1
+      " + #{model.associations.length - 1} more"
+    end
   end
 end

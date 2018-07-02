@@ -60,7 +60,7 @@ RSpec.describe Case, type: :model do
       component = create(:component)
 
       support_case = Case.new(
-        component: component,
+        components: [component],
         issue: create(:issue_requiring_component),
         cluster: nil
       )
@@ -72,7 +72,7 @@ RSpec.describe Case, type: :model do
       service = create(:service)
 
       support_case = Case.new(
-        service: service,
+        services: [service],
         issue: create(:issue_requiring_service),
         cluster: nil
       )
@@ -87,7 +87,7 @@ RSpec.describe Case, type: :model do
       # Don't use create otherwise test will fail as validation will fail.
       support_case = build(
         :case,
-        service: create(:service),
+        services: [create(:service)],
         issue: create(:issue_requiring_service),
         cluster: cluster
       )
@@ -280,12 +280,12 @@ RSpec.describe Case, type: :model do
       expect(kase.email_properties).to eq expected_properties
     end
 
-    context 'when no associated component' do
+    context 'when no associated components' do
       let(:requires_component) { false }
       let(:component) { nil }
 
       it 'does not include corresponding line' do
-        expect(kase.email_properties).not_to include(:'Associated component')
+        expect(kase.email_properties).not_to include(:'Associated components')
       end
     end
 
@@ -294,7 +294,7 @@ RSpec.describe Case, type: :model do
       let(:service) { nil }
 
       it 'does not include corresponding line' do
-        expect(kase.email_properties).not_to include(:'Associated service')
+        expect(kase.email_properties).not_to include(:'Associated services')
       end
     end
 
@@ -529,6 +529,46 @@ RSpec.describe Case, type: :model do
       expect(kase.errors.messages).to include(
         change_request: ['can\'t be blank']
       )
+    end
+  end
+
+  describe '#associations' do
+    let(:site) { create(:site) }
+    let(:cluster) { create(:cluster, site: site) }
+    let(:component) { create(:component, name: 'node01', cluster: cluster) }
+    let(:component_group) { create(:component_group, cluster: cluster) }
+    let(:service) { create(:service, name: 'Some service', cluster: cluster) }
+
+    context 'with all types of things associated' do
+      subject do
+        create(
+            :open_case,
+            components: [component],
+            services: [service],
+            component_groups: [component_group],
+            cluster: cluster
+        )
+      end
+
+      it 'lists associations in correct order' do
+        expect(subject.associations).to eq [service, component_group, component]
+      end
+    end
+
+    context 'with nothing associated' do
+      subject do
+        create(
+            :open_case,
+            components: [],
+            services: [],
+            component_groups: [],
+            cluster: cluster
+        )
+      end
+
+      it 'lists cluster as association' do
+        expect(subject.associations).to eq [cluster]
+      end
     end
   end
 end

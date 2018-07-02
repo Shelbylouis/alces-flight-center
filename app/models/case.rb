@@ -6,8 +6,6 @@ class Case < ApplicationRecord
 
   belongs_to :issue
   belongs_to :cluster
-  belongs_to :component, required: false
-  belongs_to :service, required: false
 
   has_many :case_associations
   has_many :services,
@@ -141,12 +139,12 @@ class Case < ApplicationRecord
     open? || !persisted?
   end
 
-  def associated_model
-    component || service || cluster
-  end
-
   def associations
-    services + component_groups + components
+    (services + component_groups + components).tap do |assocs|
+      if assocs.empty?
+        assocs << cluster
+      end
+    end
   end
 
   def email_reply_subject
@@ -299,8 +297,8 @@ class Case < ApplicationRecord
 
   def assign_cluster_if_necessary
     return if cluster
-    self.cluster = component.cluster if component
-    self.cluster = service.cluster if service
+    self.cluster = components.first.cluster if components.present?
+    self.cluster = services.first.cluster if services.present?
   end
 
   def assign_default_subject_if_unset
