@@ -20,4 +20,8 @@ class ComponentGroupDecorator < ApplicationDecorator
       tabs_builder.asset_record
     ]
   end
+
+  def fa_icon
+    'fa-cubes'
+  end
 end

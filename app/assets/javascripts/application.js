@@ -22,4 +22,9 @@ function enableTooltips() {
   $('[title]').tooltip({delay: {show: 500, hide: 100}, placement: 'left'});
 }
 
+function enablePopovers() {
+  $('[data-toggle="popover"]').popover();
+}
+
 document.addEventListener('turbolinks:load', enableTooltips);
+document.addEventListener('turbolinks:load', enablePopovers);

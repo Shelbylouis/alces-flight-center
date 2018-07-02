@@ -1,1 +1,15 @@
-<li><i class="fa-li fa <%= item.fa_icon %>" title="<%= item.model_name.human %>"></i><%= link_to item.name, item.path %></li>
+<li>
+  <i class="fa-li fa <%= item.fa_icon %>" title="<%= item.model_name.human %>"></i>
+  <%= link_to item.name, item.path %>
+  <% if item.respond_to? :components %>
+    <% contents = render 'cases/associations/group_contents', group: item %>
+    <i
+      class="fa fa-sitemap float-right"
+      data-html="true"
+      data-content="<%= contents.squish %>"
+      data-toggle="popover"
+      data-trigger="hover"
+      data-delay='{"hide": 1500}'
+    ></i>
+  <% end %>
+</li>
