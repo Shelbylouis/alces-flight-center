@@ -1,0 +1,8 @@
+<ul class="fa-ul">
+  <% kase.services.map(&:decorate).each do |service| %>
+    <li><i class="fa-li fa <%= service.fa_icon %>" title="Service"></i><%= link_to service.name, service.path %></li>
+  <% end %>
+  <% kase.components.map(&:decorate).each do |component| %>
+    <li><i class="fa-li fa <%= component.fa_icon %>" title="Component"></i><%= link_to component.name, component.path %></li>
+  <% end %>
+</ul>

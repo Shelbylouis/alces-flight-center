@@ -50,13 +50,19 @@ class ScopeNavLinksBuilder
   end
 
   def cluster_part_link
-    link_for_model([:service, :component], nav_icon: 'fa-cube')
+    link_for_model([:service, :component], nav_icon: icon_for_model(:cluster_part))
   end
 
   def link_for_model(possible_types, nav_icon:)
     model = first_model_from_scope(possible_types)
     return nil unless model
     nav_link_proc(model: model, nav_icon: nav_icon)
+  end
+
+  def icon_for_model(type)
+    model = first_model_from_scope(type)
+    return nil unless model
+    model.decorate.fa_icon
   end
 
   def first_model_from_scope(possible_types)

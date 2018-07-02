@@ -39,9 +39,9 @@
         </td>
       </tr>
       <tr>
-        <th>Association</th>
+        <th>Affected members</th>
         <td rowspan="<%= @case.credit_charge ? 4 : 3 %>">
-          <%= @case.association_info %>
+          <%= render 'cases/association_info', kase: @case %>
           <% if policy(MaintenanceWindow).create? && @case.open? %>
             <%= link_to 'Request maintenance',
                         @case.request_maintenance_path,
