@@ -25,6 +25,10 @@ class ServiceDecorator < ClusterPartDecorator
     'fa-gears'
   end
 
+  def type_name
+    'Service'
+  end
+
   private
 
   class IssuesJsonBuilder

@@ -1,6 +1,6 @@
 <li>
-  <i class="fa-li fa <%= item.fa_icon %>" title="<%= item.model_name.human %>"></i>
-  <%= link_to item.name, item.path %>
+  <i class="fa-li fa <%= item.fa_icon %>" title="<%= item.type_name %>"></i>
+  <%= link_to item.name, item.path %> (<%= item.type_name %>)
   <% if item.respond_to? :components %>
     <% contents = render 'cases/associations/group_contents', group: item %>
     <i

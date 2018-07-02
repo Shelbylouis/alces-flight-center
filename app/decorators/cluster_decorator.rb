@@ -80,6 +80,10 @@ class ClusterDecorator < ApplicationDecorator
     'fa-server'
   end
 
+  def type_name
+    'Entire cluster'
+  end
+
   private
 
   def notes_tab

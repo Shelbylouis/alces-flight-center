@@ -15,10 +15,6 @@ class ClusterPartDecorator < ApplicationDecorator
     }
   end
 
-  def fa_icon
-    'fa-cube'
-  end
-
   private
 
   def render_change_support_type_button(
