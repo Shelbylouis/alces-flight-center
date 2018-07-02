@@ -1,4 +1,4 @@
-<p>This group includes the following components:</p>
+<p>The <%= group.name %> group includes the following components:</p>
 <ul class="fa-ul">
   <% group.components.map(&:decorate).each do |component| %>
     <%= render 'cases/associations/cluster_part', item: component %>
