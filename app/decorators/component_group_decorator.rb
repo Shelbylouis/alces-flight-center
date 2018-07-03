@@ -20,4 +20,12 @@ class ComponentGroupDecorator < ApplicationDecorator
       tabs_builder.asset_record
     ]
   end
+
+  def fa_icon
+    'fa-cubes'
+  end
+
+  def type_name
+    "Group of #{component_type.name.pluralize.downcase}"
+  end
 end

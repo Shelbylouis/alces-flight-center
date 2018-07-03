@@ -85,7 +85,7 @@ end
 
 RSpec.feature "Maintenance windows", type: :feature do
   let(:support_case) { create(:case_with_component) }
-  let(:component) { support_case.component }
+  let(:component) { support_case.components.first }
   let(:cluster) { support_case.cluster }
   let(:site) { support_case.site }
 

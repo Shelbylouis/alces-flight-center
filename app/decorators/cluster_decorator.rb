@@ -76,6 +76,14 @@ class ClusterDecorator < ApplicationDecorator
     end
   end
 
+  def fa_icon
+    'fa-server'
+  end
+
+  def type_name
+    'Entire cluster'
+  end
+
   private
 
   def notes_tab

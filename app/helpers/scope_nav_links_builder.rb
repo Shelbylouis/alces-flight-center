@@ -12,7 +12,8 @@ class ScopeNavLinksBuilder
       site_link,
       cluster_link,
       component_group_link,
-      cluster_part_link,
+      service_link,
+      component_link
     ].compact
   end
 
@@ -49,14 +50,24 @@ class ScopeNavLinksBuilder
     link_for_model(:component_group, nav_icon: 'fa-cubes')
   end
 
-  def cluster_part_link
-    link_for_model([:service, :component], nav_icon: 'fa-cube')
+  def service_link
+    link_for_model([:service], nav_icon: icon_for_model(:service))
+  end
+
+  def component_link
+    link_for_model([:component], nav_icon: icon_for_model(:component))
   end
 
   def link_for_model(possible_types, nav_icon:)
     model = first_model_from_scope(possible_types)
     return nil unless model
     nav_link_proc(model: model, nav_icon: nav_icon)
+  end
+
+  def icon_for_model(type)
+    model = first_model_from_scope(type)
+    return nil unless model
+    model.decorate.fa_icon
   end
 
   def first_model_from_scope(possible_types)

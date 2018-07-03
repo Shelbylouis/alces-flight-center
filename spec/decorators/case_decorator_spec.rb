@@ -1,66 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe CaseDecorator do
-  describe '#association_info' do
-    let(:cluster) { subject.cluster }
-
-    context 'when Case has Component' do
-      subject { create(:case_with_component).decorate }
-
-      let(:component) { subject.component }
-
-      it 'includes link to Component' do
-        expect(
-          subject.association_info
-        ).to include(
-          h.link_to(component.name, h.component_path(component))
-        )
-      end
-
-      it 'includes link to Cluster' do
-        expect(
-          subject.association_info
-        ).to include(
-          h.link_to(cluster.name, h.cluster_path(cluster))
-        )
-      end
-    end
-
-    context 'when Case has Service' do
-      subject { create(:case_with_service).decorate }
-
-      let(:service) { subject.service }
-
-      it 'includes link to Service' do
-        expect(
-          subject.association_info
-        ).to include(
-          h.link_to(service.name, h.service_path(service))
-        )
-      end
-
-      it 'includes link to Cluster' do
-        expect(
-          subject.association_info
-        ).to include(
-          h.link_to(cluster.name, h.cluster_path(cluster))
-        )
-      end
-    end
-
-    context 'when Case has no Component or Service' do
-      subject { create(:case).decorate }
-
-      it 'returns link to Cluster' do
-        expect(
-          subject.association_info
-        ).to eq(
-          h.link_to(cluster.name, h.cluster_path(cluster))
-        )
-      end
-    end
-  end
-
   describe '#case_link' do
     it 'returns link to Case page with display_id as text' do
       kase = create(:case, rt_ticket_id: 12345)
@@ -94,5 +34,30 @@ RSpec.describe CaseDecorator do
         kase.tier_description
       end.to raise_error(RuntimeError, "Unhandled tier_level: 5")
     end
+  end
+
+  describe '#issue_type_text' do
+    let(:issue) { create(:issue, name: 'My issue', category: category) }
+
+    let(:kase) { create(:open_case, issue: issue) }
+
+    subject do
+      kase.decorate.issue_type_text
+    end
+
+    context 'without a category' do
+      let(:category) { nil }
+      it 'returns issue name' do
+        expect(subject).to eq issue.name
+      end
+    end
+
+    context 'with a category' do
+      let(:category) { create(:category, name: 'My Category') }
+      it 'returns combination of category and issue name' do
+        expect(subject).to eq "#{category.name}: #{issue.name}"
+      end
+    end
+
   end
 end

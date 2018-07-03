@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_06_12_161101) do
+ActiveRecord::Schema.define(version: 2018_07_02_135826) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,6 +72,15 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
+  create_table "case_associations", force: :cascade do |t|
+    t.bigint "case_id", null: false
+    t.string "associated_element_type", null: false
+    t.bigint "associated_element_id", null: false
+    t.index ["associated_element_type", "associated_element_id"], name: "index_case_associations_by_assoc_element"
+    t.index ["case_id", "associated_element_id", "associated_element_type"], name: "index_case_associations_uniqueness", unique: true
+    t.index ["case_id"], name: "index_case_associations_on_case_id"
+  end
+
   create_table "case_comments", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "case_id", null: false
@@ -98,11 +107,9 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "cluster_id", null: false
-    t.integer "component_id"
     t.integer "user_id", null: false
     t.bigint "rt_ticket_id"
     t.integer "issue_id", null: false
-    t.bigint "service_id"
     t.text "token", null: false
     t.text "subject", null: false
     t.datetime "completed_at"
@@ -115,11 +122,9 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.boolean "comments_enabled", default: false
     t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
-    t.index ["component_id"], name: "index_cases_on_component_id"
     t.index ["display_id"], name: "index_cases_on_display_id", unique: true
     t.index ["issue_id"], name: "index_cases_on_issue_id"
     t.index ["rt_ticket_id"], name: "index_cases_on_rt_ticket_id", unique: true
-    t.index ["service_id"], name: "index_cases_on_service_id"
     t.index ["user_id"], name: "index_cases_on_user_id"
   end
 
@@ -398,14 +403,13 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
   add_foreign_key "asset_record_fields", "asset_record_field_definitions"
   add_foreign_key "asset_record_fields", "component_groups"
   add_foreign_key "asset_record_fields", "components"
+  add_foreign_key "case_associations", "cases"
   add_foreign_key "case_comments", "cases"
   add_foreign_key "case_comments", "users"
   add_foreign_key "case_state_transitions", "cases"
   add_foreign_key "case_state_transitions", "users"
   add_foreign_key "cases", "clusters"
-  add_foreign_key "cases", "components"
   add_foreign_key "cases", "issues"
-  add_foreign_key "cases", "services"
   add_foreign_key "cases", "users"
   add_foreign_key "cases", "users", column: "assignee_id"
   add_foreign_key "change_motd_request_state_transitions", "change_motd_requests"

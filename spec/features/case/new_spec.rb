@@ -44,8 +44,8 @@ RSpec.describe 'Case form', type: :feature, js: true do
       new_case = cluster.cases.first
       expect(new_case.cluster).to eq(cluster)
       expect(new_case.issue).to eq(issue)
-      expect(new_case.component).to eq(component)
-      expect(new_case.service).to eq(service)
+      expect(new_case.components.first).to eq(component)
+      expect(new_case.services.first).to eq(service)
       expect(new_case.subject).to eq(subject_value)
       expect(new_case.tier_level).to eq(tier.level)
       expect(new_case.fields).to eq([

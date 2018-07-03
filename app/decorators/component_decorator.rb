@@ -25,4 +25,12 @@ class ComponentDecorator < ClusterPartDecorator
   def link
     h.link_to self.name, path
   end
+
+  def fa_icon
+    'fa-cube'
+  end
+
+  def type_name
+    model.component_type.name
+  end
 end

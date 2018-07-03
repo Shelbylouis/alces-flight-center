@@ -1,3 +1,6 @@
 <a class="td-link" href="<%= url %>">
-  <%= cell_content %>
+  <% if local_assigns.include? :cell_content %>
+    <%= cell_content %>
+  <% end %>
+  <%= yield if block_given? %>
 </a>

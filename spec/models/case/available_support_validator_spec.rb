@@ -5,9 +5,13 @@ RSpec.describe Case, type: :model do
     [:component, :service, :cluster].each do |part_name|
       context "with #{part_name}" do
         subject do
+
+          part_key = part_name == :cluster ? :cluster : part_name.to_s.pluralize.to_sym
+          part_value = part_name == :cluster ? part : [part]
+
           build(
             "case_requiring_#{part_name}",
-            part_name => part,
+            part_key => part_value,
             tier_level: tier_level
           )
         end

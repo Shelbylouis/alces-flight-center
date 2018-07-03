@@ -6,8 +6,23 @@ class Case < ApplicationRecord
 
   belongs_to :issue
   belongs_to :cluster
-  belongs_to :component, required: false
-  belongs_to :service, required: false
+
+  has_many :case_associations
+  has_many :services,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Service'
+
+  has_many :components,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Component'
+
+  has_many :component_groups,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'ComponentGroup'
+
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
 
@@ -124,8 +139,12 @@ class Case < ApplicationRecord
     open? || !persisted?
   end
 
-  def associated_model
-    component || service || cluster
+  def associations
+    (services + component_groups + components).tap do |assocs|
+      if assocs.empty?
+        assocs << cluster
+      end
+    end
   end
 
   def email_reply_subject
@@ -184,8 +203,8 @@ class Case < ApplicationRecord
       Cluster: cluster.name,
       Category: category&.name,
       'Issue': issue.name,
-      'Associated component': component&.name,
-      'Associated service': service&.name,
+      'Associated components': components.empty? ? nil : components.map(&:name).join(', '),
+      'Associated services': services.empty? ? nil : services.map(&:name).join(', '),
       Tier: decorate.tier_description,
       Fields: field_hash,
       'Requested MOTD': change_motd_request&.motd
@@ -278,8 +297,8 @@ class Case < ApplicationRecord
 
   def assign_cluster_if_necessary
     return if cluster
-    self.cluster = component.cluster if component
-    self.cluster = service.cluster if service
+    self.cluster = components.first.cluster if components.present?
+    self.cluster = services.first.cluster if services.present?
   end
 
   def assign_default_subject_if_unset

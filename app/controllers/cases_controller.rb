@@ -23,6 +23,7 @@ class CasesController < ApplicationController
     else
       not_found unless @scope.cases.include? @case
       @comment = @case.case_comments.new
+      @title = "#{@case.display_id}: #{@case.subject}"
     end
   end
 
@@ -46,8 +47,21 @@ class CasesController < ApplicationController
   end
 
   def create
-    @case = Case.new(case_params.merge(user: current_user))
+    my_params = case_params
+
+    service_id = my_params.delete(:service_id)
+    component_id = my_params.delete(:component_id)
+
+    @case = Case.new(my_params.merge(user: current_user))
     authorize @case
+
+    if service_id.present?
+      @case.services << Service.find(service_id)
+    end
+
+    if component_id.present?
+      @case.components << Component.find(component_id)
+    end
 
     respond_to do |format|
       if @case.save
