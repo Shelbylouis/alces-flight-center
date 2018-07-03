@@ -10,7 +10,7 @@ class CaseDecorator < ApplicationDecorator
     [
       "#{display_id} #{subject}",
       created_at.to_formatted_s(:long),
-      h.pluralize(model.associations.length, 'associated member'),
+      h.pluralize(model.associations.length, 'affected component'),
       "Created by #{user.name}"
     ].join(' | ')
   end
