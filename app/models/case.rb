@@ -147,6 +147,13 @@ class Case < ApplicationRecord
     end
   end
 
+  def associations=(objects)
+    %w(Service ComponentGroup Component).each do |type|
+      setter_method = "#{type.pluralize.underscore}=".to_sym
+      send(setter_method, objects.select { |o| o.model_name == type })
+    end
+  end
+
   def email_reply_subject
     "Re: #{email_subject}"
   end

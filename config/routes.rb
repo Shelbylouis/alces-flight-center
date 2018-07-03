@@ -123,7 +123,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resource :case_associations, only: [:update], path: 'associations'
+      resource :case_associations, only: [:update], as: 'update_associations', path: 'associations'
     end
 
     resources :change_motd_requests, only: [] do

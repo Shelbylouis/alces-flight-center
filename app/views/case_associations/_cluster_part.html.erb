@@ -1,9 +1,25 @@
+<% dom_id = "#{part.model_name}-#{part.id}" %>
 <li>
-  <%= part.name %>
+  <div class="custom-control custom-checkbox">
+    <input
+      class="custom-control-input"
+      id="<%= dom_id %>"
+      name="associations[]"
+      type="checkbox"
+      value="<%= dom_id %>"
+      <%= kase.associations.include?(part) ? 'checked' : '' %>
+    >
+    <label class="custom-control-label" for="<%= dom_id %>">
+      <%= part.name %>
+    </label>
+  </div>
   <% if part.respond_to? :components %>
     <ul>
       <% part.components.each do |component| %>
-        <%= render 'case_associations/cluster_part', part: component %>
+        <%= render 'case_associations/cluster_part',
+                   part: component,
+                   kase: kase
+        %>
       <% end %>
     </ul>
   <% end %>
