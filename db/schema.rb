@@ -73,9 +73,9 @@ ActiveRecord::Schema.define(version: 2018_07_02_135826) do
   end
 
   create_table "case_associations", force: :cascade do |t|
-    t.bigint "case_id"
-    t.string "associated_element_type"
-    t.bigint "associated_element_id"
+    t.bigint "case_id", null: false
+    t.string "associated_element_type", null: false
+    t.bigint "associated_element_id", null: false
     t.index ["associated_element_type", "associated_element_id"], name: "index_case_associations_by_assoc_element"
     t.index ["case_id", "associated_element_id", "associated_element_type"], name: "index_case_associations_uniqueness", unique: true
     t.index ["case_id"], name: "index_case_associations_on_case_id"
@@ -403,6 +403,7 @@ ActiveRecord::Schema.define(version: 2018_07_02_135826) do
   add_foreign_key "asset_record_fields", "asset_record_field_definitions"
   add_foreign_key "asset_record_fields", "component_groups"
   add_foreign_key "asset_record_fields", "components"
+  add_foreign_key "case_associations", "cases"
   add_foreign_key "case_comments", "cases"
   add_foreign_key "case_comments", "users"
   add_foreign_key "case_state_transitions", "cases"
