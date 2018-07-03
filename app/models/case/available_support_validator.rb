@@ -12,10 +12,10 @@ class Case
     attr_reader :record
 
     def associated_models
-      record.component_groups +
-          record.components +
-          record.services +
-          [record.cluster]
+      (
+        record.associations +
+            [record.cluster]
+      ).uniq
     end
 
     def validate_can_only_request_consultancy_support_for_advice_part
