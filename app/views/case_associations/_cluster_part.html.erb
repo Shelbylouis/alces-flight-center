@@ -1,0 +1,10 @@
+<li>
+  <%= part.name %>
+  <% if part.respond_to? :components %>
+    <ul>
+      <% part.components.each do |component| %>
+        <%= render 'case_associations/cluster_part', part: component %>
+      <% end %>
+    </ul>
+  <% end %>
+</li>

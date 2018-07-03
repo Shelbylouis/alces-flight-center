@@ -1,1 +1,23 @@
-Soon™
+<ul>
+  <li>
+    <%= @case.cluster.name %> (Entire cluster)
+    <ul>
+      <li>
+        Services
+        <ul>
+          <% @case.cluster.services.each do |service| %>
+            <%= render 'case_associations/cluster_part', part: service %>
+          <% end %>
+        </ul>
+      </li>
+      <li>
+        Components
+        <ul>
+          <% @case.cluster.component_groups.each do |cg| %>
+            <%= render 'case_associations/cluster_part', part: cg %>
+          <% end %>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
