@@ -12,7 +12,7 @@ class CaseAssociationsController < ApplicationController
   def update
     authorize(@case, :edit_associations?)
 
-    @case.associations = map_association_params
+    @case.associations = filter_group_children(map_association_params)
 
     redirect_to case_path(@case)
   end
@@ -30,6 +30,13 @@ class CaseAssociationsController < ApplicationController
         Kernel.const_get(assoc_data[:type]).find(assoc_data[:id])
       end
     end.compact
+  end
+
+  def filter_group_children(assocs)
+    assocs.select do |assoc|
+      !assoc.respond_to?(:component_group) ||
+        !assocs.include?(assoc.component_group)
+    end
   end
 
 end
