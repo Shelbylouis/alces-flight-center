@@ -33,7 +33,7 @@
               <h5>User and group directory</h5>
               <span>
                 <%= link_to "Manage",
-                            "#{ENV.fetch('TERMINAL_SERVICE_BASE_URL')}/directory",
+                            site.directory_service_url,
                             PolicyDependentOptions.wrap(
                               {class: ['btn', 'btn-primary']},
                               policy: policy(site.flight_directory_config).show?,

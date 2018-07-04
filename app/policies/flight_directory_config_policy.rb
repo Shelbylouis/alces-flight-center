@@ -1,7 +1,9 @@
 class FlightDirectoryConfigPolicy < ApplicationPolicy
   class Scope < Scope
     def resolve
-      if user.contact?
+      if user.admin?
+        scope
+      elsif user.contact?
         scope.
           joins(site: :users).
           where(users: {id: user.id})

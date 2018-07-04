@@ -1,6 +1,6 @@
 class TerminalServicesController < ApplicationController
   def show
-    config = policy_scope(FlightDirectoryConfig).first || FlightDirectoryConfig.new
+    config = @site.flight_directory_config || @site.build_flight_directory_config
     authorize config, :show?
     site = config.site
 

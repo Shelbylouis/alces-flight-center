@@ -83,6 +83,7 @@ Rails.application.routes.draw do
     root 'sites#index'
     resources :sites, only: [:show, :index] do
       cases.call(only: [:index, :new])
+      resource :terminal_services, only: [:show]
     end
 
     cases.call(only: []) do
