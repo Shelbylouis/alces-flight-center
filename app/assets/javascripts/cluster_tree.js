@@ -69,6 +69,20 @@ function _init_cluster_tree(idx) {
       updateTree();
     }
   );
+
+  // Initialise selectedness of children based on their parent
+  $(this).find('.cluster-part').each(
+    function() {
+      const self = $(this);
+
+      const input = self.find('input[type=checkbox]');
+      if (input.is(':checked')) {
+        const allChildren = self.parent().find('ul').find('input');
+        allChildren.prop('checked', true);
+      }
+    }
+  );
+
   updateTree();
 }
 
