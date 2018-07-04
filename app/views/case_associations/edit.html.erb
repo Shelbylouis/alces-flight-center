@@ -54,16 +54,18 @@
                   Please wait...
                 </li>
               </ul>
-              <%= link_to 'Cancel',
-                          case_path(@case),
-                          class: 'btn btn-secondary',
-                          role: 'button'
-              %>
-              <input
-                class="btn btn-primary"
-                type="submit"
-                value="Save"
-              />
+              <div class="btn-group-stretch">
+                <%= link_to 'Cancel',
+                            case_path(@case),
+                            class: 'btn btn-secondary',
+                            role: 'button'
+                %>
+                <input
+                  class="btn btn-primary"
+                  type="submit"
+                  value="Save"
+                />
+              </div>
             </div>
           </div>
         </div>
