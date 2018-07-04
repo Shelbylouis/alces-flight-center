@@ -8,6 +8,7 @@ class Site < ApplicationRecord
   has_many :cases, through: :clusters
   has_many :components, through: :clusters
   has_many :services, through: :clusters
+  has_one :flight_directory_config
 
   validates :name, presence: true
   validates :canonical_name, presence: true
