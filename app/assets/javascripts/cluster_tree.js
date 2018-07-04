@@ -4,6 +4,8 @@ function _init_cluster_tree(idx) {
   function addToTarget(thing) {
     const clone = thing.parent().clone();
     clone.find('input').remove();
+    clone.find('ul').removeClass('collapse collapsing');
+    clone.find('button').remove();
     target.append(clone);
   }
 
@@ -76,9 +78,17 @@ function _init_cluster_tree(idx) {
       const self = $(this);
 
       const input = self.find('input[type=checkbox]');
+      const childList = self.parent().find('ul');
       if (input.is(':checked')) {
-        const allChildren = self.parent().find('ul').find('input');
+        const allChildren = childList.find('input');
         allChildren.prop('checked', true);
+      }
+
+      if (childList.find('input:checked').length > 0) {
+        childList.collapse('show');
+      }
+      else if (childList.length > 0) {
+        childList.collapse('hide');
       }
     }
   );

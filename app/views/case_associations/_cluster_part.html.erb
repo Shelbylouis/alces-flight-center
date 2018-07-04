@@ -1,7 +1,18 @@
 <%
   dom_id = "#{part.model_name}-#{part.id}"
+  has_children = part.respond_to?(:components)
 %>
 <li>
+  <% if has_children %>
+    <button
+      class="btn btn-sm btn-secondary btn-collapse"
+      type="button"
+      data-toggle="collapse"
+      data-target="#<%= "#{dom_id}-children" %>"
+      aria-expanded="false"
+      aria-controls="#<%= "#{dom_id}-children" %>"
+    ></button>
+  <% end %>
   <div class="cluster-part" data-parent="<%= parent %>">
     <i class="fa-li fa <%= part.fa_icon %>" title="<%= part.type_name %>"></i>
     <div class="form-check form-check-inline">
@@ -18,8 +29,8 @@
       >
     </div>
   </div>
-  <% if part.respond_to? :components %>
-    <ul class="fa-ul">
+  <% if has_children %>
+    <ul class="fa-ul collapse" id="<%= "#{dom_id}-children" %>">
       <% part.components.map(&:decorate).each do |component| %>
         <%= render 'case_associations/cluster_part',
                    part: component,
