@@ -7,18 +7,21 @@ class Case < ApplicationRecord
   belongs_to :issue
   belongs_to :cluster
 
-  has_many :case_associations
+  has_many :case_associations, dependent: :destroy
   has_many :services,
+           dependent: :destroy,
            through: :case_associations,
            source: :associated_element,
            source_type: 'Service'
 
   has_many :components,
+           dependent: :destroy,
            through: :case_associations,
            source: :associated_element,
            source_type: 'Component'
 
   has_many :component_groups,
+           dependent: :destroy,
            through: :case_associations,
            source: :associated_element,
            source_type: 'ComponentGroup'
@@ -54,6 +57,7 @@ class Case < ApplicationRecord
   end
 
   audited only: [:assignee_id, :time_worked, :tier_level], on: [ :update ]
+  has_associated_audits
 
   validates :display_id, uniqueness: true
 
