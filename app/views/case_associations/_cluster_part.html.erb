@@ -1,6 +1,8 @@
-<% dom_id = "#{part.model_name}-#{part.id}" %>
+<%
+  dom_id = "#{part.model_name}-#{part.id}"
+%>
 <li>
-  <div class="cluster-part">
+  <div class="cluster-part" data-parent="<%= parent %>">
     <i class="fa-li fa <%= part.fa_icon %>" title="<%= part.type_name %>"></i>
     <div class="form-check form-check-inline">
       <label class="form-check-label" for="<%= dom_id %>">
@@ -21,7 +23,8 @@
       <% part.components.map(&:decorate).each do |component| %>
         <%= render 'case_associations/cluster_part',
                    part: component,
-                   kase: kase
+                   kase: kase,
+                   parent: "##{dom_id}"
         %>
       <% end %>
     </ul>

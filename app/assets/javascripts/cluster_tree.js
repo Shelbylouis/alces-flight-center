@@ -1,6 +1,12 @@
 function _init_cluster_tree(idx) {
   const target = $($(this).data('target'));
 
+  function addToTarget(thing) {
+    const clone = thing.parent().clone();
+    clone.find('input').remove();
+    target.append(clone);
+  }
+
   const updateTree = function() {
     target.html('');
     $(this).find('.cluster-part').each(
@@ -10,9 +16,16 @@ function _init_cluster_tree(idx) {
         if (input.is(':checked')) {
           self.addClass('selected');
 
-          const clone = self.parent().clone();
-          clone.find('input').remove();
-          target.append(clone);
+          if (self.data('parent')) {
+            if (!$(self.data('parent')).is(':checked')) {
+              addToTarget(self);
+            }
+          }
+          else {
+            addToTarget(self);
+          }
+
+
         }
         else {
           self.removeClass('selected');
@@ -21,7 +34,20 @@ function _init_cluster_tree(idx) {
     )
   }.bind(this);
 
-  $(this).find('input[type=checkbox]').on('change', updateTree);
+  $(this).find('input[type=checkbox]').on(
+    'click',
+    function() {
+
+      const parentLi = $(this).parents('li').first();
+
+      parentLi.find('ul').find('input[type=checkbox]').prop(
+        'checked',
+        $(this).prop('checked')
+      );
+
+      updateTree();
+    }
+  );
   updateTree();
 }
 

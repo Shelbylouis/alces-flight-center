@@ -19,7 +19,8 @@
                           <% @case.cluster.services.map(&:decorate).each do |service| %>
                             <%= render 'case_associations/cluster_part',
                                        part: service,
-                                       kase: @case
+                                       kase: @case,
+                                       parent: nil
                             %>
                           <% end %>
                         </ul>
@@ -30,7 +31,9 @@
                           <% @case.cluster.component_groups.map(&:decorate).each do |cg| %>
                             <%= render 'case_associations/cluster_part',
                                        part: cg,
-                                       kase: @case %>
+                                       kase: @case,
+                                       parent: nil
+                            %>
                           <% end %>
                         </ul>
                       </li>
