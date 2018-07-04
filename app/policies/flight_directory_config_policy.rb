@@ -1,13 +1,13 @@
 class FlightDirectoryConfigPolicy < ApplicationPolicy
-  def show?
-    scope.exists? && user.contact?
-  end
-
   class Scope < Scope
     def resolve
-      scope.
-        joins(site: :users).
-        where(users: {id: user.id})
+      if user.contact?
+        scope.
+          joins(site: :users).
+          where(users: {id: user.id})
+      else
+        scope.none
+      end
     end
   end
 end
