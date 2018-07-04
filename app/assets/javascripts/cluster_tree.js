@@ -13,6 +13,27 @@ function _init_cluster_tree(idx) {
       function() {
         const self = $(this);
         const input = self.find('input[type=checkbox]');
+
+        const childList = self.parent().find('ul');
+
+        const selectedChildren = childList.find('input:checked').length;
+        const allChildren = childList.find('input').length;
+
+        if (allChildren > 0) {
+          if (selectedChildren === allChildren) {
+            input.prop('checked', true);
+            input.prop('indeterminate', false);
+          }
+          else if (selectedChildren > 0) {
+            input.prop('checked', false);
+            input.prop('indeterminate', true);
+          }
+          else {
+            input.prop('checked', false);
+            input.prop('indeterminate', false);
+          }
+        }
+
         if (input.is(':checked')) {
           self.addClass('selected');
 
