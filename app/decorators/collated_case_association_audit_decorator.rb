@@ -39,7 +39,7 @@ class CollatedCaseAssociationAuditDecorator < ApplicationDecorator
 
     if entries.count > 2
       last_entry = entries.pop
-      first_entries = entries.join(', ') unless entries.empty?
+      first_entries = entries.empty? ? nil : entries.join(', ')
 
       [first_entries, last_entry].compact.join(', and ')
     else
