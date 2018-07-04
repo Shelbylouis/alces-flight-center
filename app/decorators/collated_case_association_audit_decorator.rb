@@ -50,6 +50,7 @@ class CollatedCaseAssociationAuditDecorator < ApplicationDecorator
 
   def item_list_entry(item)
     i = item.decorate
-    h.link_to i.name, i.path
+    "<i class=\"fa #{i.fa_icon}\" title=\"#{i.type_name}\"></i> " +
+      h.link_to(i.name, i.path)
   end
 end
