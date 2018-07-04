@@ -136,7 +136,7 @@ Rails.application.routes.draw do
       cases.call(only: []) do
         # Admin-only pages relating to cases belong here.
         resource :change_request, only: [:new, :edit], path: 'change-request'
-        resource :case_associations, only: [:edit], path: 'associations'
+        resource :case_associations, only: [:edit], as: 'associations', path: 'associations'
       end
       request_maintenance_form.call
       admin_logs.call
