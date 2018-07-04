@@ -33,3 +33,23 @@ li.credit-charge-entry {
     font-weight: bold;
   }
 }
+
+
+.cluster-tree {
+  .form-check {
+    width: 100%;
+
+    .form-check-input {
+      position: absolute;
+      right: 0;
+    }
+
+    .form-check-label {
+      width: 100%;
+    }
+  }
+
+  .cluster-part:hover {
+    background-color: #F0F0F0;
+  }
+}

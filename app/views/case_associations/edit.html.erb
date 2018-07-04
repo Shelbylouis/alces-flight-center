@@ -1,31 +1,63 @@
-<%= form_tag case_update_associations_path(@case), method: 'put' do %>
-  <ul>
-    <li>
-      <%= @case.cluster.name %> (Entire cluster)
-      <ul>
-        <li>
-          Services
-          <ul>
-            <% @case.cluster.services.each do |service| %>
-              <%= render 'case_associations/cluster_part',
-                         part: service,
-                         kase: @case
+<div class="card">
+  <div class="card-body container-fluid">
+    <div class="row">
+      <p class="col">Editing affected components and services for <%= link_to @case.display_id, case_path(@case) %>.</p>
+    </div>
+    <%= form_tag case_update_associations_path(@case), method: 'put' do %>
+      <div class="row">
+        <div class="col-sm-push-12 col-sm-12 col-md-6">
+          <div class="card">
+            <div class="card-body">
+                <ul class="fa-ul cluster-tree">
+                  <li>
+                    <i class="fa-li fa <%= @case.cluster.fa_icon %>" title="<%= @case.cluster.type_name %>"></i>
+                    <%= @case.cluster.name %> (Entire cluster)
+                    <ul>
+                      <li>
+                        Services
+                        <ul class="fa-ul">
+                          <% @case.cluster.services.map(&:decorate).each do |service| %>
+                            <%= render 'case_associations/cluster_part',
+                                       part: service,
+                                       kase: @case
+                            %>
+                          <% end %>
+                        </ul>
+                      </li>
+                      <li>
+                        Components
+                        <ul class="fa-ul">
+                          <% @case.cluster.component_groups.map(&:decorate).each do |cg| %>
+                            <%= render 'case_associations/cluster_part',
+                                       part: cg,
+                                       kase: @case %>
+                          <% end %>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+            </div>
+          </div>
+          <button class="btn btn-link" onclick="window.scrollTo(0,0); return false;">Back to top</button>
+        </div>
+        <div class="col-sm-12 col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <%= link_to 'Cancel',
+                          case_path(@case),
+                          class: 'btn btn-secondary',
+                          role: 'button'
               %>
-            <% end %>
-          </ul>
-        </li>
-        <li>
-          Components
-          <ul>
-            <% @case.cluster.component_groups.each do |cg| %>
-              <%= render 'case_associations/cluster_part',
-                         part: cg,
-                         kase: @case %>
-            <% end %>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-  <input type="submit" />
-<% end %>
+              <input
+                class="btn btn-primary"
+                type="submit"
+                value="Save"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

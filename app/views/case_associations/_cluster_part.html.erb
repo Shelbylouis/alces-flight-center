@@ -1,21 +1,24 @@
 <% dom_id = "#{part.model_name}-#{part.id}" %>
 <li>
-  <div class="custom-control custom-checkbox">
-    <input
-      class="custom-control-input"
-      id="<%= dom_id %>"
-      name="associations[]"
-      type="checkbox"
-      value="<%= dom_id %>"
-      <%= kase.associations.include?(part) ? 'checked' : '' %>
-    >
-    <label class="custom-control-label" for="<%= dom_id %>">
-      <%= part.name %>
-    </label>
+  <div class="cluster-part">
+    <i class="fa-li fa <%= part.fa_icon %>" title="<%= part.type_name %>"></i>
+    <div class="form-check form-check-inline">
+      <label class="form-check-label" for="<%= dom_id %>">
+        <%= part.name %>
+      </label>
+      <input
+        class="form-check-input"
+        id="<%= dom_id %>"
+        name="associations[]"
+        type="checkbox"
+        value="<%= dom_id %>"
+        <%= kase.associations.include?(part) ? 'checked' : '' %>
+      >
+    </div>
   </div>
   <% if part.respond_to? :components %>
-    <ul>
-      <% part.components.each do |component| %>
+    <ul class="fa-ul">
+      <% part.components.map(&:decorate).each do |component| %>
         <%= render 'case_associations/cluster_part',
                    part: component,
                    kase: kase

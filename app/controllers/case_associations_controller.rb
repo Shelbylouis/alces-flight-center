@@ -6,6 +6,7 @@ class CaseAssociationsController < ApplicationController
 
   def edit
     authorize(@case, :edit_associations?)
+    @title = "Edit affected components: #{@case.display_id}"
   end
 
   def update
