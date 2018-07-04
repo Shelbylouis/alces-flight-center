@@ -8,7 +8,7 @@
         <div class="col-sm-push-12 col-sm-12 col-md-6">
           <div class="card">
             <div class="card-body">
-                <ul class="fa-ul cluster-tree">
+                <ul class="fa-ul cluster-tree" data-target="#cluster-tree-summary">
                   <li>
                     <i class="fa-li fa <%= @case.cluster.fa_icon %>" title="<%= @case.cluster.type_name %>"></i>
                     <%= @case.cluster.name %> (Entire cluster)
@@ -44,6 +44,13 @@
         <div class="col-sm-12 col-md-6">
           <div class="card">
             <div class="card-body">
+              <p>Selected components:</p>
+              <ul class="fa-ul" id="cluster-tree-summary">
+                <li>
+                  <i class="fa fa-ul fa-spin fa-refresh"></i>
+                  Please wait...
+                </li>
+              </ul>
               <%= link_to 'Cancel',
                           case_path(@case),
                           class: 'btn btn-secondary',
