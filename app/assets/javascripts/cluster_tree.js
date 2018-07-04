@@ -72,7 +72,7 @@ function _init_cluster_tree(idx) {
   updateTree();
 }
 
-$(document).ready(
+document.addEventListener('turbolinks:load',
   function() {
     $('.cluster-tree').each(
       _init_cluster_tree
