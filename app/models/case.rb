@@ -173,7 +173,8 @@ class Case < ApplicationRecord
       audits +
       logs +
       [ credit_charge ] +
-      (change_request&.transitions || [])
+      (change_request&.transitions || []) +
+      collated_association_audits
     ).compact.sort_by(&:created_at).reverse!
   end
 
@@ -304,6 +305,20 @@ class Case < ApplicationRecord
   # https://github.com/state-machines/state_machines-audit_trail#example-5---store-advanced-method-results.
   def requesting_user(transition)
     transition.args&.first
+  end
+
+  def collated_association_audits
+    # We assume that no user will make two separate changes to the associations
+    # within a second, in order to collate their changes into one lump to
+    # provide a summary for use in an event card.
+    associated_audits
+        .where(auditable_type: 'CaseAssociation')
+        .group_by { |a|
+          [a.user_id, a.created_at.change(usec: 0)]
+        }
+        .map { |key, audits|
+          CollatedCaseAssociationAudit.new(*key, audits)
+        }
   end
 
   def assign_cluster_if_necessary
