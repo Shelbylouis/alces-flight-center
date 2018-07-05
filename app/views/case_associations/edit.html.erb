@@ -30,6 +30,14 @@
                   </div>
                   <ul class="fa-ul">
                     <li>
+                      <button
+                        class="btn btn-sm btn-primary btn-collapse"
+                        type="button"
+                        data-toggle="collapse"
+                        data-target="#services-children"
+                        aria-expanded="false"
+                        aria-controls="#services-children"
+                      ></button>
                       <div class="cluster-part">
                         <i class="fa-li fa fa-gears" title="Services"></i>
                         <div class="form-check form-check-inline">
@@ -46,7 +54,7 @@
                             />
                         </div>
                       </div>
-                      <ul class="fa-ul">
+                      <ul class="fa-ul collapse" id="services-children">
                         <% @case.cluster.services.map(&:decorate).each do |service| %>
                           <%= render 'case_associations/cluster_part',
                                      part: service,
@@ -57,6 +65,14 @@
                       </ul>
                     </li>
                     <li>
+                      <button
+                        class="btn btn-sm btn-primary btn-collapse"
+                        type="button"
+                        data-toggle="collapse"
+                        data-target="#components-children"
+                        aria-expanded="false"
+                        aria-controls="#components-children"
+                      ></button>
                       <div class="cluster-part">
                         <i class="fa-li fa fa-cubes" title="Components"></i>
                         <div class="form-check form-check-inline">
@@ -73,7 +89,7 @@
                             />
                         </div>
                       </div>
-                      <ul class="fa-ul">
+                      <ul class="fa-ul collapse" id="components-children">
                         <% @case.cluster.component_groups.map(&:decorate).each do |cg| %>
                           <%= render 'case_associations/cluster_part',
                                      part: cg,

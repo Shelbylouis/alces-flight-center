@@ -112,7 +112,7 @@ function _init_cluster_tree(idx) {
       const self = $(this);
 
       const input = self.find('input[type=checkbox]');
-      const childList = self.parent().find('ul');
+      const childList = self.parent().children('ul');
       if (input.is(':checked')) {
         const allChildren = childList.find('input');
         allChildren.prop('checked', true);
