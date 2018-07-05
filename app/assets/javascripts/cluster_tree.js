@@ -1,3 +1,5 @@
+jQuery.fn.reverse = [].reverse;
+
 function _init_cluster_tree(idx) {
   const target = $($(this).data('target'));
 
@@ -11,12 +13,16 @@ function _init_cluster_tree(idx) {
 
   const updateTree = function() {
     target.html('');
-    $(this).find('.cluster-part').each(
+
+    const clusterParts = $(this).find('.cluster-part');
+
+    // Work bottom-up to set parent checkedness
+    clusterParts.reverse().each(
       function() {
         const self = $(this);
         const input = self.find('input[type=checkbox]');
 
-        const childList = self.parent().find('ul');
+        const childList = self.parent().children('ul');
 
         const selectedChildren = childList.find('input:checked').length;
         const allChildren = childList.find('input').length;
@@ -38,8 +44,33 @@ function _init_cluster_tree(idx) {
 
         if (input.is(':checked')) {
           self.addClass('selected');
+          if (input.data('cluster')) {
+            self.addClass('selected-cluster');
+          }
+        }
+        else {
+          self.removeClass('selected selected-cluster')
+        }
+      }
+    );
 
-          if (self.data('parent')) {
+    // and top-down to add to target
+    clusterParts.reverse().each(
+      function() {
+        const self = $(this);
+        const input = self.find('input[type=checkbox]');
+
+        if (input.is(':checked')) {
+
+          if (input.data('cluster')) {
+            addToTarget(self);
+            return false;
+          }
+          else if (input.data('pseudogroup')) {
+            addToTarget(self);
+            return false;
+          }
+          else if (self.data('parent')) {
             if (!$(self.data('parent')).is(':checked')) {
               addToTarget(self);
             }
@@ -48,17 +79,14 @@ function _init_cluster_tree(idx) {
             addToTarget(self);
           }
 
+        }
 
-        }
-        else {
-          self.removeClass('selected');
-        }
       }
     )
   }.bind(this);
 
   $(this).find('input[type=checkbox]').on(
-    'click',
+    'change',
     function() {
 
       const parentLi = $(this).parents('li').first();
@@ -67,6 +95,8 @@ function _init_cluster_tree(idx) {
         'checked',
         $(this).prop('checked')
       );
+
+      $(this).prop('indeterminate', false);
 
       updateTree();
     }

@@ -1,3 +1,4 @@
+<% dom_id = "Cluster-#{@case.cluster.id}" %>
 <div class="card">
   <div class="card-body container-fluid">
     <div class="row">
@@ -8,38 +9,84 @@
         <div class="col-sm-push-12 col-sm-12 col-md-6">
           <div class="card">
             <div class="card-body">
-                <ul class="fa-ul cluster-tree" data-target="#cluster-tree-summary">
-                  <li>
+              <ul class="fa-ul cluster-tree" data-target="#cluster-tree-summary">
+                <li>
+                  <div class="cluster-part">
                     <i class="fa-li fa <%= @case.cluster.fa_icon %>" title="<%= @case.cluster.type_name %>"></i>
-                    <%= @case.cluster.name %> (Entire cluster)
-                    <ul>
-                      <li>
-                        Services
-                        <ul class="fa-ul">
-                          <% @case.cluster.services.map(&:decorate).each do |service| %>
-                            <%= render 'case_associations/cluster_part',
-                                       part: service,
-                                       kase: @case,
-                                       parent: nil
-                            %>
-                          <% end %>
-                        </ul>
-                      </li>
-                      <li>
-                        Components
-                        <ul class="fa-ul">
-                          <% @case.cluster.component_groups.map(&:decorate).each do |cg| %>
-                            <%= render 'case_associations/cluster_part',
-                                       part: cg,
-                                       kase: @case,
-                                       parent: nil
-                            %>
-                          <% end %>
-                        </ul>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
+                    <div class="form-check form-check-inline">
+                      <label class="form-check-label" for="#<%= dom_id %>">
+                        <%= @case.cluster.name %> (Entire cluster)
+                      </label>
+                      <input
+                        class="form-check-input"
+                        data-cluster="true"
+                        id="<%= dom_id %>"
+                        name="associations[]"
+                        type="checkbox"
+                        <%= @case.associations.empty? ? 'checked' : '' %>
+                      />
+                    </div>
+                  </div>
+                  <ul class="fa-ul">
+                    <li>
+                      <div class="cluster-part">
+                        <i class="fa-li fa fa-gears" title="Services"></i>
+                        <div class="form-check form-check-inline">
+                          <label class="form-check-label" for="#all_services">
+                            Services
+                          </label>
+                          <input
+                            class="form-check-input"
+                            data-parent="#<%= dom_id %>"
+                            data-pseudogroup="true"
+                            id="all_services"
+                            name="all_services"
+                            type="checkbox"
+                            value=""
+                            />
+                        </div>
+                      </div>
+                      <ul class="fa-ul">
+                        <% @case.cluster.services.map(&:decorate).each do |service| %>
+                          <%= render 'case_associations/cluster_part',
+                                     part: service,
+                                     kase: @case,
+                                     parent: 'all-services'
+                          %>
+                        <% end %>
+                      </ul>
+                    </li>
+                    <li>
+                      <div class="cluster-part">
+                        <i class="fa-li fa fa-cubes" title="Components"></i>
+                        <div class="form-check form-check-inline">
+                          <label class="form-check-label" for="#all_components">
+                            Components
+                          </label>
+                          <input
+                            class="form-check-input"
+                            data-parent="#<%= dom_id %>"
+                            data-pseudogroup="true"
+                            id="all_components"
+                            name="all_components"
+                            type="checkbox"
+                            value=""
+                            />
+                        </div>
+                      </div>
+                      <ul class="fa-ul">
+                        <% @case.cluster.component_groups.map(&:decorate).each do |cg| %>
+                          <%= render 'case_associations/cluster_part',
+                                     part: cg,
+                                     kase: @case,
+                                     parent: 'all-components'
+                          %>
+                        <% end %>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
             </div>
           </div>
           <button class="btn btn-link" onclick="window.scrollTo(0,0); return false;">Back to top</button>

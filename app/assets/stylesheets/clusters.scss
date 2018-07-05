@@ -57,6 +57,10 @@ li.credit-charge-entry {
     &.selected {
       color: green;
     }
+
+    &.selected-cluster {
+      color: orangered;
+    }
   }
 
   button.btn-collapse {

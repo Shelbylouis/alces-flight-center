@@ -13,7 +13,7 @@
       aria-controls="#<%= "#{dom_id}-children" %>"
     ></button>
   <% end %>
-  <div class="cluster-part" data-parent="<%= parent %>">
+  <div class="cluster-part" data-parent="#<%= parent %>">
     <i class="fa-li fa <%= part.fa_icon %>" title="<%= part.type_name %>"></i>
     <div class="form-check form-check-inline">
       <label class="form-check-label" for="<%= dom_id %>">
@@ -26,7 +26,7 @@
         type="checkbox"
         value="<%= dom_id %>"
         <%= kase.associations.include?(part) ? 'checked' : '' %>
-      >
+      />
     </div>
   </div>
   <% if has_children %>
@@ -35,7 +35,7 @@
         <%= render 'case_associations/cluster_part',
                    part: component,
                    kase: kase,
-                   parent: "##{dom_id}"
+                   parent: "#{dom_id}"
         %>
       <% end %>
     </ul>
