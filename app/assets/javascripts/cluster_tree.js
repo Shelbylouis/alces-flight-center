@@ -83,7 +83,10 @@ function _init_cluster_tree(idx) {
         }
 
       }
-    )
+    );
+
+    // Don't allow form to be submitted with no associations selected.
+    $('#association-form-submit').prop('disabled', target.html() === '');
   }.bind(this);
 
   $(this).find('input[type=checkbox]').on(
