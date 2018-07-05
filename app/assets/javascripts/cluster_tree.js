@@ -6,7 +6,8 @@ function _init_cluster_tree(idx) {
   function addToTarget(thing) {
     const clone = thing.parent().clone();
     clone.find('input').remove();
-    clone.find('ul').removeClass('collapse collapsing');
+    clone.find('ul').removeClass('collapse collapsing')
+      .attr('style', '');
     clone.find('button').remove();
     target.append(clone);
   }
