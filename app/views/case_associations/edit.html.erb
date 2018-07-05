@@ -1,4 +1,7 @@
-<% dom_id = "Cluster-#{@case.cluster.id}" %>
+<%
+  dom_id = "Cluster-#{@case.cluster.id}"
+  fake = Struct.new(:name, :fa_icon, :type_name)
+%>
 <div class="card">
   <div class="card-body container-fluid">
     <div class="row">
@@ -29,76 +32,22 @@
                     </div>
                   </div>
                   <ul class="fa-ul">
-                    <li>
-                      <button
-                        class="btn btn-sm btn-primary btn-collapse"
-                        type="button"
-                        data-toggle="collapse"
-                        data-target="#services-children"
-                        aria-expanded="false"
-                        aria-controls="#services-children"
-                      ></button>
-                      <div class="cluster-part">
-                        <i class="fa-li fa fa-gears" title="Services"></i>
-                        <div class="form-check form-check-inline">
-                          <label class="form-check-label" for="#all_services">
-                            Services
-                          </label>
-                          <input
-                            class="form-check-input"
-                            data-parent="#<%= dom_id %>"
-                            data-pseudogroup="true"
-                            id="all_services"
-                            name="all_services"
-                            type="checkbox"
-                            />
-                        </div>
-                      </div>
-                      <ul class="fa-ul collapse" id="services-children">
-                        <% @case.cluster.services.map(&:decorate).each do |service| %>
-                          <%= render 'case_associations/cluster_part',
-                                     part: service,
-                                     kase: @case,
-                                     parent: 'all-services'
-                          %>
-                        <% end %>
-                      </ul>
-                    </li>
-                    <li>
-                      <button
-                        class="btn btn-sm btn-primary btn-collapse"
-                        type="button"
-                        data-toggle="collapse"
-                        data-target="#components-children"
-                        aria-expanded="false"
-                        aria-controls="#components-children"
-                      ></button>
-                      <div class="cluster-part">
-                        <i class="fa-li fa fa-cubes" title="Components"></i>
-                        <div class="form-check form-check-inline">
-                          <label class="form-check-label" for="#all_components">
-                            Components
-                          </label>
-                          <input
-                            class="form-check-input"
-                            data-parent="#<%= dom_id %>"
-                            data-pseudogroup="true"
-                            id="all_components"
-                            name="all_components"
-                            type="checkbox"
-                            />
-                        </div>
-                      </div>
-                      <ul class="fa-ul collapse" id="components-children">
-                        <% @case.cluster.component_groups.map(&:decorate).each do |cg| %>
-                          <%= render 'case_associations/cluster_part',
-                                     part: cg,
-                                     kase: @case,
-                                     parent: 'all-components'
-                          %>
-                        <% end %>
-                      </ul>
-                    </li>
+                    <%=
+                      render 'case_associations/cluster_part',
+                             part: fake.new('Services', 'fa-gears', 'Services'),
+                             dom_id: 'all-services',
+                             kase: @case,
+                             children: @case.cluster.services,
+                             parent: dom_id
+                    %>
+                    <%=
+                      render 'case_associations/cluster_part',
+                             part: fake.new('Components', 'fa-cubes', 'Components'),
+                             dom_id: 'all-components',
+                             kase: @case,
+                             children: @case.cluster.component_groups,
+                             parent: dom_id
+                    %>
                   </ul>
                 </li>
               </ul>

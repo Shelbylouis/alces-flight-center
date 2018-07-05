@@ -67,10 +67,6 @@ function _init_cluster_tree(idx) {
             addToTarget(self);
             return false;
           }
-          else if (input.data('pseudogroup')) {
-            addToTarget(self);
-            return false;
-          }
           else if (self.data('parent')) {
             if (!$(self.data('parent')).is(':checked')) {
               addToTarget(self);

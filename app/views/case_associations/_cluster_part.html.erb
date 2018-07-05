@@ -1,9 +1,5 @@
-<%
-  dom_id = "#{part.model_name}-#{part.id}"
-  has_children = part.respond_to?(:components)
-%>
 <li>
-  <% if has_children %>
+  <% unless children.empty? %>
     <button
       class="btn btn-sm btn-primary btn-collapse"
       type="button"
@@ -29,13 +25,15 @@
       />
     </div>
   </div>
-  <% if has_children %>
+  <% unless children.empty? %>
     <ul class="fa-ul collapse" id="<%= "#{dom_id}-children" %>">
-      <% part.components.map(&:decorate).each do |component| %>
+      <% children.map(&:decorate).each do |child| %>
         <%= render 'case_associations/cluster_part',
-                   part: component,
+                   dom_id: "#{child.model_name}-#{child.id}",
+                   part: child,
                    kase: kase,
-                   parent: "#{dom_id}"
+                   parent: "#{dom_id}",
+                   children: child.respond_to?(:components) ? child.components : []
         %>
       <% end %>
     </ul>
