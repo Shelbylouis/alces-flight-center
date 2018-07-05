@@ -12,7 +12,13 @@ class CaseAssociationsController < ApplicationController
   def update
     authorize(@case, :edit_associations?)
 
-    @case.associations = filter_group_children(map_association_params)
+    assocs = map_association_params
+
+    @case.associations = if assocs.include?(@case.cluster)
+                           [@case.cluster]
+                         else
+                           filter_group_children(assocs)
+                         end
 
     redirect_to case_path(@case)
   end

@@ -23,7 +23,8 @@
                         id="<%= dom_id %>"
                         name="associations[]"
                         type="checkbox"
-                        <%= @case.associations.empty? ? 'checked' : '' %>
+                        value="<%= dom_id %>"
+                        <%= @case.associations.include?(@case.cluster) ? 'checked' : '' %>
                       />
                     </div>
                   </div>
@@ -42,7 +43,6 @@
                             id="all_services"
                             name="all_services"
                             type="checkbox"
-                            value=""
                             />
                         </div>
                       </div>
@@ -70,7 +70,6 @@
                             id="all_components"
                             name="all_components"
                             type="checkbox"
-                            value=""
                             />
                         </div>
                       </div>

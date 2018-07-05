@@ -26,6 +26,12 @@ class Case < ApplicationRecord
            source: :associated_element,
            source_type: 'ComponentGroup'
 
+  has_many :clusters,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Cluster'
+
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
 
@@ -144,7 +150,7 @@ class Case < ApplicationRecord
   end
 
   def associations
-    (services + component_groups + components).tap do |assocs|
+    (services + component_groups + components + clusters).tap do |assocs|
       if assocs.empty?
         assocs << cluster
       end
@@ -152,7 +158,7 @@ class Case < ApplicationRecord
   end
 
   def associations=(objects)
-    %w(Service ComponentGroup Component).each do |type|
+    %w(Service ComponentGroup Component Cluster).each do |type|
       setter_method = "#{type.pluralize.underscore}=".to_sym
       send(setter_method, objects.select { |o| o.model_name == type })
     end
