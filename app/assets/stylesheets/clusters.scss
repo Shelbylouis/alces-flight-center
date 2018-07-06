@@ -69,6 +69,10 @@ li.credit-charge-entry {
     padding: 0 0.25rem;
     width: 1.5rem;
 
+    &:focus, &:active {
+      box-shadow: none !important;
+    }
+
     &[aria-expanded=false]::before {
       content: '+'
     }
