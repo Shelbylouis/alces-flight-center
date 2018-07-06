@@ -1,64 +1,52 @@
-<% check_groups = cluster.cluster_checks
-  .group_by { |c| c.check.check_category }
-%>
+<% date_checks = cluster.check_results_by_date(cluster, Date.today) %>
 <% content_for(:subtitle) { "Cluster checks" } %>
 <%= render 'partials/tabs', activate: :checks do %>
-  <%= form_tag(cluster_set_check_results_path(cluster)) do %>
-    <div class="card-body row">
-      <div class="col-sm-12">
-        <h3><%= cluster.name %> Checks for <%= Date.today.to_formatted_s(:short) %> 2018</h3>
-        <% check_groups.each do |group| %>
-          <h4><%= group[0].name %></h4>
-          <%= render 'partials/table',
-            collection: cluster.cluster_checks,
-            message: 'No cluster checks to display' do %>
-            <thead>
-              <tr class="nowrap">
-                <th>Check</th>
-                <th>Command</th>
-                <th>Comment</th>
-                <th>Result</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% group[1].each_with_index do |cluster_check, index| %>
-                <tr class="case-highlight">
-                  <td style="width: 30%;"><%= cluster_check.check.name %></td>
-                  <td style="width: 20%;">
-                    <p style="color: #ea3ea6; font-style: italic;">
-                    <%= cluster_check.check.command %>
-                    </p>
-                  </td>
-                  <td style="width: 40%;">
-                    <input type="text" style="width: 100%" placeholder=
-                    "(Optional) Enter a comment about the check here"
-                                       name="<%= "#{cluster_check.id}-comment" %>"> </input>
-                  </td>
-                  <td class="nowrap">
-                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                      <label class="btn btn-primary">
-                        <input type="radio" name="<%= "#{cluster_check.id}-result" %>"
-                      id="success" autocomplete="off" checked="checked" value="Success" required>
-                      <i class="fa fa-check" style="color: #18bcb0;"></i></input>
-                      </label>
-                      <label class="btn btn-primary">
-                        <input type="radio" name="<%= "#{cluster_check.id}-result" %>"
-                      id="failure" autocomplete="off" value="Failure">
-                      <i class="fa fa-remove" style="color: red;"></i></input>
-                      </label>
-                      <label class="btn btn-primary">
-                        <input type="radio" name="<%= "#{cluster_check.id}-result" %>"
-                             id="na" autocomplete="off" value="N/A"> N/A </input>
-                      </label>
-                    </div>
-                  </td>
-                </tr>
-              <% end %>
-            </tbody>
-          <% end %>
-        <% end %>
+  <div class="card-body row">
+    <div class="col-sm-12">
+      <h3><%= cluster.name %> Checks for <%= Date.today.to_formatted_s(:short) %> 2018</h3>
+      <h3>
+        <%= "#{date_checks.where(result: 'Success').count}/#{date_checks.count}
+        checks successful" %>
+      </h3>
+      <div class="input-group date">
+        <input type="text" class="form-control" value="<%= Date.today %>"/>
+        <div class="input-group-addon">
+          <span class="glyphicon glyphicon-th"></span>
+        </div>
       </div>
-      <input type="submit" class="btn btn-primary btn-block" value="Submit Cluster Check Results">
+      <%= render 'partials/table',
+        collection: cluster.check_results,
+        message: 'No cluster check results to display' do %>
+        <thead>
+          <tr class="nowrap">
+            <th>Engineer</th>
+            <th>Check</th>
+            <th>Comment</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% date_checks.each do |check_result| %>
+            <tr class="case-highlight">
+              <td><%= current_user == check_result.user ?
+                raw('<strong>Me</strong>') : check_result.user.name %></td>
+              <td style="width: 30%;"><%= check_result.cluster_check.name %></td>
+              <td style="width: 40%;">
+                <%= check_result.comment %>
+              </td>
+              <td class="nowrap">
+                <% if check_result.result == 'Success' %>
+                  <i class="fa fa-check" style="color: #18bcb0;"/>
+                <% elsif check_result.result == 'Failure' %>
+                  <i class="fa fa-remove" style="color: red;"/>
+                <% else %>
+                  N/A
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      <% end %>
     </div>
-  <% end %>
+  </div>
 <% end %>
