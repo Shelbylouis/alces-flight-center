@@ -18,7 +18,8 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
         create(
           :component,
           component_group: send("component_group_#{group}"),
-          cluster: cluster
+          cluster: cluster,
+          name: "Component #{group}#{idx}"
         )
       }
     end
@@ -30,10 +31,13 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
     }
   end
 
-  let(:checkbox_for) { ->(model) { find("##{model.model_name}-#{model.id}") } }
+  let(:checkbox_id_for) { ->(model) { "##{model.model_name}-#{model.id}" } }
+  let(:checkbox_for) { ->(model) { find(checkbox_id_for[model], visible: :all) } }
 
   let(:ul_for_group_a) { "#ComponentGroup-#{component_group_a.id}-children" }
   let(:ul_for_group_b) { "#ComponentGroup-#{component_group_b.id}-children" }
+
+  let(:cluster_tree_summary) { find('#cluster-tree-summary') }
 
   before(:each) do
     visit edit_cluster_case_associations_path(kase.cluster, kase, as: admin)
@@ -91,6 +95,25 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
       expect(find(ul_for_group_a)[:class]).to match('collapsing')
       sleep 1
       expect(find(ul_for_group_a, visible: false)[:class]).not_to match('show')
+    end
+
+    it 'sets association to group when all children selected' do
+      checkbox_for[component_a1].click
+      checkbox_for[component_a2].click
+      # a3 is already associated
+
+      expect(checkbox_for[component_group_a]).to be_checked
+
+      expect(cluster_tree_summary.text).to eq 'Group A Component a1 Component a2 Component a3'
+      click_button 'Save'
+
+      kase.reload
+
+      expect(kase.components).to be_empty
+      expect(kase.component_groups).to eq [component_group_a]
+
+      expect(find('.alert-success')).to have_text "Updated affected components for support case #{kase.display_id}"
+
     end
   end
 
