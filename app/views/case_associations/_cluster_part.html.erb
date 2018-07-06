@@ -2,6 +2,7 @@
   <% unless children.empty? %>
     <button
       class="btn btn-sm btn-primary btn-collapse"
+      id="#<%= "#{dom_id}-expand" %>"
       type="button"
       data-toggle="collapse"
       data-target="#<%= "#{dom_id}-children" %>"
