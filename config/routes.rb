@@ -193,8 +193,9 @@ Rails.application.routes.draw do
       get :documents
       notes.call(false)
       get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
-      get '/checks/submit', to: 'clusters#checks', as: :checks
+      get '/checks/submit', to: 'clusters#check_submission', as: :check_submission
       post '/checks/submit', to: 'clusters#check_results', as: :set_check_results
+      get '/checks(/:date)', to: 'clusters#checks', as: :checks
     end
 
     resources :components, only: :show do
