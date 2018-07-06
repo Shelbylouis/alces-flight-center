@@ -122,8 +122,8 @@ function _init_cluster_tree(idx) {
       }
     }
   );
-
   updateTree();
+  $(this).data('initialised', true);
 }
 
 document.addEventListener('turbolinks:load',
