@@ -32,22 +32,22 @@
                   <td style="width: 40%;">
                     <input type="text" style="width: 100%" placeholder=
                     "(Optional) Enter a comment about the check here"
-                                       name="<%= "#{cluster_check.check.id}-comment" %>"> </input>
+                                       name="<%= "#{cluster_check.id}-comment" %>"> </input>
                   </td>
                   <td class="nowrap">
                     <div class="btn-group btn-group-toggle" data-toggle="buttons">
                       <label class="btn btn-primary">
-                        <input type="radio" name="<%= "#{cluster_check.check.id}-result" %>"
+                        <input type="radio" name="<%= "#{cluster_check.id}-result" %>"
                       id="success" autocomplete="off" checked="checked" value="Success" required>
                       <i class="fa fa-check" style="color: #18bcb0;"></i></input>
                       </label>
                       <label class="btn btn-primary">
-                        <input type="radio" name="<%= "#{cluster_check.check.id}-result" %>"
+                        <input type="radio" name="<%= "#{cluster_check.id}-result" %>"
                       id="failure" autocomplete="off" value="Failure">
                       <i class="fa fa-remove" style="color: red;"></i></input>
                       </label>
                       <label class="btn btn-primary">
-                        <input type="radio" name="<%= "#{cluster_check.check.id}-result" %>"
+                        <input type="radio" name="<%= "#{cluster_check.id}-result" %>"
                              id="na" autocomplete="off" value="N/A"> N/A </input>
                       </label>
                     </div>
