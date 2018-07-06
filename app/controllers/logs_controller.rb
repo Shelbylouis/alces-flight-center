@@ -13,11 +13,11 @@ class LogsController < ApplicationController
     new_log = @scope.logs.build(log_params)
     authorize new_log
     if new_log.save
+      SlackNotifier.log_notification(new_log)
       flash[:success] = 'Added new log entry'
     else
       error_flash_models [new_log], 'Could not add log entry'
     end
-    SlackNotifier.log_notification(new_log)
     redirect_back fallback_location: @cluster
   end
 
