@@ -12,13 +12,20 @@ class CaseAssociationsController < ApplicationController
   def update
     authorize(@case, :edit_associations?)
 
-    assocs = map_association_params
+    begin
+      assocs = map_association_params
 
-    @case.associations = if assocs.include?(@case.cluster)
-                           [@case.cluster]
-                         else
-                           filter_group_children(assocs)
-                         end
+      @case.associations = if assocs.include?(@case.cluster)
+                             [@case.cluster]
+                           else
+                             filter_group_children(assocs)
+                           end
+
+      flash[:success] = "Updated affected components for support case #{@case.display_id}."
+
+    rescue
+      flash[:error] = 'Unable to update associations, an error occurred.'
+    end
 
     redirect_to case_path(@case)
   end
