@@ -34,7 +34,31 @@ class ClustersController < ApplicationController
     redirect_to cluster_credit_usage_path(@cluster)
   end
 
-  def checks
+  def check_submission
+    authorize @cluster
+  end
+
+  def check_results
+    authorize @cluster
+
+    @cluster.cluster_checks.each do |cluster_check|
+      id = cluster_check.id
+      result = CheckResult.new(
+        cluster_check: cluster_check,
+        date: Date.today,
+        user: current_user,
+        result: params["#{id}-result"],
+        comment: params["#{id}-comment"]
+      )
+      if result.save
+        flash[:success] = 'Cluster check results successfully saved.'
+      else
+        flash[:error] = 'Error while trying to save the cluster check results.'
+      end
+    end
+
+
+    redirect_to cluster_checks_path(@cluster)
   end
 
   private
