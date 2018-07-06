@@ -206,7 +206,7 @@ ActiveRecord::Schema.define(version: 2018_07_26_120909) do
     t.index ["check_category_id"], name: "index_checks_on_check_category_id"
   end
 
-  create_table "cluster_checks", id: false, force: :cascade do |t|
+  create_table "cluster_checks", force: :cascade do |t|
     t.bigint "cluster_id", null: false
     t.bigint "check_id", null: false
     t.index ["check_id"], name: "index_cluster_checks_on_check_id"
@@ -469,6 +469,7 @@ ActiveRecord::Schema.define(version: 2018_07_26_120909) do
   add_foreign_key "change_request_state_transitions", "change_requests"
   add_foreign_key "change_request_state_transitions", "users"
   add_foreign_key "change_requests", "cases"
+  add_foreign_key "check_results", "users"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"
