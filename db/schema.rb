@@ -290,6 +290,7 @@ ActiveRecord::Schema.define(version: 2018_07_10_181058) do
     t.bigint "site_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "encrypted_ssh_key", limit: 4096, null: false
     t.index ["site_id"], name: "index_flight_directory_configs_on_site_id"
   end
 

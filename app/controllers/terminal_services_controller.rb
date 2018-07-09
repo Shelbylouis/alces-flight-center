@@ -8,6 +8,7 @@ class TerminalServicesController < ApplicationController
       flight_directory_config: {
         hostname: config.hostname,
         username: config.username,
+        ssh_key: config.encrypted_ssh_key,
       },
       site: {
         name: site.name,
