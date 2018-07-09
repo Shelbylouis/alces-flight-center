@@ -9,12 +9,15 @@
       <h4>Primary site contact</h4>
       <ul><li><%= site.primary_contact&.decorate&.info || raw('<em>Unset</em>') %></li></ul>
 
-      <%= site.secondary_contacts_list %>
+      <div class="secondary_contacts_list">
+        <%= site.secondary_contacts_list %>
+      </div>
 
-      <%= site.viewers_list %>
+      <div class="viewers_list">
+        <%= site.viewers_list %>
+      </div>
 
       <% if site.additional_contacts.present? %>
-
         <h4>Additional site contacts</h4>
         <ul>
           <% site.additional_contacts.each do |contact| %>
@@ -22,7 +25,30 @@
           <% end %>
         </ul>
       <% end %>
-  </div>
+      <div class="site-services">
+        <h4>Site services</h4>
+        <% if site.flight_directory_config.present? %>
+          <ul>
+            <li>
+              <h5>User and group directory</h5>
+              <span>
+                <%= link_to "Manage",
+                            "#{ENV.fetch('TERMINAL_SERVICE_BASE_URL')}/directory",
+                            PolicyDependentOptions.wrap(
+                              {class: ['btn', 'btn-primary']},
+                              policy: policy(site.flight_directory_config).show?,
+                              action_description: 'manage user and group directory',
+                              user: current_user
+                            )
+                %>
+              </span>
+            </li>
+          </ul>
+        <% else %>
+          No site services are currently available for this site.
+        <% end %>
+      </div>
+    </div>
     <div class="col">
       <h3>Clusters</h3>
       <div class="list-group cluster-list">
@@ -57,31 +83,6 @@
             </span>
           </div>
         <% end %>
-      </div>
-      <div class="site-services">
-        <h3>Site services</h3>
-        <div class="list-group site-services-list">
-          <% if site.flight_directory_config.present? %>
-            <div class="list-group-item">
-              <h4>User and group directory</h4>
-              <span>
-                <%= link_to "Manage",
-                            "#{ENV.fetch('TERMINAL_SERVICE_BASE_URL')}/directory",
-                            PolicyDependentOptions.wrap(
-                              {class: ['btn', 'btn-primary']},
-                              policy: policy(site.flight_directory_config).show?,
-                              action_description: 'manage user and group directory',
-                              user: current_user
-                            )
-                %>
-              </span>
-            </div>
-          <% else %>
-            <p>
-              No site services are currently available for this site.
-            </p>
-          <% end %>
-        </div>
       </div>
     </div>
   </div>

@@ -2,7 +2,7 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-.cluster-list, .site-services-list {
+.cluster-list {
   .list-group-item {
     display: flex;
     justify-content: space-between;
@@ -20,5 +20,12 @@
 }
 
 .site-services {
-  margin-top: 2rem;
+    h5 {
+        display: inline-block;
+        margin-right: 0.75rem;
+    }
+}
+
+.secondary_contacts_list, .viewers_list {
+    margin-bottom: 1em;
 }
