@@ -258,6 +258,12 @@ ActiveRecord::Schema.define(version: 2018_07_10_181058) do
   create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
   end
 
+  create_table "encryption_keys", force: :cascade do |t|
+    t.text "public_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "expansion_types", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
