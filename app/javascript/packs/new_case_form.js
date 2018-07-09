@@ -3,11 +3,15 @@ import Elm from 'Main';
 const initializeFormApp = () => {
   const target = document.getElementById('new-case-form');
 
-  // Only initialize the form app if the target exists (we're on a page
-  // requiring the form) and has no children (indicates app has already been
-  // initialized, e.g. this occurs due to Turbolinks if navigate away and then
-  // back to page using browser back/forward buttons).
-  if (target && !target.hasChildNodes()) {
+  // Only initialize the form app if the target exists, i.e. we're on a page
+  // requiring the form.
+  if (target) {
+    // Clear any existing contents of the form root, e.g. if this page has been
+    // reached via history navigation Turbolinks will have cached the last seen
+    // version of the form, but without the corresponding JS (compiled Elm), so
+    // we just want to completely replace this.
+    target.innerHTML = '';
+
     const loadAttributeJson = attribute =>
       JSON.parse(target.getAttribute(attribute));
 
