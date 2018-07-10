@@ -4,9 +4,6 @@ class MaintenanceWindow < ApplicationRecord
 
   default_scope { order(created_at: :desc) }
   belongs_to :case
-  belongs_to :cluster, required: false
-  belongs_to :component, required: false
-  belongs_to :service, required: false
 
   has_many :maintenance_window_associations, dependent: :destroy
   has_many :services,

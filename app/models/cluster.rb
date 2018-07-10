@@ -21,7 +21,10 @@ class Cluster < ApplicationRecord
     dependent: :destroy
   has_many :services, dependent: :destroy
   has_many :cases
-  has_many :maintenance_windows
+
+  has_many :maintenance_window_associations, as: :associated_element
+  has_many :maintenance_windows, through: :maintenance_window_associations
+
   has_many :logs, dependent: :destroy
   has_many :notes, dependent: :destroy
   has_many :credit_deposits

@@ -34,7 +34,7 @@ RSpec.describe ApplicationDecorator do
       let(:component) { create(:component, name: 'mycomponent') }
 
       it 'includes correct icon when has requested maintenance window' do
-        window = create(:requested_maintenance_window, component: component)
+        window = create(:requested_maintenance_window, components: [component])
         display_id = window.case.display_id
 
         expect(subject).to include(
@@ -48,7 +48,7 @@ RSpec.describe ApplicationDecorator do
       end
 
       it 'includes correct icon when has confirmed maintenance window' do
-        window = create(:confirmed_maintenance_window, component: component)
+        window = create(:confirmed_maintenance_window, components: [component])
         display_id = window.case.display_id
 
         expect(subject).to include(
@@ -62,7 +62,7 @@ RSpec.describe ApplicationDecorator do
       end
 
       it 'includes correct icon when has in progress maintenance window' do
-        window = create(:maintenance_window, state: :started, component: component)
+        window = create(:maintenance_window, state: :started, components: [component])
         display_id = window.case.display_id
 
         expect(subject).to include(
@@ -79,14 +79,14 @@ RSpec.describe ApplicationDecorator do
       end
 
       it 'gives nothing when only has finished maintenance window' do
-        create(:ended_maintenance_window, component: component)
+        create(:ended_maintenance_window, components: [component])
         expect(subject).to be_empty
       end
 
       it 'includes icon for every unfinished maintenance window' do
-        create(:requested_maintenance_window, component: component)
-        create(:maintenance_window, state: :started, component: component)
-        create(:ended_maintenance_window, component: component)
+        create(:requested_maintenance_window, components: [component])
+        create(:maintenance_window, state: :started, components: [component])
+        create(:ended_maintenance_window, components: [component])
 
         expect(subject).to match(/<i .*<i /)
       end

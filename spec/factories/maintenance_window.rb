@@ -6,10 +6,12 @@ FactoryBot.define do
     requested_start 1.days.from_now.at_midnight
     duration 1
 
-    # This could also be a Cluster or Service; but one of these must be
-    # associated and is the item under maintenance.
-    component do
-      create(:component) unless cluster || service || associated_model
+    after(:build) do |mw|
+      unless mw.components || mw.services || mw.clusters
+        # This could also be a Cluster or Service; but one of these must be
+        # associated and is the item under maintenance.
+        mw.components << create(:component)
+      end
     end
 
     # For these factories to create a MaintenanceWindow in a particular state,
@@ -56,7 +58,7 @@ FactoryBot.define do
   end
 
   factory :maintenance_window_state_transition do
-    maintenance_window
+    maintenance_window { build(:maintenance_window) }
     to :requested
     event :request
     association :user, factory: :admin
