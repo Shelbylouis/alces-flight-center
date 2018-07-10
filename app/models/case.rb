@@ -7,21 +7,30 @@ class Case < ApplicationRecord
   belongs_to :issue
   belongs_to :cluster
 
-  has_many :case_associations
+  has_many :case_associations, dependent: :destroy
   has_many :services,
+           dependent: :destroy,
            through: :case_associations,
            source: :associated_element,
            source_type: 'Service'
 
   has_many :components,
+           dependent: :destroy,
            through: :case_associations,
            source: :associated_element,
            source_type: 'Component'
 
   has_many :component_groups,
+           dependent: :destroy,
            through: :case_associations,
            source: :associated_element,
            source_type: 'ComponentGroup'
+
+  has_many :clusters,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Cluster'
 
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
@@ -54,6 +63,7 @@ class Case < ApplicationRecord
   end
 
   audited only: [:assignee_id, :time_worked, :tier_level], on: [ :update ]
+  has_associated_audits
 
   validates :display_id, uniqueness: true
 
@@ -140,10 +150,17 @@ class Case < ApplicationRecord
   end
 
   def associations
-    (services + component_groups + components).tap do |assocs|
+    (services + component_groups + components + clusters).tap do |assocs|
       if assocs.empty?
         assocs << cluster
       end
+    end
+  end
+
+  def associations=(objects)
+    %w(Service ComponentGroup Component Cluster).each do |type|
+      setter_method = "#{type.pluralize.underscore}=".to_sym
+      send(setter_method, objects.select { |o| o.model_name == type })
     end
   end
 
@@ -162,7 +179,8 @@ class Case < ApplicationRecord
       audits +
       logs +
       [ credit_charge ] +
-      (change_request&.transitions || [])
+      (change_request&.transitions || []) +
+      collated_association_audits
     ).compact.sort_by(&:created_at).reverse!
   end
 
@@ -293,6 +311,20 @@ class Case < ApplicationRecord
   # https://github.com/state-machines/state_machines-audit_trail#example-5---store-advanced-method-results.
   def requesting_user(transition)
     transition.args&.first
+  end
+
+  def collated_association_audits
+    # We assume that no user will make two separate changes to the associations
+    # within a second, in order to collate their changes into one lump to
+    # provide a summary for use in an event card.
+    associated_audits
+        .where(auditable_type: 'CaseAssociation')
+        .group_by { |a|
+          [a.user_id, a.created_at.change(usec: 0)]
+        }
+        .map { |key, audits|
+          CollatedCaseAssociationAudit.new(*key, audits)
+        }
   end
 
   def assign_cluster_if_necessary

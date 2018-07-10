@@ -40,12 +40,21 @@
         <th rowspan="<%= @case.credit_charge ? 4 : 3 %>">Affected components</th>
         <td rowspan="<%= @case.credit_charge ? 4 : 3 %>">
           <%= render 'cases/associations/association_info', kase: @case %>
-          <% if policy(MaintenanceWindow).create? && @case.open? %>
-            <%= link_to 'Request maintenance',
-                        @case.request_maintenance_path,
-                        class: 'btn btn-secondary ml-2 btn-sm',
-                        role: 'button'
-            %>
+          <% if @case.open? %>
+            <% if policy(@case).edit_associations? %>
+              <%= link_to 'Change affected components',
+                          edit_cluster_case_associations_path(@case.cluster, @case),
+                          class: 'btn btn-primary ml-2 btn-sm',
+                          role: 'button'
+              %>
+            <% end %>
+            <% if policy(MaintenanceWindow).create? %>
+              <%= link_to 'Request maintenance',
+                          @case.request_maintenance_path,
+                          class: 'btn btn-secondary ml-2 btn-sm',
+                          role: 'button'
+              %>
+            <% end %>
           <% end %>
         </td>
         <th>State</th>

@@ -33,3 +33,52 @@ li.credit-charge-entry {
     font-weight: bold;
   }
 }
+
+
+.cluster-tree {
+  .form-check {
+    width: 100%;
+
+    .form-check-input {
+      position: absolute;
+      right: 0;
+    }
+
+    .form-check-label {
+      width: 100%;
+    }
+  }
+
+  .cluster-part {
+    &:hover {
+      background-color: #F0F0F0;
+    }
+
+    &.selected {
+      color: green;
+    }
+
+    &.selected-cluster {
+      color: orangered;
+    }
+  }
+
+  button.btn-collapse {
+    position: absolute;
+    left: -5rem;
+    padding: 0 0.25rem;
+    width: 1.5rem;
+
+    &:focus, &:active {
+      box-shadow: none !important;
+    }
+
+    &[aria-expanded=false]::before {
+      content: '+'
+    }
+
+    &[aria-expanded=true]::before {
+      content: '-'
+    }
+  }
+}

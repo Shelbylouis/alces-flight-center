@@ -139,3 +139,16 @@ table {
   top: -2.2em;
   right: 1em;
 }
+
+.btn-group-stretch {
+  display: flex;
+
+  button, a, input {
+    flex-grow: 1;
+    margin-left: 1rem;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}

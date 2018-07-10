@@ -107,6 +107,8 @@ Rails.application.routes.draw do
     end
 
     cases.call(only: []) do
+      # Actions on cases belong here. Typically these will end with a redirect
+      # to cluster_case_path or similar.
       member do
         post :resolve  # Only admins may resolve a case
         post :close  # Only admins may close a case
@@ -120,6 +122,8 @@ Rails.application.routes.draw do
           post :handover
         end
       end
+
+      resource :case_associations, only: [:update], as: 'update_associations', path: 'associations'
     end
 
     resources :change_motd_requests, only: [] do
@@ -130,7 +134,9 @@ Rails.application.routes.draw do
 
     resources :clusters, only: [] do
       cases.call(only: []) do
+        # Admin-only pages relating to cases belong here.
         resource :change_request, only: [:new, :edit], path: 'change-request'
+        resource :case_associations, only: [:edit], as: 'associations', path: 'associations'
       end
       request_maintenance_form.call
       admin_logs.call
@@ -179,6 +185,7 @@ Rails.application.routes.draw do
     delete '/sign_out' => 'sso_sessions#destroy', as: 'sign_out'  # Keeping this one around as it's correctly coupled to SSO
 
     cases.call(only: [:new, :create, :index]) do
+      # Actions for cases, for admins and site users, belong here.
       member do
         post :escalate
       end
@@ -201,6 +208,7 @@ Rails.application.routes.draw do
 
     resources :clusters, only: :show do
       cases.call(only: [:show, :create, :index, :new]) do
+        # Pages relating to cases, for both admins and site users, belong here.
          resource :change_request, only: [:show], path: 'change-request'
       end
       resources :services, only: :index

@@ -1,4 +1,4 @@
-class ComponentGroupDecorator < ApplicationDecorator
+class ComponentGroupDecorator < ClusterPartDecorator
   include AssetRecordDecorator
 
   delegate_all

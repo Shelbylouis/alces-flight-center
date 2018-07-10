@@ -9,4 +9,6 @@ class CaseAssociation < ApplicationRecord
             uniqueness: {
               scope: [:associated_element_type, :case_id],
             }
+
+  audited associated_with: :case
 end

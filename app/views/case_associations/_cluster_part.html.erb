@@ -1,0 +1,42 @@
+<li>
+  <% unless children.empty? %>
+    <button
+      class="btn btn-sm btn-primary btn-collapse"
+      id="#<%= "#{dom_id}-expand" %>"
+      type="button"
+      data-toggle="collapse"
+      data-target="#<%= "#{dom_id}-children" %>"
+      aria-expanded="false"
+      aria-controls="#<%= "#{dom_id}-children" %>"
+    ></button>
+  <% end %>
+  <div class="cluster-part" data-parent="#<%= parent %>">
+    <i class="fa-li fa <%= part.fa_icon %>" title="<%= part.type_name %>"></i>
+    <div class="form-check form-check-inline">
+      <label class="form-check-label" for="<%= dom_id %>">
+        <%= part.name %>
+      </label>
+      <input
+        class="form-check-input"
+        id="<%= dom_id %>"
+        name="associations[]"
+        type="checkbox"
+        value="<%= dom_id %>"
+        <%= kase.associations.include?(part) ? 'checked' : '' %>
+      />
+    </div>
+  </div>
+  <% unless children.empty? %>
+    <ul class="fa-ul collapse" id="<%= "#{dom_id}-children" %>">
+      <% children.map(&:decorate).each do |child| %>
+        <%= render 'case_associations/cluster_part',
+                   dom_id: "#{child.model_name}-#{child.id}",
+                   part: child,
+                   kase: kase,
+                   parent: "#{dom_id}",
+                   children: child.respond_to?(:components) ? child.components : []
+        %>
+      <% end %>
+    </ul>
+  <% end %>
+</li>
