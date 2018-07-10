@@ -8,6 +8,31 @@ class MaintenanceWindow < ApplicationRecord
   belongs_to :component, required: false
   belongs_to :service, required: false
 
+  has_many :case_associations, dependent: :destroy
+  has_many :services,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Service'
+
+  has_many :components,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Component'
+
+  has_many :component_groups,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'ComponentGroup'
+
+  has_many :clusters,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Cluster'
+
   has_many :maintenance_window_state_transitions
   alias_attribute :transitions, :maintenance_window_state_transitions
 
