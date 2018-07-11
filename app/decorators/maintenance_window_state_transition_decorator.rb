@@ -27,7 +27,7 @@ class MaintenanceWindowStateTransitionDecorator < ApplicationDecorator
   end
 
   def cluster_dashboard_url
-    h.cluster_maintenance_windows_url(window.associated_cluster)
+    h.cluster_maintenance_windows_url(window.cluster)
   end
 
   def requested_start

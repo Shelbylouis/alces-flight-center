@@ -23,7 +23,7 @@ RSpec.describe 'Case page', type: :feature do
     create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee, tier_level: 3)
   end
 
-  let (:mw) { create(:maintenance_window, case: open_case) }
+  let(:mw) { create(:maintenance_window, case: open_case, clusters: [cluster]) }
 
   let(:comment_form_class) { '#new_case_comment' }
   let(:comment_button_text) { 'Add new comment' }

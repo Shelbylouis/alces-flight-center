@@ -82,49 +82,4 @@ RSpec.describe MaintenanceWindowDecorator do
       end
     end
   end
-
-  describe '#confirm_path' do
-    subject { window.decorate.confirm_path }
-    let :window do
-      create(
-        :maintenance_window,
-        clusters: associated_model.readable_model_name == 'cluster' ? [associated_model] : [],
-        services: associated_model.readable_model_name == 'service' ? [associated_model] : [],
-        components: associated_model.readable_model_name == 'component' ? [associated_model] : []
-      )
-    end
-
-    context 'when associated model is cluster' do
-      let(:associated_model) { create(:cluster) }
-
-      it do
-        is_expected.to eq h.confirm_cluster_maintenance_window_path(
-          id: window.id,
-          cluster_id: associated_model.id
-        )
-      end
-    end
-
-    context 'when associated model is component' do
-      let(:associated_model) { create(:component) }
-
-      it do
-        is_expected.to eq h.confirm_cluster_maintenance_window_path(
-          id: window.id,
-          cluster_id: associated_model.cluster.id
-        )
-      end
-    end
-
-    context 'when associated model is service' do
-      let(:associated_model) { create(:service) }
-
-      it do
-        is_expected.to eq h.confirm_cluster_maintenance_window_path(
-          id: window.id,
-          cluster_id: associated_model.cluster.id
-        )
-      end
-    end
-  end
 end
