@@ -2,7 +2,6 @@ require 'rails_helper'
 
 RSpec.shared_examples 'maintenance form error handling' do |form_action|
   it 're-renders form with error when invalid requested_start entered' do
-    original_path = current_path
     requested_start_in_past = Time.zone.local(2016, 9, 20, 13)
 
     expect do
@@ -11,7 +10,6 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
       click_button submit_button_text
     end.not_to change(MaintenanceWindow, :all)
 
-    expect(current_path).to eq(original_path)
     expect(
       find('.alert')
     ).to have_text("Unable to #{form_action} this maintenance")
@@ -33,27 +31,13 @@ end
 
 RSpec.shared_examples 'confirmation form' do
   before :each do
-    visit confirm_service_maintenance_window_path(
+    visit confirm_maintenance_window_path(
       window,
-      service_id: service.id,
       as: user
     )
   end
 
   include_examples 'maintenance form error handling', 'confirm'
-
-  it 'cannot change Case for requested maintenance' do
-    case_select = test_element('case-select')
-
-    expect(case_select).to be_disabled
-    expect(case_select[:title]).to match(/Case.*cannot be changed/)
-  end
-
-  it 'includes correct Case select label' do
-    case_select_label = test_element('case-select-label')
-
-    expect(case_select_label).to have_text('Associated Case')
-  end
 
   it 'cannot change duration for requested maintenance' do
     duration_input = test_element('duration-input-group').find('input')
@@ -120,37 +104,27 @@ RSpec.feature "Maintenance windows", type: :feature do
     let(:cluster) { create(:cluster) }
     let!(:component) { create(:component, cluster: cluster) }
 
-    let :component_maintenance_path do
-      new_component_maintenance_window_path(component)
-    end
-
-    it 'can navigate to maintenance request form from Cluster dashboard Components tab' do
-      visit cluster_components_path(cluster, as: user)
-
-      component_maintenance_link = page.find_link(
-        href: component_maintenance_path
-      )
-      component_maintenance_link.click
-
-      expect(current_path).to eq(component_maintenance_path)
-    end
-
     describe 'maintenance request form' do
       include ActiveSupport::Testing::TimeHelpers
 
       let! :cluster_case do
-        create(:case, cluster: cluster, subject: 'Some case')
+        create(
+          :open_case,
+          cluster: cluster,
+          subject: 'Some case',
+          components: [component]
+        )
       end
 
       before :each do
-        visit new_component_maintenance_window_path(component, as: user)
+        visit new_cluster_case_maintenance_path(cluster, cluster_case, as: user)
       end
 
       include_examples 'maintenance form error handling', 'request'
       include_examples 'maintenance form initially valid'
 
-      it 'displays the component for which maintenance is being requested' do
-        expect(find('h4').text).to eq "Requesting maintenance for #{component.name} (#{cluster.name})"
+      it 'displays the case for which maintenance is being requested' do
+        expect(find('h4').text).to eq "Requesting maintenance for support case #{cluster_case.display_id}"
       end
 
       it 'uses correct default values' do
@@ -160,9 +134,8 @@ RSpec.feature "Maintenance windows", type: :feature do
         travel_to a_distant_friday do
           # Visit page again now we have mocked the time so correct default
           # `requested_start` based on current time is used.
-          visit new_component_maintenance_window_path(component, as: user)
+          visit new_cluster_case_maintenance_path(cluster, cluster_case, as: user)
 
-          select cluster_case.subject
           click_button 'Request Maintenance'
 
           new_window = cluster_case.maintenance_windows.first
@@ -171,29 +144,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         end
       end
 
-      it 'includes correct Case select label' do
-        case_select_label = test_element('case-select-label')
-
-        expect(case_select_label).to have_text('Case to associate')
-      end
-
-      it 'can request maintenance in association with any Case for Cluster' do
-        select cluster_case.subject
-        fill_in 'Duration', with: 2
-        fill_in_datetime_selects 'requested-start', with: valid_requested_start
-        click_button 'Request Maintenance'
-
-        new_window = cluster_case.maintenance_windows.first
-        expect(new_window).to be_requested
-        expect(new_window.requested_by).to eq user
-        expect(new_window.duration).to eq 2
-        expect(new_window.requested_start).to eq valid_requested_start
-        expect(current_path).to eq(cluster_maintenance_windows_path(cluster))
-        expect(find('.alert')).to have_text('Maintenance requested')
-      end
-
       it 'can mandate maintenance' do
-        select cluster_case.subject
         fill_in 'Duration', with: 2
         fill_in_datetime_selects 'requested-start', with: valid_requested_start
         check 'mandatory'
@@ -210,14 +161,11 @@ RSpec.feature "Maintenance windows", type: :feature do
       end
 
       it 're-renders form with error when invalid duration entered' do
-        original_path = current_path
-
         expect do
           fill_in 'Duration', with: -1
           click_button 'Request Maintenance'
         end.not_to change(MaintenanceWindow, :all)
 
-        expect(current_path).to eq(original_path)
         expect(
           find('.alert')
         ).to have_text('Unable to request this maintenance')
@@ -246,7 +194,10 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     it 'can cancel requested maintenance' do
-      window = create(:requested_maintenance_window, clusters: [cluster])
+      window = create(
+        :requested_maintenance_window,
+        clusters: [cluster]
+      )
 
       visit cluster_maintenance_windows_path(cluster, as: user)
       click_button(cancel_button_text)
@@ -321,14 +272,6 @@ RSpec.feature "Maintenance windows", type: :feature do
 
       expect(page).not_to have_button(extend_button_text)
     end
-
-    context 'when maintenance is for the entire cluster' do
-      it 'shows the entire-cluster-warning message' do
-        visit new_cluster_maintenance_window_path(cluster_id: cluster, as: user)
-
-        expect(find('p.alert-warning').text).to match 'Not what you want? Try selecting a component or a service from this cluster.'
-      end
-    end
   end
 
   context 'when user is contact' do
@@ -340,15 +283,14 @@ RSpec.feature "Maintenance windows", type: :feature do
     it 'can navigate to confirmation form for requested maintenance' do
       window = create(
         :requested_maintenance_window,
-        component: component,
         case: support_case
       )
 
-      visit cluster_maintenance_windows_path(component.cluster, as: user)
+      visit cluster_maintenance_windows_path(cluster, as: user)
       click_link(confirm_button_link_text)
 
-      expected_path = confirm_component_maintenance_window_path(
-        window, component_id: component
+      expected_path = confirm_maintenance_window_path(
+        window
       )
       expect(current_path).to eq expected_path
     end
@@ -442,24 +384,6 @@ RSpec.feature "Maintenance windows", type: :feature do
       visit cluster_maintenance_windows_path(cluster, as: user)
 
       expect(page).not_to have_button(extend_button_text)
-    end
-
-    context 'when maintenance is for the entire cluster' do
-      subject do
-        create(
-            :requested_maintenance_window,
-            clusters: [cluster],
-            case: support_case
-        )
-      end
-
-      it 'does not show the entire-cluster-warning message' do
-        visit confirm_cluster_maintenance_window_path(id: subject.id, cluster_id: cluster.id, as: user)
-
-        expect do
-          find('p.alert-warning')
-        end.to raise_error(Capybara::ElementNotFound)
-      end
     end
   end
 

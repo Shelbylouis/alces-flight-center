@@ -1,23 +1,25 @@
 
 FactoryBot.define do
   factory :maintenance_window do
-    association :case # Avoid conflict with case keyword.
+    association :case, factory: :case_with_component # Avoid conflict with case keyword.
     created_at 7.days.ago
     requested_start 1.days.from_now.at_midnight
     duration 1
 
     after(:build) do |mw|
       unless mw.components.present? || mw.services.present? || mw.clusters.present?
-        # This could also be a Cluster or Service; but one of these must be
-        # associated and is the item under maintenance.
-        mw.components << create(:component)
+        mw.components = mw.case.components
+        mw.services = mw.case.services
+        mw.component_groups = mw.case.component_groups
+        mw.clusters = mw.case.clusters
       end
     end
     before(:create) do |mw|
       unless mw.components.present? || mw.services.present? || mw.clusters.present?
-        # This could also be a Cluster or Service; but one of these must be
-        # associated and is the item under maintenance.
-        mw.components << create(:component)
+        mw.components = mw.case.components
+        mw.services = mw.case.services
+        mw.component_groups = mw.case.component_groups
+        mw.clusters = mw.case.clusters
       end
     end
 

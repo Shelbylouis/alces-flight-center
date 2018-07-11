@@ -566,7 +566,7 @@ RSpec.describe 'Case page', type: :feature do
           visit cluster_case_path(cluster,subject, as: user)
 
           request_link = find('a', text: 'Request maintenance')
-          expect(request_link[:href]).to eq new_cluster_maintenance_window_path(cluster, case_id: open_case.id)
+          expect(request_link[:href]).to eq new_cluster_case_maintenance_path(cluster, open_case)
         end
 
         context 'as a contact' do

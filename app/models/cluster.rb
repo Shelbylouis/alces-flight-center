@@ -65,7 +65,7 @@ class Cluster < ApplicationRecord
   end
 
   def unfinished_related_maintenance_windows
-    parts = [self, *components, *services]
+    parts = [self, *components, *component_groups, *services]
     parts
       .map(&:maintenance_windows)
       .flat_map(&:unfinished)

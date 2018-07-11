@@ -95,7 +95,7 @@ MaintenanceNotifier = Struct.new(:window) do
   end
 
   def cluster_dashboard_url
-    cluster_maintenance_windows_url(window.associated_cluster)
+    cluster_maintenance_windows_url(window.cluster)
   end
 
   def requested_start

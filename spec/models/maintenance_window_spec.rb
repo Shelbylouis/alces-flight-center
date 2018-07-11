@@ -51,7 +51,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         expected_start = subject.requested_start.to_formatted_s(:short)
         expected_cluster_dashboard_url =
           Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
-            subject.components.first.cluster
+            subject.cluster
         )
         text_regex = Regexp.new <<~REGEX.squish
           maintenance of some_component.*was not confirmed before requested
@@ -82,7 +82,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         expected_end = subject.expected_end.to_formatted_s(:short)
         expected_cluster_dashboard_url =
           Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
-            subject.components.first.cluster
+            subject.cluster
         )
         text_regex = Regexp.new <<~REGEX.squish
           requested.*some_component.*#{expected_start}.*#{expected_end}.*by
@@ -342,18 +342,10 @@ RSpec.describe MaintenanceWindow, type: :model do
   end
 
   describe '#associated_cluster' do
-    it 'gives cluster when associated model is cluster' do
-      cluster = create(:cluster)
-      window = create(:maintenance_window, clusters: [cluster])
+    it 'inherits cluster from case' do
+      window = create(:maintenance_window)
 
-      expect(window.associated_cluster).to eq(cluster)
-    end
-
-    it "gives associated model's cluster when associated model is not cluster" do
-      component = create(:component)
-      window = create(:maintenance_window, components: [component])
-
-      expect(window.associated_cluster).to eq(component.cluster)
+      expect(window.cluster).to eq(window.case.cluster)
     end
   end
 

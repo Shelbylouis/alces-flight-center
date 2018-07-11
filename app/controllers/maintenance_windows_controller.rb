@@ -122,7 +122,7 @@ class MaintenanceWindowsController < ApplicationController
     yield
 
     flash[:success] = "Maintenance #{past_tense_of(action)}."
-    cluster = @maintenance_window.associated_cluster
+    cluster = @maintenance_window.cluster
     redirect_to cluster_maintenance_windows_path(cluster)
   rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition => e
     flash.now[:error] = "Unable to #{action} this maintenance. #{e}"
@@ -137,7 +137,7 @@ class MaintenanceWindowsController < ApplicationController
     window = MaintenanceWindow.find(params[:id])
     authorize window
     previous_user_facing_state = window.user_facing_state
-    cluster = window.associated_cluster
+    cluster = window.cluster
 
     yield window if block_given?
     window.public_send("#{event}!", current_user)

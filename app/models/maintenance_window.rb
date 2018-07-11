@@ -4,6 +4,7 @@ class MaintenanceWindow < ApplicationRecord
 
   default_scope { order(created_at: :desc) }
   belongs_to :case
+  delegate :site, to: :case
 
   has_many :maintenance_window_associations, dependent: :destroy
   has_many :services,
@@ -29,6 +30,8 @@ class MaintenanceWindow < ApplicationRecord
            through: :maintenance_window_associations,
            source: :associated_element,
            source_type: 'Cluster'
+
+  delegate :cluster, to: :case
 
   has_many :maintenance_window_state_transitions
   alias_attribute :transitions, :maintenance_window_state_transitions
@@ -92,10 +95,6 @@ class MaintenanceWindow < ApplicationRecord
     clusters + services + component_groups + components
   end
 
-  def associated_cluster
-    clusters.first || associated_models.first.cluster
-  end
-
   def expected_end
     duration.business_days.after(requested_start)
   end
@@ -131,8 +130,6 @@ class MaintenanceWindow < ApplicationRecord
   end
 
   private
-
-  delegate :site, to: :case
 
   def add_transition_comment(event)
     unless invalid? || legacy_migration_mode
