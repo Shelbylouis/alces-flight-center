@@ -88,23 +88,12 @@ class MaintenanceWindow < ApplicationRecord
     end
   end
 
-  def associated_model
-    component || service || cluster
-  end
-
-  def associated_model=(model)
-    case model
-    when Cluster
-      self.cluster = model
-    when Component
-      self.component = model
-    when Service
-      self.service = model
-    end
+  def associated_models
+    components + services + clusters
   end
 
   def associated_cluster
-    cluster || associated_model.cluster
+    clusters.first || associated_models.first.cluster
   end
 
   def expected_end

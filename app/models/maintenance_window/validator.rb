@@ -5,6 +5,7 @@ class MaintenanceWindow < ApplicationRecord
       @record = record
 
       validate_at_least_one_associated_model
+      validate_homogenous_cluster
       validate_requested_period
     end
 
@@ -22,13 +23,7 @@ class MaintenanceWindow < ApplicationRecord
     end
 
     def number_associated_models
-      (
-        record.clusters +
-        record.components +
-        record.services
-      ).tap {
-        |a| p a
-      }.length
+      record.associated_models.length
     end
 
     def validate_requested_period
@@ -64,6 +59,23 @@ class MaintenanceWindow < ApplicationRecord
       field = send(field_name)
       if field.past?
         record.errors.add(field_name, 'cannot be in the past')
+      end
+    end
+
+    def validate_homogenous_cluster
+      clusters = record.associated_models.map { |m|
+        case m
+        when Cluster
+          m
+        else
+          m.cluster
+        end
+      }.uniq
+
+      unless clusters.length == 1
+        record.errors.add(
+          :base, 'All associated components must belong to the same cluster'
+        )
       end
     end
   end

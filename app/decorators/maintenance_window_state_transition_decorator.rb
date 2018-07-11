@@ -14,8 +14,12 @@ class MaintenanceWindowStateTransitionDecorator < ApplicationDecorator
     h.render(comment_template, transition: self).squish
   end
 
-  def associated_model
-    window.associated_model
+  def associated_model_links
+    window.associated_models.map { |m| m.decorate.links }.join(', ')
+  end
+
+  def associated_model_names
+    window.associated_models.map { |m| "#{m.name} (#{m.readable_model_name})"}.join(', ')
   end
 
   def window

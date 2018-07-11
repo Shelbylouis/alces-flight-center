@@ -24,14 +24,14 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it 'generates an email when cancelled' do
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
         user = create(:admin, name: 'some_user')
 
         expect(CaseMailer).to receive(
           :maintenance_state_transition
         ).with(
           subject.case,
-          /Request for maintenance of some_component cancelled by some_user/
+          /Request for maintenance of some_component \(component\) cancelled by some_user/
         ).and_return(stub_mail)
 
         subject.cancel!(user)
@@ -46,15 +46,15 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it 'generates an email when auto-expired' do
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
 
         expected_start = subject.requested_start.to_formatted_s(:short)
         expected_cluster_dashboard_url =
           Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
-            subject.component.cluster
+            subject.components.first.cluster
         )
         text_regex = Regexp.new <<~REGEX.squish
-          maintenance of some_component was not confirmed before requested
+          maintenance of some_component.*was not confirmed before requested
           start.*#{expected_start}.*rescheduled.*confirmed.*#{expected_cluster_dashboard_url}
         REGEX
         expect(CaseMailer).to receive(
@@ -74,7 +74,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it 'generates an email when requested' do
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
         subject.requested_start = 1.days.since
         requestor = create(:admin, name: 'some_user')
 
@@ -82,7 +82,7 @@ RSpec.describe MaintenanceWindow, type: :model do
         expected_end = subject.expected_end.to_formatted_s(:short)
         expected_cluster_dashboard_url =
           Rails.application.routes.url_helpers.cluster_maintenance_windows_url(
-            subject.component.cluster
+            subject.components.first.cluster
         )
         text_regex = Regexp.new <<~REGEX.squish
           requested.*some_component.*#{expected_start}.*#{expected_end}.*by
@@ -107,7 +107,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it 'generates an email when confirmed' do
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
         user = create(:user, name: 'some_user')
 
         expected_start = subject.requested_start.to_formatted_s(:short)
@@ -135,7 +135,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it 'generates an email when mandated' do
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
         user = create(:admin, name: 'some_admin')
 
         expected_start = subject.requested_start.to_formatted_s(:short)
@@ -162,7 +162,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it 'generates an email when rejected' do
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
         user = create(:user, name: 'some_user')
 
         expect(CaseMailer).to receive(
@@ -184,11 +184,11 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it 'generates an email when auto-started' do
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
 
         expected_end = subject.expected_end.to_formatted_s(:short)
         text_regex = Regexp.new <<~REGEX.squish
-          maintenance of some_component .* started.*this component.*under
+          maintenance of some_component .* started.*they are now under
           maintenance until #{expected_end}
         REGEX
         expect(CaseMailer).to receive(
@@ -213,14 +213,14 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it 'generates an email when auto-started' do
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
         subject.duration = 5
 
         expected_start = subject.requested_start.to_formatted_s(:short)
         expected_end = subject.expected_end.to_formatted_s(:short)
         text_regex = Regexp.new <<~REGEX.squish
           #{current_state.capitalize} maintenance of some_component .*
-          extended.*this component.*under maintenance from #{expected_start}
+          extended.*they will now be under maintenance from #{expected_start}
           until #{expected_end}
         REGEX
         expect(CaseMailer).to receive(
@@ -249,7 +249,7 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
 
       it 'generates an email when auto-ended' do
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
 
         expect(CaseMailer).to receive(:maintenance_state_transition).with(
           subject.case,
@@ -271,11 +271,11 @@ RSpec.describe MaintenanceWindow, type: :model do
 
       it 'generates an email when ended' do
         admin = create(:admin, name: 'some_admin')
-        subject.component = create(:component, name: 'some_component')
+        subject.components = [create(:component, name: 'some_component')]
 
         expect(CaseMailer).to receive(:maintenance_state_transition).with(
           subject.case,
-          /maintenance of some_component ended by some_admin/i
+          /maintenance of some_component \(component\) ended by some_admin/i
         ).and_return(stub_mail)
 
         subject.end!(admin)
@@ -344,14 +344,14 @@ RSpec.describe MaintenanceWindow, type: :model do
   describe '#associated_cluster' do
     it 'gives cluster when associated model is cluster' do
       cluster = create(:cluster)
-      window = create(:maintenance_window, cluster: cluster)
+      window = create(:maintenance_window, clusters: [cluster])
 
       expect(window.associated_cluster).to eq(cluster)
     end
 
     it "gives associated model's cluster when associated model is not cluster" do
       component = create(:component)
-      window = create(:maintenance_window, component: component)
+      window = create(:maintenance_window, components: [component])
 
       expect(window.associated_cluster).to eq(component.cluster)
     end

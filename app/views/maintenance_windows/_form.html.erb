@@ -14,9 +14,6 @@
   <%= form_for maintenance_window,
     url: request.original_fullpath,
     html: { class: 'card-body' } do |f| %>
-    <%= f.hidden_field :cluster_id %>
-    <%= f.hidden_field :component_id %>
-    <%= f.hidden_field :service_id %>
 
     <% if action.request? %>
 

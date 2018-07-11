@@ -7,7 +7,14 @@ FactoryBot.define do
     duration 1
 
     after(:build) do |mw|
-      unless mw.components || mw.services || mw.clusters
+      unless mw.components.present? || mw.services.present? || mw.clusters.present?
+        # This could also be a Cluster or Service; but one of these must be
+        # associated and is the item under maintenance.
+        mw.components << create(:component)
+      end
+    end
+    before(:create) do |mw|
+      unless mw.components.present? || mw.services.present? || mw.clusters.present?
         # This could also be a Cluster or Service; but one of these must be
         # associated and is the item under maintenance.
         mw.components << create(:component)

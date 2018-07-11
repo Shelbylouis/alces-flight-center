@@ -21,10 +21,10 @@ class MaintenanceWindowDecorator < ApplicationDecorator
   end
 
   def confirm_path
-    associated_model_name = associated_model.underscored_model_name
-    path_method = "confirm_#{associated_model_name}_maintenance_window_path"
-    associated_model_id_param = associated_model_name.foreign_key.to_sym
-    h.send(path_method, self, associated_model_id_param => associated_model.id)
+    h.confirm_cluster_maintenance_window_path(
+       model.associated_cluster.id,
+       model
+    )
   end
 
   def case_attributes(form_action)
@@ -44,6 +44,10 @@ class MaintenanceWindowDecorator < ApplicationDecorator
     }.merge(
       conditional_attributes(action: form_action, field: 'duration')
     )
+  end
+
+  def associated_model_names
+    associated_models.map { |m| "#{m.name} (#{m.readable_model_name})"}.join(', ')
   end
 
   private

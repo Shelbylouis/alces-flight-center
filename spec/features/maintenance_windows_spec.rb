@@ -246,7 +246,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     it 'can cancel requested maintenance' do
-      window = create(:requested_maintenance_window, cluster: cluster)
+      window = create(:requested_maintenance_window, clusters: [cluster])
 
       visit cluster_maintenance_windows_path(cluster, as: user)
       click_button(cancel_button_text)
@@ -259,7 +259,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     it 'can end started maintenance' do
-      window = create(:started_maintenance_window, cluster: cluster)
+      window = create(:started_maintenance_window, clusters: [cluster])
 
       visit cluster_maintenance_windows_path(cluster, as: user)
       click_button(end_button_text)
@@ -272,7 +272,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     it 'cannot see end button for non-started maintenance' do
-      create(:confirmed_maintenance_window, cluster: cluster)
+      create(:confirmed_maintenance_window, clusters: [cluster])
 
       visit cluster_maintenance_windows_path(cluster, as: user)
 
@@ -280,7 +280,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     it 'cannot see reject button' do
-      create(:requested_maintenance_window, cluster: cluster)
+      create(:requested_maintenance_window, clusters: [cluster])
 
       visit cluster_maintenance_windows_path(cluster, as: user)
 
@@ -292,7 +292,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         window = create(
           :maintenance_window,
           state: state,
-          cluster: cluster,
+          clusters: [cluster],
           duration: 1
         )
         original_duration = window.duration
@@ -315,7 +315,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     end
 
     it 'cannot see extend form for non-confirmed/started maintenance' do
-      create(:requested_maintenance_window, cluster: cluster)
+      create(:requested_maintenance_window, clusters: [cluster])
 
       visit cluster_maintenance_windows_path(cluster, as: user)
 
@@ -358,7 +358,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         let :window do
           create(
             :requested_maintenance_window,
-            service: service,
+            services: [service],
             case: support_case,
           )
         end
@@ -372,7 +372,7 @@ RSpec.feature "Maintenance windows", type: :feature do
         let :window do
           create(
             :expired_maintenance_window,
-            service: service,
+            services: [service],
             case: support_case,
           )
         end
@@ -393,7 +393,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     it 'can reject requested maintenance' do
       window = create(
         :requested_maintenance_window,
-        component: component,
+        components: [component],
         case: support_case
       )
 
@@ -411,7 +411,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     it 'cannot see cancel button' do
       create(
         :requested_maintenance_window,
-        component: component,
+        components: [component],
         case: support_case
       )
 
@@ -423,7 +423,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     it 'cannot see end button' do
       create(
         :started_maintenance_window,
-        component: component,
+        components: [component],
         case: support_case
       )
 
@@ -435,7 +435,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     it 'cannot see extend form' do
       create(
         :started_maintenance_window,
-        component: component,
+        components: [component],
         case: support_case
       )
 
@@ -448,7 +448,7 @@ RSpec.feature "Maintenance windows", type: :feature do
       subject do
         create(
             :requested_maintenance_window,
-            cluster: cluster,
+            clusters: [cluster],
             case: support_case
         )
       end
@@ -467,7 +467,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     let! :window do
       create(
         :requested_maintenance_window,
-        cluster: cluster,
+        clusters: [cluster],
         case: support_case
       )
     end
