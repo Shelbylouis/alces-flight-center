@@ -219,9 +219,12 @@ There are two environment variables that need to be set in your .env file
 before Slack notifications will work within your development environment,
 `SLACK_CHANNEL` and `SLACK_WEBHOOK_URL`.
 
-The former refers to the channel that the notifier will send all notifications
-to. Therefore if you wish to receive all Slack notfications via private messages
-you will need to set this to `@<your_slack_username_here>`.
+The former refers to the channel (including preceding `#`) that the notifier
+will send all notifications to. Therefore if you wish to receive all Slack
+notifications via private messages you will need to set this to 
+`@<your_slack_username_here>`. Slack docs suggest that you can't change the
+channel from the one defined in the webhook, which means that in production
+this should be `#support`.
 
 The latter however is vital to making the notifier function properly and should
 be kept secret. This URL can be found within the `Incoming WebHooks` section
