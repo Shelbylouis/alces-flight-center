@@ -62,27 +62,6 @@ Rails.application.routes.draw do
     end
   end
 
-  request_maintenance_form = Proc.new do
-    resources :maintenance_windows, path: :maintenance, only: :new do
-      collection do
-        # Do not define route helper (by passing `as: nil`) as otherwise this
-        # will overwrite the `${model}_maintenance_windows_path` helper, as by
-        # default `resources` expects `new` and `index` to use the same route.
-        # However we do not want this, and this route can be accessed using the
-        # `new_${model}_maintenance_windows_path` helper.
-        post 'new', action: :create, as: nil
-      end
-    end
-  end
-  confirm_maintenance_form = Proc.new do
-    resources :maintenance_windows, path: :maintenance, only: [] do
-      member do
-        get :confirm
-        patch :confirm, to: 'maintenance_windows#confirm_submit'
-      end
-    end
-  end
-
   maintenance_windows = Proc.new do
     resources :maintenance_windows, path: :maintenance, only: :index
   end
@@ -137,15 +116,14 @@ Rails.application.routes.draw do
         # Admin-only pages relating to cases belong here.
         resource :change_request, only: [:new, :edit], path: 'change-request'
         resource :case_associations, only: [:edit], as: 'associations', path: 'associations'
+        resource :maintenance_windows, only: [:new, :create], as: 'maintenance', path: 'maintenance'
       end
-      request_maintenance_form.call
       admin_logs.call
       notes.call(true)
       post :deposit
     end
 
     resources :components, only: []  do
-      request_maintenance_form.call
       resource :component_expansion,
                path: component_expansions_alias,
                only: [:edit, :update, :create]
@@ -157,10 +135,6 @@ Rails.application.routes.draw do
 
     resources :component_groups, path: component_groups_alias, only: [] do
       asset_record_form.call
-    end
-
-    resources :services, only: []  do
-      request_maintenance_form.call
     end
 
     resources :maintenance_windows, path: :maintenance, only: [] do
@@ -215,7 +189,6 @@ Rails.application.routes.draw do
       maintenance_windows.call
       resources :components, only: :index
       logs.call
-      confirm_maintenance_form.call
       get :documents
       notes.call(false)
       get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
@@ -228,22 +201,23 @@ Rails.application.routes.draw do
                 only: :index
       asset_record_view.call
       logs.call
-      confirm_maintenance_form.call
     end
 
     resources :component_groups, path: component_groups_alias, only: [] do
       get '/', controller: :components, action: :index
       resources :components, only: :index
       asset_record_view.call
+      maintenance_windows.call
     end
 
     resources :services, only: :show do
       maintenance_windows.call
-      confirm_maintenance_form.call
     end
 
     resources :maintenance_windows, path: :maintenance, only: [] do
       member do
+        get :confirm
+        patch :confirm, to: 'maintenance_windows#confirm_submit'
         post :reject
       end
     end

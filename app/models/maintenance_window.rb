@@ -89,7 +89,7 @@ class MaintenanceWindow < ApplicationRecord
   end
 
   def associated_models
-    components + services + clusters
+    clusters + services + component_groups + components
   end
 
   def associated_cluster

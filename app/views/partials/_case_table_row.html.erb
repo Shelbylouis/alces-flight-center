@@ -20,20 +20,7 @@
     %></td>
   <td>
     <%= render 'partials/table_cell_link', url: url do %>
-      <%= kase.associations.first.decorate.links %>
-      <% if kase.associations.length > 1 %>
-        <% contents = render 'cases/associations/group_contents', items: kase.associations do %>
-          <p>Affected components:</p>
-        <% end %>
-        <span
-          class="and-more"
-          data-html="true"
-          data-content="<%= contents.squish %>"
-          data-toggle="popover"
-          data-trigger="hover"
-          data-delay='{"hide": 1500}'
-        >+ <%= kase.associations.length - 1 %> more</span>
-      <% end %>
+      <%= render 'partials/association_summary', associations: kase.associations %>
     <% end %>
   </td>
   <% if kase.resolved? || kase.closed? %>

@@ -15,15 +15,15 @@ class MaintenanceWindowStateTransitionDecorator < ApplicationDecorator
   end
 
   def associated_model_links
-    window.associated_models.map { |m| m.decorate.links }.join(', ')
+    window.associated_model_links
   end
 
   def associated_model_names
-    window.associated_models.map { |m| "#{m.name} (#{m.readable_model_name})"}.join(', ')
+    window.associated_model_names
   end
 
   def window
-    object.maintenance_window
+    object.maintenance_window.decorate
   end
 
   def cluster_dashboard_url

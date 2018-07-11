@@ -21,8 +21,7 @@ class MaintenanceWindowDecorator < ApplicationDecorator
   end
 
   def confirm_path
-    h.confirm_cluster_maintenance_window_path(
-       model.associated_cluster.id,
+    h.confirm_maintenance_window_path(
        model
     )
   end
@@ -48,6 +47,10 @@ class MaintenanceWindowDecorator < ApplicationDecorator
 
   def associated_model_names
     associated_models.map { |m| "#{m.name} (#{m.readable_model_name})"}.join(', ')
+  end
+
+  def associated_model_links
+    associated_models.map { |m| m.decorate.links }.join(', ').html_safe
   end
 
   private

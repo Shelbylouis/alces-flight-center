@@ -3,50 +3,23 @@
   raise "Unknown action: #{action}" unless [:request, :confirm].include?(action)
   action = action.to_s.inquiry
 
-  case_label = if action.confirm?
-                 'Associated Case'
-               else
-                 'Case to associate this maintenance with'
-               end
 %>
 
 <%= render 'partials/tabs', activate: :maintenance do %>
   <%= form_for maintenance_window,
-    url: request.original_fullpath,
+    url: path,
     html: { class: 'card-body' } do |f| %>
 
-    <% if action.request? %>
-
       <h4>
-        Requesting maintenance for <%= maintenance_window.associated_model.decorate.links %>
-        <% if maintenance_window.associated_model.is_a? Cluster %>
-        (whole cluster)
-        <% end %>
+        <%= action.request? ? 'Requesting m' : 'M' %>aintenance for support case <%= maintenance_window.case.case_link %>
       </h4>
 
-      <% if maintenance_window.associated_model.is_a? Cluster %>
-        <p class="p-3 alert alert-warning">
-          <i class="fa fa-warning"></i>
-          Not what you want? Try selecting a
-          <%= link_to 'component', cluster_components_path, class: 'alert-link' %>
-          or a
-          <%= link_to 'service', cluster_services_path, class: 'alert-link' %>
-          from this cluster.
-        </p>
-      <% end %>
+    <div class="card">
+      <div class="card-body">
+        <h5>Affected components</h5>
 
-    <% end %>
-
-    <div class="form-group">
-      <%= f.label :case_id, case_label, 'data-test': 'case-select-label' %>
-      <%= f.collection_select(
-        :case_id,
-        maintenance_window.associated_cluster.cases.active.decorate,
-        :id,
-        :case_select_details,
-        {},
-        maintenance_window.case_attributes(action)
-      ) %>
+        <%= render 'cases/associations/association_info', kase: maintenance_window.case %>
+      </div>
     </div>
 
     <div class="form-group" data-test="duration-input-group">
