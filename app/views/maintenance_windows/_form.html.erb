@@ -14,12 +14,35 @@
         <%= action.request? ? 'Requesting m' : 'M' %>aintenance for support case <%= maintenance_window.case.case_link %>
       </h4>
 
-    <div class="card">
-      <div class="card-body">
-        <h5>Affected components</h5>
+    <div class="row">
+      <div class="col-6">
+        <div class="card">
+          <div class="card-body">
+            <h5>Affected components</h5>
 
-        <%= render 'cases/associations/association_info', kase: maintenance_window.case %>
+            <%= render 'cases/associations/association_info', kase: maintenance_window.case %>
+          </div>
+        </div>
       </div>
+      <% if action.request? %>
+        <div class="col-6">
+          <% if maintenance_window.case.clusters.length > 0 %>
+            <p class="p-3 alert alert-warning">
+              <i class="fa fa-2x fa-pull-left fa-warning" aria-hidden="true"></i>
+              You are requesting maintenance on an entire cluster.
+            </p>
+          <% end %>
+          <p class="p-3 alert alert-info">
+            <i class="fa fa-2x fa-info fa-pull-left" aria-hidden="true"></i>
+            To change the components affected by this maintenance request,
+            <%=
+              link_to "return to case #{maintenance_window.case.display_id}",
+                      case_path(maintenance_window.case)
+            %> and set the appropriate associations, then
+            start the maintenance request again.
+          </p>
+        </div>
+      <% end %>
     </div>
 
     <div class="form-group" data-test="duration-input-group">

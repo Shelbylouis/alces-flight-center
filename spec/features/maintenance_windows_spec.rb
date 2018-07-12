@@ -11,7 +11,7 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
     end.not_to change(MaintenanceWindow, :all)
 
     expect(
-      find('.alert')
+      find('.alert-danger')
     ).to have_text("Unable to #{form_action} this maintenance")
     invalidated_selects =
       requested_start_element.all('select', class: 'is-invalid')
@@ -107,7 +107,7 @@ RSpec.feature "Maintenance windows", type: :feature do
     describe 'maintenance request form' do
       include ActiveSupport::Testing::TimeHelpers
 
-      let! :cluster_case do
+      let :cluster_case do
         create(
           :open_case,
           cluster: cluster,
@@ -144,6 +144,20 @@ RSpec.feature "Maintenance windows", type: :feature do
         end
       end
 
+      context 'when requesting maintenance for an entire cluster' do
+        let(:cluster_case) {
+          create(
+            :open_case,
+            cluster: cluster,
+            clusters: [cluster]
+          )
+        }
+
+        it 'shows warning message' do
+          expect(find('p.alert-warning')).to have_text 'You are requesting maintenance on an entire cluster.'
+        end
+      end
+
       it 'can mandate maintenance' do
         fill_in 'Duration', with: 2
         fill_in_datetime_selects 'requested-start', with: valid_requested_start
@@ -167,29 +181,11 @@ RSpec.feature "Maintenance windows", type: :feature do
         end.not_to change(MaintenanceWindow, :all)
 
         expect(
-          find('.alert')
+          find('.alert-danger')
         ).to have_text('Unable to request this maintenance')
         expect(duration_input_group).to have_css('input.is-invalid')
         invalid_feedback = duration_input_group.find('.invalid-feedback')
         expect(invalid_feedback).to have_text('Must be greater than 0')
-      end
-
-      %w(resolved closed).each do |state|
-        it "cannot select #{state} Case for Cluster to associate" do
-          my_case = create(
-            "#{state}_case".to_sym,
-            cluster: cluster,
-            subject: 'my_case',
-          )
-
-          # Revisit the page so given Case would be shown, if we do not
-          # successfully filter it out, to avoid false positive.
-          visit current_path
-
-          expect do
-            select my_case.subject
-          end.to raise_error(Capybara::ElementNotFound)
-        end
       end
     end
 
