@@ -27,12 +27,12 @@
       <% if action.request? %>
         <div class="col-6">
           <% if maintenance_window.case.clusters.length > 0 %>
-            <p class="p-3 alert alert-warning">
+            <p class="p-3 alert alert-warning mt-3">
               <i class="fa fa-2x fa-pull-left fa-warning" aria-hidden="true"></i>
               You are requesting maintenance on an entire cluster.
             </p>
           <% end %>
-          <p class="p-3 alert alert-info">
+          <p class="p-3 alert alert-info mt-3">
             <i class="fa fa-2x fa-info fa-pull-left" aria-hidden="true"></i>
             To change the components affected by this maintenance request,
             <%=
