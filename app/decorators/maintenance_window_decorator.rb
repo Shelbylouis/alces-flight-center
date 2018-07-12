@@ -66,7 +66,7 @@ class MaintenanceWindowDecorator < ApplicationDecorator
       TITLE
       "<strong title=\"#{title}\">(expired)</strong>"
     else
-      ''
+      "(#{state})"
     end
   end
 

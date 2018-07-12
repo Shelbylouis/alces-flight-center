@@ -1,7 +1,7 @@
 <ul>
   <% kase.maintenance_windows.unfinished.map(&:decorate).each do |mw| %>
     <li>
-      <%= mw.scheduled_period %> (<%= mw.state %>)
+      <%= mw.scheduled_period %>
       <% contents = render 'cases/associations/group_contents', items: mw.associated_models do %>
         <p>This maintenance window affects the following components:</p>
       <% end %>

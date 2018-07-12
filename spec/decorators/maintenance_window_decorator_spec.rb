@@ -76,8 +76,8 @@ RSpec.describe MaintenanceWindowDecorator do
       context "when #{state}" do
         let(:state) { state }
 
-        it 'just returns formatted time range for maintenance' do
-          expect(subject.scheduled_period).to eq expected_time_range
+        it 'includes state' do
+          expect(subject.scheduled_period).to include "(#{state})"
         end
       end
     end

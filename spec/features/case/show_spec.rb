@@ -300,7 +300,7 @@ RSpec.describe 'Case page', type: :feature do
 
         it 'shows maintenance details' do
           details = find('#maintenance-details')
-          expect(details).to have_text("(#{state})")
+          expect(details).to have_text("(#{state == 'started' ? 'in progress' : state})")
         end
       end
     end
