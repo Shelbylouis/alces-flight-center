@@ -23,7 +23,7 @@ RSpec.describe 'Case page', type: :feature do
     create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee, tier_level: 3)
   end
 
-  let (:mw) { create(:maintenance_window, case: open_case) }
+  let(:mw) { create(:maintenance_window, case: open_case, clusters: [cluster]) }
 
   let(:comment_form_class) { '#new_case_comment' }
   let(:comment_button_text) { 'Add new comment' }
@@ -273,6 +273,66 @@ RSpec.describe 'Case page', type: :feature do
 
         expect(find('#credit_charge_amount').value).to eq "42"
         expect(find('#case-state-controls')).to have_text 'Charge below should include 42 credits from attached CR'
+      end
+    end
+
+    (MaintenanceWindow.possible_states - MaintenanceWindow.finished_states)
+      .map(&:to_s).each do |state|
+      context "with a #{state} maintenance window" do
+        let!(:mw) {
+          create(
+            :maintenance_window,
+            case: open_case,
+            state: state,
+            clusters: [open_case.cluster]
+          )
+        }
+
+        before(:each) do
+          visit cluster_case_path(open_case.cluster, open_case, as: admin)
+        end
+
+        it 'does not allow case to be resolved' do
+          state_controls = find('#case-state-controls')
+          expect(state_controls).to have_text 'outstanding maintenance window.'
+          expect(state_controls).not_to have_text 'Resolve this case'
+        end
+
+        it 'shows maintenance details' do
+          details = find('#maintenance-details')
+          expect(details).to have_text("(#{state == 'started' ? 'in progress' : state})")
+        end
+      end
+    end
+
+    MaintenanceWindow.finished_states.map(&:to_s).each do |state|
+      context "with a #{state} maintenance window" do
+        let!(:mw) {
+          create(
+            :maintenance_window,
+            case: open_case,
+            state: state,
+            clusters: [open_case.cluster]
+          )
+        }
+
+        before(:each) do
+          visit cluster_case_path(open_case.cluster, open_case, as: admin)
+        end
+
+        it 'allows case to be resolved' do
+          visit cluster_case_path(open_case.cluster, open_case, as: admin)
+
+          state_controls = find('#case-state-controls')
+          expect(state_controls).not_to have_text 'outstanding maintenance window.'
+          expect(state_controls.find('a')).to have_text 'Resolve this case'
+        end
+
+        it 'does not show maintenance details' do
+          expect do
+            find('#maintenance-details')
+          end.to raise_error Capybara::ElementNotFound
+        end
       end
     end
   end
@@ -566,7 +626,7 @@ RSpec.describe 'Case page', type: :feature do
           visit cluster_case_path(cluster,subject, as: user)
 
           request_link = find('a', text: 'Request maintenance')
-          expect(request_link[:href]).to eq new_cluster_maintenance_window_path(cluster, case_id: open_case.id)
+          expect(request_link[:href]).to eq new_cluster_case_maintenance_path(cluster, open_case)
         end
 
         context 'as a contact' do

@@ -6,17 +6,6 @@ class ApplicationDecorator < Draper::Decorator
   #     h.number_to_percentage object.amount, precision: 2
   #   end
 
-  def start_maintenance_request_link
-    return unless policy(MaintenanceWindow).create?
-
-    title = "Start request for maintenance of this #{readable_model_name}"
-    h.link_to(
-      h.raw(h.icon 'wrench', interactive: true),
-      new_maintenance_window_path,
-      title: title
-    )
-  end
-
   # Strictly speaking this gives the icons for a ClusterPart or entire Cluster,
   # but I don't have a better name for that yet.
   def cluster_part_icons

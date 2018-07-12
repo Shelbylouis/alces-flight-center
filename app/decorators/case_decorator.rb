@@ -29,7 +29,7 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def request_maintenance_path
-    h.new_cluster_maintenance_window_path model.cluster, case_id: model.id
+    h.new_cluster_case_maintenance_path(model.cluster, model)
   end
 
   def tier_description

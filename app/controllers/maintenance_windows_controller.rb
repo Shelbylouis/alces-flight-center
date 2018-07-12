@@ -2,8 +2,11 @@ class MaintenanceWindowsController < ApplicationController
   decorates_assigned :maintenance_window
 
   def new
+    @case = Case.find_from_id!(params[:case_id])
     @maintenance_window = MaintenanceWindow.new(
-      initial_maintenance_window_params
+      initial_maintenance_window_params.merge(
+        maintenance_window_case_params(@case)
+      )
     )
     authorize @maintenance_window
   end
@@ -11,9 +14,14 @@ class MaintenanceWindowsController < ApplicationController
   def create
     event = mandatory? ? :mandate : :request
     action = mandatory? ? :schedule : :request
+    @case = Case.find_from_id!(params[:case_id])
 
     handle_form_submission(action: action, template: :new) do
-      @maintenance_window = MaintenanceWindow.new(request_maintenance_window_params)
+      @maintenance_window = MaintenanceWindow.new(
+        request_maintenance_window_params.merge(
+          maintenance_window_case_params(@case)
+        )
+      )
       authorize @maintenance_window
       ActiveRecord::Base.transaction do
         @maintenance_window.save!
@@ -65,10 +73,6 @@ class MaintenanceWindowsController < ApplicationController
   private
 
   REQUEST_PARAM_NAMES = [
-    :cluster_id,
-    :component_id,
-    :service_id,
-    :case_id,
     :requested_start,
     :duration,
   ].freeze
@@ -79,8 +83,6 @@ class MaintenanceWindowsController < ApplicationController
 
   def initial_maintenance_window_params
     {
-      associated_model: @scope,
-      case_id: params[:case_id],
       requested_start: default_requested_start,
       duration: 1,
     }
@@ -92,6 +94,19 @@ class MaintenanceWindowsController < ApplicationController
 
   def confirm_maintenance_window_params
     params.require(:maintenance_window).permit(CONFIRM_PARAM_NAMES)
+  end
+
+  def maintenance_window_case_params(kase)
+    # We want to inherit the _current_ associated cluster parts from @case
+    # (e.g. if the case gets changed later, we want the MW to remain
+    # the same as when it was created)
+    {
+      case: kase,
+      clusters: kase.clusters,
+      services: kase.services,
+      component_groups: kase.component_groups,
+      components: kase.components
+    }
   end
 
   def default_requested_start
@@ -107,10 +122,13 @@ class MaintenanceWindowsController < ApplicationController
     yield
 
     flash[:success] = "Maintenance #{past_tense_of(action)}."
-    cluster = @maintenance_window.associated_cluster
-    redirect_to cluster_maintenance_windows_path(cluster)
-  rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition
-    flash.now[:error] = "Unable to #{action} this maintenance."
+    if action == :confirm
+      redirect_to cluster_maintenance_windows_path(@maintenance_window.cluster)
+    else
+      redirect_to case_path(@maintenance_window.case)
+    end
+  rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition => e
+    flash.now[:error] = "Unable to #{action} this maintenance. #{e}"
     render template
   end
 
@@ -122,7 +140,7 @@ class MaintenanceWindowsController < ApplicationController
     window = MaintenanceWindow.find(params[:id])
     authorize window
     previous_user_facing_state = window.user_facing_state
-    cluster = window.associated_cluster
+    cluster = window.cluster
 
     yield window if block_given?
     window.public_send("#{event}!", current_user)

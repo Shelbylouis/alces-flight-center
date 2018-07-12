@@ -1,0 +1,23 @@
+<ul>
+  <% kase.maintenance_windows.unfinished.map(&:decorate).each do |mw| %>
+    <li>
+      <%= mw.scheduled_period %>
+      <% contents = render 'cases/associations/group_contents', items: mw.associated_models do %>
+        <p>This maintenance window affects the following components:</p>
+      <% end %>
+      <i
+        class="fa fa-sitemap"
+        data-html="true"
+        data-content="<%= contents.squish %>"
+        data-toggle="popover"
+        data-trigger="hover"
+        data-delay='{"hide": 1500}'
+      ></i>
+    </li>
+  <% end %>
+</ul>
+<%= link_to 'Manage on cluster dashboard',
+            cluster_maintenance_windows_path(kase.cluster),
+            class: 'btn btn-primary ml-2 btn-sm',
+            role: 'button'
+%>

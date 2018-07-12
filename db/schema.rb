@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_02_135826) do
+ActiveRecord::Schema.define(version: 2018_07_10_181058) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -303,6 +303,15 @@ ActiveRecord::Schema.define(version: 2018_07_02_135826) do
     t.index ["user_id"], name: "index_logs_on_user_id"
   end
 
+  create_table "maintenance_window_associations", force: :cascade do |t|
+    t.bigint "maintenance_window_id", null: false
+    t.string "associated_element_type", null: false
+    t.bigint "associated_element_id", null: false
+    t.index ["associated_element_type", "associated_element_id"], name: "index_mw_associations_by_assoc_element"
+    t.index ["maintenance_window_id", "associated_element_id", "associated_element_type"], name: "index_mw_associations_uniqueness", unique: true
+    t.index ["maintenance_window_id"], name: "index_maintenance_window_associations_on_maintenance_window_id"
+  end
+
   create_table "maintenance_window_state_transitions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "maintenance_window_id", null: false
@@ -321,17 +330,11 @@ ActiveRecord::Schema.define(version: 2018_07_02_135826) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "case_id", null: false
-    t.bigint "cluster_id"
-    t.bigint "component_id"
-    t.bigint "service_id"
     t.text "state", default: "new", null: false
     t.datetime "requested_start", null: false
     t.integer "duration", null: false
     t.boolean "maintenance_ending_soon_email_sent", default: false
     t.index ["case_id"], name: "index_maintenance_windows_on_case_id"
-    t.index ["cluster_id"], name: "index_maintenance_windows_on_cluster_id"
-    t.index ["component_id"], name: "index_maintenance_windows_on_component_id"
-    t.index ["service_id"], name: "index_maintenance_windows_on_service_id"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -432,12 +435,10 @@ ActiveRecord::Schema.define(version: 2018_07_02_135826) do
   add_foreign_key "issues", "categories"
   add_foreign_key "issues", "service_types"
   add_foreign_key "logs", "components"
+  add_foreign_key "maintenance_window_associations", "maintenance_windows"
   add_foreign_key "maintenance_window_state_transitions", "maintenance_windows"
   add_foreign_key "maintenance_window_state_transitions", "users"
   add_foreign_key "maintenance_windows", "cases"
-  add_foreign_key "maintenance_windows", "clusters"
-  add_foreign_key "maintenance_windows", "components"
-  add_foreign_key "maintenance_windows", "services"
   add_foreign_key "notes", "clusters"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"

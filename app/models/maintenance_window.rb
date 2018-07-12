@@ -4,9 +4,34 @@ class MaintenanceWindow < ApplicationRecord
 
   default_scope { order(created_at: :desc) }
   belongs_to :case
-  belongs_to :cluster, required: false
-  belongs_to :component, required: false
-  belongs_to :service, required: false
+  delegate :site, to: :case
+
+  has_many :maintenance_window_associations, dependent: :destroy
+  has_many :services,
+           dependent: :destroy,
+           through: :maintenance_window_associations,
+           source: :associated_element,
+           source_type: 'Service'
+
+  has_many :components,
+           dependent: :destroy,
+           through: :maintenance_window_associations,
+           source: :associated_element,
+           source_type: 'Component'
+
+  has_many :component_groups,
+           dependent: :destroy,
+           through: :maintenance_window_associations,
+           source: :associated_element,
+           source_type: 'ComponentGroup'
+
+  has_many :clusters,
+           dependent: :destroy,
+           through: :maintenance_window_associations,
+           source: :associated_element,
+           source_type: 'Cluster'
+
+  delegate :cluster, to: :case
 
   has_many :maintenance_window_state_transitions
   alias_attribute :transitions, :maintenance_window_state_transitions
@@ -66,23 +91,8 @@ class MaintenanceWindow < ApplicationRecord
     end
   end
 
-  def associated_model
-    component || service || cluster
-  end
-
-  def associated_model=(model)
-    case model
-    when Cluster
-      self.cluster = model
-    when Component
-      self.component = model
-    when Service
-      self.service = model
-    end
-  end
-
-  def associated_cluster
-    cluster || associated_model.cluster
+  def associated_models
+    clusters + services + component_groups + components
   end
 
   def expected_end
@@ -120,8 +130,6 @@ class MaintenanceWindow < ApplicationRecord
   end
 
   private
-
-  delegate :site, to: :case
 
   def add_transition_comment(event)
     unless invalid? || legacy_migration_mode

@@ -80,6 +80,14 @@
           <%= render 'cases/escalation_controls' %>
         </td>
       </tr>
+      <% unless @case.maintenance_windows.unfinished.empty? %>
+        <tr>
+          <th>Pending maintenance</th>
+          <td colspan="3" id="maintenance-details">
+            <%= render 'cases/case_maintenance_details', kase: @case %>
+          </td>
+        </tr>
+      <% end %>
       <%= render 'cases/fields_or_requests_row', kase: @case %>
       <%= render 'cases/time_worked_row' %>
       <tr>

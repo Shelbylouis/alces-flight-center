@@ -52,7 +52,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
   end
 
   def window_details
-    "#{window.associated_model.name} | #{start_date} - #{end_date}"
+    "#{window.decorate.associated_model_names} | #{start_date} - #{end_date}"
   end
 
   def start_date
@@ -89,7 +89,7 @@ ProgressMaintenanceWindow = Struct.new(:window) do
     CaseMailer.maintenance_ending_soon(
       window,
       <<-EOF.squish
-        Maintenance for #{window.associated_model.name} is scheduled to
+        Maintenance for #{window.decorate.associated_model_names} is scheduled to
         end at #{window.expected_end.to_formatted_s(:short)}. You have
         less than an hour to make any final changes.
       EOF

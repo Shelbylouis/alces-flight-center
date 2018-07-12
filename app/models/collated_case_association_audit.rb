@@ -4,7 +4,7 @@ class CollatedCaseAssociationAudit
   attr_accessor :created_at
 
   def initialize(user_id, created_at, audits)
-    @user = User.find(user_id)
+    @user = User.where(id: user_id).first
     @created_at = created_at
     @audits = audits
   end
