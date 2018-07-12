@@ -44,6 +44,9 @@ gem 'business_time'
 gem "audited", "~> 4.7"
 gem 'jwt'
 gem 'pundit'
+# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making
+# cross-origin AJAX possible
+gem 'rack-cors'
 
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.

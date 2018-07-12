@@ -20,6 +20,15 @@ class SiteDecorator < ApplicationDecorator
     )
   end
 
+  def directory_service_url
+    base_url = ENV.fetch('TERMINAL_SERVICE_BASE_URL')
+    if current_user.admin?
+      "#{base_url}/sites/#{id}/directory"
+    else
+      "#{base_url}/directory"
+    end
+  end
+
   private
 
   # When a Site user is signed in we don't want/need the `/sites/:site_id`

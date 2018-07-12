@@ -258,6 +258,12 @@ ActiveRecord::Schema.define(version: 2018_07_10_181058) do
   create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
   end
 
+  create_table "encryption_keys", force: :cascade do |t|
+    t.text "public_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "expansion_types", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -276,6 +282,16 @@ ActiveRecord::Schema.define(version: 2018_07_10_181058) do
     t.index ["component_id"], name: "index_expansions_on_component_id"
     t.index ["component_make_id"], name: "index_expansions_on_component_make_id"
     t.index ["expansion_type_id"], name: "index_expansions_on_expansion_type_id"
+  end
+
+  create_table "flight_directory_configs", force: :cascade do |t|
+    t.string "hostname", limit: 255, null: false
+    t.string "username", limit: 255, null: false
+    t.bigint "site_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "encrypted_ssh_key", limit: 4096, null: false
+    t.index ["site_id"], name: "index_flight_directory_configs_on_site_id"
   end
 
   create_table "issues", force: :cascade do |t|
@@ -432,6 +448,7 @@ ActiveRecord::Schema.define(version: 2018_07_10_181058) do
   add_foreign_key "expansions", "component_makes"
   add_foreign_key "expansions", "components"
   add_foreign_key "expansions", "expansion_types"
+  add_foreign_key "flight_directory_configs", "sites"
   add_foreign_key "issues", "categories"
   add_foreign_key "issues", "service_types"
   add_foreign_key "logs", "components"

@@ -83,6 +83,7 @@ Rails.application.routes.draw do
     root 'sites#index'
     resources :sites, only: [:show, :index] do
       cases.call(only: [:index, :new])
+      resource :terminal_services, only: [:show]
     end
 
     cases.call(only: []) do
@@ -222,6 +223,9 @@ Rails.application.routes.draw do
       end
     end
 
+    resource :terminal_services, only: [:show]
+    resource :users, only: [:show]
+
     # Support legacy case URLs
     get '/cases/:id', to: 'cases#redirect_to_canonical_path'
     get '/services/:service_id/cases/:id', to: 'cases#redirect_to_canonical_path'
@@ -230,6 +234,7 @@ Rails.application.routes.draw do
 
   constraints Clearance::Constraints::SignedOut.new do
     root 'sso_sessions#new', as: 'sign_in'
+    resource :users, only: [:show]
   end
 
   # Routes defined here are only defined/used in certain tests which need
