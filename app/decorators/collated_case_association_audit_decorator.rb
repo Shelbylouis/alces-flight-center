@@ -1,7 +1,7 @@
 class CollatedCaseAssociationAuditDecorator < ApplicationDecorator
   def event_card
     h.render 'cases/event',
-             name: object.user.name,
+             name: object.user&.name || 'Flight Center',
              date: object.created_at,
              text: card_text,
              formatted: false,

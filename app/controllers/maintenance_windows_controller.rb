@@ -122,8 +122,11 @@ class MaintenanceWindowsController < ApplicationController
     yield
 
     flash[:success] = "Maintenance #{past_tense_of(action)}."
-    cluster = @maintenance_window.cluster
-    redirect_to cluster_maintenance_windows_path(cluster)
+    if action == :confirm
+      redirect_to cluster_maintenance_windows_path(@maintenance_window.cluster)
+    else
+      redirect_to case_path(@maintenance_window.case)
+    end
   rescue ActiveRecord::RecordInvalid, StateMachines::InvalidTransition => e
     flash.now[:error] = "Unable to #{action} this maintenance. #{e}"
     render template
