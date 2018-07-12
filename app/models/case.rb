@@ -245,7 +245,19 @@ class Case < ApplicationRecord
 
   def resolvable?
     state_transitions.map(&:to_name).include?(:resolved) &&
-      !cr_in_progress?
+      !unresolvable_reason
+  end
+
+  def unresolvable_reason
+    if cr_in_progress?
+      'This case cannot be resolved as the change request is incomplete.'
+    else
+      unfinished_mws = maintenance_windows.unfinished.count
+      if unfinished_mws.positive?
+        "This case cannot be resolved as there #{unfinished_mws == 1 ? 'is an' : 'are'}
+         outstanding maintenance window#{unfinished_mws == 1 ? '': 's'}.".squish
+      end
+    end
   end
 
   def potential_assignees

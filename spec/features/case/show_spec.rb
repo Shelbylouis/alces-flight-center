@@ -275,6 +275,51 @@ RSpec.describe 'Case page', type: :feature do
         expect(find('#case-state-controls')).to have_text 'Charge below should include 42 credits from attached CR'
       end
     end
+
+    (MaintenanceWindow.possible_states - MaintenanceWindow.finished_states)
+      .map(&:to_s).each do |state|
+      context "with a #{state} maintenance window" do
+        let!(:mw) {
+          create(
+            :maintenance_window,
+            case: open_case,
+            state: state,
+            clusters: [open_case.cluster]
+          )
+        }
+
+        it 'does not allow case to be resolved' do
+          visit cluster_case_path(open_case.cluster, open_case, as: admin)
+
+          state_controls = find('#case-state-controls')
+          expect(state_controls).to have_text 'outstanding maintenance window.'
+          expect(state_controls).not_to have_text 'Resolve this case'
+
+        end
+      end
+    end
+
+    MaintenanceWindow.finished_states.map(&:to_s).each do |state|
+      context "with a #{state} maintenance window" do
+        let!(:mw) {
+          create(
+            :maintenance_window,
+            case: open_case,
+            state: state,
+            clusters: [open_case.cluster]
+          )
+        }
+
+        it 'allows case to be resolved' do
+          visit cluster_case_path(open_case.cluster, open_case, as: admin)
+
+          state_controls = find('#case-state-controls')
+          expect(state_controls).not_to have_text 'outstanding maintenance window.'
+          expect(state_controls.find('a')).to have_text 'Resolve this case'
+
+        end
+      end
+    end
   end
 
   describe 'case assignment' do
