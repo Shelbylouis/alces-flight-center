@@ -288,13 +288,19 @@ RSpec.describe 'Case page', type: :feature do
           )
         }
 
-        it 'does not allow case to be resolved' do
+        before(:each) do
           visit cluster_case_path(open_case.cluster, open_case, as: admin)
+        end
 
+        it 'does not allow case to be resolved' do
           state_controls = find('#case-state-controls')
           expect(state_controls).to have_text 'outstanding maintenance window.'
           expect(state_controls).not_to have_text 'Resolve this case'
+        end
 
+        it 'shows maintenance details' do
+          details = find('#maintenance-details')
+          expect(details).to have_text("(#{state})")
         end
       end
     end
@@ -310,13 +316,22 @@ RSpec.describe 'Case page', type: :feature do
           )
         }
 
+        before(:each) do
+          visit cluster_case_path(open_case.cluster, open_case, as: admin)
+        end
+
         it 'allows case to be resolved' do
           visit cluster_case_path(open_case.cluster, open_case, as: admin)
 
           state_controls = find('#case-state-controls')
           expect(state_controls).not_to have_text 'outstanding maintenance window.'
           expect(state_controls.find('a')).to have_text 'Resolve this case'
+        end
 
+        it 'does not show maintenance details' do
+          expect do
+            find('#maintenance-details')
+          end.to raise_error Capybara::ElementNotFound
         end
       end
     end
