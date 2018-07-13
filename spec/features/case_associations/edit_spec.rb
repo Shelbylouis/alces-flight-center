@@ -116,6 +116,9 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
         expect(checkbox_for[component_group_a]).to be_checked
 
         expect(cluster_tree_summary.text).to eq 'Group A Component a1 Component a2 Component a3'
+
+        expect(SlackNotifier).to receive(:case_association_notification).with(kase, admin)
+
         click_button 'Save'
 
         kase.reload
