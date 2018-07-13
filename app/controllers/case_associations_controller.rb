@@ -27,6 +27,7 @@ class CaseAssociationsController < ApplicationController
       flash[:error] = 'Unable to update associations, an error occurred.'
     end
 
+    SlackNotifier.case_association_notification(@case, current_user)
     redirect_to case_path(@case)
   end
 

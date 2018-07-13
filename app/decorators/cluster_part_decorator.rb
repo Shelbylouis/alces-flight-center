@@ -15,6 +15,10 @@ class ClusterPartDecorator < ApplicationDecorator
     }
   end
 
+  def reference_text
+    "#{name} (#{type_name})"
+  end
+
   private
 
   def render_change_support_type_button(
