@@ -1,14 +1,13 @@
 <%
-  cases = @show_resolved ? @scope.cases.inactive : @scope.cases.active
   empty_message = "No #{@show_resolved ? 'resolved or closed' : 'open'} cases"
 %>
 <%= content_for(:subtitle) do
-  "#{cases.length} #{@show_resolved ? 'Resolved' : 'Open'}
-  #{'Case'.pluralize(cases.length)}"
+  "#{@cases.length} #{@show_resolved ? 'Resolved' : 'Open'}
+  #{'Case'.pluralize(@cases.length)}"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
   <%= render 'partials/table',
-      collection: cases,
+      collection: @cases,
       message: empty_message do %>
     <thead>
       <tr class="nowrap">
@@ -26,13 +25,13 @@ end %>
     </thead>
 
     <tbody class="assigned-cases">
-      <% cases.assigned_to(current_user).decorate.each do |c| %>
+      <% @cases.assigned_to(current_user).decorate.each do |c| %>
         <%= render 'partials/case_table_row', kase: c, scope: @scope %>
       <% end %>
     </tbody>
 
     <tbody>
-      <% cases.not_assigned_to(current_user).decorate.each do |c| %>
+      <% @cases.not_assigned_to(current_user).decorate.each do |c| %>
         <%= render 'partials/case_table_row', kase: c, scope: @scope %>
       <% end %>
     </tbody>

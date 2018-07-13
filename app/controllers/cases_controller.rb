@@ -165,6 +165,7 @@ class CasesController < ApplicationController
   end
 
   def index_action(show_resolved:)
+    @cases = show_resolved ? @scope.cases.inactive : @scope.cases.active
     @show_resolved = show_resolved
     render :index
   end
