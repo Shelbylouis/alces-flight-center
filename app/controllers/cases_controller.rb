@@ -6,7 +6,8 @@ class CasesController < ApplicationController
   ]
 
   def index
-    @cases = filtered_cases
+    @filters = case_filters
+    @cases = filtered_cases(@filters)
     render :index
   end
 
@@ -186,9 +187,9 @@ class CasesController < ApplicationController
     end
   end
 
-  def filtered_cases
+  def filtered_cases(filters)
     @scope.cases.filter(
-      case_filters
+      filters
     )
   end
 

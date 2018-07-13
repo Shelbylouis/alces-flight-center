@@ -1,6 +1,21 @@
 <%
   empty_message = 'No cases match the criteria you have specified.'
 %>
+
+<%= content_for(:state_filter) do %>
+  <form class="form">
+    <div class="form-group">
+      <label class="form-label" for="filter_state">Show cases with state:</label>
+      <select class="form-control" name="state[]" id="filter_state" multiple>
+        <option value="open" <%= @filters["state"]&.include?('open') ? 'selected' : '' %>>Open</option>
+        <option value="resolved" <%= @filters["state"]&.include?('resolved') ? 'selected' : '' %>>Resolved</option>
+        <option value="closed" <%= @filters["state"]&.include?('closed') ? 'selected' : '' %>>Closed</option>
+      </select>
+    </div>
+    <input class="btn btn-primary btn-small" type="submit" value="Apply" />
+  </form>
+<% end %>
+
 <%= content_for(:subtitle) do
   "Showing #{@cases.length} #{'case'.pluralize(@cases.length)}"
 end %>
@@ -12,7 +27,20 @@ end %>
       <tr class="nowrap">
         <th>ID</th>
         <th>Date</th>
-        <th>State</th>
+        <th>
+          State
+          <a
+            class="filter <%= @filters.include?('state') ? 'filter-active' : '' %>"
+            data-content="<%= content_for(:state_filter).gsub(/\n/, '') %>"
+            data-toggle="popover"
+            data-trigger="click focus"
+            data-html="true"
+            tabindex="0"
+            title="Filter by case state"
+          >
+            <i class="fa fa-filter"></i>
+          </a>
+        </th>
         <th>Creator</th>
         <th>Subject</th>
         <th>Assigned to</th>
