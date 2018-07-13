@@ -43,9 +43,9 @@ RSpec.describe 'Cases table', type: :feature do
       include_examples 'open cases table rendered'
     end
 
-    context 'when visit archive cases page' do
-      it 'renders table of all resolved or closed Cases' do
-        visit resolved_cases_path(as: user)
+    context 'when applying state filter to cases page' do
+      it 'renders table of all cases with given states' do
+        visit cases_path(state: %w(resolved closed), as: user)
 
         cases = all('tr').map(&:text)
         expect(cases).not_to have_text('Open case')

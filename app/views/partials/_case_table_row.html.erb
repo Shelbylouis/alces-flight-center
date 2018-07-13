@@ -23,7 +23,5 @@
       <%= render 'partials/association_summary', associations: kase.associations %>
     <% end %>
   </td>
-  <% if kase.resolved? || kase.closed? %>
-    <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.credit_charge&.amount %></td>
-  <% end %>
+  <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.credit_charge&.amount %></td>
 </tr>

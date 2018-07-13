@@ -1,19 +1,13 @@
 class CasesController < ApplicationController
   decorates_assigned :site
 
-  # Authorization also not required for `resolved` here, since this is
-  # effectively the same as `index` just with different Cases listed.
   after_action :verify_authorized, except: NO_AUTH_ACTIONS + [
-    :resolved,
     :redirect_to_canonical_path,
   ]
 
   def index
-    index_action(show_resolved: false)
-  end
-
-  def resolved
-    index_action(show_resolved: true)
+    @cases = filtered_cases
+    render :index
   end
 
   def show
@@ -164,12 +158,6 @@ class CasesController < ApplicationController
     )
   end
 
-  def index_action(show_resolved:)
-    @cases = show_resolved ? @scope.cases.inactive : @scope.cases.active
-    @show_resolved = show_resolved
-    render :index
-  end
-
   def change_action(success_flash, &block)
     @case = case_from_params
     begin
@@ -196,5 +184,26 @@ class CasesController < ApplicationController
     else
       {}
     end
+  end
+
+  def filtered_cases
+    @scope.cases.filter(
+      case_filters
+    )
+  end
+
+  def case_filters
+    default_filters.merge(
+      params.permit(
+        :state,
+        state: []  # Allow state to be a singleton or array
+      ).to_h
+    )
+  end
+
+  def default_filters
+    {
+      'state' => 'open',
+    }
   end
 end

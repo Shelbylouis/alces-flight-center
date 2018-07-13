@@ -69,10 +69,7 @@ Rails.application.routes.draw do
   cases = Proc.new do |**params, &block|
     params[:only] = Array.wrap(params[:only]).concat [:index]
     resources :cases, **params do
-      collection do
-        get :resolved
-      end
-      block.call if block
+      block&.call
     end
   end
 

@@ -58,7 +58,7 @@ class TabsBuilder
   def resolved_cases_entry
     {
       text: 'Resolved',
-      path: scope.resolved_scope_cases_path,
+      path: scope.scope_cases_path(state: %w(resolved closed)),
     }
   end
 end

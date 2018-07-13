@@ -1,6 +1,7 @@
 class Case < ApplicationRecord
   include AdminConfig::Case
   include HasStateMachine
+  include Filterable
 
   default_scope { order(created_at: :desc) }
 
@@ -126,7 +127,8 @@ class Case < ApplicationRecord
   after_create :send_new_case_email
   after_update :maybe_send_new_assignee_email
 
-  scope :active, -> { where(state: 'open') }
+  scope :state, ->(state) { where(state: state) }
+  scope :active, -> { state('open') }
   scope :inactive, -> { where.not(state: 'open') }
 
   scope :assigned_to, ->(user) { where(assignee: user) }

@@ -1,9 +1,8 @@
 <%
-  empty_message = "No #{@show_resolved ? 'resolved or closed' : 'open'} cases"
+  empty_message = 'No cases match the criteria you have specified.'
 %>
 <%= content_for(:subtitle) do
-  "#{@cases.length} #{@show_resolved ? 'Resolved' : 'Open'}
-  #{'Case'.pluralize(@cases.length)}"
+  "Showing #{@cases.length} #{'case'.pluralize(@cases.length)}"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
   <%= render 'partials/table',
@@ -18,9 +17,7 @@ end %>
         <th>Subject</th>
         <th>Assigned to</th>
         <th>Affected components</th>
-        <% if @show_resolved %>
-          <th>Credit usage</th>
-        <% end %>
+        <th>Credit usage</th>
       </tr>
     </thead>
 
