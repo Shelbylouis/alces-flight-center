@@ -1,9 +1,8 @@
+<div class='table-responsive'>
+  <table class="table">
+    <%= yield %>
+  </table>
+</div>
 <% if collection.empty? %>
-  <div style="text-align: center"><em><%= message %></em></div>
-<% else %>
-  <div class='table-responsive'>
-    <table class="table">
-      <%= yield %>
-    </table>
-  </div>
+  <p class="text-center"><em><%= message %></em></p>
 <% end %>
