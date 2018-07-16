@@ -211,7 +211,7 @@ class CasesController < ApplicationController
     {
       active: case_filters,
       ranges: {
-        assigned_to: @scope.cases.map(&:assignee).uniq.compact.sort
+        assigned_to: @scope.cases.map(&:assignee).uniq.compact.sort_by { |u| u.name }
       },
     }
   end

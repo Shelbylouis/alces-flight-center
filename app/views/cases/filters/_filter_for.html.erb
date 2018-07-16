@@ -1,12 +1,18 @@
-<a
-  class="filter <%= filters[:active].include?(name) ? 'filter-active' : 'filter-inactive' %>"
-  data-container="#filter-form"
-  data-content="<%= render("cases/filters/#{name}", filters: @filters).gsub(/\n/, '') %>"
-  data-toggle="popover"
-  data-trigger="click focus"
-  data-html="true"
-  tabindex="0"
-  title="<%= title %>"
->
-  <i class="fa fa-filter"></i>
-</a>
+<div class="dropdown">
+  <%= caption %>
+  <a
+    aria-haspopup="true"
+    class="filter <%= filters[:active].include?(name) ? 'filter-active' : 'filter-inactive' %>"
+    data-toggle="dropdown"
+    title="<%= title %>"
+    tabindex=""
+  >
+    <i class="fa fa-filter"></i>
+  </a>
+  <div class="dropdown-menu dropdown-menu-right">
+    <div class="px-3 py-1">
+      <%= render("cases/filters/#{name}", filters: @filters) %>
+      <input class="btn btn-primary btn-sm" type="submit" value="Apply"/>
+    </div>
+  </div>
+</div>

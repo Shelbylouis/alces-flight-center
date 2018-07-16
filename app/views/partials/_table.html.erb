@@ -1,4 +1,8 @@
-<div class='table-responsive'>
+<% is_responsive = local_assigns.fetch(:responsive, true)
+p local_assigns
+%>
+
+<div class='table<%= is_responsive ? '-responsive' : '' %>'>
   <table class="table">
     <%= yield %>
   </table>

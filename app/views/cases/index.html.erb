@@ -9,20 +9,19 @@ end %>
   <form class="form" id="filter-form">
     <%= render 'partials/table',
         collection: @cases,
-        message: empty_message do %>
+        message: empty_message,
+        responsive: false do %>
       <thead>
         <tr class="nowrap">
           <th>ID</th>
           <th>Date</th>
           <th>
-            State
-            <%= render 'cases/filters/filter_for', name: 'state', filters: @filters, title: 'Filter by case state' %>
+            <%= render 'cases/filters/filter_for', caption: 'State', name: 'state', filters: @filters, title: 'Filter by case state' %>
           </th>
           <th>Creator</th>
           <th>Subject</th>
           <th>
-            Assigned to
-            <%= render 'cases/filters/filter_for', name: 'assigned_to', filters: @filters, title: 'Filter by assignee' %>
+            <%= render 'cases/filters/filter_for', caption: 'Assigned to', name: 'assigned_to', filters: @filters, title: 'Filter by assignee' %>
           </th>
           <th>Affected components</th>
           <th>Credit usage</th>
