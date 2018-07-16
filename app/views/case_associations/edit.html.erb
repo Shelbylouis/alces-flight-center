@@ -11,7 +11,8 @@
               <%=
                 render 'case_associations/cluster_tree',
                        selected: @case.associations,
-                       cluster: @case.cluster
+                       cluster: @case.cluster,
+                       target: '#cluster-tree-summary'
               %>
             </div>
           </div>

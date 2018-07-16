@@ -2,7 +2,7 @@
   dom_id = "Cluster-#{cluster.id}"
   fake = Struct.new(:name, :fa_icon, :type_name)
 %>
-<ul class="fa-ul cluster-tree" data-target="#cluster-tree-summary">
+<ul class="fa-ul cluster-tree" data-target="<%= local_assigns.fetch(:target, '') %>">
   <li>
     <div class="cluster-part">
       <i class="fa-li fa <%= cluster.fa_icon %>" title="<%= cluster.type_name %>"></i>
