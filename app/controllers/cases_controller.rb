@@ -6,8 +6,8 @@ class CasesController < ApplicationController
   ]
 
   def index
-    @filters = case_filters
-    @cases = filtered_cases(@filters)
+    @filters = filters_spec
+    @cases = filtered_cases(@filters[:active])
     render :index
   end
 
@@ -205,6 +205,13 @@ class CasesController < ApplicationController
   def default_filters
     {
       'state' => 'open',
+    }
+  end
+
+  def filters_spec
+    {
+      active: case_filters,
+      values: {},
     }
   end
 end
