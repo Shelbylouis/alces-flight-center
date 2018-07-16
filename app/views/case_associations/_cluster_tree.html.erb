@@ -4,6 +4,15 @@
 %>
 <ul class="fa-ul cluster-tree" data-target="<%= local_assigns.fetch(:target, '') %>">
   <li>
+    <button
+      class="btn btn-sm btn-primary btn-collapse"
+      id="#<%= "#{dom_id}-expand" %>"
+      type="button"
+      data-toggle="collapse"
+      data-target="#<%= "#{dom_id}-children" %>"
+      aria-expanded="false"
+      aria-controls="#<%= "#{dom_id}-children" %>"
+    ></button>
     <div class="cluster-part">
       <i class="fa-li fa <%= cluster.fa_icon %>" title="<%= cluster.type_name %>"></i>
       <div class="form-check form-check-inline">
@@ -21,7 +30,7 @@
           />
       </div>
     </div>
-    <ul class="fa-ul">
+    <ul class="fa-ul collapse" id="<%= "#{dom_id}-children" %>">
       <%=
         render 'case_associations/cluster_part',
                part: fake.new('Services', 'fa-gears', 'Services'),
