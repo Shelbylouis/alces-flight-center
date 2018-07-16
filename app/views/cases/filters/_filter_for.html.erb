@@ -1,0 +1,12 @@
+<a
+  class="filter <%= filters[:active].include?(name) ? 'filter-active' : 'filter-inactive' %>"
+  data-container="#filter-form"
+  data-content="<%= render("cases/filters/#{name}", filters: @filters).gsub(/\n/, '') %>"
+  data-toggle="popover"
+  data-trigger="click focus"
+  data-html="true"
+  tabindex="0"
+  title="<%= title %>"
+>
+  <i class="fa fa-filter"></i>
+</a>
