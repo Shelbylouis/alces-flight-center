@@ -51,7 +51,7 @@ class TabsBuilder
   def current_cases_entry
     {
       text: "Current (#{scope.cases.active.size})",
-      path: scope.scope_cases_path,
+      path: scope.scope_cases_path(state: 'open'),
     }
   end
 

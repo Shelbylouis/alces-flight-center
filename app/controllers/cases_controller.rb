@@ -194,19 +194,12 @@ class CasesController < ApplicationController
   end
 
   def case_filters
-    default_filters.merge(
-      params.permit(
-        :state,
-        state: []  # Allow state to be a singleton or array
-      ).to_h
-    )
+    params.permit(
+      :state,
+      state: []  # Allow state to be a singleton or array
+    ).to_h
   end
 
-  def default_filters
-    {
-      'state' => 'open',
-    }
-  end
 
   def filters_spec
     {

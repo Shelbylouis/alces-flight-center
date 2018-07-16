@@ -38,7 +38,7 @@ RSpec.describe 'Cases table', type: :feature do
     let(:user) { contact }
 
     context 'when visit site cases dashboard' do
-      let(:path) { cases_path(as: user) }
+      let(:path) { cases_path(state: 'open', as: user) }
 
       include_examples 'open cases table rendered'
     end
@@ -74,7 +74,7 @@ RSpec.describe 'Cases table', type: :feature do
     let(:user) { admin }
 
     context 'when visit site cases dashboard' do
-      let(:path) { site_cases_path(site, as: user) }
+      let(:path) { site_cases_path(site, state: 'open', as: user) }
 
       # At least for now, want to render open Cases table on Site dashboard the
       # same for both admins as contacts.
