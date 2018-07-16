@@ -1,0 +1,43 @@
+<%
+  dom_id = "Cluster-#{cluster.id}"
+  fake = Struct.new(:name, :fa_icon, :type_name)
+%>
+<ul class="fa-ul cluster-tree" data-target="#cluster-tree-summary">
+  <li>
+    <div class="cluster-part">
+      <i class="fa-li fa <%= cluster.fa_icon %>" title="<%= cluster.type_name %>"></i>
+      <div class="form-check form-check-inline">
+        <label class="form-check-label" for="#<%= dom_id %>">
+          <%= cluster.name %> (Entire cluster)
+        </label>
+        <input
+          class="form-check-input"
+          data-cluster="true"
+          id="<%= dom_id %>"
+          name="associations[]"
+          type="checkbox"
+          value="<%= dom_id %>"
+          <%= selected.include?(cluster) ? 'checked' : '' %>
+          />
+      </div>
+    </div>
+    <ul class="fa-ul">
+      <%=
+        render 'case_associations/cluster_part',
+               part: fake.new('Services', 'fa-gears', 'Services'),
+               dom_id: 'all-services',
+               selected: selected,
+               children: cluster.services,
+               parent: dom_id
+      %>
+      <%=
+        render 'case_associations/cluster_part',
+               part: fake.new('Components', 'fa-cubes', 'Components'),
+               dom_id: 'all-components',
+               selected: selected,
+               children: cluster.component_groups,
+               parent: dom_id
+      %>
+    </ul>
+  </li>
+</ul>
