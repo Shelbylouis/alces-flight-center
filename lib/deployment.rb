@@ -5,12 +5,14 @@ require 'erb'
 class Deployment
   include Rake::DSL
 
-  def initialize(type, version_name, dry_run: false)
-    @remote = type
-    @tag = version_name
-    @dry_run = dry_run
+  VERSION_ENV_VAR = 'FC_VERSION'.freeze
 
-    abort "Must set ENV['VERSION'] within command!" if @tag.nil?
+  def initialize(type,dry_run: false)
+    abort "Must set ENV['#{VERSION_ENV_VAR}'] within command!" unless ENV.include?(VERSION_ENV_VAR)
+    @remote = type
+    @dry_run = dry_run
+    @tag = ENV[VERSION_ENV_VAR]
+
   end
 
   def deploy
@@ -30,7 +32,7 @@ class Deployment
       abort unless input.downcase == 'y'
     end
 
-    dokku_config_set('VERSION', tag, app: app_name, restart: false)
+    dokku_config_set(VERSION_ENV_VAR, tag, app: app_name, restart: false)
     run "git push #{remote} -f #{current_branch}:master"
 
     import_production_backup_to_staging if staging?

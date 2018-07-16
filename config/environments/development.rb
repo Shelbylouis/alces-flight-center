@@ -73,5 +73,5 @@ Rails.application.configure do
   config.slack_channel = ENV['SLACK_CHANNEL']
   config.slack_username = 'Alces Flight Center [Development]'
 
-  config.version = 'Development'
+  config.version = ENV['FC_VERSION'] || 'Development'
 end

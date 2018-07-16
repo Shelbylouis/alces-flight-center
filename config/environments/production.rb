@@ -126,5 +126,5 @@ Rails.application.configure do
       ]
     end
 
-  config.version = ENV['VERSION']
+  config.version = ENV['FC_VERSION']
 end
