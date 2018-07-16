@@ -196,15 +196,23 @@ class CasesController < ApplicationController
   def case_filters
     params.permit(
       :state,
-      state: []  # Allow state to be a singleton or array
-    ).to_h
+      :assigned_to,
+      {
+        state: [],
+        assigned_to: [],
+      }
+    ).to_h.tap { |filters|
+      filters[:assigned_to]&.map! { |a| a == "" ? nil : User.find(a) }
+    }
   end
 
 
   def filters_spec
     {
       active: case_filters,
-      values: {},
+      ranges: {
+        assigned_to: @scope.cases.map(&:assignee).uniq.compact.sort
+      },
     }
   end
 end

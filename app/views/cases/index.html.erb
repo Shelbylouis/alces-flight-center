@@ -6,46 +6,62 @@
   "Showing #{@cases.length} #{'case'.pluralize(@cases.length)}"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
-  <%= render 'partials/table',
-      collection: @cases,
-      message: empty_message do %>
-    <thead>
-      <tr class="nowrap">
-        <th>ID</th>
-        <th>Date</th>
-        <th>
-          State
-          <a
-            class="filter <%= @filters[:active].include?('state') ? 'filter-active' : 'filter-inactive' %>"
-            data-content="<%= render('cases/filters/state', filters: @filters).gsub(/\n/, '') %>"
-            data-toggle="popover"
-            data-trigger="click focus"
-            data-html="true"
-            tabindex="0"
-            title="Filter by case state"
-          >
-            <i class="fa fa-filter"></i>
-          </a>
-        </th>
-        <th>Creator</th>
-        <th>Subject</th>
-        <th>Assigned to</th>
-        <th>Affected components</th>
-        <th>Credit usage</th>
-      </tr>
-    </thead>
+  <form class="form" id="filter-form">
+    <%= render 'partials/table',
+        collection: @cases,
+        message: empty_message do %>
+      <thead>
+        <tr class="nowrap">
+          <th>ID</th>
+          <th>Date</th>
+          <th>
+            State
+            <a
+              class="filter <%= @filters[:active].include?('state') ? 'filter-active' : 'filter-inactive' %>"
+              data-container="#filter-form"
+              data-content="<%= render('cases/filters/state', filters: @filters).gsub(/\n/, '') %>"
+              data-toggle="popover"
+              data-trigger="click focus"
+              data-html="true"
+              tabindex="0"
+              title="Filter by case state"
+            >
+              <i class="fa fa-filter"></i>
+            </a>
+          </th>
+          <th>Creator</th>
+          <th>Subject</th>
+          <th>
+            Assigned to
+            <a
+              class="filter <%= @filters[:active].include?('assigned_to') ? 'filter-active' : 'filter-inactive' %>"
+              data-container="#filter-form"
+              data-content="<%= render('cases/filters/assigned_to', filters: @filters).gsub(/\n/, '') %>"
+              data-toggle="popover"
+              data-trigger="click focus"
+              data-html="true"
+              tabindex="0"
+              title="Filter by assignee"
+            >
+              <i class="fa fa-filter"></i>
+            </a></th>
+          <th>Affected components</th>
+          <th>Credit usage</th>
+        </tr>
+      </thead>
 
-    <tbody class="assigned-cases">
-      <% @cases.assigned_to(current_user).decorate.each do |c| %>
-        <%= render 'partials/case_table_row', kase: c, scope: @scope %>
-      <% end %>
-    </tbody>
+      <tbody class="assigned-cases">
+        <% @cases.assigned_to(current_user).decorate.each do |c| %>
+          <%= render 'partials/case_table_row', kase: c, scope: @scope %>
+        <% end %>
+      </tbody>
 
-    <tbody>
-      <% @cases.not_assigned_to(current_user).decorate.each do |c| %>
-        <%= render 'partials/case_table_row', kase: c, scope: @scope %>
-      <% end %>
-    </tbody>
-  <% end %>
+      <tbody>
+        <% @cases.not_assigned_to(current_user).decorate.each do |c| %>
+          <%= render 'partials/case_table_row', kase: c, scope: @scope %>
+        <% end %>
+      </tbody>
+    <% end %>
+  </form>
 <% end %>
 
