@@ -30,7 +30,7 @@ end %>
         <th>
           State
           <a
-            class="filter <%= @filters[:active].include?('state') ? 'filter-active' : '' %>"
+            class="filter <%= @filters[:active].include?('state') ? 'filter-active' : 'filter-inactive' %>"
             data-content="<%= content_for(:state_filter).gsub(/\n/, '') %>"
             data-toggle="popover"
             data-trigger="click focus"
