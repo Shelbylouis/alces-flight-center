@@ -23,6 +23,16 @@ ActiveRecord::Schema.define(version: 2018_08_23_144957) do
     t.index ["site_id"], name: "index_additional_contacts_on_site_id"
   end
 
+  create_table "articles", force: :cascade do |t|
+    t.string "title", limit: 255, null: false
+    t.string "url", limit: 512, null: false
+    t.json "meta", default: "{}", null: false
+    t.bigint "topic_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["topic_id"], name: "index_articles_on_topic_id"
+  end
+
   create_table "asset_record_field_definitions_component_types", id: false, force: :cascade do |t|
     t.integer "asset_record_field_definition_id", null: false
     t.integer "component_type_id", null: false
@@ -383,6 +393,12 @@ ActiveRecord::Schema.define(version: 2018_08_23_144957) do
     t.index ["issue_id"], name: "index_tiers_on_issue_id"
   end
 
+  create_table "topics", force: :cascade do |t|
+    t.string "title", limit: 255, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -398,6 +414,7 @@ ActiveRecord::Schema.define(version: 2018_08_23_144957) do
   end
 
   add_foreign_key "additional_contacts", "sites"
+  add_foreign_key "articles", "topics"
   add_foreign_key "case_associations", "cases"
   add_foreign_key "case_comments", "cases"
   add_foreign_key "case_comments", "users"
