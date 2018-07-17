@@ -19,6 +19,14 @@ class ClusterPartDecorator < ApplicationDecorator
     "#{name} (#{type_name})"
   end
 
+  def scope_cases_path(**args)
+    h.cluster_cases_path(cluster, **args, associations: ["#{model_name}-#{id}"])
+  end
+
+  def new_scope_case_path
+    h.new_cluster_case_path(cluster)
+  end
+
   private
 
   def render_change_support_type_button(

@@ -13,6 +13,9 @@ class ComponentGroup < ApplicationRecord
   has_many :maintenance_window_associations, as: :associated_element
   has_many :maintenance_windows, through: :maintenance_window_associations
 
+  has_many :case_associations, as: :associated_element
+  has_many :cases, through: :case_associations
+
   validates :name, presence: true
 
   validates_associated :cluster, :asset_record_fields

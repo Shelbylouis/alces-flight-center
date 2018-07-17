@@ -13,7 +13,7 @@ class ServiceDecorator < ClusterPartDecorator
   end
 
   def tabs
-    [tabs_builder.overview, tabs_builder.maintenance]
+    [tabs_builder.overview, tabs_builder.read_only_cases, tabs_builder.maintenance]
   end
 
   def case_form_json
