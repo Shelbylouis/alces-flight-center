@@ -23,7 +23,9 @@ end %>
           <th>
             <%= render 'cases/filters/filter_for', caption: 'Assigned to', name: 'assigned_to', filters: @filters, title: 'Filter by assignee' %>
           </th>
-          <th>Affected components</th>
+          <th>
+            <%= render 'cases/filters/filter_for', caption: 'Affected components', name: 'associations', filters: @filters, title: 'Filter by component' %>
+          </th>
           <th>Credit usage</th>
         </tr>
       </thead>
