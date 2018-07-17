@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Case < ApplicationRecord
   include AdminConfig::Case
   include HasStateMachine
@@ -134,8 +136,18 @@ class Case < ApplicationRecord
   scope :assigned_to, ->(user) { where(assignee: user) }
   scope :not_assigned_to, ->(user) { where.not(assignee: user).or(where(assignee: nil)) }
 
+  scope :associated_with, lambda { |arg_array|
+    joins(:case_associations)
+      .where(
+        case_associations: {
+          associated_element_type: arg_array[0],
+          associated_element_id: arg_array[1],
+        }
+      )
+  }
+
   def to_param
-    self.display_id.parameterize.upcase
+    display_id.parameterize.upcase
   end
 
   def self.find_from_id!(id)
@@ -153,9 +165,7 @@ class Case < ApplicationRecord
 
   def associations
     (component_groups + components + services + clusters).tap do |assocs|
-      if assocs.empty?
-        assocs << cluster
-      end
+      assocs << cluster if assocs.empty?
     end
   end
 
@@ -227,7 +237,7 @@ class Case < ApplicationRecord
       'Associated services': services.empty? ? nil : services.map(&:name).join(', '),
       Tier: decorate.tier_description,
       Fields: field_hash,
-      'Requested MOTD': change_motd_request&.motd
+      'Requested MOTD': change_motd_request&.motd,
     }.compact
   end
 
@@ -333,12 +343,12 @@ class Case < ApplicationRecord
     # provide a summary for use in an event card.
     associated_audits
         .where(auditable_type: 'CaseAssociation')
-        .group_by { |a|
+        .group_by do |a|
           [a.user_id, a.created_at.change(usec: 0)]
-        }
-        .map { |key, audits|
+        end
+        .map do |key, audits|
           CollatedCaseAssociationAudit.new(*key, audits)
-        }
+        end
   end
 
   def assign_cluster_if_necessary
@@ -388,30 +398,30 @@ class Case < ApplicationRecord
 
   def validates_user_assignment
     return if assignee.nil?
-    errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
+    errors.add(:assignee, 'must belong to this site, or be an admin') unless (assignee.site == site) || assignee.admin?
   end
 
   def set_display_id
-    return if self.display_id
+    return if display_id
     # Note: this method is called `before_create`, which is AFTER validation is run.
     # This ensures that the case is valid before we increment the cluster's
     # `case_index` field. Otherwise display IDs could end up non-sequential.
 
-    if self.rt_ticket_id
-      self.display_id = "RT#{rt_ticket_id}"
+    self.display_id = if rt_ticket_id
+      "RT#{rt_ticket_id}"
     else
-      self.display_id = "#{cluster.shortcode}#{cluster.next_case_index}"
-    end
+      "#{cluster.shortcode}#{cluster.next_case_index}"
+                      end
   end
 
   def has_display_id_when_saved
     # We want to be able to validate the case initially without a display id
-    errors.add(:display_id, 'must be present') unless !persisted? or display_id
+    errors.add(:display_id, 'must be present') unless !persisted? || display_id
   end
 
   def time_worked_not_changed_unless_allowed
     error_condition = !time_entry_allowed? && @time_worked_changed
-    errors.add(:time_worked, "must not be changed when case is #{state}") unless !error_condition
+    errors.add(:time_worked, "must not be changed when case is #{state}") if error_condition
   end
 
   def validate_tier_level_changes
@@ -446,7 +456,7 @@ class Case < ApplicationRecord
   def handle_tool(type, fields:)
     case type
     when :motd
-      self.build_change_motd_request(
+      build_change_motd_request(
         fields.slice(:motd)
       )
     else

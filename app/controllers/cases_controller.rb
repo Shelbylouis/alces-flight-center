@@ -188,8 +188,22 @@ class CasesController < ApplicationController
   end
 
   def filtered_cases(filters)
-    @scope.cases.filter(
-      filters
+    my_filters = filters.dup
+    association_filter = my_filters.delete(:associations).dup || []
+    scope_results = @scope.cases
+
+    results = scope_results
+    first_assoc = association_filter.shift
+    if first_assoc
+      results = scope_results.associated_with(*first_assoc)
+    end
+
+    association_filter.each do |assoc|
+      results = results.or(scope_results.associated_with(assoc.split('-')))
+    end
+
+    results.filter(
+      my_filters
     )
   end
 
@@ -197,9 +211,11 @@ class CasesController < ApplicationController
     params.permit(
       :state,
       :assigned_to,
+      :associations,
       {
         state: [],
         assigned_to: [],
+        associations: [],
       }
     ).to_h.tap { |filters|
       filters[:assigned_to]&.map! { |a| a == "" ? nil : User.find(a) }

@@ -5,7 +5,7 @@
 
     <%= render 'case_associations/cluster_tree',
                cluster: cluster.decorate,
-               selected: filters[:associations] || []
+               selected: filters[:active][:associations] || []
     %>
 
   <% end %>

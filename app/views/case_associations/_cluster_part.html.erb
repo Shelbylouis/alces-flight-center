@@ -22,7 +22,7 @@
         name="associations[]"
         type="checkbox"
         value="<%= dom_id %>"
-        <%= selected.include?(part) ? 'checked' : '' %>
+        <%= selected.include?(part) || selected.include?(dom_id) ? 'checked' : '' %>
       />
     </div>
   </div>
