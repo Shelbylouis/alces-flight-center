@@ -136,12 +136,12 @@ class Case < ApplicationRecord
   scope :assigned_to, ->(user) { where(assignee: user) }
   scope :not_assigned_to, ->(user) { where.not(assignee: user).or(where(assignee: nil)) }
 
-  scope :associated_with, lambda { |arg_array|
+  scope :associated_with, lambda { |type, id|
     joins(:case_associations)
       .where(
         case_associations: {
-          associated_element_type: arg_array[0],
-          associated_element_id: arg_array[1],
+          associated_element_type: type,
+          associated_element_id: id,
         }
       )
   }

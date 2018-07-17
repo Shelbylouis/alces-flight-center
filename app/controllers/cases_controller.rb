@@ -195,11 +195,11 @@ class CasesController < ApplicationController
     results = scope_results
     first_assoc = association_filter.shift
     if first_assoc
-      results = scope_results.associated_with(*first_assoc)
+      results = scope_results.associated_with(*first_assoc.split('-'))
     end
 
     association_filter.each do |assoc|
-      results = results.or(scope_results.associated_with(assoc.split('-')))
+      results = results.or(scope_results.associated_with(*assoc.split('-')))
     end
 
     results.filter(
