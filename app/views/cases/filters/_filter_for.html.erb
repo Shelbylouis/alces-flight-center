@@ -11,8 +11,13 @@
   </a>
   <div class="dropdown-menu dropdown-menu-right">
     <div class="px-3 py-1">
-      <%= render("cases/filters/#{name}", filters: @filters) %>
+      <%= render("cases/filters/#{name}", filters: filters) %>
       <input class="btn btn-primary btn-sm" type="submit" value="Apply"/>
+      <%=
+        link_to 'Clear all filters',
+                @scope.decorate.scope_cases_path,
+                class: 'btn btn-danger btn-sm'
+      %>
     </div>
   </div>
 </div>
