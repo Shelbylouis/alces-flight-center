@@ -94,6 +94,10 @@ class Cluster < ApplicationRecord
     end
   end
 
+  def last_checked
+    self.check_results.order(date: :desc).first.date
+  end
+
   def to_param
     shortcode.parameterize.upcase
   end
