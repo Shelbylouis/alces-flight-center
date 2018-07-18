@@ -101,6 +101,16 @@ class ClusterDecorator < ApplicationDecorator
     check_results.where(date: last_checked).where.not(result: 'Failure').count
   end
 
+  def check_results_class
+    if no_of_checks_passed.zero?
+      'text-danger'
+    elsif no_of_checks_passed < (checks.count / 2)
+      'text-warning'
+    else
+      'text-success'
+    end
+  end
+
   private
 
   def notes_tab

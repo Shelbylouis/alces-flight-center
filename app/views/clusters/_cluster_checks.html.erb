@@ -2,7 +2,7 @@
 <div class="card credit-balance">
   <div class="card-body">
     <h4>Cluster checks</h4>
-    <p class="credit-balance">
+    <p class="credit-balance <%= cluster.check_results_class %>">
       <%= "#{cluster.no_of_checks_passed}/#{no_of_cluster_checks} checks passed" %>
     </p>
     <p style="text-align: center"> Last updated: <%=  cluster.last_checked %></p>
