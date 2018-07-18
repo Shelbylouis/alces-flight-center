@@ -3,7 +3,7 @@
   <div class="card-body">
     <h4>Cluster checks</h4>
     <p class="credit-balance"><%= "n/#{no_of_cluster_checks} checks passed" %></p>
-    <p style="text-align: center"> Last updated: dd/mm/yyyy </p>
+    <p style="text-align: center"> Last updated: <%=  cluster.last_checked %></p>
     <%= yield %>
   </div>
 </div>
