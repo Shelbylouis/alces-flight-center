@@ -85,8 +85,8 @@ class ClusterDecorator < ApplicationDecorator
     'Entire cluster'
   end
 
-  def check_results_by_date(cluster, date)
-    cluster.check_results.where(date: date).order(:cluster_check_id)
+  def check_results_by_date(date)
+    check_results.where(date: date).order(:cluster_check_id)
   end
 
   private

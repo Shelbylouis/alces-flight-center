@@ -1,4 +1,4 @@
-<% date_checks = cluster.check_results_by_date(cluster, Date.today) %>
+<% date_checks = cluster.check_results_by_date(Date.today) %>
 <% content_for(:subtitle) { "Cluster checks" } %>
 <%= render 'partials/tabs', activate: :checks do %>
   <div class="card-body row">
