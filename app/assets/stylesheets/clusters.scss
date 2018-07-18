@@ -36,6 +36,8 @@ li.credit-charge-entry {
 
 
 .cluster-tree {
+  min-width: 15rem;
+
   .form-check {
     width: 100%;
 
@@ -65,7 +67,7 @@ li.credit-charge-entry {
 
   button.btn-collapse {
     position: absolute;
-    left: -5rem;
+    left: -3.25rem;
     padding: 0 0.25rem;
     width: 1.5rem;
 

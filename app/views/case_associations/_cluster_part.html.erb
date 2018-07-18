@@ -22,7 +22,7 @@
         name="associations[]"
         type="checkbox"
         value="<%= dom_id %>"
-        <%= kase.associations.include?(part) ? 'checked' : '' %>
+        <%= selected.include?(part) || selected.include?(dom_id) ? 'checked' : '' %>
       />
     </div>
   </div>
@@ -32,7 +32,7 @@
         <%= render 'case_associations/cluster_part',
                    dom_id: "#{child.model_name}-#{child.id}",
                    part: child,
-                   kase: kase,
+                   selected: selected,
                    parent: "#{dom_id}",
                    children: child.respond_to?(:components) ? child.components : []
         %>

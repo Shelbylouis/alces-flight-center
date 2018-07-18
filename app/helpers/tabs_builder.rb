@@ -10,10 +10,16 @@ class TabsBuilder
   end
 
   def cases
+    read_only_cases.tap { |roc|
+      nce = new_case_entry
+      roc[:dropdown].unshift(new_case_entry) if nce
+    }
+  end
+
+  def read_only_cases
     {
       id: :cases, path: scope.scope_cases_path,
       dropdown: [
-        new_case_entry,
         current_cases_entry,
         resolved_cases_entry,
       ].compact
@@ -51,14 +57,14 @@ class TabsBuilder
   def current_cases_entry
     {
       text: "Current (#{scope.cases.active.size})",
-      path: scope.scope_cases_path,
+      path: scope.scope_cases_path(state: 'open'),
     }
   end
 
   def resolved_cases_entry
     {
       text: 'Resolved',
-      path: scope.resolved_scope_cases_path,
+      path: scope.scope_cases_path(state: %w(resolved closed)),
     }
   end
 end

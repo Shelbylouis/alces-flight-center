@@ -1,0 +1,11 @@
+<div class="form-group">
+  <label class="form-label" for="filter_assigned_to">Show cases assigned to:</label>
+  <select class="form-control" name="assigned_to[]" id="filter_assigned_to" multiple onclick="event.stopPropagation();">
+    <% filters[:ranges][:assigned_to].each do |assignee| %>
+      <option value="<%= assignee.id %>" <%= filters[:active]["assigned_to"]&.include?(assignee) ? 'selected' : '' %>>
+        <%= assignee.name %>
+      </option>
+    <% end %>
+    <option value="" <%= filters[:active]["assigned_to"]&.include?(nil) ? 'selected' : '' %>>Nobody</option>
+  </select>
+</div>

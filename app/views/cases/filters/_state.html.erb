@@ -1,0 +1,8 @@
+<div class="form-group">
+  <label class="form-label" for="filter_state">Show cases with state:</label>
+  <select class="form-control" name="state[]" id="filter_state" multiple onclick="event.stopPropagation();">
+    <option value="open" <%= filters[:active]["state"]&.include?('open') ? 'selected' : '' %>>Open</option>
+    <option value="resolved" <%= filters[:active]["state"]&.include?('resolved') ? 'selected' : '' %>>Resolved</option>
+    <option value="closed" <%= filters[:active]["state"]&.include?('closed') ? 'selected' : '' %>>Closed</option>
+  </select>
+</div>

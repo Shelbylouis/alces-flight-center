@@ -16,7 +16,7 @@ RSpec.describe TabsBuilder do
         let(:user) { build_stubbed(:admin) }
 
         it 'contains a link to the site cases' do
-          expect(subject).to include(site_cases_path(scope))
+          expect(subject).to include(site_cases_path(scope, state: 'open'))
         end
 
         it 'includes a link to the new case page for the site' do
@@ -28,7 +28,7 @@ RSpec.describe TabsBuilder do
         let(:user) { build_stubbed(:contact) }
 
         it 'contains a link to the cases page' do
-          expect(subject).to include(cases_path)
+          expect(subject).to include(cases_path(state: 'open'))
         end
 
         it 'includes a link to the new case page' do

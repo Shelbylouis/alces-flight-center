@@ -1,0 +1,12 @@
+<% clusters = (@scope.instance_of?(Cluster)) ? [@scope] : @scope.clusters %>
+<p>Show cases affecting:</p>
+<div class="mr-2 ml-2 associations-filter">
+  <% clusters.each do |cluster| %>
+
+    <%= render 'case_associations/cluster_tree',
+               cluster: cluster.decorate,
+               selected: filters[:active][:associations] || []
+    %>
+
+  <% end %>
+</div>

@@ -89,3 +89,14 @@ td {
   text-decoration: none;
 }
 
+th * {
+  font-weight: normal;
+}
+
+
+.associations-filter {
+  max-height: 25rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-left: 1.5rem;
+}

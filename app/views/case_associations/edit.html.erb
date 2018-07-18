@@ -1,7 +1,3 @@
-<%
-  dom_id = "Cluster-#{@case.cluster.id}"
-  fake = Struct.new(:name, :fa_icon, :type_name)
-%>
 <div class="card">
   <div class="card-body container-fluid">
     <div class="row">
@@ -12,45 +8,12 @@
         <div class="col-sm-push-12 col-sm-12 col-md-6">
           <div class="card">
             <div class="card-body">
-              <ul class="fa-ul cluster-tree" data-target="#cluster-tree-summary">
-                <li>
-                  <div class="cluster-part">
-                    <i class="fa-li fa <%= @case.cluster.fa_icon %>" title="<%= @case.cluster.type_name %>"></i>
-                    <div class="form-check form-check-inline">
-                      <label class="form-check-label" for="#<%= dom_id %>">
-                        <%= @case.cluster.name %> (Entire cluster)
-                      </label>
-                      <input
-                        class="form-check-input"
-                        data-cluster="true"
-                        id="<%= dom_id %>"
-                        name="associations[]"
-                        type="checkbox"
-                        value="<%= dom_id %>"
-                        <%= @case.associations.include?(@case.cluster) ? 'checked' : '' %>
-                      />
-                    </div>
-                  </div>
-                  <ul class="fa-ul">
-                    <%=
-                      render 'case_associations/cluster_part',
-                             part: fake.new('Services', 'fa-gears', 'Services'),
-                             dom_id: 'all-services',
-                             kase: @case,
-                             children: @case.cluster.services,
-                             parent: dom_id
-                    %>
-                    <%=
-                      render 'case_associations/cluster_part',
-                             part: fake.new('Components', 'fa-cubes', 'Components'),
-                             dom_id: 'all-components',
-                             kase: @case,
-                             children: @case.cluster.component_groups,
-                             parent: dom_id
-                    %>
-                  </ul>
-                </li>
-              </ul>
+              <%=
+                render 'case_associations/cluster_tree',
+                       selected: @case.associations,
+                       cluster: @case.cluster,
+                       target: '#cluster-tree-summary'
+              %>
             </div>
           </div>
           <button class="btn btn-link" onclick="window.scrollTo(0,0); return false;">Back to top</button>

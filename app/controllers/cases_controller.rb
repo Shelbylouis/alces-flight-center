@@ -1,19 +1,14 @@
 class CasesController < ApplicationController
   decorates_assigned :site
 
-  # Authorization also not required for `resolved` here, since this is
-  # effectively the same as `index` just with different Cases listed.
   after_action :verify_authorized, except: NO_AUTH_ACTIONS + [
-    :resolved,
     :redirect_to_canonical_path,
   ]
 
   def index
-    index_action(show_resolved: false)
-  end
-
-  def resolved
-    index_action(show_resolved: true)
+    @filters = filters_spec
+    @cases = filtered_cases(@filters[:active])
+    render :index
   end
 
   def show
@@ -164,11 +159,6 @@ class CasesController < ApplicationController
     )
   end
 
-  def index_action(show_resolved:)
-    @show_resolved = show_resolved
-    render :index
-  end
-
   def change_action(success_flash, &block)
     @case = case_from_params
     begin
@@ -195,5 +185,50 @@ class CasesController < ApplicationController
     else
       {}
     end
+  end
+
+  def filtered_cases(filters)
+    my_filters = filters.dup
+    association_filter = my_filters.delete(:associations).dup || []
+    scope_results = @scope.cases
+
+    results = scope_results
+    first_assoc = association_filter.shift
+    if first_assoc
+      results = scope_results.associated_with(*first_assoc.split('-'))
+    end
+
+    association_filter.each do |assoc|
+      results = results.or(scope_results.associated_with(*assoc.split('-')))
+    end
+
+    results.filter(
+      my_filters
+    )
+  end
+
+  def case_filters
+    params.permit(
+      :state,
+      :assigned_to,
+      :associations,
+      {
+        state: [],
+        assigned_to: [],
+        associations: [],
+      }
+    ).to_h.tap { |filters|
+      filters[:assigned_to]&.map! { |a| a == "" ? nil : User.find(a) }
+    }
+  end
+
+
+  def filters_spec
+    {
+      active: case_filters,
+      ranges: {
+        assigned_to: @scope.cases.map(&:assignee).uniq.compact.sort_by { |u| u.name }
+      },
+    }
   end
 end
