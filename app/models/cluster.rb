@@ -102,7 +102,7 @@ class Cluster < ApplicationRecord
     end
   end
 
-  def successful_checks
+  def no_of_checks_passed
     self.check_results.where(date: last_checked).where.not(result: 'Failure').count
   end
 
