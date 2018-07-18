@@ -55,11 +55,23 @@ RSpec.describe 'Cases table', type: :feature do
       end
     end
 
-    it 'shows cases assigned to current user in separate section' do
+    it 'shows open cases assigned to current user in separate section' do
       create(
         :open_case,
         cluster: cluster,
         subject: 'Assigned case',
+        assignee: user
+      )
+      create(
+        :resolved_case,
+        cluster: cluster,
+        subject: 'Resolved assigned case',
+        assignee: user
+      )
+      create(
+        :closed_case,
+        cluster: cluster,
+        subject: 'Closed assigned case',
         assignee: user
       )
 
@@ -67,6 +79,8 @@ RSpec.describe 'Cases table', type: :feature do
       assigned_cases = find('.assigned-cases').all('tr').map(&:text)
       expect(assigned_cases).to have_text('Assigned case')
       expect(assigned_cases).not_to have_text('Open case')
+      expect(assigned_cases).not_to have_text('Resolved assigned case')
+      expect(assigned_cases).not_to have_text('Closed assigned case')
     end
   end
 

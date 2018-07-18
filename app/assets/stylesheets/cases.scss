@@ -48,6 +48,10 @@
 
 .assigned-cases {
   background-color: rgba(39,148,216,0.1);
+
+  .current-user {
+    font-weight: bold;
+  }
 }
 
 .case-highlight {
