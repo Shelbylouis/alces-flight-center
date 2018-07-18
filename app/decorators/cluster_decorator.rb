@@ -89,6 +89,18 @@ class ClusterDecorator < ApplicationDecorator
     check_results.where(date: date).order(:cluster_check_id)
   end
 
+  def last_checked
+    if check_results.empty?
+      'N/A'
+    else
+      check_results.order(date: :desc).first.date unless self.check_results.empty?
+    end
+  end
+
+  def no_of_checks_passed
+    check_results.where(date: last_checked).where.not(result: 'Failure').count
+  end
+
   private
 
   def notes_tab

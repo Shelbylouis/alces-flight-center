@@ -94,18 +94,6 @@ class Cluster < ApplicationRecord
     end
   end
 
-  def last_checked
-    if self.check_results.empty?
-      'N/A'
-    else
-      self.check_results.order(date: :desc).first.date unless self.check_results.empty?
-    end
-  end
-
-  def no_of_checks_passed
-    self.check_results.where(date: last_checked).where.not(result: 'Failure').count
-  end
-
   def to_param
     shortcode.parameterize.upcase
   end
