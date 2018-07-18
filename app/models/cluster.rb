@@ -95,7 +95,11 @@ class Cluster < ApplicationRecord
   end
 
   def last_checked
-    self.check_results.order(date: :desc).first.date
+    if self.check_results.empty?
+      'N/A'
+    else
+      self.check_results.order(date: :desc).first.date unless self.check_results.empty?
+    end
   end
 
   def successful_checks
