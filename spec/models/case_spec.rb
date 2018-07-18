@@ -551,7 +551,7 @@ RSpec.describe Case, type: :model do
       end
 
       it 'lists associations in correct order' do
-        expect(subject.associations).to eq [service, component_group, component]
+        expect(subject.associations).to eq [component_group, component, service]
       end
     end
 

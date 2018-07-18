@@ -150,7 +150,7 @@ class Case < ApplicationRecord
   end
 
   def associations
-    (services + component_groups + components + clusters).tap do |assocs|
+    (component_groups + components + services + clusters).tap do |assocs|
       if assocs.empty?
         assocs << cluster
       end
