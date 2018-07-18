@@ -29,8 +29,8 @@ class ChangeRequest < ApplicationRecord
   validates :credit_charge,
             presence: true,
             numericality: {
-                only_integer: true,
-                minimum: 0
+              only_integer: true,
+              greater_than_or_equal_to: 0,
             }
 
   validates :description, presence: true
