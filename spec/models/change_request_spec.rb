@@ -15,4 +15,10 @@ RSpec.describe ChangeRequest, type: :model do
     end
   end
 
+  it do
+    is_expected.to validate_numericality_of(:credit_charge)
+      .only_integer
+      .is_greater_than_or_equal_to(0)
+  end
+
 end
