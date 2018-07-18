@@ -103,7 +103,7 @@ class Cluster < ApplicationRecord
   end
 
   def successful_checks
-    self.check_results.where.not(result: 'Failure').count
+    self.check_results.where(date: last_checked).where.not(result: 'Failure').count
   end
 
   def to_param
