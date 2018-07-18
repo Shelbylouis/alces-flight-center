@@ -54,8 +54,8 @@
                   class: 'btn btn-primary'
       %>
       <% if current_user.admin? && cluster.last_checked != Date.today %>
-        <%= link_to 'Check results submission', cluster_check_submission_path(cluster),
-                    class: 'btn btn-primary'
+        <%= link_to 'Set check results for today', cluster_check_submission_path(cluster),
+                    class: 'btn btn-danger'
         %>
       <% end %>
     <% end %>
