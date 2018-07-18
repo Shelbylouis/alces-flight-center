@@ -98,6 +98,10 @@ class Cluster < ApplicationRecord
     self.check_results.order(date: :desc).first.date
   end
 
+  def successful_checks
+    self.check_results.where.not(result: 'Failure').count
+  end
+
   def to_param
     shortcode.parameterize.upcase
   end
