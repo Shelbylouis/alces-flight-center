@@ -6,7 +6,7 @@ module MarkdownRenderer
     Kramdown::Converter::RemoveHtmlTags.convert(doc.root,
                                                 remove_block_html_tags: true
                                                )
-    doc.to_html
+    "<div class=\"markdown\">#{doc.to_html}</div>".html_safe
   end
 end
 
