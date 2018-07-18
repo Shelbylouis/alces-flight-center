@@ -147,8 +147,8 @@ RSpec.describe 'Case page', type: :feature do
       log_html = event_cards[0].find('.card-body').native.inner_html
       case_comment_html = event_cards[1].find('.card-body').native.inner_html
 
-      expect(log_html.strip).to eq('<p><em>Loggy</em> <strong>McLogface</strong></p>')
-      expect(case_comment_html.strip).to eq('<p><strong>Commenty</strong> <em>McCommentface</em></p>')
+      expect(log_html.strip).to eq("<div class=\"markdown\">\n<p><em>Loggy</em> <strong>McLogface</strong></p>\n</div>")
+      expect(case_comment_html.strip).to eq("<div class=\"markdown\">\n<p><strong>Commenty</strong> <em>McCommentface</em></p>\n</div>")
     end
 
     it 'shows a card for creation of CreditCharge' do

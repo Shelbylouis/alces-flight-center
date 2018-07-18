@@ -31,6 +31,7 @@ RSpec.shared_examples 'markdown_column' do |options={}|
 
       let(:html_text) do
         <<~EOF
+        <div class="markdown">
         <h1 id="title">Title</h1>
 
         <p>Paragraph</p>
@@ -39,6 +40,7 @@ RSpec.shared_examples 'markdown_column' do |options={}|
           <li>List item 1</li>
           <li>List item 2</li>
         </ul>
+        </div>
         EOF
       end
 
