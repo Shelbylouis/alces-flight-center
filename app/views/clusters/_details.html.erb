@@ -53,6 +53,11 @@
       <%= link_to 'See check history', cluster_checks_path(cluster),
                   class: 'btn btn-primary'
       %>
+      <% if current_user.admin? && cluster.last_checked != Date.today %>
+        <%= link_to 'Check results submission', cluster_check_submission_path(cluster),
+                    class: 'btn btn-primary'
+        %>
+      <% end %>
     <% end %>
   </div>
 </div>
