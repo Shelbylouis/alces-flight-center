@@ -34,7 +34,7 @@
       <%=
         render 'case_associations/cluster_part',
                part: fake.new('Services', 'fa-gears', 'Services'),
-               dom_id: "all-services-#{cluster.id}",
+               dom_id: "allservices-#{cluster.id}",
                selected: selected,
                children: cluster.services,
                parent: dom_id
@@ -42,7 +42,7 @@
       <%=
         render 'case_associations/cluster_part',
                part: fake.new('Components', 'fa-cubes', 'Components'),
-               dom_id: "all-components-#{cluster.id}",
+               dom_id: "allcomponents-#{cluster.id}",
                selected: selected,
                children: cluster.component_groups,
                parent: dom_id
