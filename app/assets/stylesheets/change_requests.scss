@@ -1,4 +1,7 @@
-@import "bootstrap";
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+@import "bootstrap/tables";
 
 .card.change-request-body {
   border-width: 2px !important;
