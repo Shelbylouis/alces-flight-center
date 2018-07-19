@@ -4,7 +4,6 @@ FactoryBot.define do
     site
     name 'A Scientist'
     email
-    password 'definitely_encrypted'
     role :secondary_contact
 
     factory :viewer do

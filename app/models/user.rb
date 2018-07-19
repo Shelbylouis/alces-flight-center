@@ -97,4 +97,8 @@ class User < ApplicationRecord
   def site_primary_contact
     @site_primary_contact ||= site&.primary_contact
   end
+
+  def password_optional?
+    true  # since we use SSO for passwords
+  end
 end

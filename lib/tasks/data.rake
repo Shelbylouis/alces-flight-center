@@ -28,7 +28,7 @@ namespace :alces do
       User.all.each do |user|
         local_part = user.email.split('@').first
         new_email =  "#{local_part}@example.com"
-        user.update!(email: new_email, password: 'password')
+        user.update!(email: new_email)
       end
     end
 
