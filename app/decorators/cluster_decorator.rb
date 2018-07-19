@@ -104,7 +104,7 @@ class ClusterDecorator < ApplicationDecorator
   def check_results_class
     if no_of_checks_passed.zero?
       'text-danger'
-    elsif no_of_checks_passed < (checks.count / 2)
+    elsif no_of_checks_passed < checks.count
       'text-warning'
     else
       'text-success'
