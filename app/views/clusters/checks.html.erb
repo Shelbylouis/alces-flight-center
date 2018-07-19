@@ -7,32 +7,33 @@
     }
   </script>
   <div class="card-body row">
-    <div class="input-group date col-sm-3">
-      <input type="text"
-             id="datepicker"
-             class="form-control"
-             value="<%= @date %>"
-             onchange="dateChanged(this.value)"
-             />
-             <div class="input-group-append">
-               <input type="submit" class="btn btn-primary" value="View"/>
-             </div>
-    </div>
     <div class="col-sm-12">
+      <div class="input-group date col-sm-3" style="float: right;">
+        <input type="text"
+               id="datepicker"
+               class="form-control"
+               value="<%= @date %>"
+               onchange="dateChanged(this.value)"
+               />
+               <div class="input-group-append">
+                 <input type="submit" class="btn btn-primary" value="View"/>
+               </div>
+      </div>
       <% if @date_checks.empty? %>
         <% if current_user.admin? && @date == Date.today %>
-          <%= link_to 'Set check results for today', cluster_check_submission_path(cluster),
+          No check results have been submitted yet for today, click below to begin the process
+          <br><%= link_to 'Set check results for today', cluster_check_submission_path(cluster),
                       class: 'btn btn-danger'
           %>
         <% else %>
           There are no check results for this date
         <% end %>
       <% else %>
-        <br><h3><%= cluster.name %> Checks for <%= @date.to_formatted_s(:long) %></h3>
+        <h3><%= cluster.name %> Checks for <%= @date.to_formatted_s(:long) %></h3>
         <h3>
           <%= "#{cluster.no_of_checks_passed(@date)}/#{@date_checks.count}
-          checks successful" %>
-        </h3><br>
+            checks successful" %>
+        </h3>
         <%= render 'partials/table',
           collection: cluster.check_results,
           message: 'No cluster check results to display' do %>
