@@ -6,7 +6,12 @@ module MarkdownRenderer
     Kramdown::Converter::RemoveHtmlTags.convert(doc.root,
                                                 remove_block_html_tags: true
                                                )
-    doc.to_html
+    html_doc = doc.to_html.strip
+    if html_doc.empty?
+      ''
+    else
+      "<div class=\"markdown\">\n#{html_doc}\n</div>"
+    end
   end
 end
 
