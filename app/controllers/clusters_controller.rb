@@ -57,8 +57,12 @@ class ClustersController < ApplicationController
       end
     end
 
-
     redirect_to cluster_checks_path(@cluster)
+  end
+
+  def checks
+    @date = params[:date]&.to_date || Date.today
+    @date_checks = cluster.check_results_by_date(@date)
   end
 
   private
