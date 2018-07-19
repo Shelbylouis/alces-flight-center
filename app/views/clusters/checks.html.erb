@@ -1,51 +1,71 @@
-<% date_checks = cluster.check_results_by_date(Date.today) %>
-<% content_for(:subtitle) { "Cluster checks" } %>
+<% content_for(:subtitle) { "Cluster checks for #{@date.to_formatted_s(:long)}" } %>
 <%= render 'partials/tabs', activate: :checks do %>
+  <script type="text/javascript">
+    function dateChanged(date) {
+      var url = "<%= cluster_checks_path(cluster) %>/" + date;
+      Turbolinks.visit(url);
+    }
+  </script>
   <div class="card-body row">
+    <div class="input-group date col-sm-3">
+      <input type="text"
+             id="datepicker"
+             class="form-control"
+             value="<%= @date %>"
+             onchange="dateChanged(this.value)"
+             />
+             <div class="input-group-append">
+               <input type="submit" class="btn btn-primary" value="View"/>
+             </div>
+    </div>
     <div class="col-sm-12">
-      <h3><%= cluster.name %> Checks for <%= Date.today.to_formatted_s(:short) %> 2018</h3>
-      <h3>
-        <%= "#{date_checks.where(result: 'Success').count}/#{date_checks.count}
-        checks successful" %>
-      </h3>
-      <div class="input-group date">
-        <input type="text" class="form-control" value="<%= Date.today %>"/>
-        <div class="input-group-addon">
-          <span class="glyphicon glyphicon-th"></span>
-        </div>
-      </div>
-      <%= render 'partials/table',
-        collection: cluster.check_results,
-        message: 'No cluster check results to display' do %>
-        <thead>
-          <tr class="nowrap">
-            <th>Engineer</th>
-            <th>Check</th>
-            <th>Comment</th>
-            <th>Result</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% date_checks.each do |check_result| %>
-            <tr class="case-highlight">
-              <td><%= current_user == check_result.user ?
-                raw('<strong>Me</strong>') : check_result.user.name %></td>
-              <td style="width: 30%;"><%= check_result.cluster_check.name %></td>
-              <td style="width: 40%;">
-                <%= check_result.comment %>
-              </td>
-              <td class="nowrap">
-                <% if check_result.result == 'Success' %>
-                  <i class="fa fa-check" style="color: #18bcb0;"/>
-                <% elsif check_result.result == 'Failure' %>
-                  <i class="fa fa-remove" style="color: red;"/>
-                <% else %>
-                  N/A
-                <% end %>
-              </td>
+      <% if @date_checks.empty? %>
+        <% if current_user.admin? && @date == Date.today %>
+          <%= link_to 'Set check results for today', cluster_check_submission_path(cluster),
+                      class: 'btn btn-danger'
+          %>
+        <% else %>
+          There are no check results for this date
+        <% end %>
+      <% else %>
+        <br><h3><%= cluster.name %> Checks for <%= @date.to_formatted_s(:long) %></h3>
+        <h3>
+          <%= "#{@date_checks.where(result: 'Success').count}/#{@date_checks.count}
+          checks successful" %>
+        </h3><br>
+        <%= render 'partials/table',
+          collection: cluster.check_results,
+          message: 'No cluster check results to display' do %>
+          <thead>
+            <tr class="nowrap">
+              <th>Engineer</th>
+              <th>Check</th>
+              <th>Comment</th>
+              <th>Result</th>
             </tr>
-          <% end %>
-        </tbody>
+          </thead>
+          <tbody>
+            <% @date_checks.each do |check_result| %>
+              <tr class="case-highlight">
+                <td><%= current_user == check_result.user ?
+                  raw('<strong>Me</strong>') : check_result.user.name %></td>
+                <td style="width: 30%;"><%= check_result.cluster_check.name %></td>
+                <td style="width: 40%;">
+                  <%= check_result.comment %>
+                </td>
+                <td class="nowrap">
+                  <% if check_result.result == 'Success' %>
+                    <i class="fa fa-check" style="color: #18bcb0;"/>
+                  <% elsif check_result.result == 'Failure' %>
+                    <i class="fa fa-remove" style="color: red;"/>
+                  <% else %>
+                    N/A
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        <% end %>
       <% end %>
     </div>
   </div>
