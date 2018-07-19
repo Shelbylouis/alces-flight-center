@@ -30,7 +30,7 @@
       <% else %>
         <br><h3><%= cluster.name %> Checks for <%= @date.to_formatted_s(:long) %></h3>
         <h3>
-          <%= "#{@date_checks.where(result: 'Success').count}/#{@date_checks.count}
+          <%= "#{cluster.no_of_checks_passed(@date)}/#{@date_checks.count}
           checks successful" %>
         </h3><br>
         <%= render 'partials/table',
