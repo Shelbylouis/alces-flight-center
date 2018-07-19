@@ -97,8 +97,8 @@ class ClusterDecorator < ApplicationDecorator
     end
   end
 
-  def no_of_checks_passed
-    check_results.where(date: last_checked).where.not(result: 'Failure').count
+  def no_of_checks_passed(date = last_checked)
+    check_results.where(date: date).where.not(result: 'Failure').count
   end
 
   def check_results_class
