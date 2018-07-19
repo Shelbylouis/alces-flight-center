@@ -46,19 +46,6 @@ class Deployment
     output_manual_steps
   end
 
-  module Staging
-    STAGING_PASSWORD = 'STAGING_PASSWORD'
-
-    def self.password
-      ENV.fetch(STAGING_PASSWORD)
-    rescue KeyError
-      raise <<~ERROR.squish
-        #{STAGING_PASSWORD} environment variable must be set, to be used as
-        password for all Site contacts in staging environment
-      ERROR
-    end
-  end
-
   private
 
   attr_reader :remote, :tag
@@ -71,9 +58,6 @@ class Deployment
   end
 
   def import_production_backup_to_staging
-    # Get staging password first so we fail before doing anything if this
-    # hasn't been given.
-    staging_password = Staging.password
 
     staging_database_url = dokku_config_get('DATABASE_URL', app: STAGING_APP)
     database_server_url = File.dirname(staging_database_url)
@@ -99,10 +83,7 @@ class Deployment
 
     # Obfuscate the imported production data for non-admin users to not use
     # real emails and to all use password passed as environment variable.
-    obfuscate_dokku_command = <<~COMMAND.squish
-      rake alces:deploy:staging:obfuscate_users
-      STAGING_PASSWORD="#{Shellwords.escape(staging_password)}"
-    COMMAND
+    obfuscate_dokku_command = 'rake alces:deploy:staging:obfuscate_users'
     dokku_run obfuscate_dokku_command, app: STAGING_APP
 
     dokku_start STAGING_APP
