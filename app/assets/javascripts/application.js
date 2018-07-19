@@ -16,6 +16,7 @@
 //= require popper
 //= require bootstrap-sprockets
 //= require_tree .
+//= require bootstrap-datepicker
 //
 
 function enableTooltips() {

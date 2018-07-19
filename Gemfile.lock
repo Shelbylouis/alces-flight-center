@@ -89,6 +89,8 @@ GEM
       autoprefixer-rails (>= 6.0.3)
       popper_js (>= 1.12.9, < 2)
       sass (>= 3.5.2)
+    bootstrap-datepicker-rails (1.8.0.1)
+      railties (>= 3.0)
     builder (3.2.3)
     business_time (0.9.3)
       activesupport (>= 3.2.0)
@@ -463,6 +465,7 @@ DEPENDENCIES
   aws-sdk-s3
   bootsnap
   bootstrap (~> 4.0.0)
+  bootstrap-datepicker-rails
   business_time
   byebug
   capybara (~> 2.13)
