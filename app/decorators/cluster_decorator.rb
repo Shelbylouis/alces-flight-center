@@ -39,7 +39,9 @@ class ClusterDecorator < ApplicationDecorator
       id: id,
       name: name,
       components: components.map(&:case_form_json),
-      services: services.map(&:case_form_json),
+      services: services.map(&:case_form_json).tap { |services|
+        services << other_service_json
+      },
       supportType: support_type,
       chargingInfo: charging_info,
       # Encode MOTD in two forms: the raw form, to be used as the initial value
@@ -108,4 +110,21 @@ class ClusterDecorator < ApplicationDecorator
       }
     end
   end
+
+  def other_service_json
+    {
+      id: -1,
+      name: 'Other / N/A',
+      supportType: 'managed'
+    }.merge(IssuesJsonBuilder.build_for(self))
+  end
+
+  class IssuesJsonBuilder < ServiceDecorator::IssuesJsonBuilder
+    private
+
+    def applicable_issues
+      Issue.where(requires_component: false, requires_service: false).decorate.reject(&:special?)
+    end
+  end
+
 end

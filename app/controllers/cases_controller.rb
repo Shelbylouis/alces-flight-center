@@ -50,7 +50,7 @@ class CasesController < ApplicationController
     @case = Case.new(my_params.merge(user: current_user))
     authorize @case
 
-    if service_id.present?
+    if service_id.present? && service_id.positive?
       @case.services << Service.find(service_id)
     end
 
