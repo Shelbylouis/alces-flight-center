@@ -1,6 +1,11 @@
 class TerminalServicesController < ApplicationController
   def show
-    config = @site.flight_directory_config || @site.build_flight_directory_config
+    config = @site.flight_directory_config
+    if config.nil?
+      render json: {}, status: 404
+      return
+    end
+
     authorize config, :show?
     site = config.site
 
