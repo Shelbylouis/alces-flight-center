@@ -31,7 +31,10 @@
       <% end %>
 
       <span class="navbar-text text-light">
-        <%= current_user.name %> (<em><%= current_user.role.titlecase %></em>)
+        <%= current_user.name %>
+        <% if current_user.admin? || Rails.env.development? %>
+          <em>(<%= current_user.role.titlecase %>)</em>
+        <% end %>
       </span>
     <% end %>
   </div>
