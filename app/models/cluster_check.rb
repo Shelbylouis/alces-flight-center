@@ -4,7 +4,7 @@ class ClusterCheck < ApplicationRecord
 
   has_many :check_results
 
-  delegate :id, to: :check
-  delegate :name, to: :check
+  delegate :id, to: :check, allow_nil: true
+  delegate :name, to: :check, allow_nil: true
   delegate :check_category, to: :check
 end
