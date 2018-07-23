@@ -1,3 +1,4 @@
+<% check_groups = cluster.check_groups(@date_checks) %>
 <% content_for(:subtitle) { "Cluster checks for #{@date.to_formatted_s(:long)}" } %>
 <%= render 'partials/tabs', activate: :checks do %>
   <script type="text/javascript">
@@ -34,38 +35,43 @@
           <%= "#{cluster.no_of_checks_passed(@date)}/#{@date_checks.count}
             checks successful" %>
         </h3>
-        <%= render 'partials/table',
-          collection: cluster.check_results,
-          message: 'No cluster check results to display' do %>
-          <thead>
-            <tr class="nowrap">
-              <th>Engineer</th>
-              <th>Check</th>
-              <th>Comment</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @date_checks.each do |check_result| %>
-              <tr class="case-highlight">
-                <td><%= current_user == check_result.user ?
-                  raw('<strong>Me</strong>') : check_result.user.name %></td>
-                <td style="width: 30%;"><%= check_result.cluster_check.name %></td>
-                <td style="width: 40%;">
-                  <%= check_result.comment %>
-                </td>
-                <td class="nowrap">
-                  <% if check_result.result == 'Success' %>
-                    <i class="fa fa-check" style="color: #18bcb0;"/>
-                  <% elsif check_result.result == 'Failure' %>
-                    <i class="fa fa-remove" style="color: red;"/>
-                  <% else %>
-                    N/A
-                  <% end %>
-                </td>
+        <% check_groups.each do |group| %>
+          <h4><%= group[0].name %></h4>
+          <%= render 'partials/table',
+            collection: cluster.check_results,
+            message: 'No cluster check results to display' do %>
+            <thead>
+              <tr class="nowrap">
+                <th>Engineer</th>
+                <th>Check</th>
+                <th>Comment</th>
+                <th>Result</th>
               </tr>
-            <% end %>
-          </tbody>
+            </thead>
+            <tbody>
+              <% @date_checks.each do |check_result| %>
+                <% if check_result.check_category == group[0] %>
+                  <tr class="case-highlight">
+                    <td><%= current_user == check_result.user ?
+                      raw('<strong>Me</strong>') : check_result.user.name %></td>
+                    <td style="width: 30%;"><%= check_result.cluster_check.name %></td>
+                    <td style="width: 40%;">
+                      <%= check_result.comment %>
+                    </td>
+                    <td class="nowrap">
+                      <% if check_result.result == 'Success' %>
+                        <i class="fa fa-check" style="color: #18bcb0;"/>
+                        <% elsif check_result.result == 'Failure' %>
+                          <i class="fa fa-remove" style="color: red;"/>
+                          <% else %>
+                            N/A
+                          <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              <% end %>
+            </tbody>
+          <% end %>
         <% end %>
       <% end %>
     </div>
