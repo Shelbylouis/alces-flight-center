@@ -6,4 +6,5 @@ class ClusterCheck < ApplicationRecord
 
   delegate :id, to: :check
   delegate :name, to: :check
+  delegate :check_category, to: :check
 end
