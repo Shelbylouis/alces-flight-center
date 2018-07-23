@@ -101,6 +101,16 @@ class ClusterDecorator < ApplicationDecorator
     check_results.where(date: date).where.not(result: 'Failure').count
   end
 
+  def check_groups(checks)
+    checks.group_by do |c|
+      if c.is_a? ClusterCheck
+        c.check.check_category
+      else
+        c.cluster_check.check.check_category
+      end
+    end
+  end
+
   def check_results_class
     if no_of_checks_passed.zero?
       'text-danger'
