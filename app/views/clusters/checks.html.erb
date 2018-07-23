@@ -56,7 +56,8 @@
                       raw('<strong>Me</strong>') : check_result.user.name %></td>
                     <td style="width: 30%;"><%= check_result.cluster_check.name %></td>
                     <td style="width: 40%;">
-                      <%= check_result.comment %>
+                      <%= check_result.comment.empty? ?
+                        raw('<em>N/A</em>') : check_result.comment %>
                     </td>
                     <td class="nowrap">
                       <% if check_result.result == 'Success' %>
