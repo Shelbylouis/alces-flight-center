@@ -26,10 +26,5 @@ function enablePopovers() {
   $('[data-toggle="popover"]').popover();
 }
 
-function enableCollapses() {
-  $('.collapse').collapse();
-}
-
 document.addEventListener('turbolinks:load', enableTooltips);
 document.addEventListener('turbolinks:load', enablePopovers);
-document.addEventListener('turbolinks:load', enableCollapses);
