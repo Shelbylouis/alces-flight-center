@@ -64,7 +64,7 @@
                           ]
               %>
               <%= link_to "View cases",
-                          cluster_cases_path(cluster),
+                          cluster_cases_path(cluster, state: 'open'),
                           class: [
                             'btn',
                             'btn-primary'
