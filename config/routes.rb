@@ -231,7 +231,6 @@ Rails.application.routes.draw do
 
   constraints Clearance::Constraints::SignedOut.new do
     root 'sso_sessions#new', as: 'sign_in'
-    resource :users, only: [:show]
   end
 
   # Routes defined here are only defined/used in certain tests which need
