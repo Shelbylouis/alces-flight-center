@@ -6,7 +6,7 @@
         <%= link_to site.name, site_path(site) %>
         &mdash;
         <%= link_to "Manage Support Cases (#{site.cases.active.size})",
-            site_cases_path(site) %>
+            site_cases_path(site, state: 'open') %>
       </li>
     <% end %>
   </ul>
