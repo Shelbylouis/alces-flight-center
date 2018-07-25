@@ -1,16 +1,16 @@
-<div id="markdown-editor">
+<div data-markdown-editor>
     <ul class="nav nav-tabs">
         <li class='nav-item <%= 'nav-link--active' if activate == 'write' %>'>
             <%= form_builder.button 'Write',
                 class: 'btn btn-link',
-                id: 'markdown-write-button',
+                'data-markdown-write-button': true,
                 'data-write-url': write_path
             %>
         </li>
         <li class='nav-item <%= 'nav-link--active' if activate == 'preview' %>'>
             <%= form_builder.button 'Preview',
                 class: 'btn btn-link',
-                id: 'markdown-preview-button',
+                'data-markdown-preview-button': true,
                 'data-preview-url': preview_path
             %>
         </li>
