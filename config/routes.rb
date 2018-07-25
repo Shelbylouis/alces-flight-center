@@ -195,6 +195,8 @@ Rails.application.routes.draw do
       get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
       get '/checks/submit', to: 'clusters#check_submission', as: :check_submission
       post '/checks/submit', to: 'clusters#check_results', as: :set_check_results
+      post '/checks/submit/preview', to: 'clusters#preview'
+      post '/checks/submit/write', to: 'clusters#write'
       get '/checks(/:date)', to: 'clusters#checks', as: :checks
     end
 
