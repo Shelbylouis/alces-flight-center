@@ -25,8 +25,6 @@ function showWrite(event, editor) {
 }
 
 function getData(editor) {
-  console.log('Get data!');
-  console.log(editor);
   const contentElement = editor.find(('[data-markdown-content]'))[0]
   return {
       authenticity_token: window._authenticity_token,
