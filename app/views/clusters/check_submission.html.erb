@@ -6,7 +6,7 @@
       There are no checks for this cluster currently
     </em></p>
   <% else %>
-    <%= form_tag(cluster_set_check_results_path(cluster)) do %>
+    <%= form_for :check_result, as: :post, url: cluster_set_check_results_path(cluster) do |f| %>
       <% if cluster.last_checked == Date.today %>
         <p style="text-align: center;">
         Results have already been submitted for today. Check back tomorrow to submit new results.
@@ -25,11 +25,13 @@
                     <th>Check</th>
                     <th>Command</th>
                     <th>Comment</th>
+                    <th>Component</th>
                     <th>Result</th>
                   </tr>
                 </thead>
                 <tbody>
                   <% group[1].each_with_index do |cluster_check, index| %>
+                    <% cluster_check_id = cluster_check.id %>
                     <tr class="case-highlight">
                       <td style="width: 30%;"><%= cluster_check.check.name %></td>
                       <td style="width: 20%;">
@@ -37,26 +39,49 @@
                         <%= cluster_check.check.command %>
                         </p>
                       </td>
-                      <td style="width: 40%;">
-                        <input type="text" style="width: 100%" placeholder=
-                        "(Optional) Enter a comment about the check here"
-                                           name="<%= "#{cluster_check.id}-comment" %>"> </input>
+                      <td style="width: 35%;">
+                        <%= render 'partials/markdown_editor_layout',
+                          activate: 'write',
+                          form_builder: f,
+                          preview_path: cluster_checks_submit_preview_path(
+                            cluster,
+                            cluster_check_id
+                          ),
+                          write_path: cluster_checks_submit_write_path(
+                            cluster,
+                            cluster_check_id
+                          ) do %>
+
+                          <%= render 'markdown_content',
+                            form_builder: f,
+                            index: cluster_check_id,
+                            value: nil
+                          %>
+                        <% end %>
+                      </td>
+                      <td style="width: 15%;">
+                        <%= collection_select :check_result,
+                          :component_id,
+                          cluster.components,
+                          :id,
+                          :name,
+                          { include_blank: true },
+                          { class: 'form-control' } %>
                       </td>
                       <td class="nowrap">
                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
                           <label class="btn btn-primary">
                             <input type="radio"
-                                   name="<%= "#{cluster_check.id}-result" %>"
+                                   name="<%= "#{cluster_check_id}-result" %>"
                                    id="success"
                                    autocomplete="off"
-                                   checked="checked"
                                    value="Success" required>
                                    <i class="fa fa-check" style="color: #18bcb0;"></i>
                             </input>
                           </label>
                           <label class="btn btn-primary">
                             <input type="radio"
-                                   name="<%= "#{cluster_check.id}-result" %>"
+                                   name="<%= "#{cluster_check_id}-result" %>"
                                    id="failure"
                                    autocomplete="off"
                                    value="Failure">
@@ -65,7 +90,7 @@
                           </label>
                           <label class="btn btn-primary">
                             <input type="radio"
-                                   name="<%= "#{cluster_check.id}-result" %>"
+                                   name="<%= "#{cluster_check_id}-result" %>"
                                    id="na"
                                    autocomplete="off"
                                    value="N/A">
