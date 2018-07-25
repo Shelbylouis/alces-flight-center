@@ -115,6 +115,8 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    commonmarker (0.17.9)
+      ruby-enum (~> 0.5)
     concurrent-ruby (1.0.5)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
@@ -197,7 +199,6 @@ GEM
       activerecord
       kaminari-core (= 1.1.1)
     kaminari-core (1.1.1)
-    kramdown (1.17.0)
     launchy (2.4.3)
       addressable (~> 2.3)
     listen (3.1.5)
@@ -354,6 +355,8 @@ GEM
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (~> 1.0, >= 1.0.1)
+    ruby-enum (0.7.2)
+      i18n
     ruby-graphviz (1.2.3)
     ruby-progressbar (1.9.0)
     ruby_dep (1.5.0)
@@ -458,6 +461,7 @@ DEPENDENCIES
   byebug
   capybara (~> 2.13)
   clearance
+  commonmarker
   data_migrate
   development_ribbon
   dotenv-rails
@@ -469,7 +473,6 @@ DEPENDENCIES
   jbuilder (~> 2.5)
   jquery-rails
   jwt
-  kramdown
   listen (>= 3.0.5, < 3.2)
   nullalign
   pg (~> 0.18)
