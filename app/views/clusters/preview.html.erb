@@ -1,0 +1,24 @@
+<%
+  index = params[:format]
+  form_builder = nil
+  form_for :check_result, as: :post, url: cluster_set_check_results_path(cluster) do |f|
+    form_builder = f
+  end
+%>
+
+<%= render 'partials/markdown_editor_layout',
+  activate: 'preview',
+  form_builder: form_builder,
+  preview_path: cluster_checks_submit_preview_path(cluster, index),
+  write_path: cluster_checks_submit_write_path(cluster, index),
+  index: index do %>
+
+  <%= form_builder.hidden_field :text,
+    'data-markdown-content': true,
+    name: "#{index}-comment",
+    value: @check_result_comment
+  %>
+  <div class="border-bottom p-2">
+    <%= MarkdownRenderer.render(@check_result_comment || '').html_safe %>
+  </div>
+<% end %>
