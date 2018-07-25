@@ -127,21 +127,47 @@ RSpec.describe 'Cluster credit usage', type: :feature do
         end.not_to raise_error
       end
 
-      it 'allows admin to make a deposit for a given day' do
-        visit cluster_credit_usage_path(cluster, as: admin)
-        fill_in 'credit_deposit[amount]', with: 42
-        fill_in 'credit_deposit[effective_date]', with: '2018-01-01'
-        click_on 'Add credits'
+      RSpec.shared_examples 'allows deposit' do
+        it 'allows deposit' do
+          visit cluster_credit_usage_path(cluster, as: admin)
+          fill_in 'credit_deposit[amount]', with: 42
+          fill_in 'credit_deposit[effective_date]', with: effective_date
+          click_on 'Add credits'
 
-        cluster.reload
+          cluster.reload
 
-        expect(cluster.credit_balance).to eq 42
-        deposits = cluster.credit_deposits
-        expect(cluster.credit_deposits.count).to eq 1
-        expect(deposits[0].amount).to eq 42
-        expect(deposits[0].effective_date).to eq Date.parse('2018-01-01')
+          expect(cluster.credit_balance).to eq 42
+          deposits = cluster.credit_deposits
+          expect(cluster.credit_deposits.count).to eq 1
+          expect(deposits[0].amount).to eq 42
+          expect(deposits[0].effective_date).to eq effective_date
 
-        expect(find('.alert-success')).to have_text('42 credits added to cluster')
+          expect(find('.alert-success')).to have_text('42 credits added to cluster')
+        end
+      end
+
+      context 'for dates in the past' do
+        let(:effective_date) { Date.today - 1.day }
+        include_examples 'allows deposit'
+      end
+
+      context 'for today\'s date' do
+        let(:effective_date) { Date.today }
+        include_examples 'allows deposit'
+      end
+
+      context 'with dates in the future' do
+        let(:effective_date) { Date.today + 1.day }
+        it 'rejects deposit' do
+          visit cluster_credit_usage_path(cluster, as: admin)
+          fill_in 'credit_deposit[amount]', with: 42
+          fill_in 'credit_deposit[effective_date]', with: effective_date
+          click_on 'Add credits'
+
+          cluster.reload
+          expect(cluster.credit_balance).to eq 0
+          expect(find('.alert-danger')).to have_text 'Error while trying to deposit credits for this cluster'
+        end
       end
     end
 

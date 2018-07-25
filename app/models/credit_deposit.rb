@@ -10,4 +10,14 @@ class CreditDeposit < CreditEvent
 
   validates :effective_date, presence: true
 
+  validate :effective_date_not_future
+
+  private
+
+  def effective_date_not_future
+    if effective_date.future?
+      errors.add(:effective_date, 'cannot be in the future')
+    end
+  end
+
 end

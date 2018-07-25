@@ -20,6 +20,7 @@
         <%= date_field :credit_deposit,
                        :effective_date,
                        class: 'form-control',
+                       max: Date.today,
                        required: true,
                        value: Date.today
         %>
