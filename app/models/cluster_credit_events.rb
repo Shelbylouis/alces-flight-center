@@ -9,7 +9,7 @@ class ClusterCreditEvents
 
   def events
     (charges + deposits)
-      .sort_by(&:created_at)
+      .sort_by(&:effective_date)
       .reverse!
   end
 
