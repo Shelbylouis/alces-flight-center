@@ -8,14 +8,7 @@ class CreditCharge < CreditEvent
     only_integer: true,
   }
 
-  validates :effective_date, presence: true, if: :persisted?
-
   before_save :set_effective_date
-
-
-  scope :in_period, lambda { |start_date, end_date|
-    where(effective_date: start_date..end_date)
-  }
 
   private
 

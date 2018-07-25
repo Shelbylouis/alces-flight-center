@@ -21,7 +21,7 @@ class ClustersController < ApplicationController
     authorize @cluster
 
     deposit_params = params.require(:credit_deposit)
-                           .permit(:amount)
+                           .permit(:amount, :effective_date)
                            .merge(user: current_user)
 
     begin

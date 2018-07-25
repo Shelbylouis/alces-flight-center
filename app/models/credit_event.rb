@@ -9,6 +9,12 @@ class CreditEvent < ApplicationRecord
                 only_integer: true,
             }
 
-  attr_readonly :user, :amount
+  validates :effective_date, presence: true, if: :persisted?
+
+  attr_readonly :user, :amount, :effective_date
+
+  scope :in_period, lambda { |start_date, end_date|
+    where(effective_date: start_date..end_date)
+  }
 
 end
