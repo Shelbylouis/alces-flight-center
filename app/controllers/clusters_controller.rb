@@ -65,6 +65,27 @@ class ClustersController < ApplicationController
     @date_checks = cluster.check_results_by_date(@date)
   end
 
+  def preview
+      @check_result_comment ||= nil
+      params.each do |key, value|
+        @check_result_comment = value if key.include? 'comment'
+      end
+
+      authorize @cluster, :create?
+
+      render layout: false
+  end
+
+  def write
+      params.each do |key, value|
+        @check_result_comment = value if key.include? 'comment'
+      end
+
+      authorize @cluster, :create?
+
+      render layout: false
+  end
+
   private
 
   def start_date
