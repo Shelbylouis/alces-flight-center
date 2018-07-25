@@ -40,8 +40,9 @@ Rails.application.configure do
     host: 'center.alces-flight.lvh.me:3000'
   }
 
-  # Do not send emails in development.
-  config.action_mailer.perform_deliveries = false
+  # Send emails to Letter Opener Web in development.
+  config.action_mailer.delivery_method = :letter_opener_web
+  config.action_mailer.perform_deliveries = true
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

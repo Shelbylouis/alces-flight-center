@@ -79,6 +79,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'vcr'
   gem 'webmock'
+  gem 'letter_opener_web', '~> 1.0'
 end
 
 group :test do
