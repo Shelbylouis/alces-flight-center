@@ -1,6 +1,6 @@
 
 Time::DATE_FORMATS[:long] = lambda do |time|
-  time.strftime("%A, #{time.day.ordinalize} %B %Y, %H:%M%P")
+  time.strftime("%A, #{time.day.ordinalize} %B %Y, %H:%M")
 end
 Date::DATE_FORMATS[:long] = lambda do |time|
   time.strftime("%A, #{time.day.ordinalize} %B %Y")
