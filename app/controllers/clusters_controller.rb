@@ -50,6 +50,16 @@ class ClustersController < ApplicationController
         result: params["#{id}-result"],
         comment: params["#{id}-comment"]
       )
+
+      if params["#{id}-component"]
+        new_log = @cluster.logs.build(
+          details: params["#{id}-comment"],
+          component_id: params["#{id}-component"],
+          user_id: current_user.id
+        )
+        SlackNotifier.log_notification(new_log) if new_log.save
+      end
+
       if result.save
         flash[:success] = 'Cluster check results successfully saved.'
       else
