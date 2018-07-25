@@ -7,7 +7,7 @@ function showPreview(event, editor) {
   })
     .then((content) => {
       editor.html(content);
-      configureMarkdownPreview();
+      configureEditor(editor);
     });
 }
 
@@ -20,12 +20,14 @@ function showWrite(event, editor) {
   })
     .then((content) => {
       editor.html(content);
-      configureMarkdownPreview();
+      configureEditor(editor);
     });
 }
 
 function getData(editor) {
-  const contentElement = editor.find($('[data-markdown-content]'))[0]
+  console.log('Get data!');
+  console.log(editor);
+  const contentElement = editor.find(('[data-markdown-content]'))[0]
   return {
       authenticity_token: window._authenticity_token,
       [contentElement.name]: contentElement.value,
@@ -35,9 +37,13 @@ function getData(editor) {
 function configureMarkdownPreview() {
   const editor = $('[data-markdown-editor]');
   editor.each(function(e){
-    $(this).find('[data-markdown-preview-button]').click((e) => showPreview(e, $(this)));
-    $(this).find('[data-markdown-write-button]').click((e) => showWrite(e, $(this)));
+    configureEditor($(this))
   })
+};
+
+function configureEditor(editor) {
+  editor.find('[data-markdown-preview-button]').click((e) => showPreview(e, editor));
+  editor.find('[data-markdown-write-button]').click((e) => showWrite(e, editor));
 };
 
 document.addEventListener('turbolinks:load', configureMarkdownPreview);
