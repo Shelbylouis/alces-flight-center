@@ -47,4 +47,9 @@
     padding: 3px;
     border-radius: 5px;
   }
+
+  pre code {
+    word-break: break-all;
+    white-spae: pre-wrap;
+  }
 }
