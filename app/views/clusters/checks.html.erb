@@ -57,7 +57,7 @@
                     <td style="width: 30%;"><%= check_result.cluster_check.name %></td>
                     <td style="width: 40%;">
                       <%= check_result.comment.empty? ?
-                        raw('<em>N/A</em>') : check_result.comment %>
+                        raw('<em>N/A</em>') : MarkdownRenderer.render(check_result.comment || '').html_safe%>
                     </td>
                     <td class="nowrap">
                       <% if check_result.result == 'Success' %>
