@@ -55,4 +55,8 @@ module MailerHelper
   def case_url(kase)
     cluster_case_url(kase.cluster, kase)
   end
+
+  def markdown_format(text)
+    MarkdownRenderer.render(text).html_safe
+  end
 end
