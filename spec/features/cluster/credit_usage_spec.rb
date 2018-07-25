@@ -166,7 +166,7 @@ RSpec.describe 'Cluster credit usage', type: :feature do
 
           cluster.reload
           expect(cluster.credit_balance).to eq 0
-          expect(find('.alert-danger')).to have_text 'Error while trying to deposit credits for this cluster'
+          expect(find('.alert-danger')).to have_text 'Effective date cannot be in the future'
         end
       end
     end
