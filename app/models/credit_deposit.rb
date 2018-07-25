@@ -15,7 +15,7 @@ class CreditDeposit < CreditEvent
   private
 
   def effective_date_not_future
-    if effective_date.future?
+    if effective_date&.future?
       errors.add(:effective_date, 'cannot be in the future')
     end
   end
