@@ -87,6 +87,36 @@ RSpec.describe 'Cluster credit usage', type: :feature do
     end
   end
 
+  context 'when case is resolved in different quarter to when it was charged' do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:kase) { create(:open_case, cluster: cluster, subject: 'Important case') }
+
+    it 'uses resolution date to filter charge events' do
+      travel_to Time.zone.local(2018, 6, 1) do  # Resolve in Q3 2018
+        kase.resolve!(admin)
+      end
+
+      kase.reload
+      expect(kase.resolution_date).to eq(Time.zone.local(2018, 6, 1))
+
+      travel_to Time.zone.local(2018, 9, 1) do  # Close in Q4 2018
+        kase.create_credit_charge(amount:1, user: admin)
+        kase.close!
+      end
+
+      visit cluster_credit_usage_path(cluster, start_date: '2018-06-01', as: admin)
+      events = find_all('li.credit-charge-entry')
+      expect(events.length).to eq 1
+      expect(events[0]).to have_text('Important case')
+
+      visit cluster_credit_usage_path(cluster, start_date: '2018-09-01', as: admin)
+      events = find_all('li.credit-charge-entry')
+      expect(events.length).to eq 0
+    end
+
+  end
+
   describe 'credit deposits' do
     context 'as an admin' do
       it 'shows credit deposit form' do

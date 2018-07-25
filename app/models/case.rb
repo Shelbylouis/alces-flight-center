@@ -326,6 +326,13 @@ class Case < ApplicationRecord
     change_request.present? && !change_request.finalised?
   end
 
+  def resolution_date
+    # NB This assumes that each case will only ever be resolved once
+    # If we decide to allow reopening cases then we'll want this to be e.g.
+    # transitions.where(event: 'resolve').last
+    transitions.find_by_event('resolve')&.created_at
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
