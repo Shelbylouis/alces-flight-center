@@ -1,40 +1,42 @@
 <% if policy(cluster).deposit? %>
-  <%= form_tag({controller: 'clusters', action: 'deposit'},
-               method: :post,
-               class: 'form',
-               id: 'credit-deposit-form'
-      ) do %>
-    <h4>Deposit credits</h4>
-    <div class="form-row">
-      <div class="col">
-        <label>
-          Amount
-          <%= number_field :credit_deposit,
-                           :amount,
+  <div class="card">
+    <%= form_tag({controller: 'clusters', action: 'deposit'},
+                 method: :post,
+                 class: 'form card-body',
+                 id: 'credit-deposit-form'
+        ) do %>
+      <h4>Deposit credits</h4>
+      <div class="form-row">
+        <div class="col">
+          <label>
+            Amount
+            <%= number_field :credit_deposit,
+                             :amount,
+                             class: 'form-control',
+                             min: 1,
+                             required: true
+            %>
+          </label>
+        </div>
+        <div class="col">
+          <label>
+            Effective date
+            <%= date_field :credit_deposit,
+                           :effective_date,
                            class: 'form-control',
-                           min: 1,
-                           required: true
-          %>
-        </label>
+                           max: Date.today,
+                           required: true,
+                           value: Date.today
+            %>
+          </label>
+        </div>
       </div>
-      <div class="col">
-        <label>
-          Effective date
-          <%= date_field :credit_deposit,
-                         :effective_date,
-                         class: 'form-control',
-                         max: Date.today,
-                         required: true,
-                         value: Date.today
-          %>
-        </label>
-      </div>
-    </div>
-    <%= submit_tag 'Add credits',
-                   class: 'form-control btn btn-primary',
-                   data: {
-                       confirm: 'Are you sure you want to add support credits to this cluster?'
-                   }
-    %>
-  <% end %>
+      <%= submit_tag 'Add credits',
+                     class: 'form-control btn btn-primary',
+                     data: {
+                         confirm: 'Are you sure you want to add support credits to this cluster?'
+                     }
+      %>
+    <% end %>
+  </div>
 <% end %>
