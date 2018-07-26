@@ -16,8 +16,8 @@
                value="<%= @date %>"
                onchange="dateChanged(this.value)"
                />
-               <div class="input-group-append">
-                 <input type="submit" class="btn btn-primary" value="View"/>
+               <div class="input-group-prepend">
+                 <span class="input-group-text">Change Date</span>
                </div>
       </div>
       <% if @date_checks.empty? %>
