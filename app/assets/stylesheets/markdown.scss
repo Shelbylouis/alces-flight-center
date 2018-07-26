@@ -31,4 +31,25 @@
   thead {
     @extend .thead-dark;
   }
+
+  pre {
+    display: block;
+    color: #212529;
+    background: #f0f0f0;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
+  code {
+    color: #212529;
+    word-break: break-word;
+    background-color: #f0f0f0;
+    padding: 3px;
+    border-radius: 5px;
+  }
+
+  pre code {
+    word-break: break-all;
+    white-space: pre-wrap;
+  }
 }
