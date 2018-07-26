@@ -51,7 +51,7 @@ class ClustersController < ApplicationController
         comment: params["#{id}-comment"]
       )
 
-      if params["#{id}-component"]
+      unless Component.find_by_id(params["#{id}-component"]).nil?
         new_log = @cluster.logs.build(
           details: params["#{id}-comment"],
           component_id: params["#{id}-component"],
