@@ -9,7 +9,7 @@
     <%= form_for :check_result, as: :post, url: cluster_set_check_results_path(cluster) do |f| %>
       <% if cluster.last_checked == Date.today %>
         <p style="text-align: center;">
-        Results have already been submitted for today. Check back tomorrow to submit new results.
+          Results have already been submitted for today. Check back tomorrow to submit new results.
         </p>
       <% else %>
         <div class="card-body row">
@@ -33,13 +33,13 @@
                   <% group[1].each_with_index do |cluster_check, index| %>
                     <% cluster_check_id = cluster_check.id %>
                     <tr class="case-highlight">
-                      <td style="width: 30%;"><%= cluster_check.check.name %></td>
+                      <td style="width: 20%;"><%= cluster_check.check.name %></td>
                       <td style="width: 20%;">
                         <p style="color: #ea3ea6; font-style: italic;">
-                        <%= cluster_check.check.command %>
+                          <%= cluster_check.check.command %>
                         </p>
                       </td>
-                      <td style="width: 35%;">
+                      <td style="width: 45%;">
                         <%= render 'partials/markdown_editor_layout',
                           activate: 'write',
                           form_builder: f,
@@ -66,7 +66,7 @@
                           :id,
                           :name,
                           { include_blank: true },
-                          { class: 'form-control' } %>
+                          { class: 'form-control', name: "#{cluster_check_id}-component" } %>
                       </td>
                       <td class="nowrap">
                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -105,7 +105,10 @@
               <% end %>
             <% end %>
           </div>
-          <input type="submit" class="btn btn-primary btn-block" value="Submit Cluster Check Results">
+          <input type="submit"
+                 class="btn btn-primary btn-block"
+                 value="Submit Cluster Check Results">
+          </input>
         </div>
       <% end %>
     <% end %>
