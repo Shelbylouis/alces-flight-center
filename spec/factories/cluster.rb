@@ -25,5 +25,6 @@ FactoryBot.define do
     association :cluster
     association :user, factory: :admin
     amount 10
+    effective_date Date.today
   end
 end

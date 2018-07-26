@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_24_142635) do
+ActiveRecord::Schema.define(version: 2018_07_26_120909) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -243,6 +243,7 @@ ActiveRecord::Schema.define(version: 2018_07_24_142635) do
     t.integer "amount", null: false
     t.date "effective_date"
     t.index ["case_id"], name: "index_credit_charges_on_case_id"
+    t.index ["effective_date"], name: "index_credit_charges_on_effective_date"
     t.index ["user_id"], name: "index_credit_charges_on_user_id"
   end
 
@@ -252,7 +253,9 @@ ActiveRecord::Schema.define(version: 2018_07_24_142635) do
     t.bigint "cluster_id", null: false
     t.bigint "user_id", null: false
     t.integer "amount", null: false
+    t.date "effective_date", null: false
     t.index ["cluster_id"], name: "index_credit_deposits_on_cluster_id"
+    t.index ["effective_date"], name: "index_credit_deposits_on_effective_date"
     t.index ["user_id"], name: "index_credit_deposits_on_user_id"
   end
 

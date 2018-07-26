@@ -8,9 +8,16 @@ class CreditDeposit < CreditEvent
     only_integer: true,
   }
 
-  # When we add `effective_date`s to deposits, this and the equivalent method in
-  # CreditCharge can be pulled up into CreditEvent
-  scope :in_period, lambda { |start_date, end_date|
-    where(created_at: start_date..end_date)
-  }
+  validates :effective_date, presence: true
+
+  validate :effective_date_not_future
+
+  private
+
+  def effective_date_not_future
+    if effective_date&.future?
+      errors.add(:effective_date, 'cannot be in the future')
+    end
+  end
+
 end

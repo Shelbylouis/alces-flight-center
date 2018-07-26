@@ -21,14 +21,14 @@ class ClustersController < ApplicationController
     authorize @cluster
 
     deposit_params = params.require(:credit_deposit)
-                           .permit(:amount)
+                           .permit(:amount, :effective_date)
                            .merge(user: current_user)
 
     begin
       deposit = @cluster.credit_deposits.create!(deposit_params)
       flash[:success] = "#{view_context.pluralize(deposit.amount, 'credit')} added to cluster #{@cluster.name}."
-    rescue
-      flash[:error] = 'Error while trying to deposit credits for this cluster.'
+    rescue ActiveRecord::RecordInvalid => e
+      flash[:error] = "Error while trying to deposit credits for this cluster: #{e.message}"
     end
 
     redirect_to cluster_credit_usage_path(@cluster)
