@@ -3,4 +3,5 @@ class CheckResult < ApplicationRecord
   belongs_to :user
 
   delegate :check_category, to: :cluster_check
+  delegate :site, to: :cluster_check
 end
