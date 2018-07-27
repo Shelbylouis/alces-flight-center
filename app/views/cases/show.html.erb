@@ -1,3 +1,10 @@
+<% content_for :title do %>
+  <div class="card title-card">
+    <div class="card-body">
+      <h1><%= @case.display_id %>: <%= @case.subject %></h1>
+    </div>
+  </div>
+<% end %>
 <%= render 'partials/tabs', activate: :cases do %>
   <div class='table-responsive'>
     <table class="table case-table">
