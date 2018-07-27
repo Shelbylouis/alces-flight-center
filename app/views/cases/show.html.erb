@@ -1,7 +1,31 @@
 <% content_for :title do %>
   <div class="card title-card">
     <div class="card-body">
-      <h1><%= @case.display_id %>: <%= @case.subject %></h1>
+      <h1>
+        <% if policy(@case).edit? %>
+          <div class="case-subject-edit collapse show">
+            <%= @case.display_id %>: <%= @case.subject %>
+            <button class="btn btn-link" data-toggle="collapse" data-target=".case-subject-edit">
+              <i class="fa fa-2x fa-pencil"></i>
+            </button>
+          </div>
+          <div class="case-subject-edit collapse">
+            <%= form_for @case do |f| %>
+              <div class="form-row align-items-center">
+                <div class="col">
+                  <%= f.text_field :subject, class: 'form-control form-control-lg' %>
+                </div>
+                <div class="col-auto">
+                  <%= f.submit 'Change subject', class: 'btn btn-primary mb-2' %>
+                  <a class="btn btn-secondary mb-2" data-toggle="collapse" data-target=".case-subject-edit" tabindex="1">
+                    Cancel
+                  </a>
+                </div>
+              </div>
+          <% end %>
+          </div>
+        <% end %>
+      </h1>
     </div>
   </div>
 <% end %>
