@@ -6,6 +6,11 @@ class ApplicationMailer < ActionMailer::Base
   include Roadie::Rails::Automatic
   extend Alces::Mailer::Resender
 
+  # As we only use CC recipients right now, we need to add this in
+  # development in order to convince Letter Opener to work as, FSR, it
+  # requires a To recipient.
+  default to: 'nobody@example.com' if Rails.env.development?
+
   default from: "#{Rails.application.config.email_from}"
   layout 'mailer'
   helper 'mailer'

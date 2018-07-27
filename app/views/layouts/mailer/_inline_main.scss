@@ -8,6 +8,10 @@
 /* Alces Portal main inlined styles */
 
 @import 'layouts/mailer/settings';
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+@import "bootstrap/tables";
 
 body {
     font-family: $c-fontFamily--base;
@@ -109,13 +113,54 @@ dd {
     padding: 5px;
 }
 
-code {
-    color: #85643b;
-    background-color: rgb(255,244,231);
-    background-color: rgba(255,244,231,0.7);
-    border-radius: 4px;
-    font-size: 16px;
-    padding: 2px 4px;
+.markdown {
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  h4 {
+    font-size: 0.75rem;
+  }
+
+  pre {
+    display: block;
+    color: #212529;
+    background: #f0f0f0;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
+  code {
+    color: #212529;
+    word-break: break-word;
+    background-color: #f0f0f0;
+    padding: 3px;
+    border-radius: 5px;
+  }
+
+  pre code {
+    word-break: break-all;
+    white-space: pre-wrap;
+  }
+
+  table {
+    @extend .table;
+    @extend .table-bordered;
+    @extend .table-sm;
+    width: unset;
+  }
+
+  thead {
+    @extend .thead-dark;
+  }
 }
 
 div.blockquote {
@@ -125,7 +170,8 @@ div.blockquote {
     background-color: $c-primary-color--lightest;
     border: 1px solid $c-primary-color;
     line-height: 1.5rem;
-
+    max-width: 600px;
+    
     table tbody td {
         padding: 1px 10px;
     }
