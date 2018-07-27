@@ -43,22 +43,24 @@ class ClustersController < ApplicationController
 
     @cluster.cluster_checks.each do |cluster_check|
       id = cluster_check.id
+
+      unless Component.find_by_id(params["#{id}-component"]).nil?
+        @new_log = @cluster.logs.build(
+          details: params["#{id}-comment"],
+          component_id: params["#{id}-component"],
+          user_id: current_user.id
+        )
+        SlackNotifier.log_notification(@new_log) if @new_log.save
+      end
+
       result = CheckResult.new(
         cluster_check: cluster_check,
         date: Date.today,
         user: current_user,
         result: params["#{id}-result"],
-        comment: params["#{id}-comment"]
+        comment: params["#{id}-comment"],
+        log_id: @new_log.id || nil
       )
-
-      unless Component.find_by_id(params["#{id}-component"]).nil?
-        new_log = @cluster.logs.build(
-          details: params["#{id}-comment"],
-          component_id: params["#{id}-component"],
-          user_id: current_user.id
-        )
-        SlackNotifier.log_notification(new_log) if new_log.save
-      end
 
       if result.save
         flash[:success] = 'Cluster check results successfully saved.'
