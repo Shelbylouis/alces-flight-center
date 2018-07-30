@@ -19,9 +19,9 @@ RSpec.describe 'Cluster credit usage', type: :feature do
 
     expect(events.length).to eq 4
 
-    expect(events[3].text).to match(/#{c3.display_id}.*-4 credits$/)
+    expect(events[3].text).to match(/#{c3.display_id}.*4 credits$/)
     expect(events[2].text).to match(/#{c2.display_id}.*0 credits$/)
-    expect(events[1].text).to match(/#{c1.display_id}.*-1 credits$/)
+    expect(events[1].text).to match(/#{c1.display_id}.*1 credit$/)
     expect(events[0].text).to match(/Credits added.* 10 credits$/)
 
     expect(find('p.credit-balance').text).to eq '5 credits'
@@ -69,14 +69,14 @@ RSpec.describe 'Cluster credit usage', type: :feature do
       events = find_all('li.credit-charge-entry')
 
       expect(events.length).to eq 1
-      expect(events[0].text).to match(/-1 credits$/)
+      expect(events[0].text).to match(/1 credit$/)
 
       visit cluster_credit_usage_path(cluster, start_date: '2017-10-01', as: user)
 
       events = find_all('li.credit-charge-entry')
 
       expect(events.length).to eq 2
-      expect(events[1].text).to match(/-2 credits$/)
+      expect(events[1].text).to match(/2 credits$/)
       expect(events[0].text).to match(/Credits added.* 4 credits$/)
 
       visit cluster_credit_usage_path(cluster, start_date: '2018-01-01', as: user)
