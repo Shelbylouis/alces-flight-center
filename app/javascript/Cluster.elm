@@ -47,13 +47,16 @@ type Id
 
 decoder : D.Decoder Cluster
 decoder =
-    D.field "motd" D.string
+    D.field "motd" (D.nullable D.string)
         |> D.andThen decodeWithMotd
 
 
-decodeWithMotd : String -> D.Decoder Cluster
-decodeWithMotd motd =
+decodeWithMotd : Maybe String -> D.Decoder Cluster
+decodeWithMotd maybeMotd =
     let
+        motd =
+            Maybe.withDefault "" maybeMotd
+
         serviceDecoder =
             Service.decoder motd
     in
