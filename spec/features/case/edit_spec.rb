@@ -28,6 +28,10 @@ RSpec.describe 'Case editing', type: :feature do
       click_button 'Change subject'
 
       expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
+
+      expect(find('.event-card')).to \
+        have_text 'Changed the subject of this case from \'Original subject\' to \'New subject\''
+
       kase.reload
 
       expect(kase.subject).to eq 'New subject'
