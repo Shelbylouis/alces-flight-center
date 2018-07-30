@@ -1,4 +1,7 @@
 class ClusterCheck < ApplicationRecord
+  include BelongsToCluster
+  include AdminConfig::ClusterCheck
+
   belongs_to :cluster
   belongs_to :check
 
