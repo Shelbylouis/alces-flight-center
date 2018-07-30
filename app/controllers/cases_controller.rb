@@ -82,6 +82,16 @@ class CasesController < ApplicationController
     end
   end
 
+  UPDATABLE_FIELDS = [:subject].freeze
+
+  def update
+   change_action 'Support case %s updated.' do |kase|
+      kase.update(  # update! doesn't work here :( But we call save! later anyway
+        params.require(:case).permit(UPDATABLE_FIELDS)
+      )
+    end
+  end
+
   def close
     charge_params = params.require(:credit_charge)
                           .permit(:amount)
