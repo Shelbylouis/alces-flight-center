@@ -59,7 +59,7 @@ class ClustersController < ApplicationController
         user: current_user,
         result: params["#{id}-result"],
         comment: params["#{id}-comment"],
-        log_id: @new_log.id || nil
+        log_id: @new_log ? @new_log.id : nil
       )
 
       if result.save
