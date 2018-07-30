@@ -11,7 +11,6 @@
 @import "bootstrap/functions";
 @import "bootstrap/variables";
 @import "bootstrap/mixins";
-@import "bootstrap/tables";
 
 body {
     font-family: $c-fontFamily--base;
@@ -152,14 +151,52 @@ dd {
   }
 
   table {
-    @extend .table;
-    @extend .table-bordered;
-    @extend .table-sm;
-    width: unset;
+    // Bootstrap table
+    max-width: 100%;
+    margin-bottom: $spacer;
+
+    th,
+    td {
+      padding: $table-cell-padding-sm;  // .table-sm
+      vertical-align: top;
+      border-top: $table-border-width solid $table-border-color;
+    }
+
+    thead th {
+      vertical-align: bottom;
+      border-bottom: (2 * $table-border-width) solid $table-border-color;
+    }
+
+    tbody + tbody {
+      border-top: (2 * $table-border-width) solid $table-border-color;
+    }
+
+    background-color: $body-bg;
+
+    // Bootstrap table-bordered
+
+    border: $table-border-width solid $table-border-color;
+
+    th,
+    td {
+      border: $table-border-width solid $table-border-color;
+    }
+
+    thead {
+      th,
+      td {
+        border-bottom-width: (2 * $table-border-width);
+      }
+    }
   }
 
+  // Bootstrap .thead-dark
   thead {
-    @extend .thead-dark;
+    th {
+      color: $table-dark-color;
+      background-color: $table-dark-bg;
+      border-color: $table-dark-border-color;
+    }
   }
 }
 
