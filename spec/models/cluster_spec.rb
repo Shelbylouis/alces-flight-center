@@ -7,8 +7,6 @@ RSpec.describe Cluster, type: :model do
   describe '#valid?' do
     subject { create(:cluster) }
 
-    it { is_expected.to validate_presence_of(:motd) }
-
     context 'when managed cluster' do
       subject do
         create(:managed_cluster)
