@@ -17,7 +17,6 @@ module Audited
     ADMIN_ONLY_CARDS = %w(time_worked)
 
     def change_card(date, user, change)
-      p change
       field = change[0]
       from, to = *change[1]
 
