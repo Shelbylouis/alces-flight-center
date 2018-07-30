@@ -60,7 +60,7 @@ RSpec.describe ClusterDecorator do
           array_including(
             hash_including({
               id: injected_service_id,
-              name: 'Other / N/A',
+              name: 'Other or N/A',
               supportType: 'managed',
             })
           )

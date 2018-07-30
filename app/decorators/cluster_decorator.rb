@@ -115,7 +115,7 @@ class ClusterDecorator < ApplicationDecorator
     return unless IssuesJsonBuilder.other_service_issues.present?
     @other_service_json ||= {
       id: -1,
-      name: 'Other / N/A',
+      name: 'Other or N/A',
       supportType: 'managed'
     }.merge(IssuesJsonBuilder.build_for(self))
   end
