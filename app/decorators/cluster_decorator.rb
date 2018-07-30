@@ -40,6 +40,9 @@ class ClusterDecorator < ApplicationDecorator
       name: name,
       components: components.map(&:case_form_json),
       services: services.map(&:case_form_json).tap { |services|
+        # We inject an 'Other' Service, to allow Users to create Issues they do
+        # not think are associated to any existing Service via the usual Case
+        # form drill-down process.
         services << other_service_json if other_service_json
       },
       supportType: support_type,
