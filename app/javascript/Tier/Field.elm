@@ -2,13 +2,13 @@ module Tier.Field
     exposing
         ( Field(..)
         , TextInputData
-        , Touched(..)
         , data
         , decoder
         , encoder
         , replaceValue
         )
 
+import Field.Touched exposing (Touched(..))
 import Json.Decode as D
 import Json.Encode as E
 import Types
@@ -26,19 +26,9 @@ type alias TextInputData =
 
     -- Whether this field has been touched yet by a user.
     , touched : Touched
-
     , optional : Bool
     , help : Maybe String
     }
-
-
-type
-    Touched
-    -- This is essentially a Bool, but use a custom type to force us to be
-    -- explicit about what we're doing and prevent accidentally using it in the
-    -- wrong place, at the expense of being slightly more verbose.
-    = Touched
-    | Untouched
 
 
 decoder : D.Decoder Field

@@ -1,5 +1,6 @@
 module Field exposing (..)
 
+import Field.Touched exposing (Touched(..))
 import Tier.Field
 
 
@@ -38,10 +39,10 @@ hasBeenTouched field =
             -- A Tier field has been touched if we have saved that we have
             -- touched it.
             case data.touched of
-                Tier.Field.Touched ->
+                Touched ->
                     True
 
-                Tier.Field.Untouched ->
+                Untouched ->
                     False
 
         _ ->

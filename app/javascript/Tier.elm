@@ -13,6 +13,7 @@ module Tier
 
 import Array
 import Dict exposing (Dict)
+import Field.Touched exposing (Touched(..))
 import Json.Decode as D
 import Json.Encode as E
 import Maybe.Extra
@@ -106,7 +107,7 @@ motdTool clusterMotd =
 
                 -- Can initially be considered touched as already contains
                 -- content (the current MOTD).
-                , touched = Field.Touched
+                , touched = Touched
                 , optional = False
                 , help = Nothing
                 }
