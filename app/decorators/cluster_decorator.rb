@@ -116,11 +116,20 @@ class ClusterDecorator < ApplicationDecorator
 
   def other_service_json
     return unless IssuesJsonBuilder.other_service_issues.present?
-    @other_service_json ||= {
+    @other_service_json ||=
+      other_service
+      .decorate
+      .case_form_json
+      .merge(IssuesJsonBuilder.build_for(self))
+  end
+
+  def other_service
+    Service.new(
       id: -1,
       name: 'Other or N/A',
-      supportType: 'managed'
-    }.merge(IssuesJsonBuilder.build_for(self))
+      support_type: 'managed',
+      service_type: ServiceType.new
+    )
   end
 
   class IssuesJsonBuilder < ServiceDecorator::IssuesJsonBuilder
