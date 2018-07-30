@@ -5,7 +5,7 @@
         <% if policy(@case).edit? %>
           <div class="case-subject-edit collapse show">
             <%= @case.display_id %>: <%= @case.subject %>
-            <button class="btn btn-link" data-toggle="collapse" data-target=".case-subject-edit">
+            <button class="btn btn-link" data-toggle="collapse" data-target=".case-subject-edit" id="case-subject-edit">
               <i class="fa fa-2x fa-pencil"></i>
             </button>
           </div>
