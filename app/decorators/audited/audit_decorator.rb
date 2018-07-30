@@ -17,6 +17,7 @@ module Audited
     ADMIN_ONLY_CARDS = %w(time_worked)
 
     def change_card(date, user, change)
+      p change
       field = change[0]
       from, to = *change[1]
 
@@ -97,6 +98,18 @@ module Audited
 
     def tier_level_details
       'Tier Change'
+    end
+
+    def subject_text(from, to)
+      "Changed the subject of this case from '#{from}' to '#{to}'."
+    end
+
+    def subject_type
+      'pencil-square-o'
+    end
+
+    def subject_details
+      'Subject Change'
     end
   end
 end
