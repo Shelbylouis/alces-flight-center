@@ -85,10 +85,32 @@ class CasesController < ApplicationController
   UPDATABLE_FIELDS = [:subject].freeze
 
   def update
-   change_action 'Support case %s updated.' do |kase|
-      kase.update(  # update! doesn't work here :( But we call save! later anyway
-        params.require(:case).permit(UPDATABLE_FIELDS)
+
+    fields_changing = params.require(:case).permit(UPDATABLE_FIELDS)
+
+    change_action 'Support case %s updated.' do |kase|
+      old_fields = {}.tap do |fields|
+        fields_changing.to_h.keys.each { |f| fields[f.to_sym] = kase.send(f) }
+      end
+
+      kase.update(  # update! doesn't work here FSR :(
+        fields_changing
       )
+      kase.save!
+
+      old_fields.each do |field, old_value|
+        mailer_method = "change_#{field}".to_sym
+
+        next unless CaseMailer.respond_to?(mailer_method)
+
+        CaseMailer.send(
+          mailer_method,
+          kase,
+          old_value,
+          kase.send(field)
+        ).deliver_later
+      end
+
     end
   end
 
