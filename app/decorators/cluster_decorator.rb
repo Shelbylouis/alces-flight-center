@@ -40,7 +40,7 @@ class ClusterDecorator < ApplicationDecorator
       name: name,
       components: components.map(&:case_form_json),
       services: services.map(&:case_form_json).tap { |services|
-        services << other_service_json
+        services << other_service_json if other_service_json
       },
       supportType: support_type,
       chargingInfo: charging_info,
@@ -112,7 +112,8 @@ class ClusterDecorator < ApplicationDecorator
   end
 
   def other_service_json
-    {
+    return unless IssuesJsonBuilder.other_service_issues.present?
+    @other_service_json ||= {
       id: -1,
       name: 'Other / N/A',
       supportType: 'managed'
@@ -122,8 +123,12 @@ class ClusterDecorator < ApplicationDecorator
   class IssuesJsonBuilder < ServiceDecorator::IssuesJsonBuilder
     private
 
-    def applicable_issues
+    def self.other_service_issues
       Issue.where(requires_component: false, requires_service: false).decorate.reject(&:special?)
+    end
+
+    def applicable_issues
+      self.class.other_service_issues
     end
   end
 
