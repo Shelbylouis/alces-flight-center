@@ -12,17 +12,17 @@ module Issues
         )
 
 import Category exposing (Category)
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Json.Decode as D
 import Maybe.Extra
-import SelectList exposing (SelectList)
 import SelectList.Extra
 import Utils
 
 
 type Issues
-    = CategorisedIssues (SelectList Category)
-    | JustIssues (SelectList Issue)
+    = CategorisedIssues (DrillDownSelectList Category)
+    | JustIssues (DrillDownSelectList Issue)
 
 
 decoder : String -> D.Decoder Issues
@@ -36,15 +36,17 @@ decoder clusterMotd =
     in
     D.oneOf
         [ SelectList.Extra.orderedDecoder Issue.name issueDecoder
+            |> D.map DrillDownSelectList.Unselected
             |> D.map JustIssues
             |> D.field "issues"
         , SelectList.Extra.orderedDecoder .name categoryDecoder
+            |> D.map DrillDownSelectList.Unselected
             |> D.map CategorisedIssues
             |> D.field "categories"
         ]
 
 
-categories : Issues -> Maybe (SelectList Category)
+categories : Issues -> Maybe (DrillDownSelectList Category)
 categories issues =
     case issues of
         CategorisedIssues categories ->
@@ -58,11 +60,11 @@ mapIssue : (Issue -> Issue) -> Issues -> Issues
 mapIssue transform issues =
     let
         updateIssue =
-            SelectList.Extra.mapSelected transform
+            DrillDownSelectList.mapSelected transform
     in
     case issues of
         CategorisedIssues categories ->
-            SelectList.Extra.mapSelected
+            DrillDownSelectList.mapSelected
                 (\category ->
                     category.issues
                         |> updateIssue
@@ -83,7 +85,7 @@ selectIssue issueId issues =
                 |> CategorisedIssues
 
         JustIssues issues ->
-            SelectList.select (Issue.sameId issueId) issues
+            DrillDownSelectList.select (Issue.sameId issueId) issues
                 |> JustIssues
 
 
@@ -91,30 +93,30 @@ selectedIssue : Issues -> Issue
 selectedIssue issues =
     case issues of
         CategorisedIssues categories ->
-            SelectList.selected categories
+            DrillDownSelectList.selected categories
                 |> .issues
-                |> SelectList.selected
+                |> DrillDownSelectList.selected
 
         JustIssues issues ->
-            SelectList.selected issues
+            DrillDownSelectList.selected issues
 
 
 selectCategory : Category.Id -> Issues -> Issues
 selectCategory categoryId issues =
     case issues of
         CategorisedIssues categories ->
-            SelectList.select (Utils.sameId categoryId) categories
+            DrillDownSelectList.select (Utils.sameId categoryId) categories
                 |> CategorisedIssues
 
         JustIssues issues ->
             JustIssues issues
 
 
-availableIssues : Issues -> SelectList Issue
+availableIssues : Issues -> DrillDownSelectList Issue
 availableIssues issues =
     case issues of
         CategorisedIssues categories ->
-            SelectList.selected categories
+            DrillDownSelectList.selected categories
                 |> .issues
 
         JustIssues issues ->
@@ -126,21 +128,44 @@ matchingIssues condition issues =
     let
         filterIssues =
             \issues ->
-                SelectList.toList issues
+                let
+                    issuesConstructor =
+                        case issues of
+                            DrillDownSelectList.Selected _ ->
+                                DrillDownSelectList.Selected
+
+                            DrillDownSelectList.Unselected _ ->
+                                DrillDownSelectList.Unselected
+                in
+                DrillDownSelectList.toList issues
                     |> List.filter condition
                     |> SelectList.Extra.fromList
+                    |> Maybe.map issuesConstructor
+
+        filterCategoriesAndIssues =
+            \categories ->
+                let
+                    categoriesConstructor =
+                        case categories of
+                            DrillDownSelectList.Selected _ ->
+                                DrillDownSelectList.Selected
+
+                            DrillDownSelectList.Unselected _ ->
+                                DrillDownSelectList.Unselected
+                in
+                DrillDownSelectList.toList categories
+                    |> List.map
+                        (\category ->
+                            filterIssues category.issues
+                                |> Maybe.map (Category.asIssuesIn category)
+                        )
+                    |> Maybe.Extra.values
+                    |> SelectList.Extra.fromList
+                    |> Maybe.map (categoriesConstructor >> CategorisedIssues)
     in
     case issues of
         CategorisedIssues categories ->
-            SelectList.toList categories
-                |> List.map
-                    (\category ->
-                        filterIssues category.issues
-                            |> Maybe.map (Category.asIssuesIn category)
-                    )
-                |> Maybe.Extra.values
-                |> SelectList.Extra.fromList
-                |> Maybe.map CategorisedIssues
+            filterCategoriesAndIssues categories
 
         JustIssues issues ->
             filterIssues issues

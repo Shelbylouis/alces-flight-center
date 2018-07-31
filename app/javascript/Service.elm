@@ -111,7 +111,10 @@ findTierAndAncestors predicate services =
         findCategoryIssueAndTier predicate categories =
             let
                 findIssueAddingCategory cat =
-                    case findIssueAndTier predicate cat.issues of
+                    case
+                        DrillDownSelectList.unwrap cat.issues
+                            |> findIssueAndTier predicate
+                    of
                         Just ( issue, tier ) ->
                             Just ( cat, issue, tier )
 
@@ -126,7 +129,10 @@ findTierAndAncestors predicate services =
         findServiceCategoryIssueAndTier service =
             case service.issues of
                 Issues.CategorisedIssues categories ->
-                    case findCategoryIssueAndTier predicate categories of
+                    case
+                        DrillDownSelectList.unwrap categories
+                            |> findCategoryIssueAndTier predicate
+                    of
                         Just ( category, issue, tier ) ->
                             Just ( service, Just category, issue, tier )
 
@@ -134,7 +140,10 @@ findTierAndAncestors predicate services =
                             Nothing
 
                 Issues.JustIssues issues ->
-                    case findIssueAndTier predicate issues of
+                    case
+                        DrillDownSelectList.unwrap issues
+                            |> findIssueAndTier predicate
+                    of
                         Just ( issue, tier ) ->
                             Just ( service, Nothing, issue, tier )
 

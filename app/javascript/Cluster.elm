@@ -65,7 +65,9 @@ decodeWithMotd maybeMotd =
         |> P.required "id" (D.int |> D.map Id)
         |> P.required "name" D.string
         |> P.required "components"
-            -- XXX DRY up and/or extract functions for this sort of decoding.
+            -- XXX DRY up and/or extract functions for this sort of decoding,
+            -- both here and everywhere else where we `D.map
+            -- DrillDownSelectList.Unselected`.
             (SelectList.Extra.nameOrderedDecoder Component.decoder
                 |> D.map DrillDownSelectList.Unselected
             )
@@ -174,7 +176,7 @@ updateSelectedIssue clusters changeIssue =
 
         updateCategory =
             \category ->
-                SelectList.Extra.mapSelected changeIssue category.issues
+                DrillDownSelectList.mapSelected changeIssue category.issues
                     |> Category.asIssuesIn category
     in
     SelectList.Extra.mapSelected updateCluster clusters

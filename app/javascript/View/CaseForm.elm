@@ -140,7 +140,7 @@ maybeCategoriesField state =
         |> Issues.categories
         |> Maybe.map
             (\categories_ ->
-                Fields.selectField Field.Category
+                Fields.drillDownSelectField Field.Category
                     categories_
                     Category.extractId
                     .name
@@ -156,7 +156,7 @@ issuesField state =
         selectedServiceAvailableIssues =
             State.selectedServiceAvailableIssues state
     in
-    Fields.selectField Field.Issue
+    Fields.drillDownSelectField Field.Issue
         selectedServiceAvailableIssues
         Issue.extractId
         Issue.name

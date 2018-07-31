@@ -47,6 +47,49 @@ mapSelected transform selectList =
         |> Selected
 
 
+nestedSelect :
+    DrillDownSelectList a
+    -> (a -> DrillDownSelectList b)
+    -> (a -> DrillDownSelectList b -> a)
+    -> (b -> Bool)
+    -> DrillDownSelectList a
+nestedSelect selectList getNested asNestedIn isSelectable =
+    updateNested
+        selectList
+        getNested
+        asNestedIn
+        (select isSelectable)
+
+
+updateNested :
+    -- XXX Collapse back into simple `updateNested` function?
+    -- XXX Can this just use function from SelectList.Extra?
+    DrillDownSelectList a
+    -> (a -> DrillDownSelectList b)
+    -> (a -> DrillDownSelectList b -> a)
+    -> (DrillDownSelectList b -> DrillDownSelectList b)
+    -> DrillDownSelectList a
+updateNested selectList getNested asNestedIn transform =
+    -- XXX Can this just use function from SelectList.Extra?
+    let
+        updateNested =
+            \item ->
+                getNested item
+                    |> transform
+                    |> asNestedIn item
+    in
+    mapSelected updateNested selectList
+
+
+toList : DrillDownSelectList a -> List a
+toList =
+    unwrap >> SelectList.toList
+
+
+
+-- XXX Remove following once all items use DrillDownSelectList?
+
+
 nestedDrillDownSelect :
     SelectList a
     -> (a -> DrillDownSelectList b)

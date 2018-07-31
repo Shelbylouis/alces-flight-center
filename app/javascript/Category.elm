@@ -8,6 +8,7 @@ module Category
         , setSelectedIssue
         )
 
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Json.Decode as D
 import SelectList exposing (SelectList)
@@ -17,7 +18,7 @@ import SelectList.Extra
 type alias Category =
     { id : Id
     , name : String
-    , issues : SelectList Issue
+    , issues : DrillDownSelectList Issue
     }
 
 
@@ -38,6 +39,7 @@ decoder clusterMotd =
             (SelectList.Extra.orderedDecoder
                 Issue.name
                 issueDecoder
+                |> D.map DrillDownSelectList.Unselected
             )
         )
 
@@ -49,15 +51,18 @@ extractId category =
             id
 
 
-setSelectedIssue : SelectList Category -> Issue.Id -> SelectList Category
+setSelectedIssue :
+    DrillDownSelectList Category
+    -> Issue.Id
+    -> DrillDownSelectList Category
 setSelectedIssue caseCategories issueId =
-    SelectList.Extra.nestedSelect
+    DrillDownSelectList.nestedSelect
         caseCategories
         .issues
         asIssuesIn
         (Issue.sameId issueId)
 
 
-asIssuesIn : Category -> SelectList Issue -> Category
+asIssuesIn : Category -> DrillDownSelectList Issue -> Category
 asIssuesIn category issues =
     { category | issues = issues }
