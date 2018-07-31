@@ -26,36 +26,25 @@ unwrap selectList =
 
 select : (a -> Bool) -> DrillDownSelectList a -> DrillDownSelectList a
 select isSelectable selectList =
-    Selected <|
-        case selectList of
-            Unselected s ->
-                SelectList.select isSelectable s
-
-            Selected s ->
-                SelectList.select isSelectable s
+    unwrap selectList
+        |> SelectList.select isSelectable
+        -- XXX Document why this always returns `Selected`?
+        |> Selected
 
 
 selected : DrillDownSelectList a -> a
-selected selectList =
+selected =
     -- XXX Should this actually return a Maybe, with Nothing when nothing yet
     -- selected?
-    case selectList of
-        Unselected s ->
-            SelectList.selected s
-
-        Selected s ->
-            SelectList.selected s
+    unwrap >> SelectList.selected
 
 
 mapSelected : (a -> a) -> DrillDownSelectList a -> DrillDownSelectList a
 mapSelected transform selectList =
-    Selected <|
-        case selectList of
-            Unselected s ->
-                SelectList.Extra.mapSelected transform s
-
-            Selected s ->
-                SelectList.Extra.mapSelected transform s
+    unwrap selectList
+        |> SelectList.Extra.mapSelected transform
+        -- XXX Should this always return `Selected`?
+        |> Selected
 
 
 nestedDrillDownSelect :
