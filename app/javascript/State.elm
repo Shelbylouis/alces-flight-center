@@ -107,6 +107,22 @@ decoder =
 
                     ClusterMode ->
                         D.succeed initialState
+
+        setClustersSelectedIfSingleClusterAvailable state =
+            let
+                singleClusterAvailable =
+                    DrillDownSelectList.toList state.clusters
+                        |> List.length
+                        |> (==) 1
+            in
+            if singleClusterAvailable then
+                { state
+                    | clusters =
+                        DrillDownSelectList.unwrap state.clusters
+                            |> DrillDownSelectList.Selected
+                }
+            else
+                state
     in
     D.map2
         (,)
@@ -115,7 +131,15 @@ decoder =
                 SelectList.Extra.nameOrderedDecoder Cluster.decoder
         )
         (D.field "singlePart" <| modeDecoder)
-        |> D.andThen createInitialState
+        |> D.andThen
+            (createInitialState
+                -- If only a single Cluster is available we hide the Cluster
+                -- selection field as no need to show it, but want to otherwise
+                -- seamlessly handle things as if the user had selected a
+                -- Cluster; therefore in this case pre-select the Clusters in
+                -- the same way as if a user had selected one.
+                >> D.map setClustersSelectedIfSingleClusterAvailable
+            )
 
 
 type Mode
