@@ -16,6 +16,7 @@ module State
 import Bootstrap.Modal as Modal
 import Cluster exposing (Cluster)
 import Component exposing (Component)
+import DrillDownSelectList
 import Issue exposing (Issue)
 import Issues
 import Json.Decode as D
@@ -221,7 +222,7 @@ selectedService : State -> Service
 selectedService state =
     selectedCluster state
         |> .services
-        |> SelectList.selected
+        |> DrillDownSelectList.selected
 
 
 selectedTier : State -> Tier

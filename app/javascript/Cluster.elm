@@ -16,12 +16,13 @@ module Cluster
 
 import Category
 import Component exposing (Component)
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Issues
 import Json.Decode as D
 import Json.Decode.Pipeline as P
 import Maybe.Extra
-import SelectList exposing (Position(..), SelectList)
+import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)
@@ -33,7 +34,7 @@ type alias Cluster =
     { id : Id
     , name : String
     , components : SelectList Component
-    , services : SelectList Service
+    , services : DrillDownSelectList Service
     , supportType : SupportType
     , chargingInfo : Maybe String
     , motd : String
@@ -64,7 +65,10 @@ decodeWithMotd maybeMotd =
         |> P.required "id" (D.int |> D.map Id)
         |> P.required "name" D.string
         |> P.required "components" (SelectList.Extra.nameOrderedDecoder Component.decoder)
-        |> P.required "services" (SelectList.Extra.nameOrderedDecoder serviceDecoder)
+        |> P.required "services"
+            (SelectList.Extra.nameOrderedDecoder serviceDecoder
+                |> D.map DrillDownSelectList.Unselected
+            )
         |> P.required "supportType" SupportType.decoder
         |> P.required "chargingInfo"
             (D.nullable D.string
@@ -110,7 +114,7 @@ asComponentsIn cluster components =
 
 setSelectedService : SelectList Cluster -> Service.Id -> SelectList Cluster
 setSelectedService clusters serviceId =
-    SelectList.Extra.nestedSelect
+    DrillDownSelectList.nestedDrillDownSelect
         clusters
         .services
         asServicesIn
@@ -121,9 +125,9 @@ setSelectedCategory : SelectList Cluster -> Category.Id -> SelectList Cluster
 setSelectedCategory clusters categoryId =
     let
         updateService =
-            SelectList.Extra.mapSelected (Service.setSelectedCategory categoryId)
+            DrillDownSelectList.mapSelected (Service.setSelectedCategory categoryId)
     in
-    SelectList.Extra.updateNested
+    DrillDownSelectList.updateNestedDrillDownSelectList
         clusters
         .services
         asServicesIn
@@ -134,9 +138,9 @@ setSelectedIssue : SelectList Cluster -> Issue.Id -> SelectList Cluster
 setSelectedIssue clusters issueId =
     let
         updateService =
-            SelectList.Extra.mapSelected (Service.setSelectedIssue issueId)
+            DrillDownSelectList.mapSelected (Service.setSelectedIssue issueId)
     in
-    SelectList.Extra.updateNested
+    DrillDownSelectList.updateNestedDrillDownSelectList
         clusters
         .services
         asServicesIn
@@ -153,7 +157,7 @@ updateSelectedIssue clusters changeIssue =
     let
         updateCluster =
             \cluster ->
-                SelectList.Extra.mapSelected updateService cluster.services
+                DrillDownSelectList.mapSelected updateService cluster.services
                     |> asServicesIn cluster
 
         updateService =
@@ -172,11 +176,11 @@ updateSelectedIssue clusters changeIssue =
     SelectList.Extra.mapSelected updateCluster clusters
 
 
-setServices : SelectList Service -> Cluster -> Cluster
+setServices : DrillDownSelectList Service -> Cluster -> Cluster
 setServices services cluster =
     { cluster | services = services }
 
 
-asServicesIn : Cluster -> SelectList Service -> Cluster
+asServicesIn : Cluster -> DrillDownSelectList Service -> Cluster
 asServicesIn =
     flip setServices

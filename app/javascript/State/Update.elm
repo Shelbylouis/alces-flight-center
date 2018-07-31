@@ -3,6 +3,7 @@ module State.Update exposing (update)
 import Category
 import Cluster
 import Component
+import DrillDownSelectList
 import Http
 import Issue
 import Json.Decode as D
@@ -165,7 +166,9 @@ handleSelectTool : State -> String -> ( State, Cmd Msg )
 handleSelectTool state toolName =
     let
         services =
-            State.selectedCluster state |> .services
+            State.selectedCluster state
+                |> .services
+                |> DrillDownSelectList.unwrap
 
         isWantedTier : Tier.Tier -> Bool
         isWantedTier tier =

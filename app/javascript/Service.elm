@@ -1,6 +1,7 @@
 module Service exposing (..)
 
 import Category exposing (Category)
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Issues exposing (Issues(..))
 import Json.Decode as D
@@ -23,12 +24,22 @@ type Id
     = Id Int
 
 
-filterByIssues : (Issue -> Bool) -> SelectList Service -> Maybe (SelectList Service)
-filterByIssues condition services =
-    SelectList.map (withJustMatchingIssues condition) services
-        |> SelectList.toList
-        |> Maybe.Extra.values
-        |> SelectList.Extra.fromList
+filterByIssues : (Issue -> Bool) -> DrillDownSelectList Service -> Maybe (DrillDownSelectList Service)
+filterByIssues condition servicesList =
+    let
+        filter services constructor =
+            SelectList.map (withJustMatchingIssues condition) services
+                |> SelectList.toList
+                |> Maybe.Extra.values
+                |> SelectList.Extra.fromList
+                |> Maybe.map constructor
+    in
+    case servicesList of
+        DrillDownSelectList.Selected services ->
+            filter services DrillDownSelectList.Selected
+
+        DrillDownSelectList.Unselected services ->
+            filter services DrillDownSelectList.Unselected
 
 
 withJustMatchingIssues : (Issue -> Bool) -> Service -> Maybe Service

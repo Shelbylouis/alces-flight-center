@@ -6,6 +6,7 @@ import Category
 import Cluster
 import Component
 import Dict
+import DrillDownSelectList
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -277,7 +278,9 @@ maybeServicesField state =
             else if state.singleService then
                 SinglePartField (State.selectedService state)
             else
-                SelectionField .services
+                -- XXX Handle this differently depending on if any Service
+                -- selected yet
+                SelectionField (.services >> DrillDownSelectList.unwrap)
 
         singleServiceApplicable =
             SelectList.toList state.clusters
