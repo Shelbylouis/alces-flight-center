@@ -9,6 +9,6 @@
     <%= yield %>
   </span>
   <span>
-    <%= pluralize(amount, 'credit') %>
+    <%= pluralize(amount.abs,'credit') %>
   </span>
 </li>
