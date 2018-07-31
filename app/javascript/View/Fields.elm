@@ -1,7 +1,6 @@
 module View.Fields
     exposing
-        ( drillDownSelectField
-        , hiddenFieldWithVisibleErrors
+        ( hiddenFieldWithVisibleErrors
         , selectField
         , textField
         )
@@ -24,11 +23,7 @@ import Validation exposing (Error, ErrorMessage(..))
 import View.Utils
 
 
--- XXX Once everything uses DrillDownSelectList can collapse these two
--- functions together.
-
-
-drillDownSelectField :
+selectField :
     Field
     -> DrillDownSelectList a
     -> (a -> Int)
@@ -37,7 +32,7 @@ drillDownSelectField :
     -> (String -> msg)
     -> State
     -> Html msg
-drillDownSelectField field items toId toOptionLabel isDisabled changeMsg state =
+selectField field items toId toOptionLabel isDisabled changeMsg state =
     let
         fieldOption =
             \position item ->
@@ -70,39 +65,6 @@ drillDownSelectField field items toId toOptionLabel isDisabled changeMsg state =
         itemOptions =
             DrillDownSelectList.unwrap items
                 |> SelectList.mapBy fieldOption
-                |> SelectList.toList
-    in
-    formField field
-        select
-        [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
-        options
-        False
-        Nothing
-        state
-
-
-selectField :
-    Field
-    -> SelectList a
-    -> (a -> Int)
-    -> (a -> String)
-    -> (a -> Bool)
-    -> (String -> msg)
-    -> State
-    -> Html msg
-selectField field items toId toOptionLabel isDisabled changeMsg state =
-    let
-        fieldOption =
-            \position item ->
-                option
-                    [ toId item |> toString |> value
-                    , position == Selected |> selected
-                    , isDisabled item |> disabled
-                    ]
-                    [ toOptionLabel item |> text ]
-
-        options =
-            SelectList.mapBy fieldOption items
                 |> SelectList.toList
     in
     formField field

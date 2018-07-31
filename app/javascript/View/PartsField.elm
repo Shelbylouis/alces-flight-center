@@ -41,7 +41,7 @@ maybePartsField field partsFieldConfig toId state changeMsg =
 
         selectField =
             \parts ->
-                Fields.drillDownSelectField
+                Fields.selectField
                     field
                     parts
                     toId

@@ -124,7 +124,7 @@ maybeClustersField state =
         Nothing
     else
         Just
-            (Fields.drillDownSelectField Field.Cluster
+            (Fields.selectField Field.Cluster
                 clusters
                 Cluster.extractId
                 .name
@@ -141,7 +141,7 @@ maybeCategoriesField state =
         |> Issues.categories
         |> Maybe.map
             (\categories_ ->
-                Fields.drillDownSelectField Field.Category
+                Fields.selectField Field.Category
                     categories_
                     Category.extractId
                     .name
@@ -157,7 +157,7 @@ issuesField state =
         selectedServiceAvailableIssues =
             State.selectedServiceAvailableIssues state
     in
-    Fields.drillDownSelectField Field.Issue
+    Fields.selectField Field.Issue
         selectedServiceAvailableIssues
         Issue.extractId
         Issue.name
