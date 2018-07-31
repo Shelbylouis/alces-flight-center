@@ -230,23 +230,6 @@ displayWrapperToTab position wrapper =
         ]
 
 
-tierSelectField : State -> Html Msg
-tierSelectField state =
-    let
-        wrappedTiers =
-            State.selectedIssue state
-                |> Issue.tiers
-                |> Tier.DisplayWrapper.wrap
-    in
-    Fields.selectField Field.Tier
-        wrappedTiers
-        Tier.DisplayWrapper.extractId
-        Tier.DisplayWrapper.description
-        Tier.DisplayWrapper.isUnavailable
-        ChangeSelectedTier
-        state
-
-
 maybeComponentsField : State -> Maybe (Html Msg)
 maybeComponentsField state =
     let
