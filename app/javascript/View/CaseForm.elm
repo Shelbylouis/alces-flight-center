@@ -256,7 +256,7 @@ maybeComponentsField state =
             else if state.singleComponent then
                 SinglePartField (State.selectedComponent state)
             else
-                DrillDownSelectionField .components
+                SelectionField .components
     in
     PartsField.maybePartsField Field.Component
         config
@@ -277,7 +277,7 @@ maybeServicesField state =
             else if state.singleService then
                 SinglePartField (State.selectedService state)
             else
-                DrillDownSelectionField .services
+                SelectionField .services
 
         singleServiceApplicable =
             SelectList.toList state.clusters

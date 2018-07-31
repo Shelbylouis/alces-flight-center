@@ -11,12 +11,8 @@ import SupportType exposing (HasSupportType)
 import View.Fields as Fields
 
 
-type
-    PartsFieldConfig a
-    -- XXX Once all ClusterParts use DrillDownSelectList can collapse these two
-    -- branches together.
-    = SelectionField (PartsFromCluster a)
-    | DrillDownSelectionField (Cluster -> DrillDownSelectList (ClusterPart a))
+type PartsFieldConfig a
+    = SelectionField (Cluster -> DrillDownSelectList (ClusterPart a))
     | SinglePartField (ClusterPart a)
     | NotRequired
 
@@ -43,21 +39,9 @@ maybePartsField field partsFieldConfig toId state changeMsg =
                     _ ->
                         part.name
 
-        drillDownSelectField =
-            \parts ->
-                Fields.drillDownSelectField
-                    field
-                    parts
-                    toId
-                    labelForPart
-                    (always False)
-                    changeMsg
-                    state
-                    |> Just
-
         selectField =
             \parts ->
-                Fields.selectField
+                Fields.drillDownSelectField
                     field
                     parts
                     toId
@@ -71,17 +55,6 @@ maybePartsField field partsFieldConfig toId state changeMsg =
             State.selectedCluster state
     in
     case partsFieldConfig of
-        -- XXX Once all ClusterParts use DrillDownSelectList can collapse these
-        -- two branches together.
-        DrillDownSelectionField partsForCluster ->
-            let
-                allParts =
-                    partsForCluster cluster
-            in
-            -- Issue requires a part of this type => allow selection from all
-            -- parts of this type for Cluster.
-            drillDownSelectField allParts
-
         SelectionField partsForCluster ->
             let
                 allParts =
