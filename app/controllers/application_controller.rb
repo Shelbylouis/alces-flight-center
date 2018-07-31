@@ -10,7 +10,6 @@ class ApplicationController < RootController
   helper_method :case_url
   helper_method :case_path
 
-  before_action :set_sentry_raven_context
   before_action :assign_current_user
   before_action :assign_scope
   before_action :assign_title
@@ -66,18 +65,6 @@ class ApplicationController < RootController
     cookies['flight_sso'] && JsonWebToken.decode(cookies['flight_sso'])
   rescue JWT::DecodeError
     false
-  end
-
-  def set_sentry_raven_context
-    if current_user
-      Raven.user_context(
-        id: current_user.id,
-        email: current_user.email,
-        name: current_user.name,
-        site: current_user.site&.name,
-      )
-    end
-    Raven.extra_context(params: params.to_unsafe_h, url: request.url)
   end
 
   def assign_current_user
