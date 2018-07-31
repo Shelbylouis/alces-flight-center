@@ -47,7 +47,6 @@ selectField field items toId toOptionLabel isDisabled changeMsg state =
                 |> SelectList.toList
     in
     formField field
-        (SelectList.selected items)
         select
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
@@ -87,7 +86,6 @@ textField config state item =
                 ++ additionalAttributes
     in
     formField config.field
-        item
         element
         attributes
         []
@@ -102,7 +100,6 @@ type alias HtmlFunction msg =
 
 formField :
     Field
-    -> a
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
@@ -110,7 +107,7 @@ formField :
     -> Maybe String
     -> State
     -> Html msg
-formField field item htmlFn additionalAttributes children optional help state =
+formField field htmlFn additionalAttributes children optional help state =
     let
         fieldName =
             case field of
