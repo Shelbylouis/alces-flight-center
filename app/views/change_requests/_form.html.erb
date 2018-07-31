@@ -6,7 +6,14 @@
       use Markdown to format your text.
     </label>
     <div class="col-sm-9">
-      <%= f.text_area :description, rows: 15, class: 'form-control' %>
+      <%= render 'partials/markdown_editor_layout',
+        activate: 'write',
+        form_builder: f,
+        preview_path: preview_case_change_request_path,
+        write_path: write_case_change_request_path do %>
+
+        <%= render 'markdown_content', form_builder: f %>
+      <% end %>
     </div>
   </div>
 
