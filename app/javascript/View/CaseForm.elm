@@ -6,6 +6,7 @@ import Category
 import Cluster
 import Component
 import Dict
+import DrillDownSelectList
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -113,7 +114,7 @@ maybeClustersField state =
             state.clusters
 
         singleCluster =
-            SelectList.toList clusters
+            DrillDownSelectList.toList clusters
                 |> List.length
                 |> (==) 1
     in
@@ -123,7 +124,7 @@ maybeClustersField state =
         Nothing
     else
         Just
-            (Fields.selectField Field.Cluster
+            (Fields.drillDownSelectField Field.Cluster
                 clusters
                 Cluster.extractId
                 .name
@@ -263,7 +264,7 @@ maybeServicesField state =
                 SelectionField .services
 
         singleServiceApplicable =
-            SelectList.toList state.clusters
+            DrillDownSelectList.toList state.clusters
                 |> List.length
                 |> (==) 1
     in

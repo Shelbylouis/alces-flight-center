@@ -104,9 +104,12 @@ extractId cluster =
             id
 
 
-setSelectedComponent : SelectList Cluster -> Component.Id -> SelectList Cluster
+setSelectedComponent :
+    DrillDownSelectList Cluster
+    -> Component.Id
+    -> DrillDownSelectList Cluster
 setSelectedComponent clusters componentId =
-    DrillDownSelectList.nestedDrillDownSelect
+    DrillDownSelectList.nestedSelect
         clusters
         .components
         asComponentsIn
@@ -118,47 +121,63 @@ asComponentsIn cluster components =
     { cluster | components = components }
 
 
-setSelectedService : SelectList Cluster -> Service.Id -> SelectList Cluster
+setSelectedService :
+    DrillDownSelectList Cluster
+    -> Service.Id
+    -> DrillDownSelectList Cluster
 setSelectedService clusters serviceId =
-    DrillDownSelectList.nestedDrillDownSelect
+    DrillDownSelectList.nestedSelect
         clusters
         .services
         asServicesIn
         (Utils.sameId serviceId)
 
 
-setSelectedCategory : SelectList Cluster -> Category.Id -> SelectList Cluster
+setSelectedCategory :
+    DrillDownSelectList Cluster
+    -> Category.Id
+    -> DrillDownSelectList Cluster
 setSelectedCategory clusters categoryId =
     let
         updateService =
-            DrillDownSelectList.mapSelected (Service.setSelectedCategory categoryId)
+            DrillDownSelectList.mapSelected
+                (Service.setSelectedCategory categoryId)
     in
-    DrillDownSelectList.updateNestedDrillDownSelectList
+    DrillDownSelectList.updateNested
         clusters
         .services
         asServicesIn
         updateService
 
 
-setSelectedIssue : SelectList Cluster -> Issue.Id -> SelectList Cluster
+setSelectedIssue :
+    DrillDownSelectList Cluster
+    -> Issue.Id
+    -> DrillDownSelectList Cluster
 setSelectedIssue clusters issueId =
     let
         updateService =
             DrillDownSelectList.mapSelected (Service.setSelectedIssue issueId)
     in
-    DrillDownSelectList.updateNestedDrillDownSelectList
+    DrillDownSelectList.updateNested
         clusters
         .services
         asServicesIn
         updateService
 
 
-setSelectedTier : SelectList Cluster -> Tier.Id -> SelectList Cluster
+setSelectedTier :
+    DrillDownSelectList Cluster
+    -> Tier.Id
+    -> DrillDownSelectList Cluster
 setSelectedTier clusters tierId =
     updateSelectedIssue clusters (Issue.selectTier tierId)
 
 
-updateSelectedIssue : SelectList Cluster -> (Issue -> Issue) -> SelectList Cluster
+updateSelectedIssue :
+    DrillDownSelectList Cluster
+    -> (Issue -> Issue)
+    -> DrillDownSelectList Cluster
 updateSelectedIssue clusters changeIssue =
     let
         updateCluster =
@@ -179,7 +198,7 @@ updateSelectedIssue clusters changeIssue =
                 DrillDownSelectList.mapSelected changeIssue category.issues
                     |> Category.asIssuesIn category
     in
-    SelectList.Extra.mapSelected updateCluster clusters
+    DrillDownSelectList.mapSelected updateCluster clusters
 
 
 setServices : DrillDownSelectList Service -> Cluster -> Cluster

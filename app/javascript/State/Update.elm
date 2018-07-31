@@ -10,7 +10,6 @@ import Json.Decode as D
 import Msg exposing (..)
 import Navigation
 import Rails
-import SelectList exposing (Position(..), SelectList)
 import Service
 import State exposing (State)
 import Tier
@@ -95,7 +94,7 @@ handleChangeSelectedCluster : State -> Cluster.Id -> ( State, Cmd Msg )
 handleChangeSelectedCluster state clusterId =
     let
         newClusters =
-            SelectList.select (Utils.sameId clusterId) state.clusters
+            DrillDownSelectList.select (Utils.sameId clusterId) state.clusters
     in
     { state | clusters = newClusters } ! []
 

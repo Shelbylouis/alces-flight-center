@@ -30,7 +30,7 @@ import Tier.Level
 
 
 type alias State =
-    { clusters : SelectList Cluster
+    { clusters : DrillDownSelectList Cluster
     , error : Maybe String
     , singleComponent : Bool
     , singleService : Bool
@@ -65,7 +65,7 @@ decoder =
                             applicableServices =
                                 -- Only include Services, and Issues within
                                 -- them, which require a Component.
-                                SelectList.selected singleClusterWithSingleComponentSelected
+                                DrillDownSelectList.selected singleClusterWithSingleComponentSelected
                                     |> .services
                                     |> Service.filterByIssues Issue.requiresComponent
                         in
@@ -75,9 +75,10 @@ decoder =
                                     newClusters =
                                         -- Set just the applicable Services in
                                         -- the single Cluster SelectList.
-                                        SelectList.selected singleClusterWithSingleComponentSelected
+                                        DrillDownSelectList.selected singleClusterWithSingleComponentSelected
                                             |> Cluster.setServices services
                                             |> SelectList.singleton
+                                            |> DrillDownSelectList.Unselected
                                 in
                                 D.succeed
                                     { initialState
@@ -109,7 +110,10 @@ decoder =
     in
     D.map2
         (,)
-        (D.field "clusters" <| SelectList.Extra.nameOrderedDecoder Cluster.decoder)
+        (D.field "clusters" <|
+            D.map DrillDownSelectList.Unselected <|
+                SelectList.Extra.nameOrderedDecoder Cluster.decoder
+        )
         (D.field "singlePart" <| modeDecoder)
         |> D.andThen createInitialState
 
@@ -208,7 +212,7 @@ selectedIssue state =
 
 selectedCluster : State -> Cluster
 selectedCluster state =
-    SelectList.selected state.clusters
+    DrillDownSelectList.selected state.clusters
 
 
 selectedComponent : State -> Component
