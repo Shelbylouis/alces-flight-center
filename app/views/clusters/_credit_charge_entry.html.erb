@@ -1,4 +1,4 @@
-<li class="list-group-item credit-charge-entry <%= credit_value_class(amount) %>" <%=amount = amount.abs%>>
+<li class="list-group-item credit-charge-entry <%= credit_value_class(amount) %>">
   <span>
     <i class="fa fa-circle mr-2" aria-hidden="true"></i>
   </span>
@@ -9,6 +9,6 @@
     <%= yield %>
   </span>
   <span>
-    <%= pluralize(amount, 'credit') %>
+    <%= pluralize(amount.abs,'credit') %>
   </span>
 </li>
