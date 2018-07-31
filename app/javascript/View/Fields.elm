@@ -1,12 +1,14 @@
 module View.Fields
     exposing
-        ( hiddenFieldWithVisibleErrors
+        ( drillDownSelectField
+        , hiddenFieldWithVisibleErrors
         , selectField
         , textField
         )
 
 import Bootstrap.Badge as Badge
 import Bootstrap.Utilities.Spacing as Spacing
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -20,6 +22,63 @@ import String.Extra
 import Types
 import Validation exposing (Error, ErrorMessage(..))
 import View.Utils
+
+
+-- XXX Once everything uses DrillDownSelectList can collapse these two
+-- functions together.
+
+
+drillDownSelectField :
+    Field
+    -> DrillDownSelectList a
+    -> (a -> Int)
+    -> (a -> String)
+    -> (a -> Bool)
+    -> (String -> msg)
+    -> State
+    -> Html msg
+drillDownSelectField field items toId toOptionLabel isDisabled changeMsg state =
+    let
+        fieldOption =
+            \position item ->
+                option
+                    [ toId item |> toString |> value
+                    , position == Selected && itemHasBeenSelected |> selected
+                    , isDisabled item |> disabled
+                    ]
+                    [ toOptionLabel item |> text ]
+
+        itemHasBeenSelected =
+            case items of
+                DrillDownSelectList.Selected _ ->
+                    True
+
+                DrillDownSelectList.Unselected _ ->
+                    False
+
+        options =
+            preSelectionOption :: itemOptions
+
+        preSelectionOption =
+            -- Always include this option as the first item, which will only
+            -- appear and be selected if no other item has been selected yet
+            -- (i.e. if `items` is `Unselected`).
+            option
+                [ selected True, disabled True, hidden True ]
+                [ text "Please select..." ]
+
+        itemOptions =
+            DrillDownSelectList.unwrap items
+                |> SelectList.mapBy fieldOption
+                |> SelectList.toList
+    in
+    formField field
+        select
+        [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
+        options
+        False
+        Nothing
+        state
 
 
 selectField :
