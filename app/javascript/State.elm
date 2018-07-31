@@ -11,6 +11,7 @@ module State
         , selectedServiceAvailableIssues
         , selectedTier
         , selectedTierSupportUnavailable
+        , singleClusterAvailable
         )
 
 import Bootstrap.Modal as Modal
@@ -109,13 +110,7 @@ decoder =
                         D.succeed initialState
 
         setClustersSelectedIfSingleClusterAvailable state =
-            let
-                singleClusterAvailable =
-                    DrillDownSelectList.toList state.clusters
-                        |> List.length
-                        |> (==) 1
-            in
-            if singleClusterAvailable then
+            if singleClusterAvailable state then
                 { state
                     | clusters =
                         DrillDownSelectList.unwrap state.clusters
@@ -310,3 +305,11 @@ associatedModelTypeName state =
         "component"
     else
         "service"
+
+
+singleClusterAvailable : State -> Bool
+singleClusterAvailable =
+    .clusters
+        >> DrillDownSelectList.toList
+        >> List.length
+        >> (==) 1

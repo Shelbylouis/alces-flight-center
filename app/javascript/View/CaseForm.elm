@@ -109,23 +109,14 @@ dynamicFieldsSection state =
 
 maybeClustersField : State -> Maybe (Html Msg)
 maybeClustersField state =
-    let
-        clusters =
-            state.clusters
-
-        singleCluster =
-            DrillDownSelectList.toList clusters
-                |> List.length
-                |> (==) 1
-    in
-    if singleCluster then
+    if State.singleClusterAvailable state then
         -- Only one Cluster available => no need to display Cluster selection
         -- field.
         Nothing
     else
         Just
             (Fields.selectField Field.Cluster
-                clusters
+                state.clusters
                 Cluster.extractId
                 .name
                 (always False)
