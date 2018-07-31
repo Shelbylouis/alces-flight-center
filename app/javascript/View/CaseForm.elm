@@ -256,7 +256,7 @@ maybeComponentsField state =
             else if state.singleComponent then
                 SinglePartField (State.selectedComponent state)
             else
-                SelectionField .components
+                DrillDownSelectionField .components
     in
     PartsField.maybePartsField Field.Component
         config

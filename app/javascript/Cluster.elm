@@ -33,7 +33,7 @@ import Utils
 type alias Cluster =
     { id : Id
     , name : String
-    , components : SelectList Component
+    , components : DrillDownSelectList Component
     , services : DrillDownSelectList Service
     , supportType : SupportType
     , chargingInfo : Maybe String
@@ -64,7 +64,11 @@ decodeWithMotd maybeMotd =
     P.decode Cluster
         |> P.required "id" (D.int |> D.map Id)
         |> P.required "name" D.string
-        |> P.required "components" (SelectList.Extra.nameOrderedDecoder Component.decoder)
+        |> P.required "components"
+            -- XXX DRY up and/or extract functions for this sort of decoding.
+            (SelectList.Extra.nameOrderedDecoder Component.decoder
+                |> D.map DrillDownSelectList.Unselected
+            )
         |> P.required "services"
             (SelectList.Extra.nameOrderedDecoder serviceDecoder
                 |> D.map DrillDownSelectList.Unselected
@@ -100,14 +104,14 @@ extractId cluster =
 
 setSelectedComponent : SelectList Cluster -> Component.Id -> SelectList Cluster
 setSelectedComponent clusters componentId =
-    SelectList.Extra.nestedSelect
+    DrillDownSelectList.nestedDrillDownSelect
         clusters
         .components
         asComponentsIn
         (Utils.sameId componentId)
 
 
-asComponentsIn : Cluster -> SelectList Component -> Cluster
+asComponentsIn : Cluster -> DrillDownSelectList Component -> Cluster
 asComponentsIn cluster components =
     { cluster | components = components }
 

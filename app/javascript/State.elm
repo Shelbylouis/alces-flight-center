@@ -215,7 +215,7 @@ selectedComponent : State -> Component
 selectedComponent state =
     selectedCluster state
         |> .components
-        |> SelectList.selected
+        |> DrillDownSelectList.selected
 
 
 selectedService : State -> Service
