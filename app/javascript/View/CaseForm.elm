@@ -103,7 +103,11 @@ dynamicFieldsSection state =
         tierContentElements =
             tierContent state
     in
-    section attributes fields
+    -- Hide everything in this section until the Tier field's parent (i.e. an
+    -- Issue) has been selected, since until this has occurred don't know which
+    -- Issue's fields to display and form cannot be submitted.
+    View.Utils.showIfParentFieldSelected state Field.Tier <|
+        section attributes fields
 
 
 maybeClustersField : State -> Maybe (Html Msg)
@@ -167,23 +171,28 @@ tierTabs state =
             State.selectedIssue state
                 |> Issue.tiers
                 |> Tier.DisplayWrapper.wrap
-    in
-    -- Tab support is available in elm-bootstrap, but we do not use it at the
-    -- moment as it is not really designed for a situation like ours, where the
-    -- tab state is derived and changed based on the rest of the model rather
-    -- than being an independent part of the model itself. Doing what we want
-    -- with it seemed difficult and convoluted, if not impossible, with the
-    -- current API.
-    div []
-        [ ul [ class "nav nav-tabs" ] tabItems
 
-        -- Need hidden field and accompanying `invalid-feedback` `div`, which
-        -- Bootstrap will use to decide whether to show any validation errors
-        -- for the selected Tier.
-        , Fields.hiddenFieldWithVisibleErrors Field.Tier state
-        , Charging.chargeableAlert state
-            |> Maybe.withDefault View.Utils.nothing
-        ]
+        tabs =
+            -- Tab support is available in elm-bootstrap, but we do not use it
+            -- at the moment as it is not really designed for a situation like
+            -- ours, where the tab state is derived and changed based on the
+            -- rest of the model rather than being an independent part of the
+            -- model itself. Doing what we want with it seemed difficult and
+            -- convoluted, if not impossible, with the current API.
+            div []
+                [ ul [ class "nav nav-tabs" ] tabItems
+
+                -- Need hidden field and accompanying `invalid-feedback` `div`, which
+                -- Bootstrap will use to decide whether to show any validation errors
+                -- for the selected Tier.
+                , Fields.hiddenFieldWithVisibleErrors Field.Tier state
+                , Charging.chargeableAlert state
+                    |> Maybe.withDefault View.Utils.nothing
+                ]
+    in
+    -- Hide the Tier tabs until the Tier field's parent (i.e. an Issue) has
+    -- been selected.
+    View.Utils.showIfParentFieldSelected state Field.Tier tabs
 
 
 displayWrapperToTab : SelectList.Position -> DisplayWrapper -> Html Msg
