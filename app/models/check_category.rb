@@ -1,5 +1,5 @@
 class CheckCategory < ApplicationRecord
-  has_many :check
+  has_many :checks
 
   def self.globally_available?
     true
