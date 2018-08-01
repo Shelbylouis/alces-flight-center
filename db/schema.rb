@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_26_120909) do
+ActiveRecord::Schema.define(version: 2018_08_01_130904) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -469,7 +469,12 @@ ActiveRecord::Schema.define(version: 2018_07_26_120909) do
   add_foreign_key "change_request_state_transitions", "change_requests"
   add_foreign_key "change_request_state_transitions", "users"
   add_foreign_key "change_requests", "cases"
+  add_foreign_key "check_results", "cluster_checks"
+  add_foreign_key "check_results", "logs"
   add_foreign_key "check_results", "users"
+  add_foreign_key "checks", "check_categories"
+  add_foreign_key "cluster_checks", "checks"
+  add_foreign_key "cluster_checks", "clusters"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"
