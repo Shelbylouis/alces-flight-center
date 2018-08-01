@@ -50,7 +50,6 @@ class ClustersController < ApplicationController
           component_id: params["#{id}-component"],
           user_id: current_user.id
         )
-        SlackNotifier.log_notification(@new_log) if @new_log.save
       end
 
       result = CheckResult.new(
@@ -63,6 +62,10 @@ class ClustersController < ApplicationController
       )
 
       if result.save
+        if @new_log
+          SlackNotifier.log_notification(@new_log) if @new_log.save
+        end
+
         flash[:success] = 'Cluster check results successfully saved.'
       else
         flash[:error] = 'Error while trying to save the cluster check results.'
