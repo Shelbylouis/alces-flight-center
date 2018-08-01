@@ -55,7 +55,7 @@ class ClustersController < ApplicationController
 
       result = CheckResult.new(
         cluster_check: cluster_check,
-        date: Date.today,
+        date: Date.current,
         user: current_user,
         result: params["#{id}-result"],
         comment: params["#{id}-comment"],
@@ -73,7 +73,7 @@ class ClustersController < ApplicationController
   end
 
   def checks
-    @date = params[:date]&.to_date || Date.today
+    @date = params[:date]&.to_date || Date.current
     @date_checks = check_results_by_date(@date)
   end
 
