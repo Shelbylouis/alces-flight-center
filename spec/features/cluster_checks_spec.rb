@@ -5,8 +5,8 @@ RSpec.describe 'Cluster checks', type: :feature do
   let(:contact) { create(:contact, site: site) }
   let(:admin) { create(:admin) }
   let(:cluster) { create(:cluster, site: site) }
-  let(:check) { create(:check) }
-  let!(:cluster_check) { create(:cluster_check, cluster: cluster) }
+  let(:check) { create(:check, name: 'Is everything on fire?') }
+  let!(:cluster_check) { create(:cluster_check, check: check, cluster: cluster ) }
   let!(:check_result) {
     create(
       :check_result,
@@ -30,7 +30,7 @@ RSpec.describe 'Cluster checks', type: :feature do
       end
 
       it 'contains the clusters check' do
-        expect(page).to have_content('Check check testing 1 2 3')
+        expect(page).to have_content('Is everything on fire?')
       end
 
       it 'submits results correctly' do
