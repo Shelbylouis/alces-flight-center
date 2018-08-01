@@ -22,6 +22,12 @@ RSpec.describe 'Case editing', type: :feature do
   context 'as an admin' do
     let(:user) { create(:admin) }
 
+    let(:emails) { ActionMailer::Base.deliveries }
+
+    before(:each) do
+      emails.clear
+    end
+
     it 'allows editing case subject' do
       find('#case-subject-edit').click
       fill_in 'case[subject]', with: 'New subject'
@@ -35,6 +41,9 @@ RSpec.describe 'Case editing', type: :feature do
       kase.reload
 
       expect(kase.subject).to eq 'New subject'
+
+      expect(emails.count).to eq 1
+      expect(emails[0].subject).to have_text 'New subject'
     end
   end
 
