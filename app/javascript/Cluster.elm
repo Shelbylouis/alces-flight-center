@@ -22,7 +22,6 @@ import Issues
 import Json.Decode as D
 import Json.Decode.Pipeline as P
 import Maybe.Extra
-import SelectList exposing (SelectList)
 import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)

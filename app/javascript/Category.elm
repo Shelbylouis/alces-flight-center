@@ -11,7 +11,6 @@ module Category
 import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Json.Decode as D
-import SelectList exposing (SelectList)
 import SelectList.Extra
 
 

@@ -14,7 +14,6 @@ import Category exposing (Category)
 import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Json.Decode as D
-import Maybe.Extra
 import SelectList.Extra
 import Utils
 
