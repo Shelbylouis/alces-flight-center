@@ -7,7 +7,10 @@ class ClusterCheck < ApplicationRecord
 
   has_many :check_results
 
-  delegate :name, to: :check, allow_nil: true
+  validates :cluster, presence: true
+  validates :check, presence: true
+
+  delegate :name, to: :check
   delegate :check_category, to: :check
   delegate :site, to: :cluster
 end
