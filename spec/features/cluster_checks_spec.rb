@@ -6,8 +6,8 @@ RSpec.describe 'Cluster checks', type: :feature do
   let(:admin) { create(:admin) }
   let(:cluster) { create(:cluster, site: site) }
   let(:check) { create(:check) }
-  let(:cluster_check) { create(:cluster_check, cluster: cluster) }
-  let(:check_result) {
+  let!(:cluster_check) { create(:cluster_check, cluster: cluster) }
+  let!(:check_result) {
     create(
       :check_result,
       cluster_check: cluster_check,
@@ -19,11 +19,9 @@ RSpec.describe 'Cluster checks', type: :feature do
   describe 'Cluster submission form' do
     context 'as an admin' do
       let(:path) { cluster_check_submission_path(cluster, as: admin) }
-      let(:component) { create(:component, cluster: cluster) }
+      let!(:component) { create(:component, cluster: cluster) }
 
       before(:each) {
-        cluster_check
-        component
         visit path
       }
 
@@ -67,8 +65,8 @@ RSpec.describe 'Cluster checks', type: :feature do
     end
 
     context 'for a cluster with no checks' do
-      let(:cluster) { create(:cluster) }
-      let(:path) { cluster_check_submission_path(cluster, as: admin) }
+      let(:new_cluster) { create(:cluster) }
+      let(:path) { cluster_check_submission_path(new_cluster, as: admin) }
 
       it 'displays correct message' do
         visit path
@@ -81,7 +79,6 @@ RSpec.describe 'Cluster checks', type: :feature do
     let(:path) { cluster_checks_path(cluster, as: contact) }
 
     before(:each) do
-      check_result
       visit path
     end
 
