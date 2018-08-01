@@ -1,7 +1,7 @@
 class ClustersController < ApplicationController
   decorates_assigned :cluster
 
-  additional_read_only_actions = [:credit_usage, :documents, :checks]
+  additional_read_only_actions = [:credit_usage, :documents, :view_checks]
   after_action :verify_authorized,
     except: NO_AUTH_ACTIONS + additional_read_only_actions
 
@@ -38,7 +38,7 @@ class ClustersController < ApplicationController
     authorize @cluster
   end
 
-  def check_results
+  def save_check_results
     authorize @cluster
 
     @cluster.cluster_checks.each do |cluster_check|
@@ -75,7 +75,7 @@ class ClustersController < ApplicationController
     redirect_to cluster_checks_path(@cluster)
   end
 
-  def checks
+  def view_checks
     @date = params[:date]&.to_date || Date.current
     @date_checks = check_results_by_date(@date)
   end
