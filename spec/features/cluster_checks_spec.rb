@@ -52,6 +52,10 @@ RSpec.describe 'Cluster checks', type: :feature do
         choose 'failure'
         click_button 'Submit Cluster Check Results'
         expect(cluster.logs).to_not be_empty
+        cluster.logs.each do |log|
+          expect(log[:user_id]).to eq(admin.id)
+          expect(log[:component_id]).to eq(component.id)
+        end
       end
     end
 
