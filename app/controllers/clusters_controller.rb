@@ -34,7 +34,7 @@ class ClustersController < ApplicationController
     redirect_to cluster_credit_usage_path(@cluster)
   end
 
-  def check_submission
+  def enter_check_results
     authorize @cluster
   end
 

@@ -122,7 +122,7 @@ Rails.application.routes.draw do
       admin_logs.call
       notes.call(true)
       post :deposit
-      get '/checks/submit', to: 'clusters#check_submission', as: :check_submission
+      get '/checks/submit', to: 'clusters#enter_check_results', as: :check_submission
       post '/checks/submit', to: 'clusters#check_results', as: :set_check_results
       post '/checks/submit/preview', to: 'clusters#preview'
       post '/checks/submit/write', to: 'clusters#write'
