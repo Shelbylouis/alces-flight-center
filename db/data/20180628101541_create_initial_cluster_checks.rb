@@ -9,7 +9,7 @@ class CreateInitialClusterChecks < ActiveRecord::Migration[5.2]
     general_checks = [
       {
         name: 'Check connectivity (login)',
-        command: 'ssh DEMO'
+        command: 'ssh <login node>'
       },
       {
         name: 'Check controller messages logs',
@@ -36,7 +36,7 @@ class CreateInitialClusterChecks < ActiveRecord::Migration[5.2]
     create_checks(general_checks, general_category)
 
     master_category = CheckCategory.create!(
-      name: 'Master1/2'
+      name: 'Master Nodes'
     )
 
     master_checks = [
@@ -74,7 +74,7 @@ class CreateInitialClusterChecks < ActiveRecord::Migration[5.2]
 
     storage_checks = [
       {
-        name: 'Check messages logs on storage nodes oss1, oss2, nfs1, nfs2, mds1' ,
+        name: 'Check messages logs on storage nodes' ,
         command: 'less /var/log/messages'
       },
       {
@@ -82,7 +82,7 @@ class CreateInitialClusterChecks < ActiveRecord::Migration[5.2]
         command: 'less /var/logs/messages'
       },
       {
-        name: 'Check disk space available (local) oss/mds/nfs',
+        name: 'Check disk space available (local)',
         command: "pdsh storage 'df -h/' - 'df -h /tmp'"
       },
       {
@@ -90,11 +90,11 @@ class CreateInitialClusterChecks < ActiveRecord::Migration[5.2]
         command: 'df -h /users'
       },
       {
-        name: 'Check parallel filesystem (Lustre) capacity on login1',
+        name: 'Check parallel filesystem (Lustre) capacity on login node',
         command: 'lfs df -h'
       },
       {
-        name: 'Check parallel filesystem (Lustre) inodes on login1',
+        name: 'Check parallel filesystem (Lustre) inodes on login node',
         command: 'lfs df -i'
       },
       {
@@ -134,7 +134,7 @@ class CreateInitialClusterChecks < ActiveRecord::Migration[5.2]
     create_checks(storage_checks, storage_category)
 
     infra_category = CheckCategory.create!(
-      name: 'infra[1,2,3] nodes'
+      name: 'Infra Nodes'
     )
 
     infra_checks = [
@@ -155,7 +155,7 @@ class CreateInitialClusterChecks < ActiveRecord::Migration[5.2]
     create_checks(infra_checks, infra_category)
 
     login_category = CheckCategory.create!(
-      name: 'Logins (login[1-2] & viz0[1-2])'
+      name: 'Login Nodes'
     )
 
     login_checks = [
@@ -264,23 +264,23 @@ class CreateInitialClusterChecks < ActiveRecord::Migration[5.2]
     ganglia_checks = [
       {
         name: 'Check all nodes are reporting metrics',
-        command: 'http://flightcenter-ganglia/ganglia/?c=DEMO'
+        command: 'http://flightcenter-ganglia/ganglia/?c=<cluster>'
       },
       {
         name: 'Check for high memory usage',
-        command: 'http://flightcenter-ganglia/ganglia/?c=DEMO'
+        command: 'http://flightcenter-ganglia/ganglia/?c=<cluster>'
       },
       {
         name: 'Check for high swap usage',
-        command: 'http://flightcenter-ganglia/ganglia/?c=DEMO'
+        command: 'http://flightcenter-ganglia/ganglia/?c=<cluster>'
       },
       {
         name: 'Check for any high temperatures/hot spots in logs',
-        command: 'http://flightcenter-ganglia/ganglia/?c=DEMO'
+        command: 'http://flightcenter-ganglia/ganglia/?c=<cluster>'
       },
       {
         name: 'Check overall cluster load',
-        command: 'http://flightcenter-ganglia/ganglia/?c=DEMO'
+        command: 'http://flightcenter-ganglia/ganglia/?c=<cluster>'
       },
     ]
 
