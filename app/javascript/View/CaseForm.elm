@@ -14,7 +14,6 @@ import Html.Events exposing (onClick, onSubmit)
 import Issue
 import Issues
 import Markdown
-import Maybe.Extra
 import Msg exposing (..)
 import SelectList
 import Service
@@ -54,14 +53,13 @@ issueDrillDownSection state =
     -- and possible solutions (via different Tiers) to a problem they are
     -- having.
     section [] <|
-        Maybe.Extra.values
-            [ maybeClustersField state
-            , maybeServicesField state
-            , maybeCategoriesField state
-            , issuesField state |> Just
-            , maybeComponentsField state
-            , tierTabs state |> Just
-            ]
+        [ clustersField state
+        , servicesField state
+        , categoriesField state
+        , issuesField state
+        , componentsField state
+        , tierTabs state
+        ]
 
 
 dynamicFieldsSection : State -> Html Msg
@@ -110,26 +108,24 @@ dynamicFieldsSection state =
         section attributes fields
 
 
-maybeClustersField : State -> Maybe (Html Msg)
-maybeClustersField state =
+clustersField : State -> Html Msg
+clustersField state =
     if State.singleClusterAvailable state then
         -- Only one Cluster available => no need to display Cluster selection
         -- field.
-        Nothing
+        View.Utils.nothing
     else
-        Just
-            (Fields.selectField Field.Cluster
-                state.clusters
-                Cluster.extractId
-                .name
-                (always False)
-                ChangeSelectedCluster
-                state
-            )
+        Fields.selectField Field.Cluster
+            state.clusters
+            Cluster.extractId
+            .name
+            (always False)
+            ChangeSelectedCluster
+            state
 
 
-maybeCategoriesField : State -> Maybe (Html Msg)
-maybeCategoriesField state =
+categoriesField : State -> Html Msg
+categoriesField state =
     State.selectedService state
         |> .issues
         |> Issues.categories
@@ -143,6 +139,7 @@ maybeCategoriesField state =
                     ChangeSelectedCategory
                     state
             )
+        |> Maybe.withDefault View.Utils.nothing
 
 
 issuesField : State -> Html Msg
@@ -230,8 +227,8 @@ displayWrapperToTab position wrapper =
         ]
 
 
-maybeComponentsField : State -> Maybe (Html Msg)
-maybeComponentsField state =
+componentsField : State -> Html Msg
+componentsField state =
     let
         config =
             if State.selectedIssue state |> Issue.requiresComponent |> not then
@@ -239,20 +236,20 @@ maybeComponentsField state =
             else
                 SelectionField .components
     in
-    PartsField.maybePartsField Field.Component
+    PartsField.partsField Field.Component
         config
         Component.extractId
         state
         ChangeSelectedComponent
 
 
-maybeServicesField : State -> Maybe (Html Msg)
-maybeServicesField state =
+servicesField : State -> Html Msg
+servicesField state =
     let
         config =
             SelectionField .services
     in
-    PartsField.maybePartsField Field.Service
+    PartsField.partsField Field.Service
         config
         Service.extractId
         state

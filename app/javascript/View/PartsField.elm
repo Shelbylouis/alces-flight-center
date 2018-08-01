@@ -1,4 +1,4 @@
-module View.PartsField exposing (PartsFieldConfig(..), maybePartsField)
+module View.PartsField exposing (PartsFieldConfig(..), partsField)
 
 import Cluster exposing (Cluster)
 import ClusterPart exposing (ClusterPart)
@@ -9,9 +9,13 @@ import SelectList exposing (Position(..), SelectList)
 import State exposing (State)
 import SupportType exposing (HasSupportType)
 import View.Fields as Fields
+import View.Utils
 
 
-type PartsFieldConfig a
+type
+    PartsFieldConfig a
+    -- XXX Could remove this and simplify now, the `NotRequired` case could
+    -- just be handled directly and more simply in CaseForm?
     = SelectionField (Cluster -> DrillDownSelectList (ClusterPart a))
     | NotRequired
 
@@ -20,14 +24,14 @@ type alias PartsFromCluster a =
     Cluster -> SelectList (ClusterPart a)
 
 
-maybePartsField :
+partsField :
     Field
     -> PartsFieldConfig a
     -> (ClusterPart a -> Int)
     -> State
     -> (String -> msg)
-    -> Maybe (Html msg)
-maybePartsField field partsFieldConfig toId state changeMsg =
+    -> Html msg
+partsField field partsFieldConfig toId state changeMsg =
     let
         labelForPart =
             \part ->
@@ -48,7 +52,6 @@ maybePartsField field partsFieldConfig toId state changeMsg =
                     (always False)
                     changeMsg
                     state
-                    |> Just
 
         cluster =
             State.selectedCluster state
@@ -66,4 +69,4 @@ maybePartsField field partsFieldConfig toId state changeMsg =
         NotRequired ->
             -- Issue does not require a part of this type => do not show any
             -- select.
-            Nothing
+            View.Utils.nothing
