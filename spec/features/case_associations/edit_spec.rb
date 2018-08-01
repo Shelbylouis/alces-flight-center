@@ -45,7 +45,6 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
   end
 
   context 'for a case with no associations' do
-    # Implicitly: associated with entire cluster
     let(:kase) {
       create(
         :open_case,
