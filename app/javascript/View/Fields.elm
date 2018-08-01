@@ -181,7 +181,7 @@ formField field htmlFn additionalAttributes children optional help state =
         errors =
             Validation.validateField field state
     in
-    if Field.parentFieldHasBeenSelected state field then
+    View.Utils.showIfParentFieldSelected state field <|
         div [ class "form-group" ]
             [ label
                 [ for identifier ]
@@ -191,8 +191,6 @@ formField field htmlFn additionalAttributes children optional help state =
             , helpElement
             , validationFeedback errors
             ]
-    else
-        View.Utils.nothing
 
 
 hiddenFieldWithVisibleErrors : Field -> State -> Html msg

@@ -1,7 +1,9 @@
 module View.Utils exposing (..)
 
+import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import State exposing (State)
 
 
 supportEmailLink : Html msg
@@ -20,3 +22,11 @@ supportEmailLink =
 nothing : Html msg
 nothing =
     text ""
+
+
+showIfParentFieldSelected : State -> Field -> Html msg -> Html msg
+showIfParentFieldSelected state field html =
+    if Field.parentFieldHasBeenSelected state field then
+        html
+    else
+        nothing
