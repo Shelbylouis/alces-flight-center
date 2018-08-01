@@ -19,7 +19,20 @@ unwrap selectList =
             s
 
 
+hasBeenSelected : DrillDownSelectList a -> Bool
+hasBeenSelected selectList =
+    case selectList of
+        Unselected _ ->
+            False
 
+        Selected _ ->
+            True
+
+
+
+-- XXX Consider distinguishing these functions more - functions above are
+-- DrillDownSelectList-specific, whereas those below are just wrappers around
+-- SelectList functions.
 -- XXX Rename arguments and/or simplify functions in this file?
 -- XXX Or pull in or reference docs from SelectList.Extra?
 

@@ -1,5 +1,14 @@
-module Field exposing (..)
+module Field
+    exposing
+        ( Field(..)
+        , hasBeenTouched
+        , isDynamicField
+        , parentFieldHasBeenSelected
+        )
 
+import DrillDownSelectList
+import Issues exposing (Issues(..))
+import State exposing (State)
 import Tier.Field
 
 
@@ -48,3 +57,83 @@ hasBeenTouched field =
             -- Always consider every other field touched, since they all start
             -- pre-filled.
             True
+
+
+parentFieldHasBeenSelected : State -> Field -> Bool
+parentFieldHasBeenSelected state field =
+    case field of
+        Cluster ->
+            True
+
+        Service ->
+            clusterSelected state
+
+        Component ->
+            -- Whether a Component is required is dependent on whether the
+            -- current Issue requires a Component, so the user must also have
+            -- first selected an Issue before we decide whether to display this
+            -- field.
+            issueSelected state
+
+        Category ->
+            case selectedServiceIssues state of
+                CategorisedIssues categories ->
+                    serviceSelected state
+
+                JustIssues _ ->
+                    False
+
+        Issue ->
+            case selectedServiceIssues state of
+                CategorisedIssues categories ->
+                    categorySelected state
+
+                JustIssues _ ->
+                    serviceSelected state
+
+        Tier ->
+            issueSelected state
+
+        Subject ->
+            issueSelected state
+
+        TierField _ ->
+            issueSelected state
+
+
+selectedServiceIssues : State -> Issues
+selectedServiceIssues state =
+    State.selectedService state |> .issues
+
+
+clusterSelected : State -> Bool
+clusterSelected state =
+    DrillDownSelectList.hasBeenSelected state.clusters
+
+
+serviceSelected : State -> Bool
+serviceSelected state =
+    State.selectedCluster state
+        |> .services
+        |> DrillDownSelectList.hasBeenSelected
+
+
+categorySelected : State -> Bool
+categorySelected state =
+    State.selectedService state
+        |> .issues
+        |> (\issues ->
+                case issues of
+                    JustIssues _ ->
+                        False
+
+                    CategorisedIssues categories ->
+                        DrillDownSelectList.hasBeenSelected categories
+           )
+
+
+issueSelected : State -> Bool
+issueSelected state =
+    selectedServiceIssues state
+        |> Issues.availableIssues
+        |> DrillDownSelectList.hasBeenSelected
