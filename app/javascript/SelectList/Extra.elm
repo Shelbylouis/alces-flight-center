@@ -5,9 +5,7 @@ module SelectList.Extra
         , fromList
         , mapSelected
         , nameOrderedDecoder
-        , nestedSelect
         , orderedDecoder
-        , updateNested
         )
 
 import Json.Decode as D
@@ -87,50 +85,6 @@ mapSelected transform selectList =
                 item
         )
         selectList
-
-
-{-|
-
-    Given a SelectList of `a`, where an `a` also contains a SelectList of `b`,
-    update the selected `a` to change its SelectList of `b` to select the first
-    `b` that isSelectable returns True for.
-
--}
-nestedSelect :
-    SelectList a
-    -> (a -> SelectList b)
-    -> (a -> SelectList b -> a)
-    -> (b -> Bool)
-    -> SelectList a
-nestedSelect selectList getNested asNestedIn isSelectable =
-    updateNested
-        selectList
-        getNested
-        asNestedIn
-        (SelectList.select isSelectable)
-
-
-{-|
-
-    As above but more general; apply an arbitrary `transform` to the nested
-    SelectList.
-
--}
-updateNested :
-    SelectList a
-    -> (a -> SelectList b)
-    -> (a -> SelectList b -> a)
-    -> (SelectList b -> SelectList b)
-    -> SelectList a
-updateNested selectList getNested asNestedIn transform =
-    let
-        updateNested =
-            \item ->
-                getNested item
-                    |> transform
-                    |> asNestedIn item
-    in
-    mapSelected updateNested selectList
 
 
 {-|

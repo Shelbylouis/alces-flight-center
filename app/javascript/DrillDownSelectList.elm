@@ -60,6 +60,14 @@ mapSelected transform selectList =
         |> Selected
 
 
+{-|
+
+    Given a DrillDownSelectList of `a`, where an `a` also contains a
+    DrillDownSelectList of `b`, update the selected `a` to change its
+    DrillDownSelectList of `b` to select the first `b` that isSelectable
+    returns True for.
+
+-}
 nestedSelect :
     DrillDownSelectList a
     -> (a -> DrillDownSelectList b)
@@ -74,6 +82,12 @@ nestedSelect selectList getNested asNestedIn isSelectable =
         (select isSelectable)
 
 
+{-|
+
+    As above but more general; apply an arbitrary `transform` to the nested
+    DrillDownSelectList.
+
+-}
 updateNested :
     -- XXX Collapse back into simple `updateNested` function?
     -- XXX Can this just use function from SelectList.Extra?
