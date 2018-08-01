@@ -1,4 +1,4 @@
-<%= associations.first.decorate.links %>
+<%= associations.first&.decorate&.links || 'None' %>
 <% if associations.length > 1 %>
   <% contents = render 'cases/associations/group_contents', items: associations do %>
     <p>Affected components:</p>
