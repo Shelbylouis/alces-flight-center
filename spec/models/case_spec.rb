@@ -566,8 +566,9 @@ RSpec.describe Case, type: :model do
         )
       end
 
-      it 'lists cluster as association' do
-        expect(subject.associations).to eq [cluster]
+      it 'lists nothing as associations' do
+        # This used to pretend that the cluster was associated.
+        expect(subject.associations).to eq []
       end
     end
   end

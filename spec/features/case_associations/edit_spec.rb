@@ -53,6 +53,27 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
       )
     }
 
+    it 'marks nothing as associated' do
+      cluster_checkbox = checkbox_for[cluster]
+
+      expect(cluster_checkbox).not_to be_checked
+
+      expect(
+        find_all('input[type=checkbox]').map(&:checked?).reduce(false, :|)
+      ).to eq false
+    end
+
+  end
+
+  context 'for a case associated with an entire cluster' do
+    let(:kase) {
+      create(
+        :open_case,
+        cluster: cluster,
+        clusters: [cluster]
+      )
+    }
+
     it 'marks entire cluster as associated' do
       cluster_checkbox = checkbox_for[cluster]
 
