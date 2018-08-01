@@ -28,14 +28,16 @@
     <%= render 'partials/nav_bar' %>
     <div class='page-content'>
 
-      <% if @title %>
-          <div class="card title-card">
-            <div class="card-body">
-              <h1><%= @title %></h1>
-              <% if content_for? :subtitle %>
-                <p class="lead" style="font-size: 18px;">
-                  <%= yield :subtitle %>
-                </p>
+      <% if content_for? :title %>
+        <%= yield :title %>
+      <% elsif @title %>
+        <div class="card title-card">
+          <div class="card-body">
+            <h1><%= @title %></h1>
+            <% if content_for? :subtitle %>
+              <p class="lead" style="font-size: 18px;">
+                <%= yield :subtitle %>
+              </p>
             <% end %>
           </div>
         </div>

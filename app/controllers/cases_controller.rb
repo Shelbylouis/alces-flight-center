@@ -18,7 +18,6 @@ class CasesController < ApplicationController
     else
       not_found unless @scope.cases.include? @case
       @comment = @case.case_comments.new
-      @title = "#{@case.display_id}: #{@case.subject}"
     end
   end
 
@@ -81,6 +80,38 @@ class CasesController < ApplicationController
         flash[:error] = "Error creating support case: #{errors}." if errors
         redirect_back fallback_location: @case.cluster ? cluster_path(@case.cluster) : root_path
       end
+    end
+  end
+
+  UPDATABLE_FIELDS = [:subject].freeze
+
+  def update
+
+    fields_changing = params.require(:case).permit(UPDATABLE_FIELDS)
+
+    change_action 'Support case %s updated.' do |kase|
+      old_fields = {}.tap do |fields|
+        fields_changing.to_h.keys.each { |f| fields[f.to_sym] = kase.send(f) }
+      end
+
+      kase.update(  # update! doesn't work here FSR :(
+        fields_changing
+      )
+      kase.save!
+
+      old_fields.each do |field, old_value|
+        mailer_method = "change_#{field}".to_sym
+
+        next unless CaseMailer.respond_to?(mailer_method)
+
+        CaseMailer.send(
+          mailer_method,
+          kase,
+          old_value,
+          kase.send(field)
+        ).deliver_later
+      end
+
     end
   end
 

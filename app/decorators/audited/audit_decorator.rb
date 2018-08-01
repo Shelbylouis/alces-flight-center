@@ -98,5 +98,17 @@ module Audited
     def tier_level_details
       'Tier Change'
     end
+
+    def subject_text(from, to)
+      "Changed the subject of this case from '#{from}' to '#{to}'."
+    end
+
+    def subject_type
+      'pencil-square-o'
+    end
+
+    def subject_details
+      'Subject Change'
+    end
   end
 end

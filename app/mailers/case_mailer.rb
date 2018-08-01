@@ -24,6 +24,16 @@ class CaseMailer < ApplicationMailer
     SlackNotifier.assignee_notification(@case, @assignee)
   end
 
+  def change_subject(my_case, old_val, new_val)
+    @case = my_case
+    @old = old_val
+    @new = new_val
+    mail(
+      cc: @case.email_recipients,
+      subject: @case.email_reply_subject
+    )
+  end
+
   def comment(comment)
     @comment = comment
     @case = @comment.case
