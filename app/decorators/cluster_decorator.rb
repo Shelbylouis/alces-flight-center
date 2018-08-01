@@ -39,7 +39,12 @@ class ClusterDecorator < ApplicationDecorator
       id: id,
       name: name,
       components: components.map(&:case_form_json),
-      services: services.map(&:case_form_json),
+      services: services.map(&:case_form_json).tap { |services|
+        # We inject an 'Other' Service, to allow Users to create Issues they do
+        # not think are associated to any existing Service via the usual Case
+        # form drill-down process.
+        services << other_service_json if other_service_json
+      },
       supportType: support_type,
       chargingInfo: charging_info,
       # Encode MOTD in two forms: the raw form, to be used as the initial value
@@ -108,4 +113,35 @@ class ClusterDecorator < ApplicationDecorator
       }
     end
   end
+
+  def other_service_json
+    return unless IssuesJsonBuilder.other_service_issues.present?
+    @other_service_json ||=
+      other_service
+      .decorate
+      .case_form_json
+      .merge(IssuesJsonBuilder.build_for(self))
+  end
+
+  def other_service
+    Service.new(
+      id: -1,
+      name: 'Other or N/A',
+      support_type: 'managed',
+      service_type: ServiceType.new
+    )
+  end
+
+  class IssuesJsonBuilder < ServiceDecorator::IssuesJsonBuilder
+    private
+
+    def self.other_service_issues
+      Issue.where(requires_component: false, requires_service: false).decorate.reject(&:special?)
+    end
+
+    def applicable_issues
+      self.class.other_service_issues
+    end
+  end
+
 end
