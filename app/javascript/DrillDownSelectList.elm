@@ -1,4 +1,15 @@
-module DrillDownSelectList exposing (..)
+module DrillDownSelectList
+    exposing
+        ( DrillDownSelectList(..)
+        , hasBeenSelected
+        , mapSelected
+        , nestedSelect
+        , select
+        , selected
+        , toList
+        , unwrap
+        , updateNested
+        )
 
 import SelectList exposing (SelectList)
 import SelectList.Extra
@@ -29,6 +40,28 @@ hasBeenSelected selectList =
             True
 
 
+{-| Map over the SelectList contained by the DrillDownSelectList.
+
+    Note this does not map over the items of the contained SelectList itself,
+    i.e.  it is not a wrapper for `SelectList.map`. If we later need that,
+    possibly we should extract a new module for DrillDownSelectList's wrapper
+    functions to avoid confusion over which functions operate on the SelectList
+    as a whole vs the items within the SelectList.
+
+-}
+map :
+    (SelectList a -> SelectList b)
+    -> DrillDownSelectList a
+    -> DrillDownSelectList b
+map transform selectList =
+    case selectList of
+        Selected s ->
+            Selected <| transform s
+
+        Unselected s ->
+            Unselected <| transform s
+
+
 
 -- XXX Consider distinguishing these functions more - functions above are
 -- DrillDownSelectList-specific, whereas those below are just wrappers around
@@ -54,10 +87,7 @@ selected =
 
 mapSelected : (a -> a) -> DrillDownSelectList a -> DrillDownSelectList a
 mapSelected transform selectList =
-    unwrap selectList
-        |> SelectList.Extra.mapSelected transform
-        -- XXX Should this always return `Selected`?
-        |> Selected
+    map (SelectList.Extra.mapSelected transform) selectList
 
 
 {-|
