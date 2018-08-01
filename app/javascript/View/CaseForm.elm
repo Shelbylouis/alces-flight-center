@@ -6,7 +6,6 @@ import Category
 import Cluster
 import Component
 import Dict
-import DrillDownSelectList
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -228,8 +227,6 @@ maybeComponentsField state =
         config =
             if State.selectedIssue state |> Issue.requiresComponent |> not then
                 NotRequired
-            else if state.singleComponent then
-                SinglePartField (State.selectedComponent state)
             else
                 SelectionField .components
     in
@@ -244,20 +241,7 @@ maybeServicesField : State -> Maybe (Html Msg)
 maybeServicesField state =
     let
         config =
-            if state.singleComponent && singleServiceApplicable then
-                -- No need to allow selection of a Service if we're in single
-                -- Component mode and there's only one Service with Issues
-                -- which require a Component.
-                NotRequired
-            else if state.singleService then
-                SinglePartField (State.selectedService state)
-            else
-                SelectionField .services
-
-        singleServiceApplicable =
-            DrillDownSelectList.toList state.clusters
-                |> List.length
-                |> (==) 1
+            SelectionField .services
     in
     PartsField.maybePartsField Field.Service
         config

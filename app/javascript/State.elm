@@ -33,8 +33,6 @@ import Tier.Level
 type alias State =
     { clusters : DrillDownSelectList Cluster
     , error : Maybe String
-    , singleComponent : Bool
-    , singleService : Bool
     , isSubmitting : Bool
     , clusterChargingInfoModal : Modal.Visibility
     , chargeablePreSubmissionModal : Modal.Visibility
@@ -45,69 +43,17 @@ decoder : D.Decoder State
 decoder =
     let
         createInitialState =
-            \( clusters, mode ) ->
+            \clusters ->
                 let
                     initialState =
                         { clusters = clusters
                         , error = Nothing
-                        , singleComponent = False
-                        , singleService = False
                         , isSubmitting = False
                         , clusterChargingInfoModal = Modal.hidden
                         , chargeablePreSubmissionModal = Modal.hidden
                         }
                 in
-                case mode of
-                    SingleComponentMode id ->
-                        let
-                            singleClusterWithSingleComponentSelected =
-                                Cluster.setSelectedComponent clusters id
-
-                            applicableServices =
-                                -- Only include Services, and Issues within
-                                -- them, which require a Component.
-                                DrillDownSelectList.selected singleClusterWithSingleComponentSelected
-                                    |> .services
-                                    |> Service.filterByIssues Issue.requiresComponent
-                        in
-                        case applicableServices of
-                            Just services ->
-                                let
-                                    newClusters =
-                                        -- Set just the applicable Services in
-                                        -- the single Cluster SelectList.
-                                        DrillDownSelectList.selected singleClusterWithSingleComponentSelected
-                                            |> Cluster.setServices services
-                                            |> SelectList.singleton
-                                            |> DrillDownSelectList.Unselected
-                                in
-                                D.succeed
-                                    { initialState
-                                        | clusters = newClusters
-                                        , singleComponent = True
-                                    }
-
-                            Nothing ->
-                                D.fail "expected some Issues to exist requiring a Component, but none were found"
-
-                    SingleServiceMode id ->
-                        let
-                            singleClusterWithSingleServiceSelected =
-                                Cluster.setSelectedService clusters id
-
-                            partialNewState =
-                                { initialState
-                                    | clusters = singleClusterWithSingleServiceSelected
-                                    , singleService = True
-                                }
-
-                            singleService =
-                                selectedService partialNewState
-                        in
-                        D.succeed partialNewState
-
-                    ClusterMode ->
-                        D.succeed initialState
+                D.succeed initialState
 
         setClustersSelectedIfSingleClusterAvailable state =
             if singleClusterAvailable state then
@@ -119,13 +65,10 @@ decoder =
             else
                 state
     in
-    D.map2
-        (,)
-        (D.field "clusters" <|
-            D.map DrillDownSelectList.Unselected <|
-                SelectList.Extra.nameOrderedDecoder Cluster.decoder
-        )
-        (D.field "singlePart" <| modeDecoder)
+    (D.field "clusters" <|
+        D.map DrillDownSelectList.Unselected <|
+            SelectList.Extra.nameOrderedDecoder Cluster.decoder
+    )
         |> D.andThen
             (createInitialState
                 -- If only a single Cluster is available we hide the Cluster
@@ -135,46 +78,6 @@ decoder =
                 -- the same way as if a user had selected one.
                 >> D.map setClustersSelectedIfSingleClusterAvailable
             )
-
-
-type Mode
-    = ClusterMode
-    | SingleComponentMode Component.Id
-    | SingleServiceMode Service.Id
-
-
-type alias SinglePartModeFields =
-    { id : Int
-    , type_ : String
-    }
-
-
-modeDecoder : D.Decoder Mode
-modeDecoder =
-    let
-        singlePartModeFieldsDecoder =
-            D.map2 SinglePartModeFields
-                (D.field "id" D.int)
-                (D.field "type" D.string)
-
-        fieldsToMode =
-            Maybe.map singlePartModeDecoder
-                >> Maybe.withDefault (D.succeed ClusterMode)
-    in
-    D.nullable singlePartModeFieldsDecoder |> D.andThen fieldsToMode
-
-
-singlePartModeDecoder : SinglePartModeFields -> D.Decoder Mode
-singlePartModeDecoder fields =
-    case fields.type_ of
-        "component" ->
-            Component.Id fields.id |> SingleComponentMode |> D.succeed
-
-        "service" ->
-            Service.Id fields.id |> SingleServiceMode |> D.succeed
-
-        _ ->
-            "Unknown type: " ++ fields.type_ |> D.fail
 
 
 encoder : State -> E.Value

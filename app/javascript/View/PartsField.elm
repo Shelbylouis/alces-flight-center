@@ -13,7 +13,6 @@ import View.Fields as Fields
 
 type PartsFieldConfig a
     = SelectionField (Cluster -> DrillDownSelectList (ClusterPart a))
-    | SinglePartField (ClusterPart a)
     | NotRequired
 
 
@@ -63,12 +62,6 @@ maybePartsField field partsFieldConfig toId state changeMsg =
             -- Issue requires a part of this type => allow selection from all
             -- parts of this type for Cluster.
             selectField allParts
-
-        SinglePartField part ->
-            -- We're creating a Case for a specific part => don't want to allow
-            -- selection of another part, but do still want to display any
-            -- error between this part and selected Issue.
-            Nothing
 
         NotRequired ->
             -- Issue does not require a part of this type => do not show any

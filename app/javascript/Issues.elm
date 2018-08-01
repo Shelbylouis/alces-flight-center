@@ -5,7 +5,6 @@ module Issues
         , categories
         , decoder
         , mapIssue
-        , matchingIssues
         , selectCategory
         , selectIssue
         , selectedIssue
@@ -121,52 +120,3 @@ availableIssues issues =
 
         JustIssues issues ->
             issues
-
-
-matchingIssues : (Issue -> Bool) -> Issues -> Maybe Issues
-matchingIssues condition issues =
-    let
-        filterIssues =
-            \issues ->
-                let
-                    issuesConstructor =
-                        case issues of
-                            DrillDownSelectList.Selected _ ->
-                                DrillDownSelectList.Selected
-
-                            DrillDownSelectList.Unselected _ ->
-                                DrillDownSelectList.Unselected
-                in
-                DrillDownSelectList.toList issues
-                    |> List.filter condition
-                    |> SelectList.Extra.fromList
-                    |> Maybe.map issuesConstructor
-
-        filterCategoriesAndIssues =
-            \categories ->
-                let
-                    categoriesConstructor =
-                        case categories of
-                            DrillDownSelectList.Selected _ ->
-                                DrillDownSelectList.Selected
-
-                            DrillDownSelectList.Unselected _ ->
-                                DrillDownSelectList.Unselected
-                in
-                DrillDownSelectList.toList categories
-                    |> List.map
-                        (\category ->
-                            filterIssues category.issues
-                                |> Maybe.map (Category.asIssuesIn category)
-                        )
-                    |> Maybe.Extra.values
-                    |> SelectList.Extra.fromList
-                    |> Maybe.map (categoriesConstructor >> CategorisedIssues)
-    in
-    case issues of
-        CategorisedIssues categories ->
-            filterCategoriesAndIssues categories
-
-        JustIssues issues ->
-            filterIssues issues
-                |> Maybe.map JustIssues

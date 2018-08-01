@@ -5,7 +5,6 @@ import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Issues exposing (Issues(..))
 import Json.Decode as D
-import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import SupportType exposing (SupportType)
@@ -22,30 +21,6 @@ type alias Service =
 
 type Id
     = Id Int
-
-
-filterByIssues : (Issue -> Bool) -> DrillDownSelectList Service -> Maybe (DrillDownSelectList Service)
-filterByIssues condition servicesList =
-    let
-        filter services constructor =
-            SelectList.map (withJustMatchingIssues condition) services
-                |> SelectList.toList
-                |> Maybe.Extra.values
-                |> SelectList.Extra.fromList
-                |> Maybe.map constructor
-    in
-    case servicesList of
-        DrillDownSelectList.Selected services ->
-            filter services DrillDownSelectList.Selected
-
-        DrillDownSelectList.Unselected services ->
-            filter services DrillDownSelectList.Unselected
-
-
-withJustMatchingIssues : (Issue -> Bool) -> Service -> Maybe Service
-withJustMatchingIssues condition service =
-    Issues.matchingIssues condition service.issues
-        |> Maybe.map (asIssuesIn service)
 
 
 asIssuesIn : Service -> Issues -> Service
