@@ -14,7 +14,6 @@ import Category exposing (Category)
 import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Json.Decode as D
-import SelectList.Extra
 import Utils
 
 
@@ -33,12 +32,10 @@ decoder clusterMotd =
             Category.decoder clusterMotd
     in
     D.oneOf
-        [ SelectList.Extra.orderedDecoder Issue.name issueDecoder
-            |> D.map DrillDownSelectList.Unselected
+        [ DrillDownSelectList.orderedDecoder Issue.name issueDecoder
             |> D.map JustIssues
             |> D.field "issues"
-        , SelectList.Extra.orderedDecoder .name categoryDecoder
-            |> D.map DrillDownSelectList.Unselected
+        , DrillDownSelectList.nameOrderedDecoder categoryDecoder
             |> D.map CategorisedIssues
             |> D.field "categories"
         ]

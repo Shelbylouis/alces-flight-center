@@ -24,7 +24,6 @@ import Issues exposing (Issues)
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
-import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)
 import Tier exposing (Tier)
@@ -63,8 +62,7 @@ decoder =
                 state
     in
     (D.field "clusters" <|
-        D.map DrillDownSelectList.Unselected <|
-            SelectList.Extra.nameOrderedDecoder Cluster.decoder
+        DrillDownSelectList.nameOrderedDecoder Cluster.decoder
     )
         |> D.andThen
             (createInitialState

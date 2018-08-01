@@ -11,7 +11,6 @@ module Category
 import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Json.Decode as D
-import SelectList.Extra
 
 
 type alias Category =
@@ -35,11 +34,7 @@ decoder clusterMotd =
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
         (D.field "issues"
-            (SelectList.Extra.orderedDecoder
-                Issue.name
-                issueDecoder
-                |> D.map DrillDownSelectList.Unselected
-            )
+            (DrillDownSelectList.orderedDecoder Issue.name issueDecoder)
         )
 
 

@@ -22,7 +22,6 @@ import Issues
 import Json.Decode as D
 import Json.Decode.Pipeline as P
 import Maybe.Extra
-import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)
 import Tier
@@ -64,16 +63,9 @@ decodeWithMotd maybeMotd =
         |> P.required "id" (D.int |> D.map Id)
         |> P.required "name" D.string
         |> P.required "components"
-            -- XXX DRY up and/or extract functions for this sort of decoding,
-            -- both here and everywhere else where we `D.map
-            -- DrillDownSelectList.Unselected`.
-            (SelectList.Extra.nameOrderedDecoder Component.decoder
-                |> D.map DrillDownSelectList.Unselected
-            )
+            (DrillDownSelectList.nameOrderedDecoder Component.decoder)
         |> P.required "services"
-            (SelectList.Extra.nameOrderedDecoder serviceDecoder
-                |> D.map DrillDownSelectList.Unselected
-            )
+            (DrillDownSelectList.nameOrderedDecoder serviceDecoder)
         |> P.required "supportType" SupportType.decoder
         |> P.required "chargingInfo"
             (D.nullable D.string

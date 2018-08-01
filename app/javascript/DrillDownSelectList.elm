@@ -3,7 +3,9 @@ module DrillDownSelectList
         ( DrillDownSelectList(..)
         , hasBeenSelected
         , mapSelected
+        , nameOrderedDecoder
         , nestedSelect
+        , orderedDecoder
         , select
         , selected
         , toList
@@ -11,6 +13,7 @@ module DrillDownSelectList
         , updateNested
         )
 
+import Json.Decode as D
 import SelectList exposing (SelectList)
 import SelectList.Extra
 
@@ -141,3 +144,18 @@ updateNested selectList getNested asNestedIn transform =
 toList : DrillDownSelectList a -> List a
 toList =
     unwrap >> SelectList.toList
+
+
+nameOrderedDecoder :
+    D.Decoder { a | name : comparable }
+    -> D.Decoder (DrillDownSelectList { a | name : comparable })
+nameOrderedDecoder =
+    SelectList.Extra.nameOrderedDecoder >> D.map Unselected
+
+
+orderedDecoder :
+    (a -> comparable)
+    -> D.Decoder a
+    -> D.Decoder (DrillDownSelectList a)
+orderedDecoder compare =
+    SelectList.Extra.orderedDecoder compare >> D.map Unselected
