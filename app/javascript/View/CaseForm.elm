@@ -6,11 +6,13 @@ import Category
 import Cluster
 import Component
 import Dict
+import DrillDownSelectList
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Attributes.Extra
 import Html.Events exposing (onClick, onSubmit)
+import Html.Keyed
 import Issue
 import Issues
 import Markdown
@@ -49,16 +51,61 @@ view state =
 
 issueDrillDownSection : State -> Html Msg
 issueDrillDownSection state =
+    -- XXX There's a certain amount of duplication between the logic here and
+    -- in `Field.parentFieldHasBeenSelected`, as we need to find the same
+    -- parent select lists but for a different purpose - consider DRYing these
+    -- up.
+    let
+        keyedSection =
+            Html.Keyed.node "section"
+
+        issuesFieldKey =
+            case State.selectedServiceIssues state of
+                Issues.JustIssues _ ->
+                    "issues-for-service-" ++ selectedServiceId
+
+                Issues.CategorisedIssues categories ->
+                    let
+                        selectedCategoryId =
+                            DrillDownSelectList.selected categories
+                                |> .id
+                                |> toString
+                    in
+                    "issues-for-category-" ++ selectedCategoryId
+
+        selectedClusterId =
+            State.selectedCluster state
+                |> .id
+                |> toString
+
+        selectedServiceId =
+            State.selectedService state
+                |> .id
+                |> toString
+
+        selectedIssueId =
+            State.selectedIssue state
+                |> Issue.id
+                |> toString
+    in
     -- These fields allow a user to drill down to identify the particular Issue
     -- and possible solutions (via different Tiers) to a problem they are
     -- having.
-    section [] <|
-        [ clustersField state
-        , servicesField state
-        , categoriesField state
-        , issuesField state
-        , componentsField state
-        , tierTabs state
+    --
+    -- We key each field in such a way that a new key is used each time the
+    -- parent field, and therefore the items within each `select`, change. This
+    -- prevents Elm from reusing different `select`s when this happens, which
+    -- in turn is useful as `selected` is only applied to a `select` `option`
+    -- on render, and so if a `select` is reused it can cause weird behaviour
+    -- with the selected option not corresponding with the selected item in the
+    -- model.
+    keyedSection [] <|
+        [ ( "clusters", clustersField state )
+        , ( "services-for-cluster-" ++ selectedClusterId, servicesField state )
+        , ( "categories-for-service-" ++ selectedServiceId, categoriesField state )
+        , ( issuesFieldKey, issuesField state )
+        , ( "components-for-issue-" ++ selectedIssueId, componentsField state )
+        , ( "tiers-for-issue-" ++ selectedIssueId, tierTabs state )
         ]
 
 
