@@ -48,7 +48,7 @@ class ClustersController < ApplicationController
         @new_log = @cluster.logs.build(
           details: params["#{id}-comment"],
           component_id: params["#{id}-component"],
-          user_id: current_user.id
+          user: current_user
         )
       end
 
