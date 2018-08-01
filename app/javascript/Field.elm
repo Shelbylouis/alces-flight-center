@@ -76,7 +76,7 @@ parentFieldHasBeenSelected state field =
             issueSelected state
 
         Category ->
-            case selectedServiceIssues state of
+            case State.selectedServiceIssues state of
                 CategorisedIssues categories ->
                     serviceSelected state
 
@@ -84,7 +84,7 @@ parentFieldHasBeenSelected state field =
                     False
 
         Issue ->
-            case selectedServiceIssues state of
+            case State.selectedServiceIssues state of
                 CategorisedIssues categories ->
                     categorySelected state
 
@@ -99,11 +99,6 @@ parentFieldHasBeenSelected state field =
 
         TierField _ ->
             issueSelected state
-
-
-selectedServiceIssues : State -> Issues
-selectedServiceIssues state =
-    State.selectedService state |> .issues
 
 
 clusterSelected : State -> Bool
@@ -134,6 +129,6 @@ categorySelected state =
 
 issueSelected : State -> Bool
 issueSelected state =
-    selectedServiceIssues state
+    State.selectedServiceIssues state
         |> Issues.availableIssues
         |> DrillDownSelectList.hasBeenSelected

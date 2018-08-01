@@ -9,6 +9,7 @@ module State
         , selectedIssue
         , selectedService
         , selectedServiceAvailableIssues
+        , selectedServiceIssues
         , selectedTier
         , selectedTierSupportUnavailable
         , singleClusterAvailable
@@ -19,7 +20,7 @@ import Cluster exposing (Cluster)
 import Component exposing (Component)
 import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
-import Issues
+import Issues exposing (Issues)
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
@@ -156,7 +157,12 @@ selectedTier state =
 
 selectedServiceAvailableIssues : State -> DrillDownSelectList Issue
 selectedServiceAvailableIssues state =
-    selectedService state |> .issues |> Issues.availableIssues
+    selectedServiceIssues state |> Issues.availableIssues
+
+
+selectedServiceIssues : State -> Issues
+selectedServiceIssues state =
+    selectedService state |> .issues
 
 
 selectedTierSupportUnavailable : State -> Bool
