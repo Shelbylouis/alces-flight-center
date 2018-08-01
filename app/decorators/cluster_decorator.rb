@@ -93,7 +93,7 @@ class ClusterDecorator < ApplicationDecorator
     if check_results.empty?
       'N/A'
     else
-      check_results.order(date: :desc).first.date unless self.check_results.empty?
+      check_results.order(date: :desc).first.date
     end
   end
 
