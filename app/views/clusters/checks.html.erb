@@ -59,7 +59,7 @@
                       <% if check_result.comment.empty? %>
                         <em>N/A</em>
                       <% else %>
-                        <%= MarkdownRenderer.render(check_result.comment || '').html_safe %>
+                        <%= check_result.rendered_comment.html_safe %>
                       <% end %>
                     </td>
                     <td class="nowrap">
