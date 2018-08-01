@@ -35,6 +35,7 @@ RSpec.describe 'Case form', type: :feature, js: true do
       visit path
       select service.name, from: 'Service'
       select issue.name, from: 'Issue'
+      select component.name, from: 'Component'
       fill_in 'Subject', with: subject_value
       fill_in 'Some field', with: field_value
       expect do
@@ -79,6 +80,7 @@ RSpec.describe 'Case form', type: :feature, js: true do
       visit new_case_path(as: user)
       select service.name, from: 'Service'
       select issue.name, from: 'Issue'
+      select component.name, from: 'Component'
       fill_in 'New MOTD', with: motd
       expect do
         click_button 'Create Case'
