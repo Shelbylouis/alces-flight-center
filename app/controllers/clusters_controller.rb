@@ -74,7 +74,7 @@ class ClustersController < ApplicationController
 
   def checks
     @date = params[:date]&.to_date || Date.today
-    @date_checks = cluster.check_results_by_date(@date)
+    @date_checks = check_results_by_date(@date)
   end
 
   def preview
@@ -114,5 +114,9 @@ class ClustersController < ApplicationController
 
   def parse_start_date
     Date.parse(params[:start_date])
+  end
+
+  def check_results_by_date(date)
+    @cluster.check_results.where(date: date).order(:cluster_check_id)
   end
 end
