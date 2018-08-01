@@ -98,13 +98,7 @@ class ClusterDecorator < ApplicationDecorator
   end
 
   def check_groups(checks)
-    checks.group_by do |c|
-      if c.is_a? ClusterCheck
-        c.check.check_category
-      else
-        c.cluster_check.check.check_category
-      end
-    end
+    checks.group_by(&:check_category)
   end
 
   def check_results_class
