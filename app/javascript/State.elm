@@ -42,18 +42,14 @@ type alias State =
 decoder : D.Decoder State
 decoder =
     let
-        createInitialState =
-            \clusters ->
-                let
-                    initialState =
-                        { clusters = clusters
-                        , error = Nothing
-                        , isSubmitting = False
-                        , clusterChargingInfoModal = Modal.hidden
-                        , chargeablePreSubmissionModal = Modal.hidden
-                        }
-                in
-                D.succeed initialState
+        createInitialState clusters =
+            D.succeed
+                { clusters = clusters
+                , error = Nothing
+                , isSubmitting = False
+                , clusterChargingInfoModal = Modal.hidden
+                , chargeablePreSubmissionModal = Modal.hidden
+                }
 
         setClustersSelectedIfSingleClusterAvailable state =
             if singleClusterAvailable state then
