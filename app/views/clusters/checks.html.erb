@@ -57,7 +57,7 @@
                     <td style="width: 30%;"><%= check_result.cluster_check.name %></td>
                     <td style="width: 40%;">
                       <% if check_result.comment.empty? %>
-                        <%= raw('<em>N/A</em>') %>
+                        <em>N/A</em>
                       <% else %>
                         <%= MarkdownRenderer.render(check_result.comment || '').html_safe %>
                       <% end %>
