@@ -1,4 +1,6 @@
 class CheckResult < ApplicationRecord
+  include MarkdownColumn(:comment)
+
   belongs_to :cluster_check
   belongs_to :user
 
