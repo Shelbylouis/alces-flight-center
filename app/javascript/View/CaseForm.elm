@@ -28,7 +28,7 @@ import Types
 import Validation
 import View.Charging as Charging
 import View.Fields as Fields
-import View.PartsField as PartsField exposing (PartsFieldConfig(..))
+import View.PartsField as PartsField
 import View.Utils
 
 
@@ -277,27 +277,24 @@ displayWrapperToTab position wrapper =
 componentsField : State -> Html Msg
 componentsField state =
     let
-        config =
-            if State.selectedIssue state |> Issue.requiresComponent |> not then
-                NotRequired
-            else
-                SelectionField .components
+        issueRequiresComponent =
+            State.selectedIssue state
+                |> Issue.requiresComponent
     in
-    PartsField.partsField Field.Component
-        config
-        Component.extractId
-        state
-        ChangeSelectedComponent
+    if issueRequiresComponent then
+        PartsField.partsField Field.Component
+            .components
+            Component.extractId
+            state
+            ChangeSelectedComponent
+    else
+        View.Utils.nothing
 
 
 servicesField : State -> Html Msg
 servicesField state =
-    let
-        config =
-            SelectionField .services
-    in
     PartsField.partsField Field.Service
-        config
+        .services
         Service.extractId
         state
         ChangeSelectedService
