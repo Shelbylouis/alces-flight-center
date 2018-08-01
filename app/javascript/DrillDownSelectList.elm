@@ -23,6 +23,10 @@ type DrillDownSelectList a
     | Selected (SelectList a)
 
 
+
+-- DrillDownSelectList-specific functions.
+
+
 unwrap : DrillDownSelectList a -> SelectList a
 unwrap selectList =
     case selectList of
@@ -66,25 +70,21 @@ map transform selectList =
 
 
 
--- XXX Consider distinguishing these functions more - functions above are
--- DrillDownSelectList-specific, whereas those below are just wrappers around
--- SelectList functions.
--- XXX Rename arguments and/or simplify functions in this file?
--- XXX Or pull in or reference docs from SelectList.Extra?
+-- SelectList and SelectList.Extra wrapper functions.
 
 
 select : (a -> Bool) -> DrillDownSelectList a -> DrillDownSelectList a
 select isSelectable selectList =
     unwrap selectList
         |> SelectList.select isSelectable
-        -- XXX Document why this always returns `Selected`?
+        -- Once a DrillDownSelectList has been `select`ed we want it to always
+        -- be Selected, since a user has now explicitly selected the option
+        -- they want to use.
         |> Selected
 
 
 selected : DrillDownSelectList a -> a
 selected =
-    -- XXX Should this actually return a Maybe, with Nothing when nothing yet
-    -- selected?
     unwrap >> SelectList.selected
 
 
@@ -122,15 +122,12 @@ nestedSelect selectList getNested asNestedIn isSelectable =
 
 -}
 updateNested :
-    -- XXX Collapse back into simple `updateNested` function?
-    -- XXX Can this just use function from SelectList.Extra?
     DrillDownSelectList a
     -> (a -> DrillDownSelectList b)
     -> (a -> DrillDownSelectList b -> a)
     -> (DrillDownSelectList b -> DrillDownSelectList b)
     -> DrillDownSelectList a
 updateNested selectList getNested asNestedIn transform =
-    -- XXX Can this just use function from SelectList.Extra?
     let
         updateNested =
             \item ->

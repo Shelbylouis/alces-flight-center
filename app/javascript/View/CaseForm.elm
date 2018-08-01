@@ -51,10 +51,9 @@ view state =
 
 issueDrillDownSection : State -> Html Msg
 issueDrillDownSection state =
-    -- XXX There's a certain amount of duplication between the logic here and
-    -- in `Field.parentFieldHasBeenSelected`, as we need to find the same
-    -- parent select lists but for a different purpose - consider DRYing these
-    -- up.
+    -- There's a certain amount of duplication between the logic here and in
+    -- `Field.parentFieldHasBeenSelected`, as we need to find the same parent
+    -- select lists but for a different purpose - consider DRYing these up.
     let
         keyedSection =
             Html.Keyed.node "section"
