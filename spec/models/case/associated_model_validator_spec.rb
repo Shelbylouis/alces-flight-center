@@ -128,7 +128,7 @@ RSpec.describe Case, type: :model do
         it 'should be invalid' do
           expect(subject).to be_invalid
           expect(subject.errors.messages).to match(
-            service: [/must be.*File System.*but not given one/]
+            case: [/for issue.*must be.*File System.*but not given one/]
           )
         end
       end

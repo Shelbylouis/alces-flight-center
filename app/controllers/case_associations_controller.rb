@@ -15,19 +15,23 @@ class CaseAssociationsController < ApplicationController
     begin
       assocs = map_association_params
 
-      @case.associations = if assocs.include?(@case.cluster)
-                             [@case.cluster]
-                           else
-                             filter_group_children(assocs)
-                           end
+      new_assocs = if assocs.include?(@case.cluster)
+                     [@case.cluster]
+                   else
+                     filter_group_children(assocs)
+                   end
+
+      validate_as_if_set(new_assocs)
+
+      @case.associations = new_assocs
 
       flash[:success] = "Updated affected components for support case #{@case.display_id}."
+      SlackNotifier.case_association_notification(@case, current_user)
 
-    rescue
-      flash[:error] = 'Unable to update associations, an error occurred.'
+    rescue ActiveRecord::RecordInvalid => e
+      flash[:error] = "Unable to update associations, an error occurred: #{format_errors(e.record)}"
     end
 
-    SlackNotifier.case_association_notification(@case, current_user)
     redirect_to case_path(@case)
   end
 
@@ -51,6 +55,14 @@ class CaseAssociationsController < ApplicationController
       !assoc.respond_to?(:component_group) ||
         !assocs.include?(assoc.component_group)
     end
+  end
+
+  def validate_as_if_set(new_assocs)
+    old_assocs = @case.associations
+    @case.associations = new_assocs
+    @case.validate!
+  ensure
+    @case.associations = old_assocs
   end
 
 end

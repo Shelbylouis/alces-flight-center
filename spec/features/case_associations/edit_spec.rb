@@ -151,4 +151,38 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
     end
   end
 
+  unless ENV.fetch('TRAVIS', false)
+    context 'for a case whose issue requires a certain service type' do
+      let :service_type do
+        create(:service_type, name: 'File System')
+      end
+      let :issue do
+        create(:issue, requires_service: true, service_type: service_type)
+      end
+      let :service do
+        create(:service, cluster: cluster, service_type: service_type)
+      end
+      let(:kase) {
+        create(
+          :open_case,
+          cluster: cluster,
+          services: [service, service_1],
+          issue: issue
+        )
+      }
+
+      it 'does not allow removing the association' do
+        expect(checkbox_for[service]).to be_checked
+        checkbox_for[service].click
+        click_button 'Save'
+
+        kase.reload
+        expect(kase.associations).to include(service, service_1)
+        expect(find('.alert-danger')).to have_text \
+          "for issue '#{issue.name}' must be associated with " \
+                "#{service_type.name} service but not given one"
+      end
+    end
+  end
+
 end
