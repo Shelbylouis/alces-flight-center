@@ -124,8 +124,8 @@ Rails.application.routes.draw do
       post :deposit
       get '/checks/submit', to: 'clusters#enter_check_results', as: :check_submission
       post '/checks/submit', to: 'clusters#save_check_results', as: :set_check_results
-      post '/checks/submit/preview', to: 'clusters#preview'
-      post '/checks/submit/write', to: 'clusters#write'
+      post '/checks/submit/preview', to: 'cluster_checks#preview'
+      post '/checks/submit/write', to: 'cluster_checks#write'
     end
 
     resources :components, only: []  do
