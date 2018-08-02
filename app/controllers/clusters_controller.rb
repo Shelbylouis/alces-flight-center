@@ -77,6 +77,11 @@ class ClustersController < ApplicationController
 
   def view_checks
     begin
+      # Here we are assuming that results will only be saved by their date
+      # and not have any information on the exact time at which they were
+      # submitted. If this requirement changes in the future then work will
+      # need to be done to convert these into correct UTC dates.
+
       @date = params[:date]&.to_date || Date.current
       @date_checks = check_results_by_date(@date)
     rescue
