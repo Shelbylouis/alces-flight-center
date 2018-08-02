@@ -76,8 +76,12 @@ class ClustersController < ApplicationController
   end
 
   def view_checks
-    @date = params[:date]&.to_date || Date.current
-    @date_checks = check_results_by_date(@date)
+    begin
+      @date = params[:date]&.to_date || Date.current
+      @date_checks = check_results_by_date(@date)
+    rescue
+      not_found
+    end
   end
 
   def preview
