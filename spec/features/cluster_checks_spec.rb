@@ -26,9 +26,14 @@ RSpec.describe 'Cluster checks', type: :feature do
       end
 
       it 'submits results correctly' do
-        choose 'success'
+        create(:cluster_check, cluster: cluster)
+        visit path
+
+        all(:xpath, '//input[@id="success"]')[0].click
+        all(:xpath, '//input[@id="failure"]')[1].click
+
         click_button 'Submit Cluster Check Results'
-        expect(cluster.check_results).to_not be_empty
+        expect(cluster.check_results.length).to eq(2)
       end
 
       it 'lets the user submit a comment' do
