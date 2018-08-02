@@ -40,9 +40,9 @@ class Case
         associated_service_types = services.map(&:service_type)
 
         unless associated_service_types.include?(required_service_type)
-          error = "must be associated with #{required_service_type.name} " \
-            "service but not given one"
-          record.errors.add(:service, error)
+          error = "for issue '#{record.issue.name}' must be associated with " \
+            "#{required_service_type.name} service but not given one"
+          record.errors.add(:case, error)
         end
       end
     end
