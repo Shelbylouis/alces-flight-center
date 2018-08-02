@@ -21,7 +21,7 @@
                </div>
       </div>
       <% if @date_checks.empty? %>
-        <% if policy(cluster).authorise? && @date == Date.today %>
+        <% if policy(cluster).enter_check_results? && @date == Date.today %>
           No check results have been submitted yet for today, click below to begin the process
           <br><%= link_to 'Set check results for today', cluster_check_submission_path(cluster),
                       class: 'btn btn-danger'
