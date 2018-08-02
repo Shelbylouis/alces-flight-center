@@ -1,9 +1,3 @@
-<script type="text/javascript"
-        src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js">
-</script>
-<script type="text/javascript"
-        src="http://flesler-plugins.googlecode.com/files/jquery.scrollTo-1.4.2.js">
-</script>
 <% check_groups = cluster.check_groups(cluster.cluster_checks) %>
 <% content_for(:subtitle) { "Cluster checks" } %>
 <%= render 'partials/tabs', activate: :checks do %>
