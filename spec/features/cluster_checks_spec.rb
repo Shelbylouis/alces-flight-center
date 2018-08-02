@@ -7,14 +7,6 @@ RSpec.describe 'Cluster checks', type: :feature do
   let(:cluster) { create(:cluster, site: site) }
   let(:check) { create(:check, name: 'Is everything on fire?') }
   let!(:cluster_check) { create(:cluster_check, check: check, cluster: cluster ) }
-  let!(:check_result) {
-    create(
-      :check_result,
-      cluster_check: cluster_check,
-      date: Date.yesterday,
-      user: admin
-    )
-  }
 
   describe 'Cluster submission form' do
     context 'as an admin' do
@@ -64,7 +56,7 @@ RSpec.describe 'Cluster checks', type: :feature do
 
       it 'is not accessible' do
         visit path
-        expect(page.status_code).to eq(403)
+        expect(page).to have_http_status(404)
       end
     end
 
@@ -81,6 +73,14 @@ RSpec.describe 'Cluster checks', type: :feature do
 
   describe 'Cluster check results page' do
     let(:path) { cluster_checks_path(cluster, as: contact) }
+    let!(:check_result) {
+      create(
+        :check_result,
+        cluster_check: cluster_check,
+        date: Date.yesterday,
+        user: admin
+      )
+    }
 
     before(:each) do
       visit path
