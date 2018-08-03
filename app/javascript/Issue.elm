@@ -64,8 +64,22 @@ decoder clusterMotd =
                         IssueData
                             id
                             name
-                            defaultSubject
+                            initialSubject
                             tiers
+
+                    initialSubject =
+                        -- If an 'Other' Issue is selected do not pre-fill Case
+                        -- subject with Issue's default subject (i.e. the Issue
+                        -- name) to require the user to enter something which
+                        -- is (hopefully) more useful than creating a Case with
+                        -- subject 'Other'.
+                        if isOtherIssue then
+                            ""
+                        else
+                            defaultSubject
+
+                    isOtherIssue =
+                        Utils.isOtherCategorisation name
                 in
                 if requiresComponent then
                     ComponentRequiredIssue data
