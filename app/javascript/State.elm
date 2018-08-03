@@ -50,29 +50,11 @@ decoder =
                 , clusterChargingInfoModal = Modal.hidden
                 , chargeablePreSubmissionModal = Modal.hidden
                 }
-
-        setClustersSelectedIfSingleClusterAvailable state =
-            if singleClusterAvailable state then
-                { state
-                    | clusters =
-                        DrillDownSelectList.unwrap state.clusters
-                            |> DrillDownSelectList.Selected
-                }
-            else
-                state
     in
     (D.field "clusters" <|
         DrillDownSelectList.nameOrderedDecoder Cluster.decoder
     )
-        |> D.andThen
-            (createInitialState
-                -- If only a single Cluster is available we hide the Cluster
-                -- selection field as no need to show it, but want to otherwise
-                -- seamlessly handle things as if the user had selected a
-                -- Cluster; therefore in this case pre-select the Clusters in
-                -- the same way as if a user had selected one.
-                >> D.map setClustersSelectedIfSingleClusterAvailable
-            )
+        |> D.andThen createInitialState
 
 
 encoder : State -> E.Value

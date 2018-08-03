@@ -47,6 +47,24 @@ hasBeenSelected selectList =
             True
 
 
+init : SelectList a -> DrillDownSelectList a
+init selectList =
+    let
+        constructor =
+            -- If only one option available no need to require user to select
+            -- this, so initialize as Selected, otherwise initialize as
+            -- Unselected so they must choose.
+            if length == 1 then
+                Selected
+            else
+                Unselected
+
+        length =
+            SelectList.toList selectList |> List.length
+    in
+    constructor selectList
+
+
 {-| Map over the SelectList contained by the DrillDownSelectList.
 
     Note this does not map over the items of the contained SelectList itself,
@@ -147,7 +165,7 @@ nameOrderedDecoder :
     D.Decoder { a | name : comparable }
     -> D.Decoder (DrillDownSelectList { a | name : comparable })
 nameOrderedDecoder =
-    SelectList.Extra.nameOrderedDecoder >> D.map Unselected
+    SelectList.Extra.nameOrderedDecoder >> D.map init
 
 
 orderedDecoder :
@@ -155,4 +173,4 @@ orderedDecoder :
     -> D.Decoder a
     -> D.Decoder (DrillDownSelectList a)
 orderedDecoder compare =
-    SelectList.Extra.orderedDecoder compare >> D.map Unselected
+    SelectList.Extra.orderedDecoder compare >> D.map init
