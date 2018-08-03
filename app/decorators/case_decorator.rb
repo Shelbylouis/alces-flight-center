@@ -38,7 +38,8 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def available_issues
-    services.map { |s| s.service_type.issues }.flatten.uniq.map(&:decorate)
+    services.map { |s| s.service_type.issues }.flatten.uniq.map(&:decorate) +
+      Issue.where(requires_component: false, requires_service: false).decorate.reject(&:special?)
   end
 
   private
