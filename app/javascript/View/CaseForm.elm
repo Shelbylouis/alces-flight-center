@@ -99,7 +99,8 @@ issueDrillDownSection state =
     -- with the selected option not corresponding with the selected item in the
     -- model.
     keyedSection [] <|
-        [ ( "clusters", clustersField state )
+        [ ( "drill-down-info", drillDownInfoAlert )
+        , ( "clusters", clustersField state )
         , ( "services-for-cluster-" ++ selectedClusterId, servicesField state )
         , ( "categories-for-service-" ++ selectedServiceId, categoriesField state )
         , ( issuesFieldKey, issuesField state )
@@ -152,6 +153,31 @@ dynamicFieldsSection state =
     -- Issue's fields to display and form cannot be submitted.
     View.Utils.showIfParentFieldSelected state Field.Tier <|
         section attributes fields
+
+
+drillDownInfoAlert : Html msg
+drillDownInfoAlert =
+    -- Styling here adapted (i.e. converted from HTML to Elm) from
+    -- `app/views/cases/_case_comment_toggle_controls.html.erb`.
+    let
+        infoIcon =
+            i [ class "fa fa-info fa-2x mr-2" ] []
+
+        alertContent =
+            """
+            Please attempt to classify your issue as much as possible by
+            selecting from each box in turn, and then provide any further
+            details needed. This helps Alces engineers better determine what
+            problem you are facing and helps us resolve this faster.
+            """
+    in
+    Alert.simpleInfo
+        [ class "d-flex justify-content-between align-items-center" ]
+        [ infoIcon
+        , span
+            [ style [ ( "flex-grow", "1" ) ] ]
+            [ text alertContent ]
+        ]
 
 
 clustersField : State -> Html Msg
