@@ -4,7 +4,6 @@ module SelectList.Extra
         , findValueBy
         , fromList
         , mapSelected
-        , nameOrderedDecoder
         , orderedDecoder
         )
 
@@ -12,11 +11,6 @@ import Json.Decode as D
 import List.Extra
 import Maybe.Extra
 import SelectList exposing (Position(..), SelectList)
-
-
-nameOrderedDecoder : D.Decoder { a | name : comparable } -> D.Decoder (SelectList { a | name : comparable })
-nameOrderedDecoder =
-    orderedDecoder .name
 
 
 orderedDecoder : (a -> comparable) -> D.Decoder a -> D.Decoder (SelectList a)

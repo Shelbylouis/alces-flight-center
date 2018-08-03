@@ -165,7 +165,7 @@ nameOrderedDecoder :
     D.Decoder { a | name : comparable }
     -> D.Decoder (DrillDownSelectList { a | name : comparable })
 nameOrderedDecoder =
-    SelectList.Extra.nameOrderedDecoder >> D.map init
+    orderedDecoder .name
 
 
 orderedDecoder :
