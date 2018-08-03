@@ -71,8 +71,6 @@ selectField field items toId toOptionLabel isDisabled changeMsg state =
         select
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
-        False
-        Nothing
         state
 
 
@@ -81,8 +79,6 @@ type alias TextFieldConfig a =
     , field : Field
     , toContent : a -> String
     , inputMsg : String -> Msg
-    , optional : Bool
-    , help : Maybe String
     }
 
 
@@ -106,13 +102,7 @@ textField config state item =
             ]
                 ++ additionalAttributes
     in
-    formField config.field
-        element
-        attributes
-        []
-        config.optional
-        config.help
-        state
+    formField config.field element attributes [] state
 
 
 type alias HtmlFunction msg =
@@ -124,19 +114,17 @@ formField :
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
-    -> Bool
-    -> Maybe String
     -> State
     -> Html msg
-formField field htmlFn additionalAttributes children optional help state =
+formField field htmlFn additionalAttributes children state =
     let
-        fieldName =
+        ( fieldName, helpText ) =
             case field of
                 Field.TierField data ->
-                    data.name
+                    ( data.name, data.help )
 
                 _ ->
-                    toString field
+                    ( toString field, Nothing )
 
         fieldIsUnavailable =
             tierIsUnavailable && Field.isDynamicField field
@@ -153,6 +141,14 @@ formField field htmlFn additionalAttributes children optional help state =
             else
                 Badge.badgeLight [ Spacing.ml1 ] [ text "Required" ]
 
+        optional =
+            case field of
+                Field.TierField data ->
+                    data.optional
+
+                _ ->
+                    False
+
         attributes =
             List.append
                 [ id identifier
@@ -166,11 +162,11 @@ formField field htmlFn additionalAttributes children optional help state =
             htmlFn attributes children
 
         helpElement =
-            case help of
-                Just helpText ->
+            case helpText of
+                Just h ->
                     small
                         [ id helpIdentifier, class "form-text text-muted" ]
-                        [ text helpText ]
+                        [ text h ]
 
                 Nothing ->
                     View.Utils.nothing

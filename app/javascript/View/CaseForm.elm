@@ -336,8 +336,6 @@ subjectField state =
             , field = Field.Subject
             , toContent = Issue.subject
             , inputMsg = ChangeSubject
-            , optional = False
-            , help = Nothing
             }
     in
     Fields.textField textFieldConfig state selectedIssue
@@ -378,8 +376,6 @@ renderTierField state ( index, field ) =
                     , field = Field.TierField fieldData
                     , toContent = .value
                     , inputMsg = ChangeTierField index
-                    , optional = fieldData.optional
-                    , help = fieldData.help
                     }
             in
             Fields.textField textFieldConfig state fieldData
