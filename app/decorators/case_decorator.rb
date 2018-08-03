@@ -37,6 +37,10 @@ class CaseDecorator < ApplicationDecorator
     commenting.disabled_text
   end
 
+  def available_issues
+    services.map { |s| s.service_type.issues }.flatten.uniq.map(&:decorate)
+  end
+
   private
 
   def commenting
