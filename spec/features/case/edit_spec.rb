@@ -72,6 +72,10 @@ RSpec.describe 'Case editing', type: :feature do
 
       kase.reload
       expect(kase.issue).to eq issue
+
+      expect(emails.count).to eq 1
+      expect(emails[0].parts.first.body.raw_source).to \
+        have_text 'This case\'s associated issue has been changed from \'New user/group\' to \'Some other issue\''
     end
   end
 
