@@ -21,7 +21,7 @@ class IssueDecorator < ApplicationDecorator
 
   def category_text
     if category.present?
-      "#{category.name} : "
+      "#{category.name}: "
     end
   end
 end
