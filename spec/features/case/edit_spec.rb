@@ -67,6 +67,9 @@ RSpec.describe 'Case editing', type: :feature do
       click_button 'Change issue'
       expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
 
+      expect(find('.event-card')).to \
+        have_text 'Changed this case\'s associated issue from \'New user/group\' to \'Some other issue\''
+
       kase.reload
       expect(kase.issue).to eq issue
     end
