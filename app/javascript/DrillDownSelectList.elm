@@ -16,6 +16,7 @@ module DrillDownSelectList
 import Json.Decode as D
 import SelectList exposing (SelectList)
 import SelectList.Extra
+import Utils
 
 
 type DrillDownSelectList a
@@ -162,10 +163,14 @@ toList =
 
 
 nameOrderedDecoder :
-    D.Decoder { a | name : comparable }
-    -> D.Decoder (DrillDownSelectList { a | name : comparable })
+    D.Decoder { a | name : String }
+    -> D.Decoder (DrillDownSelectList { a | name : String })
 nameOrderedDecoder =
-    orderedDecoder .name
+    let
+        nameSort { name } =
+            Utils.othersLastComparison name
+    in
+    orderedDecoder nameSort
 
 
 orderedDecoder :

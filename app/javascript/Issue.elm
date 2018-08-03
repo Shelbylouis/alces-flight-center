@@ -47,8 +47,11 @@ issuesDecoder clusterMotd =
     let
         issueDecoder =
             decoder clusterMotd
+
+        nameSort =
+            name >> Utils.othersLastComparison
     in
-    DrillDownSelectList.orderedDecoder name issueDecoder
+    DrillDownSelectList.orderedDecoder nameSort issueDecoder
 
 
 decoder : String -> D.Decoder Issue
