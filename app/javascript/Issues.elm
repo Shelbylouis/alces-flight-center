@@ -25,14 +25,11 @@ type Issues
 decoder : String -> D.Decoder Issues
 decoder clusterMotd =
     let
-        issueDecoder =
-            Issue.decoder clusterMotd
-
         categoryDecoder =
             Category.decoder clusterMotd
     in
     D.oneOf
-        [ DrillDownSelectList.orderedDecoder Issue.name issueDecoder
+        [ Issue.issuesDecoder clusterMotd
             |> D.map JustIssues
             |> D.field "issues"
         , DrillDownSelectList.nameOrderedDecoder categoryDecoder

@@ -26,16 +26,10 @@ type Id
 
 decoder : String -> D.Decoder Category
 decoder clusterMotd =
-    let
-        issueDecoder =
-            Issue.decoder clusterMotd
-    in
     D.map3 Category
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
-        (D.field "issues"
-            (DrillDownSelectList.orderedDecoder Issue.name issueDecoder)
-        )
+        (D.field "issues" (Issue.issuesDecoder clusterMotd))
 
 
 extractId : Category -> Int

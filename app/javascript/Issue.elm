@@ -2,10 +2,10 @@ module Issue
     exposing
         ( Id(..)
         , Issue
-        , decoder
         , extractId
         , findTier
         , id
+        , issuesDecoder
         , name
         , requiresComponent
         , sameId
@@ -16,6 +16,7 @@ module Issue
         , updateSelectedTierField
         )
 
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Json.Decode as D
 import SelectList exposing (SelectList)
 import SelectList.Extra
@@ -39,6 +40,15 @@ type alias IssueData =
 
 type Id
     = Id Int
+
+
+issuesDecoder : String -> D.Decoder (DrillDownSelectList Issue)
+issuesDecoder clusterMotd =
+    let
+        issueDecoder =
+            decoder clusterMotd
+    in
+    DrillDownSelectList.orderedDecoder name issueDecoder
 
 
 decoder : String -> D.Decoder Issue
