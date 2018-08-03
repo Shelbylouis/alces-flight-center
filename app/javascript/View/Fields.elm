@@ -118,13 +118,11 @@ formField :
     -> Html msg
 formField field htmlFn additionalAttributes children state =
     let
-        ( fieldName, helpText ) =
-            case field of
-                Field.TierField data ->
-                    ( data.name, data.help )
+        fieldName =
+            Field.name field
 
-                _ ->
-                    ( toString field, Nothing )
+        fieldHelpText =
+            Field.helpText field
 
         fieldIsUnavailable =
             tierIsUnavailable && Field.isDynamicField field
@@ -162,7 +160,7 @@ formField field htmlFn additionalAttributes children state =
             htmlFn attributes children
 
         helpElement =
-            case helpText of
+            case fieldHelpText of
                 Just h ->
                     small
                         [ id helpIdentifier, class "form-text text-muted" ]
