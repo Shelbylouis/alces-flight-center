@@ -2,6 +2,7 @@ class CaseDecorator < ApplicationDecorator
   delegate_all
   decorates_association :change_request
   decorates_association :cluster
+  decorates_association :issue
 
   def user_facing_state
     model.state.to_s.titlecase
@@ -14,10 +15,6 @@ class CaseDecorator < ApplicationDecorator
       h.pluralize(model.associations.length, 'affected component'),
       "Created by #{user.name}"
     ].join(' | ')
-  end
-
-  def issue_type_text
-    "#{category_text}#{model.issue.name}"
   end
 
   def case_link
@@ -44,10 +41,6 @@ class CaseDecorator < ApplicationDecorator
 
   def commenting
     @commenting ||= CaseCommenting.new(self, current_user)
-  end
-
-  def category_text
-    model.category ? "#{model.category.name}: " : ''
   end
 
 end
