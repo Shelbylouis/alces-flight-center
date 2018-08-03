@@ -83,7 +83,7 @@ class CasesController < ApplicationController
     end
   end
 
-  UPDATABLE_FIELDS = [:subject].freeze
+  UPDATABLE_FIELDS = [:subject, :issue_id].freeze
 
   def update
 

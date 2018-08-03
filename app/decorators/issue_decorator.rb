@@ -12,4 +12,16 @@ class IssueDecorator < ApplicationDecorator
       tiers: tiers.map(&:case_form_json)
     }
   end
+
+  def label_text
+    "#{category_text}#{name}"
+  end
+
+  private
+
+  def category_text
+    if category.present?
+      "#{category.name}: "
+    end
+  end
 end

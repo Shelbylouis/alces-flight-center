@@ -110,5 +110,18 @@ module Audited
     def subject_details
       'Subject Change'
     end
+
+    def issue_id_text(from, to)
+      "Changed this case's associated issue from '#{Issue.find(from).decorate.label_text}'" \
+      " to '#{Issue.find(to).decorate.label_text}'."
+    end
+
+    def issue_id_type
+      'map-signs'
+    end
+
+    def issue_id_details
+      'Change of Issue'
+    end
   end
 end

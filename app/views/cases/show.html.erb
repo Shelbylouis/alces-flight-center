@@ -110,7 +110,7 @@
       <% end %>
       <tr>
         <th>Issue type</th>
-        <td><%= @case.issue_type_text %></td>
+        <td><%= render 'cases/issue_controls', kase: @case %></td>
       </tr>
       <tr>
         <th>Tier</th>

@@ -32,4 +32,27 @@ RSpec.describe IssueDecorator do
       )
     end
   end
+
+  describe '#label_text' do
+    let(:issue) { create(:issue, name: 'My issue', category: category) }
+
+    subject do
+      issue.decorate.label_text
+    end
+
+    context 'without a category' do
+      let(:category) { nil }
+      it 'returns issue name' do
+        expect(subject).to eq issue.name
+      end
+    end
+
+    context 'with a category' do
+      let(:category) { create(:category, name: 'My Category') }
+      it 'returns combination of category and issue name' do
+        expect(subject).to eq "#{category.name}: #{issue.name}"
+      end
+    end
+
+  end
 end

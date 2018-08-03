@@ -35,29 +35,4 @@ RSpec.describe CaseDecorator do
       end.to raise_error(RuntimeError, "Unhandled tier_level: 5")
     end
   end
-
-  describe '#issue_type_text' do
-    let(:issue) { create(:issue, name: 'My issue', category: category) }
-
-    let(:kase) { create(:open_case, issue: issue) }
-
-    subject do
-      kase.decorate.issue_type_text
-    end
-
-    context 'without a category' do
-      let(:category) { nil }
-      it 'returns issue name' do
-        expect(subject).to eq issue.name
-      end
-    end
-
-    context 'with a category' do
-      let(:category) { create(:category, name: 'My Category') }
-      it 'returns combination of category and issue name' do
-        expect(subject).to eq "#{category.name}: #{issue.name}"
-      end
-    end
-
-  end
 end
