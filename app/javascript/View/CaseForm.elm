@@ -166,9 +166,9 @@ drillDownInfoAlert =
         alertContent =
             """
             Please attempt to classify your issue as much as possible by
-            selecting from each box in turn, and then provide any further
-            details needed. This helps Alces engineers better determine what
-            problem you are facing and helps us resolve this faster.
+            selecting from each box in turn, and providing further details
+            as requested. This helps Alces engineers to identify and resolve
+            your issue faster.
             """
     in
     Alert.simpleInfo
