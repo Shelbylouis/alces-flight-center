@@ -9,19 +9,21 @@ module State
         , selectedIssue
         , selectedService
         , selectedServiceAvailableIssues
+        , selectedServiceIssues
         , selectedTier
         , selectedTierSupportUnavailable
+        , singleClusterAvailable
         )
 
 import Bootstrap.Modal as Modal
 import Cluster exposing (Cluster)
 import Component exposing (Component)
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
-import Issues
+import Issues exposing (Issues)
 import Json.Decode as D
 import Json.Encode as E
 import SelectList exposing (SelectList)
-import SelectList.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)
 import Tier exposing (Tier)
@@ -29,10 +31,8 @@ import Tier.Level
 
 
 type alias State =
-    { clusters : SelectList Cluster
+    { clusters : DrillDownSelectList Cluster
     , error : Maybe String
-    , singleComponent : Bool
-    , singleService : Bool
     , isSubmitting : Bool
     , clusterChargingInfoModal : Modal.Visibility
     , chargeablePreSubmissionModal : Modal.Visibility
@@ -42,115 +42,19 @@ type alias State =
 decoder : D.Decoder State
 decoder =
     let
-        createInitialState =
-            \( clusters, mode ) ->
-                let
-                    initialState =
-                        { clusters = clusters
-                        , error = Nothing
-                        , singleComponent = False
-                        , singleService = False
-                        , isSubmitting = False
-                        , clusterChargingInfoModal = Modal.hidden
-                        , chargeablePreSubmissionModal = Modal.hidden
-                        }
-                in
-                case mode of
-                    SingleComponentMode id ->
-                        let
-                            singleClusterWithSingleComponentSelected =
-                                Cluster.setSelectedComponent clusters id
-
-                            applicableServices =
-                                -- Only include Services, and Issues within
-                                -- them, which require a Component.
-                                SelectList.selected singleClusterWithSingleComponentSelected
-                                    |> .services
-                                    |> Service.filterByIssues Issue.requiresComponent
-                        in
-                        case applicableServices of
-                            Just services ->
-                                let
-                                    newClusters =
-                                        -- Set just the applicable Services in
-                                        -- the single Cluster SelectList.
-                                        SelectList.selected singleClusterWithSingleComponentSelected
-                                            |> Cluster.setServices services
-                                            |> SelectList.singleton
-                                in
-                                D.succeed
-                                    { initialState
-                                        | clusters = newClusters
-                                        , singleComponent = True
-                                    }
-
-                            Nothing ->
-                                D.fail "expected some Issues to exist requiring a Component, but none were found"
-
-                    SingleServiceMode id ->
-                        let
-                            singleClusterWithSingleServiceSelected =
-                                Cluster.setSelectedService clusters id
-
-                            partialNewState =
-                                { initialState
-                                    | clusters = singleClusterWithSingleServiceSelected
-                                    , singleService = True
-                                }
-
-                            singleService =
-                                selectedService partialNewState
-                        in
-                        D.succeed partialNewState
-
-                    ClusterMode ->
-                        D.succeed initialState
+        createInitialState clusters =
+            D.succeed
+                { clusters = clusters
+                , error = Nothing
+                , isSubmitting = False
+                , clusterChargingInfoModal = Modal.hidden
+                , chargeablePreSubmissionModal = Modal.hidden
+                }
     in
-    D.map2
-        (,)
-        (D.field "clusters" <| SelectList.Extra.nameOrderedDecoder Cluster.decoder)
-        (D.field "singlePart" <| modeDecoder)
+    (D.field "clusters" <|
+        DrillDownSelectList.nameOrderedDecoder Cluster.decoder
+    )
         |> D.andThen createInitialState
-
-
-type Mode
-    = ClusterMode
-    | SingleComponentMode Component.Id
-    | SingleServiceMode Service.Id
-
-
-type alias SinglePartModeFields =
-    { id : Int
-    , type_ : String
-    }
-
-
-modeDecoder : D.Decoder Mode
-modeDecoder =
-    let
-        singlePartModeFieldsDecoder =
-            D.map2 SinglePartModeFields
-                (D.field "id" D.int)
-                (D.field "type" D.string)
-
-        fieldsToMode =
-            Maybe.map singlePartModeDecoder
-                >> Maybe.withDefault (D.succeed ClusterMode)
-    in
-    D.nullable singlePartModeFieldsDecoder |> D.andThen fieldsToMode
-
-
-singlePartModeDecoder : SinglePartModeFields -> D.Decoder Mode
-singlePartModeDecoder fields =
-    case fields.type_ of
-        "component" ->
-            Component.Id fields.id |> SingleComponentMode |> D.succeed
-
-        "service" ->
-            Service.Id fields.id |> SingleServiceMode |> D.succeed
-
-        _ ->
-            "Unknown type: " ++ fields.type_ |> D.fail
 
 
 encoder : State -> E.Value
@@ -207,21 +111,21 @@ selectedIssue state =
 
 selectedCluster : State -> Cluster
 selectedCluster state =
-    SelectList.selected state.clusters
+    DrillDownSelectList.selected state.clusters
 
 
 selectedComponent : State -> Component
 selectedComponent state =
     selectedCluster state
         |> .components
-        |> SelectList.selected
+        |> DrillDownSelectList.selected
 
 
 selectedService : State -> Service
 selectedService state =
     selectedCluster state
         |> .services
-        |> SelectList.selected
+        |> DrillDownSelectList.selected
 
 
 selectedTier : State -> Tier
@@ -231,9 +135,14 @@ selectedTier state =
         |> SelectList.selected
 
 
-selectedServiceAvailableIssues : State -> SelectList Issue
+selectedServiceAvailableIssues : State -> DrillDownSelectList Issue
 selectedServiceAvailableIssues state =
-    selectedService state |> .issues |> Issues.availableIssues
+    selectedServiceIssues state |> Issues.availableIssues
+
+
+selectedServiceIssues : State -> Issues
+selectedServiceIssues state =
+    selectedService state |> .issues
 
 
 selectedTierSupportUnavailable : State -> Bool
@@ -281,3 +190,11 @@ associatedModelTypeName state =
         "component"
     else
         "service"
+
+
+singleClusterAvailable : State -> Bool
+singleClusterAvailable =
+    .clusters
+        >> DrillDownSelectList.toList
+        >> List.length
+        >> (==) 1

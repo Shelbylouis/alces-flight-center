@@ -7,6 +7,7 @@ module View.Fields
 
 import Bootstrap.Badge as Badge
 import Bootstrap.Utilities.Spacing as Spacing
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Field exposing (Field)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -24,7 +25,7 @@ import View.Utils
 
 selectField :
     Field
-    -> SelectList a
+    -> DrillDownSelectList a
     -> (a -> Int)
     -> (a -> String)
     -> (a -> Bool)
@@ -37,22 +38,39 @@ selectField field items toId toOptionLabel isDisabled changeMsg state =
             \position item ->
                 option
                     [ toId item |> toString |> value
-                    , position == Selected |> selected
+                    , position == Selected && itemHasBeenSelected |> selected
                     , isDisabled item |> disabled
                     ]
                     [ toOptionLabel item |> text ]
 
+        itemHasBeenSelected =
+            case items of
+                DrillDownSelectList.Selected _ ->
+                    True
+
+                DrillDownSelectList.Unselected _ ->
+                    False
+
         options =
-            SelectList.mapBy fieldOption items
+            preSelectionOption :: itemOptions
+
+        preSelectionOption =
+            -- Always include this option as the first item, which will only
+            -- appear and be selected if no other item has been selected yet
+            -- (i.e. if `items` is `Unselected`).
+            option
+                [ selected True, disabled True, hidden True ]
+                [ text "Please select..." ]
+
+        itemOptions =
+            DrillDownSelectList.unwrap items
+                |> SelectList.mapBy fieldOption
                 |> SelectList.toList
     in
     formField field
-        (SelectList.selected items)
         select
         [ Html.Events.on "change" (D.map changeMsg Html.Events.targetValue) ]
         options
-        False
-        Nothing
         state
 
 
@@ -61,8 +79,6 @@ type alias TextFieldConfig a =
     , field : Field
     , toContent : a -> String
     , inputMsg : String -> Msg
-    , optional : Bool
-    , help : Maybe String
     }
 
 
@@ -86,14 +102,7 @@ textField config state item =
             ]
                 ++ additionalAttributes
     in
-    formField config.field
-        item
-        element
-        attributes
-        []
-        config.optional
-        config.help
-        state
+    formField config.field element attributes [] state
 
 
 type alias HtmlFunction msg =
@@ -102,23 +111,18 @@ type alias HtmlFunction msg =
 
 formField :
     Field
-    -> a
     -> HtmlFunction msg
     -> List (Attribute msg)
     -> List (Html msg)
-    -> Bool
-    -> Maybe String
     -> State
     -> Html msg
-formField field item htmlFn additionalAttributes children optional help state =
+formField field htmlFn additionalAttributes children state =
     let
         fieldName =
-            case field of
-                Field.TierField data ->
-                    data.name
+            Field.name field
 
-                _ ->
-                    toString field
+        fieldHelpText =
+            Field.helpText field
 
         fieldIsUnavailable =
             tierIsUnavailable && Field.isDynamicField field
@@ -135,6 +139,14 @@ formField field item htmlFn additionalAttributes children optional help state =
             else
                 Badge.badgeLight [ Spacing.ml1 ] [ text "Required" ]
 
+        optional =
+            case field of
+                Field.TierField data ->
+                    data.optional
+
+                _ ->
+                    False
+
         attributes =
             List.append
                 [ id identifier
@@ -148,11 +160,11 @@ formField field item htmlFn additionalAttributes children optional help state =
             htmlFn attributes children
 
         helpElement =
-            case help of
-                Just helpText ->
+            case fieldHelpText of
+                Just h ->
                     small
                         [ id helpIdentifier, class "form-text text-muted" ]
-                        [ text helpText ]
+                        [ text h ]
 
                 Nothing ->
                     View.Utils.nothing
@@ -163,15 +175,16 @@ formField field item htmlFn additionalAttributes children optional help state =
         errors =
             Validation.validateField field state
     in
-    div [ class "form-group" ]
-        [ label
-            [ for identifier ]
-            [ text fieldName ]
-        , requiredBadge
-        , formElement
-        , helpElement
-        , validationFeedback errors
-        ]
+    View.Utils.showIfParentFieldSelected state field <|
+        div [ class "form-group" ]
+            [ label
+                [ for identifier ]
+                [ text fieldName ]
+            , requiredBadge
+            , formElement
+            , helpElement
+            , validationFeedback errors
+            ]
 
 
 hiddenFieldWithVisibleErrors : Field -> State -> Html msg

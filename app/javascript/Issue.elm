@@ -2,10 +2,10 @@ module Issue
     exposing
         ( Id(..)
         , Issue
-        , decoder
         , extractId
         , findTier
         , id
+        , issuesDecoder
         , name
         , requiresComponent
         , sameId
@@ -16,6 +16,7 @@ module Issue
         , updateSelectedTierField
         )
 
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Json.Decode as D
 import SelectList exposing (SelectList)
 import SelectList.Extra
@@ -41,6 +42,18 @@ type Id
     = Id Int
 
 
+issuesDecoder : String -> D.Decoder (DrillDownSelectList Issue)
+issuesDecoder clusterMotd =
+    let
+        issueDecoder =
+            decoder clusterMotd
+
+        nameSort =
+            name >> Utils.othersLastComparison
+    in
+    DrillDownSelectList.orderedDecoder nameSort issueDecoder
+
+
 decoder : String -> D.Decoder Issue
 decoder clusterMotd =
     let
@@ -51,8 +64,22 @@ decoder clusterMotd =
                         IssueData
                             id
                             name
-                            defaultSubject
+                            initialSubject
                             tiers
+
+                    initialSubject =
+                        -- If an 'Other' Issue is selected do not pre-fill Case
+                        -- subject with Issue's default subject (i.e. the Issue
+                        -- name) to require the user to enter something which
+                        -- is (hopefully) more useful than creating a Case with
+                        -- subject 'Other'.
+                        if isOtherIssue then
+                            ""
+                        else
+                            defaultSubject
+
+                    isOtherIssue =
+                        Utils.isOtherCategorisation name
                 in
                 if requiresComponent then
                     ComponentRequiredIssue data

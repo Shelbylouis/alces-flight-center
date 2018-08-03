@@ -9,6 +9,7 @@ module Validation
         )
 
 import Dict
+import DrillDownSelectList
 import Field exposing (Field)
 import Issue
 import State exposing (State)
@@ -56,6 +57,21 @@ createStateValidator : State -> Validator Error State
 createStateValidator state =
     Validate.all
         [ subjectPresentValidator
+
+        -- We use a DrillDownSelectList for storing many items in the State,
+        -- however Components are the only items that we store in this way and
+        -- that are also displayed in an Unselected form at the point where it
+        -- is possible to submit the Case form (since the Components field is
+        -- shown, when required, when an Issue is Selected, and this also
+        -- reveals all fields within the Tier tabs including the submit
+        -- button).
+        --
+        -- Therefore we need to validate that a Component has been selected
+        -- when required, to avoid the form being submitted without doing this;
+        -- for other items stored as a DrillDownSelectList we do not need to do
+        -- this since the form cannot be submitted without selecting them,
+        -- however this may change if the form structure later changes.
+        , componentSelectedIfRequiredValidator
         , createAvailableTierValidator state
         , createTierFieldsValidator state
         ]
@@ -66,6 +82,26 @@ subjectPresentValidator =
     Validate.ifBlank
         (State.selectedIssue >> Issue.subject)
         ( Field.Subject, Empty )
+
+
+componentSelectedIfRequiredValidator : Validator Error State
+componentSelectedIfRequiredValidator =
+    let
+        componentRequiredAndNotSelected state =
+            componentRequired state && not (componentSelected state)
+
+        componentRequired =
+            State.selectedIssue
+                >> Issue.requiresComponent
+
+        componentSelected =
+            State.selectedCluster
+                >> .components
+                >> DrillDownSelectList.hasBeenSelected
+    in
+    Validate.ifTrue
+        componentRequiredAndNotSelected
+        ( Field.Component, Empty )
 
 
 createAvailableTierValidator : State -> Validator Error State

@@ -1,10 +1,10 @@
 module Service exposing (..)
 
 import Category exposing (Category)
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Issues exposing (Issues(..))
 import Json.Decode as D
-import Maybe.Extra
 import SelectList exposing (SelectList)
 import SelectList.Extra
 import SupportType exposing (SupportType)
@@ -21,20 +21,6 @@ type alias Service =
 
 type Id
     = Id Int
-
-
-filterByIssues : (Issue -> Bool) -> SelectList Service -> Maybe (SelectList Service)
-filterByIssues condition services =
-    SelectList.map (withJustMatchingIssues condition) services
-        |> SelectList.toList
-        |> Maybe.Extra.values
-        |> SelectList.Extra.fromList
-
-
-withJustMatchingIssues : (Issue -> Bool) -> Service -> Maybe Service
-withJustMatchingIssues condition service =
-    Issues.matchingIssues condition service.issues
-        |> Maybe.map (asIssuesIn service)
 
 
 asIssuesIn : Service -> Issues -> Service
@@ -100,7 +86,10 @@ findTierAndAncestors predicate services =
         findCategoryIssueAndTier predicate categories =
             let
                 findIssueAddingCategory cat =
-                    case findIssueAndTier predicate cat.issues of
+                    case
+                        DrillDownSelectList.unwrap cat.issues
+                            |> findIssueAndTier predicate
+                    of
                         Just ( issue, tier ) ->
                             Just ( cat, issue, tier )
 
@@ -115,7 +104,10 @@ findTierAndAncestors predicate services =
         findServiceCategoryIssueAndTier service =
             case service.issues of
                 Issues.CategorisedIssues categories ->
-                    case findCategoryIssueAndTier predicate categories of
+                    case
+                        DrillDownSelectList.unwrap categories
+                            |> findCategoryIssueAndTier predicate
+                    of
                         Just ( category, issue, tier ) ->
                             Just ( service, Just category, issue, tier )
 
@@ -123,7 +115,10 @@ findTierAndAncestors predicate services =
                             Nothing
 
                 Issues.JustIssues issues ->
-                    case findIssueAndTier predicate issues of
+                    case
+                        DrillDownSelectList.unwrap issues
+                            |> findIssueAndTier predicate
+                    of
                         Just ( issue, tier ) ->
                             Just ( service, Nothing, issue, tier )
 

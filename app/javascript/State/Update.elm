@@ -3,13 +3,13 @@ module State.Update exposing (update)
 import Category
 import Cluster
 import Component
+import DrillDownSelectList
 import Http
 import Issue
 import Json.Decode as D
 import Msg exposing (..)
 import Navigation
 import Rails
-import SelectList exposing (Position(..), SelectList)
 import Service
 import State exposing (State)
 import Tier
@@ -94,7 +94,7 @@ handleChangeSelectedCluster : State -> Cluster.Id -> ( State, Cmd Msg )
 handleChangeSelectedCluster state clusterId =
     let
         newClusters =
-            SelectList.select (Utils.sameId clusterId) state.clusters
+            DrillDownSelectList.select (Utils.sameId clusterId) state.clusters
     in
     { state | clusters = newClusters } ! []
 
@@ -165,7 +165,9 @@ handleSelectTool : State -> String -> ( State, Cmd Msg )
 handleSelectTool state toolName =
     let
         services =
-            State.selectedCluster state |> .services
+            State.selectedCluster state
+                |> .services
+                |> DrillDownSelectList.unwrap
 
         isWantedTier : Tier.Tier -> Bool
         isWantedTier tier =

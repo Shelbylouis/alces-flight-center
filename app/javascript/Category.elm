@@ -8,16 +8,15 @@ module Category
         , setSelectedIssue
         )
 
+import DrillDownSelectList exposing (DrillDownSelectList)
 import Issue exposing (Issue)
 import Json.Decode as D
-import SelectList exposing (SelectList)
-import SelectList.Extra
 
 
 type alias Category =
     { id : Id
     , name : String
-    , issues : SelectList Issue
+    , issues : DrillDownSelectList Issue
     }
 
 
@@ -27,19 +26,10 @@ type Id
 
 decoder : String -> D.Decoder Category
 decoder clusterMotd =
-    let
-        issueDecoder =
-            Issue.decoder clusterMotd
-    in
     D.map3 Category
         (D.field "id" D.int |> D.map Id)
         (D.field "name" D.string)
-        (D.field "issues"
-            (SelectList.Extra.orderedDecoder
-                Issue.name
-                issueDecoder
-            )
-        )
+        (D.field "issues" (Issue.issuesDecoder clusterMotd))
 
 
 extractId : Category -> Int
@@ -49,15 +39,18 @@ extractId category =
             id
 
 
-setSelectedIssue : SelectList Category -> Issue.Id -> SelectList Category
+setSelectedIssue :
+    DrillDownSelectList Category
+    -> Issue.Id
+    -> DrillDownSelectList Category
 setSelectedIssue caseCategories issueId =
-    SelectList.Extra.nestedSelect
+    DrillDownSelectList.nestedSelect
         caseCategories
         .issues
         asIssuesIn
         (Issue.sameId issueId)
 
 
-asIssuesIn : Category -> SelectList Issue -> Category
+asIssuesIn : Category -> DrillDownSelectList Issue -> Category
 asIssuesIn category issues =
     { category | issues = issues }
