@@ -3,6 +3,14 @@ require 'rails_helper'
 RSpec.describe 'Case editing', type: :feature do
 
   let(:kase) { create(:open_case, subject: 'Original subject') }
+  let!(:issue) {
+    create(
+      :issue,
+      requires_component: false,
+      requires_service: false,
+      name: 'Some other issue'
+    )
+  }
 
   before(:each) do
     visit cluster_case_path(kase.cluster, kase, as: user)
@@ -14,6 +22,12 @@ RSpec.describe 'Case editing', type: :feature do
     it 'does not show subject edit button' do
       expect do
         find('#case-subject-edit')
+      end.to raise_error Capybara::ElementNotFound
+    end
+
+    it 'does not show issue edit selectbox' do
+      expect do
+        find('#case_issue_id')
       end.to raise_error Capybara::ElementNotFound
     end
 
@@ -44,6 +58,17 @@ RSpec.describe 'Case editing', type: :feature do
 
       expect(emails.count).to eq 1
       expect(emails[0].subject).to have_text 'New subject'
+    end
+
+    it 'allows editing case issue' do
+      expect(kase.issue).not_to eq issue
+
+      select 'Some other issue'
+      click_button 'Change issue'
+      expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
+
+      kase.reload
+      expect(kase.issue).to eq issue
     end
   end
 
