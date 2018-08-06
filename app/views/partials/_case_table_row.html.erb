@@ -5,7 +5,7 @@
     description:  'Support case created',
     timestamp: kase.created_at
   ) do |content|
-    render 'partials/table_cell_link', url: url, cell_content: "By "  + kase.user.name + " on " + content
+      render 'partials/table_cell_link', url: url, cell_content: "By #{kase.user.name} on #{content}"
   end %>
   <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.user_facing_state %></td>
   <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.subject %></td>
