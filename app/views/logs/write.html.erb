@@ -10,6 +10,6 @@
     preview_path: @new_log.decorate.preview_path,
     write_path: @new_log.decorate.write_path do %>
 
-    <%= render 'markdown_content', form_builder: form_builder %>
+    <%= render 'partials/markdown_content', form_builder: form_builder, field: :details %>
 <% end %>
 

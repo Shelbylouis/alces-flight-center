@@ -9,6 +9,12 @@
     preview_path: @comment.preview_path,
     write_path: @comment.write_path do %>
 
-    <%= render 'markdown_content', form_builder: form_builder %>
+    <%= render 'partials/markdown_content',
+               form_builder: form_builder,
+               field: :text,
+               options: {
+                 rows: 3
+               }
+    %>
 <% end %>
 

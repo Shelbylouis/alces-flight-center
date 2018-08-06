@@ -1,0 +1,13 @@
+<%
+  options ||= {}
+%>
+
+<div class="pb-2 m-0">
+  <div class="form-group">
+    <%= form_builder.text_area field,
+                               'data-markdown-content': true,
+                               class: 'form-control',
+                               **options
+    %>
+  </div>
+</div>
