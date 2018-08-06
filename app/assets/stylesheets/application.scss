@@ -161,3 +161,15 @@ a.filter {
     color: black;
   }
 }
+
+.nav-item-text {
+  padding: 0.375rem 0.75rem;
+  font-size: .9375rem;
+  line-height: 1.5;
+}
+
+
+.nav-item .btn {
+  display: block;
+  width: 100%;
+}
