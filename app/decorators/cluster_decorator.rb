@@ -9,7 +9,10 @@ class ClusterDecorator < ApplicationDecorator
   end
 
   def links
-    h.link_to name, path
+    h.raw(
+     "<i class=\"fa #{fa_icon}\" title=\"#{type_name}\"></i> " +
+       h.link_to(name,path)
+    )
   end
 
   def tabs
