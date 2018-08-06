@@ -1,0 +1,83 @@
+<% check_groups = cluster.check_groups(@date_checks) %>
+<% content_for(:subtitle) { "Cluster checks for #{@date.to_formatted_s(:long)}" } %>
+<%= render 'partials/tabs', activate: :checks do %>
+  <script type="text/javascript">
+    function dateChanged(date) {
+      var url = "<%= cluster_checks_path(cluster) %>/" + date;
+      Turbolinks.visit(url);
+    }
+  </script>
+  <div class="card-body row">
+    <div class="col-sm-12">
+      <div class="input-group date col-sm-3" style="float: right;">
+        <input type="text"
+               id="datepicker"
+               class="form-control"
+               value="<%= @date %>"
+               onchange="dateChanged(this.value)"
+               />
+               <div class="input-group-prepend">
+                 <span class="input-group-text">Change Date</span>
+               </div>
+      </div>
+      <% if @date_checks.empty? %>
+        <% if policy(cluster).enter_check_results? && @date == Date.today %>
+          No check results have been submitted yet for today, click below to begin the process
+          <br><%= link_to 'Set check results for today', cluster_check_submission_path(cluster),
+                      class: 'btn btn-danger'
+          %>
+        <% else %>
+          There are no check results for this date
+        <% end %>
+      <% else %>
+        <h3><%= cluster.name %> Checks for <%= @date.to_formatted_s(:long) %></h3>
+        <h3>
+          <%= "#{cluster.no_of_checks_passed(@date)}/#{@date_checks.count}
+            checks successful" %>
+        </h3>
+        <% check_groups.each do |group| %>
+          <h4><%= group[0].name %></h4>
+          <%= render 'partials/table',
+            collection: cluster.check_results,
+            message: 'No cluster check results to display' do %>
+            <thead>
+              <tr class="nowrap">
+                <th>Engineer</th>
+                <th>Check</th>
+                <th>Comment</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @date_checks.each do |check_result| %>
+                <% if check_result.check_category == group[0] %>
+                  <tr class="case-highlight">
+                    <td><%= current_user == check_result.user ?
+                      raw('<strong>Me</strong>') : check_result.user.name %></td>
+                    <td style="width: 30%;"><%= check_result.cluster_check.name %></td>
+                    <td style="width: 40%;">
+                      <% if check_result.comment.empty? %>
+                        <em>N/A</em>
+                      <% else %>
+                        <%= check_result.rendered_comment.html_safe %>
+                      <% end %>
+                    </td>
+                    <td class="nowrap">
+                      <% if check_result.result == 'Success' %>
+                        <i class="fa fa-check" style="color: #18bcb0;"/>
+                      <% elsif check_result.result == 'Failure' %>
+                        <i class="fa fa-remove" style="color: red;"/>
+                      <% else %>
+                        N/A
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              <% end %>
+            </tbody>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

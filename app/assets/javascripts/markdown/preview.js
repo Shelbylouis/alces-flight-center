@@ -1,31 +1,31 @@
-function showPreview(event) {
+function showPreview(event, editor) {
   event.preventDefault();
   $.ajax({
     url: event.target.getAttribute('data-preview-url'),
     method: 'POST',
-    data: getData(),
+    data: getData(editor),
   })
     .then((content) => {
-      $('#markdown-editor').replaceWith(content);
-      configureMarkdownPreview();
+      editor.html(content);
+      configureEditor(editor);
     });
 }
 
-function showWrite(event) {
+function showWrite(event, editor) {
   event.preventDefault();
   $.ajax({
     url: event.target.getAttribute('data-write-url'),
     method: 'POST',
-    data: getData(),
+    data: getData(editor),
   })
     .then((content) => {
-      $('#markdown-editor').replaceWith(content);
-      configureMarkdownPreview();
+      editor.html(content);
+      configureEditor(editor);
     });
 }
 
-function getData() {
-  const contentElement = document.querySelector('[data-markdown-content]');
+function getData(editor) {
+  const contentElement = editor.find(('[data-markdown-content]'))[0]
   return {
       authenticity_token: window._authenticity_token,
       [contentElement.name]: contentElement.value,
@@ -33,15 +33,15 @@ function getData() {
 }
 
 function configureMarkdownPreview() {
-  let target;
-  target = document.getElementById('markdown-preview-button');
-  if (target) {
-    target.addEventListener('click', showPreview);
-  }
-  target = document.getElementById('markdown-write-button');
-  if (target) {
-    target.addEventListener('click', showWrite);
-  }
+  const editor = $('[data-markdown-editor]');
+  editor.each(function(e){
+    configureEditor($(this))
+  })
+};
+
+function configureEditor(editor) {
+  editor.find('[data-markdown-preview-button]').click((e) => showPreview(e, editor));
+  editor.find('[data-markdown-write-button]').click((e) => showWrite(e, editor));
 };
 
 document.addEventListener('turbolinks:load', configureMarkdownPreview);

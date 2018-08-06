@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_26_120909) do
+ActiveRecord::Schema.define(version: 2018_08_01_130904) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -181,6 +181,36 @@ ActiveRecord::Schema.define(version: 2018_07_26_120909) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["case_id"], name: "index_change_requests_on_case_id"
+  end
+
+  create_table "check_categories", force: :cascade do |t|
+    t.string "name", null: false
+  end
+
+  create_table "check_results", force: :cascade do |t|
+    t.bigint "cluster_check_id", null: false
+    t.date "date", null: false
+    t.bigint "user_id", null: false
+    t.string "result", null: false
+    t.string "comment"
+    t.bigint "log_id"
+    t.index ["cluster_check_id"], name: "index_check_results_on_cluster_check_id"
+    t.index ["log_id"], name: "index_check_results_on_log_id"
+    t.index ["user_id"], name: "index_check_results_on_user_id"
+  end
+
+  create_table "checks", force: :cascade do |t|
+    t.bigint "check_category_id", null: false
+    t.string "name", null: false
+    t.string "command"
+    t.index ["check_category_id"], name: "index_checks_on_check_category_id"
+  end
+
+  create_table "cluster_checks", force: :cascade do |t|
+    t.bigint "cluster_id", null: false
+    t.bigint "check_id", null: false
+    t.index ["check_id"], name: "index_cluster_checks_on_check_id"
+    t.index ["cluster_id"], name: "index_cluster_checks_on_cluster_id"
   end
 
   create_table "clusters", force: :cascade do |t|
@@ -439,6 +469,12 @@ ActiveRecord::Schema.define(version: 2018_07_26_120909) do
   add_foreign_key "change_request_state_transitions", "change_requests"
   add_foreign_key "change_request_state_transitions", "users"
   add_foreign_key "change_requests", "cases"
+  add_foreign_key "check_results", "cluster_checks"
+  add_foreign_key "check_results", "logs"
+  add_foreign_key "check_results", "users"
+  add_foreign_key "checks", "check_categories"
+  add_foreign_key "cluster_checks", "checks"
+  add_foreign_key "cluster_checks", "clusters"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"

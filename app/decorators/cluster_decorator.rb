@@ -17,6 +17,7 @@ class ClusterDecorator < ApplicationDecorator
       tabs_builder.overview,
       documents.empty? ? nil : { id: :documents, path: h.cluster_documents_path(self) },
       { id: :credit_usage, path: h.cluster_credit_usage_path(self) },
+      { id: :checks, path: h.cluster_checks_path(self) },
       tabs_builder.logs,
       tabs_builder.cases,
       tabs_builder.maintenance,
@@ -87,6 +88,32 @@ class ClusterDecorator < ApplicationDecorator
 
   def type_name
     'Entire cluster'
+  end
+
+  def last_checked
+    if check_results.empty?
+      'N/A'
+    else
+      check_results.order(date: :desc).first.date
+    end
+  end
+
+  def no_of_checks_passed(date = last_checked)
+    check_results.where(date: date).where.not(result: 'Failure').count
+  end
+
+  def check_groups(checks)
+    checks.group_by(&:check_category)
+  end
+
+  def check_results_class
+    if no_of_checks_passed.zero?
+      'text-danger'
+    elsif no_of_checks_passed < checks.count
+      'text-warning'
+    else
+      'text-success'
+    end
   end
 
   private

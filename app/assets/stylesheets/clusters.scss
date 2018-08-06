@@ -34,7 +34,6 @@ li.credit-charge-entry {
   }
 }
 
-
 .cluster-tree {
   min-width: 15rem;
 
@@ -83,4 +82,10 @@ li.credit-charge-entry {
       content: '-'
     }
   }
+}
+
+.error {
+  color: red;
+  text-align: center;
+  font-style: italic;
 }

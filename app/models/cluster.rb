@@ -29,6 +29,9 @@ class Cluster < ApplicationRecord
   has_many :notes, dependent: :destroy
   has_many :credit_deposits
   has_many :credit_charges, through: :cases
+  has_many :cluster_checks
+  has_many :checks, through: :cluster_checks
+  has_many :check_results, through: :cluster_checks
 
   validates_associated :site
   validates :name, presence: true

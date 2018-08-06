@@ -122,6 +122,10 @@ Rails.application.routes.draw do
       admin_logs.call
       notes.call(true)
       post :deposit
+      get '/checks/submit', to: 'clusters#enter_check_results', as: :check_submission
+      post '/checks/submit', to: 'clusters#save_check_results', as: :set_check_results
+      post '/checks/submit/preview', to: 'cluster_checks#preview'
+      post '/checks/submit/write', to: 'cluster_checks#write'
     end
 
     resources :components, only: []  do
@@ -193,6 +197,7 @@ Rails.application.routes.draw do
       get :documents
       notes.call(false)
       get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
+      get '/checks(/:date)', to: 'clusters#view_checks', as: :checks
     end
 
     resources :components, only: :show do
