@@ -66,9 +66,10 @@
       <tr style="width: 100%;">
         <th>Created</th>
         <td>
-          <%= @case.created_at.to_formatted_s(:long) %>
-          by
+          By
           <%= @case.user.name %>
+          on
+          <%= @case.created_at.to_formatted_s(:short) %>
         </td>
         <th>Assigned to</th>
         <td id="case-assignment">
