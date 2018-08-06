@@ -22,6 +22,16 @@ class Deployment
 
     important 'Make sure you have anything you want deployed on this branch!'
 
+    wipe_database = ENV['WIPE_DATABASE'] || false
+
+    if staging?
+      if wipe_database
+        important 'Staging database will be wiped and replaced with a copy of production.'
+      else
+        info 'Staging database will be preserved. Set WIPE_DATABASE=true to replace with a copy of production.'
+      end
+    end
+
     unless dry_run?
       STDERR.puts <<~EOF.squish
         About to deploy `#{current_branch}` branch to real #{remote}
@@ -35,7 +45,7 @@ class Deployment
     dokku_config_set(VERSION_ENV_VAR, tag, app: app_name, restart: false)
     run "git push #{remote} -f #{current_branch}:master"
 
-    import_production_backup_to_staging if staging?
+    import_production_backup_to_staging if staging? && wipe_database
 
     run "git tag -f #{remote} #{current_branch}"
     run "git tag -f #{tag} #{current_branch}"
