@@ -100,6 +100,8 @@ Rails.application.routes.draw do
         member do
           post :propose
           post :handover
+          post :preview
+          post :write
         end
       end
 

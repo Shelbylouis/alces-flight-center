@@ -73,6 +73,24 @@ class ChangeRequestsController < ApplicationController
     end
   end
 
+  def preview
+    @cr = @case.change_request || @case.build_change_request
+    @cr.update(cr_params)
+
+    authorize @cr, :create?
+
+    render layout: false
+  end
+
+  def write
+    @cr = @case.change_request || @case.build_change_request
+    @cr.update(cr_params)
+
+    authorize @cr, :create?
+
+    render layout: false
+  end
+
   private
 
   def assign_case

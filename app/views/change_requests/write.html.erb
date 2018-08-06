@@ -1,0 +1,13 @@
+<%
+  form_builder = nil
+  form_for cr, url: case_change_request_path do |f| form_builder = f end
+%>
+
+<%= render 'partials/markdown_editor_layout',
+  activate: 'write',
+  form_builder: form_builder,
+  preview_path: preview_case_change_request_path,
+  write_path: write_case_change_request_path do %>
+
+  <%= render 'markdown_content', form_builder: form_builder %>
+<% end %>
