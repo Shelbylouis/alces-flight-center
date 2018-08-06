@@ -17,6 +17,8 @@
 //= require bootstrap-sprockets
 //= require_tree .
 //= require bootstrap-datepicker
+//= require jquery.scrollTo.min.js
+//= require jquery.validate.min.js
 //
 
 function enableTooltips() {
