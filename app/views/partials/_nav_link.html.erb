@@ -25,9 +25,13 @@
   <% if dropdown %>
     <div class='dropdown-menu'>
       <% dropdown.each do |dropitem| %>
-        <%= link_to dropitem[:text],
-                    dropitem[:path],
-                    class: 'dropdown-item' %>
+        <% if dropitem[:heading] %>
+          <h6 class="dropdown-header"><%= dropitem[:text] %></h6>
+        <% else %>
+          <%= link_to dropitem[:text],
+                      dropitem[:path],
+                      class: 'dropdown-item' %>
+        <% end %>
       <% end %>
     </div>
   <% end %>

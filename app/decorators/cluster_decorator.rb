@@ -21,15 +21,26 @@ class ClusterDecorator < ApplicationDecorator
       tabs_builder.logs,
       tabs_builder.cases,
       tabs_builder.maintenance,
-      { id: :services, path: h.cluster_services_path(self) },
       {
-        id: :components,
-        dropdown: self.available_component_group_types.map do |t|
+        id: :cluster,
+        dropdown: [
           {
-            text: t.pluralize,
-            path: h.cluster_components_path(self, type: t)
+            text: 'Services',
+            path: h.cluster_services_path(self)
+          },
+          {
+            text: 'Components:',
+            heading: true,
           }
-        end.push(text: 'All', path: h.cluster_components_path(self))
+        ].tap do |comps|
+          comps.push(text: 'All', path: h.cluster_components_path(self))
+          available_component_group_types.each do |t|
+            comps.push(
+              text: t.pluralize,
+              path: h.cluster_components_path(self, type: t)
+            )
+          end
+        end
       },
       notes_tab,
     ].compact
