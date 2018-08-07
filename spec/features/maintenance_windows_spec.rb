@@ -15,7 +15,7 @@ RSpec.shared_examples 'maintenance form error handling' do |form_action|
     ).to have_text("Unable to #{form_action} this maintenance")
     invalidated_selects =
       requested_start_element.all('select', class: 'is-invalid')
-    expect(invalidated_selects.length).to eq(5)
+    expect(invalidated_selects.length).to eq(2)
     invalid_feedback = requested_start_element.find('.invalid-feedback')
     expect(invalid_feedback).to have_text('Cannot be in the past')
   end
@@ -82,10 +82,8 @@ RSpec.feature "Maintenance windows", type: :feature do
   let(:extend_button_text) { 'Extend' }
 
   def fill_in_datetime_selects(identifier, with:)
-    select with.year.to_s, from: "#{identifier}-datetime-select-year"
-    month_name = with.strftime('%B')
-    select month_name, from: "#{identifier}-datetime-select-month"
-    select with.day.to_s, from: "#{identifier}-datetime-select-day"
+    date = "#{with.year}-#{with.month}-#{with.day}"
+    fill_in('maintenance-datepicker', with: date)
     select with.hour.to_s, from: "#{identifier}-datetime-select-hour"
   end
 
