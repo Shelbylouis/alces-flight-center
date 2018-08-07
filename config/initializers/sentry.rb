@@ -17,5 +17,7 @@ if ENV.has_key?('SENTRY_DSN')
     config.async = lambda { |event|
       SentryJob.perform_later(event.to_hash)
     }
+
+    config.release = Rails.application.config.version
   end
 end
