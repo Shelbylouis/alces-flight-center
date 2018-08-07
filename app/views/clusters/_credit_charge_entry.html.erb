@@ -8,9 +8,11 @@
   <span class="text">
     <%= yield %>
   </span>
-  <span>
-    <%= time_to_response%>
-  </span>
+  <% if local_assigns[:time_to_response] %>
+    <span>
+      <%= time_to_response %>
+    <span>
+  <% end %>
   <span>
     <%= pluralize(amount.abs,'credit') %>
   </span>
