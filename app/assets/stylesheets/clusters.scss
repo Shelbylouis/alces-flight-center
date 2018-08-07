@@ -24,13 +24,18 @@ li.credit-charge-entry {
 
   * {
     flex-grow: 0;
-    flex-shrink: 1;
+    flex-shrink: 0;
   }
 
   .text {
     flex-grow: 1;
     padding: 0 1rem;
     font-weight: bold;
+    flex-shrink: 1;
+  }
+
+  .response-time {
+    padding: 0 1rem 0 0;
   }
 }
 

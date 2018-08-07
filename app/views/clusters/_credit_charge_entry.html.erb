@@ -9,9 +9,9 @@
     <%= yield %>
   </span>
   <% if local_assigns[:time_to_response] %>
-    <span>
+    <span class="response-time" title="Business time elapsed before the case recieved a response from an admin">
       <%= time_to_response %>
-    <span>
+    </span>
   <% end %>
   <span>
     <%= pluralize(amount.abs,'credit') %>
