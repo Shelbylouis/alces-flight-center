@@ -3,8 +3,10 @@ class ClusterPartDecorator < ApplicationDecorator
   decorates_association :cluster
 
   def links
-    self_link = h.link_to name, path
-    h.raw("#{self_link} (#{cluster.links})")
+    h.raw(
+      "<i class=\"fa #{fa_icon}\" title=\"#{type_name}\"></i> " +
+         h.link_to(name, path)
+    )
   end
 
   def case_form_json

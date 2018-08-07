@@ -7,7 +7,7 @@ RSpec.describe ClusterDecorator do
     it 'returns link to Cluster' do
       expect(
         subject.links
-      ).to eq(
+      ).to include(
         h.link_to(subject.name, h.cluster_path(subject))
       )
     end

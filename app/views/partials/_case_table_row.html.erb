@@ -18,9 +18,7 @@
                   end
     %></td>
   <td>
-    <%= render 'partials/table_cell_link', url: url do %>
       <%= render 'partials/association_summary', associations: kase.associations %>
-    <% end %>
   </td>
   <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.credit_charge&.amount %></td>
 </tr>
