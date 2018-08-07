@@ -4,9 +4,8 @@ class CreditChargeDecorator < ApplicationDecorator
   def credit_usage_card
     kase = object.case.decorate
     link_text = "#{kase.display_id} - #{kase.subject}"
-    time_to_response = 0
+    time_to_response_str = 0
     first_admin_comment = nil
-    #if an admin created the case, time to response is 0
     if !kase.user.admin?
       kase.events.reverse.each do |event|
         if event.instance_of?(CaseComment)
@@ -17,15 +16,18 @@ class CreditChargeDecorator < ApplicationDecorator
         end
       end
       if first_admin_comment.nil?
-        time_to_response = "N/A" 
+        time_to_response_str = "N/A"
       else
-        time_to_response = kase.created_at.business_time_until(first_admin_comment.created_at)
+          time_to_response = kase.created_at.business_time_until(first_admin_comment.created_at).floor
+          hours = time_to_response/3600
+          mins = (time_to_response/60)%60
+          time_to_response_str = "#{hours}h #{mins}m until response from admin"
       end
     end
     h.render 'clusters/credit_charge_entry',
              amount: -amount,
              date: effective_date,
-             time_to_response: time_to_response do
+             time_to_response: time_to_response_str do
       h.link_to link_text, h.case_path(kase), class: h.credit_value_class(-amount)
     end
   end
