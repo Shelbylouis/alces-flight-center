@@ -8,7 +8,7 @@ class ClusterPartDecorator < ApplicationDecorator
          h.link_to(name, path)
     )
   end
-  
+
   def case_form_json
     {
       id: id,
