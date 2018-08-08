@@ -73,6 +73,12 @@ class ChangeRequestsController < ApplicationController
     end
   end
 
+  def cancel
+    change_action 'Change request cancelled.' do |cr|
+      cr.cancel!(current_user)
+    end
+  end
+
   def preview
     @cr = @case.change_request || @case.build_change_request
     @cr.update(cr_params)
