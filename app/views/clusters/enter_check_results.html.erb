@@ -36,10 +36,10 @@
                     <% cluster_check_id = cluster_check.id %>
                     <tr class="case-highlight">
                       <td style="width: 20%;"><%= cluster_check.check.name %></td>
-                      <td style="width: 20%;">
-                        <p style="color: #ea3ea6; font-style: italic;">
-                          <%= cluster_check.check.command %>
-                        </p>
+                      <td class="markdown" style="width: 20%;">
+                        <code>
+                          <%= cluster_check.check.command || 'N/A' %>
+                        </code>
                       </td>
                       <td style="width: 60%;">
                         <%= render 'partials/markdown_editor_layout',
