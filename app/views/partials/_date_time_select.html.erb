@@ -14,7 +14,7 @@
       <input type="text"
              id="maintenance-datepicker"
              name="maintenance_window[requested_start]"
-             class="form-control"
+             class="form-control <%= model.bootstrap_valid_class('requested_start') %>"
              value=<%= @date %>
            />
     </div>
