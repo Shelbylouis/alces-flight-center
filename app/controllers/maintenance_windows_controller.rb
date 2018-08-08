@@ -1,5 +1,6 @@
 class MaintenanceWindowsController < ApplicationController
   decorates_assigned :maintenance_window
+  before_action :format_requested_start_fields, only: [:create, :confirm_submit]
 
   def new
     @case = Case.find_from_id!(params[:case_id])
@@ -8,6 +9,7 @@ class MaintenanceWindowsController < ApplicationController
         maintenance_window_case_params(@case)
       )
     )
+    @date = default_requested_start
     authorize @maintenance_window
   end
 
@@ -15,6 +17,7 @@ class MaintenanceWindowsController < ApplicationController
     event = mandatory? ? :mandate : :request
     action = mandatory? ? :schedule : :request
     @case = Case.find_from_id!(params[:case_id])
+    @date = params['maintenance_window']['requested_start']
 
     handle_form_submission(action: action, template: :new) do
       @maintenance_window = MaintenanceWindow.new(
@@ -32,6 +35,7 @@ class MaintenanceWindowsController < ApplicationController
 
   def confirm
     @maintenance_window = MaintenanceWindow.find(params[:id])
+    @date = @maintenance_window.requested_start
     authorize @maintenance_window
 
     # Validate window as if it was confirmed without changes up front, so can
@@ -158,5 +162,12 @@ class MaintenanceWindowsController < ApplicationController
     window.state = :confirm
     window.validate
     window.state = original_state
+  end
+
+  def format_requested_start_fields
+    year, month, day = params['maintenance_window']['requested_start'].split('-')
+    params['maintenance_window']['requested_start(1i)'] = year
+    params['maintenance_window']['requested_start(2i)'] = month
+    params['maintenance_window']['requested_start(3i)'] = day
   end
 end

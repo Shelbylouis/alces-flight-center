@@ -21,13 +21,15 @@
         <div class="col">
           <label>
             Effective date
-            <%= date_field :credit_deposit,
-                           :effective_date,
-                           class: 'form-control',
-                           max: Date.today,
-                           required: true,
-                           value: Date.today
-            %>
+            <div class="input-group date">
+              <input type="text"
+                     id="credit-datepicker"
+                     name="credit_deposit[effective_date]"
+                     class="form-control"
+                     required="true"
+                     value="<%= Date.today %>">
+              </input>
+            </div>
           </label>
         </div>
       </div>
