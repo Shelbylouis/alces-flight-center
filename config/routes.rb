@@ -102,6 +102,7 @@ Rails.application.routes.draw do
           post :handover
           post :preview
           post :write
+          post :cancel
         end
       end
 
