@@ -17,8 +17,10 @@ class ChangeRequest < ApplicationRecord
     state :in_progress
     state :in_handover
     state :completed
+    state :cancelled
 
     event(:propose) { transition draft: :awaiting_authorisation }
+    event(:cancel) { transition draft: :cancelled }
     event(:decline) { transition awaiting_authorisation: :declined }
     event(:authorise) { transition awaiting_authorisation: :in_progress }
     event(:handover) { transition in_progress: :in_handover }
@@ -36,7 +38,7 @@ class ChangeRequest < ApplicationRecord
   validates :description, presence: true
 
   def finalised?
-    completed? || declined?
+    completed? || declined? || cancelled?
   end
 
   private
