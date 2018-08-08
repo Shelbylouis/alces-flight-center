@@ -17,6 +17,7 @@ class MaintenanceWindowsController < ApplicationController
     event = mandatory? ? :mandate : :request
     action = mandatory? ? :schedule : :request
     @case = Case.find_from_id!(params[:case_id])
+    @date = params['maintenance_window']['requested_start']
 
     handle_form_submission(action: action, template: :new) do
       @maintenance_window = MaintenanceWindow.new(
