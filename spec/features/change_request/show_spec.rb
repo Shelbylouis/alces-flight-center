@@ -4,7 +4,7 @@ RSpec.describe 'Change request view', type: :feature do
 
   EXPECTED_BUTTONS = {
     draft: {
-      admin: ['Edit', 'Submit for authorisation'],
+      admin: ['Edit', 'Cancel', 'Submit for authorisation'],
       contact: [],
       viewer: [],
     },
@@ -29,6 +29,11 @@ RSpec.describe 'Change request view', type: :feature do
       viewer: [],
     },
     completed: {
+      admin: [],
+      contact: [],
+      viewer: [],
+    },
+    cancelled: {
       admin: [],
       contact: [],
       viewer: [],
@@ -117,6 +122,15 @@ RSpec.describe 'Change request view', type: :feature do
     cr.reload
     expect(cr.state).to eq 'declined'
     expect(find('.alert').text).to have_text("Change request #{kase.display_id} declined.")
+  end
+
+  it 'transitions to :cancelled as a final state' do
+    cr = create(:change_request, state: :draft, case: kase)
+
+    as(admin) { click_link('Cancel') }
+    cr.reload
+    expect(cr.state).to eq 'cancelled'
+    expect(find('.alert').text).to have_text('Change request cancelled.')
   end
 
 end
