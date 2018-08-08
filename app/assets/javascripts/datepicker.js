@@ -23,6 +23,7 @@ function initialiseDatepicker() {
 
   $("#maintenance-datepicker").datepicker({
     format: "yyyy-mm-dd",
+    startDate: '-0d',
     todayHighlight: true,
     todayBtn: "linked",
     autoclose: true,
