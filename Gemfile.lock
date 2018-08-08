@@ -165,6 +165,7 @@ GEM
       temple (>= 0.8.0)
       tilt
     hashdiff (0.3.7)
+    holidays (6.4.0)
     htmlentities (4.3.4)
     http (3.3.0)
       addressable (~> 2.3)
@@ -478,6 +479,7 @@ DEPENDENCIES
   email_spec
   factory_bot_rails
   font-awesome-rails
+  holidays
   http
   jbuilder (~> 2.5)
   jquery-rails
@@ -527,4 +529,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   1.16.2
+   1.16.3
