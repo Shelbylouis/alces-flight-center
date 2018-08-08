@@ -25,6 +25,8 @@ module Cluster::DocumentsRetriever
           Document.new(name, url)
         end
       end.reject(&:nil?)
+    rescue Aws::S3::Errors::ServiceError
+      []
     end
 
     private
