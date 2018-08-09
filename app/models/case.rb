@@ -262,14 +262,20 @@ class Case < ApplicationRecord
 
   def unresolvable_reason
     if cr_in_progress?
-      'This case cannot be resolved as the change request is incomplete.'
-    else
-      unfinished_mws = maintenance_windows.unfinished.count
-      if unfinished_mws.positive?
-        "This case cannot be resolved as there #{unfinished_mws == 1 ? 'is an' : 'are'}
-         outstanding maintenance window#{unfinished_mws == 1 ? '': 's'}.".squish
-      end
+      return 'This case cannot be resolved as the change request is incomplete.'
     end
+
+    unfinished_mws = maintenance_windows.unfinished.count
+    if unfinished_mws.positive?
+      return "This case cannot be resolved as there #{unfinished_mws == 1 ? 'is an' : 'are'}
+       outstanding maintenance window#{unfinished_mws == 1 ? '': 's'}.".squish
+    end
+
+    if time_worked.nil?
+      return 'This case cannot be resolved until time worked is added.'
+    end
+
+    nil
   end
 
   def potential_assignees

@@ -6,9 +6,17 @@ RSpec.describe 'Case page', type: :feature do
   let (:site) { create(:site, name: 'My Site') }
   let (:cluster) { create(:cluster, site: site) }
   let (:assignee) { nil }
+  let(:time_worked) { 42 }
 
   let :open_case do
-    create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee, tier_level: 2)
+    create(
+      :open_case,
+      cluster: cluster,
+      subject: 'Open case',
+      assignee: assignee,
+      tier_level: 2,
+      time_worked: time_worked
+    )
   end
 
   let :resolved_case do
@@ -98,7 +106,7 @@ RSpec.describe 'Case page', type: :feature do
       expect(event_cards[5].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
-      expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked to 2h 3m.'
+      expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked from 42m to 2h 3m.'
 
       expect(event_cards[3].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'
@@ -218,7 +226,7 @@ RSpec.describe 'Case page', type: :feature do
     end
 
     it 'shows or hides state controls for admins' do
-      visit cluster_case_path(cluster,open_case, as: admin)
+      visit cluster_case_path(cluster, open_case, as: admin)
 
       expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
 
@@ -333,6 +341,17 @@ RSpec.describe 'Case page', type: :feature do
             find('#maintenance-details')
           end.to raise_error Capybara::ElementNotFound
         end
+      end
+    end
+
+    context 'without time added' do
+      let(:time_worked) { nil }
+
+      it 'does not allow case to be resolved' do
+        visit cluster_case_path(open_case.cluster, open_case, as: admin)
+        state_controls = find('#case-state-controls')
+        expect(state_controls).to have_text 'until time worked is added.'
+        expect(state_controls).not_to have_text 'Resolve this case'
       end
     end
   end
