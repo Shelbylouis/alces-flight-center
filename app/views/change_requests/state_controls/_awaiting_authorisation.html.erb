@@ -10,6 +10,19 @@
               role: 'button'
   %>
 <% end %>
+<% if my_policy.request_changes? %>
+  <%= link_to 'Request changes',
+              request_changes_case_change_request_path(cr.case),
+              class: 'btn btn-warning form-control mb-2',
+              data: {
+                  confirm: 'Are you sure you want to request changes for this
+                  change request? If so press OK and detail the required
+                  changes in the comment section for the case.'.squish
+              },
+              method: 'post',
+              role: 'button'
+  %>
+<% end %>
 <% if my_policy.decline? %>
   <%= link_to 'Decline',
               decline_case_change_request_path(cr.case),
