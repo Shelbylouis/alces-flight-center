@@ -129,7 +129,7 @@ RSpec.describe 'Change request view', type: :feature do
     as(admin) { click_link('Cancel') }
     cr.reload
     expect(cr.state).to eq 'cancelled'
-    expect(find('.alert').text).to have_text('Change request cancelled.')
+    expect(find('.alert').text).to have_text("Change request #{kase.display_id} cancelled.")
   end
 
   it 'transitions back to draft upon requesting changes' do
