@@ -98,7 +98,7 @@ RSpec.describe 'Case page', type: :feature do
       expect(event_cards[5].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
-      expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
+      expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked to 2h 3m.'
 
       expect(event_cards[3].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'

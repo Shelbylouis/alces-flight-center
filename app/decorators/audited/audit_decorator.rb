@@ -61,7 +61,11 @@ module Audited
     end
 
     def time_worked_text(from, to)
-      "Changed time worked from #{format_minutes(from)} to #{format_minutes(to)}."
+      if from.nil?
+        "Changed time worked to #{format_minutes(to)}."
+      else
+        "Changed time worked from #{format_minutes(from)} to #{format_minutes(to)}."
+      end
     end
 
     def time_worked_type

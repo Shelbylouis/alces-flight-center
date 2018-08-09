@@ -93,10 +93,12 @@ class Case < ApplicationRecord
     }
   validate :validate_tier_level_changes
 
-  validates :time_worked, numericality: {
-      greater_than_or_equal_to: 0,
-      only_integer: true  # We store time worked as integer minutes.
-  }
+  validates :time_worked,
+            numericality: {
+              allow_blank: true,
+              greater_than_or_equal_to: 0,
+              only_integer: true,  # We store time worked as integer minutes.
+            }
 
   validate :time_worked_not_changed_unless_allowed
 
