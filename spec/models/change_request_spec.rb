@@ -4,7 +4,7 @@ RSpec.describe ChangeRequest, type: :model do
 
   describe '#finalised?' do
 
-    FINAL_STATES = %w(declined completed).freeze
+    FINAL_STATES = %w(declined completed cancelled).freeze
 
     it 'reports final states as finalised' do
 

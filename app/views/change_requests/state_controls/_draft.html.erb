@@ -20,6 +20,20 @@
   %>
 <% end %>
 
+<hr>
+
+<% if my_policy.cancel? %>
+  <%= link_to 'Cancel',
+              cancel_case_change_request_path(cr.case),
+              class: 'btn btn-danger form-control',
+              data: {
+                  confirm: 'Are you sure you want to cancel this change request?'
+              },
+              method: 'post',
+              role: 'button'
+  %>
+<% end %>
+
 <% if !my_policy.edit? && !my_policy.propose? %>
 <p>
   This CR is in draft. When it has been completed you will be able to authorize or

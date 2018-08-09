@@ -13,7 +13,7 @@ class ChangeRequestStateTransition < ApplicationRecord
 
   def validate_user_can_initiate
     case event&.to_sym
-    when :propose, :handover
+    when :propose, :handover, :cancel
       errors.add(:user, 'must be an admin') unless user&.admin?
     when :authorise, :decline, :complete
       errors.add(:user, 'must be a contact') unless user&.contact?
