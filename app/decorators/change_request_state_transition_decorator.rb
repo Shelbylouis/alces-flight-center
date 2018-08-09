@@ -21,6 +21,8 @@ class ChangeRequestStateTransitionDecorator < ApplicationDecorator
       'is ready for handover.'
     when 'complete'
       'is now complete.'
+    when 'cancel'
+      'has been cancelled.'
     end
   end
 
