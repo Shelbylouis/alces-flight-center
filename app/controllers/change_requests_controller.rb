@@ -79,6 +79,12 @@ class ChangeRequestsController < ApplicationController
     end
   end
 
+  def request_changes
+    change_action_and_email 'Change request %s has been sent back for adjustments.' do |cr|
+      cr.request_changes!(current_user)
+    end
+  end
+
   def preview
     @cr = @case.change_request || @case.build_change_request
     @cr.update(cr_params)
