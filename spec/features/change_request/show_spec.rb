@@ -4,7 +4,7 @@ RSpec.describe 'Change request view', type: :feature do
 
   EXPECTED_BUTTONS = {
     draft: {
-      admin: ['Edit', 'Cancel', 'Submit for authorisation'],
+      admin: ['Edit', 'Submit for authorisation', 'Cancel'],
       contact: [],
       viewer: [],
     },
