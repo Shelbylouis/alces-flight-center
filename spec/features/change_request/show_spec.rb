@@ -139,7 +139,7 @@ RSpec.describe 'Change request view', type: :feature do
     cr.reload
     expect(cr.state).to eq 'draft'
     expect(find('.alert').text).to have_text(
-      "Change request #{kase.display_id} has been sent back for adjustments."
+      "Further changes requested on change request #{kase.display_id}."
     )
   end
 

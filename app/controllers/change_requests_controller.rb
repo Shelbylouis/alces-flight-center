@@ -80,7 +80,7 @@ class ChangeRequestsController < ApplicationController
   end
 
   def request_changes
-    change_action_and_email 'Change request %s has been sent back for adjustments.' do |cr|
+    change_action_and_email 'Further changes requested on change request %s.' do |cr|
       cr.request_changes!(current_user)
     end
   end

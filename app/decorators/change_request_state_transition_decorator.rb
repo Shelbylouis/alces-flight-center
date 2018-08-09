@@ -24,7 +24,7 @@ class ChangeRequestStateTransitionDecorator < ApplicationDecorator
     when 'cancel'
       'has been cancelled.'
     when 'request_changes'
-      'has been sent back for adjustments'
+      'has had further changes requested.'
     end
   end
 
