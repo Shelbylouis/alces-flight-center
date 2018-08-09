@@ -23,6 +23,8 @@ class ChangeRequestStateTransitionDecorator < ApplicationDecorator
       'is now complete.'
     when 'cancel'
       'has been cancelled.'
+    when 'request_changes'
+      'has had further changes requested.'
     end
   end
 

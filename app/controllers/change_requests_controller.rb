@@ -74,8 +74,14 @@ class ChangeRequestsController < ApplicationController
   end
 
   def cancel
-    change_action 'Change request cancelled.' do |cr|
+    change_action 'Change request %s cancelled.' do |cr|
       cr.cancel!(current_user)
+    end
+  end
+
+  def request_changes
+    change_action_and_email 'Further changes requested on change request %s.' do |cr|
+      cr.request_changes!(current_user)
     end
   end
 

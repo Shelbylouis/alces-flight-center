@@ -10,7 +10,7 @@ RSpec.describe 'Change request view', type: :feature do
     },
     awaiting_authorisation: {
       admin: [],
-      contact: ['Authorise', 'Decline'],
+      contact: ['Authorise', 'Request changes', 'Decline'],
       viewer: [],
     },
     declined: {
@@ -73,8 +73,7 @@ RSpec.describe 'Change request view', type: :feature do
   end
 
   it 'has test coverage for all possible CR states' do
-    cr = create(:change_request, case: kase)
-    states = cr.state_paths(from: :draft).flatten.map(&:to_name).uniq << :draft
+    states = ChangeRequest.state_machine.states.keys
 
     expect(states.sort).to eq EXPECTED_BUTTONS.keys.sort
   end
@@ -130,7 +129,18 @@ RSpec.describe 'Change request view', type: :feature do
     as(admin) { click_link('Cancel') }
     cr.reload
     expect(cr.state).to eq 'cancelled'
-    expect(find('.alert').text).to have_text('Change request cancelled.')
+    expect(find('.alert').text).to have_text("Change request #{kase.display_id} cancelled.")
+  end
+
+  it 'transitions back to draft upon requesting changes' do
+    cr = create(:change_request, state: :awaiting_authorisation, case: kase)
+
+    as(contact) { click_link('Request changes') }
+    cr.reload
+    expect(cr.state).to eq 'draft'
+    expect(find('.alert').text).to have_text(
+      "Further changes requested on change request #{kase.display_id}."
+    )
   end
 
 end

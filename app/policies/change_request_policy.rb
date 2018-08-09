@@ -10,6 +10,7 @@ class ChangeRequestPolicy < ApplicationPolicy
   alias_method :authorise?, :contact?
   alias_method :decline?, :contact?
   alias_method :complete?, :contact?
+  alias_method :request_changes?, :contact?
 
   class Scope < Scope
     def resolve

@@ -177,6 +177,7 @@ Rails.application.routes.draw do
           post :authorise
           post :decline
           post :complete
+          post :request_changes
         end
       end
 
