@@ -23,6 +23,7 @@ class ChangeRequest < ApplicationRecord
     event(:cancel) { transition draft: :cancelled }
     event(:decline) { transition awaiting_authorisation: :declined }
     event(:authorise) { transition awaiting_authorisation: :in_progress }
+    event(:request_changes) { transition awaiting_authorisation: :draft }
     event(:handover) { transition in_progress: :in_handover }
     event(:complete) { transition in_handover: :completed }
 
