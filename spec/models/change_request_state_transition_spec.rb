@@ -30,7 +30,7 @@ RSpec.describe ChangeRequestStateTransition, type: :model do
   end
 
   ADMIN_EVENTS = %w(propose cancel handover).freeze
-  NON_ADMIN_EVENTS = %w(authorise decline complete).freeze
+  NON_ADMIN_EVENTS = %w(authorise decline complete request_changes).freeze
 
   let(:event) { 'propose' }
   let(:user) { create(:admin) }
