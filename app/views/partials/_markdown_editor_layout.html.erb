@@ -1,24 +1,23 @@
 <div data-markdown-editor>
-    <ul class="nav nav-tabs">
-        <li class='nav-item <%= 'nav-link--active' if activate == 'write' %>'>
+    <ul class="nav nav-tabs nav-fill">
+        <li class='nav-item ml-2 rounded-top <%= 'nav-link--active' if activate == 'write' %>'>
             <%= form_builder.button 'Write',
                 class: 'btn btn-link',
                 'data-markdown-write-button': true,
                 'data-write-url': write_path
             %>
         </li>
-        <li class='nav-item <%= 'nav-link--active' if activate == 'preview' %>'>
+        <li class='nav-item rounded-top <%= 'nav-link--active' if activate == 'preview' %>'>
             <%= form_builder.button 'Preview',
                 class: 'btn btn-link',
                 'data-markdown-preview-button': true,
                 'data-preview-url': preview_path
             %>
         </li>
+        <li class='nav-item text-muted nav-item-text text-right'>
+          Styling with Markdown is supported
+        </li>
     </ul>
 
     <%= yield if block_given? %>
-
-    <p class="form-text text-muted">
-    Styling with markdown is supported
-    </p>
 </div>

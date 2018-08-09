@@ -54,10 +54,14 @@
                             cluster_check_id
                           ) do %>
 
-                          <%= render 'cluster_checks/markdown_content',
-                            form_builder: f,
-                            index: cluster_check_id,
-                            value: nil
+                          <%= render 'partials/markdown_content',
+                                     form_builder: f,
+                                     field: :text,
+                                     options: {
+                                         name: "#{cluster_check_id}-comment",
+                                         placeholder: "(Optional) Enter a comment about the check here",
+                                         value: nil
+                                     }
                           %>
                         <% end %>
                         <div style="width: 70%;">

@@ -7,7 +7,13 @@
           preview_path: @comment.decorate.preview_path,
           write_path: @comment.decorate.write_path do %>
 
-          <%= render 'case_comments/markdown_content', form_builder: f %>
+        <%= render 'partials/markdown_content',
+                   form_builder: f,
+                   field: :text,
+                   options: {
+                       rows: 3
+                   }
+        %>
       <% end %>
     <div class="form-group" style="overflow: hidden;">
       <%= f.submit "Add new comment",
