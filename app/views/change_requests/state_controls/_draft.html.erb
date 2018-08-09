@@ -6,17 +6,6 @@
               role: 'button'
   %>
 <% end %>
-<% if my_policy.cancel? %>
-  <%= link_to 'Cancel',
-              cancel_case_change_request_path(cr.case),
-              class: 'btn btn-danger form-control mb-2',
-              data: {
-                  confirm: 'Are you sure you want to cancel this change request?'
-              },
-              method: 'post',
-              role: 'button'
-  %>
-<% end %>
 <% if my_policy.propose? %>
   <%= link_to 'Submit for authorisation',
               propose_case_change_request_path(cr.case),
@@ -25,6 +14,20 @@
                   confirm: 'Are you sure you want to finalise this CR and submit
                   it for customer authorization? You will not be able to make
                   further changes once you have done so.'.squish
+              },
+              method: 'post',
+              role: 'button'
+  %>
+<% end %>
+
+<hr>
+
+<% if my_policy.cancel? %>
+  <%= link_to 'Cancel',
+              cancel_case_change_request_path(cr.case),
+              class: 'btn btn-danger form-control',
+              data: {
+                  confirm: 'Are you sure you want to cancel this change request?'
               },
               method: 'post',
               role: 'button'
