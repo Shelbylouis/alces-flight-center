@@ -100,6 +100,8 @@ class Case < ApplicationRecord
               only_integer: true,  # We store time worked as integer minutes.
             }
 
+  validates :time_worked, presence: true, unless: :open?
+
   validate :time_worked_not_changed_unless_allowed
 
   validates :credit_charge, presence: true,  if: :closed?

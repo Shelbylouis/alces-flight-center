@@ -202,7 +202,7 @@ RSpec.describe CasesController, type: :controller do
 
   describe 'case state management' do
     let (:open_case) {
-      create(:open_case)
+      create(:open_case, time_worked: 42)
     }
 
     let (:resolved_case) {

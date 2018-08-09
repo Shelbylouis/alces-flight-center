@@ -90,7 +90,7 @@ RSpec.describe 'Cluster credit usage', type: :feature do
   context 'when case is resolved in different quarter to when it was charged' do
     include ActiveSupport::Testing::TimeHelpers
 
-    let(:kase) { create(:open_case, cluster: cluster, subject: 'Important case') }
+    let(:kase) { create(:open_case, cluster: cluster, subject: 'Important case', time_worked: 1) }
 
     it 'uses resolution date to filter charge events' do
       travel_to Time.zone.local(2018, 6, 1) do  # Resolve in Q3 2018
