@@ -25,6 +25,10 @@ li.credit-charge-entry {
   * {
     flex-grow: 0;
     flex-shrink: 0;
+
+    &:not(:first-child) {
+      flex-basis: 6rem;
+    }
   }
 
   .text {
@@ -36,6 +40,7 @@ li.credit-charge-entry {
 
   .response-time {
     padding: 0 1rem 0 0;
+    flex-basis: 10rem;
   }
 }
 
