@@ -572,4 +572,36 @@ RSpec.describe Case, type: :model do
       end
     end
   end
+
+  describe '#time_to_first_response' do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:cluster) { create(:cluster) }
+    let(:admin) { create(:admin) }
+    let(:contact) { create(:contact, site: cluster.site) }
+    let(:kase) { create(:open_case, cluster: cluster) }
+
+    it 'calculates business time to response' do
+      travel_to Time.zone.local(2018, 8, 10, 16, 30) do # 16:30 on a Friday
+        kase
+      end
+
+      travel_to Time.zone.local(2018, 8, 13, 9, 30) do # 09:30 on the next Monday
+        kase.case_comments.create(
+          user: contact,
+          text: 'This is not the admin comment you\'re looking for'
+        )
+      end
+
+      travel_to Time.zone.local(2018, 8, 13, 10, 45) do # 10:45 that Monday
+        kase.case_comments.create(
+          user: admin,
+          text: 'This is an admin comment'
+        )
+      end
+
+      expect(kase.time_to_first_response).to eq 2.hours + 15.minutes
+
+    end
+  end
 end

@@ -33,9 +33,7 @@ class CreditChargeDecorator < ApplicationDecorator
       if first_admin_comment.nil?
         h.raw('<i class="fa fa-hourglass-half"></i> N/A')
       else
-        time_to_response = kase.created_at
-                               .business_time_until(first_admin_comment.created_at)
-                               .floor
+        time_to_response = kase.time_to_first_response.floor
         hours = time_to_response / 3600
         mins = (time_to_response / 60) % 60
         h.raw("<i class=\"fa fa-hourglass-half\"></i> #{hours}h #{mins}m")

@@ -332,10 +332,17 @@ class Case < ApplicationRecord
   end
 
   def first_admin_comment
-    case_comments.joins(:user)
+    @first_admin_comment ||= case_comments.joins(:user)
                  .where(users: { role: 'admin' })
                  .order(:created_at)
                  .first
+  end
+
+  def time_to_first_response
+    return unless first_admin_comment
+    created_at.business_time_until(
+      first_admin_comment.created_at
+    )
   end
 
   private
