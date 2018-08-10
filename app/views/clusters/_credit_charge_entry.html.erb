@@ -3,7 +3,7 @@
     <i class="fa fa-circle mr-2" aria-hidden="true"></i>
   </span>
   <span title="<%= date.to_formatted_s(:long) %>">
-    <%= date.to_formatted_s(:day_only) %>
+    <%= date.to_formatted_s(:friendly_date) %>
   </span>
   <span class="text">
     <%= yield %>

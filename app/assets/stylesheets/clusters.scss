@@ -27,7 +27,10 @@ li.credit-charge-entry {
     flex-shrink: 0;
 
     &:not(:first-child) {
-      flex-basis: 6rem;
+      flex-basis: 9rem;
+    }
+    &:last-child {
+      flex-basis: 5rem;
     }
   }
 
