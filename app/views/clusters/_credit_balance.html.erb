@@ -5,6 +5,11 @@
       <i class="fa fa-circle mr-2" aria-hidden="true"></i>
       <%= pluralize(cluster.credit_balance, 'credit') %>
     </p>
+    <p style="text-align: center;">
+    Cases pending closure: <%= link_to cluster.resolved_cases,
+                                       cluster_cases_path(state: 'resolved')
+                            %>
+    </p>
     <%= yield %>
   </div>
 </div>
