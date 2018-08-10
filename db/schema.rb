@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_01_130904) do
+ActiveRecord::Schema.define(version: 2018_08_09_095114) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -118,7 +118,7 @@ ActiveRecord::Schema.define(version: 2018_08_01_130904) do
     t.text "state", default: "open", null: false
     t.bigint "assignee_id"
     t.string "display_id", null: false
-    t.integer "time_worked", default: 0, null: false
+    t.integer "time_worked"
     t.boolean "comments_enabled", default: false
     t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"

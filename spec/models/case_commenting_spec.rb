@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe CaseCommenting do
   subject { CaseCommenting.new(kase, user) }
-  let(:kase) { create(:case, state: state) }
+  let(:kase) { create("#{state}_case".to_sym) }
   let(:user) { create(:user) }
 
   RSpec.shared_examples 'commenting enabled' do

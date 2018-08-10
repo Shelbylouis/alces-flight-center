@@ -93,10 +93,14 @@ class Case < ApplicationRecord
     }
   validate :validate_tier_level_changes
 
-  validates :time_worked, numericality: {
-      greater_than_or_equal_to: 0,
-      only_integer: true  # We store time worked as integer minutes.
-  }
+  validates :time_worked,
+            numericality: {
+              allow_blank: true,
+              greater_than_or_equal_to: 0,
+              only_integer: true,  # We store time worked as integer minutes.
+            }
+
+  validates :time_worked, presence: true, unless: :open?
 
   validate :time_worked_not_changed_unless_allowed
 
@@ -260,14 +264,20 @@ class Case < ApplicationRecord
 
   def unresolvable_reason
     if cr_in_progress?
-      'This case cannot be resolved as the change request is incomplete.'
-    else
-      unfinished_mws = maintenance_windows.unfinished.count
-      if unfinished_mws.positive?
-        "This case cannot be resolved as there #{unfinished_mws == 1 ? 'is an' : 'are'}
-         outstanding maintenance window#{unfinished_mws == 1 ? '': 's'}.".squish
-      end
+      return 'This case cannot be resolved as the change request is incomplete.'
     end
+
+    unfinished_mws = maintenance_windows.unfinished.count
+    if unfinished_mws.positive?
+      return "This case cannot be resolved as there #{unfinished_mws == 1 ? 'is an' : 'are'}
+       outstanding maintenance window#{unfinished_mws == 1 ? '': 's'}.".squish
+    end
+
+    if time_worked.nil?
+      return 'This case cannot be resolved until time worked is added.'
+    end
+
+    nil
   end
 
   def potential_assignees

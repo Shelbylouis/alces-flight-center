@@ -13,10 +13,12 @@ FactoryBot.define do
 
     factory :resolved_case do
       state 'resolved'
+      time_worked 42
     end
 
     factory :closed_case do
       state 'closed'
+      time_worked 42
 
       before(:create) do |k|
         if k.credit_charge.nil?
