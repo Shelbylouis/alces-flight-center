@@ -41,6 +41,7 @@ gem 'state_machines-activerecord',
   ref: 'fed06d9fa64af1cba49d241f4a3ae79626946fe3'
 gem 'state_machines-audit_trail'
 gem 'business_time'
+gem 'holidays'
 gem "audited", "~> 4.7"
 gem 'jwt'
 gem 'pundit'
