@@ -7,8 +7,8 @@
     </p>
     <p style="text-align: center;">
     Cases pending closure: <%= link_to cluster.resolved_cases,
-                                       cluster_cases_path(state: 'resolved')
-                            %>
+                                       cluster_cases_path(cluster, state: 'resolved')
+                                     %>
     </p>
     <%= yield %>
   </div>
