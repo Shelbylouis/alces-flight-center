@@ -109,6 +109,10 @@ class Cluster < ApplicationRecord
     cluster_checks.length
   end
 
+  def resolved_cases
+    self.cases.where(state: 'resolved').count
+  end
+
   private
 
   def validate_all_cluster_parts_advice
