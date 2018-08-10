@@ -1,5 +1,5 @@
-<% no_of_cluster_checks = cluster.cluster_checks.length %>
-<% unless no_of_cluster_checks == 0 %>
+<% no_of_cluster_checks = cluster.cluster_check_count %>
+<% unless no_of_cluster_checks.zero? %>
   <div class="card credit-balance">
     <div class="card-body">
       <h4>Cluster checks</h4>
