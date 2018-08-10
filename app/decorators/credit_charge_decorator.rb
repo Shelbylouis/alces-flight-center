@@ -21,9 +21,9 @@ class CreditChargeDecorator < ApplicationDecorator
              type: 'usd',
              details: 'Credit Charge'
   end
-  
+
   private
-  
+
   def time_to_response_str(kase)
     if kase.user.admin?
       'Raised by admin'
@@ -31,7 +31,7 @@ class CreditChargeDecorator < ApplicationDecorator
       first_admin_comment = kase.first_admin_comment
 
       if first_admin_comment.nil?
-        'N/A'
+        h.raw('<i class="fa fa-hourglass-half"></i> N/A')
       else
         time_to_response = kase.created_at.business_time_until(first_admin_comment.created_at).floor
         hours = time_to_response/3600
