@@ -130,7 +130,7 @@ class Case < ApplicationRecord
   before_validation :assign_default_subject_if_unset
 
   before_create :set_display_id
-  after_create :send_new_case_email
+  after_create :send_new_case_email, :maybe_set_default_assignee
   after_update :maybe_send_new_assignee_email
 
   scope :state, ->(state) { where(state: state) }
@@ -417,6 +417,23 @@ class Case < ApplicationRecord
 
   def send_new_case_email
     CaseMailer.new_case(self).deliver_later
+  end
+
+  def maybe_set_default_assignee
+    if assignee.nil? && !site.default_assignee.nil?
+      transaction do # to make sure audits.last is our assignee change
+        self.assignee = site.default_assignee
+        save!
+        la = audits.last
+        # This will show as 'Flight Center' rather than the customer's name
+        # - the latter would be misleading here since customers can't assign
+        # cases to people!
+        # NB Audited.audit_class.as_user(nil) does not work since it then gets
+        # the user from current_user anyway :(
+        la.user = nil
+        la.save!
+      end
+    end
   end
 
   def maybe_send_new_assignee_email
