@@ -105,6 +105,10 @@ class Cluster < ApplicationRecord
     end
   end
 
+  def cluster_check_count
+    cluster_checks.length
+  end
+
   private
 
   def validate_all_cluster_parts_advice
