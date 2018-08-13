@@ -535,6 +535,33 @@ RSpec.describe 'Case page', type: :feature do
         expect(subject.time_worked).to eq (3 * 60) + 42
       end
 
+      it 'allows null values in time worked' do
+        visit cluster_case_path(cluster,subject, as: admin)
+
+        fill_in 'time[hours]', with: ''
+        fill_in 'time[minutes]', with: '42'
+        click_button time_form_submit_button
+
+        subject.reload
+
+        expect(subject.time_worked).to eq 42
+
+        fill_in 'time[hours]', with: ''
+        fill_in 'time[minutes]', with: ''
+        click_button time_form_submit_button
+
+        subject.reload
+
+        expect(subject.time_worked).to eq nil
+
+        fill_in 'time[hours]', with: '1'
+        fill_in 'time[minutes]', with: ''
+        click_button time_form_submit_button
+
+        subject.reload
+
+        expect(subject.time_worked).to eq 60
+      end
 
     end
 

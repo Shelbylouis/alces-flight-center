@@ -77,11 +77,15 @@ module Audited
     end
 
     def format_minutes(mins)
-      hours, minutes = mins.divmod(60)
-      if hours > 0
-        "#{hours}h #{minutes}m"
+      if mins.nil?
+        'unset'
       else
-        "#{minutes}m"
+        hours, minutes = mins.divmod(60)
+        if hours > 0
+          "#{hours}h #{minutes}m"
+        else
+          "#{minutes}m"
+        end
       end
     end
 
