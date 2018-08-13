@@ -1,5 +1,42 @@
-<% content_for(:subtitle) { "Support Case #{@case.display_id}: #{@case.subject}" } %>
-
+<% content_for :title do %>
+  <div class="card title-card">
+    <div class="card-body">
+      <h1>
+        <% if policy(@case).edit? %>
+          <div class="case-subject-edit collapse show">
+            <%= @case.display_id %>: <%= @case.subject %>
+            <button
+              class="btn btn-link"
+              data-toggle="collapse"
+              data-target=".case-subject-edit"
+              id="case-subject-edit"
+              title="Edit subject"
+            >
+              <i class="fa fa-2x fa-pencil"></i>
+            </button>
+          </div>
+          <div class="case-subject-edit collapse">
+            <%= form_for @case do |f| %>
+              <div class="form-row align-items-center">
+                <div class="col">
+                  <%= f.text_field :subject, class: 'form-control form-control-lg' %>
+                </div>
+                <div class="col-auto">
+                  <%= f.submit 'Change subject', class: 'btn btn-primary mb-2' %>
+                  <a class="btn btn-secondary mb-2" data-toggle="collapse" data-target=".case-subject-edit" tabindex="1">
+                    Cancel
+                  </a>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <%= @case.subject %>
+        <% end %>
+      </h1>
+    </div>
+  </div>
+<% end %>
 <%= render 'partials/tabs', activate: :cases do %>
   <div class='table-responsive'>
     <table class="table case-table">
@@ -29,9 +66,10 @@
       <tr style="width: 100%;">
         <th>Created</th>
         <td>
-          <%= @case.created_at.to_formatted_s(:long) %>
-          by
+          By
           <%= @case.user.name %>
+          on
+          <%= @case.created_at.to_formatted_s(:short) %>
         </td>
         <th>Assigned to</th>
         <td id="case-assignment">
@@ -39,15 +77,24 @@
         </td>
       </tr>
       <tr>
-        <th>Association</th>
-        <td>
-          <%= @case.association_info %>
-          <% if policy(MaintenanceWindow).create? && @case.open? %>
-            <%= link_to 'Request maintenance',
-                        @case.request_maintenance_path,
-                        class: 'btn btn-secondary ml-2 btn-sm',
-                        role: 'button'
-            %>
+        <th rowspan="<%= @case.credit_charge ? 4 : 3 %>">Affected components</th>
+        <td rowspan="<%= @case.credit_charge ? 4 : 3 %>">
+          <%= render 'cases/associations/association_info', kase: @case %>
+          <% if @case.open? %>
+            <% if policy(@case).edit_associations? %>
+              <%= link_to 'Change affected components',
+                          edit_cluster_case_associations_path(@case.cluster, @case),
+                          class: 'btn btn-primary ml-2 btn-sm',
+                          role: 'button'
+              %>
+            <% end %>
+            <% if policy(MaintenanceWindow).create? %>
+              <%= link_to 'Request maintenance',
+                          @case.request_maintenance_path,
+                          class: 'btn btn-secondary ml-2 btn-sm',
+                          role: 'button'
+              %>
+            <% end %>
           <% end %>
         </td>
         <th>State</th>
@@ -58,16 +105,13 @@
       </tr>
       <% if @case.credit_charge %>
       <tr>
-        <td colspan="2"></td>
         <th>Credit usage</th>
         <td><%= pluralize(@case.credit_charge.amount, 'credit') %></td>
       </tr>
       <% end %>
       <tr>
-        <th>Category</th>
-        <td><%= @case.category&.name || 'None' %></td>
-        <th>Issue</th>
-        <td><%= @case.issue.name %></td>
+        <th>Issue type</th>
+        <td><%= render 'cases/issue_controls', kase: @case %></td>
       </tr>
       <tr>
         <th>Tier</th>
@@ -75,9 +119,15 @@
           <%= @case.tier_description %>
           <%= render 'cases/escalation_controls' %>
         </td>
-        <th>Unique identifier</th>
-        <td><%= @case.display_id %></td>
       </tr>
+      <% unless @case.maintenance_windows.unfinished.empty? %>
+        <tr>
+          <th>Pending maintenance</th>
+          <td colspan="3" id="maintenance-details">
+            <%= render 'cases/case_maintenance_details', kase: @case %>
+          </td>
+        </tr>
+      <% end %>
       <%= render 'cases/fields_or_requests_row', kase: @case %>
       <%= render 'cases/time_worked_row' %>
       <tr>

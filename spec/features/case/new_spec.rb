@@ -33,7 +33,10 @@ RSpec.describe 'Case form', type: :feature, js: true do
       field_value = 'my value'
 
       visit path
-      fill_in 'Subject', with: subject_value
+      select service.name, from: 'service'
+      select issue.name, from: 'Issue'
+      select component.name, from: 'component'
+      fill_in 'subject', with: subject_value
       fill_in 'Some field', with: field_value
       expect do
         click_button 'Create Case'
@@ -44,8 +47,8 @@ RSpec.describe 'Case form', type: :feature, js: true do
       new_case = cluster.cases.first
       expect(new_case.cluster).to eq(cluster)
       expect(new_case.issue).to eq(issue)
-      expect(new_case.component).to eq(component)
-      expect(new_case.service).to eq(service)
+      expect(new_case.components.first).to eq(component)
+      expect(new_case.services.first).to eq(service)
       expect(new_case.subject).to eq(subject_value)
       expect(new_case.tier_level).to eq(tier.level)
       expect(new_case.fields).to eq([
@@ -66,18 +69,6 @@ RSpec.describe 'Case form', type: :feature, js: true do
     it_behaves_like 'it allows Case creation'
   end
 
-  context 'when accessed at `/service/*/cases/new`' do
-    let(:path) { new_service_case_path(service, as: user) }
-
-    it_behaves_like 'it allows Case creation'
-  end
-
-  context 'when accessed at `/component/*/cases/new`' do
-    let(:path) { new_component_case_path(component, as: user) }
-
-    it_behaves_like 'it allows Case creation'
-  end
-
   describe 'motd tool' do
     let!(:tier) do
       create(:tier_with_tool, issue: issue, tool: :motd)
@@ -87,6 +78,9 @@ RSpec.describe 'Case form', type: :feature, js: true do
       motd = 'My new MOTD'
 
       visit new_case_path(as: user)
+      select service.name, from: 'service'
+      select issue.name, from: 'Issue'
+      select component.name, from: 'component'
       fill_in 'New MOTD', with: motd
       expect do
         click_button 'Create Case'

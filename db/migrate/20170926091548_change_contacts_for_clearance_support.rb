@@ -3,7 +3,7 @@ class ChangeContactsForClearanceSupport < ActiveRecord::Migration[5.1]
     # Just drop and recreate table in format expected by Clearance (adjusted
     # for our use case, with our additional fields etc), so don't need to
     # handle migrating data since we don't care about this.
-    drop_table :contacts {}
+    drop_table :contacts
     create_table :contacts do |t|
       t.timestamps null: false
       t.string :name, null: false

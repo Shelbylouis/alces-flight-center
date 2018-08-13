@@ -1,3 +1,4 @@
+require 'etc'
 
 namespace :alces do
   namespace :data do
@@ -27,7 +28,7 @@ namespace :alces do
       User.all.each do |user|
         local_part = user.email.split('@').first
         new_email =  "#{local_part}@example.com"
-        user.update!(email: new_email, password: 'password')
+        user.update!(email: new_email)
       end
     end
 
@@ -52,7 +53,7 @@ namespace :alces do
         # container.
         Dir.chdir(sso_repo) do
           sso_docker_command = <<~SH.squish
-            sudo docker-compose run --rm sso bin/rails runner
+            #{docker_requires_sudo? ? 'sudo' : ''} docker-compose run --rm sso bin/rails runner
             '#{sso_script_path}' --trace
           SH
 
@@ -80,6 +81,15 @@ namespace :alces do
           end
         RUBY
       end.join("\n")
+    end
+
+    private
+
+    def docker_requires_sudo?
+      docker_group = Etc.getgrnam('docker')
+      current_user = Etc.getlogin
+
+      !docker_group.mem.include? current_user
     end
   end
 end

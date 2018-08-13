@@ -1,7 +1,3 @@
-
-# XXX Nothing in here is applicable to every decorated model in the app, it's
-# just a bit of a dumping ground. At some point should pull things out to
-# better places.
 class ApplicationDecorator < Draper::Decorator
   # Define methods for all decorated objects.
   # Helpers are accessed through `helpers` (aka `h`). For example:
@@ -9,17 +5,6 @@ class ApplicationDecorator < Draper::Decorator
   #   def percent_amount
   #     h.number_to_percentage object.amount, precision: 2
   #   end
-
-  def start_maintenance_request_link
-    return unless policy(MaintenanceWindow).create?
-
-    title = "Start request for maintenance of this #{readable_model_name}"
-    h.link_to(
-      h.raw(h.icon 'wrench', interactive: true),
-      new_maintenance_window_path,
-      title: title
-    )
-  end
 
   # Strictly speaking this gives the icons for a ClusterPart or entire Cluster,
   # but I don't have a better name for that yet.

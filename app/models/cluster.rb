@@ -21,11 +21,17 @@ class Cluster < ApplicationRecord
     dependent: :destroy
   has_many :services, dependent: :destroy
   has_many :cases
-  has_many :maintenance_windows
+
+  has_many :maintenance_window_associations, as: :associated_element
+  has_many :maintenance_windows, through: :maintenance_window_associations
+
   has_many :logs, dependent: :destroy
   has_many :notes, dependent: :destroy
   has_many :credit_deposits
   has_many :credit_charges, through: :cases
+  has_many :cluster_checks
+  has_many :checks, through: :cluster_checks
+  has_many :check_results, through: :cluster_checks
 
   validates_associated :site
   validates :name, presence: true
@@ -33,7 +39,6 @@ class Cluster < ApplicationRecord
   validates :canonical_name, presence: true
   validate :validate_all_cluster_parts_advice, if: :advice?
   validates :shortcode, presence: true, uniqueness: true
-  # validates_presence_of :motd
 
   before_validation CanonicalNameCreator.new, on: :create
 
@@ -62,7 +67,7 @@ class Cluster < ApplicationRecord
   end
 
   def unfinished_related_maintenance_windows
-    parts = [self, *components, *services]
+    parts = [self, *components, *component_groups, *services]
     parts
       .map(&:maintenance_windows)
       .flat_map(&:unfinished)
@@ -86,6 +91,22 @@ class Cluster < ApplicationRecord
     credit_charges.reduce(deposits) do |total, kase|
       total -= kase.amount
     end
+  end
+
+  def to_param
+    shortcode.parameterize.upcase
+  end
+
+  def self.find_from_id!(id)
+    if /^[0-9]+$/.match(id)
+      Cluster.find(id)
+    else
+      Cluster.find_by_shortcode!(id)
+    end
+  end
+
+  def cluster_check_count
+    cluster_checks.length
   end
 
   private

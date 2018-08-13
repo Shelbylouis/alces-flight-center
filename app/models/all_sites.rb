@@ -4,6 +4,10 @@ class AllSites
     Case.all
   end
 
+  def clusters
+    Cluster.all
+  end
+
   def readable_model_name
     'All Sites'
   end

@@ -33,12 +33,10 @@ namespace :alces do
 
     namespace :staging do
       task obfuscate_users: :environment do
-        staging_password = Deployment::Staging.password
-
         User.where.not(role: :admin).each do |user|
           local_part = user.email.split('@').first
           new_email = "center+#{local_part}@alces-software.com"
-          user.update!(email: new_email, password: staging_password)
+          user.update!(email: new_email)
         end
       end
     end

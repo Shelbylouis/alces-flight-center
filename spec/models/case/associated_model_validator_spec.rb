@@ -41,8 +41,8 @@ RSpec.describe Case, type: :model do
       attributes = {
         issue: issue,
         cluster: cluster,
-        component: component,
-        service: service,
+        components: component ? [component] : [],
+        services: service ? [service] : [],
         # Specify consultancy Tier explicitly here, to avoid triggering
         # validations from AvailableSupportValidator which would get in the
         # way.
@@ -54,9 +54,9 @@ RSpec.describe Case, type: :model do
       if part
         case part
         when Component
-          attributes[:component] = part
+          attributes[:components] << part
         when Service
-          attributes[:service] = part
+          attributes[:services] << part
         else
           raise "Unknown part class: #{part.class}"
         end
@@ -90,20 +90,12 @@ RSpec.describe Case, type: :model do
 
       context 'when associated with component' do
         let(:component) { create(:component) }
-
-        it 'should be invalid' do
-          expect(subject).not_to be_valid
-          expect(subject.errors.messages).to include(component: [/does not require a component/])
-        end
+        it { is_expected.to be_valid }
       end
 
       context 'when associated with service' do
         let(:service) { create(:service) }
-
-        it 'should be invalid' do
-          expect(subject).not_to be_valid
-          expect(subject.errors.messages).to include(service: [/does not require a service/])
-        end
+        it { is_expected.to be_valid }
       end
     end
 
@@ -136,7 +128,7 @@ RSpec.describe Case, type: :model do
         it 'should be invalid' do
           expect(subject).to be_invalid
           expect(subject.errors.messages).to match(
-            service: [/must be.*File System.*but.*User Management/]
+            case: [/for issue.*must be.*File System.*but not given one/]
           )
         end
       end

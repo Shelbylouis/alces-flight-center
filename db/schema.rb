@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_06_12_161101) do
+ActiveRecord::Schema.define(version: 2018_08_09_095114) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,6 +72,15 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
+  create_table "case_associations", force: :cascade do |t|
+    t.bigint "case_id", null: false
+    t.string "associated_element_type", null: false
+    t.bigint "associated_element_id", null: false
+    t.index ["associated_element_type", "associated_element_id"], name: "index_case_associations_by_assoc_element"
+    t.index ["case_id", "associated_element_id", "associated_element_type"], name: "index_case_associations_uniqueness", unique: true
+    t.index ["case_id"], name: "index_case_associations_on_case_id"
+  end
+
   create_table "case_comments", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "case_id", null: false
@@ -98,11 +107,9 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "cluster_id", null: false
-    t.integer "component_id"
     t.integer "user_id", null: false
     t.bigint "rt_ticket_id"
     t.integer "issue_id", null: false
-    t.bigint "service_id"
     t.text "token", null: false
     t.text "subject", null: false
     t.datetime "completed_at"
@@ -111,15 +118,13 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.text "state", default: "open", null: false
     t.bigint "assignee_id"
     t.string "display_id", null: false
-    t.integer "time_worked", default: 0, null: false
+    t.integer "time_worked"
     t.boolean "comments_enabled", default: false
     t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
-    t.index ["component_id"], name: "index_cases_on_component_id"
     t.index ["display_id"], name: "index_cases_on_display_id", unique: true
     t.index ["issue_id"], name: "index_cases_on_issue_id"
     t.index ["rt_ticket_id"], name: "index_cases_on_rt_ticket_id", unique: true
-    t.index ["service_id"], name: "index_cases_on_service_id"
     t.index ["user_id"], name: "index_cases_on_user_id"
   end
 
@@ -176,6 +181,36 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["case_id"], name: "index_change_requests_on_case_id"
+  end
+
+  create_table "check_categories", force: :cascade do |t|
+    t.string "name", null: false
+  end
+
+  create_table "check_results", force: :cascade do |t|
+    t.bigint "cluster_check_id", null: false
+    t.date "date", null: false
+    t.bigint "user_id", null: false
+    t.string "result", null: false
+    t.string "comment"
+    t.bigint "log_id"
+    t.index ["cluster_check_id"], name: "index_check_results_on_cluster_check_id"
+    t.index ["log_id"], name: "index_check_results_on_log_id"
+    t.index ["user_id"], name: "index_check_results_on_user_id"
+  end
+
+  create_table "checks", force: :cascade do |t|
+    t.bigint "check_category_id", null: false
+    t.string "name", null: false
+    t.string "command"
+    t.index ["check_category_id"], name: "index_checks_on_check_category_id"
+  end
+
+  create_table "cluster_checks", force: :cascade do |t|
+    t.bigint "cluster_id", null: false
+    t.bigint "check_id", null: false
+    t.index ["check_id"], name: "index_cluster_checks_on_check_id"
+    t.index ["cluster_id"], name: "index_cluster_checks_on_cluster_id"
   end
 
   create_table "clusters", force: :cascade do |t|
@@ -236,7 +271,9 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.bigint "case_id", null: false
     t.bigint "user_id", null: false
     t.integer "amount", null: false
+    t.date "effective_date"
     t.index ["case_id"], name: "index_credit_charges_on_case_id"
+    t.index ["effective_date"], name: "index_credit_charges_on_effective_date"
     t.index ["user_id"], name: "index_credit_charges_on_user_id"
   end
 
@@ -246,11 +283,19 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.bigint "cluster_id", null: false
     t.bigint "user_id", null: false
     t.integer "amount", null: false
+    t.date "effective_date", null: false
     t.index ["cluster_id"], name: "index_credit_deposits_on_cluster_id"
+    t.index ["effective_date"], name: "index_credit_deposits_on_effective_date"
     t.index ["user_id"], name: "index_credit_deposits_on_user_id"
   end
 
   create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
+  end
+
+  create_table "encryption_keys", force: :cascade do |t|
+    t.text "public_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "expansion_types", force: :cascade do |t|
@@ -271,6 +316,16 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.index ["component_id"], name: "index_expansions_on_component_id"
     t.index ["component_make_id"], name: "index_expansions_on_component_make_id"
     t.index ["expansion_type_id"], name: "index_expansions_on_expansion_type_id"
+  end
+
+  create_table "flight_directory_configs", force: :cascade do |t|
+    t.string "hostname", limit: 255, null: false
+    t.string "username", limit: 255, null: false
+    t.bigint "site_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "encrypted_ssh_key", limit: 4096, null: false
+    t.index ["site_id"], name: "index_flight_directory_configs_on_site_id"
   end
 
   create_table "issues", force: :cascade do |t|
@@ -298,6 +353,15 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.index ["user_id"], name: "index_logs_on_user_id"
   end
 
+  create_table "maintenance_window_associations", force: :cascade do |t|
+    t.bigint "maintenance_window_id", null: false
+    t.string "associated_element_type", null: false
+    t.bigint "associated_element_id", null: false
+    t.index ["associated_element_type", "associated_element_id"], name: "index_mw_associations_by_assoc_element"
+    t.index ["maintenance_window_id", "associated_element_id", "associated_element_type"], name: "index_mw_associations_uniqueness", unique: true
+    t.index ["maintenance_window_id"], name: "index_maintenance_window_associations_on_maintenance_window_id"
+  end
+
   create_table "maintenance_window_state_transitions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "maintenance_window_id", null: false
@@ -316,17 +380,11 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "case_id", null: false
-    t.bigint "cluster_id"
-    t.bigint "component_id"
-    t.bigint "service_id"
     t.text "state", default: "new", null: false
     t.datetime "requested_start", null: false
     t.integer "duration", null: false
     t.boolean "maintenance_ending_soon_email_sent", default: false
     t.index ["case_id"], name: "index_maintenance_windows_on_case_id"
-    t.index ["cluster_id"], name: "index_maintenance_windows_on_cluster_id"
-    t.index ["component_id"], name: "index_maintenance_windows_on_component_id"
-    t.index ["service_id"], name: "index_maintenance_windows_on_service_id"
   end
 
   create_table "notes", force: :cascade do |t|
@@ -382,7 +440,6 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
     t.datetime "updated_at", null: false
     t.string "name", null: false
     t.string "email", null: false
-    t.string "encrypted_password", limit: 128, null: false
     t.string "remember_token", limit: 128, null: false
     t.integer "site_id"
     t.string "confirmation_token", limit: 128
@@ -398,14 +455,13 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
   add_foreign_key "asset_record_fields", "asset_record_field_definitions"
   add_foreign_key "asset_record_fields", "component_groups"
   add_foreign_key "asset_record_fields", "components"
+  add_foreign_key "case_associations", "cases"
   add_foreign_key "case_comments", "cases"
   add_foreign_key "case_comments", "users"
   add_foreign_key "case_state_transitions", "cases"
   add_foreign_key "case_state_transitions", "users"
   add_foreign_key "cases", "clusters"
-  add_foreign_key "cases", "components"
   add_foreign_key "cases", "issues"
-  add_foreign_key "cases", "services"
   add_foreign_key "cases", "users"
   add_foreign_key "cases", "users", column: "assignee_id"
   add_foreign_key "change_motd_request_state_transitions", "change_motd_requests"
@@ -413,6 +469,12 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
   add_foreign_key "change_request_state_transitions", "change_requests"
   add_foreign_key "change_request_state_transitions", "users"
   add_foreign_key "change_requests", "cases"
+  add_foreign_key "check_results", "cluster_checks"
+  add_foreign_key "check_results", "logs"
+  add_foreign_key "check_results", "users"
+  add_foreign_key "checks", "check_categories"
+  add_foreign_key "cluster_checks", "checks"
+  add_foreign_key "cluster_checks", "clusters"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
   add_foreign_key "component_groups", "component_makes"
@@ -425,15 +487,14 @@ ActiveRecord::Schema.define(version: 2018_06_12_161101) do
   add_foreign_key "expansions", "component_makes"
   add_foreign_key "expansions", "components"
   add_foreign_key "expansions", "expansion_types"
+  add_foreign_key "flight_directory_configs", "sites"
   add_foreign_key "issues", "categories"
   add_foreign_key "issues", "service_types"
   add_foreign_key "logs", "components"
+  add_foreign_key "maintenance_window_associations", "maintenance_windows"
   add_foreign_key "maintenance_window_state_transitions", "maintenance_windows"
   add_foreign_key "maintenance_window_state_transitions", "users"
   add_foreign_key "maintenance_windows", "cases"
-  add_foreign_key "maintenance_windows", "clusters"
-  add_foreign_key "maintenance_windows", "components"
-  add_foreign_key "maintenance_windows", "services"
   add_foreign_key "notes", "clusters"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"

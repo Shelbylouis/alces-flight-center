@@ -61,7 +61,11 @@ module Audited
     end
 
     def time_worked_text(from, to)
-      "Changed time worked from #{format_minutes(from)} to #{format_minutes(to)}."
+      if from.nil?
+        "Changed time worked to #{format_minutes(to)}."
+      else
+        "Changed time worked from #{format_minutes(from)} to #{format_minutes(to)}."
+      end
     end
 
     def time_worked_type
@@ -73,11 +77,15 @@ module Audited
     end
 
     def format_minutes(mins)
-      hours, minutes = mins.divmod(60)
-      if hours > 0
-        "#{hours}h #{minutes}m"
+      if mins.nil?
+        'unset'
       else
-        "#{minutes}m"
+        hours, minutes = mins.divmod(60)
+        if hours > 0
+          "#{hours}h #{minutes}m"
+        else
+          "#{minutes}m"
+        end
       end
     end
 
@@ -97,6 +105,31 @@ module Audited
 
     def tier_level_details
       'Tier Change'
+    end
+
+    def subject_text(from, to)
+      "Changed the subject of this case from '#{from}' to '#{to}'."
+    end
+
+    def subject_type
+      'pencil-square-o'
+    end
+
+    def subject_details
+      'Subject Change'
+    end
+
+    def issue_id_text(from, to)
+      "Changed this case's associated issue from '#{Issue.find(from).decorate.label_text}'" \
+      " to '#{Issue.find(to).decorate.label_text}'."
+    end
+
+    def issue_id_type
+      'map-signs'
+    end
+
+    def issue_id_details
+      'Change of Issue'
     end
   end
 end

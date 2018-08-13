@@ -1,0 +1,17 @@
+<%
+  form_builder = nil
+  form_for cr, url: case_change_request_path do |f| form_builder = f end
+%>
+
+<%= render 'partials/markdown_editor_layout',
+  activate: 'preview',
+  form_builder: form_builder,
+  change_request_action: params[:format],
+  preview_path: preview_case_change_request_path,
+  write_path: write_case_change_request_path do %>
+
+  <%= form_builder.hidden_field :description, 'data-markdown-content': true %>
+  <div class="border-bottom p-2">
+    <%= @cr.rendered_description.html_safe %>
+  </div>
+<% end %>

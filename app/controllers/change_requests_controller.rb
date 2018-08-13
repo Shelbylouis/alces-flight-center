@@ -17,7 +17,7 @@ class ChangeRequestsController < ApplicationController
 
     if @case.save
       flash[:success] = "Created change request for case #{@case.display_id}."
-      redirect_to case_path(@case.display_id)
+      redirect_to case_path(@case)
     else
       errors = format_errors(cr)
       flash[:error] = "Error creating change request: #{errors}." if errors
@@ -71,6 +71,36 @@ class ChangeRequestsController < ApplicationController
     change_action_and_email 'Change request %s completed.' do |cr|
       cr.complete!(current_user)
     end
+  end
+
+  def cancel
+    change_action 'Change request %s cancelled.' do |cr|
+      cr.cancel!(current_user)
+    end
+  end
+
+  def request_changes
+    change_action_and_email 'Further changes requested on change request %s.' do |cr|
+      cr.request_changes!(current_user)
+    end
+  end
+
+  def preview
+    @cr = @case.change_request || @case.build_change_request
+    @cr.update(cr_params)
+
+    authorize @cr, :create?
+
+    render layout: false
+  end
+
+  def write
+    @cr = @case.change_request || @case.build_change_request
+    @cr.update(cr_params)
+
+    authorize @cr, :create?
+
+    render layout: false
   end
 
   private

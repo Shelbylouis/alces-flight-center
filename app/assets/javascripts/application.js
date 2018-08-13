@@ -16,10 +16,18 @@
 //= require popper
 //= require bootstrap-sprockets
 //= require_tree .
+//= require bootstrap-datepicker
+//= require jquery.scrollTo.min.js
+//= require jquery.validate.min.js
 //
 
 function enableTooltips() {
   $('[title]').tooltip({delay: {show: 500, hide: 100}, placement: 'left'});
 }
 
+function enablePopovers() {
+  $('[data-toggle="popover"]').popover();
+}
+
 document.addEventListener('turbolinks:load', enableTooltips);
+document.addEventListener('turbolinks:load', enablePopovers);

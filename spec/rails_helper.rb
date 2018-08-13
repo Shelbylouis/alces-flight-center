@@ -108,4 +108,6 @@ RSpec.configure do |config|
     # tests.
     RequestStore.clear!
   end
+
+  config.include ShowMeTheCookies, :type => :feature
 end

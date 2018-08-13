@@ -17,13 +17,21 @@ class ComponentDecorator < ClusterPartDecorator
       tabs_builder.overview,
       tabs_builder.logs,
       tabs_builder.asset_record,
-      tabs_builder.cases,
       tabs_builder.maintenance,
+      tabs_builder.read_only_cases,
       { id: :expansions, path: h.component_component_expansions_path(self) },
     ]
   end
 
   def link
     h.link_to self.name, path
+  end
+
+  def fa_icon
+    'fa-cube'
+  end
+
+  def type_name
+    model.component_type.name
   end
 end

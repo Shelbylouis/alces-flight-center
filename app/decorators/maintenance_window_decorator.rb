@@ -21,10 +21,9 @@ class MaintenanceWindowDecorator < ApplicationDecorator
   end
 
   def confirm_path
-    associated_model_name = associated_model.underscored_model_name
-    path_method = "confirm_#{associated_model_name}_maintenance_window_path"
-    associated_model_id_param = associated_model_name.foreign_key.to_sym
-    h.send(path_method, self, associated_model_id_param => associated_model.id)
+    h.confirm_maintenance_window_path(
+       model
+    )
   end
 
   def case_attributes(form_action)
@@ -46,6 +45,14 @@ class MaintenanceWindowDecorator < ApplicationDecorator
     )
   end
 
+  def associated_model_names
+    associated_models.map { |m| "#{m.name} (#{m.readable_model_name})"}.join(', ')
+  end
+
+  def associated_model_links
+    associated_models.map { |m| m.decorate.links }.join(', ').html_safe
+  end
+
   private
 
   def scheduled_period_state_indicator
@@ -59,7 +66,7 @@ class MaintenanceWindowDecorator < ApplicationDecorator
       TITLE
       "<strong title=\"#{title}\">(expired)</strong>"
     else
-      ''
+      "(#{state})"
     end
   end
 

@@ -1,0 +1,17 @@
+<%
+    log_type = (@component ? :component : :cluster)
+    form_builder = nil
+    form_for([log_type, @new_log]) do |f| form_builder = f end
+%>
+
+<%= render 'partials/markdown_editor_layout',
+    activate: 'preview',
+    form_builder: form_builder,
+    preview_path: @new_log.decorate.preview_path,
+    write_path: @new_log.decorate.write_path do %>
+
+    <%= form_builder.hidden_field :details, 'data-markdown-content': true %>
+    <div class="border-bottom p-2">
+        <%= @new_log.rendered_details.html_safe %>
+    </div>
+<% end %>

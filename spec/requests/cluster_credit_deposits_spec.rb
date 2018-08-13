@@ -7,7 +7,13 @@ RSpec.describe 'Cluster credit deposits' do
   let(:admin) { create(:admin) }
 
   let(:params) {
-    { cluster_id: cluster.id, credit_deposit: { amount: 4 } }
+    {
+      cluster_id: cluster.id,
+      credit_deposit: {
+        amount: 4,
+        effective_date: Date.today
+      }
+    }
   }
 
   context 'as a non-admin' do

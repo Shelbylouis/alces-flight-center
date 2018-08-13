@@ -27,7 +27,10 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
 
-  mount RailsEmailPreview::Engine, at: 'emails' if Rails.env.development?
+  if Rails.env.development?
+    mount RailsEmailPreview::Engine, at: 'emails'
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
 
   asset_record_view = Proc.new {
     resource :asset_record, path: asset_record_alias, only: :show
@@ -40,7 +43,12 @@ Rails.application.routes.draw do
     resources :logs, only: :index
   end
   admin_logs = Proc.new do
-    resources :logs, only: :create
+    resources :logs, only: :create do
+      collection do
+        post 'preview' => 'logs#preview'
+        post 'write' => 'logs#write'
+      end
+    end
   end
   notes = Proc.new do |admin|
     constraints NoteFlavourConstraint.new(admin: admin) do
@@ -49,27 +57,10 @@ Rails.application.routes.draw do
         collection do
           post ':flavour' => 'notes#create', as: prefix
         end
-      end
-    end
-  end
-
-  request_maintenance_form = Proc.new do
-    resources :maintenance_windows, path: :maintenance, only: :new do
-      collection do
-        # Do not define route helper (by passing `as: nil`) as otherwise this
-        # will overwrite the `${model}_maintenance_windows_path` helper, as by
-        # default `resources` expects `new` and `index` to use the same route.
-        # However we do not want this, and this route can be accessed using the
-        # `new_${model}_maintenance_windows_path` helper.
-        post 'new', action: :create, as: nil
-      end
-    end
-  end
-  confirm_maintenance_form = Proc.new do
-    resources :maintenance_windows, path: :maintenance, only: [] do
-      member do
-        get :confirm
-        patch :confirm, to: 'maintenance_windows#confirm_submit'
+        member do
+          post 'preview' => 'notes#preview'
+          post 'write' => 'notes#write'
+        end
       end
     end
   end
@@ -79,12 +70,9 @@ Rails.application.routes.draw do
   end
 
   cases = Proc.new do |**params, &block|
-    params[:only] = Array.wrap(params[:only]).concat [:show, :new, :index]
+    params[:only] = Array.wrap(params[:only]).concat [:index]
     resources :cases, **params do
-      collection do
-        get :resolved
-      end
-      block.call if block
+      block&.call
     end
   end
 
@@ -94,10 +82,13 @@ Rails.application.routes.draw do
 
     root 'sites#index'
     resources :sites, only: [:show, :index] do
-      cases.call
+      cases.call(only: [:index, :new])
+      resource :terminal_services, only: [:show]
     end
 
-    resources :cases, only: [] do
+    cases.call(only: []) do
+      # Actions on cases belong here. Typically these will end with a redirect
+      # to cluster_case_path or similar.
       member do
         post :resolve  # Only admins may resolve a case
         post :close  # Only admins may close a case
@@ -105,12 +96,17 @@ Rails.application.routes.draw do
         post :set_time
         post :set_commenting
       end
-      resource :change_request, only: [:new, :create, :edit, :update], path: 'change-request' do
+      resource :change_request, only: [:create, :update], path: 'change-request' do
         member do
           post :propose
           post :handover
+          post :preview
+          post :write
+          post :cancel
         end
       end
+
+      resource :case_associations, only: [:update], as: 'update_associations', path: 'associations'
     end
 
     resources :change_motd_requests, only: [] do
@@ -120,17 +116,22 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: [] do
-      request_maintenance_form.call
+      cases.call(only: [:update]) do
+        # Admin-only pages relating to cases belong here.
+        resource :change_request, only: [:new, :edit], path: 'change-request'
+        resource :case_associations, only: [:edit], as: 'associations', path: 'associations'
+        resource :maintenance_windows, only: [:new, :create], as: 'maintenance', path: 'maintenance'
+      end
       admin_logs.call
       notes.call(true)
       post :deposit
-      cases.call do
-        resource :change_request, only: [:new, :create, :edit], path: 'change-request'
-      end
+      get '/checks/submit', to: 'clusters#enter_check_results', as: :check_submission
+      post '/checks/submit', to: 'clusters#save_check_results', as: :set_check_results
+      post '/checks/submit/preview', to: 'cluster_checks#preview'
+      post '/checks/submit/write', to: 'cluster_checks#write'
     end
 
     resources :components, only: []  do
-      request_maintenance_form.call
       resource :component_expansion,
                path: component_expansions_alias,
                only: [:edit, :update, :create]
@@ -142,10 +143,6 @@ Rails.application.routes.draw do
 
     resources :component_groups, path: component_groups_alias, only: [] do
       asset_record_form.call
-    end
-
-    resources :services, only: []  do
-      request_maintenance_form.call
     end
 
     resources :maintenance_windows, path: :maintenance, only: [] do
@@ -160,68 +157,88 @@ Rails.application.routes.draw do
     # rails-admin expects a `logout_path` route helper to exist which will sign
     # them out; this declaration defines this.
     delete :logout, to: 'sso_sessions#destroy'
+
+    # Support legacy case URLs
+    get '/sites/:site_id/cases/:id', to: 'cases#redirect_to_canonical_path'
   end
 
   constraints Clearance::Constraints::SignedIn.new do
     root 'sites#show'
     delete '/sign_out' => 'sso_sessions#destroy', as: 'sign_out'  # Keeping this one around as it's correctly coupled to SSO
 
-    cases.call(only: [:create]) do
-      resources :case_comments, only: :create
+    cases.call(only: [:new, :create, :index]) do
+      # Actions for cases, for admins and site users, belong here.
       member do
         post :escalate
       end
+
       resource :change_request, only: [:show], path: 'change-request' do
         member do
           post :authorise
           post :decline
           post :complete
+          post :request_changes
+        end
+      end
+
+      resources :case_comments, only: :create do
+        collection do
+          post :preview
+          post :write
         end
       end
     end
 
     resources :clusters, only: :show do
-      cases.call do
-        resource :change_request, only: [:show], path: 'change-request'
+      cases.call(only: [:show, :create, :index, :new]) do
+        # Pages relating to cases, for both admins and site users, belong here.
+         resource :change_request, only: [:show], path: 'change-request'
       end
       resources :services, only: :index
       maintenance_windows.call
       resources :components, only: :index
       logs.call
-      confirm_maintenance_form.call
       get :documents
       notes.call(false)
       get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
+      get '/checks(/:date)', to: 'clusters#view_checks', as: :checks
     end
 
     resources :components, only: :show do
-      cases.call
       maintenance_windows.call
       resources :component_expansions,
                 path: component_expansions_alias,
                 only: :index
       asset_record_view.call
       logs.call
-      confirm_maintenance_form.call
     end
 
     resources :component_groups, path: component_groups_alias, only: [] do
       get '/', controller: :components, action: :index
       resources :components, only: :index
       asset_record_view.call
+      maintenance_windows.call
     end
 
     resources :services, only: :show do
-      cases.call
       maintenance_windows.call
-      confirm_maintenance_form.call
     end
 
     resources :maintenance_windows, path: :maintenance, only: [] do
       member do
+        get :confirm
+        patch :confirm, to: 'maintenance_windows#confirm_submit'
         post :reject
       end
     end
+
+    resource :terminal_services, only: [:show]
+    resource :users, only: [:show]
+
+    # Support legacy case URLs
+    get '/cases/:id', to: 'cases#redirect_to_canonical_path'
+    get '/services/:service_id/cases/:id', to: 'cases#redirect_to_canonical_path'
+    get '/components/:component_id/cases/:id', to: 'cases#redirect_to_canonical_path'
   end
 
   constraints Clearance::Constraints::SignedOut.new do

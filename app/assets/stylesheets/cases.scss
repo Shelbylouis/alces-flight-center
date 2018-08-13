@@ -41,8 +41,17 @@
   text-align: right;
 }
 
+.and-more {
+  border-bottom: 1px dashed black;
+  cursor: pointer;
+}
+
 .assigned-cases {
   background-color: rgba(39,148,216,0.1);
+
+  .current-user {
+    font-weight: bold;
+  }
 }
 
 .case-highlight {
@@ -82,4 +91,16 @@ td {
 
 .td-link:hover {
   text-decoration: none;
+}
+
+th * {
+  font-weight: normal;
+}
+
+
+.associations-filter {
+  max-height: 25rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-left: 1.5rem;
 }

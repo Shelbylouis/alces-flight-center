@@ -3,12 +3,17 @@
     <i class="fa fa-circle mr-2" aria-hidden="true"></i>
   </span>
   <span title="<%= date.to_formatted_s(:long) %>">
-    <%= date.to_formatted_s(:day_only) %>
+    <%= date.to_formatted_s(:friendly_date) %>
   </span>
   <span class="text">
     <%= yield %>
   </span>
+  <% if local_assigns[:time_to_response] %>
+    <span class="response-time" title="Business time elapsed before the case recieved a response from an admin">
+      <%= time_to_response %>
+    </span>
+  <% end %>
   <span>
-    <%= pluralize(amount, 'credit') %>
+    <%= pluralize(amount.abs,'credit') %>
   </span>
 </li>

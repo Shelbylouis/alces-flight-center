@@ -1,0 +1,20 @@
+<% if policy(kase).edit? %>
+  <%= form_for kase do |f| %>
+    <div class="form-group">
+      <div class="input-group">
+        <%=
+          f.select :issue_id,
+                   kase.available_issues.map { |i| [i.label_text, i.id] },
+                   {},
+                   { class: 'form-control' }
+        %>
+        <div class="input-group-append">
+          <%= f.submit 'Change issue', class: 'btn btn-primary btn-sm' %>
+        </div>
+      </div>
+      <p class="small">Associate more services with this case for more options.</p>
+    </div>
+  <% end %>
+<% else %>
+  <%= kase.issue.label_text %>
+<% end %>

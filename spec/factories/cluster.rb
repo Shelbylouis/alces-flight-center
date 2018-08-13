@@ -10,7 +10,6 @@ FactoryBot.define do
     name 'Hamilton Research Computing Cluster'
     support_type :managed
     shortcode
-    motd 'My MOTD'
 
     factory :managed_cluster do
       support_type :managed
@@ -25,5 +24,29 @@ FactoryBot.define do
     association :cluster
     association :user, factory: :admin
     amount 10
+    effective_date Date.today
+  end
+
+  factory :check_category do
+    name 'Generic Category Name'
+  end
+
+  factory :check do
+    association :check_category
+    name 'Check check testing 1 2 3'
+    command 'Do the thing'
+  end
+
+  factory :cluster_check do
+    association :check
+    association :cluster
+  end
+
+  factory :check_result do
+    association :cluster_check
+    user
+    date Date.today
+    result 'Failure'
+    comment 'Everything is fine'
   end
 end

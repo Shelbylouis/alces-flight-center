@@ -1,8 +1,8 @@
 require 'slack-notifier'
 class LogsController < ApplicationController
   def index
-    @new_log = Log.new
     @scope = @component || @cluster
+    @new_log = Log.new(@scope.class.name.downcase => @scope)
     @logs = @scope.logs
     @cases = @scope.cases
     @components = @scope.components if @scope.is_a? Cluster
@@ -13,12 +13,26 @@ class LogsController < ApplicationController
     new_log = @scope.logs.build(log_params)
     authorize new_log
     if new_log.save
+      SlackNotifier.log_notification(new_log)
       flash[:success] = 'Added new log entry'
     else
       error_flash_models [new_log], 'Could not add log entry'
     end
-    SlackNotifier.log_notification(new_log)
     redirect_back fallback_location: @cluster
+  end
+
+  def preview
+    @new_log = @scope.logs.build(log_params)
+    authorize @new_log, :create?
+
+    render layout: false
+  end
+
+  def write
+    @new_log = @scope.logs.build(log_params)
+    authorize @new_log, :create?
+
+    render layout: false
   end
 
   private
@@ -29,4 +43,3 @@ class LogsController < ApplicationController
           .merge(engineer: current_user)
   end
 end
-

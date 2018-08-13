@@ -25,25 +25,20 @@
     </p>
   </div>
   <div class="col-md-6 col-sm-12">
-    <div id='clearance' class='card sign-in'>
-      <div class='card-header'>
-        <ul class='nav'>
-          <li class='nav-item'>
-          <span class='navbar-brand'><%= t('.title') %></span>
-          </li>
-        </ul>
-      </div>
 
-      <div class='card-body'>
-        <p>Please sign in to Flight in order to use Flight Center.</p>
-        <%= render 'partials/sso_sign_in_button' %>
-        <h4>I've signed in, why am I seeing this?</h4>
+    <% if signed_in_without_account? %>
+      <%= render 'sessions/sign_in_box', title: 'Account not authorised' do %>
         <p>
           Your Alces Flight account manager must request that your Flight
           account be given access to Flight Center before you can get started.
         </p>
-      </div>
-    </div>
+      <% end %>
+    <% else %>
+      <%= render 'sessions/sign_in_box', title: t('.title') do %>
+        <p>Please sign in to Flight in order to use Flight Center.</p>
+        <%= render 'partials/sso_sign_in_button' %>
+      <% end %>
+    <% end %>
 
   </div>
 </div>

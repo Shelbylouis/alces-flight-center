@@ -4,7 +4,8 @@ class MaintenanceWindow < ApplicationRecord
     def validate(record)
       @record = record
 
-      validate_precisely_one_associated_model
+      validate_at_least_one_associated_model
+      validate_homogenous_cluster
       validate_requested_period
     end
 
@@ -13,18 +14,16 @@ class MaintenanceWindow < ApplicationRecord
     attr_reader :record
     delegate :requested_start, to: :record
 
-    def validate_precisely_one_associated_model
-      record.errors.add(
-        :base, 'precisely one Cluster, Component, or Service can be under maintenance'
-      ) unless number_associated_models == 1
+    def validate_at_least_one_associated_model
+      unless number_associated_models >= 1
+        record.errors.add(
+          :base, 'at least one Cluster, Component, or Service must be under maintenance'
+        )
+      end
     end
 
     def number_associated_models
-      [
-        record.cluster,
-        record.component,
-        record.service
-      ].select(&:present?).length
+      record.associated_models.length
     end
 
     def validate_requested_period
@@ -60,6 +59,23 @@ class MaintenanceWindow < ApplicationRecord
       field = send(field_name)
       if field.past?
         record.errors.add(field_name, 'cannot be in the past')
+      end
+    end
+
+    def validate_homogenous_cluster
+      clusters = record.associated_models.map { |m|
+        case m
+        when Cluster
+          m
+        else
+          m.cluster
+        end
+      }.uniq
+
+      unless clusters.length == 1
+        record.errors.add(
+          :base, 'All associated components must belong to the same cluster'
+        )
       end
     end
   end

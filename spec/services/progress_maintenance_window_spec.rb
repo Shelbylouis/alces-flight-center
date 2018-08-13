@@ -53,7 +53,7 @@ RSpec.describe ProgressMaintenanceWindow do
         state: state,
         requested_start: requested_start,
         duration: 1,
-        component: component,
+        components: [component],
         id: 123
       )
     end
@@ -78,7 +78,7 @@ RSpec.describe ProgressMaintenanceWindow do
       start_date = window.requested_start.to_formatted_s(:short)
       end_date = window.expected_end.to_formatted_s(:short)
       full_expected_message = <<~EOF.squish
-        Maintenance window #{window.id} (#{component.name} | #{start_date} -
+        Maintenance window #{window.id} (#{component.name} (#{component.readable_model_name}) | #{start_date} -
         #{end_date}): #{expected}
       EOF
       expect(message).to eq full_expected_message

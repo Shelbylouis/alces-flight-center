@@ -7,12 +7,6 @@ RSpec.describe Cluster, type: :model do
   describe '#valid?' do
     subject { create(:cluster) }
 
-    # XXX Add this back once current staging deployed and so `rake
-    # alces:data:import_and_migrate_production` should succeed with this set
-    # (failing right now due to multiple Cluster data migrations since last
-    # deploy).
-    # it { is_expected.to validate_presence_of(:motd) }
-
     context 'when managed cluster' do
       subject do
         create(:managed_cluster)
@@ -203,14 +197,14 @@ RSpec.describe Cluster, type: :model do
     subject { create(:cluster) }
 
     it 'gives unfinished maintenance windows for Cluster and parts' do
-      create(:requested_maintenance_window, cluster: subject, id: 1)
-      create(:confirmed_maintenance_window, cluster: subject, id: 2)
-      create(:ended_maintenance_window, cluster: subject, id: 3)
+      create(:requested_maintenance_window, clusters: [subject], id: 1)
+      create(:confirmed_maintenance_window, clusters: [subject], id: 2)
+      create(:ended_maintenance_window, clusters: [subject], id: 3)
 
       component = create(:component, cluster: subject)
-      create(:requested_maintenance_window, component: component, id: 4)
-      create(:confirmed_maintenance_window, component: component, id: 5)
-      create(:ended_maintenance_window, component: component, id: 6)
+      create(:requested_maintenance_window, components: [component], id: 4)
+      create(:confirmed_maintenance_window, components: [component], id: 5)
+      create(:ended_maintenance_window, components: [component], id: 6)
 
       resulting_window_ids = subject.unfinished_related_maintenance_windows.map(&:id)
 
@@ -218,8 +212,8 @@ RSpec.describe Cluster, type: :model do
     end
 
     it 'gives maintenance windows with newest first' do
-      create(:requested_maintenance_window, cluster: subject, id: 1, created_at: 2.days.ago)
-      create(:confirmed_maintenance_window, cluster: subject, id: 2, created_at: 1.day.ago)
+      create(:requested_maintenance_window, clusters: [subject], id: 1, created_at: 2.days.ago)
+      create(:confirmed_maintenance_window, clusters: [subject], id: 2, created_at: 1.day.ago)
 
       resulting_window_ids = subject.unfinished_related_maintenance_windows.map(&:id)
 

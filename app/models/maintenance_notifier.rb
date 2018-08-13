@@ -8,13 +8,16 @@ MaintenanceNotifier = Struct.new(:window) do
 
   private
 
-  delegate :associated_model, to: :window
+  def associated_model_names
+    window.decorate.associated_model_names
+  end
+
   delegate :cluster_maintenance_windows_url,
     to: 'Rails.application.routes.url_helpers'
 
   def request_comment
     <<-EOF
-      Maintenance requested for #{associated_model.name} from
+      Maintenance requested for #{associated_model_names} from
       #{requested_start} until #{expected_end} by #{window.requested_by.name};
       to proceed this maintenance must be confirmed on the cluster dashboard:
       #{cluster_dashboard_url}.
@@ -23,7 +26,7 @@ MaintenanceNotifier = Struct.new(:window) do
 
   def confirm_comment
     <<~EOF
-      Request for maintenance of #{associated_model.name} confirmed by
+      Request for maintenance of #{associated_model_names} confirmed by
       #{window.confirmed_by.name}; this maintenance has been scheduled from
       #{requested_start} until #{expected_end}.
     EOF
@@ -31,7 +34,7 @@ MaintenanceNotifier = Struct.new(:window) do
 
   def mandate_comment
     <<~EOF
-      Maintenance for #{associated_model.name} has been scheduled from
+      Maintenance for #{associated_model_names} has been scheduled from
       #{requested_start} until #{expected_end} by #{window.confirmed_by.name};
       this maintenance is mandatory.
     EOF
@@ -39,14 +42,14 @@ MaintenanceNotifier = Struct.new(:window) do
 
   def cancel_comment
     <<~EOF
-      Request for maintenance of #{associated_model.name} cancelled by
+      Request for maintenance of #{associated_model_names} cancelled by
       #{window.cancelled_by.name}.
     EOF
   end
 
   def reject_comment
     <<~EOF
-      Request for maintenance of #{associated_model.name} rejected by
+      Request for maintenance of #{associated_model_names} rejected by
       #{window.rejected_by.name}.
     EOF
   end
@@ -54,19 +57,18 @@ MaintenanceNotifier = Struct.new(:window) do
   def extend_duration_comment
     <<~EOF
       #{window.user_facing_state.capitalize} maintenance of
-      #{associated_model.name} has been extended, this
-      #{associated_model.readable_model_name} will now be under maintenance
-      from #{requested_start} until #{expected_end}.
+      #{associated_model_names} has been extended, they will now be under 
+      maintenance from #{requested_start} until #{expected_end}.
     EOF
   end
 
   def end_comment
-    "Maintenance of #{associated_model.name} ended by #{window.ended_by.name}."
+    "Maintenance of #{associated_model_names} ended by #{window.ended_by.name}."
   end
 
   def auto_expire_comment
     <<~EOF
-      Request for maintenance of #{associated_model.name} was not confirmed
+      Request for maintenance of #{associated_model_names} was not confirmed
       before requested start date of #{requested_start}; this maintenance can
       no longer occur as requested and must be rescheduled and confirmed on the
       cluster dashboard: #{cluster_dashboard_url}.
@@ -75,15 +77,15 @@ MaintenanceNotifier = Struct.new(:window) do
 
   def auto_start_comment
     <<~EOF
-      Scheduled maintenance of #{associated_model.name} has automatically
-      started; this #{associated_model.readable_model_name} is now under
+      Scheduled maintenance of #{associated_model_names} has automatically
+      started; they are now under
       maintenance until #{expected_end}.
     EOF
   end
 
   def auto_end_comment
     <<~EOF
-      Scheduled maintenance of #{associated_model.name} has automatically
+      Scheduled maintenance of #{associated_model_names} has automatically
       ended.
     EOF
   end
@@ -93,7 +95,7 @@ MaintenanceNotifier = Struct.new(:window) do
   end
 
   def cluster_dashboard_url
-    cluster_maintenance_windows_url(window.associated_cluster)
+    cluster_maintenance_windows_url(window.cluster)
   end
 
   def requested_start

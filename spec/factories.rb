@@ -118,4 +118,35 @@ FactoryBot.define do
     from 'draft'
     to 'awaiting_authorisation'
   end
+
+  factory :collated_case_association_audit do
+    skip_create  # since this isn't an ActiveRecord model
+    association :user
+    created_at DateTime.now
+
+    initialize_with {
+      component = create(:component)
+      new(
+        user.id,
+        created_at,
+        [
+          create(
+            :audit,
+            action: 'create',
+            audited_changes: {
+              'associated_element_type': 'Component',
+              'associated_element_id': component.id,
+            }
+          )
+        ]
+      )
+    }
+
+  end
+
+  factory :audit, class: Audited::Audit do
+    association :user
+    action :update
+    audited_changes []
+  end
 end

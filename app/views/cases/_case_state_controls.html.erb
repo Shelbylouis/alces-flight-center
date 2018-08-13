@@ -11,8 +11,8 @@
                     confirm: 'Are you sure you want to resolve this support case?'
                 }
     %>
-  <% elsif @case.open? && @case.cr_in_progress? %>
-    <p class="small">This case cannot be resolved as the change request is incomplete.</p>
+  <% elsif @case.open? %>
+    <p class="small" id="unresolvable-reason"><%= @case.unresolvable_reason %></p>
   <% end %>
 <% end %>
 

@@ -49,5 +49,15 @@
                   class: 'btn btn-primary'
       %>
     <% end %>
+    <%= render 'clusters/cluster_checks', cluster: cluster do %>
+      <%= link_to 'See check history', cluster_checks_path(cluster),
+                  class: 'btn btn-primary'
+      %>
+      <% if policy(cluster).enter_check_results? && cluster.last_checked != Date.today %>
+        <%= link_to 'Set check results for today', cluster_check_submission_path(cluster),
+                    class: 'btn btn-danger'
+        %>
+      <% end %>
+    <% end %>
   </div>
 </div>

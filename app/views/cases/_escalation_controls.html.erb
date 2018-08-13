@@ -20,38 +20,39 @@
     )
     %>
 
-  <div
-    class="modal fade"
-    id="<%= modal_id %>"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="<%= modal_label %>"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="<%= modal_label %>">
-            Escalating a case, please note:
-          </h5>
-          <button class="close" data-dismiss="modal">×</button>
-        </div>
-        <div class="modal-body">
-          <p>Escalating a support case means that you authorise potential use
+    <div
+      class="modal fade"
+      id="<%= modal_id %>"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="<%= modal_label %>"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="<%= modal_label %>">
+              Escalating a case, please note:
+            </h5>
+            <button class="close" data-dismiss="modal">×</button>
+          </div>
+          <div class="modal-body">
+            <p>Escalating a support case means that you authorise potential use
             of available account credit to help resolve your issue.</p>
-          <p>Do you wish to continue?</p>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-outline-primary" data-dismiss="modal">
-            Cancel
-          </button>
-          <%= link_to 'Escalate',
-                      escalate_case_path(@case.id),
-                      class: 'btn btn-outline-warning',
-                      id: 'confirm-escalate-button',
-                      method: :post,
-                      role: 'button'
-          %>
+            <p>Do you wish to continue?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline-primary" data-dismiss="modal">
+              Cancel
+            </button>
+            <%= link_to 'Escalate',
+                        escalate_case_path(@case.id),
+                        class: 'btn btn-outline-warning',
+                        id: 'confirm-escalate-button',
+                        method: :post,
+                        role: 'button'
+            %>
+          </div>
         </div>
       </div>
     </div>

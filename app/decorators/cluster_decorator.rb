@@ -9,7 +9,10 @@ class ClusterDecorator < ApplicationDecorator
   end
 
   def links
-    h.link_to name, path
+    h.raw(
+     "<i class=\"fa #{fa_icon}\" title=\"#{type_name}\"></i> " +
+       h.link_to(name,path)
+    )
   end
 
   def tabs
@@ -17,18 +20,30 @@ class ClusterDecorator < ApplicationDecorator
       tabs_builder.overview,
       documents.empty? ? nil : { id: :documents, path: h.cluster_documents_path(self) },
       { id: :credit_usage, path: h.cluster_credit_usage_path(self) },
+      ({ id: :checks, path: h.cluster_checks_path(self) } unless self.cluster_check_count.zero? ),
       tabs_builder.logs,
       tabs_builder.cases,
       tabs_builder.maintenance,
-      { id: :services, path: h.cluster_services_path(self) },
       {
-        id: :components,
-        dropdown: self.available_component_group_types.map do |t|
+        id: :cluster,
+        dropdown: [
           {
-            text: t.pluralize,
-            path: h.cluster_components_path(self, type: t)
+            text: 'Services',
+            path: h.cluster_services_path(self)
+          },
+          {
+            text: 'Components:',
+            heading: true,
           }
-        end.push(text: 'All', path: h.cluster_components_path(self))
+        ].tap do |comps|
+          comps.push(text: 'All', path: h.cluster_components_path(self))
+          available_component_group_types.each do |t|
+            comps.push(
+              text: t.pluralize,
+              path: h.cluster_components_path(self, type: t)
+            )
+          end
+        end
       },
       notes_tab,
     ].compact
@@ -39,7 +54,12 @@ class ClusterDecorator < ApplicationDecorator
       id: id,
       name: name,
       components: components.map(&:case_form_json),
-      services: services.map(&:case_form_json),
+      services: services.map(&:case_form_json).tap { |services|
+        # We inject an 'Other' Service, to allow Users to create Issues they do
+        # not think are associated to any existing Service via the usual Case
+        # form drill-down process.
+        services << other_service_json if other_service_json
+      },
       supportType: support_type,
       chargingInfo: charging_info,
       # Encode MOTD in two forms: the raw form, to be used as the initial value
@@ -76,6 +96,40 @@ class ClusterDecorator < ApplicationDecorator
     end
   end
 
+  def fa_icon
+    'fa-server'
+  end
+
+  def type_name
+    'Entire cluster'
+  end
+
+  def last_checked
+    if check_results.empty?
+      'N/A'
+    else
+      check_results.order(date: :desc).first.date
+    end
+  end
+
+  def no_of_checks_passed(date = last_checked)
+    check_results.where(date: date).where.not(result: 'Failure').count
+  end
+
+  def check_groups(checks)
+    checks.group_by(&:check_category)
+  end
+
+  def check_results_class
+    if no_of_checks_passed.zero?
+      'text-danger'
+    elsif no_of_checks_passed < checks.count
+      'text-warning'
+    else
+      'text-success'
+    end
+  end
+
   private
 
   def notes_tab
@@ -100,4 +154,35 @@ class ClusterDecorator < ApplicationDecorator
       }
     end
   end
+
+  def other_service_json
+    return unless IssuesJsonBuilder.other_service_issues.present?
+    @other_service_json ||=
+      other_service
+      .decorate
+      .case_form_json
+      .merge(IssuesJsonBuilder.build_for(self))
+  end
+
+  def other_service
+    Service.new(
+      id: -1,
+      name: 'Other or N/A',
+      support_type: 'managed',
+      service_type: ServiceType.new
+    )
+  end
+
+  class IssuesJsonBuilder < ServiceDecorator::IssuesJsonBuilder
+    private
+
+    def self.other_service_issues
+      Issue.where(requires_component: false, requires_service: false).decorate.reject(&:special?)
+    end
+
+    def applicable_issues
+      self.class.other_service_issues
+    end
+  end
+
 end

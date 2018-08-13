@@ -1,0 +1,126 @@
+<% check_groups = cluster.check_groups(cluster.cluster_checks) %>
+<% content_for(:subtitle) { "Cluster checks" } %>
+<%= render 'partials/tabs', activate: :checks do %>
+  <% if check_groups.empty? %>
+    <p style="text-align: center;"><em>
+      There are no checks for this cluster currently
+    </em></p>
+  <% else %>
+    <%= form_for :check_result,
+      as: :post,
+      url: cluster_set_check_results_path(cluster),
+      html: { id: 'check-result-submission-form' } do |f| %>
+      <% if cluster.last_checked == Date.today %>
+        <p style="text-align: center;">
+          Results have already been submitted for today. Check back tomorrow to submit new results.
+        </p>
+      <% else %>
+        <div class="card-body row">
+          <div class="col-sm-12">
+            <h3><%= cluster.name %> Checks for <%= Date.today.to_formatted_s(:short) %> 2018</h3>
+            <% check_groups.each do |group| %>
+              <h4><%= group[0].name %></h4>
+              <%= render 'partials/table',
+                collection: cluster.cluster_checks,
+                message: 'No cluster checks to display' do %>
+                <thead>
+                  <tr class="nowrap">
+                    <th>Check</th>
+                    <th>Command</th>
+                    <th>Comment</th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% group[1].each_with_index do |cluster_check, index| %>
+                    <% cluster_check_id = cluster_check.id %>
+                    <tr class="case-highlight">
+                      <td style="width: 20%;"><%= cluster_check.check.name %></td>
+                      <td class="markdown" style="width: 20%;">
+                        <code>
+                          <%= cluster_check.check.command || 'N/A' %>
+                        </code>
+                      </td>
+                      <td style="width: 60%;">
+                        <%= render 'partials/markdown_editor_layout',
+                          activate: 'write',
+                          form_builder: f,
+                          preview_path: cluster_checks_submit_preview_path(
+                            cluster,
+                            cluster_check_id
+                          ),
+                          write_path: cluster_checks_submit_write_path(
+                            cluster,
+                            cluster_check_id
+                          ) do %>
+
+                          <%= render 'partials/markdown_content',
+                                     form_builder: f,
+                                     field: :text,
+                                     options: {
+                                         name: "#{cluster_check_id}-comment",
+                                         placeholder: "(Optional) Enter a comment about the check here",
+                                         value: nil
+                                     }
+                          %>
+                        <% end %>
+                        <div style="width: 70%;">
+                          <%= collection_select :check_result,
+                            :component_id,
+                            cluster.components,
+                            :id,
+                            :name,
+                            { prompt: '(Optional) Associated component' },
+                            { class: 'form-control', name: "#{cluster_check_id}-component" }%>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="btn-group btn-group-toggle nowrap" data-toggle="buttons">
+                          <label class="btn btn-primary result-btn">
+                            <input type="radio"
+                                   name="<%= "#{cluster_check_id}-result" %>"
+                                   id="success"
+                                   autocomplete="off"
+                                   value="Success" required>
+                                   <i class="fa fa-check" style="color: #18bcb0;"></i>
+                            </input>
+                          </label>
+                          <label class="btn btn-primary result-btn">
+                            <input type="radio"
+                                   name="<%= "#{cluster_check_id}-result" %>"
+                                   id="failure"
+                                   autocomplete="off"
+                                   value="Failure">
+                                   <i class="fa fa-remove" style="color: red;"></i>
+                            </input>
+                          </label>
+                          <label class="btn btn-primary result-btn">
+                            <input type="radio"
+                                   name="<%= "#{cluster_check_id}-result" %>"
+                                   id="na"
+                                   autocomplete="off"
+                                   value="N/A">
+                                   N/A
+                            </input>
+                          </label>
+                        </div>
+                          <label for="<%= "#{cluster_check_id}-result" %>"
+                                 class="error"
+                                 generated="true">
+                          </label>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              <% end %>
+            <% end %>
+          </div>
+          <input type="submit"
+                 class="btn btn-primary btn-block"
+                 value="Submit Cluster Check Results">
+          </input>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

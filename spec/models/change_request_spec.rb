@@ -4,7 +4,7 @@ RSpec.describe ChangeRequest, type: :model do
 
   describe '#finalised?' do
 
-    FINAL_STATES = %w(declined completed).freeze
+    FINAL_STATES = %w(declined completed cancelled).freeze
 
     it 'reports final states as finalised' do
 
@@ -13,6 +13,12 @@ RSpec.describe ChangeRequest, type: :model do
         expect(cr.finalised?).to eq(FINAL_STATES.include?(state.to_s))
       end
     end
+  end
+
+  it do
+    is_expected.to validate_numericality_of(:credit_charge)
+      .only_integer
+      .is_greater_than_or_equal_to(0)
   end
 
 end

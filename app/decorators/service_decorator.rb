@@ -13,12 +13,20 @@ class ServiceDecorator < ClusterPartDecorator
   end
 
   def tabs
-    [tabs_builder.overview, tabs_builder.cases, tabs_builder.maintenance]
+    [tabs_builder.overview, tabs_builder.read_only_cases, tabs_builder.maintenance]
   end
 
   def case_form_json
     issues_json = IssuesJsonBuilder.build_for(self)
     super.merge(issues_json)
+  end
+
+  def fa_icon
+    'fa-gears'
+  end
+
+  def type_name
+    'Service'
   end
 
   private

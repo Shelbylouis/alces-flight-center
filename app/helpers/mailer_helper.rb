@@ -51,4 +51,12 @@ module MailerHelper
     return nil if eh.blank?
     " #{eh}"
   end
+
+  def case_url(kase)
+    cluster_case_url(kase.cluster, kase)
+  end
+
+  def markdown_format(text)
+    MarkdownRenderer.render(text).html_safe
+  end
 end

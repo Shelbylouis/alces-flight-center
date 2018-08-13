@@ -5,9 +5,14 @@ require 'erb'
 class Deployment
   include Rake::DSL
 
+  VERSION_ENV_VAR = 'FC_VERSION'.freeze
+
   def initialize(type, dry_run: false)
-    @remote, @tag = parse_deploy_type(type)
+    abort "Must set ENV['#{VERSION_ENV_VAR}'] within command!" unless ENV.include?(VERSION_ENV_VAR)
+    @remote = type
     @dry_run = dry_run
+    @tag = ENV[VERSION_ENV_VAR]
+
   end
 
   def deploy
@@ -16,6 +21,16 @@ class Deployment
     end
 
     important 'Make sure you have anything you want deployed on this branch!'
+
+    wipe_database = ENV['WIPE_DATABASE'] || false
+
+    if staging?
+      if wipe_database
+        important 'Staging database will be wiped and replaced with a copy of production.'
+      else
+        info 'Staging database will be preserved. Set WIPE_DATABASE=true to replace with a copy of production.'
+      end
+    end
 
     unless dry_run?
       STDERR.puts <<~EOF.squish
@@ -27,9 +42,10 @@ class Deployment
       abort unless input.downcase == 'y'
     end
 
+    dokku_config_set(VERSION_ENV_VAR, tag, app: app_name, restart: false)
     run "git push #{remote} -f #{current_branch}:master"
 
-    import_production_backup_to_staging if staging?
+    import_production_backup_to_staging if staging? && wipe_database
 
     run "git tag -f #{remote} #{current_branch}"
     run "git tag -f #{tag} #{current_branch}"
@@ -40,19 +56,6 @@ class Deployment
     output_manual_steps
   end
 
-  module Staging
-    STAGING_PASSWORD = 'STAGING_PASSWORD'
-
-    def self.password
-      ENV.fetch(STAGING_PASSWORD)
-    rescue KeyError
-      raise <<~ERROR.squish
-        #{STAGING_PASSWORD} environment variable must be set, to be used as
-        password for all Site contacts in staging environment
-      ERROR
-    end
-  end
-
   private
 
   attr_reader :remote, :tag
@@ -60,31 +63,11 @@ class Deployment
   PRODUCTION_APP = 'flight-center'
   STAGING_APP = 'flight-center-staging'
 
-  def parse_deploy_type(type)
-    case type
-    when :production
-      [:production, today]
-    when :hotfix
-      [:production, "#{today}-hotfix"]
-    when :staging
-      [:staging, "#{today}-staging"]
-    else
-      raise "Unknown deployment type: '#{type}'"
-    end
-  end
-
-  def today
-    Date.today.iso8601
-  end
-
   def current_branch
     @current_branch ||= `git rev-parse --abbrev-ref HEAD`.strip.inquiry
   end
 
   def import_production_backup_to_staging
-    # Get staging password first so we fail before doing anything if this
-    # hasn't been given.
-    staging_password = Staging.password
 
     staging_database_url = dokku_config_get('DATABASE_URL', app: STAGING_APP)
     database_server_url = File.dirname(staging_database_url)
@@ -110,10 +93,7 @@ class Deployment
 
     # Obfuscate the imported production data for non-admin users to not use
     # real emails and to all use password passed as environment variable.
-    obfuscate_dokku_command = <<~COMMAND.squish
-      rake alces:deploy:staging:obfuscate_users
-      STAGING_PASSWORD="#{Shellwords.escape(staging_password)}"
-    COMMAND
+    obfuscate_dokku_command = 'rake alces:deploy:staging:obfuscate_users'
     dokku_run obfuscate_dokku_command, app: STAGING_APP
 
     dokku_start STAGING_APP
@@ -190,6 +170,10 @@ class Deployment
   def dokku_config_get(env_var, app:)
     command = dokku_command("config:get #{app} #{env_var}")
     `#{command}`.strip
+  end
+
+  def dokku_config_set(key, value, app:, restart: true)
+    run dokku_command("config:set #{restart ? '' : '--no-restart'} #{app} #{key}=#{value}")
   end
 
   def dokku_stop(app)

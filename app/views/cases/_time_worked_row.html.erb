@@ -1,5 +1,5 @@
 <% if policy(@case).set_time?
-  hours, minutes = @case.time_worked.divmod(60)
+  hours, minutes = @case.time_worked&.divmod(60)
 %>
 <tr>
   <th>Time worked</th>

@@ -1,11 +1,15 @@
 require 'exceptions'
+require 'json_web_token'
 
 class ApplicationController < RootController
   include Pundit
 
   decorates_assigned :site
 
-  before_action :set_sentry_raven_context
+  helper_method :signed_in_without_account?
+  helper_method :case_url
+  helper_method :case_path
+
   before_action :assign_current_user
   before_action :assign_scope
   before_action :assign_title
@@ -35,18 +39,32 @@ class ApplicationController < RootController
     cookies.delete('flight_sso', domain: domain)
   end
 
+  def signed_in_without_account?
+    # A Flight SSO account does not necessarily correspond to a Flight Center
+    # account. If someone is logged in to Flight SSO but does not have access to
+    # Flight Center then current_user will be nil but they will have a
+    # `flight-sso` cookie.
+    # We want to identify this scenario so that we can use more appropriate
+    # language e.g. don't tell them to "log in" again.
+    current_user.nil? && valid_sso_token?
+  end
+
+  def case_url(kase)
+    cluster_case_url(kase.cluster, kase)
+  end
+
+  def case_path(kase)
+    cluster_case_path(kase.cluster, kase)
+  end
+
   private
 
-  def set_sentry_raven_context
-    if current_user
-      Raven.user_context(
-        id: current_user.id,
-        email: current_user.email,
-        name: current_user.name,
-        site: current_user.site&.name,
-      )
-    end
-    Raven.extra_context(params: params.to_unsafe_h, url: request.url)
+  def valid_sso_token?
+    # This method checks that the token itself is valid (and verifies the
+    # signature), not that it corresponds to a User.
+    cookies['flight_sso'] && JsonWebToken.decode(cookies['flight_sso'])
+  rescue JWT::DecodeError
+    false
   end
 
   def assign_current_user
@@ -71,8 +89,8 @@ class ApplicationController < RootController
 
     @scope = case request.path
              when /^\/clusters/
-               id = scope_id_param(:cluster_id)
-               @cluster = Cluster.find(id)
+               id = scope_id_param(:cluster_id).upcase
+               @cluster = Cluster.find_from_id!(id)
              when /^\/components/
                id = scope_id_param(:component_id)
                @component = @cluster_part = Component.find(id)
@@ -117,9 +135,6 @@ class ApplicationController < RootController
   end
 
   def format_errors(model)
-    # XXX Improve error handling - for now we just return a formatted string of
-    # all errors; could be worth returning JSON which can be decoded and
-    # displayed inline with fields in app.
     model.errors.messages.map do |field, messages|
       "#{field} #{messages.join(', ')}"
     end.join('; ')

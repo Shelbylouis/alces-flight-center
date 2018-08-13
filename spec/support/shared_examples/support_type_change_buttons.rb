@@ -37,7 +37,7 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
       click_button button_text
 
       created_case = part.cases.first
-      expect(created_case.send(part_name)).to eq(part)
+      expect(created_case.send(part_name.to_s.pluralize.to_sym).first).to eq(part)
       issue = Issue.send("request_#{part_name}_becomes_advice_issue")
       expect(created_case.issue).to eq(issue)
       tier = issue.tiers.first
@@ -64,7 +64,7 @@ RSpec.shared_examples 'can request support_type change via buttons' do |part_nam
       click_button button_text
 
       created_case = part.cases.first
-      expect(created_case.send(part_name)).to eq(part)
+      expect(created_case.send(part_name.to_s.pluralize.to_sym).first).to eq(part)
       issue = Issue.send("request_#{part_name}_becomes_managed_issue")
       expect(created_case.issue).to eq(issue)
       tier = issue.tiers.first

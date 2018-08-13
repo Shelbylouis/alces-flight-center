@@ -20,14 +20,14 @@ RSpec.describe CasesController, type: :controller do
 
     context 'from cluster-level route' do
       it 'assigns just given cluster to @clusters' do
-        get :new, params: { cluster_id: first_cluster.id }
+        get :new, params: { cluster_id: first_cluster }
         expect(assigns(:clusters)).to eq([first_cluster])
       end
 
       it 'gives 404 if cluster does not belong to user site' do
         another_cluster = create(:cluster)
         expect do
-          get :new, params: { cluster_id: another_cluster.id }
+          get :new, params: { cluster_id: another_cluster }
         end.to raise_error(ActionController::RoutingError)
       end
 
@@ -55,7 +55,7 @@ RSpec.describe CasesController, type: :controller do
 
         context 'when given a tool' do
           it 'assigns the correct tool to @pre_selected' do
-            get :new, params: { tool: tier.tool, cluster_id: first_cluster.id }
+            get :new, params: { tool: tier.tool, cluster_id: first_cluster }
 
             expect(assigns(:pre_selected)).to eq({
               tool: tier.tool
@@ -63,50 +63,9 @@ RSpec.describe CasesController, type: :controller do
           end
         end
 
-        context 'when given a service' do
-          it 'assigns the correct service id to @pre_selected' do
-            get :new, params: { service: service.name, cluster_id: first_cluster.id }
-
-            expect(assigns(:pre_selected)).to eq({
-              service: service.id,
-            })
-          end
-        end
-
-        context 'when given a category' do
-          it 'assigns the correct category id to @pre_selected' do
-            issue = category.issues.first
-            service = issue.present? ?
-              Service.find_by(service_type: issue.service_type, cluster: first_cluster) :
-              nil
-
-            get :new, params: { category: category.name, cluster_id: first_cluster.id }
-
-            expect(assigns(:pre_selected)).to eq({
-              category: category.id,
-              service: service.present? ? service.id : nil,
-            })
-          end
-        end
-
-        context 'when given a issue' do
-          it 'assigns the correct service, category, issue and tier to @pre_selected' do
-            service = Service.find_by(service_type: issue.service_type, cluster: first_cluster)
-
-            get :new, params: { issue: issue.name, cluster_id: first_cluster.id }
-
-            expect(assigns(:pre_selected)).to eq({
-              category: issue.category.id,
-              issue: issue.id,
-              service: service.id,
-              tier: issue.tiers.first.id,
-            })
-          end
-        end
-
         context 'when given no pre-populations' do
           it 'does not assign anything to @pre_selected' do
-            get :new, params: { cluster_id: first_cluster.id }
+            get :new, params: { cluster_id: first_cluster }
 
             expect(assigns(:pre_selected)).to eq({})
           end
@@ -243,7 +202,7 @@ RSpec.describe CasesController, type: :controller do
 
   describe 'case state management' do
     let (:open_case) {
-      create(:open_case)
+      create(:open_case, time_worked: 42)
     }
 
     let (:resolved_case) {

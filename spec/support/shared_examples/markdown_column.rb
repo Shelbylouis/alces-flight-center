@@ -31,14 +31,15 @@ RSpec.shared_examples 'markdown_column' do |options={}|
 
       let(:html_text) do
         <<~EOF
-        <h1 id="title">Title</h1>
-
+        <div class="markdown">
+        <h1>Title</h1>
         <p>Paragraph</p>
-
         <ul>
-          <li>List item 1</li>
-          <li>List item 2</li>
+        <li>List item 1</li>
+        <li>List item 2</li>
         </ul>
+        <!-- raw HTML omitted -->
+        </div>
         EOF
       end
 

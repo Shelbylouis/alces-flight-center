@@ -1,13 +1,40 @@
+# frozen_string_literal: true
+
 class Case < ApplicationRecord
   include AdminConfig::Case
   include HasStateMachine
+  include Filterable
 
   default_scope { order(created_at: :desc) }
 
   belongs_to :issue
   belongs_to :cluster
-  belongs_to :component, required: false
-  belongs_to :service, required: false
+
+  has_many :case_associations, dependent: :destroy
+  has_many :services,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Service'
+
+  has_many :components,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Component'
+
+  has_many :component_groups,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'ComponentGroup'
+
+  has_many :clusters,
+           dependent: :destroy,
+           through: :case_associations,
+           source: :associated_element,
+           source_type: 'Cluster'
+
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
 
@@ -38,7 +65,8 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: [:assignee_id, :time_worked, :tier_level], on: [ :update ]
+  audited only: [:assignee_id, :issue_id, :subject, :time_worked, :tier_level], on: [ :update ]
+  has_associated_audits
 
   validates :display_id, uniqueness: true
 
@@ -65,10 +93,14 @@ class Case < ApplicationRecord
     }
   validate :validate_tier_level_changes
 
-  validates :time_worked, numericality: {
-      greater_than_or_equal_to: 0,
-      only_integer: true  # We store time worked as integer minutes.
-  }
+  validates :time_worked,
+            numericality: {
+              allow_blank: true,
+              greater_than_or_equal_to: 0,
+              only_integer: true,  # We store time worked as integer minutes.
+            }
+
+  validates :time_worked, presence: true, unless: :open?
 
   validate :time_worked_not_changed_unless_allowed
 
@@ -101,14 +133,25 @@ class Case < ApplicationRecord
   after_create :send_new_case_email
   after_update :maybe_send_new_assignee_email
 
-  scope :active, -> { where(state: 'open') }
+  scope :state, ->(state) { where(state: state) }
+  scope :active, -> { state('open') }
   scope :inactive, -> { where.not(state: 'open') }
 
   scope :assigned_to, ->(user) { where(assignee: user) }
   scope :not_assigned_to, ->(user) { where.not(assignee: user).or(where(assignee: nil)) }
 
+  scope :associated_with, lambda { |type, id|
+    joins(:case_associations)
+      .where(
+        case_associations: {
+          associated_element_type: type,
+          associated_element_id: id,
+        }
+      )
+  }
+
   def to_param
-    self.display_id.parameterize.upcase
+    display_id.parameterize.upcase
   end
 
   def self.find_from_id!(id)
@@ -124,8 +167,15 @@ class Case < ApplicationRecord
     open? || !persisted?
   end
 
-  def associated_model
-    component || service || cluster
+  def associations
+    (component_groups + components + services + clusters)
+  end
+
+  def associations=(objects)
+    %w(Service ComponentGroup Component Cluster).each do |type|
+      setter_method = "#{type.pluralize.underscore}=".to_sym
+      send(setter_method, objects.select { |o| o.model_name == type })
+    end
   end
 
   def email_reply_subject
@@ -143,7 +193,8 @@ class Case < ApplicationRecord
       audits +
       logs +
       [ credit_charge ] +
-      (change_request&.transitions || [])
+      (change_request&.transitions || []) +
+      collated_association_audits
     ).compact.sort_by(&:created_at).reverse!
   end
 
@@ -184,11 +235,11 @@ class Case < ApplicationRecord
       Cluster: cluster.name,
       Category: category&.name,
       'Issue': issue.name,
-      'Associated component': component&.name,
-      'Associated service': service&.name,
+      'Associated components': components.empty? ? nil : components.map(&:name).join(', '),
+      'Associated services': services.empty? ? nil : services.map(&:name).join(', '),
       Tier: decorate.tier_description,
       Fields: field_hash,
-      'Requested MOTD': change_motd_request&.motd
+      'Requested MOTD': change_motd_request&.motd,
     }.compact
   end
 
@@ -208,7 +259,25 @@ class Case < ApplicationRecord
 
   def resolvable?
     state_transitions.map(&:to_name).include?(:resolved) &&
-      !cr_in_progress?
+      !unresolvable_reason
+  end
+
+  def unresolvable_reason
+    if cr_in_progress?
+      return 'This case cannot be resolved as the change request is incomplete.'
+    end
+
+    unfinished_mws = maintenance_windows.unfinished.count
+    if unfinished_mws.positive?
+      return "This case cannot be resolved as there #{unfinished_mws == 1 ? 'is an' : 'are'}
+       outstanding maintenance window#{unfinished_mws == 1 ? '': 's'}.".squish
+    end
+
+    if time_worked.nil?
+      return 'This case cannot be resolved until time worked is added.'
+    end
+
+    nil
   end
 
   def potential_assignees
@@ -265,6 +334,27 @@ class Case < ApplicationRecord
     change_request.present? && !change_request.finalised?
   end
 
+  def resolution_date
+    # NB This assumes that each case will only ever be resolved once
+    # If we decide to allow reopening cases then we'll want this to be e.g.
+    # transitions.where(event: 'resolve').last
+    transitions.find_by_event('resolve')&.created_at
+  end
+
+  def first_admin_comment
+    @first_admin_comment ||= case_comments.joins(:user)
+                 .where(users: { role: 'admin' })
+                 .order(:created_at)
+                 .first
+  end
+
+  def time_to_first_response
+    return unless first_admin_comment
+    created_at.business_time_until(
+      first_admin_comment.created_at
+    )
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
@@ -276,10 +366,24 @@ class Case < ApplicationRecord
     transition.args&.first
   end
 
+  def collated_association_audits
+    # We assume that no user will make two separate changes to the associations
+    # within a second, in order to collate their changes into one lump to
+    # provide a summary for use in an event card.
+    associated_audits
+        .where(auditable_type: 'CaseAssociation')
+        .group_by do |a|
+          [a.user_id, a.created_at.change(usec: 0)]
+        end
+        .map do |key, audits|
+          CollatedCaseAssociationAudit.new(*key, audits)
+        end
+  end
+
   def assign_cluster_if_necessary
     return if cluster
-    self.cluster = component.cluster if component
-    self.cluster = service.cluster if service
+    self.cluster = components.first.cluster if components.present?
+    self.cluster = services.first.cluster if services.present?
   end
 
   def assign_default_subject_if_unset
@@ -323,30 +427,30 @@ class Case < ApplicationRecord
 
   def validates_user_assignment
     return if assignee.nil?
-    errors.add(:assignee, 'must belong to this site, or be an admin') unless assignee.site == site or assignee.admin?
+    errors.add(:assignee, 'must belong to this site, or be an admin') unless (assignee.site == site) || assignee.admin?
   end
 
   def set_display_id
-    return if self.display_id
+    return if display_id
     # Note: this method is called `before_create`, which is AFTER validation is run.
     # This ensures that the case is valid before we increment the cluster's
     # `case_index` field. Otherwise display IDs could end up non-sequential.
 
-    if self.rt_ticket_id
-      self.display_id = "RT#{rt_ticket_id}"
+    self.display_id = if rt_ticket_id
+      "RT#{rt_ticket_id}"
     else
-      self.display_id = "#{cluster.shortcode}#{cluster.next_case_index}"
-    end
+      "#{cluster.shortcode}#{cluster.next_case_index}"
+                      end
   end
 
   def has_display_id_when_saved
     # We want to be able to validate the case initially without a display id
-    errors.add(:display_id, 'must be present') unless !persisted? or display_id
+    errors.add(:display_id, 'must be present') unless !persisted? || display_id
   end
 
   def time_worked_not_changed_unless_allowed
     error_condition = !time_entry_allowed? && @time_worked_changed
-    errors.add(:time_worked, "must not be changed when case is #{state}") unless !error_condition
+    errors.add(:time_worked, "must not be changed when case is #{state}") if error_condition
   end
 
   def validate_tier_level_changes
@@ -381,7 +485,7 @@ class Case < ApplicationRecord
   def handle_tool(type, fields:)
     case type
     when :motd
-      self.build_change_motd_request(
+      build_change_motd_request(
         fields.slice(:motd)
       )
     else

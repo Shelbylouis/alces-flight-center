@@ -1,6 +1,8 @@
 class CaseDecorator < ApplicationDecorator
   delegate_all
   decorates_association :change_request
+  decorates_association :cluster
+  decorates_association :issue
 
   def user_facing_state
     model.state.to_s.titlecase
@@ -10,26 +12,21 @@ class CaseDecorator < ApplicationDecorator
     [
       "#{display_id} #{subject}",
       created_at.to_formatted_s(:long),
-      associated_model.name,
+      h.pluralize(model.associations.length, 'affected component'),
       "Created by #{user.name}"
     ].join(' | ')
-  end
-
-  def association_info
-    associated_model.decorate.links
   end
 
   def case_link
     h.link_to(
       display_id,
-      h.cluster_case_path(self.cluster, self),
+      h.case_path(self),
       title: subject
     )
   end
 
   def request_maintenance_path
-    assoc_class = model.associated_model.underscored_model_name
-    h.send("new_#{assoc_class}_maintenance_window_path", model.associated_model, case_id: model.id)
+    h.new_cluster_case_maintenance_path(model.cluster, model)
   end
 
   def tier_description
@@ -40,9 +37,21 @@ class CaseDecorator < ApplicationDecorator
     commenting.disabled_text
   end
 
+  def available_issues
+    services.map { |s| s.service_type.issues }
+            .flatten
+            .uniq
+            .map(&:decorate)
+            .sort_by { |i| i.category&.name || '' } +
+      Issue.where(requires_component: false, requires_service: false)
+        .decorate
+        .reject(&:special?)
+  end
+
   private
 
   def commenting
     @commenting ||= CaseCommenting.new(self, current_user)
   end
+
 end

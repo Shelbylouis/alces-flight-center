@@ -8,6 +8,7 @@ class Site < ApplicationRecord
   has_many :cases, through: :clusters
   has_many :components, through: :clusters
   has_many :services, through: :clusters
+  has_one :flight_directory_config
 
   validates :name, presence: true
   validates :canonical_name, presence: true
@@ -24,13 +25,5 @@ class Site < ApplicationRecord
 
   def primary_contact
     users.find_by(role: 'primary_contact')
-  end
-
-  def dashboard_case_path(kase)
-    if current_user.site_user?
-      Rails.application.routes.url_helpers.cluster_case_path(kase.cluster, kase)
-    else
-      Rails.application.routes.url_helpers.polymorphic_path([self, kase])
-    end
   end
 end

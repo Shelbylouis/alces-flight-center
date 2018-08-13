@@ -10,9 +10,14 @@
 <label for="<%= helper.id(:day) %>"><%= helper.label %></label>
 <div class="form-group" data-test="<%= datetime_field_name %>">
   <div class="row datetime-select">
-    <%= helper.select(:year) %>
-    <%= helper.select(:month) %>
-    <%= helper.select(:day) %>
+    <div class="input-group date col-sm-2">
+      <input type="text"
+             id="maintenance-datepicker"
+             name="maintenance_window[requested_start]"
+             class="form-control <%= model.bootstrap_valid_class('requested_start') %>"
+             value=<%= @date %>
+           />
+    </div>
     <div class="col-md-1">&mdash;</div>
     <%= helper.select(:hour) %>
     <div>:</div>

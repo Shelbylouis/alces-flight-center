@@ -4,7 +4,7 @@
       The page you were looking for cannot be found.
     </p>
 
-    <% unless current_user.present? %>
+    <% unless current_user.present? || signed_in_without_account? %>
 
       <p>
         This page may only be available to signed-in users, so you can try signing in.

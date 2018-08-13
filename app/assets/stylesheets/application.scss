@@ -12,6 +12,7 @@
  *
  *= require_tree .
  *= require_self
+ *= require bootstrap-datepicker
  */
 
 
@@ -125,4 +126,50 @@ table {
 
 .alert a.btn {
   text-decoration: none;
+}
+
+.version {
+  font-size: 13px;
+  color: white;
+  margin-bottom: 0; // Remove default margin from p element
+
+  // This should push the text to the bottom right of the page within the
+  // footer
+  position: relative;
+  float: right;
+  top: -2.2em;
+  right: 1em;
+}
+
+.btn-group-stretch {
+  display: flex;
+
+  button, a, input {
+    flex-grow: 1;
+    margin-left: 1rem;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+a.filter {
+  cursor: pointer;
+
+  &.filter-inactive {
+    color: black;
+  }
+}
+
+.nav-item-text {
+  padding: 0.375rem 0.75rem;
+  font-size: .9375rem;
+  line-height: 1.5;
+}
+
+
+.nav-item .btn {
+  display: block;
+  width: 100%;
 }

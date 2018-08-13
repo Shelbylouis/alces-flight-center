@@ -14,16 +14,20 @@ class MaintenanceWindowStateTransitionDecorator < ApplicationDecorator
     h.render(comment_template, transition: self).squish
   end
 
-  def associated_model
-    window.associated_model
+  def associated_model_links
+    window.associated_model_links
+  end
+
+  def associated_model_names
+    window.associated_model_names
   end
 
   def window
-    object.maintenance_window
+    object.maintenance_window.decorate
   end
 
   def cluster_dashboard_url
-    h.cluster_maintenance_windows_url(window.associated_cluster)
+    h.cluster_maintenance_windows_url(window.cluster)
   end
 
   def requested_start

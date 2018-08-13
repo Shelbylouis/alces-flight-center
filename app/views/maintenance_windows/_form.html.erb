@@ -3,53 +3,46 @@
   raise "Unknown action: #{action}" unless [:request, :confirm].include?(action)
   action = action.to_s.inquiry
 
-  case_label = if action.confirm?
-                 'Associated Case'
-               else
-                 'Case to associate this maintenance with'
-               end
 %>
 
 <%= render 'partials/tabs', activate: :maintenance do %>
   <%= form_for maintenance_window,
-    url: request.original_fullpath,
+    url: path,
     html: { class: 'card-body' } do |f| %>
-    <%= f.hidden_field :cluster_id %>
-    <%= f.hidden_field :component_id %>
-    <%= f.hidden_field :service_id %>
-
-    <% if action.request? %>
 
       <h4>
-        Requesting maintenance for <%= maintenance_window.associated_model.decorate.links %>
-        <% if maintenance_window.associated_model.is_a? Cluster %>
-        (whole cluster)
-        <% end %>
+        <%= action.request? ? 'Requesting m' : 'M' %>aintenance for support case <%= maintenance_window.case.case_link %>
       </h4>
 
-      <% if maintenance_window.associated_model.is_a? Cluster %>
-        <p class="p-3 alert alert-warning">
-          <i class="fa fa-warning"></i>
-          Not what you want? Try selecting a
-          <%= link_to 'component', cluster_components_path, class: 'alert-link' %>
-          or a
-          <%= link_to 'service', cluster_services_path, class: 'alert-link' %>
-          from this cluster.
-        </p>
+    <div class="row">
+      <div class="col-6">
+        <div class="card">
+          <div class="card-body">
+            <h5>Affected components</h5>
+
+            <%= render 'cases/associations/association_info', kase: maintenance_window.case %>
+          </div>
+        </div>
+      </div>
+      <% if action.request? %>
+        <div class="col-6">
+          <% if maintenance_window.case.clusters.length > 0 %>
+            <p class="p-3 alert alert-warning mt-3">
+              <i class="fa fa-2x fa-pull-left fa-warning" aria-hidden="true"></i>
+              You are requesting maintenance on an entire cluster.
+            </p>
+          <% end %>
+          <p class="p-3 alert alert-info mt-3">
+            <i class="fa fa-2x fa-info fa-pull-left" aria-hidden="true"></i>
+            To change the components affected by this maintenance request,
+            <%=
+              link_to "return to case #{maintenance_window.case.display_id}",
+                      case_path(maintenance_window.case)
+            %> and set the appropriate associations, then
+            start the maintenance request again.
+          </p>
+        </div>
       <% end %>
-
-    <% end %>
-
-    <div class="form-group">
-      <%= f.label :case_id, case_label, 'data-test': 'case-select-label' %>
-      <%= f.collection_select(
-        :case_id,
-        maintenance_window.associated_cluster.cases.active.decorate,
-        :id,
-        :case_select_details,
-        {},
-        maintenance_window.case_attributes(action)
-      ) %>
     </div>
 
     <div class="form-group" data-test="duration-input-group">

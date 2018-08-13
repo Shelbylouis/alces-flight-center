@@ -1,12 +1,24 @@
-require 'kramdown/converter/remove_html_tags'
-
 module MarkdownRenderer
   def self.render(markdown_text)
-    doc = Kramdown::Document.new(markdown_text || '')
-    Kramdown::Converter::RemoveHtmlTags.convert(doc.root,
-                                                remove_block_html_tags: true
-                                               )
-    doc.to_html
+    html_doc = CommonMarker.render_doc(
+      markdown_text || '', :SMART, [
+        :table,
+        :tagfilter,
+        :autolink,
+        :strikethrough,
+      ]
+    ).to_html(
+      [
+        :GITHUB_PRE_LANG,
+        :HARDBREAKS,
+        :SAFE,
+      ]
+    ).strip
+    if html_doc.empty?
+      ''
+    else
+      "<div class=\"markdown\">\n#{html_doc}\n</div>"
+    end
   end
 end
 

@@ -14,7 +14,7 @@ Rails.application.config.assets.paths << Rails.root.join('node_modules')
 # Rails.application.config.assets.precompile += %w( admin.js admin.css )
 
 Rails.application.config.assets.precompile += [
-  'flight-branding/main.2559e3f5.css',
+  'flight-branding/main.d5a6417a.css',
   'flight-branding/fonts.css',
   'development_ribbon.css'
 ]

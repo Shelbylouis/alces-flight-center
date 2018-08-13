@@ -1,0 +1,6 @@
+<%= yield %>
+<ul class="fa-ul">
+  <% items.map(&:decorate).each do |component| %>
+    <%= render 'cases/associations/cluster_part', item: component %>
+  <% end %>
+</ul>

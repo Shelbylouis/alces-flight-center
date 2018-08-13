@@ -1,16 +1,14 @@
 class CasesController < ApplicationController
   decorates_assigned :site
 
-  # Authorization also not required for `resolved` here, since this is
-  # effectively the same as `index` just with different Cases listed.
-  after_action :verify_authorized, except: NO_AUTH_ACTIONS + [:resolved]
+  after_action :verify_authorized, except: NO_AUTH_ACTIONS + [
+    :redirect_to_canonical_path,
+  ]
 
   def index
-    index_action(show_resolved: false)
-  end
-
-  def resolved
-    index_action(show_resolved: true)
+    @filters = filters_spec
+    @cases = filtered_cases(@filters[:active])
+    render :index
   end
 
   def show
@@ -29,7 +27,7 @@ class CasesController < ApplicationController
     component_id = params[:component_id]
     service_id = params[:service_id]
     @clusters = if cluster_id
-                  [Cluster.find(cluster_id)]
+                  [Cluster.find_from_id!(cluster_id)]
                 elsif component_id
                   @single_part = Component.find(component_id)
                   [@single_part.cluster]
@@ -43,8 +41,22 @@ class CasesController < ApplicationController
   end
 
   def create
-    @case = Case.new(case_params.merge(user: current_user))
+    my_params = case_params
+
+    service_id = my_params.delete(:service_id)
+    component_id = my_params.delete(:component_id)
+
+    @case = Case.new(my_params.merge(user: current_user))
     authorize @case
+
+    not_injected_service = service_id&.to_i&.positive?
+    if service_id.present? && not_injected_service
+      @case.services << Service.find(service_id)
+    end
+
+    if component_id.present?
+      @case.components << Component.find(component_id)
+    end
 
     respond_to do |format|
       if @case.save
@@ -53,7 +65,7 @@ class CasesController < ApplicationController
         format.json do
           # Return no errors and success status to case form app; it will
           # redirect to the path we give it.
-          render json: { redirect: cluster_case_path(@case.cluster, @case) }
+          render json: { redirect: case_path(@case) }
         end
       else
         errors = format_errors(@case)
@@ -68,6 +80,38 @@ class CasesController < ApplicationController
         flash[:error] = "Error creating support case: #{errors}." if errors
         redirect_back fallback_location: @case.cluster ? cluster_path(@case.cluster) : root_path
       end
+    end
+  end
+
+  UPDATABLE_FIELDS = [:subject, :issue_id].freeze
+
+  def update
+
+    fields_changing = params.require(:case).permit(UPDATABLE_FIELDS)
+
+    change_action 'Support case %s updated.' do |kase|
+      old_fields = {}.tap do |fields|
+        fields_changing.to_h.keys.each { |f| fields[f.to_sym] = kase.send(f) }
+      end
+
+      kase.update(  # update! doesn't work here FSR :(
+        fields_changing
+      )
+      kase.save!
+
+      old_fields.each do |field, old_value|
+        mailer_method = "change_#{field}".to_sym
+
+        next unless CaseMailer.respond_to?(mailer_method)
+
+        CaseMailer.send(
+          mailer_method,
+          kase,
+          old_value,
+          kase.send(field)
+        ).deliver_later
+      end
+
     end
   end
 
@@ -105,7 +149,15 @@ class CasesController < ApplicationController
 
   def set_time
     times = params.require(:time).permit(:hours, :minutes)
-    total_time = (times.require(:hours).to_i * 60) + times.require(:minutes).to_i
+
+    total_time = nil
+
+    if times[:hours] && !times[:hours].empty?
+      total_time = times[:hours].to_i * 60
+    end
+    if times[:minutes] && !times[:minutes].empty?
+      total_time = (total_time || 0) + times[:minutes].to_i
+    end
 
     change_action "Updated 'time worked' for support case %s." do |kase|
       kase.time_worked = total_time
@@ -127,6 +179,11 @@ class CasesController < ApplicationController
     end
   end
 
+  def redirect_to_canonical_path
+    kase = case_from_params
+    redirect_to case_path(kase)
+  end
+
   private
 
   def case_params
@@ -140,11 +197,6 @@ class CasesController < ApplicationController
       fields: [:type, :name, :value, :optional, :help],
       tool_fields: {}
     )
-  end
-
-  def index_action(show_resolved:)
-    @show_resolved = show_resolved
-    render :index
   end
 
   def change_action(success_flash, &block)
@@ -170,53 +222,53 @@ class CasesController < ApplicationController
       {
         tool: params[:tool],
       }
-
-    elsif params[:issue].present?
-      issue_name = params[:issue]
-      issue = Issue.find_by(name: issue_name)
-      tier = if issue.present? && !issue.tiers.empty?
-               issue.tiers.order(:level).first
-             end
-      category = issue.category
-      service = if issue.service_type.present?
-                  Service.find_by(service_type: issue.service_type, cluster: @clusters.first)
-                elsif params[:service].present?
-                  Service.find_by(name: params[:service], cluster: @clusters.first)
-                end
-
-      {}.tap do |h|
-        h[:category] = category.id if category.present?
-        h[:issue] = issue.id if issue.present?
-        h[:service] = service.id if service.present?
-        h[:tier] = tier.id if tier.present?
-      end
-
-    elsif params[:category].present?
-      category_name = params[:category]
-      category = Category.find_by(name: category_name)
-      if category.present?
-        issue = category.issues.first
-        service = if issue.present? && issue.service_type.present?
-                    Service.find_by(service_type: issue.service_type, cluster: @clusters.first)
-                  elsif params[:service].present?
-                    Service.find_by(name: params[:service], cluster: @clusters.first)
-                  end
-      end
-
-      {}.tap do |h|
-        h[:category] = category.id if category.present?
-        h[:service] = service.id if service.present?
-      end
-
-    elsif params[:service].present?
-      service_name = params[:service]
-      service = Service.find_by(name: service_name, cluster: @clusters.first)
-
-      {}.tap do |h|
-        h[:service] = service.id if service.present?
-      end
     else
       {}
     end
+  end
+
+  def filtered_cases(filters)
+    my_filters = filters.dup
+    association_filter = my_filters.delete(:associations).dup || []
+    scope_results = @scope.cases
+
+    results = scope_results
+    first_assoc = association_filter.shift
+    if first_assoc
+      results = scope_results.associated_with(*first_assoc.split('-'))
+    end
+
+    association_filter.each do |assoc|
+      results = results.or(scope_results.associated_with(*assoc.split('-')))
+    end
+
+    results.filter(
+      my_filters
+    )
+  end
+
+  def case_filters
+    params.permit(
+      :state,
+      :assigned_to,
+      :associations,
+      {
+        state: [],
+        assigned_to: [],
+        associations: [],
+      }
+    ).to_h.tap { |filters|
+      filters[:assigned_to]&.map! { |a| a == "" ? nil : User.find(a) }
+    }
+  end
+
+
+  def filters_spec
+    {
+      active: case_filters,
+      ranges: {
+        assigned_to: @scope.cases.map(&:assignee).uniq.compact.sort_by { |u| u.name }
+      },
+    }
   end
 end

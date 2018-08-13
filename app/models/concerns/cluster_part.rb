@@ -12,8 +12,10 @@ module ClusterPart
   SUPPORT_TYPES = SupportType::VALUES + ['inherit']
 
   included do
-    has_many :cases
-    has_many :maintenance_windows
+    has_many :case_associations, as: :associated_element
+    has_many :cases, through: :case_associations
+    has_many :maintenance_window_associations, as: :associated_element
+    has_many :maintenance_windows, through: :maintenance_window_associations
 
     validates :name, presence: true
     validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true

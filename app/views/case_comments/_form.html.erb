@@ -1,12 +1,20 @@
 <% if policy(@comment).create? %>
 
-  <%= form_for [@case, @comment] do |f| %>
-    <div class="form-group">
-      <%= f.text_area :text,
-            class: 'form-control',
-            rows: 3
-      %>
-    </div>
+  <%= form_for @comment.decorate.form_path do |f| %>
+      <%= render 'partials/markdown_editor_layout',
+          activate: 'write',
+          form_builder: f,
+          preview_path: @comment.decorate.preview_path,
+          write_path: @comment.decorate.write_path do %>
+
+        <%= render 'partials/markdown_content',
+                   form_builder: f,
+                   field: :text,
+                   options: {
+                       rows: 3
+                   }
+        %>
+      <% end %>
     <div class="form-group" style="overflow: hidden;">
       <%= f.submit "Add new comment",
         class: 'btn btn-primary float-right'

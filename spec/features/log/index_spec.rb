@@ -91,7 +91,7 @@ RSpec.feature Log, type: :feature do
         }
         if subject.is_a?(Component)
           case_attributes.merge!(
-              component: subject,
+              components: [subject],
               issue: create(:issue, requires_component: true)
           )
         end
@@ -148,8 +148,9 @@ RSpec.feature Log, type: :feature do
     before :each do
       ['component_case1', 'component_case2'].each do |case_subject|
         create :case_requiring_component,
-               component: subject,
-               subject: case_subject
+               components: [subject],
+               subject: case_subject,
+               cluster: cluster
       end
       visit component_logs_path subject, as: engineer
     end

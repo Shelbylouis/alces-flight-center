@@ -6,9 +6,17 @@ RSpec.describe 'Case page', type: :feature do
   let (:site) { create(:site, name: 'My Site') }
   let (:cluster) { create(:cluster, site: site) }
   let (:assignee) { nil }
+  let(:time_worked) { 42 }
 
   let :open_case do
-    create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee, tier_level: 2)
+    create(
+      :open_case,
+      cluster: cluster,
+      subject: 'Open case',
+      assignee: assignee,
+      tier_level: 2,
+      time_worked: time_worked
+    )
   end
 
   let :resolved_case do
@@ -23,7 +31,7 @@ RSpec.describe 'Case page', type: :feature do
     create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee, tier_level: 3)
   end
 
-  let (:mw) { create(:maintenance_window, case: open_case) }
+  let(:mw) { create(:maintenance_window, case: open_case, clusters: [cluster]) }
 
   let(:comment_form_class) { '#new_case_comment' }
   let(:comment_button_text) { 'Add new comment' }
@@ -38,7 +46,7 @@ RSpec.describe 'Case page', type: :feature do
         cluster: cluster
       )
 
-      visit case_path(kase, as: contact)
+      visit cluster_case_path(kase.cluster, kase, as: contact)
 
       header_text = all('th').map(&:text)
       expect(header_text).to include(field_name)
@@ -55,7 +63,7 @@ RSpec.describe 'Case page', type: :feature do
         change_motd_request: build(:change_motd_request, motd: motd),
       )
 
-      visit case_path(kase, as: contact)
+      visit cluster_case_path(kase.cluster, kase, as: contact)
 
       data_text = all('td').map(&:text)
       expect(data_text).to include(motd)
@@ -88,7 +96,7 @@ RSpec.describe 'Case page', type: :feature do
       cr = create(:change_request, case: open_case, state: 'draft')
       create(:change_request_state_transition, event: 'propose', user: admin, change_request: cr)
 
-      visit case_path(open_case, as: admin)
+      visit cluster_case_path(cluster, open_case, as: admin)
 
       event_cards = all('.event-card')
       expect(event_cards.size).to eq(8)
@@ -98,7 +106,7 @@ RSpec.describe 'Case page', type: :feature do
       expect(event_cards[5].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
-      expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked from 0m to 2h 3m.'
+      expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked from 42m to 2h 3m.'
 
       expect(event_cards[3].find('.card-body').text).to eq(
           'Assigned this case to A Scientist.'
@@ -118,7 +126,7 @@ RSpec.describe 'Case page', type: :feature do
       open_case.time_worked = 1138
       open_case.save
 
-      visit case_path(open_case, as: contact)
+      visit cluster_case_path(cluster, open_case, as: contact)
 
       open_case.reload
 
@@ -139,7 +147,7 @@ RSpec.describe 'Case page', type: :feature do
              cluster: cluster,
              details: '*Loggy* **McLogface**')
 
-      visit case_path(open_case, as: admin)
+      visit cluster_case_path(cluster, open_case, as: admin)
 
       event_cards = all('.event-card')
       expect(event_cards.size).to eq(2)
@@ -147,59 +155,59 @@ RSpec.describe 'Case page', type: :feature do
       log_html = event_cards[0].find('.card-body').native.inner_html
       case_comment_html = event_cards[1].find('.card-body').native.inner_html
 
-      expect(log_html.strip).to eq('<p><em>Loggy</em> <strong>McLogface</strong></p>')
-      expect(case_comment_html.strip).to eq('<p><strong>Commenty</strong> <em>McCommentface</em></p>')
+      expect(log_html.strip).to eq("<div class=\"markdown\">\n<p><em>Loggy</em> <strong>McLogface</strong></p>\n</div>")
+      expect(case_comment_html.strip).to eq("<div class=\"markdown\">\n<p><strong>Commenty</strong> <em>McCommentface</em></p>\n</div>")
     end
 
     it 'shows a card for creation of CreditCharge' do
-      visit case_path(closed_case, as: admin)
+      visit cluster_case_path(cluster, closed_case, as: admin)
       expect(find('.event-card').find('.card-body')).to have_text 'A charge of 1 credit was added for this case.'
     end
   end
 
   describe 'comments form' do
     it 'shows or hides add comment form for contacts' do
-      visit case_path(consultancy_case, as: contact)
+      visit cluster_case_path(cluster, consultancy_case, as: contact)
 
       form = find('#new_case_comment')
       form.find('#case_comment_text')
 
       expect(form.find('input').value).to eq 'Add new comment'
 
-      visit case_path(open_case, as: contact)
+      visit cluster_case_path(cluster, open_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
 
       # Observe that case state overrides case tier in terms of why we report commenting
       # being disabled.
-      visit case_path(resolved_case, as: contact)
+      visit cluster_case_path(cluster, resolved_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
       expect(find('.card.bg-light').text).to match 'Commenting is disabled as this case is resolved.'
 
-      visit case_path(closed_case, as: contact)
+      visit cluster_case_path(cluster, closed_case, as: contact)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
       expect(find('.card.bg-light').text).to match 'Commenting is disabled as this case is closed.'
     end
 
     it 'shows or hides add comment form for admins' do
-      visit case_path(consultancy_case, as: admin)
+      visit cluster_case_path(cluster, consultancy_case, as: admin)
 
       form = find('#new_case_comment')
       form.find('#case_comment_text')
 
       expect(form.find('input').value).to eq 'Add new comment'
 
-      visit case_path(open_case, as: admin)
+      visit cluster_case_path(cluster, open_case, as: admin)
 
       form = find('#new_case_comment')
       form.find('#case_comment_text')
 
       expect(form.find('input').value).to eq 'Add new comment'
 
-      visit case_path(resolved_case, as: admin)
+      visit cluster_case_path(cluster, resolved_case, as: admin)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
       expect(find('.card.bg-light').text).to match 'Commenting is disabled as this case is resolved.'
 
-      visit case_path(closed_case, as: admin)
+      visit cluster_case_path(cluster,closed_case, as: admin)
       expect { find('#new_case_comment') }.to raise_error(Capybara::ElementNotFound)
       expect(find('.card.bg-light').text).to match 'Commenting is disabled as this case is closed.'
     end
@@ -207,30 +215,30 @@ RSpec.describe 'Case page', type: :feature do
 
   describe 'state controls' do
     it 'hides state controls for contacts' do
-      visit case_path(open_case, as: contact)
+      visit cluster_case_path(cluster,open_case, as: contact)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-      visit case_path(resolved_case, as: contact)
+      visit cluster_case_path(cluster,resolved_case, as: contact)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
 
-      visit case_path(closed_case, as: contact)
+      visit cluster_case_path(cluster,closed_case, as: contact)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
     end
 
     it 'shows or hides state controls for admins' do
-      visit case_path(open_case, as: admin)
+      visit cluster_case_path(cluster, open_case, as: admin)
 
       expect(find('#case-state-controls').find('a').text).to eq 'Resolve this case'
 
-      visit case_path(resolved_case, as: admin)
+      visit cluster_case_path(cluster,resolved_case, as: admin)
       expect(find('#case-state-controls').find('input[type=submit]').value).to eq 'Set charge and close case'
 
-      visit case_path(closed_case, as: admin)
+      visit cluster_case_path(cluster,closed_case, as: admin)
       expect { find('#case-state-controls').find('a') }.to raise_error(Capybara::ElementNotFound)
     end
 
     it 'requires a charge to be specified to close a case' do
-      visit case_path(resolved_case, as: admin)
+      visit cluster_case_path(cluster,resolved_case, as: admin)
       fill_in 'credit_charge_amount', with: ''
       click_button 'Set charge and close case'
 
@@ -240,7 +248,7 @@ RSpec.describe 'Case page', type: :feature do
     end
 
     let(:cr_case) {
-      create(:resolved_case, tier_level: 4, change_request: cr)
+      create(:resolved_case, tier_level: 4, change_request: cr, cluster: cluster)
     }
 
     context 'with a declined change request' do
@@ -253,7 +261,7 @@ RSpec.describe 'Case page', type: :feature do
       }
 
       it 'does not use CR charge as a minimum' do
-        visit case_path(cr_case, as: admin)
+        visit cluster_case_path(cluster, cr_case, as: admin)
 
         expect(find('#credit_charge_amount').value).to eq "0"
       end
@@ -269,24 +277,95 @@ RSpec.describe 'Case page', type: :feature do
       }
 
       it 'uses CR charge as a minimum' do
-        visit case_path(cr_case, as: admin)
+        visit cluster_case_path(cluster,cr_case, as: admin)
 
         expect(find('#credit_charge_amount').value).to eq "42"
         expect(find('#case-state-controls')).to have_text 'Charge below should include 42 credits from attached CR'
+      end
+    end
+
+    (MaintenanceWindow.possible_states - MaintenanceWindow.finished_states)
+      .map(&:to_s).each do |state|
+      context "with a #{state} maintenance window" do
+        let!(:mw) {
+          create(
+            :maintenance_window,
+            case: open_case,
+            state: state,
+            clusters: [open_case.cluster]
+          )
+        }
+
+        before(:each) do
+          visit cluster_case_path(open_case.cluster, open_case, as: admin)
+        end
+
+        it 'does not allow case to be resolved' do
+          state_controls = find('#case-state-controls')
+          expect(state_controls).to have_text 'outstanding maintenance window.'
+          expect(state_controls).not_to have_text 'Resolve this case'
+        end
+
+        it 'shows maintenance details' do
+          details = find('#maintenance-details')
+          expect(details).to have_text("(#{state == 'started' ? 'in progress' : state})")
+        end
+      end
+    end
+
+    MaintenanceWindow.finished_states.map(&:to_s).each do |state|
+      context "with a #{state} maintenance window" do
+        let!(:mw) {
+          create(
+            :maintenance_window,
+            case: open_case,
+            state: state,
+            clusters: [open_case.cluster]
+          )
+        }
+
+        before(:each) do
+          visit cluster_case_path(open_case.cluster, open_case, as: admin)
+        end
+
+        it 'allows case to be resolved' do
+          visit cluster_case_path(open_case.cluster, open_case, as: admin)
+
+          state_controls = find('#case-state-controls')
+          expect(state_controls).not_to have_text 'outstanding maintenance window.'
+          expect(state_controls.find('a')).to have_text 'Resolve this case'
+        end
+
+        it 'does not show maintenance details' do
+          expect do
+            find('#maintenance-details')
+          end.to raise_error Capybara::ElementNotFound
+        end
+      end
+    end
+
+    context 'without time added' do
+      let(:time_worked) { nil }
+
+      it 'does not allow case to be resolved' do
+        visit cluster_case_path(open_case.cluster, open_case, as: admin)
+        state_controls = find('#case-state-controls')
+        expect(state_controls).to have_text 'until time worked is added.'
+        expect(state_controls).not_to have_text 'Resolve this case'
       end
     end
   end
 
   describe 'case assignment' do
     it 'hides assignment controls for contacts' do
-      visit case_path(open_case, as: contact)
+      visit cluster_case_path(cluster, open_case, as: contact)
       assignment_td = find('#case-assignment')
       expect { assignment_td.find('input') }.to raise_error(Capybara::ElementNotFound)
       expect(assignment_td.text).to eq('Nobody')
     end
 
     it 'displays assignment controls for admins' do
-      visit case_path(open_case, as: admin)
+      visit cluster_case_path(cluster, open_case, as: admin)
       assignment_select = find('#case-assignment').find('select')
 
       options = assignment_select.all('option').map(&:text)
@@ -296,7 +375,7 @@ RSpec.describe 'Case page', type: :feature do
     it 'changes assigned user when assignee is selected' do
       user = create(:admin, name: 'Jerry')
 
-      visit case_path(open_case, as: admin)
+      visit cluster_case_path(cluster,open_case, as: admin)
       find('#case-assignment').select(user.name)
       click_button('Change assignment')
       open_case.reload
@@ -307,7 +386,7 @@ RSpec.describe 'Case page', type: :feature do
     context 'when a case has an assignee' do
       let(:assignee) { contact }
       it 'preselects the current assignee' do
-        visit case_path(open_case, as: admin)
+        visit cluster_case_path(cluster,open_case, as: admin)
         assignment_select = find('#case-assignment').find('select')
 
         expect(assignment_select.value).to eq(contact.id.to_s)
@@ -321,7 +400,7 @@ RSpec.describe 'Case page', type: :feature do
       subject { create(:open_case, cluster: cluster, tier_level: 2) }
 
       it 'disables commenting for site contact' do
-        visit case_path(subject, as: contact)
+        visit cluster_case_path(cluster,subject, as: contact)
 
         expect do
           find(comment_form_class)
@@ -334,7 +413,7 @@ RSpec.describe 'Case page', type: :feature do
         subject.comments_enabled = true
         subject.save
 
-        visit case_path(subject, as: contact)
+        visit cluster_case_path(cluster,subject, as: contact)
 
         fill_in 'case_comment_text', with: 'This is a test comment'
         click_button 'Add new comment'
@@ -348,7 +427,7 @@ RSpec.describe 'Case page', type: :feature do
       end
 
       it 'allows admin to enable commenting when disabled' do
-        visit case_path(subject, as: admin)
+        visit cluster_case_path(cluster,subject, as: admin)
         click_link 'Enable'
 
         subject.reload
@@ -360,7 +439,7 @@ RSpec.describe 'Case page', type: :feature do
         subject.comments_enabled = true
         subject.save
 
-        visit case_path(subject, as: admin)
+        visit cluster_case_path(cluster,subject, as: admin)
         click_link 'Disable'
 
         subject.reload
@@ -370,7 +449,7 @@ RSpec.describe 'Case page', type: :feature do
     end
 
     it 'allows a comment to be added' do
-      visit case_path(open_case, as: admin)
+      visit cluster_case_path(cluster,open_case, as: admin)
 
       fill_in 'case_comment_text', with: 'This is a test comment'
       click_button 'Add new comment'
@@ -383,7 +462,7 @@ RSpec.describe 'Case page', type: :feature do
     end
 
     it 'does not allow empty comments' do
-      visit case_path(open_case, as: admin)
+      visit cluster_case_path(cluster,open_case, as: admin)
 
       fill_in 'case_comment_text', with: ''
       click_button 'Add new comment'
@@ -399,14 +478,14 @@ RSpec.describe 'Case page', type: :feature do
         subject { create("#{state}_case".to_sym, cluster: cluster, tier_level: 3) }
 
         it 'does not allow commenting by site contact' do
-          visit case_path(subject, as: contact)
+          visit cluster_case_path(cluster,subject, as: contact)
           expect do
             find('textarea')
           end.to raise_error(Capybara::ElementNotFound)
         end
 
         it 'does not allow commenting by admin' do
-          visit case_path(subject, as: admin)
+          visit cluster_case_path(cluster,subject, as: admin)
           expect do
             find('textarea')
           end.to raise_error(Capybara::ElementNotFound)
@@ -424,7 +503,7 @@ RSpec.describe 'Case page', type: :feature do
 
     RSpec.shared_examples 'time display' do
       it 'correctly displays existing time in hours and minutes' do
-        visit case_path(subject, as: admin)
+        visit cluster_case_path(cluster,subject, as: admin)
 
         form = find(time_form_id)
         expect(form.find_field('time[hours]', disabled: :all).value).to eq "2"
@@ -432,7 +511,7 @@ RSpec.describe 'Case page', type: :feature do
       end
 
       it 'doesn\'t show time worked to contacts' do
-        visit case_path(subject, as: contact)
+        visit cluster_case_path(cluster,subject, as: contact)
         expect { find(time_form_id) }.to raise_error(Capybara::ElementNotFound)
       end
     end
@@ -445,7 +524,7 @@ RSpec.describe 'Case page', type: :feature do
       include_examples 'time display'
 
       it 'allows admins to set time worked' do
-        visit case_path(subject, as: admin)
+        visit cluster_case_path(cluster,subject, as: admin)
 
         fill_in 'time[hours]', with: '3'
         fill_in 'time[minutes]', with: '42'
@@ -456,6 +535,33 @@ RSpec.describe 'Case page', type: :feature do
         expect(subject.time_worked).to eq (3 * 60) + 42
       end
 
+      it 'allows null values in time worked' do
+        visit cluster_case_path(cluster,subject, as: admin)
+
+        fill_in 'time[hours]', with: ''
+        fill_in 'time[minutes]', with: '42'
+        click_button time_form_submit_button
+
+        subject.reload
+
+        expect(subject.time_worked).to eq 42
+
+        fill_in 'time[hours]', with: ''
+        fill_in 'time[minutes]', with: ''
+        click_button time_form_submit_button
+
+        subject.reload
+
+        expect(subject.time_worked).to eq nil
+
+        fill_in 'time[hours]', with: '1'
+        fill_in 'time[minutes]', with: ''
+        click_button time_form_submit_button
+
+        subject.reload
+
+        expect(subject.time_worked).to eq 60
+      end
 
     end
 
@@ -467,7 +573,7 @@ RSpec.describe 'Case page', type: :feature do
       include_examples 'time display'
 
       it 'does not allow time worked to be changed' do
-        visit case_path(subject, as: admin)
+        visit cluster_case_path(cluster,subject, as: admin)
 
         expect(find_field('time[hours]', disabled: true)).to be_disabled
         expect(find_field('time[minutes]', disabled: true)).to be_disabled
@@ -486,7 +592,7 @@ RSpec.describe 'Case page', type: :feature do
       end
 
       it 'can be escalated using button' do
-        visit case_path(subject, as: admin)
+        visit cluster_case_path(cluster,subject, as: admin)
 
         expect do
           find_button escalate_button_text
@@ -502,7 +608,7 @@ RSpec.describe 'Case page', type: :feature do
       end
 
       it_behaves_like 'button is disabled for viewers' do
-        let(:path) { case_path(subject, as: user) }
+        let(:path) { cluster_case_path(subject.cluster, subject, as: user) }
         let(:button_text) { escalate_button_text }
         let(:disabled_button_title) do
           'As a viewer you cannot escalate a case'
@@ -512,7 +618,7 @@ RSpec.describe 'Case page', type: :feature do
 
     RSpec.shared_examples 'for inapplicable cases' do
       it 'does not show escalate button' do
-        visit case_path(subject, as: admin)
+        visit cluster_case_path(cluster, subject, as: admin)
 
         expect do
           find_button escalate_button_text
@@ -522,7 +628,7 @@ RSpec.describe 'Case page', type: :feature do
 
     context 'for open tier 3 case' do
       subject do
-        create(:open_case, tier_level: 3)
+        create(:open_case, tier_level: 3, cluster: cluster)
       end
 
       it_behaves_like 'for inapplicable cases'
@@ -530,7 +636,7 @@ RSpec.describe 'Case page', type: :feature do
 
     context 'for resolved tier 2 case' do
       subject do
-        create(:resolved_case, tier_level: 2)
+        create(:resolved_case, tier_level: 2, cluster: cluster)
       end
 
       it_behaves_like 'for inapplicable cases'
@@ -538,7 +644,7 @@ RSpec.describe 'Case page', type: :feature do
 
     context 'for closed tier 2 case' do
       subject do
-        create(:closed_case, tier_level: 2)
+        create(:closed_case, tier_level: 2, cluster: cluster)
       end
 
       it_behaves_like 'for inapplicable cases'
@@ -549,7 +655,7 @@ RSpec.describe 'Case page', type: :feature do
 
     RSpec.shared_examples 'does not show maintenance button' do
       it 'doesn\'t show maintenance button' do
-        visit case_path(subject, as: user)
+        visit cluster_case_path(cluster, subject, as: user)
         expect do
           find('a', text: 'Request maintenance')
         end.to raise_error(Capybara::ElementNotFound)
@@ -563,10 +669,10 @@ RSpec.describe 'Case page', type: :feature do
         let(:user) { admin }
 
         it 'shows button' do
-          visit case_path(subject, as: user)
+          visit cluster_case_path(cluster,subject, as: user)
 
           request_link = find('a', text: 'Request maintenance')
-          expect(request_link[:href]).to eq new_cluster_maintenance_window_path(cluster, case_id: open_case.id)
+          expect(request_link[:href]).to eq new_cluster_case_maintenance_path(cluster, open_case)
         end
 
         context 'as a contact' do
@@ -599,7 +705,7 @@ RSpec.describe 'Case page', type: :feature do
 
     let(:request) { create(:change_motd_request, state: :unapplied) }
 
-    let(:path) { case_path(subject, as: user) }
+    let(:path) { cluster_case_path(subject.cluster, subject, as: user) }
     let(:apply_button_text) { 'Done' }
     let(:reapply_button_text) { 'Already applied' }
 
@@ -665,7 +771,7 @@ RSpec.describe 'Case page', type: :feature do
 
     RSpec.shared_examples 'redirect examples' do
       it "redirects to the cluster dashboard case page from /cases/:id" do
-        visit(case_path(kase, as: user))
+        visit(cluster_case_path(cluster, kase, as: user))
         expect(current_path).to eq(cluster_case_path(kase.cluster, kase))
       end
 

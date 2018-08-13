@@ -27,7 +27,7 @@
             <hr />
             <%=
               link_to 'Return to case',
-                      cluster_case_path(@case.cluster, @case),
+                      case_path(@case),
                       class: 'btn btn-primary form-control',
                       role: 'button'
             %>
@@ -37,7 +37,11 @@
     </div>
     <div class="col-12">
       <h3>Details</h3>
-      <%= cr.rendered_description.html_safe %>
+      <div class="card change-request-body">
+        <div class="card-body">
+          <%= cr.rendered_description.html_safe %>
+        </div>
+      </div>
       <hr />
       <a href="#cr-top">Back to top</a>
     </div>

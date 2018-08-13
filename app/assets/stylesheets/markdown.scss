@@ -1,0 +1,55 @@
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+@import "bootstrap/tables";
+
+
+.markdown {
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  h4 {
+    font-size: 0.75rem;
+  }
+
+  table {
+    @extend .table;
+    @extend .table-bordered;
+    @extend .table-sm;
+    width: unset;
+  }
+
+  thead {
+    @extend .thead-dark;
+  }
+
+  pre {
+    display: block;
+    color: #212529;
+    background: #f0f0f0;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
+  code {
+    color: #212529;
+    word-break: break-word;
+    background-color: #f0f0f0;
+    padding: 3px;
+    border-radius: 5px;
+  }
+
+  pre code {
+    word-break: break-all;
+    white-space: pre-wrap;
+  }
+}

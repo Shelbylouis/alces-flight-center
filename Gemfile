@@ -22,7 +22,7 @@ gem 'uglifier', '>= 1.3.0'
 gem 'aws-sdk-s3'
 gem 'clearance'
 gem 'http'
-gem 'kramdown'
+gem 'commonmarker'
 gem 'rails_admin', '~> 1.3'
 gem 'rails_email_preview', '~> 2.0.4'
 gem 'validates_email_format_of'
@@ -41,9 +41,13 @@ gem 'state_machines-activerecord',
   ref: 'fed06d9fa64af1cba49d241f4a3ae79626946fe3'
 gem 'state_machines-audit_trail'
 gem 'business_time'
+gem 'holidays'
 gem "audited", "~> 4.7"
 gem 'jwt'
 gem 'pundit'
+# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making
+# cross-origin AJAX possible
+gem 'rack-cors'
 
 gem 'bootstrap', '~> 4.0.0'
 gem 'jquery-rails' # Required for Bootstrap.
@@ -69,12 +73,14 @@ group :development, :test do
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
+  gem 'show_me_the_cookies'  # Cookies helpers for Capybara
 
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'rspec-rails'
   gem 'vcr'
   gem 'webmock'
+  gem 'letter_opener_web', '~> 1.0'
 end
 
 group :test do
@@ -117,3 +123,5 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'slack-notifier'
+
+gem 'bootstrap-datepicker-rails'

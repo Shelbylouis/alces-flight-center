@@ -1,4 +1,4 @@
-class ComponentGroupDecorator < ApplicationDecorator
+class ComponentGroupDecorator < ClusterPartDecorator
   include AssetRecordDecorator
 
   delegate_all
@@ -17,7 +17,16 @@ class ComponentGroupDecorator < ApplicationDecorator
   def tabs
     [
       { id: :components, path: h.component_group_components_path(self) },
-      tabs_builder.asset_record
+      tabs_builder.asset_record,
+      tabs_builder.read_only_cases
     ]
+  end
+
+  def fa_icon
+    'fa-cubes'
+  end
+
+  def type_name
+    "Group of #{component_type.name.pluralize.downcase}"
   end
 end
