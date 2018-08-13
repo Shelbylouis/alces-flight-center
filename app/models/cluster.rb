@@ -109,7 +109,7 @@ class Cluster < ApplicationRecord
     cluster_checks.length
   end
 
-  def resolved_cases
+  def resolved_cases_count
     self.cases.where(state: 'resolved').count
   end
 

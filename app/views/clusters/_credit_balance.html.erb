@@ -6,7 +6,7 @@
       <%= pluralize(cluster.credit_balance, 'credit') %>
     </p>
     <p style="text-align: center;">
-    Cases pending closure: <%= link_to cluster.resolved_cases,
+    Cases pending closure: <%= link_to cluster.resolved_cases_count,
                                        cluster_cases_path(cluster, state: 'resolved')
                                      %>
     </p>
