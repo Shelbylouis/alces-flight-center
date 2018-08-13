@@ -384,6 +384,9 @@ RSpec.describe 'Case page', type: :feature do
       visit cluster_case_path(cluster, open_case, as: admin)
       find('#case-assignment').select(user.name)
       click_button('Change assignment')
+
+      expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
+
       open_case.reload
 
       expect(open_case.assignee).to eq(user)

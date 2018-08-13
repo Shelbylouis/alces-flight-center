@@ -83,7 +83,7 @@ class CasesController < ApplicationController
     end
   end
 
-  UPDATABLE_FIELDS = [:subject, :issue_id].freeze
+  UPDATABLE_FIELDS = [:assignee_id, :subject, :issue_id].freeze
 
   def update
 
@@ -127,25 +127,6 @@ class CasesController < ApplicationController
   rescue ActionController::ParameterMissing
     flash[:error] = 'You must specify a credit charge to close this case.'
     redirect_to @scope.dashboard_case_path(case_from_params)
-  end
-
-  def assign
-    new_assignee_id = params[:case][:assignee_id]
-    new_assignee = new_assignee_id.empty? ? nil : User.find(new_assignee_id)
-    success_flash = new_assignee ?
-                        "Support case %s assigned to #{new_assignee.name}."
-                        : 'Support case %s unassigned.'
-
-    change_action success_flash do |kase|
-      kase.assignee = new_assignee
-      kase.save!
-      unless new_assignee.nil?
-        CaseMailer.change_assignee(
-          kase, new_assignee
-        ).deliver_later
-      end
-    end
-
   end
 
   def resolve
