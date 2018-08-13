@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_09_095114) do
+ActiveRecord::Schema.define(version: 2018_08_13_112637) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -423,6 +423,8 @@ ActiveRecord::Schema.define(version: 2018_08_09_095114) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "canonical_name", null: false
+    t.bigint "default_assignee_id"
+    t.index ["default_assignee_id"], name: "index_sites_on_default_assignee_id"
   end
 
   create_table "tiers", force: :cascade do |t|
@@ -498,5 +500,6 @@ ActiveRecord::Schema.define(version: 2018_08_09_095114) do
   add_foreign_key "notes", "clusters"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
+  add_foreign_key "sites", "users", column: "default_assignee_id"
   add_foreign_key "users", "sites"
 end
