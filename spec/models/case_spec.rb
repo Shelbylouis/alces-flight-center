@@ -144,63 +144,6 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe 'Email creation on assignee change' do
-
-    let(:initial_assignee) { nil }
-    let(:site) { create(:site) }
-    let(:cluster) { create(:cluster, site: site) }
-
-    subject do
-      create(:case, assignee: initial_assignee, cluster: cluster)
-    end
-
-    let :stub_mail do
-      obj = double
-      expect(obj).to receive(:deliver_later)
-      obj
-    end
-
-    context 'with no previous assignee' do
-      it 'sends an email' do
-        assignee = create(:admin)
-        subject.assignee = assignee
-
-        expect(CaseMailer).to receive(:change_assignee).with(
-          subject,
-          assignee
-        ).and_return(stub_mail)
-
-        subject.save!
-      end
-    end
-
-    context 'with a previous assignee' do
-      let(:initial_assignee) { create(:user, site: site) }
-      it 'sends an email' do
-        assignee = create(:admin)
-        subject.assignee = assignee
-
-        expect(CaseMailer).to receive(:change_assignee).with(
-          subject,
-          assignee
-        ).and_return(stub_mail)
-
-        subject.save!
-      end
-    end
-
-    context 'when being de-assigned' do
-      let(:initial_assignee) { create(:user, site: site) }
-      it 'does not send an email' do
-        subject.assignee = nil
-
-        expect(CaseMailer).not_to receive(:change_assignee)
-
-        subject.save!
-      end
-    end
-  end
-
   describe '#active' do
     it 'returns all open Cases' do
       create(:open_case, subject: 'one')

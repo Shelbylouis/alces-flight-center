@@ -357,6 +357,9 @@ RSpec.describe 'Case page', type: :feature do
   end
 
   describe 'case assignment' do
+
+    let(:emails) { ActionMailer::Base.deliveries }
+
     it 'hides assignment controls for contacts' do
       visit cluster_case_path(cluster, open_case, as: contact)
       assignment_td = find('#case-assignment')
@@ -373,14 +376,20 @@ RSpec.describe 'Case page', type: :feature do
     end
 
     it 'changes assigned user when assignee is selected' do
+      open_case.reload  # generates case-creation email which we can then ignore
+      emails.clear
+
       user = create(:admin, name: 'Jerry')
 
-      visit cluster_case_path(cluster,open_case, as: admin)
+      visit cluster_case_path(cluster, open_case, as: admin)
       find('#case-assignment').select(user.name)
       click_button('Change assignment')
       open_case.reload
 
       expect(open_case.assignee).to eq(user)
+      expect(emails.count).to eq 1
+      expect(emails[0].parts.first.body.raw_source).to have_text 'This case has now been assigned to Jerry'
+
     end
 
     context 'when a case has an assignee' do

@@ -78,7 +78,4 @@ RSpec.describe 'Case editing', type: :feature do
         have_text 'This case\'s associated issue has been changed from \'New user/group\' to \'Some other issue\''
     end
   end
-
-
-
 end

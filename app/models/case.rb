@@ -131,7 +131,6 @@ class Case < ApplicationRecord
 
   before_create :set_display_id
   after_create :send_new_case_email, :maybe_set_default_assignee
-  after_update :maybe_send_new_assignee_email
 
   scope :state, ->(state) { where(state: state) }
   scope :active, -> { state('open') }
@@ -434,12 +433,6 @@ class Case < ApplicationRecord
         la.save!
       end
     end
-  end
-
-  def maybe_send_new_assignee_email
-    return unless @assignee_changed
-    return if assignee.nil?
-    CaseMailer.change_assignee(self, assignee).deliver_later
   end
 
   def validates_user_assignment

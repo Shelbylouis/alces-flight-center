@@ -138,7 +138,14 @@ class CasesController < ApplicationController
 
     change_action success_flash do |kase|
       kase.assignee = new_assignee
+      kase.save!
+      unless new_assignee.nil?
+        CaseMailer.change_assignee(
+          kase, new_assignee
+        ).deliver_later
+      end
     end
+
   end
 
   def resolve
