@@ -403,6 +403,24 @@ RSpec.describe 'Case page', type: :feature do
 
         expect(assignment_select.value).to eq(contact.id.to_s)
       end
+
+      it 'can remove assignee' do
+        open_case.reload  # generates case-creation email which we can then ignore
+        emails.clear
+
+        visit cluster_case_path(cluster, open_case, as: admin)
+        find('#case-assignment').select('Nobody')
+        click_button('Change assignment')
+
+        expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
+
+        open_case.reload
+
+        expect(open_case.assignee).to be nil
+        expect(emails.count).to eq 1
+        expect(emails[0].parts.first.body.raw_source).to have_text 'This case is no longer assigned.'
+
+      end
     end
   end
 
