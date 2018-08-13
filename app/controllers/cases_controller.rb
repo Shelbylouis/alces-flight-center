@@ -149,7 +149,15 @@ class CasesController < ApplicationController
 
   def set_time
     times = params.require(:time).permit(:hours, :minutes)
-    total_time = (times.require(:hours).to_i * 60) + times.require(:minutes).to_i
+
+    total_time = nil
+
+    if times[:hours] && !times[:hours].empty?
+      total_time = times[:hours].to_i * 60
+    end
+    if times[:minutes] && !times[:minutes].empty?
+      total_time = (total_time || 0) + times[:minutes].to_i
+    end
 
     change_action "Updated 'time worked' for support case %s." do |kase|
       kase.time_worked = total_time
