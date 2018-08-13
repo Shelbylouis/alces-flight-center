@@ -14,11 +14,11 @@ class CaseMailer < ApplicationMailer
     SlackNotifier.case_notification(@case)
   end
 
-  def change_assignee(my_case, new_assignee)
+  def change_assignee_id(my_case, old_id, new_id)
     @case = my_case
-    @assignee = new_assignee
+    @assignee = new_id.nil? ? nil : User.find(new_id)
     mail(
-      cc: new_assignee&.email, # Send to new assignee only
+      cc: @assignee&.email, # Send to new assignee only
       subject: @case.email_reply_subject
     )
     SlackNotifier.assignee_notification(@case, @assignee)

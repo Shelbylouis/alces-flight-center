@@ -1,5 +1,5 @@
 <% if policy(@case).assign? %>
-  <%= form_for @case, url: assign_case_path, method: :post do |f| %>
+  <%= form_for @case do |f| %>
     <div class="form-group">
       <div class="input-group">
       <%= f.collection_select(

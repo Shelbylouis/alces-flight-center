@@ -33,7 +33,11 @@ class SlackNotifier
     end
 
     def assignee_notification(kase, assignee)
-      notification_text = "#{assignee.name} has been assigned to #{kase.display_id}"
+      notification_text = if assignee
+                            "#{assignee.name} has been assigned to #{kase.display_id}"
+                          else
+                            "#{kase.display_id} is no longer assigned"
+                          end
       assignee_note = {
         fallback: notification_text,
         color: "#6e5494",
@@ -42,7 +46,7 @@ class SlackNotifier
         fields: [
           {
             title: "Assigned to",
-            value: assignee.name,
+            value: assignee&.name || 'Nobody',
             short: true
           }
         ]

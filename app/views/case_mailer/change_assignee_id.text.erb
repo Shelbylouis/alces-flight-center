@@ -1,0 +1,7 @@
+<%= @case.display_id %> <%= @case.ticket_subject %>
+
+<% if @assignee %>
+  This case has now been assigned to <%= @assignee.name %>.
+<% else %>
+  This case is no longer assigned.
+<% end %>

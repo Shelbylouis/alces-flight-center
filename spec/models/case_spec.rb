@@ -144,63 +144,6 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe 'Email creation on assignee change' do
-
-    let(:initial_assignee) { nil }
-    let(:site) { create(:site) }
-    let(:cluster) { create(:cluster, site: site) }
-
-    subject do
-      create(:case, assignee: initial_assignee, cluster: cluster)
-    end
-
-    let :stub_mail do
-      obj = double
-      expect(obj).to receive(:deliver_later)
-      obj
-    end
-
-    context 'with no previous assignee' do
-      it 'sends an email' do
-        assignee = create(:admin)
-        subject.assignee = assignee
-
-        expect(CaseMailer).to receive(:change_assignee).with(
-          subject,
-          assignee
-        ).and_return(stub_mail)
-
-        subject.save!
-      end
-    end
-
-    context 'with a previous assignee' do
-      let(:initial_assignee) { create(:user, site: site) }
-      it 'sends an email' do
-        assignee = create(:admin)
-        subject.assignee = assignee
-
-        expect(CaseMailer).to receive(:change_assignee).with(
-          subject,
-          assignee
-        ).and_return(stub_mail)
-
-        subject.save!
-      end
-    end
-
-    context 'when being de-assigned' do
-      let(:initial_assignee) { create(:user, site: site) }
-      it 'does not send an email' do
-        subject.assignee = nil
-
-        expect(CaseMailer).not_to receive(:change_assignee)
-
-        subject.save!
-      end
-    end
-  end
-
   describe '#active' do
     it 'returns all open Cases' do
       create(:open_case, subject: 'one')
@@ -602,6 +545,26 @@ RSpec.describe Case, type: :model do
 
       expect(kase.time_to_first_response).to eq 2.hours + 15.minutes
 
+    end
+  end
+
+  describe '#maybe_set_default_assignee' do
+    let(:site) { create(:site, default_assignee: default_assignee) }
+    let(:cluster) { create(:cluster, site: site) }
+    let(:new_case) { create(:open_case, cluster: cluster) }
+
+    context 'where site has no default assignee' do
+      let(:default_assignee) { nil }
+      it 'remains unassigned' do
+        expect(new_case.assignee).to be nil
+      end
+    end
+
+    context 'where site has a default assignee' do
+      let(:default_assignee) { create(:admin) }
+      it 'assigns case after creation' do
+        expect(new_case.assignee).to eq(default_assignee)
+      end
     end
   end
 end

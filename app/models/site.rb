@@ -10,6 +10,10 @@ class Site < ApplicationRecord
   has_many :services, through: :clusters
   has_one :flight_directory_config
 
+  belongs_to :default_assignee,
+             class_name: 'User',
+             required: false
+
   validates :name, presence: true
   validates :canonical_name, presence: true
 

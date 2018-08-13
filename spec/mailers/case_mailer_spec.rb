@@ -139,10 +139,10 @@ RSpec.describe 'Case mailer', :type => :mailer do
   end
 
   describe 'Case assignment email' do
-    subject { CaseMailer.change_assignee(kase, another_user) }
+    subject { CaseMailer.change_assignee_id(kase, nil, another_user.id) }
 
-    let (:notification_method) { :assignee_notification }
-    let (:args) { [kase, another_user] }
+    let(:notification_method) { :assignee_notification }
+    let(:args) { [kase, another_user] }
 
     it 'sends an email on initial case assignment' do
       expect(subject.to).to eq nil
@@ -154,7 +154,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
     it 'sends an email on case assignment change' do
       kase.assignee = another_user
-      mail = CaseMailer.change_assignee(kase, requestor)
+      mail = CaseMailer.change_assignee_id(kase, another_user.id, requestor.id)
 
       expect(mail.to).to eq nil
       expect(mail.cc).to match_array %w(someuser@somecluster.com)

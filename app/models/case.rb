@@ -130,8 +130,7 @@ class Case < ApplicationRecord
   before_validation :assign_default_subject_if_unset
 
   before_create :set_display_id
-  after_create :send_new_case_email
-  after_update :maybe_send_new_assignee_email
+  after_create :send_new_case_email, :maybe_set_default_assignee
 
   scope :state, ->(state) { where(state: state) }
   scope :active, -> { state('open') }
@@ -286,11 +285,6 @@ class Case < ApplicationRecord
       .order(:name)
   end
 
-  def assignee=(new_assignee)
-    @assignee_changed = true
-    super(new_assignee)
-  end
-
   def time_worked=(new_time)
     @time_worked_changed = (new_time != time_worked)
     super(new_time)
@@ -307,7 +301,6 @@ class Case < ApplicationRecord
     # So that the validation on these setters works properly, we need to reset the "changed" state
     # of them all before continuing.
     super
-    @assignee_changed = false
     @time_worked_changed = false
     @tier_level_changed = false
   end
@@ -419,10 +412,21 @@ class Case < ApplicationRecord
     CaseMailer.new_case(self).deliver_later
   end
 
-  def maybe_send_new_assignee_email
-    return unless @assignee_changed
-    return if assignee.nil?
-    CaseMailer.change_assignee(self, assignee).deliver_later
+  def maybe_set_default_assignee
+    if assignee.nil? && !site.default_assignee.nil?
+      transaction do # to make sure audits.last is our assignee change
+        self.assignee = site.default_assignee
+        save!
+        la = audits.last
+        # This will show as 'Flight Center' rather than the customer's name
+        # - the latter would be misleading here since customers can't assign
+        # cases to people!
+        # NB Audited.audit_class.as_user(nil) does not work since it then gets
+        # the user from current_user anyway :(
+        la.user = nil
+        la.save!
+      end
+    end
   end
 
   def validates_user_assignment
