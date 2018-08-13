@@ -604,4 +604,24 @@ RSpec.describe Case, type: :model do
 
     end
   end
+
+  describe '#maybe_set_default_assignee' do
+    let(:site) { create(:site, default_assignee: default_assignee) }
+    let(:cluster) { create(:cluster, site: site) }
+    let(:new_case) { create(:open_case, cluster: cluster) }
+
+    context 'where site has no default assignee' do
+      let(:default_assignee) { nil }
+      it 'remains unassigned' do
+        expect(new_case.assignee).to be nil
+      end
+    end
+
+    context 'where site has a default assignee' do
+      let(:default_assignee) { create(:admin) }
+      it 'assigns case after creation' do
+        expect(new_case.assignee).to eq(default_assignee)
+      end
+    end
+  end
 end
