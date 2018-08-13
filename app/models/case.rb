@@ -285,11 +285,6 @@ class Case < ApplicationRecord
       .order(:name)
   end
 
-  def assignee=(new_assignee)
-    @assignee_changed = true
-    super(new_assignee)
-  end
-
   def time_worked=(new_time)
     @time_worked_changed = (new_time != time_worked)
     super(new_time)
@@ -306,7 +301,6 @@ class Case < ApplicationRecord
     # So that the validation on these setters works properly, we need to reset the "changed" state
     # of them all before continuing.
     super
-    @assignee_changed = false
     @time_worked_changed = false
     @tier_level_changed = false
   end
