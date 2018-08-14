@@ -149,6 +149,11 @@ class Case < ApplicationRecord
       )
   }
 
+  # _ parameter to work with URL filtering system
+  # Defaults to nil so we can just say `.prioritised`
+  # Uses reorder rather than order to overwrite the sorting of default_scope
+  scope :prioritised, ->(_=nil) { reorder('last_update ASC NULLS FIRST') }
+
   def to_param
     display_id.parameterize.upcase
   end

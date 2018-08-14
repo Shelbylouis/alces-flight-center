@@ -240,6 +240,7 @@ class CasesController < ApplicationController
       :state,
       :assigned_to,
       :associations,
+      :prioritised,
       {
         state: [],
         assigned_to: [],
