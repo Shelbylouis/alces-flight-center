@@ -354,9 +354,19 @@ class Case < ApplicationRecord
   end
 
   def time_since_last_update
-    ActiveSupport::Duration.build(
-      last_update.business_time_until(Time.current)
-    )
+    # In which we redefine a "day" to be 8 hours long.
+    raw = last_update.business_time_until(Time.current)
+
+    days = (raw / 8.hours).floor
+    raw -= (8 * days.hours).seconds
+
+    hours = (raw / 1.hour).floor
+    raw -= hours.hours.seconds
+
+    minutes = (raw / 1.minutes).floor
+    raw -= minutes.minutes.seconds
+
+    days.days + hours.hours + minutes.minutes + raw.seconds
   end
 
   private
