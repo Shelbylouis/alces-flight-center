@@ -98,9 +98,7 @@ class CaseMailer < ApplicationMailer
     # an email update to the customer.
     has_non_admin = !all_recipients.reject { |a| a.include? '@alces-' }.empty?
     if has_non_admin && @case
-      puts 'Case email being sent to non-admins, updating last_update timestamp'
-      @case.last_update = DateTime.now
-      @case.save!
+      @case.update_columns(last_update: DateTime.now)
     end
     super(options)
   end
