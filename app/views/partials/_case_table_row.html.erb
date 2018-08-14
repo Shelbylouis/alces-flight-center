@@ -21,4 +21,11 @@
       <%= render 'partials/association_summary', associations: kase.associations %>
   </td>
   <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.credit_charge&.amount %></td>
+  <% if current_user.admin? %>
+    <%=
+      timestamp_td(description: 'Last update', timestamp: kase.last_update) do
+        render 'partials/table_cell_link', url: url, cell_content: "Soon™"
+      end
+    %>
+  <% end %>
 </tr>
