@@ -90,6 +90,7 @@ class CaseMailer < ApplicationMailer
   private
 
   def mail(**options)
+    super(options)
     all_recipients = [options[:cc], options[:to]].flatten.compact
     # This is a bit of a hack - since we'd need to check each User model for
     # admin-ness to be fully correct - but that would be quite costly!
@@ -100,6 +101,5 @@ class CaseMailer < ApplicationMailer
     if has_non_admin && @case
       @case.update_columns(last_update: DateTime.now)
     end
-    super(options)
   end
 end
