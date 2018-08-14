@@ -48,6 +48,18 @@ class CaseDecorator < ApplicationDecorator
         .reject(&:special?)
   end
 
+  def formatted_time_since_last_update
+    tslu = time_since_last_update.parts
+    [].tap do |result|
+      # Exclude seconds (we don't need to be that precise)
+      ActiveSupport::Duration::PARTS[0..-2].each do |part|
+        if tslu.include?(part)
+          result << "#{tslu[part]}#{part.to_s[0]}"
+        end
+      end
+    end.join(' ')
+  end
+
   private
 
   def commenting

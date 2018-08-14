@@ -24,7 +24,7 @@
   <% if current_user.admin? %>
     <%=
       timestamp_td(description: 'Last update', timestamp: kase.last_update) do
-        render 'partials/table_cell_link', url: url, cell_content: "Soon™"
+        render 'partials/table_cell_link', url: url, cell_content: kase.formatted_time_since_last_update
       end
     %>
   <% end %>

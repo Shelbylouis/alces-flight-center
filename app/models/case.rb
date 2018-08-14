@@ -348,6 +348,12 @@ class Case < ApplicationRecord
     )
   end
 
+  def time_since_last_update
+    ActiveSupport::Duration.build(
+      last_update.business_time_until(Time.current)
+    )
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
