@@ -22,10 +22,16 @@
 //
 
 function enableTooltips() {
+  // Get rid of any left over from Turbolinks' cached version of the page.
+  // NB we can't do this on before-visit because timing issues means we'll
+  // still leave an orphan behind.
+  $('.tooltip').remove();
+  // and regenerate
   $('[title]').tooltip({delay: {show: 500, hide: 100}, placement: 'left'});
 }
 
 function enablePopovers() {
+  $('.popover').remove();
   $('[data-toggle="popover"]').popover();
 }
 
