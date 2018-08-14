@@ -86,4 +86,22 @@ class CaseMailer < ApplicationMailer
     )
     SlackNotifier.change_request_notification(@case, @text, user)
   end
+
+  private
+
+  def mail(**options)
+    all_recipients = [options[:cc], options[:to]].flatten.compact
+    # This is a bit of a hack - since we'd need to check each User model for
+    # admin-ness to be fully correct - but that would be quite costly!
+    # In practice checking for '@alces-' is enough since all admins are @alces
+    # and even if we had non-alces admins, emailing them probably counts as
+    # an email update to the customer.
+    has_non_admin = !all_recipients.reject { |a| a.include? '@alces-' }.empty?
+    if has_non_admin && @case
+      puts 'Case email being sent to non-admins, updating last_update timestamp'
+      @case.last_update = DateTime.now
+      @case.save!
+    end
+    super(options)
+  end
 end
