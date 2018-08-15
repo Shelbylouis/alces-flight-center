@@ -102,7 +102,7 @@ class CaseMailer < ApplicationMailer
     # an email update to the customer.
     has_non_admin = !all_recipients.reject { |a| a.include? '@alces-' }.empty?
     if has_non_admin && @case
-      @case.update_columns(last_update: DateTime.now)
+      @case.update_columns(last_update: Time.now)
     end
   end
 end
