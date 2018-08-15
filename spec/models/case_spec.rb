@@ -548,6 +548,27 @@ RSpec.describe Case, type: :model do
     end
   end
 
+  describe '#time_since_last_update' do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:cluster) { create(:cluster) }
+    let(:admin) { create(:admin) }
+    let!(:kase) { create(:open_case, cluster: cluster) }
+
+    it 'handles business time in the expected way' do
+      # Where "expected" means "treats a day as eight hours long".
+
+      kase.last_update = Time.zone.local(2018, 8, 13, 9, 00)
+      kase.save!
+
+      travel_to Time.zone.local(2018, 8, 14, 10, 0) do
+        expect(kase.time_since_last_update).to eq 1.days + 1.hours
+      end
+
+    end
+
+  end
+
   describe '#maybe_set_default_assignee' do
     let(:site) { create(:site, default_assignee: default_assignee) }
     let(:cluster) { create(:cluster, site: site) }

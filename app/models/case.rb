@@ -149,6 +149,11 @@ class Case < ApplicationRecord
       )
   }
 
+  # _ parameter to work with URL filtering system
+  # Defaults to nil so we can just say `.prioritised`
+  # Uses reorder rather than order to overwrite the sorting of default_scope
+  scope :prioritised, ->(_=nil) { reorder('last_update ASC NULLS FIRST') }
+
   def to_param
     display_id.parameterize.upcase
   end
@@ -346,6 +351,22 @@ class Case < ApplicationRecord
     created_at.business_time_until(
       first_admin_comment.created_at
     )
+  end
+
+  def time_since_last_update
+    # In which we redefine a "day" to be 8 hours long.
+    raw = last_update.business_time_until(Time.current)
+
+    days = (raw / 8.hours).floor
+    raw -= (8 * days.hours).seconds
+
+    hours = (raw / 1.hour).floor
+    raw -= hours.hours.seconds
+
+    minutes = (raw / 1.minutes).floor
+    raw -= minutes.minutes.seconds
+
+    days.days + hours.hours + minutes.minutes + raw.seconds
   end
 
   private

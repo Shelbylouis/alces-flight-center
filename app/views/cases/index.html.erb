@@ -28,6 +28,9 @@ end %>
             <%= render 'cases/filters/filter_for', caption: 'Affected components', name: 'associations', filters: @filters, title: 'Filter by component' %>
           </th>
           <th>Credit usage</th>
+          <% if current_user.admin? %>
+            <th>Last update</th>
+          <% end %>
         </tr>
       </thead>
 

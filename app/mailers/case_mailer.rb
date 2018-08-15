@@ -9,7 +9,8 @@ class CaseMailer < ApplicationMailer
     @case = my_case
     mail(
       cc: @case.email_recipients.reject { |contact| contact == @case.user.email }, # Exclude the user raising the case
-      subject: @case.email_subject
+      subject: @case.email_subject,
+      bypass_timestamp_update: true
     )
     SlackNotifier.case_notification(@case)
   end
@@ -50,6 +51,7 @@ class CaseMailer < ApplicationMailer
     mail(
       cc: @case.email_recipients.reject { |contact| contact == @comment.user.email }, # Exclude the user making the comment
       subject: @case.email_reply_subject,
+      bypass_timestamp_update: !comment.user.admin?  # Only count admin comments towards update time
     )
     SlackNotifier.comment_notification(@case, @comment)
   end
@@ -85,5 +87,22 @@ class CaseMailer < ApplicationMailer
       subject: @case.email_reply_subject
     )
     SlackNotifier.change_request_notification(@case, @text, user)
+  end
+
+  private
+
+  def mail(**options)
+    super(options)
+    return if options[:bypass_timestamp_update]
+    all_recipients = [options[:cc], options[:to]].flatten.compact
+    # This is a bit of a hack - since we'd need to check each User model for
+    # admin-ness to be fully correct - but that would be quite costly!
+    # In practice checking for '@alces-' is enough since all admins are @alces
+    # and even if we had non-alces admins, emailing them probably counts as
+    # an email update to the customer.
+    has_non_admin = !all_recipients.reject { |a| a.include? '@alces-' }.empty?
+    if has_non_admin && @case
+      @case.update_columns(last_update: Time.now)
+    end
   end
 end
