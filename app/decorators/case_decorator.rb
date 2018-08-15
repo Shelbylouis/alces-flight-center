@@ -49,6 +49,7 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def formatted_time_since_last_update
+    return 'None' unless time_since_last_update
     tslu = time_since_last_update.parts
     [].tap do |result|
       # Exclude seconds (we don't need to be that precise)
