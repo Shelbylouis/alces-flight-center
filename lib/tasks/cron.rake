@@ -10,6 +10,6 @@ namespace :alces do
     task hourly: nil
 
     desc 'Tasks to run at the start of every business day'
-    task daily: nil
+    task daily: 'alces:admin_mailer:daily_reminder'
   end
 end
