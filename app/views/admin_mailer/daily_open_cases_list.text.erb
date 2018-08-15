@@ -1,0 +1,18 @@
+Hello <%= @admin.name.split(' ').first %>,
+
+The following cases are unresolved and assigned to you in Flight Center:
+
+--------------------------------------------------------------------------------
+<% @cases.each do |kase| %>
+  <%= kase.display_id %>: <%= kase.subject %>
+  Created by <%= kase.user.name %> on <%= kase.created_at.to_formatted_s(:long) %>
+  Last update: <% if kase.last_update.nil? %>None
+  <% else %><%= kase.last_update.to_formatted_s(:long) %> (<%= kase.formatted_time_since_last_update %> ago)
+  <% end %>
+  < <%= case_url(kase) %> >
+--------------------------------------------------------------------------------
+<% end %>
+
+Have a nice day,
+
+Flight Center
