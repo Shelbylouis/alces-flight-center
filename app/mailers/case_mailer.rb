@@ -10,7 +10,7 @@ class CaseMailer < ApplicationMailer
     mail(
       cc: @case.email_recipients.reject { |contact| contact == @case.user.email }, # Exclude the user raising the case
       subject: @case.email_subject,
-      bypass_update_mail: true
+      bypass_timestamp_update: true
     )
     SlackNotifier.case_notification(@case)
   end
@@ -51,7 +51,7 @@ class CaseMailer < ApplicationMailer
     mail(
       cc: @case.email_recipients.reject { |contact| contact == @comment.user.email }, # Exclude the user making the comment
       subject: @case.email_reply_subject,
-      bypass_update_mail: !comment.user.admin?  # Only count admin comments towards update time
+      bypass_timestamp_update: !comment.user.admin?  # Only count admin comments towards update time
     )
     SlackNotifier.comment_notification(@case, @comment)
   end
@@ -93,7 +93,7 @@ class CaseMailer < ApplicationMailer
 
   def mail(**options)
     super(options)
-    return if options[:bypass_update_mail]
+    return if options[:bypass_timestamp_update]
     all_recipients = [options[:cc], options[:to]].flatten.compact
     # This is a bit of a hack - since we'd need to check each User model for
     # admin-ness to be fully correct - but that would be quite costly!
