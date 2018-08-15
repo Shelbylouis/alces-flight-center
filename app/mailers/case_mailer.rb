@@ -51,6 +51,7 @@ class CaseMailer < ApplicationMailer
     mail(
       cc: @case.email_recipients.reject { |contact| contact == @comment.user.email }, # Exclude the user making the comment
       subject: @case.email_reply_subject,
+      bypass_update_mail: !comment.user.admin?  # Only count admin comments towards update time
     )
     SlackNotifier.comment_notification(@case, @comment)
   end

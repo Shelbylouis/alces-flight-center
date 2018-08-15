@@ -163,7 +163,7 @@ RSpec.describe 'Cases table', type: :feature do
 
     let(:kase1) { create(:open_case, cluster: cluster2, subject: 'Kase1') }
     let(:kase2) { create(:open_case, cluster: cluster2, subject: 'Kase2') }
-    let(:kase3) { create(:open_case, cluster: cluster2, subject: 'Kase3') }
+    let(:kase3) { create(:open_case, cluster: cluster2, subject: 'Kase3', tier_level: 3) }
 
     it 'sorts cases by last update' do
       travel_to Time.zone.local(2018, 8, 13, 9, 0, 0) do
@@ -182,6 +182,10 @@ RSpec.describe 'Cases table', type: :feature do
       travel_to Time.zone.local(2018, 8, 13, 12, 30, 0) do
         visit cluster_case_path(cluster2, kase2, as: admin)
         fill_in 'case_comment_text', with: 'Response!'
+        click_button 'Add new comment'
+
+        visit cluster_case_path(cluster2, kase3, as: cluster2_contact)
+        fill_in 'case_comment_text', with: 'This response doesn\'t count!'
         click_button 'Add new comment'
       end
 
