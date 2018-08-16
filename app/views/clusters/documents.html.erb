@@ -7,4 +7,13 @@
       </li>
     <% end %>
   </ul>
+  <ul class="list-group list-group-flush">
+    <% cluster.notes.each do |note| %>
+      <% if policy(note).permitted? %>
+        <li class="list-group-item">
+          <%= link_to note.title, cluster_note_path(cluster, note.flavour) %>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
 <% end %>
