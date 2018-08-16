@@ -11,6 +11,9 @@
     <% cluster.notes.each do |note| %>
       <% if policy(note).permitted? %>
         <li class="list-group-item">
+          <% if note.visibility == 'engineering' %>
+            <i class="fa fa-lock" title="This note is only visible to engineers"></i>
+          <% end %>
           <%= link_to note.title, cluster_note_path(cluster, note) %>
         </li>
       <% end %>

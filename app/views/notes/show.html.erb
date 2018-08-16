@@ -2,7 +2,12 @@
 
 <%= render 'partials/tabs', activate: :documents do %>
   <div class="card-body">
-    <h2><%= note.title %></h2>
+    <h2>
+      <% if note.visibility == 'engineering' %>
+        <i class="fa fa-lock" title="This note is only visible to engineers"></i>
+      <% end %>
+      <%= note.title %>
+    </h2>
     <div class="card">
       <div class="card-body">
         <%= note.rendered_description %>
