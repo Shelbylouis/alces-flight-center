@@ -420,4 +420,23 @@ RSpec.feature "Maintenance windows", type: :feature do
       end
     end
   end
+
+  context 'when maintenance window associated with multiple cluster components' do
+    let! :window do
+      create(
+        :requested_maintenance_window,
+        clusters: [cluster],
+        components: [component],
+        case: support_case
+      )
+    end
+
+    let(:user) { create(:contact, site: cluster.site) }
+
+    it 'only appears once on cluster dashboard page' do
+      visit cluster_maintenance_windows_path(cluster, as: user)
+
+      expect(all('tr').length).to eq 2 # heading row plus one MW
+    end
+  end
 end
