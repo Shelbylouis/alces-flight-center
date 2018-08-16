@@ -26,10 +26,9 @@ RSpec.describe 'cluster tabs', type: :feature do
         expect(maintenance_tab).to have_link(href: path)
       end
 
-      it 'does not have a Documents tab' do
-        expect do
-          documents_tab
-        end.to raise_error(Capybara::ElementNotFound)
+      it 'has a Documents tab' do
+        path = cluster_documents_path(cluster)
+        expect(documents_tab).to have_link(href: path)
       end
 
       it 'has a dropdown menu for notes tab' do
@@ -56,10 +55,9 @@ RSpec.describe 'cluster tabs', type: :feature do
         expect(maintenance_tab).to have_link(href: path)
       end
 
-      it 'does not have a Documents tab' do
-        expect do
-          documents_tab
-        end.to raise_error(Capybara::ElementNotFound)
+      it 'has a Documents tab' do
+        path = cluster_documents_path(cluster)
+        expect(documents_tab).to have_link(href: path)
       end
 
       it 'does not have dropdown menu for notes tab' do

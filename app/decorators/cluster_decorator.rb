@@ -18,7 +18,7 @@ class ClusterDecorator < ApplicationDecorator
   def tabs
     [
       tabs_builder.overview,
-      documents.empty? ? nil : { id: :documents, path: h.cluster_documents_path(self) },
+      { id: :documents, path: h.cluster_documents_path(self) },
       { id: :credit_usage, path: h.cluster_credit_usage_path(self) },
       ({ id: :checks, path: h.cluster_checks_path(self) } unless self.cluster_check_count.zero? ),
       tabs_builder.logs,
