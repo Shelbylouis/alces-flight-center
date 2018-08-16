@@ -5,8 +5,8 @@ RSpec.describe Note, type: :model do
 
   describe '#valid?' do
     shared_examples 'note validations' do
-      it { is_expected.to validate_presence_of(:flavour) }
-      it { is_expected.to validate_inclusion_of(:flavour).in_array(Note::FLAVOURS) }
+      it { is_expected.to validate_presence_of(:visibility) }
+      it { is_expected.to validate_inclusion_of(:visibility).in_array(Note::VISIBILITIES) }
       it { is_expected.to validate_presence_of(:description) }
       it { is_expected.to belong_to(:cluster) }
       it { is_expected.to have_one(:site) }
@@ -23,20 +23,6 @@ RSpec.describe Note, type: :model do
     end
   end
 
-  describe 'funky routing using `flavour` instead of `id`' do
-    subject { note.to_param }
-
-    context 'when customer note' do
-      let(:note) { create(:customer_note) }
-      it { is_expected.to eq('customer') }
-    end
-
-    context 'when engineering note' do
-      let(:note) { create(:engineering_note) }
-      it { is_expected.to eq('engineering') }
-    end
-  end
-
   describe 'scope method for each flavour' do
     let(:cluster) { create(:cluster) }
 
@@ -47,7 +33,7 @@ RSpec.describe Note, type: :model do
       }
     end
 
-    Note::FLAVOURS.each do |flavour|
+    Note::VISIBILITIES.each do |flavour|
       it "Note::#{flavour} should return correct notes" do
         expect(Note.send(flavour)).to eq(notes[flavour.to_sym])
       end

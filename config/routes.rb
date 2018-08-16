@@ -1,20 +1,5 @@
 require 'resque/server'
 
-class NoteFlavourConstraint
-  def initialize(admin:)
-    @admin = admin
-  end
-
-  def matches?(request)
-    flavour = request.env['action_dispatch.request.path_parameters'][:flavour]
-    if @admin
-      Note::FLAVOURS.include?(flavour)
-    else
-      flavour == 'customer'
-    end
-  end
-end
-
 Rails.application.routes.draw do
 
   match '/404', to: 'errors#not_found', via: :all
@@ -47,20 +32,6 @@ Rails.application.routes.draw do
       collection do
         post 'preview' => 'logs#preview'
         post 'write' => 'logs#write'
-      end
-    end
-  end
-  notes = Proc.new do |admin|
-    constraints NoteFlavourConstraint.new(admin: admin) do
-      prefix = admin ? '' : 'prevent_named_route_clash_'
-      resources :notes, param: :flavour, except: [:new, :create, :index] do
-        collection do
-          post ':flavour' => 'notes#create', as: prefix
-        end
-        member do
-          post 'preview' => 'notes#preview'
-          post 'write' => 'notes#write'
-        end
       end
     end
   end
@@ -122,7 +93,6 @@ Rails.application.routes.draw do
         resource :maintenance_windows, only: [:new, :create], as: 'maintenance', path: 'maintenance'
       end
       admin_logs.call
-      notes.call(true)
       post :deposit
       get '/checks/submit', to: 'clusters#enter_check_results', as: :check_submission
       post '/checks/submit', to: 'clusters#save_check_results', as: :set_check_results
@@ -198,7 +168,14 @@ Rails.application.routes.draw do
       resources :components, only: :index
       logs.call
       get :documents
-      notes.call(false)
+
+      resources :notes, except: [:index] do
+        member do
+          post 'preview' => 'notes#preview'
+          post 'write' => 'notes#write'
+        end
+      end
+
       get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
       get '/checks(/:date)', to: 'clusters#view_checks', as: :checks
     end

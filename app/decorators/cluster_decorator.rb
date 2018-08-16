@@ -44,8 +44,7 @@ class ClusterDecorator < ApplicationDecorator
             )
           end
         end
-      },
-      notes_tab,
+      }
     ].compact
   end
 
@@ -131,29 +130,6 @@ class ClusterDecorator < ApplicationDecorator
   end
 
   private
-
-  def notes_tab
-    if current_user.admin?
-      {
-        id: :notes,
-        dropdown: [
-          {
-            text: 'Engineering',
-            path: h.cluster_note_path(self, flavour: :engineering),
-          },
-          {
-            text: 'Customer',
-            path: h.cluster_note_path(self, flavour: :customer),
-          },
-        ]
-      }
-    else
-      {
-        id: :notes,
-        path: h.cluster_note_path(self, flavour: :customer),
-      }
-    end
-  end
 
   def other_service_json
     return unless IssuesJsonBuilder.other_service_issues.present?

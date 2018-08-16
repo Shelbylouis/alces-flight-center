@@ -31,21 +31,6 @@ RSpec.describe 'cluster tabs', type: :feature do
         expect(documents_tab).to have_link(href: path)
       end
 
-      it 'has a dropdown menu for notes tab' do
-        expect(notes_tab).to match_css('.dropdown')
-        expect(notes_tab.first('div')).to match_css('.dropdown-menu')
-      end
-
-      it 'has a link to the engineering notes' do
-        path = cluster_note_path(cluster, flavour: 'engineering')
-        expect(notes_tab).to have_link(href: path)
-      end
-
-      it 'has a link to the customer notes' do
-        path = cluster_note_path(cluster, flavour: 'customer')
-        expect(notes_tab).to have_link(href: path)
-      end
-
     end
 
     context 'with a contact user' do
@@ -58,15 +43,6 @@ RSpec.describe 'cluster tabs', type: :feature do
       it 'has a Documents tab' do
         path = cluster_documents_path(cluster)
         expect(documents_tab).to have_link(href: path)
-      end
-
-      it 'does not have dropdown menu for notes tab' do
-        expect(notes_tab).not_to match_css('.dropdown')
-      end
-
-      it 'has a link to the customer notes' do
-        path = cluster_note_path(cluster, flavour: 'customer')
-        expect(notes_tab).to have_link(href: path)
       end
     end
 

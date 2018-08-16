@@ -1,6 +1,5 @@
 <%= render 'partials/tabs', activate: :notes do %>
     <%= render 'form',
-        intro_text: note.new_form_intro,
         button_text: 'Create notes',
         policy: policy(note).create?
     %>

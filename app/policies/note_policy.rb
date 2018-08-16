@@ -1,7 +1,7 @@
 class NotePolicy < ApplicationPolicy
 
   def permitted?
-    case @record.flavour
+    case @record.visibility
     when 'engineering'
       admin?
     else

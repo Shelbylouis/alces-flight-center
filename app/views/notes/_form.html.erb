@@ -1,9 +1,6 @@
 <% content_for(:subtitle) { note.subtitle } %>
 
 <div class="card-body">
-  <p>
-    <%= intro_text %>
-  </p>
   <%= form_for note.form_path do |f| %>
     <% if policy %>
       <%= render 'partials/markdown_editor_layout',
