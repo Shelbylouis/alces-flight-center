@@ -14,11 +14,11 @@ class NoteDecorator < ApplicationDecorator
   end
 
   def preview_path
-    h.preview_cluster_note_path(cluster, self)
+    h.preview_cluster_notes_path(cluster, self)
   end
 
   def write_path
-    h.write_cluster_note_path(cluster, self)
+    h.write_cluster_notes_path(cluster, self)
   end
 
   def form_path

@@ -16,4 +16,11 @@
       <% end %>
     <% end %>
   </ul>
+  <% if policy(Note).create? %>
+    <%=
+      link_to 'Add new document',
+              new_cluster_note_path(cluster),
+              class: 'btn btn-primary'
+    %>
+  <% end %>
 <% end %>

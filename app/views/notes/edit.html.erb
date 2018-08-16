@@ -1,6 +1,7 @@
-<%= render 'partials/tabs', activate: :notes do %>
+<%= render 'partials/tabs', activate: :documents do %>
     <%= render 'form',
-        button_text: 'Update notes',
-        policy: policy(note).update?
+               button_text: 'Save document',
+               policy: policy(note).update?,
+               can_set_visibility: policy(Note).set_visibility?
     %>
 <% end %>

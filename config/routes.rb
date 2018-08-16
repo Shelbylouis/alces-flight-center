@@ -170,7 +170,7 @@ Rails.application.routes.draw do
       get :documents
 
       resources :notes, except: [:index] do
-        member do
+        collection do
           post 'preview' => 'notes#preview'
           post 'write' => 'notes#write'
         end

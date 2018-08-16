@@ -11,12 +11,21 @@ class NotesController < ApplicationController
     authorize @note
   end
 
+  def new
+    @note = cluster_from_params.notes.build(
+      title: 'New document',
+      visibility: 'customer'
+    ).decorate
+    authorize @note
+  end
+
   def create
     @note = note_from_params
     authorize @note
 
-    if @note.update_attributes(note_params)
+    if @note.update_attributes(enforce_visibility(note_params))
       flash[:success] = 'Notes created'
+      redirect_to cluster_documents_path(@note.cluster)
     else
       flash[:error] = "Your notes were not created: #{format_errors(@note)}"
     end
@@ -31,7 +40,7 @@ class NotesController < ApplicationController
       @note.destroy
       flash[:success] = 'Notes removed'
       redirect_to cluster_path(@note.cluster)
-    elsif @note.update_attributes(note_params)
+    elsif @note.update_attributes(enforce_visibility(note_params))
       flash[:success] = 'Notes updated'
       redirect_to @note.decorate.path
     else
@@ -59,10 +68,26 @@ class NotesController < ApplicationController
   private
 
   def note_from_params
-    Note.find(params.require(:id))
+    if params[:id]
+      Note.find(params[:id])
+    else
+      cluster_from_params.notes.build
+    end
   end
 
   def note_params
-    params.require(:note).permit(:description)
+    params.require(:note).permit(:description, :title, :visibility)
+  end
+
+  def cluster_from_params
+    Cluster.find_from_id!(params.require(:cluster_id))
+  end
+
+  def enforce_visibility(params)
+    params.tap do |p|
+      unless policy(@note).set_visibility?
+        p[:visibility] = 'customer'
+      end
+    end
   end
 end
