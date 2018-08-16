@@ -71,6 +71,7 @@ class Cluster < ApplicationRecord
     parts
       .map(&:maintenance_windows)
       .flat_map(&:unfinished)
+      .uniq
       .sort_by(&:created_at)
       .reverse
   end
