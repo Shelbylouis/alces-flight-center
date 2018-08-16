@@ -354,6 +354,7 @@ class Case < ApplicationRecord
   end
 
   def time_since_last_update
+    return unless last_update
     # In which we redefine a "day" to be 8 hours long.
     raw = last_update.business_time_until(Time.current)
 

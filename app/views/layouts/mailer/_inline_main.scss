@@ -112,6 +112,55 @@ dd {
     padding: 5px;
 }
 
+.table {
+  // Bootstrap table
+  max-width: 100%;
+  margin-bottom: $spacer;
+
+  th,
+  td {
+    padding: $table-cell-padding-sm;  // .table-sm
+    vertical-align: top;
+    border-top: $table-border-width solid $table-border-color;
+  }
+
+  thead th {
+    vertical-align: bottom;
+    border-bottom: (2 * $table-border-width) solid $table-border-color;
+  }
+
+  tbody + tbody {
+    border-top: (2 * $table-border-width) solid $table-border-color;
+  }
+
+  background-color: $body-bg;
+
+  // Bootstrap table-bordered
+
+  border: $table-border-width solid $table-border-color;
+
+  th,
+  td {
+    border: $table-border-width solid $table-border-color;
+  }
+
+  thead {
+    th,
+    td {
+      border-bottom-width: (2 * $table-border-width);
+    }
+  }
+}
+
+// Bootstrap .thead-dark
+thead {
+  th {
+    color: $table-dark-color;
+    background-color: $table-dark-bg;
+    border-color: $table-dark-border-color;
+  }
+}
+
 .markdown {
   h1 {
     font-size: 1.75rem;
@@ -151,52 +200,7 @@ dd {
   }
 
   table {
-    // Bootstrap table
-    max-width: 100%;
-    margin-bottom: $spacer;
-
-    th,
-    td {
-      padding: $table-cell-padding-sm;  // .table-sm
-      vertical-align: top;
-      border-top: $table-border-width solid $table-border-color;
-    }
-
-    thead th {
-      vertical-align: bottom;
-      border-bottom: (2 * $table-border-width) solid $table-border-color;
-    }
-
-    tbody + tbody {
-      border-top: (2 * $table-border-width) solid $table-border-color;
-    }
-
-    background-color: $body-bg;
-
-    // Bootstrap table-bordered
-
-    border: $table-border-width solid $table-border-color;
-
-    th,
-    td {
-      border: $table-border-width solid $table-border-color;
-    }
-
-    thead {
-      th,
-      td {
-        border-bottom-width: (2 * $table-border-width);
-      }
-    }
-  }
-
-  // Bootstrap .thead-dark
-  thead {
-    th {
-      color: $table-dark-color;
-      background-color: $table-dark-bg;
-      border-color: $table-dark-border-color;
-    }
+    @extend .table
   }
 }
 

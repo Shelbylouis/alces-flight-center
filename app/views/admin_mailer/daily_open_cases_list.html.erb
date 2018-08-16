@@ -1,0 +1,41 @@
+<p>Hello <%= @admin.name.split(' ').first %>,</p>
+
+<p>The following cases are unresolved and assigned to you in Flight Center:</p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Subject</th>
+      <th>Raised</th>
+      <th>Last update</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @cases.each do |kase| %>
+      <tr>
+        <td><%= link_to kase.display_id, case_url(kase) %></td>
+        <td><%= link_to kase.subject, case_url(kase) %></td>
+        <%=
+          timestamp_td(
+              description: 'Support case created',
+              timestamp: kase.created_at
+          ) do |content|
+            "By <em>#{kase.user.name}</em> on <em>#{content}</em>"
+          end
+        %>
+        <% if kase.last_update.nil? %>
+          <td class="text-danger">None</td>
+        <% else %>
+          <%= timestamp_td(description: 'Last update', timestamp: kase.last_update) do
+            kase.formatted_time_since_last_update
+          end
+          %>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p>Have a nice day,</p>
+<p><em>Flight Center</em></p>

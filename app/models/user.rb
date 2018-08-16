@@ -13,6 +13,8 @@ class User < ApplicationRecord
 
   belongs_to :site, required: false
 
+  has_many :assigned_cases, class_name: 'Case', foreign_key: :assignee
+
   validates_associated :site
   validates :name, presence: true
   validates :email,
