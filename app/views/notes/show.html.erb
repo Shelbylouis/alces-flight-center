@@ -3,7 +3,11 @@
 <%= render 'partials/tabs', activate: :documents do %>
   <div class="card-body">
     <h2><%= note.title %></h2>
-    <%= note.rendered_description %>
+    <div class="card">
+      <div class="card-body">
+        <%= note.rendered_description %>
+      </div>
+    </div>
   </div>
   <%= link_to 'Edit document',
     note.edit_path,
