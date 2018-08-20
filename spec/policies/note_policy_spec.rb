@@ -6,7 +6,7 @@ RSpec.describe NotePolicy do
   context 'when the note is an engineering note' do
     let(:record) { build(:engineering_note) }
 
-    permissions :create?, :edit?, :update? do
+    permissions :edit?, :update?, :set_visibility? do
       it_behaves_like 'it is available only to admins'
     end
   end
