@@ -23,7 +23,7 @@ class ScopeNavLinksBuilder
 
   def all_sites_link
     if h.current_user&.admin?
-      nav_link_proc(text: 'All Sites',
+      nav_link_proc(text: 'Global',
                     path: h.root_path,
                     nav_icon: 'fa-globe')
     end
