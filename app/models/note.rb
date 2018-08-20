@@ -23,6 +23,7 @@ class Note < ApplicationRecord
 
   def check_read_permissions
     super
+    return if permissions_check_unneeded?
 
     allowed = visibility == 'customer' || current_user.admin?
 
