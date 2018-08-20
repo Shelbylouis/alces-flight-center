@@ -15,7 +15,7 @@
       <input class="btn btn-primary btn-sm" type="submit" value="Apply"/>
       <%=
         link_to 'Clear all filters',
-                @scope.decorate.scope_cases_path,
+                request.path,
                 class: 'btn btn-danger btn-sm'
       %>
     </div>
