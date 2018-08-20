@@ -58,11 +58,15 @@ class CaseAssociationsController < ApplicationController
   end
 
   def validate_as_if_set(new_assocs)
-    old_assocs = @case.associations
-    @case.associations = new_assocs
-    @case.validate!
-  ensure
-    @case.associations = old_assocs
+    @case.without_auditing do
+      CaseAssociation.without_auditing do
+        old_assocs = @case.associations
+        @case.associations = new_assocs
+        @case.validate!
+      ensure
+        @case.associations = old_assocs
+      end
+    end
   end
 
 end

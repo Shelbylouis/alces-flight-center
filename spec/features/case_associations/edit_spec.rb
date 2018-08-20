@@ -192,6 +192,8 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
       }
 
       it 'does not allow removing the association' do
+        initial_number_of_audits = kase.associated_audits.where(auditable_type: 'CaseAssociation').count
+
         expect(checkbox_for[service]).to be_checked
         checkbox_for[service].click
         click_button 'Save'
@@ -201,6 +203,9 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
         expect(find('.alert-danger')).to have_text \
           "for issue '#{issue.name}' must be associated with " \
                 "#{service_type.name} service but not given one"
+
+        expect(kase.associated_audits.where(auditable_type: 'CaseAssociation').length)
+          .to eq initial_number_of_audits  # No new audits added
       end
     end
   end
