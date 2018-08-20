@@ -14,7 +14,10 @@ class CasesController < ApplicationController
 
   def assigned
     @filters = filters_spec
-    @cases = filtered_cases(Case.assigned_to(current_user).prioritised, @filters[:active])
+    @cases = filtered_cases(
+      Case.assigned_to(current_user).where(state: 'open').prioritised,
+      @filters[:active]
+    )
     render :assigned
   end
 
