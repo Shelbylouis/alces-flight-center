@@ -3,12 +3,19 @@ class CasesController < ApplicationController
 
   after_action :verify_authorized, except: NO_AUTH_ACTIONS + [
     :redirect_to_canonical_path,
+    :assigned
   ]
 
   def index
     @filters = filters_spec
     @cases = filtered_cases(@filters[:active])
     render :index
+  end
+
+  def assigned
+    @filters = filters_spec
+    @cases = filtered_cases(@filters[:active])
+    render :assigned
   end
 
   def show

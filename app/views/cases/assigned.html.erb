@@ -1,0 +1,4 @@
+<% content_for(:subtitle) { 'Admin Home Page' } %>
+<%= render 'partials/tabs', activate: :cases do %>
+  <%= render 'partials/show_cases', cases: Case.assigned_to(current_user) %>
+<% end %>
