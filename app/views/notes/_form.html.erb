@@ -1,16 +1,22 @@
-<% content_for(:subtitle) { note.subtitle } %>
+<% content_for(:subtitle) { note.title } %>
 
 <div class="card-body">
-  <p>
-    <%= intro_text %>
-  </p>
   <%= form_for note.form_path do |f| %>
     <% if policy %>
+
+      <div class="form-group">
+        <label for="note_title">Title</label>
+        <%=
+          f.text_field :title,
+                       class: 'form-control'
+        %>
+      </div>
+
       <%= render 'partials/markdown_editor_layout',
             activate: 'write',
             form_builder: f,
-            preview_path: note.preview_path,
-            write_path: note.write_path do %>
+            preview_path: preview_cluster_notes_path,
+            write_path: write_cluster_notes_path do %>
 
         <%= render 'partials/markdown_content',
                    form_builder: f,
@@ -19,7 +25,23 @@
                        rows: 10
                    }
         %>
+
       <% end %>
+
+      <% if can_set_visibility %>
+        <div class="form-group">
+          <label for="note_visibility">Visibility</label>
+          <%=
+            f.select :visibility,
+                     [['Customer and engineer', 'customer'], ['Engineers only', 'engineering']],
+                     {},
+                     class: 'form-control'
+          %>
+        </div>
+      <% else %>
+        <%= f.hidden_field :visibility %>
+      <% end %>
+
     <% end %>
     <div class="form-group" style="overflow: hidden;">
       <%#

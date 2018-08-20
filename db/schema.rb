@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_14_105312) do
+ActiveRecord::Schema.define(version: 2018_08_16_105616) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -390,12 +390,12 @@ ActiveRecord::Schema.define(version: 2018_08_14_105312) do
 
   create_table "notes", force: :cascade do |t|
     t.text "description", null: false
-    t.string "flavour", limit: 64, null: false
+    t.string "visibility", limit: 64, null: false
     t.bigint "cluster_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "title"
     t.index ["cluster_id"], name: "index_notes_on_cluster_id"
-    t.index ["flavour", "cluster_id"], name: "index_notes_on_flavour_and_cluster_id", unique: true
   end
 
   create_table "service_types", force: :cascade do |t|
