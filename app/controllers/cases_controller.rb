@@ -14,7 +14,7 @@ class CasesController < ApplicationController
 
   def assigned
     @filters = filters_spec
-    @cases = filtered_cases(@filters[:active])
+    @cases = Case.assigned_to(current_user).prioritised
     render :assigned
   end
 
