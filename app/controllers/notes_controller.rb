@@ -24,12 +24,12 @@ class NotesController < ApplicationController
     authorize @note
 
     if @note.update_attributes(enforce_visibility(note_params))
-      flash[:success] = 'Notes created'
+      flash[:success] = 'Document created.'
       redirect_to cluster_documents_path(@note.cluster)
     else
-      flash[:error] = "Your notes were not created: #{format_errors(@note)}"
+      flash[:error] = "Your document was not created: #{format_errors(@note)}"
+      redirect_back fallback_location: @note.cluster
     end
-    redirect_back fallback_location: @note.cluster
   end
 
   def update
@@ -38,13 +38,13 @@ class NotesController < ApplicationController
 
     if note_params[:description].blank?
       @note.destroy
-      flash[:success] = 'Notes removed'
-      redirect_to cluster_path(@note.cluster)
+      flash[:success] = 'Document deleted.'
+      redirect_to cluster_documents_path(@note.cluster)
     elsif @note.update_attributes(enforce_visibility(note_params))
-      flash[:success] = 'Notes updated'
+      flash[:success] = 'Document updated.'
       redirect_to @note.decorate.path
     else
-      flash[:error] = "Your notes were not updated: #{format_errors(@note)}"
+      flash[:error] = "Your document was not updated: #{format_errors(@note)}"
       render :edit
     end
   end
