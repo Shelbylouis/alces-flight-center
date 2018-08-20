@@ -12,7 +12,7 @@
         <li class="list-group-item">
 
           <% if note.visibility == 'engineering' %>
-            <i class="fa fa-lock mr-2" title="This note is only visible to engineers"></i>
+            <i class="fa fa-lock mr-2" title="This document is only visible to engineers"></i>
           <% else %>
             <i class="fa fa-file-text-o mr-2"></i>
           <% end %>
@@ -21,7 +21,7 @@
 
           <% if policy(note).edit? %>
             <%=
-              link_to raw('<i class="fa fa-pencil fa-pull-right" title="This note is editable"></i>'),
+              link_to raw('<i class="fa fa-pencil fa-pull-right" title="This document is editable"></i>'),
                       edit_cluster_note_path(cluster, note)
             %>
           <% end %>
