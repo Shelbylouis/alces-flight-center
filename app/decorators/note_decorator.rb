@@ -1,10 +1,6 @@
 class NoteDecorator < ApplicationDecorator
   delegate_all
 
-  def subtitle
-    title
-  end
-
   def path
     h.cluster_note_path(cluster, self)
   end
