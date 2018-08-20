@@ -1,9 +1,4 @@
-<%
-  empty_message = 'No cases match the criteria you have specified.'
-
-  mine, others = @cases.decorate.partition { |c| c.assignee == current_user && c.open? }
-%>
-
+<%  empty_message = 'No cases match the criteria you have specified.' %>
 <%= content_for(:subtitle) do
   "Showing #{@cases.length} #{'case'.pluralize(@cases.length)}"
 end %>
@@ -34,14 +29,8 @@ end %>
         </tr>
       </thead>
 
-      <tbody class="assigned-cases">
-        <% mine.each do |c| %>
-          <%= render 'partials/case_table_row', kase: c, scope: @scope %>
-        <% end %>
-      </tbody>
-
       <tbody>
-        <% others.each do |c| %>
+        <% @cases.decorate.each do |c| %>
           <%= render 'partials/case_table_row', kase: c, scope: @scope %>
         <% end %>
       </tbody>
