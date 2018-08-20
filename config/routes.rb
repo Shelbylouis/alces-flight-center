@@ -51,10 +51,14 @@ Rails.application.routes.draw do
 
     mount Resque::Server, at: '/resque'
 
-    root 'sites#index'
+    root 'sites#home'
     resources :sites, only: [:show, :index] do
       cases.call(only: [:index, :new])
       resource :terminal_services, only: [:show]
+    end
+
+    resources :sites, only: [] do
+      get '/sites', to: 'sites#index'
     end
 
     cases.call(only: []) do
