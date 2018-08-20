@@ -57,10 +57,6 @@ Rails.application.routes.draw do
       resource :terminal_services, only: [:show]
     end
 
-    resources :sites, only: [] do
-      get '/sites', to: 'sites#index'
-    end
-
     cases.call(only: []) do
       # Actions on cases belong here. Typically these will end with a redirect
       # to cluster_case_path or similar.
