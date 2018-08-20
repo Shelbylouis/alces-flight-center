@@ -18,4 +18,20 @@ class Note < ApplicationRecord
   def visibilities_enum
     VISIBILITIES
   end
+
+  private
+
+  def check_read_permissions
+    super
+
+    allowed = visibility == 'customer' || current_user.admin?
+
+    unless allowed
+      raise ReadPermissionsError,
+            <<-EOF.squish
+          User #{current_user.name} (site_id: #{current_user.site_id}) forbidden
+          from accessing #{model_identifier} (site_id: #{site.id})
+      EOF
+    end
+  end
 end

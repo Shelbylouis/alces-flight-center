@@ -3,6 +3,7 @@ class NotesController < ApplicationController
 
   def show
     @note = note_from_params
+    # Authorisation happens in Note#check_read_permissions
     render :new unless @note.persisted?
   end
 
