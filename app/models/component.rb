@@ -8,9 +8,4 @@ class Component < ApplicationRecord
 
   validates_associated :component_group,
                        :cluster
-
-  def component_type
-    # TODO
-    'NOT_YET_IMPLEMENTED'
-  end
 end

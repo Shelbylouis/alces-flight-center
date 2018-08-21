@@ -225,6 +225,7 @@ ActiveRecord::Schema.define(version: 2018_08_21_140905) do
     t.integer "component_group_id", null: false
     t.string "support_type", default: "inherit", null: false
     t.boolean "internal", default: false
+    t.string "component_type", null: false
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end
 
