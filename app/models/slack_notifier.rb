@@ -135,6 +135,19 @@ class SlackNotifier
       )
     end
 
+    def subject_notification(kase, old, new)
+      text = "The subject for #{kase.display_id} has been changed from '#{old}' to '#{new}'"
+
+      subject_note = {
+        fallback: text,
+        title: new,
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+
+      send_notification(subject_note)
+    end
+
     private
 
     def maintenance_notification(kase, text, colour)

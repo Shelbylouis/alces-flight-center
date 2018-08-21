@@ -33,6 +33,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
+    SlackNotifier.subject_notification(@case, @old, @new)
   end
 
   def change_issue_id(my_case, old_val, new_val)
