@@ -1,5 +1,4 @@
 class ComponentDecorator < ClusterPartDecorator
-  include AssetRecordDecorator
 
   def change_support_type_button
     render_change_support_type_button(
@@ -32,6 +31,6 @@ class ComponentDecorator < ClusterPartDecorator
   end
 
   def type_name
-    model.component_type.name
+    model.component_type
   end
 end
