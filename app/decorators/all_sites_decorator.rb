@@ -18,7 +18,7 @@ class AllSitesDecorator < ApplicationDecorator
 
       tab[:dropdown].unshift(
         {
-          text: "My Cases (#{Case.assigned_to(h.current_user).size})",
+          text: "My Cases (#{Case.assigned_to(h.current_user).where(state: 'open').size})",
           path: h.root_path
         }
       )
