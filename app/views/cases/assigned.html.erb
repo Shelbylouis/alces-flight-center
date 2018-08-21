@@ -1,7 +1,6 @@
-<%= content_for(:subtitle) do
-  "Showing #{@cases.length} #{'case'.pluralize(@cases.length)}"
+<% content_for(:subtitle) do
+  "Showing #{@cases.length} #{'case'.pluralize(@cases.length)} for #{current_user.name}"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
   <%= render 'partials/show_cases', cases: @cases %>
 <% end %>
-

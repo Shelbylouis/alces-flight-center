@@ -106,13 +106,13 @@ class ApplicationController < RootController
   end
 
   def assign_site_scope
+    id = scope_id_param(:site_id)
     if current_user.site_user?
       # For a Site user, the Site in scope is always the Site they belong to.
       @site = current_user.site
-    elsif request.path =~ /^\/sites/
+    elsif request.path =~ /^\/sites/ && id.present?
       # For an admin viewing the pages for a particular Site, that is the Site
       # in scope.
-      id = scope_id_param(:site_id)
       @site = Site.find(id)
     else
       # If we reach this point we must be an admin viewing the top-level pages

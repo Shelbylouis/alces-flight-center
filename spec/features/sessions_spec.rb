@@ -18,10 +18,10 @@ RSpec.feature 'Sessions (home page)', type: :feature do
   context 'when logged in as admin' do
     let(:user) { create(:admin) }
 
-    it 'shows \'all sites\' dashboard' do
+    it 'shows \'global\' dashboard' do
       visit root_path(as: user)
 
-      expect(find('.title-card')).to have_text 'All Sites Dashboard'
+      expect(find('.title-card')).to have_text 'Global Dashboard'
     end
   end
 

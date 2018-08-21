@@ -9,7 +9,7 @@ class AllSites
   end
 
   def readable_model_name
-    'All Sites'
+    'Global'
   end
 
   def ==(other_object)

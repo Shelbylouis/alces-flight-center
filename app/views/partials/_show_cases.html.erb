@@ -1,0 +1,34 @@
+<%  empty_message = 'No cases match the criteria you have specified.' %>
+<form class="form" id="filter-form">
+  <%= render 'partials/table',
+    collection: cases,
+    message: empty_message,
+    responsive: false do %>
+    <thead>
+      <tr class="nowrap">
+        <th>ID</th>
+        <th>Created</th>
+        <th>
+          <%= render 'cases/filters/filter_for', caption: 'State', name: 'state', filters: @filters, title: 'Filter by case state' %>
+        </th>
+        <th>Subject</th>
+        <th>
+          <%= render 'cases/filters/filter_for', caption: 'Assigned to', name: 'assigned_to', filters: @filters, title: 'Filter by assignee' %>
+        </th>
+        <th>
+          <%= render 'cases/filters/filter_for', caption: 'Affected components', name: 'associations', filters: @filters, title: 'Filter by component' %>
+        </th>
+        <th>Credit usage</th>
+        <% if current_user.admin? %>
+          <th>Last update</th>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% cases.decorate.each do |c| %>
+        <%= render 'partials/case_table_row', kase: c, scope: @scope %>
+      <% end %>
+    </tbody>
+  <% end %>
+</form>

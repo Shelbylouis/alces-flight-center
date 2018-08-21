@@ -3,12 +3,22 @@ class CasesController < ApplicationController
 
   after_action :verify_authorized, except: NO_AUTH_ACTIONS + [
     :redirect_to_canonical_path,
+    :assigned
   ]
 
   def index
     @filters = filters_spec
-    @cases = filtered_cases(@filters[:active])
+    @cases = filtered_cases(@scope.cases, @filters[:active])
     render :index
+  end
+
+  def assigned
+    @filters = filters_spec
+    @cases = filtered_cases(
+      Case.assigned_to(current_user).where(state: 'open').prioritised,
+      @filters[:active]
+    )
+    render :assigned
   end
 
   def show
@@ -215,19 +225,18 @@ class CasesController < ApplicationController
     end
   end
 
-  def filtered_cases(filters)
+  def filtered_cases(initial, filters)
     my_filters = filters.dup
     association_filter = my_filters.delete(:associations).dup || []
-    scope_results = @scope.cases
 
-    results = scope_results
+    results = initial
     first_assoc = association_filter.shift
     if first_assoc
-      results = scope_results.associated_with(*first_assoc.split('-'))
+      results = initial.associated_with(*first_assoc.split('-'))
     end
 
     association_filter.each do |assoc|
-      results = results.or(scope_results.associated_with(*assoc.split('-')))
+      results = results.or(initial.associated_with(*assoc.split('-')))
     end
 
     results.filter(
