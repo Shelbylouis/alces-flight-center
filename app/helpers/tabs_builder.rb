@@ -26,10 +26,6 @@ class TabsBuilder
     }
   end
 
-  def asset_record
-    { id: :asset_record, path: scope.scope_asset_record_path }
-  end
-
   def logs
     { id: :logs, path: scope.scope_logs_path }
   end

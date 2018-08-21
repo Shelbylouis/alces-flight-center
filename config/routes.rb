@@ -5,8 +5,6 @@ Rails.application.routes.draw do
   match '/404', to: 'errors#not_found', via: :all
   match '/500', to: 'errors#internal_server_error', via: :all
 
-  asset_record_alias = 'asset-record'
-  component_expansions_alias = 'expansions'
   component_groups_alias = 'component-groups'
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
@@ -101,17 +99,7 @@ Rails.application.routes.draw do
     end
 
     resources :components, only: []  do
-      resource :component_expansion,
-               path: component_expansions_alias,
-               only: [:edit, :update, :create]
-      asset_record_form.call
       admin_logs.call
-    end
-
-    resources :component_expansions, only: [:destroy]
-
-    resources :component_groups, path: component_groups_alias, only: [] do
-      asset_record_form.call
     end
 
     resources :maintenance_windows, path: :maintenance, only: [] do
@@ -182,17 +170,12 @@ Rails.application.routes.draw do
 
     resources :components, only: :show do
       maintenance_windows.call
-      resources :component_expansions,
-                path: component_expansions_alias,
-                only: :index
-      asset_record_view.call
       logs.call
     end
 
     resources :component_groups, path: component_groups_alias, only: [] do
       get '/', controller: :components, action: :index
       resources :components, only: :index
-      asset_record_view.call
       maintenance_windows.call
     end
 
