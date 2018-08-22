@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_21_140905) do
+ActiveRecord::Schema.define(version: 2018_08_22_095558) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -226,6 +226,7 @@ ActiveRecord::Schema.define(version: 2018_08_21_140905) do
     t.string "support_type", default: "inherit", null: false
     t.boolean "internal", default: false
     t.string "component_type", null: false
+    t.text "info", default: "", null: false
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end
 

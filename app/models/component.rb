@@ -1,6 +1,7 @@
 class Component < ApplicationRecord
   include AdminConfig::Component
   include ClusterPart
+  include MarkdownColumn(:info)
 
   belongs_to :component_group
   has_one :cluster, through: :component_group
@@ -8,4 +9,6 @@ class Component < ApplicationRecord
 
   validates_associated :component_group,
                        :cluster
+
+  validates :info, presence: true
 end
