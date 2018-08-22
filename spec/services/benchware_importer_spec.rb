@@ -43,11 +43,14 @@ RSpec.describe BenchwareImporter do
           It is informative
 DATA
 
-    importer.from_text(data)
+    new_comp, updated_comp = importer.from_text(data)
 
     component1.reload
     expect(component1.info).to include("This is some info\nIt is informative")
     expect(component1.component_group).to eq component_group
+
+    expect(new_comp).to eq 0
+    expect(updated_comp).to eq 1
 
   end
 
