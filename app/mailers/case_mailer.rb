@@ -90,6 +90,22 @@ class CaseMailer < ApplicationMailer
     SlackNotifier.change_request_notification(@case, @text, user)
   end
 
+  def change_association(my_case, user)
+    @case = my_case
+    reference_texts = @case.associations
+      .map { |a| a.decorate.reference_text }
+    @text = %{Changed the affected components on this case to:
+
+• #{reference_texts.join("\n • ")}
+    }
+
+    mail(
+      subject: @case.email_reply_subject
+    )
+
+    SlackNotifier.case_association_notification(@case, user, @text)
+  end
+
   private
 
   def mail(**options)

@@ -26,7 +26,7 @@ class CaseAssociationsController < ApplicationController
       @case.associations = new_assocs
 
       flash[:success] = "Updated affected components for support case #{@case.display_id}."
-      SlackNotifier.case_association_notification(@case, current_user)
+      CaseMailer.change_association(@case, current_user).deliver_later
 
     rescue ActiveRecord::RecordInvalid => e
       flash[:error] = "Unable to update associations, an error occurred: #{format_errors(e.record)}"

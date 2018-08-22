@@ -117,16 +117,7 @@ class SlackNotifier
       send_notification(change_request_note)
     end
 
-    def case_association_notification(kase, user)
-
-      reference_texts = kase.associations
-                            .map { |a| a.decorate.reference_text }
-
-      text = %{Changed the affected components on this case to:
-
-• #{reference_texts.join("\n • ")}
-}
-
+    def case_association_notification(kase, user, text)
       send_notification(
         author_name: user.name,
         title: subject_and_id_title(kase),
