@@ -10,6 +10,7 @@ class BenchwareImporter
     @cluster = cluster
     @new_components = 0
     @updated_components = 0
+    @invalid_components = []
   end
 
   def from_file(file)
@@ -23,11 +24,13 @@ class BenchwareImporter
   private
 
   def import(data)
-    data.values.each do |component|
+    data.each do |key, component|
       process_component(component.symbolize_keys)
+    rescue
+      @invalid_components << key
     end
 
-    return @new_components, @updated_components
+    return @new_components, @updated_components, @invalid_components
   end
 
   def process_component(spec)

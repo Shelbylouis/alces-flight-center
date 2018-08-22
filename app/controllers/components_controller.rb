@@ -11,9 +11,13 @@ class ComponentsController < ApplicationController
     importer = BenchwareImporter.new(@scope)
 
     uploaded_file = params[:benchdown]
-    new_comps, updated_comps = importer.from_file(uploaded_file)
+    new_comps, updated_comps, invalid_comps = importer.from_file(uploaded_file)
 
-    flash[:success] = "Imported #{view_context.pluralize(new_comps, 'new component')} and updated #{view_context.pluralize(updated_comps, 'existing component')}"
+    if invalid_comps.empty?
+      flash[:success] = success_message(new_comps, updated_comps)
+    else
+      flash[:warning] = warning_message(new_comps, updated_comps, invalid_comps)
+    end
     redirect_to cluster_components_path(@scope)
   end
 
@@ -45,5 +49,13 @@ class ComponentsController < ApplicationController
 
   def all_groups
     @scope.component_groups
+  end
+
+  def success_message(new_comps, updated_comps)
+    "Imported #{view_context.pluralize(new_comps, 'new component')} and updated #{view_context.pluralize(updated_comps, 'existing component')}"
+  end
+
+  def warning_message(new_comps, updated_comps, invalid_comps)
+    "The following components were not imported: #{invalid_comps.join(', ')}. #{new_comps} new and #{updated_comps} updated components were processed successfully."
   end
 end

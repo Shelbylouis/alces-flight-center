@@ -159,4 +159,28 @@ DATA
     expect(updated_comp).to eq 0
   end
 
+  it 'warns about invalid components' do
+    data = <<~DATA
+      comp3:
+        name: comp3
+        type: another type
+        primary_group: anothergroup
+        secondary_group: yetanothergroup,somedifferentgroup
+        info: |
+          This is some info
+          It is informative
+      comp4:
+        whatIsThis: itsNotEvenValid
+        whyAreYouDoing: thisToMe?
+    DATA
+
+    new_comp, updated_comp, invalid = importer.from_text(data)
+
+    expect(cluster.components.find_by(name: 'comp3')).not_to be nil
+
+    expect(new_comp).to eq 1
+    expect(updated_comp).to eq 0
+    expect(invalid).to eq ['comp4']
+  end
+
 end
