@@ -2,7 +2,7 @@
 <%= render 'partials/tabs', activate: :cluster do %>
   <div class="card-body">
     <% if policy(@cluster).import_components? %>
-      <%= form_tag import_cluster_components_path(@cluster) do %>
+      <%= form_tag import_cluster_components_path(@cluster), multipart: true do %>
         <div class="form-group">
           <label for="benchdown">Select Benchware export file:</label>
           <%=
