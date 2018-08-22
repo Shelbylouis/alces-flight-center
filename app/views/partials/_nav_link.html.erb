@@ -27,6 +27,8 @@
       <% dropdown.each do |dropitem| %>
         <% if dropitem[:heading] %>
           <h6 class="dropdown-header"><%= dropitem[:text] %></h6>
+        <% elsif dropitem[:divider] %>
+          <div class="dropdown-divider"></div>
         <% else %>
           <%= link_to dropitem[:text],
                       dropitem[:path],

@@ -43,6 +43,10 @@ class ClusterDecorator < ApplicationDecorator
               path: h.cluster_components_path(self, type: t)
             )
           end
+          if h.policy(self).import_components?
+            comps.push(divider: true)
+            comps.push(text: 'Import from Benchware', path: h.import_cluster_components_path(self))
+          end
         end
       }
     ].compact
