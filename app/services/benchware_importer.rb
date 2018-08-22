@@ -58,7 +58,7 @@ class BenchwareImporter
   end
 
   def group_from_spec(spec)
-    if spec[:secondary_group].split(',').include? NODES_GROUP_IDENT
+    if spec[:secondary_group]&.split(',')&.include?(NODES_GROUP_IDENT)
       NODES_GROUP_IDENT
     else
       spec[:primary_group]
@@ -86,6 +86,7 @@ class BenchwareImporter
     'mds' => 'Lustre MDS',
     'oss' => 'Lustre OSS',
     'master' => 'Masters',
+    'masters' => 'Masters',
     'nfs' => 'NFS servers',
     'admin' => 'Site nodes',
     'viz' => 'Viz nodes',

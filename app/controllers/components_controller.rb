@@ -16,7 +16,7 @@ class ComponentsController < ApplicationController
     if invalid_comps.empty?
       flash[:success] = success_message(new_comps, updated_comps)
     else
-      flash[:warning] = warning_message(new_comps, updated_comps, invalid_comps)
+      flash[:alert] = warning_message(new_comps, updated_comps, invalid_comps)
     end
     redirect_to cluster_components_path(@scope)
   end
