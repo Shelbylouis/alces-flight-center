@@ -148,6 +148,19 @@ class SlackNotifier
       send_notification(subject_note)
     end
 
+    def issue_notification(kase, old, new)
+      text = "The issue for #{kase.display_id} has been changed from '#{old}' to '#{new}'"
+
+      issue_note = {
+        fallback: text,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+
+      send_notification(issue_note)
+    end
+
     private
 
     def maintenance_notification(kase, text, colour)

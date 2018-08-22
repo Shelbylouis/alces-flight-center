@@ -44,6 +44,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
+    SlackNotifier.issue_notification(@case, @old, @new)
   end
 
   def comment(comment)

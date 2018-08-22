@@ -70,22 +70,32 @@ RSpec.describe 'Case editing', type: :feature do
       include_examples 'Slack'
     end
 
-    it 'allows editing case issue' do
-      expect(kase.issue).not_to eq issue
+    context 'when editing case issue' do
+      let(:subject) {
+        select 'Some other issue'
+        click_button 'Change issue'
+       }
+      let(:notification_method) { :issue_notification }
+      let(:args) { [kase, 'New user/group', 'Some other issue'] }
 
-      select 'Some other issue'
-      click_button 'Change issue'
-      expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
+      it 'allows editing case issue' do
+        expect(kase.issue).not_to eq issue
 
-      expect(find('.event-card')).to \
-        have_text 'Changed this case\'s associated issue from \'New user/group\' to \'Some other issue\''
+        subject
+        expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
 
-      kase.reload
-      expect(kase.issue).to eq issue
+        expect(find('.event-card')).to \
+          have_text 'Changed this case\'s associated issue from \'New user/group\' to \'Some other issue\''
 
-      expect(emails.count).to eq 1
-      expect(emails[0].parts.first.body.raw_source).to \
-        have_text 'This case\'s associated issue has been changed from \'New user/group\' to \'Some other issue\''
+        kase.reload
+        expect(kase.issue).to eq issue
+
+        expect(emails.count).to eq 1
+        expect(emails[0].parts.first.body.raw_source).to \
+          have_text 'This case\'s associated issue has been changed from \'New user/group\' to \'Some other issue\''
+      end
+
+      include_examples 'Slack'
     end
   end
 end
