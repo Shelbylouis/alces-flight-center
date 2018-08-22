@@ -5,6 +5,11 @@ class ComponentsController < ApplicationController
     define_variables_from_type
   end
 
+  def import
+    # @scope here is our cluster
+    authorize @scope, :import_components?
+  end
+
   private
 
   def define_variables_from_type

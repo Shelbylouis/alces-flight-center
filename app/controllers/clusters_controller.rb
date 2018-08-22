@@ -89,6 +89,10 @@ class ClustersController < ApplicationController
     end
   end
 
+  def import_components
+    authorize @cluster
+  end
+
   private
 
   def start_date

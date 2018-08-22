@@ -1,0 +1,18 @@
+<% content_for(:subtitle) {'Import components'} %>
+<%= render 'partials/tabs', activate: :cluster do %>
+  <div class="card-body">
+    <% if policy(@cluster).import_components? %>
+      <%= form_tag import_cluster_components_path(@cluster) do %>
+        <div class="form-group">
+          <label for="benchdown">Select Benchware export file:</label>
+          <%=
+            file_field_tag 'benchdown', class: 'form-control'
+          %>
+        </div>
+        <%= submit_tag 'Import Benchware definitions', class: 'btn btn-primary' %>
+      <% end %>
+    <% else %>
+      <p class="danger">You do not have permission to import components to this cluster.</p>
+    <% end %>
+  </div>
+<% end %>
