@@ -1,5 +1,4 @@
 class ComponentGroupDecorator < ClusterPartDecorator
-  include AssetRecordDecorator
 
   delegate_all
 
@@ -10,14 +9,13 @@ class ComponentGroupDecorator < ClusterPartDecorator
   end
 
   def link
-    component_name = h.pluralize(components.length, component_type.name)
+    component_name = h.pluralize(components.length, component_type)
     h.link_to "#{name} — #{component_name}", path
   end
 
   def tabs
     [
       { id: :components, path: h.component_group_components_path(self) },
-      tabs_builder.asset_record,
       tabs_builder.read_only_cases
     ]
   end
@@ -27,6 +25,6 @@ class ComponentGroupDecorator < ClusterPartDecorator
   end
 
   def type_name
-    "Group of #{component_type.name.pluralize.downcase}"
+    "Group of #{component_type.pluralize.downcase}"
   end
 end

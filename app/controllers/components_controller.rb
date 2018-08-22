@@ -23,7 +23,7 @@ class ComponentsController < ApplicationController
     elsif type_param.blank?
       all_groups
     else
-      all_groups.where({ component_types: { name: type_param[:type] } })
+      all_groups.select { |cg| cg.component_type == type_param[:type] }
     end
   end
 

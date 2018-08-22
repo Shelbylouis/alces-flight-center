@@ -141,58 +141,6 @@ RSpec.describe Cluster, type: :model do
     end
   end
 
-  describe '#available_component_group_types' do
-    subject do
-      create(:cluster).tap do |cluster|
-
-        server_make = create(
-          :component_make,
-          component_type: server_component_type
-        )
-        cluster.component_groups.create!(
-          name: 'Node group',
-          component_make: server_make
-        )
-
-        another_make = create(
-          :component_make,
-          component_type: another_component_type
-        )
-        cluster.component_groups.create!(
-          name: 'Another group',
-          component_make: another_make
-        )
-
-        yet_another_make = create(
-          :component_make,
-          component_type: yet_another_component_type
-        )
-        cluster.component_groups.create!(
-          name: 'Yet another group',
-          component_make: yet_another_make
-        )
-      end.available_component_group_types
-    end
-
-    let! :server_component_type do
-      create(:component_type, name: 'Server', ordering: 2)
-    end
-    let! :another_component_type do
-      create(:component_type, name: 'Another Type', ordering: 1)
-    end
-    let! :yet_another_component_type do
-      create(:component_type, name: 'Yet Another Type', ordering: 4)
-    end
-    let! :unused_component_type do
-      create(:component_type, name: 'Unused Type', ordering: 3)
-    end
-
-    it 'returns the available component types' do
-      expect(subject).not_to include('Unused Type')
-      expect(subject).to eq(['Another Type', 'Server', 'Yet Another Type'])
-    end
-  end
-
   describe '#unfinished_related_maintenance_windows' do
     subject { create(:cluster) }
 

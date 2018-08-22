@@ -32,43 +32,14 @@ FactoryBot.define do
     email
   end
 
-  factory :component_type do
-    name 'server'
-    ordering 5
-  end
-
-  factory :component_make do
-    component_type
-    manufacturer 'manufacturer'
-    model 'model'
-    knowledgebase_url 'knowledgebase_url'
-  end
 
   factory :component_group do
     cluster
-    component_make
     name 'nodes'
-  end
-
-  factory :expansion_type do
-    name 'switch'
-  end
-
-  factory :default_expansion do
-    expansion_type
-    component_make
-    ports 4
-    slot 'a'
   end
 
   factory :category do
     name 'User management'
-  end
-
-  factory :asset_record_field_definition, aliases: [:definition] do
-    field_name 'Manufacturer/model name'
-    level :group
-    data_type 'short_text'
   end
 
   factory :service_type do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_16_105616) do
+ActiveRecord::Schema.define(version: 2018_08_22_095558) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,31 +23,11 @@ ActiveRecord::Schema.define(version: 2018_08_16_105616) do
     t.index ["site_id"], name: "index_additional_contacts_on_site_id"
   end
 
-  create_table "asset_record_field_definitions", force: :cascade do |t|
-    t.string "field_name", null: false
-    t.string "level", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "data_type"
-  end
-
   create_table "asset_record_field_definitions_component_types", id: false, force: :cascade do |t|
     t.integer "asset_record_field_definition_id", null: false
     t.integer "component_type_id", null: false
     t.index ["asset_record_field_definition_id"], name: "index_arfd_ct_on_asset_record_field_definition_id"
     t.index ["component_type_id"], name: "index_arfd_ct_on_component_type_id"
-  end
-
-  create_table "asset_record_fields", force: :cascade do |t|
-    t.string "value", null: false
-    t.integer "component_id"
-    t.integer "component_group_id"
-    t.integer "asset_record_field_definition_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["asset_record_field_definition_id"], name: "index_asset_record_fields_on_asset_record_field_definition_id"
-    t.index ["component_group_id"], name: "index_asset_record_fields_on_component_group_id"
-    t.index ["component_id"], name: "index_asset_record_fields_on_component_id"
   end
 
   create_table "audits", force: :cascade do |t|
@@ -235,25 +215,7 @@ ActiveRecord::Schema.define(version: 2018_08_16_105616) do
     t.integer "cluster_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "component_make_id", null: false
     t.index ["cluster_id"], name: "index_component_groups_on_cluster_id"
-    t.index ["component_make_id"], name: "index_component_groups_on_component_make_id"
-  end
-
-  create_table "component_makes", force: :cascade do |t|
-    t.string "manufacturer", null: false
-    t.string "model", null: false
-    t.string "knowledgebase_url", null: false
-    t.bigint "component_type_id", null: false
-    t.index ["component_type_id"], name: "index_component_makes_on_component_type_id"
-  end
-
-  create_table "component_types", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "ordering", null: false
   end
 
   create_table "components", force: :cascade do |t|
@@ -263,6 +225,8 @@ ActiveRecord::Schema.define(version: 2018_08_16_105616) do
     t.integer "component_group_id", null: false
     t.string "support_type", default: "inherit", null: false
     t.boolean "internal", default: false
+    t.string "component_type", null: false
+    t.text "info", default: "", null: false
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end
 
@@ -297,26 +261,6 @@ ActiveRecord::Schema.define(version: 2018_08_16_105616) do
     t.text "public_key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "expansion_types", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "expansions", force: :cascade do |t|
-    t.string "slot", null: false
-    t.integer "ports", null: false
-    t.bigint "expansion_type_id", null: false
-    t.string "type", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.bigint "component_make_id"
-    t.bigint "component_id"
-    t.index ["component_id"], name: "index_expansions_on_component_id"
-    t.index ["component_make_id"], name: "index_expansions_on_component_make_id"
-    t.index ["expansion_type_id"], name: "index_expansions_on_expansion_type_id"
   end
 
   create_table "flight_directory_configs", force: :cascade do |t|
@@ -453,11 +397,6 @@ ActiveRecord::Schema.define(version: 2018_08_16_105616) do
   end
 
   add_foreign_key "additional_contacts", "sites"
-  add_foreign_key "asset_record_field_definitions_component_types", "asset_record_field_definitions"
-  add_foreign_key "asset_record_field_definitions_component_types", "component_types"
-  add_foreign_key "asset_record_fields", "asset_record_field_definitions"
-  add_foreign_key "asset_record_fields", "component_groups"
-  add_foreign_key "asset_record_fields", "components"
   add_foreign_key "case_associations", "cases"
   add_foreign_key "case_comments", "cases"
   add_foreign_key "case_comments", "users"
@@ -480,16 +419,11 @@ ActiveRecord::Schema.define(version: 2018_08_16_105616) do
   add_foreign_key "cluster_checks", "clusters"
   add_foreign_key "clusters", "sites"
   add_foreign_key "component_groups", "clusters"
-  add_foreign_key "component_groups", "component_makes"
-  add_foreign_key "component_makes", "component_types"
   add_foreign_key "components", "component_groups"
   add_foreign_key "credit_charges", "cases"
   add_foreign_key "credit_charges", "users"
   add_foreign_key "credit_deposits", "clusters"
   add_foreign_key "credit_deposits", "users"
-  add_foreign_key "expansions", "component_makes"
-  add_foreign_key "expansions", "components"
-  add_foreign_key "expansions", "expansion_types"
   add_foreign_key "flight_directory_configs", "sites"
   add_foreign_key "issues", "categories"
   add_foreign_key "issues", "service_types"
