@@ -163,6 +163,17 @@ class SlackNotifier
       send_notification(resolved_note)
     end
 
+    def draft_change_request_notification(kase, user, text)
+      draft_note = {
+        fallback: text,
+        author_name: user.name,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+      send_notification(draft_note)
+    end
+
     private
 
     def maintenance_notification(kase, text, colour)

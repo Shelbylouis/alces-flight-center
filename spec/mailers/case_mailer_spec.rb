@@ -196,6 +196,18 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
       include_examples 'Slack'
     end
+
+    context 'change request draft' do
+      subject { CaseMailer.draft_change_request(kase, another_user) }
+
+      let(:text) {
+        "A draft change request for #{kase.display_id} has been created by #{another_user.name}"
+      }
+      let(:notification_method) { :draft_change_request_notification }
+      let(:args) { [kase, another_user, text] }
+
+      include_examples 'Slack'
+    end
   end
 
   describe 'Case association emails' do

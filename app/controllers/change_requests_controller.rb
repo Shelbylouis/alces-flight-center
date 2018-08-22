@@ -17,6 +17,7 @@ class ChangeRequestsController < ApplicationController
 
     if @case.save
       flash[:success] = "Created change request for case #{@case.display_id}."
+      CaseMailer.draft_change_request(@case, current_user).deliver_later
       redirect_to case_path(@case)
     else
       errors = format_errors(cr)
