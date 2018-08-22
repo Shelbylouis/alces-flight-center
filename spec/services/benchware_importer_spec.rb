@@ -42,7 +42,7 @@ RSpec.describe BenchwareImporter do
         name: comp1
         type: another type
         primary_group: anothergroup
-        secondary_groups: yetanothergroup,somedifferentgroup
+        secondary_group: yetanothergroup,somedifferentgroup
         info: |
           This is some info
           It is informative
@@ -66,7 +66,7 @@ DATA
         name: comp3
         type: another type
         primary_group: anothergroup
-        secondary_groups: yetanothergroup,somedifferentgroup
+        secondary_group: yetanothergroup,somedifferentgroup
         info: |
           This is some info
           It is informative
@@ -89,7 +89,7 @@ DATA
         name: comp3
         type: another type
         primary_group: original
-        secondary_groups: yetanothergroup,somedifferentgroup
+        secondary_group: yetanothergroup,somedifferentgroup
         info: |
           This is some info
           It is informative
@@ -107,7 +107,7 @@ DATA
         name: comp3
         type: another type
         primary_group: sw
-        secondary_groups: yetanothergroup,somedifferentgroup
+        secondary_group: yetanothergroup,somedifferentgroup
         info: |
           This is some info
           It is informative
@@ -125,7 +125,7 @@ DATA
         name: comp3
         type: another type
         primary_group: sw
-        secondary_groups: yetanothergroup,nodes,somedifferentgroup
+        secondary_group: yetanothergroup,nodes,somedifferentgroup
         info: |
           This is some info
           It is informative
@@ -143,7 +143,7 @@ DATA
         name: comp3
         type: another type
         primary_group: anothergroup
-        secondary_groups: yetanothergroup,somedifferentgroup
+        secondary_group: yetanothergroup,somedifferentgroup
         info: |
           This is some info
           It is informative
