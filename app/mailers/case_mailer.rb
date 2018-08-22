@@ -41,7 +41,6 @@ class CaseMailer < ApplicationMailer
     @old = Issue.find(old_val).decorate.label_text
     @new = Issue.find(new_val).decorate.label_text
     mail(
-      cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
     SlackNotifier.issue_notification(@case, @old, @new)
