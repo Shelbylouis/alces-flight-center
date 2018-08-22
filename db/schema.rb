@@ -215,7 +215,9 @@ ActiveRecord::Schema.define(version: 2018_08_23_144957) do
     t.integer "cluster_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "unix_name"
     t.index ["cluster_id"], name: "index_component_groups_on_cluster_id"
+    t.index ["unix_name"], name: "index_component_groups_on_unix_name"
   end
 
   create_table "components", force: :cascade do |t|
