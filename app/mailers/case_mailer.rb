@@ -112,15 +112,6 @@ class CaseMailer < ApplicationMailer
     SlackNotifier.resolved_case_notification(@case, @user, @text)
   end
 
-  def draft_change_request(kase, user)
-    @case = kase
-    @user = user
-    @text = "A draft change request for #{kase.display_id} has been created by #{user.name}"
-
-    mail( subject: @case.email_reply_subject )
-    SlackNotifier.draft_change_request_notification(@case, @user, @text)
-  end
-
   private
 
   def mail(**options)

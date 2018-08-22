@@ -16,8 +16,16 @@ class ChangeRequestsController < ApplicationController
     authorize cr
 
     if @case.save
-      flash[:success] = "Created change request for case #{@case.display_id}."
-      CaseMailer.draft_change_request(@case, current_user).deliver_later
+      text = "Created change request for case #{@case.display_id}."
+      flash[:success] = text
+      email(
+        [
+          @case,
+          text,
+          current_user,
+          {}
+        ]
+      )
       redirect_to case_path(@case)
     else
       errors = format_errors(cr)
@@ -141,13 +149,18 @@ class ChangeRequestsController < ApplicationController
       # the record to the database (or raised an exception). Hence we can be
       # certain that, if we reach this point, the model is saved and valid, so
       # it's safe to send the email.
-      CaseMailer.change_request(
-        cr.case,
-        cr.transitions.last.decorate.text_for_event,
-        current_user,
-        @recipients ||= @case.email_recipients
-      ).deliver_later
+      email(
+        [
+          cr.case,
+          "The change request for this case #{cr.transitions.last.decorate.text_for_event}",
+          current_user,
+          @recipients ||= @case.email_recipients
+        ]
+      )
     end
   end
 
+  def email(args)
+    CaseMailer.change_request(*args).deliver_later
+  end
 end

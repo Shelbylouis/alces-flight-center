@@ -104,7 +104,6 @@ class SlackNotifier
     end
 
     def change_request_notification(kase, text, user)
-      text = "The change request for this case #{text}"
       change_request_note = {
         fallback: text,
         color: '#f44192',
@@ -161,17 +160,6 @@ class SlackNotifier
         text: text
       }
       send_notification(resolved_note)
-    end
-
-    def draft_change_request_notification(kase, user, text)
-      draft_note = {
-        fallback: text,
-        author_name: user.name,
-        title: subject_and_id_title(kase),
-        title_link: cluster_case_url(kase.cluster, kase),
-        text: text
-      }
-      send_notification(draft_note)
     end
 
     private
