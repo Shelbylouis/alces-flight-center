@@ -183,4 +183,20 @@ DATA
     expect(invalid).to eq ['comp4']
   end
 
+  it 'ignores components in `orphan` group' do
+    data = <<~DATA
+      comp3:
+        name: comp3
+        type: another type
+        primary_group: orphan
+        secondary_group: yetanothergroup,somedifferentgroup
+        info: |
+          This is some info
+          It is informative
+    DATA
+
+    importer.from_text(data)
+    expect(cluster.components.find_by(name: 'comp3')).to be nil
+  end
+
 end

@@ -10,10 +10,10 @@ RSpec.describe 'Import cluster components', type: :feature do
     attach_file 'Select Benchware export file:', Rails.root + 'spec/fixtures/benchware-ex.yml'
     click_button 'Import Benchware definitions'
 
-    expect(find('.alert-success')).to have_text 'Imported 29 new components and updated 0 existing components'
+    expect(find('.alert-success')).to have_text 'Imported 28 new components and updated 0 existing components'
 
-    expect(cluster.components.count).to eq 29
-    expect(cluster.component_groups.count).to eq 14
+    expect(cluster.components.count).to eq 28
+    expect(cluster.component_groups.count).to eq 13
 
     master1 = cluster.components.find_by(name: 'master1')
     expect(master1).not_to be nil

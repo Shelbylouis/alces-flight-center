@@ -6,6 +6,9 @@ class BenchwareImporter
   # the :primary_group attribute and is treated as primary.
   NODES_GROUP_IDENT = 'nodes'.freeze
 
+  # If nodes are in this primary group we don't import them at all.
+  IGNORE_GROUPS = %w(orphan).freeze
+
   def initialize(cluster)
     @cluster = cluster
     @new_components = 0
@@ -45,15 +48,21 @@ class BenchwareImporter
   end
 
   def process_new_component(spec)
-    group = group_from_unix(group_from_spec(spec))
+    group_unix_name = group_from_spec(spec)
 
-    group.components.create(
-      name: spec[:name],
-      component_type: spec[:type],
-      info: spec[:info]
-    )
+    unless IGNORE_GROUPS.include?(group_unix_name)
 
-    @new_components += 1
+      group = group_from_unix(group_unix_name)
+
+      group.components.create(
+        name: spec[:name],
+        component_type: spec[:type],
+        info: spec[:info]
+      )
+
+      @new_components += 1
+
+    end
 
   end
 
