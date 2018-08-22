@@ -42,22 +42,32 @@ RSpec.describe 'Case editing', type: :feature do
       emails.clear
     end
 
-    it 'allows editing case subject' do
-      find('#case-subject-edit').click
-      fill_in 'case[subject]', with: 'New subject'
-      click_button 'Change subject'
+    context 'when editing case subject' do
+      let(:subject) {
+        find('#case-subject-edit').click
+        fill_in 'case[subject]', with: 'New subject'
+        click_button 'Change subject'
+      }
+      let(:notification_method) { :subject_notification }
+      let(:args) { [kase, 'Original subject', 'New subject'] }
 
-      expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
+      it 'can be edited successfully' do
+        subject
 
-      expect(find('.event-card')).to \
-        have_text 'Changed the subject of this case from \'Original subject\' to \'New subject\''
+        expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
 
-      kase.reload
+        expect(find('.event-card')).to \
+          have_text 'Changed the subject of this case from \'Original subject\' to \'New subject\''
 
-      expect(kase.subject).to eq 'New subject'
+        kase.reload
 
-      expect(emails.count).to eq 1
-      expect(emails[0].subject).to have_text 'New subject'
+        expect(kase.subject).to eq 'New subject'
+
+        expect(emails.count).to eq 1
+        expect(emails[0].subject).to have_text 'New subject'
+      end
+
+      include_examples 'Slack'
     end
 
     it 'allows editing case issue' do
