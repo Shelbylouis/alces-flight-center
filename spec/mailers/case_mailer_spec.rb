@@ -209,4 +209,16 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
     include_examples 'Slack'
   end
+
+  describe 'Resolved case emails' do
+    subject { CaseMailer.resolve_case(kase, another_user) }
+
+    let(:text) {
+      "#{kase.display_id} has been resolved by #{another_user.name} and is awaiting closure"
+    }
+    let(:notification_method) { :resolved_case_notification }
+    let(:args) { [kase, another_user, text] }
+
+    include_examples 'Slack'
+  end
 end

@@ -99,11 +99,17 @@ class CaseMailer < ApplicationMailer
 • #{reference_texts.join("\n • ")}
     }
 
-    mail(
-      subject: @case.email_reply_subject
-    )
-
+    mail( subject: @case.email_reply_subject )
     SlackNotifier.case_association_notification(@case, user, @text)
+  end
+
+  def resolve_case(kase, user)
+    @case = kase
+    @user = user
+    @text = "#{@case.display_id} has been resolved by #{@user.name} and is awaiting closure"
+
+    mail( subject: @case.email_reply_subject )
+    SlackNotifier.resolved_case_notification(@case, user, @text)
   end
 
   private
