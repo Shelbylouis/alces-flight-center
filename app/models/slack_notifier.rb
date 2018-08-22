@@ -83,16 +83,13 @@ class SlackNotifier
       maintenance_notification(kase, text, 'warning')
     end
 
-    def log_notification(log)
-      notification_text = "New log created on #{log.cluster.name}" \
-        " #{log&.component ? 'for ' + log.component.name : nil }"
-
+    def log_notification(log, text)
       logs_url = cluster_logs_url(log.cluster)
 
       log_note = {
-        fallback: notification_text,
+        fallback: text,
         color: "#8daec2",
-        pretext: notification_text,
+        pretext: text,
         author_name: log.engineer.name,
         title: "Details",
         title_link: logs_url,
