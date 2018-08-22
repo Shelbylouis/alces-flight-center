@@ -4,6 +4,8 @@ class BenchwareImporter
 
   def initialize(cluster)
     @cluster = cluster
+    @new_components = 0
+    @updated_components = 0
   end
 
   def from_file(file)
@@ -17,12 +19,24 @@ class BenchwareImporter
   private
 
   def import(data)
-    new_components = 0
-    updated_components = 0
-    puts "TODO actually import into #{@cluster}"
+    data.values.each do |component|
+      process_component(component.symbolize_keys)
+    end
 
-    return new_components, updated_components
+    return @new_components, @updated_components
   end
 
+  def process_component(spec)
+    existing = @cluster.components.find_by(name: spec[:name])
+    existing.info = spec[:info]
+    existing.save!
+    @updated_components += 1
+  rescue ActiveRecord::RecordNotFound
+    process_new_component(spec)
+  end
+
+  def process_new_component(spec)
+
+  end
 
 end
