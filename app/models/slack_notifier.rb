@@ -140,7 +140,7 @@ class SlackNotifier
 
       subject_note = {
         fallback: text,
-        title: new,
+        title: subject_and_id_title(kase),
         title_link: cluster_case_url(kase.cluster, kase),
         text: text
       }
