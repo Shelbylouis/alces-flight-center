@@ -63,7 +63,7 @@ class ClustersController < ApplicationController
 
       if result.save
         if new_log
-          SlackNotifier.log_notification(new_log) if new_log.save
+          AdminMailer.new_log(new_log).deliver_later if new_log.save
         end
 
         flash[:success] = 'Cluster check results successfully saved.'
