@@ -60,14 +60,6 @@ RSpec.describe 'Case mailer', :type => :mailer do
     site.additional_contacts = [additional_contact]
   end
 
-  RSpec.shared_examples 'Slack' do
-    it 'sends a notification to Slack' do
-      expect(SlackNotifier).to receive(notification_method)
-        .with(*args)
-      subject
-    end
-  end
-
   describe 'Case creation email' do
     subject { CaseMailer.new_case(kase) }
 
