@@ -8,6 +8,13 @@ class ComponentsController < ApplicationController
   def import
     # @scope here is our cluster
     authorize @scope, :import_components?
+    importer = BenchwareImporter.new(@scope)
+
+    uploaded_file = params[:benchdown]
+    new_comps, updated_comps = importer.from_file(uploaded_file)
+
+    flash[:success] = "Imported #{view_context.pluralize(new_comps, 'new component')} and updated #{view_context.pluralize(updated_comps, 'existing component')}"
+    redirect_to cluster_components_path(@scope)
   end
 
   private
