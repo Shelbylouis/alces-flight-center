@@ -43,7 +43,7 @@ RSpec.describe 'Case editing', type: :feature do
     end
 
     context 'when editing case subject' do
-      let(:subject) {
+      subject {
         find('#case-subject-edit').click
         fill_in 'case[subject]', with: 'New subject'
         click_button 'Change subject'
@@ -71,7 +71,7 @@ RSpec.describe 'Case editing', type: :feature do
     end
 
     context 'when editing case issue' do
-      let(:subject) {
+      subject {
         select 'Some other issue'
         click_button 'Change issue'
        }
