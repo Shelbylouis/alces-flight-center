@@ -80,11 +80,11 @@ class CaseMailer < ApplicationMailer
     window.set_maintenance_ending_soon_email_flag
   end
 
-  def change_request(my_case, text, user)
+  def change_request(my_case, text, user, recipients)
     @case = my_case
     @text = text
     mail(
-      cc: @case.email_recipients,
+      cc: recipients,
       subject: @case.email_reply_subject
     )
     SlackNotifier.change_request_notification(@case, @text, user)

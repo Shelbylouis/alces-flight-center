@@ -188,7 +188,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
   describe 'Change Request emails' do
     context 'change request event' do
-      subject { CaseMailer.change_request(kase, text, requestor) }
+      subject { CaseMailer.change_request(kase, text, requestor, kase.email_recipients) }
 
       let (:text) { "Request to change please" }
       let (:notification_method) { :change_request_notification }

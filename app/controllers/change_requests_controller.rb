@@ -75,7 +75,8 @@ class ChangeRequestsController < ApplicationController
   end
 
   def cancel
-    change_action 'Change request %s cancelled.' do |cr|
+    change_action_and_email 'Change request %s cancelled.' do |cr|
+      @recipients = {}
       cr.cancel!(current_user)
     end
   end
@@ -143,7 +144,8 @@ class ChangeRequestsController < ApplicationController
       CaseMailer.change_request(
         cr.case,
         cr.transitions.last.decorate.text_for_event,
-        current_user
+        current_user,
+        @recipients ||= @case.email_recipients
       ).deliver_later
     end
   end
