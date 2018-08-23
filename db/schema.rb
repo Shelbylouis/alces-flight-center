@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_22_095558) do
+ActiveRecord::Schema.define(version: 2018_08_23_144957) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -64,7 +64,7 @@ ActiveRecord::Schema.define(version: 2018_08_22_095558) do
   create_table "case_comments", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "case_id", null: false
-    t.string "text", null: false
+    t.text "text", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["case_id"], name: "index_case_comments_on_case_id"
@@ -157,7 +157,7 @@ ActiveRecord::Schema.define(version: 2018_08_22_095558) do
   create_table "change_requests", force: :cascade do |t|
     t.bigint "case_id"
     t.string "state", default: "draft", null: false
-    t.string "description", null: false
+    t.text "description", null: false
     t.integer "credit_charge", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -173,7 +173,7 @@ ActiveRecord::Schema.define(version: 2018_08_22_095558) do
     t.date "date", null: false
     t.bigint "user_id", null: false
     t.string "result", null: false
-    t.string "comment"
+    t.text "comment"
     t.bigint "log_id"
     t.index ["cluster_check_id"], name: "index_check_results_on_cluster_check_id"
     t.index ["log_id"], name: "index_check_results_on_log_id"
