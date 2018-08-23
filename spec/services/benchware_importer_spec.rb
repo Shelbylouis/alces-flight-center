@@ -119,12 +119,12 @@ DATA
     expect(component3.component_group.name).to eq 'Ethernet switches'
   end
 
-  it 'uses `nodes` secondary group if present' do
+  it 'uses `nodes` secondary group if present and primary is unmappable' do
     data = <<~DATA
       comp3:
         name: comp3
         type: another type
-        primary_group: sw
+        primary_group: unmappedgroup
         secondary_group: yetanothergroup,nodes,somedifferentgroup
         info: |
           This is some info
@@ -135,6 +135,24 @@ DATA
 
     component3 = cluster.components.find_by(name: 'comp3')
     expect(component3.component_group.name).to eq 'Compute nodes'
+  end
+
+  it 'ignores `nodes` secondary group if primary is mappable' do
+    data = <<~DATA
+      comp3:
+        name: comp3
+        type: another type
+        primary_group: gpu
+        secondary_group: yetanothergroup,nodes,somedifferentgroup
+        info: |
+          This is some info
+          It is informative
+    DATA
+
+    importer.from_text(data)
+
+    component3 = cluster.components.find_by(name: 'comp3')
+    expect(component3.component_group.name).to eq 'GPU nodes'
   end
 
   it 'also works through #from_file' do

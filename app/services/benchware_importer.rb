@@ -67,7 +67,9 @@ class BenchwareImporter
   end
 
   def group_from_spec(spec)
-    if spec[:secondary_group]&.split(',')&.include?(NODES_GROUP_IDENT)
+    if UNIX_NAME_MAPPING.include?(spec[:primary_group])
+      spec[:primary_group]
+    elsif spec[:secondary_group]&.split(',')&.include?(NODES_GROUP_IDENT)
       NODES_GROUP_IDENT
     else
       spec[:primary_group]

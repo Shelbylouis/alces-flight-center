@@ -13,7 +13,7 @@ RSpec.describe 'Import cluster components', type: :feature do
     expect(find('.alert-success')).to have_text 'Imported 28 new components and updated 0 existing components'
 
     expect(cluster.components.count).to eq 28
-    expect(cluster.component_groups.count).to eq 13
+    expect(cluster.component_groups.count).to eq 17
 
     master1 = cluster.components.find_by(name: 'master1')
     expect(master1).not_to be nil
