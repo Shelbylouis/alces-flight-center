@@ -202,8 +202,13 @@ RSpec.describe 'Case mailer', :type => :mailer do
     subject { CaseMailer.change_association(kase, another_user) }
 
     let(:text) {
-      "Changed the affected components on this case to:\n\n• node01 (server)\n"\
-      " • Some service (Service)\n    " }
+      reference_texts = kase.associations
+        .map { |a| a.decorate.reference_text }
+     %{Changed the affected components on this case to:
+
+• #{reference_texts.join("\n • ")}
+    }
+    }
     let(:notification_method) { :case_association_notification }
     let(:args) { [kase, another_user, text] }
 
