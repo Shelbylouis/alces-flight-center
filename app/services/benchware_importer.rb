@@ -2,8 +2,9 @@ require 'yaml'
 
 class BenchwareImporter
 
-  # If this group name appears in secondary_groups then it takes priority over
-  # the :primary_group attribute and is treated as primary.
+  # If this group name appears in secondary_groups then, if the :primary_group
+  # attribute does not map to a friendly name in UNIX_NAME_MAPPING, this group
+  # is treated as the primary.
   NODES_GROUP_IDENT = 'nodes'.freeze
 
   # If nodes are in this primary group we don't import them at all.
