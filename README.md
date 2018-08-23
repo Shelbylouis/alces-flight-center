@@ -48,6 +48,9 @@
 7. Perform required/suggested additional manual setup steps output at the end
    of `bin/setup` script.
 
+8. Read through the `.env.example` file and set up any necessary environment
+   variables.
+
 
 ### To run development server(s)
 
