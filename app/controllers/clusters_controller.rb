@@ -72,6 +72,11 @@ class ClustersController < ApplicationController
       end
     end
 
+    if @cluster.check_results.where(date: Date.today)
+      .size.equal?(@cluster.cluster_checks.count)
+      AdminMailer.cluster_check_submission(@cluster, current_user).deliver_later
+    end
+
     redirect_to cluster_checks_path(@cluster)
   end
 

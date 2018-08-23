@@ -10,6 +10,17 @@ RSpec.describe 'Cluster checks', type: :feature do
 
   describe 'Cluster submission form' do
     context 'as an admin' do
+      subject {
+        visit path
+        choose 'success'
+        click_button 'Submit Cluster Check Results'
+      }
+      let(:notification_method) { :cluster_check_submission_notification }
+      let(:text) {
+        "The daily checks for #{cluster.name} have been submitted by #{admin.name}."\
+        "\n1/1 checks passed"
+      }
+      let(:args) { [cluster, admin, text] }
       let(:path) { cluster_check_submission_path(cluster, as: admin) }
       let!(:component) { create(:component, cluster: cluster) }
 
@@ -54,6 +65,8 @@ RSpec.describe 'Cluster checks', type: :feature do
           expect(log[:component_id]).to eq(component.id)
         end
       end
+
+      include_examples 'Slack'
     end
 
     context 'as a contact' do

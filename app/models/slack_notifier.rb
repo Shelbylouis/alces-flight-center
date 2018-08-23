@@ -159,6 +159,17 @@ class SlackNotifier
       send_notification(resolved_note)
     end
 
+    def cluster_check_submission_notification(cluster, user, text)
+      cluster_check_submission_note = {
+        fallback: text,
+        author_name: user.name,
+        title: "[#{cluster.name}] Cluster Check Results",
+        title_link: cluster_checks_url(cluster),
+        text: text
+      }
+      send_notification(cluster_check_submission_note)
+    end
+
     private
 
     def maintenance_notification(kase, text, colour)
