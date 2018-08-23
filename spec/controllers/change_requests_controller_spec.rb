@@ -27,11 +27,11 @@ RSpec.describe ChangeRequestsController, type: :controller do
       it "transitions from #{initial_state} to #{next_state}" do
 
         cr = create(:change_request, case: kase, state: initial_state)
-
         expect(CaseMailer).to receive(:change_request).with(
           kase,
-          message,
-          send(user)
+          "The change request for this case #{message}",
+          send(user),
+          [contact.email]
         ).and_return(stub_mail)
 
         sign_in_as(send(user))
