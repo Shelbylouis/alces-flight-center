@@ -17,6 +17,7 @@ class ComponentDecorator < ClusterPartDecorator
       tabs_builder.logs,
       tabs_builder.maintenance,
       tabs_builder.read_only_cases,
+      tabs_builder.cluster_composition(h),
     ]
   end
 

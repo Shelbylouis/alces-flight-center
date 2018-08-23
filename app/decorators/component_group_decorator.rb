@@ -15,7 +15,8 @@ class ComponentGroupDecorator < ClusterPartDecorator
   def tabs
     [
       { id: :components, path: h.component_group_components_path(self) },
-      tabs_builder.read_only_cases
+      tabs_builder.read_only_cases,
+      tabs_builder.cluster_composition(h),
     ]
   end
 

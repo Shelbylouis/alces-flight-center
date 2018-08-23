@@ -24,31 +24,7 @@ class ClusterDecorator < ApplicationDecorator
       tabs_builder.logs,
       tabs_builder.cases,
       tabs_builder.maintenance,
-      {
-        id: :cluster,
-        dropdown: [
-          {
-            text: 'Services',
-            path: h.cluster_services_path(self)
-          },
-          {
-            text: 'Components:',
-            heading: true,
-          }
-        ].tap do |comps|
-          comps.push(text: 'All', path: h.cluster_components_path(self))
-          cluster.component_groups.each do |g|
-            comps.push(
-              text: g.name,
-              path: h.component_group_path(g)
-            )
-          end
-          if h.policy(self).import_components?
-            comps.push(divider: true)
-            comps.push(text: 'Import from Benchware', path: h.import_cluster_components_path(self))
-          end
-        end
-      }
+      tabs_builder.cluster_composition(h)
     ].compact
   end
 
