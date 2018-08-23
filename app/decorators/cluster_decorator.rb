@@ -37,10 +37,10 @@ class ClusterDecorator < ApplicationDecorator
           }
         ].tap do |comps|
           comps.push(text: 'All', path: h.cluster_components_path(self))
-          available_component_group_types.each do |t|
+          cluster.component_groups.each do |g|
             comps.push(
-              text: t.pluralize,
-              path: h.cluster_components_path(self, type: t)
+              text: g.name,
+              path: h.component_group_path(g)
             )
           end
           if h.policy(self).import_components?

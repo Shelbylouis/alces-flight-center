@@ -22,7 +22,6 @@ RSpec.describe BenchwareImporter do
       :component,
       name: 'comp1',
       cluster: cluster,
-      component_type: 'a type',
       component_group: component_group
     )
   }
@@ -31,7 +30,6 @@ RSpec.describe BenchwareImporter do
       :component,
       name: 'comp2',
       cluster: cluster,
-      component_type: 'a type',
       component_group: component_group
     )
   }
@@ -40,7 +38,6 @@ RSpec.describe BenchwareImporter do
     data = <<~DATA
       comp1:
         name: comp1
-        type: another type
         primary_group: anothergroup
         secondary_group: yetanothergroup,somedifferentgroup
         info: |
@@ -53,7 +50,6 @@ DATA
     component1.reload
     expect(component1.info).to include("This is some info\nIt is informative")
     expect(component1.component_group).to eq component_group
-    expect(component1.component_type).to eq 'a type'
 
     expect(new_comp).to eq 0
     expect(updated_comp).to eq 1
@@ -64,7 +60,6 @@ DATA
     data = <<~DATA
       comp3:
         name: comp3
-        type: another type
         primary_group: anothergroup
         secondary_group: yetanothergroup,somedifferentgroup
         info: |
@@ -76,7 +71,6 @@ DATA
 
     component3 = cluster.components.find_by(name: 'comp3')
     expect(component3.component_group.name).to eq 'anothergroup'
-    expect(component3.component_type).to eq 'another type'
     expect(component3.info).to include("This is some info\nIt is informative")
 
     expect(new_comp).to eq 1
@@ -87,7 +81,6 @@ DATA
     data = <<~DATA
       comp3:
         name: comp3
-        type: another type
         primary_group: original
         secondary_group: yetanothergroup,somedifferentgroup
         info: |
@@ -105,7 +98,6 @@ DATA
     data = <<~DATA
       comp3:
         name: comp3
-        type: another type
         primary_group: sw
         secondary_group: yetanothergroup,somedifferentgroup
         info: |
@@ -123,7 +115,6 @@ DATA
     data = <<~DATA
       comp3:
         name: comp3
-        type: another type
         primary_group: unmappedgroup
         secondary_group: yetanothergroup,nodes,somedifferentgroup
         info: |
@@ -141,7 +132,6 @@ DATA
     data = <<~DATA
       comp3:
         name: comp3
-        type: another type
         primary_group: gpu
         secondary_group: yetanothergroup,nodes,somedifferentgroup
         info: |
@@ -159,7 +149,6 @@ DATA
     data = <<~DATA
       comp3:
         name: comp3
-        type: another type
         primary_group: anothergroup
         secondary_group: yetanothergroup,somedifferentgroup
         info: |
@@ -181,7 +170,6 @@ DATA
     data = <<~DATA
       comp3:
         name: comp3
-        type: another type
         primary_group: anothergroup
         secondary_group: yetanothergroup,somedifferentgroup
         info: |
@@ -205,7 +193,6 @@ DATA
     data = <<~DATA
       comp3:
         name: comp3
-        type: another type
         primary_group: orphan
         secondary_group: yetanothergroup,somedifferentgroup
         info: |

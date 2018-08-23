@@ -29,6 +29,6 @@ class ComponentDecorator < ClusterPartDecorator
   end
 
   def type_name
-    model.component_type
+    'Component'
   end
 end

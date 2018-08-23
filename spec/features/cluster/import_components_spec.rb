@@ -22,7 +22,6 @@ RSpec.describe 'Import cluster components', type: :feature do
     node1 = cluster.components.find_by(name: 'node01')
     expect(node1).not_to be nil
     expect(node1.component_group.name).to eq 'Compute nodes'
-    expect(node1.component_type).to eq 'NOT IMPLEMENTED'
 
   end
 end

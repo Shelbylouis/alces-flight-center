@@ -56,7 +56,6 @@ class BenchwareImporter
 
       group.components.create(
         name: spec[:name],
-        component_type: spec[:type],
         info: spec[:info]
       )
 
