@@ -3,9 +3,9 @@ class CaseMailerPreview < ApplicationMailerPreview
     CaseMailer.new_case(get_case)
   end
 
-  def change_assignee
+  def change_assignee_id
     my_case = get_case
-    CaseMailer.change_assignee(my_case, user)
+    CaseMailer.change_assignee_id(my_case, nil, User.admins.first.id)
   end
 
   def comment
