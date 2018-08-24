@@ -1,6 +1,6 @@
 class AddTopics < ActiveRecord::Migration[5.2]
   def up
-    topics = YAML.load_file(Rails.root.join('config', 'topics.yml'))
+    topics = YAML.load_file(Rails.root.join('db', 'data', 'topics.yml'))
     topics.each do |topic|
       if topic['site'].present?
         site = Site.find_by(name: topic['site'])

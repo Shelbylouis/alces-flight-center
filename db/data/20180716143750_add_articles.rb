@@ -1,6 +1,6 @@
 class AddArticles < ActiveRecord::Migration[5.2]
   def up
-    topics = YAML.load_file(Rails.root.join('config', 'topics.yml'))
+    topics = YAML.load_file(Rails.root.join('db', 'data', 'topics.yml'))
     topics.each do |t|
       articles = t['articles'] || []
       topic = Topic.find_by(title: t['title'])
