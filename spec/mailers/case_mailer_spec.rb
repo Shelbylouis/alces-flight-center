@@ -64,7 +64,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
     subject { CaseMailer.new_case(kase) }
 
     let (:notification_method) { :case_notification }
-    let (:args) { kase }
+    let (:slack_args) { kase }
 
     it 'has correct subject' do
       expect(
@@ -117,7 +117,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
             )
     }
     let (:notification_method) { :comment_notification }
-    let (:args) { [kase, comment] }
+    let (:slack_args) { [kase, comment] }
 
     it 'sends an email on case comment being added' do
       expect(subject.to).to eq nil
@@ -134,7 +134,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
     subject { CaseMailer.change_assignee_id(kase, nil, another_user.id) }
 
     let(:notification_method) { :assignee_notification }
-    let(:args) { [kase, another_user] }
+    let(:slack_args) { [kase, another_user] }
 
     it 'sends an email on initial case assignment' do
       expect(subject.to).to eq nil
@@ -166,7 +166,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
       subject { CaseMailer.maintenance_state_transition(kase, text) }
 
       let (:notification_method) { :maintenance_state_transition_notification }
-      let (:args) { [kase, text] }
+      let (:slack_args) { [kase, text] }
 
       include_examples 'Slack'
     end
@@ -175,7 +175,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
       subject { CaseMailer.maintenance_ending_soon(window, text) }
 
       let (:notification_method) { :maintenance_ending_soon_notification }
-      let (:args) { [window.case, text] }
+      let (:slack_args) { [window.case, text] }
 
       it 'sets the maintenance_ending_soon_email_sent flag' do
         subject
@@ -192,7 +192,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
       let (:text) { "Request to change please" }
       let (:notification_method) { :change_request_notification }
-      let (:args) { [kase, text, requestor] }
+      let (:slack_args) { [kase, text, requestor] }
 
       include_examples 'Slack'
     end
@@ -210,7 +210,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
     }
     }
     let(:notification_method) { :case_association_notification }
-    let(:args) { [kase, another_user, text] }
+    let(:slack_args) { [kase, another_user, text] }
 
     include_examples 'Slack'
   end
@@ -222,7 +222,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
       "#{kase.display_id} has been resolved by #{another_user.name} and is awaiting closure"
     }
     let(:notification_method) { :resolved_case_notification }
-    let(:args) { [kase, another_user, text] }
+    let(:slack_args) { [kase, another_user, text] }
 
     include_examples 'Slack'
   end

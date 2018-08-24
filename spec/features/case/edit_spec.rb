@@ -49,7 +49,7 @@ RSpec.describe 'Case editing', type: :feature do
         click_button 'Change subject'
       }
       let(:notification_method) { :subject_notification }
-      let(:args) { [kase, 'Original subject', 'New subject'] }
+      let(:slack_args) { [kase, 'Original subject', 'New subject'] }
 
       it 'can be edited successfully' do
         subject
@@ -76,7 +76,7 @@ RSpec.describe 'Case editing', type: :feature do
         click_button 'Change issue'
        }
       let(:notification_method) { :issue_notification }
-      let(:args) { [kase, 'New user/group', 'Some other issue'] }
+      let(:slack_args) { [kase, 'New user/group', 'Some other issue'] }
 
       it 'allows editing case issue' do
         expect(kase.issue).not_to eq issue

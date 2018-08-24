@@ -20,7 +20,7 @@ RSpec.describe 'Cluster checks', type: :feature do
         "The daily checks for #{cluster.name} have been submitted by #{admin.name}."\
         "\n1/1 checks passed"
       }
-      let(:args) { [cluster, admin, text] }
+      let(:slack_args) { [cluster, admin, text] }
       let(:path) { cluster_check_submission_path(cluster, as: admin) }
       let!(:component) { create(:component, cluster: cluster) }
 
