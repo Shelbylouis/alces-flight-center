@@ -29,6 +29,14 @@ class CaseMailerPreview < ApplicationMailerPreview
     )
   end
 
+  def change_association
+    CaseMailer.change_association(get_case, user)
+  end
+
+  def resolve_case
+    CaseMailer.resolve_case(get_case, user)
+  end
+
   private
 
   def get_case
