@@ -120,4 +120,35 @@ FactoryBot.define do
     action :update
     audited_changes []
   end
+
+  factory :topic do
+    sequence(:title) {|n| "Topic #{n}" }
+
+    factory :global_topic do
+      scope 'global'
+    end
+
+    factory :site_topic do
+      scope 'site'
+      association :site, factory: :site
+    end
+
+    trait :with_articles do
+      transient do
+        num_articles { 1 }
+      end
+
+      after :create do |topic, evaluator|
+        create_list :article, evaluator.num_articles, topic: topic
+      end
+    end
+  end
+
+
+  factory :article do
+    sequence(:title) {|n| "Article #{n}" }
+    url { "http://some/url" }
+    meta { { author: 'Alces Flight' } }
+    association :topic, factory: :global_topic
+  end
 end
