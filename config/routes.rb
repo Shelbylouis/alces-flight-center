@@ -96,6 +96,13 @@ Rails.application.routes.draw do
       post '/checks/submit', to: 'clusters#save_check_results', as: :set_check_results
       post '/checks/submit/preview', to: 'cluster_checks#preview'
       post '/checks/submit/write', to: 'cluster_checks#write'
+
+      resources :components, only: [] do
+        collection do
+          get :import, to: 'clusters#import_components'
+          post :import
+        end
+      end
     end
 
     resources :components, only: []  do

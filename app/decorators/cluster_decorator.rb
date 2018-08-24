@@ -24,27 +24,7 @@ class ClusterDecorator < ApplicationDecorator
       tabs_builder.logs,
       tabs_builder.cases,
       tabs_builder.maintenance,
-      {
-        id: :cluster,
-        dropdown: [
-          {
-            text: 'Services',
-            path: h.cluster_services_path(self)
-          },
-          {
-            text: 'Components:',
-            heading: true,
-          }
-        ].tap do |comps|
-          comps.push(text: 'All', path: h.cluster_components_path(self))
-          available_component_group_types.each do |t|
-            comps.push(
-              text: t.pluralize,
-              path: h.cluster_components_path(self, type: t)
-            )
-          end
-        end
-      }
+      tabs_builder.cluster_composition(h)
     ].compact
   end
 

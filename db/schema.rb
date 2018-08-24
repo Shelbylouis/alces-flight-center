@@ -215,7 +215,9 @@ ActiveRecord::Schema.define(version: 2018_08_23_144957) do
     t.integer "cluster_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "unix_name"
     t.index ["cluster_id"], name: "index_component_groups_on_cluster_id"
+    t.index ["unix_name"], name: "index_component_groups_on_unix_name"
   end
 
   create_table "components", force: :cascade do |t|
@@ -225,7 +227,6 @@ ActiveRecord::Schema.define(version: 2018_08_23_144957) do
     t.integer "component_group_id", null: false
     t.string "support_type", default: "inherit", null: false
     t.boolean "internal", default: false
-    t.string "component_type", null: false
     t.text "info", default: "", null: false
     t.index ["component_group_id"], name: "index_components_on_component_group_id"
   end

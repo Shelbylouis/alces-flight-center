@@ -20,8 +20,4 @@ class ComponentGroup < ApplicationRecord
     components.map(&:name)
   end
 
-  def component_type
-    components.first&.component_type || 'component'
-  end
-
 end

@@ -52,10 +52,6 @@ class Cluster < ApplicationRecord
     @documents ||= DocumentsRetriever.retrieve(documents_path)
   end
 
-  def available_component_group_types
-    components.map(&:component_type).uniq
-  end
-
   def unfinished_related_maintenance_windows
     parts = [self, *components, *component_groups, *services]
     parts
