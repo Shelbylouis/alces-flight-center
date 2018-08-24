@@ -94,10 +94,14 @@ class CaseMailer < ApplicationMailer
     @case = my_case
     reference_texts = @case.associations
       .map { |a| a.decorate.reference_text }
+    if reference_texts.empty?
+      @text = 'This case no longer has any associated components.'
+    else
     @text = %{Changed the affected components on this case to:
 
 • #{reference_texts.join("\n • ")}
     }
+    end
 
     mail( subject: @case.email_reply_subject )
     SlackNotifier.case_association_notification(@case, user, @text)
