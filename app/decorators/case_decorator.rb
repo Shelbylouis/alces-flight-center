@@ -38,15 +38,6 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def available_issues
-    # Note: There are two "Other"s available: one that requires a service (any
-    # service) and one which does not. To avoid having two indistinguishable
-    # "Other"s in the list, we need to test for service association here
-    # and include the correct "Other". This means not including issues that do
-    # not require a service if we have at least one service (even though these
-    # would be valid issues for this case).
-    # At the moment only "Other" is affected by this but if we ever add Issues
-    # that require no service but that should be available to all cases we'll
-    # need to try harder.
     if services.empty?
       Issue.where(requires_component: false, requires_service: false)
            .decorate
@@ -57,7 +48,7 @@ class CaseDecorator < ApplicationDecorator
         .uniq
         .map(&:decorate)
         .sort_by { |i| i.category&.name || '' } +
-        Issue.where(requires_component: false, requires_service: true, service_type: nil)
+        Issue.where(requires_component: false, service_type: nil)
           .decorate
           .reject(&:special?)
     end
