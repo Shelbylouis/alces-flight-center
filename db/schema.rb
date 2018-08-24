@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_23_144957) do
+ActiveRecord::Schema.define(version: 2018_08_24_095501) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,7 +27,7 @@ ActiveRecord::Schema.define(version: 2018_08_23_144957) do
     t.string "title", limit: 255, null: false
     t.string "url", limit: 512, null: false
     t.json "meta", default: "{}", null: false
-    t.bigint "topic_id"
+    t.bigint "topic_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["topic_id"], name: "index_articles_on_topic_id"
