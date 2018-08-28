@@ -33,6 +33,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
+    SlackNotifier.subject_notification(@case, @old, @new)
   end
 
   def change_issue_id(my_case, old_val, new_val)
@@ -40,9 +41,9 @@ class CaseMailer < ApplicationMailer
     @old = Issue.find(old_val).decorate.label_text
     @new = Issue.find(new_val).decorate.label_text
     mail(
-      cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
+    SlackNotifier.issue_notification(@case, @old, @new)
   end
 
   def comment(comment)
@@ -79,14 +80,40 @@ class CaseMailer < ApplicationMailer
     window.set_maintenance_ending_soon_email_flag
   end
 
-  def change_request(my_case, text, user)
+  def change_request(my_case, text, user, recipients)
     @case = my_case
     @text = text
     mail(
-      cc: @case.email_recipients,
+      cc: recipients,
       subject: @case.email_reply_subject
     )
     SlackNotifier.change_request_notification(@case, @text, user)
+  end
+
+  def change_association(my_case, user)
+    @case = my_case
+    reference_texts = @case.associations
+      .map { |a| a.decorate.reference_text }
+    if reference_texts.empty?
+      @text = 'This case no longer has any associated components.'
+    else
+    @text = %{Changed the affected components on this case to:
+
+• #{reference_texts.join("\n • ")}
+    }
+    end
+
+    mail( subject: @case.email_reply_subject )
+    SlackNotifier.case_association_notification(@case, user, @text)
+  end
+
+  def resolve_case(kase, user)
+    @case = kase
+    @user = user
+    @text = "#{@case.display_id} has been resolved by #{@user.name} and is awaiting closure"
+
+    mail( subject: @case.email_reply_subject )
+    SlackNotifier.resolved_case_notification(@case, @user, @text)
   end
 
   private

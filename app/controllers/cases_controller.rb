@@ -142,6 +142,7 @@ class CasesController < ApplicationController
   def resolve
     change_action "Support case %s resolved." do |kase|
       kase.resolve!(current_user)
+      CaseMailer.resolve_case(kase, current_user).deliver_later
     end
   end
 

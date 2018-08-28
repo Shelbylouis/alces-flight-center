@@ -83,16 +83,13 @@ class SlackNotifier
       maintenance_notification(kase, text, 'warning')
     end
 
-    def log_notification(log)
-      notification_text = "New log created on #{log.cluster.name}" \
-        " #{log&.component ? 'for ' + log.component.name : nil }"
-
+    def log_notification(log, text)
       logs_url = cluster_logs_url(log.cluster)
 
       log_note = {
-        fallback: notification_text,
+        fallback: text,
         color: "#8daec2",
-        pretext: notification_text,
+        pretext: text,
         author_name: log.engineer.name,
         title: "Details",
         title_link: logs_url,
@@ -104,7 +101,6 @@ class SlackNotifier
     end
 
     def change_request_notification(kase, text, user)
-      text = "The change request for this case #{text}"
       change_request_note = {
         fallback: text,
         color: '#f44192',
@@ -117,22 +113,61 @@ class SlackNotifier
       send_notification(change_request_note)
     end
 
-    def case_association_notification(kase, user)
-
-      reference_texts = kase.associations
-                            .map { |a| a.decorate.reference_text }
-
-      text = %{Changed the affected components on this case to:
-
-• #{reference_texts.join("\n • ")}
-}
-
+    def case_association_notification(kase, user, text)
       send_notification(
         author_name: user.name,
         title: subject_and_id_title(kase),
         title_link: cluster_case_url(kase.cluster, kase),
         text: text
       )
+    end
+
+    def subject_notification(kase, old, new)
+      text = "The subject for #{kase.display_id} has been changed from '#{old}' to '#{new}'"
+
+      subject_note = {
+        fallback: text,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+
+      send_notification(subject_note)
+    end
+
+    def issue_notification(kase, old, new)
+      text = "The issue for #{kase.display_id} has been changed from '#{old}' to '#{new}'"
+
+      issue_note = {
+        fallback: text,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+
+      send_notification(issue_note)
+    end
+
+    def resolved_case_notification(kase, user, text)
+      resolved_note = {
+        fallback: text,
+        author_name: user.name,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+      send_notification(resolved_note)
+    end
+
+    def cluster_check_submission_notification(cluster, user, text)
+      cluster_check_submission_note = {
+        fallback: text,
+        author_name: user.name,
+        title: "[#{cluster.name}] Cluster Check Results",
+        title_link: cluster_checks_url(cluster),
+        text: text
+      }
+      send_notification(cluster_check_submission_note)
     end
 
     private
