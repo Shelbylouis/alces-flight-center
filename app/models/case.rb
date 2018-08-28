@@ -37,6 +37,7 @@ class Case < ApplicationRecord
 
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
+  belongs_to :contact, class_name: 'User', required: false
 
   has_many :maintenance_windows
   has_and_belongs_to_many :logs
