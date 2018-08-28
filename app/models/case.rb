@@ -132,7 +132,7 @@ class Case < ApplicationRecord
   before_validation :assign_default_subject_if_unset
 
   before_create :set_display_id
-  after_create :send_new_case_email, :maybe_set_default_assignee
+  after_create :send_new_case_email, :maybe_set_default_assignee, :set_assigned_contact
 
   scope :state, ->(state) { where(state: state) }
   scope :active, -> { state('open') }
@@ -460,6 +460,17 @@ class Case < ApplicationRecord
         la.user = nil
         la.save!
       end
+    end
+  end
+
+  def set_assigned_contact
+    contact = (current_user.admin? ? site.primary_contact : current_user)
+    transaction do
+      self.contact = contact
+      save!
+      la = audits.last
+      la.user = nil
+      la.save!
     end
   end
 
