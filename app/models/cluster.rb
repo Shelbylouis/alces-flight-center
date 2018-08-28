@@ -23,6 +23,8 @@ class Cluster < ApplicationRecord
   has_many :checks, through: :cluster_checks
   has_many :check_results, through: :cluster_checks
 
+  has_many :service_plans
+
   validates_associated :site
   validates :name, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
