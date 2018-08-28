@@ -3,12 +3,12 @@
     <div class="form-group">
       <div class="input-group">
       <%= f.collection_select(
-            :assignee_id,
-            @case.potential_assignees,
+            column,
+            users,
             :id,
             Proc.new { |a| "#{a.admin? ? '* ' : ''}#{a.name}"},
             {
-              include_blank: 'Nobody',
+              include_blank: 'Nobody'
             },
             {
               class: 'form-control'
@@ -24,5 +24,5 @@
     </div>
   <% end %>
 <% else %>
-  <%= @case.assignee&.name or 'Nobody' %>
+  <%= assignee&.name or 'Nobody' %>
 <% end %>

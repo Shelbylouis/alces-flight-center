@@ -295,9 +295,11 @@ class Case < ApplicationRecord
   end
 
   def potential_assignees
-    site.users.where.not(role: :viewer)
-      .or(User.where(role: :admin))
-      .order(:name)
+    User.where(role: :admin)
+  end
+
+  def potential_contacts
+    site.users.where.not(role: :viewer).order(:name)
   end
 
   def time_worked=(new_time)
