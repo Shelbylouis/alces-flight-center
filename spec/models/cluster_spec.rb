@@ -286,5 +286,16 @@ RSpec.describe Cluster, type: :model do
         expect(cluster.previous_service_plan).to eq plan_2
       end
     end
+
+    it 'identifies service plans covering a date range' do
+      expect(cluster.service_plans_covering('2018-01-01', '2019-05-01'))
+        .to eq [plan_1, plan_2]
+
+      expect(cluster.service_plans_covering('2018-02-01', '2018-02-28'))
+        .to eq [plan_1]
+
+      expect(cluster.service_plans_covering('2018-06-01', '2018-09-30'))
+        .to eq [plan_1, plan_2]
+    end
   end
 end

@@ -116,6 +116,18 @@ class Cluster < ApplicationRecord
                  .last
   end
 
+  def service_plans_covering(from, to)
+    service_plans.where(start_date: from..to)
+      .or(service_plans.where(end_date: from..to))
+      .or(
+        service_plans.where(
+          'start_date <= ? AND end_date >= ?',
+          from,
+          to
+        )
+      ).order(:start_date)
+  end
+
   private
 
   def validate_all_cluster_parts_advice
