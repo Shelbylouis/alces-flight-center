@@ -109,7 +109,7 @@ class ClusterDecorator < ApplicationDecorator
     end
   end
 
-  SERVICE_PLAN_WARNING_THRESHOLD = 60.days.freeze
+  SERVICE_PLAN_WARNING_THRESHOLD ||= 60.days.freeze
 
   def service_plan_badge
     current = current_service_plan
