@@ -102,6 +102,20 @@ class Cluster < ApplicationRecord
     self.cases.where(state: 'resolved').count
   end
 
+  def current_service_plan
+    service_plans.where(
+      'start_date <= ? AND end_date >= ?',
+      Date.current,
+      Date.current
+    ).first
+  end
+
+  def previous_service_plan
+    service_plans.where('end_date < ?', Date.current)
+                 .order(:start_date)
+                 .last
+  end
+
   private
 
   def validate_all_cluster_parts_advice
