@@ -116,6 +116,8 @@ class Case < ApplicationRecord
 
   validates_with AssociatedModelValidator
 
+  validates_with IssueValidator
+
   validate :validates_user_assignment
 
   validate :validate_not_resolved_with_open_cr
