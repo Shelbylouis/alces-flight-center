@@ -58,7 +58,7 @@ module Audited
     end
 
     def assignee_id_details
-      'Assignee Change'
+      'Engineer Assignee Change'
     end
 
     def contact_id_text(from, to)
@@ -79,7 +79,7 @@ module Audited
     end
 
     def contact_id_details
-      'Assignee Change'
+      'Contact Assignee Change'
     end
 
     def time_worked_text(from, to)
