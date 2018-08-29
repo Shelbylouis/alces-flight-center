@@ -399,6 +399,7 @@ submitButton state =
         [ type_ "submit"
         , value "Create Case"
         , class "btn btn-primary btn-block"
+        , id "create-case-button"
         , disabled (state.isSubmitting || Validation.invalidState state)
         ]
         []

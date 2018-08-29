@@ -17,6 +17,8 @@ Dir[Rails.root.join('spec/support/**/*.rb')].each {|f| require f}
 require 'clearance/rspec'
 require 'pundit/rspec'
 
+require 'capybara/poltergeist'
+
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -59,15 +61,7 @@ Capybara.add_selector(:test_element) do
   end
 end
 
-# Override Capybara Selenium driver with increased timeout, to (hopefully)
-# avoid intermittent failures on tiny CI server (see
-# https://stackoverflow.com/a/33898828/2620402).
-Capybara.register_driver :selenium do |app|
-  profile = Selenium::WebDriver::Firefox::Profile.new
-  client = Selenium::WebDriver::Remote::Http::Default.new(open_timeout: 120, read_timeout: 120)
-  options = Selenium::WebDriver::Firefox::Options.new(profile: profile)
-  Capybara::Selenium::Driver.new(app, browser: :firefox, options: options, http_client: client)
-end
+Capybara.javascript_driver = :poltergeist
 
 # Convenience function to use above.
 def test_element(data_test_value)

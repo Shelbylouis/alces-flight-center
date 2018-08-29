@@ -39,7 +39,8 @@ RSpec.describe 'Case form', type: :feature, js: true do
       fill_in 'subject', with: subject_value
       fill_in 'Some field', with: field_value
       expect do
-        click_button 'Create Case'
+        find('#create-case-button').click
+        find('.alert-success')  # Wait for next page to load
       end.to change { cluster.reload.cases.length }.by(1)
 
       # Test all encoded fields in `app/javascript/packs/State.elm` are used in
@@ -82,8 +83,10 @@ RSpec.describe 'Case form', type: :feature, js: true do
       select issue.name, from: 'Issue'
       select component.name, from: 'component'
       fill_in 'New MOTD', with: motd
+
       expect do
-        click_button 'Create Case'
+        find('#create-case-button').click
+        find('.alert-success')  # Wait for next page to load
       end.to change { cluster.reload.cases.length }.by(1)
 
       new_case = cluster.cases.first

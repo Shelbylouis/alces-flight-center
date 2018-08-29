@@ -95,6 +95,7 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
     }
 
     it 'displays a partially-expanded tree' do
+      find("#{ul_for_group_a}.show")  # Wait for it to exist
       expect(find(ul_for_group_a)[:class]).to match('show')
       expect(find(ul_for_group_b, visible: false)[:class]).not_to match('show')
     end
