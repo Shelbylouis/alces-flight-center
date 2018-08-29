@@ -382,6 +382,10 @@ class Case < ApplicationRecord
     days.days + hours.hours + minutes.minutes + raw.seconds
   end
 
+  def allowed_to_comment
+    [self.assignee, self.contact].include?(current_user)
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
