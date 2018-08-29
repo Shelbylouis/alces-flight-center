@@ -100,7 +100,7 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
       expect(find(ul_for_group_b, visible: false)[:class]).not_to match('show')
     end
 
-    unless ENV.fetch('TRAVIS', false)
+    #unless ENV.fetch('TRAVIS', false)
       # For reasons far beyond my ability to fathom, these tests pass locally but
       # fail on Travis. All clicks seem to be caught by the "Admin interface"
       # link in the navbar rather than the selected elements, which means that
@@ -151,7 +151,7 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
 
       end
     end
-  end
+  #end
 
   context 'for a case with multiple associations' do
     let(:kase) {
@@ -172,7 +172,7 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
     end
   end
 
-  unless ENV.fetch('TRAVIS', false)
+  #unless ENV.fetch('TRAVIS', false)
     context 'for a case whose issue requires a certain service type' do
       let :service_type do
         create(:service_type, name: 'File System')
@@ -208,7 +208,7 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
         expect(kase.associated_audits.where(auditable_type: 'CaseAssociation').length)
           .to eq initial_number_of_audits  # No new audits added
       end
-    end
+   # end
 
     context 'for a case whose issue does not require an association' do
       let(:issue) {
