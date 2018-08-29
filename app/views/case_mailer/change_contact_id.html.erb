@@ -1,0 +1,9 @@
+<h3><%= @case.display_id %> <%= @case.ticket_subject %></h3>
+
+<p>
+  <% if @assignee %>
+    <em><%= @assignee.name %></em> has been set as the assigned contact for this case.
+  <% else %>
+    This case is no longer assigned to a contact.
+  <% end %>
+</p>
