@@ -82,7 +82,12 @@ RSpec.describe 'Case form', type: :feature, js: true do
       motd = 'My new MOTD'
 
       visit new_case_path(as: user)
-      find('#cluster-service-affected-by-issue')  # and wait for it to exist
+      begin
+        find('#cluster-service-affected-by-issue')  # and wait for it to exist
+      rescue Capybara::ElementNotFound
+        puts page.body
+        raise
+      end
       select service.name, from: 'service'
       select issue.name, from: 'Issue'
       select component.name, from: 'component'

@@ -12,7 +12,7 @@ module WaitForClusterTree
   private
 
   def cluster_tree_initialised?
-    page.evaluate_script('$ !== undefined && $(".cluster-tree").data("initialised")')
+    page.evaluate_script('typeof $ !== "undefined" && $(".cluster-tree").data("initialised")')
   end
 
 end
