@@ -139,7 +139,10 @@ class ClusterDecorator < ApplicationDecorator
       other_service
       .decorate
       .case_form_json
-      .merge(IssuesJsonBuilder.build_for(self))
+      .merge(IssuesJsonBuilder.build_for(
+        self,
+        !current_user || current_user.admin?
+      ))
   end
 
   def other_service
@@ -155,11 +158,15 @@ class ClusterDecorator < ApplicationDecorator
     private
 
     def self.other_service_issues
-      Issue.where(requires_component: false, requires_service: false).decorate.reject(&:special?)
+      Issue.where(requires_component: false, requires_service: false)
+           .decorate
+           .reject(&:special?)
     end
 
     def applicable_issues
-      self.class.other_service_issues
+      self.class.other_service_issues.reject { |i|
+        !@admin && i.administrative?
+      }
     end
   end
 
