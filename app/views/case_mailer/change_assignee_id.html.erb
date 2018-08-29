@@ -2,7 +2,7 @@
 
 <p>
   <% if @assignee %>
-    This case has now been assigned to <em><%= @assignee.name %></em>.
+    <em><%= @assignee.name %></em> has been set as the assigned engineer for this case.
   <% else %>
     This case is no longer assigned.
   <% end %>

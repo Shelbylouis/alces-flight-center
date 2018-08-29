@@ -1,7 +1,7 @@
 <%= @case.display_id %> <%= @case.ticket_subject %>
 
 <% if @assignee %>
-  This case has now been assigned to <%= @assignee.name %>.
+  <%= @assignee.name %> has been set as the assigned engineer for this case.
 <% else %>
   This case is no longer assigned.
 <% end %>
