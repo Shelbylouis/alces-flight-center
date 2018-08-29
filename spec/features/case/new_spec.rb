@@ -33,6 +33,9 @@ RSpec.describe 'Case form', type: :feature, js: true do
       field_value = 'my value'
 
       visit path
+
+      find('#cluster-service-affected-by-issue')  # and wait for it to exist
+
       select service.name, from: 'service'
       select issue.name, from: 'Issue'
       select component.name, from: 'component'
@@ -79,6 +82,7 @@ RSpec.describe 'Case form', type: :feature, js: true do
       motd = 'My new MOTD'
 
       visit new_case_path(as: user)
+      find('#cluster-service-affected-by-issue')  # and wait for it to exist
       select service.name, from: 'service'
       select issue.name, from: 'Issue'
       select component.name, from: 'component'
