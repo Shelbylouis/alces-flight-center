@@ -93,36 +93,13 @@ class CasesController < ApplicationController
     end
   end
 
-  UPDATABLE_FIELDS = [:assignee_id, :contact_id, :subject, :issue_id].freeze
+  ADMIN_UPDATABLE_FIELDS = [:assignee_id, :contact_id, :subject, :issue_id].freeze
+  CONTACT_UPDATABLE_FIELDS = [:contact_id].freeze
 
   def update
-
-    fields_changing = params.require(:case).permit(UPDATABLE_FIELDS)
-
-    change_action 'Support case %s updated.' do |kase|
-      old_fields = {}.tap do |fields|
-        fields_changing.to_h.keys.each { |f| fields[f.to_sym] = kase.send(f) }
-      end
-
-      kase.update(  # update! doesn't work here FSR :(
-        fields_changing
-      )
-      kase.save!
-
-      old_fields.each do |field, old_value|
-        mailer_method = "change_#{field}".to_sym
-
-        next unless CaseMailer.respond_to?(mailer_method)
-
-        CaseMailer.send(
-          mailer_method,
-          kase,
-          old_value,
-          kase.send(field)
-        ).deliver_later
-      end
-
-    end
+    fields_changing = params.require(:case)
+      .permit(current_user.admin? ? ADMIN_UPDATABLE_FIELDS : CONTACT_UPDATABLE_FIELDS)
+    update_fields(fields_changing)
   end
 
   def close
@@ -269,5 +246,31 @@ class CasesController < ApplicationController
         assigned_to: @scope.cases.map(&:assignee).uniq.compact.sort_by { |u| u.name }
       },
     }
+  end
+
+  def update_fields(fields_changing)
+    change_action 'Support case %s updated.' do |kase|
+      old_fields = {}.tap do |fields|
+        fields_changing.to_h.keys.each { |f| fields[f.to_sym] = kase.send(f) }
+      end
+
+      kase.update(  # update! doesn't work here FSR :(
+        fields_changing
+      )
+      kase.save!
+
+      old_fields.each do |field, old_value|
+        mailer_method = "change_#{field}".to_sym
+
+        next unless CaseMailer.respond_to?(mailer_method)
+
+        CaseMailer.send(
+          mailer_method,
+          kase,
+          old_value,
+          kase.send(field)
+        ).deliver_later
+      end
+    end
   end
 end

@@ -154,7 +154,7 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: :show do
-      cases.call(only: [:show, :create, :index, :new]) do
+      cases.call(only: [:show, :create, :index, :new, :update]) do
         # Pages relating to cases, for both admins and site users, belong here.
          resource :change_request, only: [:show], path: 'change-request'
       end
