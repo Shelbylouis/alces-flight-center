@@ -65,7 +65,14 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: [:assignee_id, :issue_id, :subject, :time_worked, :tier_level], on: [ :update ]
+  audited only: [
+    :assignee_id,
+    :issue_id,
+    :subject,
+    :time_worked,
+    :tier_level,
+    :contact_id
+  ], on: [ :update ]
   has_associated_audits
 
   validates :display_id, uniqueness: true

@@ -60,6 +60,27 @@ module Audited
       'Assignee Change'
     end
 
+    def contact_id_text(from, to)
+      if from
+        if to
+          "Changed the assigned contact for this case from #{User.find(from).name}"\
+          " to #{User.find(to).name}."
+        else
+          "Unassigned this case from #{User.find(from).name}."
+        end
+      else
+        "Assigned this case to #{User.find(to).name}."
+      end
+    end
+
+    def contact_id_type
+      'user'
+    end
+
+    def contact_id_details
+      'Assignee Change'
+    end
+
     def time_worked_text(from, to)
       if from.nil?
         "Changed time worked to #{format_minutes(to)}."
