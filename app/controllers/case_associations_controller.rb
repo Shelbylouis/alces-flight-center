@@ -42,7 +42,7 @@ class CaseAssociationsController < ApplicationController
   end
 
   def map_association_params
-    params[:associations].map do |assoc|
+    assoc_param.map do |assoc|
       assoc_data = ASSOCIATION_PARAM_REGEX.match(assoc)
       if assoc_data
         Kernel.const_get(assoc_data[:type]).find(assoc_data[:id])
@@ -67,6 +67,10 @@ class CaseAssociationsController < ApplicationController
         @case.associations = old_assocs
       end
     end
+  end
+
+  def assoc_param
+    params[:associations] || []
   end
 
 end
