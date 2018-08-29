@@ -43,7 +43,8 @@ module Audited
     def assignee_id_text(from, to)
       if from
         if to
-          "Changed the assignee of this case from #{User.find(from).name} to #{User.find(to).name}."
+          "Changed the assigned engineer of this case from #{User.find(from).name}"\
+          " to #{User.find(to).name}."
         else
           "Unassigned this case from #{User.find(from).name}."
         end
@@ -63,7 +64,7 @@ module Audited
     def contact_id_text(from, to)
       if from
         if to
-          "Changed the assigned contact for this case from #{User.find(from).name}"\
+          "Changed the assigned contact of this case from #{User.find(from).name}"\
           " to #{User.find(to).name}."
         else
           "Unassigned this case from #{User.find(from).name}."
