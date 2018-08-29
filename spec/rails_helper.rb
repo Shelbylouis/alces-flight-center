@@ -62,6 +62,7 @@ Capybara.add_selector(:test_element) do
 end
 
 Capybara.javascript_driver = :poltergeist
+Capybara.default_max_wait_time = 60
 
 # Convenience function to use above.
 def test_element(data_test_value)
