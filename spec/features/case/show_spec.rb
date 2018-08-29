@@ -13,7 +13,7 @@ RSpec.describe 'Case page', type: :feature do
       :open_case,
       cluster: cluster,
       subject: 'Open case',
-      assignee: assignee,
+      assignee: admin,
       tier_level: 2,
       time_worked: time_worked
     )
@@ -28,7 +28,8 @@ RSpec.describe 'Case page', type: :feature do
   end
 
   let :consultancy_case do
-    create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee, tier_level: 3)
+    create(:open_case, cluster: cluster, subject: 'Open case',
+           assignee: admin, contact: contact, tier_level: 3)
   end
 
   let(:mw) { create(:maintenance_window, case: open_case, clusters: [cluster]) }
@@ -99,18 +100,15 @@ RSpec.describe 'Case page', type: :feature do
       visit cluster_case_path(cluster, open_case, as: admin)
 
       event_cards = all('.event-card')
-      expect(event_cards.size).to eq(8)
+      expect(event_cards.size).to eq(7)
 
-      expect(event_cards[7].find('.card-body').text).to eq('First')
-      expect(event_cards[6].find('.card-body').text).to eq('Second')
-      expect(event_cards[5].find('.card-body').text).to match(
+      expect(event_cards[6].find('.card-body').text).to eq('First')
+      expect(event_cards[5].find('.card-body').text).to eq('Second')
+      expect(event_cards[4].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
-      expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked from 42m to 2h 3m.'
+      expect(event_cards[3].find('.card-body').text).to eq 'Changed time worked from 42m to 2h 3m.'
 
-      expect(event_cards[3].find('.card-body').text).to eq(
-          'Assigned this case to A Scientist.'
-      )
       expect(event_cards[2].find('.card-body').text).to eq(
           'Escalated this case to tier 3 (General Support).'
       )
@@ -362,17 +360,17 @@ RSpec.describe 'Case page', type: :feature do
 
     it 'hides assignment controls for contacts' do
       visit cluster_case_path(cluster, open_case, as: contact)
-      assignment_td = find('#case-assignment')
+      assignment_td = find('#case-engineer-assignment')
       expect { assignment_td.find('input') }.to raise_error(Capybara::ElementNotFound)
-      expect(assignment_td.text).to eq('Nobody')
+      expect(assignment_td.text).to eq('A Scientist')
     end
 
     it 'displays assignment controls for admins' do
       visit cluster_case_path(cluster, open_case, as: admin)
-      assignment_select = find('#case-assignment').find('select')
+      assignment_select = find('#case-engineer-assignment').find('select')
 
       options = assignment_select.all('option').map(&:text)
-      expect(options).to eq(['Nobody', 'A Scientist', '* A Scientist'])
+      expect(options).to eq(['Nobody', '* A Scientist'])
     end
 
     it 'changes assigned user when assignee is selected' do
@@ -382,8 +380,8 @@ RSpec.describe 'Case page', type: :feature do
       user = create(:admin, name: 'Jerry')
 
       visit cluster_case_path(cluster, open_case, as: admin)
-      find('#case-assignment').select(user.name)
-      click_button('Change assignment')
+      find('#case-engineer-assignment').select(user.name)
+      click_button('Change assignment', match: :first)
 
       expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
 
@@ -391,17 +389,17 @@ RSpec.describe 'Case page', type: :feature do
 
       expect(open_case.assignee).to eq(user)
       expect(emails.count).to eq 1
-      expect(emails[0].parts.first.body.raw_source).to have_text 'This case has now been assigned to Jerry'
+      expect(emails[0].parts.first.body.raw_source)
+        .to have_text 'Jerry has been set as the assigned engineer for this case'
 
     end
 
     context 'when a case has an assignee' do
-      let(:assignee) { contact }
       it 'preselects the current assignee' do
         visit cluster_case_path(cluster,open_case, as: admin)
-        assignment_select = find('#case-assignment').find('select')
+        assignment_select = find('#case-engineer-assignment').find('select')
 
-        expect(assignment_select.value).to eq(contact.id.to_s)
+        expect(assignment_select.value).to eq(admin.id.to_s)
       end
 
       it 'can remove assignee' do
@@ -409,8 +407,8 @@ RSpec.describe 'Case page', type: :feature do
         emails.clear
 
         visit cluster_case_path(cluster, open_case, as: admin)
-        find('#case-assignment').select('Nobody')
-        click_button('Change assignment')
+        find('#case-engineer-assignment').select('Nobody')
+        click_button('Change assignment', match: :first)
 
         expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
 
@@ -427,7 +425,7 @@ RSpec.describe 'Case page', type: :feature do
   describe 'Commenting' do
 
     context 'for open non-consultancy Case' do
-      subject { create(:open_case, cluster: cluster, tier_level: 2) }
+      subject { create(:open_case, cluster: cluster, tier_level: 2, contact: contact) }
 
       it 'disables commenting for site contact' do
         visit cluster_case_path(cluster,subject, as: contact)

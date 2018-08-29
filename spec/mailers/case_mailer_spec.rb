@@ -155,14 +155,16 @@ RSpec.describe 'Case mailer', :type => :mailer do
     subject { CaseMailer.change_assignee_id(kase, nil, another_user.id) }
 
     let(:notification_method) { :assignee_notification }
-    let(:slack_args) { [kase, another_user] }
+    let(:slack_args) { [kase, another_user, 'engineer'] }
 
     it 'sends an email on initial case assignment' do
       expect(subject.to).to eq nil
       expect(subject.cc).to match_array %w(another.user@somecluster.com)
       expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
-      expect(subject.body.encoded).to match('This case has now been assigned to A Scientist.')
+      expect(subject.body.encoded).to match(
+        'A Scientist has been set as the assigned engineer for this case.'
+      )
     end
 
     it 'sends an email on case assignment change' do
@@ -173,7 +175,9 @@ RSpec.describe 'Case mailer', :type => :mailer do
       expect(mail.cc).to match_array %w(someuser@somecluster.com)
       expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
-      expect(mail.body.encoded).to match(/This case has now been assigned to Some User\./)
+      expect(mail.body.encoded).to match(
+        /Some User has been set as the assigned engineer for this case\./
+      )
     end
 
     include_examples 'Slack'

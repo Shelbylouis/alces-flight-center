@@ -377,22 +377,11 @@ RSpec.describe Case, type: :model do
       expect(subject).to include('some_admin')
     end
 
-    it 'includes any contact for site of Case' do
-      create(:contact, name: 'some_contact', site: kase.site)
-
-      expect(subject).to include('some_contact')
-    end
-
-    it 'does not include unrelated contact' do
-      create(:contact, name: 'some_contact')
-
-      expect(subject).not_to include('some_contact')
-    end
-
-    it 'does not include viewer for site of Case' do
+    it 'does not include any user that is not an admin' do
       create(:viewer, name: 'some_viewer', site: kase.site)
+      create(:contact, name: 'that_contact', site: kase.site)
 
-      expect(subject).not_to include('some_viewer')
+      expect(subject).not_to include('some_viewer' || 'that_contact')
     end
   end
 
