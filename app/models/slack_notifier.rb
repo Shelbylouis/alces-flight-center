@@ -32,9 +32,10 @@ class SlackNotifier
       send_notification(case_note)
     end
 
-    def assignee_notification(kase, assignee)
+    def assignee_notification(kase, assignee, role)
       notification_text = if assignee
-                            "#{assignee.name} has been assigned to #{kase.display_id}"
+                            "#{assignee.name} has been set as the assigned #{role}"\
+                              " for #{kase.display_id}"
                           else
                             "#{kase.display_id} is no longer assigned"
                           end
@@ -45,7 +46,7 @@ class SlackNotifier
         title_link: cluster_case_url(kase.cluster, kase),
         fields: [
           {
-            title: "Assigned to",
+            title: "Assigned #{role}",
             value: assignee&.name || 'Nobody',
             short: true
           }
