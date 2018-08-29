@@ -104,6 +104,16 @@ RSpec.describe 'Case mailer', :type => :mailer do
     end
 
     include_examples 'Slack'
+
+    context 'where case is for an administrative issue' do
+      let(:issue) { create(:administrative_issue) }
+
+      it 'excludes all site email addresses' do
+        expect(subject.to).to eq nil
+        expect(subject.cc).to match_array []
+        expect(subject.bcc).to match_array(['tickets@alces-software.com'])
+      end
+    end
   end
 
   describe 'Comment email' do
@@ -125,6 +135,17 @@ RSpec.describe 'Case mailer', :type => :mailer do
       expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
       expect(subject.body.encoded).to match('I can haz comment')
+    end
+
+
+    context 'where case is for an administrative issue' do
+      let(:issue) { create(:administrative_issue) }
+
+      it 'excludes all site email addresses' do
+        expect(subject.to).to eq nil
+        expect(subject.cc).to match_array []
+        expect(subject.bcc).to match_array(['tickets@alces-software.com'])
+      end
     end
 
     include_examples 'Slack'
@@ -195,6 +216,17 @@ RSpec.describe 'Case mailer', :type => :mailer do
       let (:slack_args) { [kase, text, requestor] }
 
       include_examples 'Slack'
+
+
+      context 'where case is for an administrative issue' do
+        let(:issue) { create(:administrative_issue) }
+
+        it 'excludes all site email addresses' do
+          expect(subject.to).to eq nil
+          expect(subject.cc).to match_array []
+          expect(subject.bcc).to match_array(['tickets@alces-software.com'])
+        end
+      end
     end
   end
 

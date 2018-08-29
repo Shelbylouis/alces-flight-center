@@ -50,7 +50,6 @@ class Case < ApplicationRecord
   has_one :credit_charge, required: false
 
   delegate :category, to: :issue
-  delegate :email_recipients, to: :site
   delegate :site, to: :cluster, allow_nil: true
 
   state_machine initial: :open do
@@ -211,6 +210,14 @@ class Case < ApplicationRecord
       "[helpdesk.alces-software.com ##{rt_ticket_id}]"
     else
       "[Alces Flight Center #{display_id}]"
+    end
+  end
+
+  def email_recipients
+    if issue.administrative?
+      []
+    else
+      site.email_recipients
     end
   end
 
