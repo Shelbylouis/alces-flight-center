@@ -107,5 +107,30 @@ RSpec.describe CaseCommenting do
         end
       end
     end
+
+    context 'when Case has administrative issue' do
+      let(:issue) { create(:administrative_issue) }
+      let(:kase) { create("#{state}_case".to_sym, issue: issue) }
+
+      include_examples 'commenting disabled for viewer'
+
+      context 'for admin' do
+        let(:user) { create(:admin) }
+
+        include_examples 'commenting enabled'
+      end
+
+      context 'for contact' do
+        let(:user) { create(:contact) }
+
+        it 'should have commenting disabled' do
+          expect(subject).to be_disabled
+          expect(subject.disabled_text).to include(
+            'this is an administrative case'
+          )
+        end
+      end
+
+    end
   end
 end
