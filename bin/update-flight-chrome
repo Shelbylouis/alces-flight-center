@@ -40,8 +40,8 @@ main() {
 
 
     You still need to update the references in
-    'app/views/layouts/application.html.erb' and
-    'config/initializers/assets.rb' to use the new Chrome!
+    'app/views/layouts/application.html.erb' (CSS at top; JS at bottom) and
+    'config/initializers/assets.rb' (just CSS) to use the new Chrome!
 
     New paths:
 
