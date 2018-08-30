@@ -13,7 +13,8 @@ class User < ApplicationRecord
 
   belongs_to :site, required: false
 
-  has_many :assigned_cases, class_name: 'Case', foreign_key: :assignee
+  has_many :engineer_cases, class_name: 'Case', foreign_key: :assignee
+  has_many :contact_cases, class_name: 'Case', foreign_key: :contact
 
   validates_associated :site
   validates :name, presence: true
@@ -88,6 +89,11 @@ class User < ApplicationRecord
     ::JsonWebToken.encode(
       { 'email' => email }
     )
+  end
+
+  def assigned_cases
+    cases = engineer_cases | contact_cases
+    Case.where(id: cases.map(&:id))
   end
 
   private
