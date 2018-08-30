@@ -358,43 +358,118 @@ RSpec.describe 'Case page', type: :feature do
 
     let(:emails) { ActionMailer::Base.deliveries }
 
-    it 'hides assignment controls for contacts' do
-      visit cluster_case_path(cluster, open_case, as: contact)
-      assignment_td = find('#case-engineer-assignment')
-      expect { assignment_td.find('input') }.to raise_error(Capybara::ElementNotFound)
-      expect(assignment_td.text).to eq('A Scientist')
+    RSpec.shared_examples 'contact assignment controls' do
+      it 'displays contact assignment controls' do
+        visit cluster_case_path(cluster, open_case, as: user)
+        assignment_select = find('#case-contact-assignment').find('select')
+
+        options = assignment_select.all('option').map(&:text)
+        expect(options).to eq(['Nobody', 'A Scientist'])
+      end
+
+      it 'changes assigned contact when assignee is selected' do
+        open_case.reload
+        emails.clear
+
+        new_user = create(:contact, site: site, name: 'Walter White')
+
+        visit cluster_case_path(cluster, open_case, as: user)
+        find('#case-contact-assignment').select(new_user.name)
+        within('#case-contact-assignment') do
+          click_on('Change assignment')
+        end
+
+        expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
+
+        open_case.reload
+
+        expect(open_case.contact).to eq(new_user)
+        expect(emails.count).to eq 1
+        expect(emails[0].parts.first.body.raw_source)
+          .to have_text 'Walter White has been set as the assigned contact for this case'
+      end
+
+      context 'when a case has an assigned contact' do
+        it 'preselects the currently assigned contact' do
+          visit cluster_case_path(cluster, consultancy_case, as: user)
+          assignment_select = find('#case-contact-assignment').find('select')
+
+          expect(assignment_select.value).to eq(contact.id.to_s)
+        end
+
+        it 'can remove assignee' do
+
+          consultancy_case.reload
+          emails.clear
+
+          visit cluster_case_path(cluster, consultancy_case, as: user)
+          find('#case-contact-assignment').select('Nobody')
+          within('#case-contact-assignment') do
+            click_on('Change assignment')
+          end
+
+          expect(find('.alert-success'))
+            .to have_text "Support case #{consultancy_case.display_id} updated."
+
+          consultancy_case.reload
+
+          expect(consultancy_case.contact).to be nil
+          expect(emails.count).to eq 1
+          expect(emails[0].parts.first.body.raw_source)
+            .to have_text 'This case is no longer assigned to a contact.'
+        end
+      end
     end
 
-    it 'displays assignment controls for admins' do
-      visit cluster_case_path(cluster, open_case, as: admin)
-      assignment_select = find('#case-engineer-assignment').find('select')
+    context 'as an admin' do
+      let(:user) { admin }
 
-      options = assignment_select.all('option').map(&:text)
-      expect(options).to eq(['Nobody', '* A Scientist'])
+      it 'displays engineer assignment controls' do
+        visit cluster_case_path(cluster, open_case, as: admin)
+        assignment_select = find('#case-engineer-assignment').find('select')
+
+        options = assignment_select.all('option').map(&:text)
+        expect(options).to eq(['Nobody', '* A Scientist'])
+      end
+
+      it 'changes assigned engineer when assignee is selected' do
+        open_case.reload  # generates case-creation email which we can then ignore
+        emails.clear
+
+        user = create(:admin, name: 'Jerry')
+
+        visit cluster_case_path(cluster, open_case, as: admin)
+        find('#case-engineer-assignment').select(user.name)
+        click_button('Change assignment', match: :first)
+
+        expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
+
+        open_case.reload
+
+        expect(open_case.assignee).to eq(user)
+        expect(emails.count).to eq 1
+        expect(emails[0].parts.first.body.raw_source)
+          .to have_text 'Jerry has been set as the assigned engineer for this case'
+
+      end
+
+      it_behaves_like 'contact assignment controls'
     end
 
-    it 'changes assigned user when assignee is selected' do
-      open_case.reload  # generates case-creation email which we can then ignore
-      emails.clear
+    context 'as a contact' do
+      let(:user) { contact }
 
-      user = create(:admin, name: 'Jerry')
+      it 'hides engineer assignment controls' do
+        visit cluster_case_path(cluster, open_case, as: contact)
+        assignment_td = find('#case-engineer-assignment')
+        expect { assignment_td.find('input') }.to raise_error(Capybara::ElementNotFound)
+        expect(assignment_td.text).to eq('A Scientist')
+      end
 
-      visit cluster_case_path(cluster, open_case, as: admin)
-      find('#case-engineer-assignment').select(user.name)
-      click_button('Change assignment', match: :first)
-
-      expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
-
-      open_case.reload
-
-      expect(open_case.assignee).to eq(user)
-      expect(emails.count).to eq 1
-      expect(emails[0].parts.first.body.raw_source)
-        .to have_text 'Jerry has been set as the assigned engineer for this case'
-
+      it_behaves_like 'contact assignment controls'
     end
 
-    context 'when a case has an assignee' do
+    context 'when a case has an assigned engineer' do
       it 'preselects the current assignee' do
         visit cluster_case_path(cluster,open_case, as: admin)
         assignment_select = find('#case-engineer-assignment').find('select')
