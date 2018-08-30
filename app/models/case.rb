@@ -475,8 +475,13 @@ class Case < ApplicationRecord
   end
 
   def set_assigned_contact
-    if current_user && open?
-      contact = (current_user.admin? ? site.primary_contact : current_user)
+    if open?
+      contact = if current_user.nil? || current_user.admin?
+                  site.primary_contact
+                else
+                  current_user
+                end
+
       transaction do
         self.contact = contact
         save!
