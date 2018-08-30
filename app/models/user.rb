@@ -29,6 +29,8 @@ class User < ApplicationRecord
   }
   validate :validates_primary_contact_assignment
 
+  after_validation :validates_case_assignments
+
   delegate :admin?,
     :primary_contact?,
     :secondary_contact?,
@@ -108,5 +110,20 @@ class User < ApplicationRecord
 
   def password_optional?
     true  # since we use SSO for passwords
+  end
+
+  def validates_case_assignments
+    if viewer?
+      reassign_cases
+    end
+  end
+
+  def reassign_cases
+    if assigned_cases
+      assigned_cases.each do |kase|
+        kase.contact = site_primary_contact
+        kase.save!
+      end
+    end
   end
 end
