@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_24_095501) do
+ActiveRecord::Schema.define(version: 2018_08_28_100631) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -353,6 +353,13 @@ ActiveRecord::Schema.define(version: 2018_08_24_095501) do
     t.index ["cluster_id"], name: "index_notes_on_cluster_id"
   end
 
+  create_table "service_plans", force: :cascade do |t|
+    t.bigint "cluster_id", null: false
+    t.date "start_date", null: false
+    t.date "end_date", null: false
+    t.index ["cluster_id"], name: "index_service_plans_on_cluster_id"
+  end
+
   create_table "service_types", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
@@ -454,6 +461,7 @@ ActiveRecord::Schema.define(version: 2018_08_24_095501) do
   add_foreign_key "maintenance_window_state_transitions", "users"
   add_foreign_key "maintenance_windows", "cases"
   add_foreign_key "notes", "clusters"
+  add_foreign_key "service_plans", "clusters"
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
   add_foreign_key "sites", "users", column: "default_assignee_id"

@@ -1,6 +1,7 @@
 <div class="card credit-balance">
   <div class="card-body">
     <h4>Support credit balance</h4>
+    <%= cluster.service_plan_badge %>
     <p class="credit-balance <%= cluster.credit_balance_class %>">
       <i class="fa fa-circle mr-2" aria-hidden="true"></i>
       <%= pluralize(cluster.credit_balance, 'credit') %>

@@ -109,6 +109,28 @@ class ClusterDecorator < ApplicationDecorator
     end
   end
 
+  SERVICE_PLAN_WARNING_THRESHOLD ||= 60.days.freeze
+
+  SERVICE_PLAN_DATE_FORMAT ||= :friendly_date
+
+  def service_plan_badge
+    current = current_service_plan
+    if current
+      if current.end_date > SERVICE_PLAN_WARNING_THRESHOLD.from_now
+        badge('success', "Service plan expires on #{current.end_date.to_formatted_s(SERVICE_PLAN_DATE_FORMAT)}")
+      else
+        badge('warning', "Service plan expires on #{current.end_date.to_formatted_s(SERVICE_PLAN_DATE_FORMAT)}")
+      end
+    else
+      prev = previous_service_plan
+      if prev
+        badge('danger', "Service plan expired on #{prev.end_date.to_formatted_s(SERVICE_PLAN_DATE_FORMAT)}")
+      else
+        badge('danger', 'No service plan')
+      end
+    end
+  end
+
   private
 
   def other_service_json
@@ -139,6 +161,12 @@ class ClusterDecorator < ApplicationDecorator
     def applicable_issues
       self.class.other_service_issues
     end
+  end
+
+  def badge(colour, text)
+    h.raw(
+      "<span class=\"badge badge-pill badge-#{colour} pull-right\">#{text}</span>"
+    )
   end
 
 end

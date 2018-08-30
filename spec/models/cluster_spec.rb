@@ -209,4 +209,93 @@ RSpec.describe Cluster, type: :model do
       expect(subject.credit_balance).to eq -12
     end
   end
+
+  describe 'service plans' do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:cluster) { create(:cluster) }
+
+    let!(:plan_1) {
+      create(
+        :service_plan,
+        cluster: cluster,
+        start_date: '2018-01-01',
+        end_date: '2018-08-31'
+      )
+    }
+
+    let!(:plan_2) {
+      create(
+        :service_plan,
+        cluster: cluster,
+        start_date: '2018-09-05',
+        end_date: '2019-04-30'
+      )
+    }
+
+    it 'locates current plan' do
+      travel_to Time.zone.local(2017, 12, 30) do
+        expect(cluster.current_service_plan).to eq nil
+      end
+      travel_to Time.zone.local(2018, 1, 1) do
+        expect(cluster.current_service_plan).to eq plan_1
+      end
+      travel_to Time.zone.local(2018, 8, 31) do
+        expect(cluster.current_service_plan).to eq plan_1
+      end
+      travel_to Time.zone.local(2018, 9, 1) do
+        expect(cluster.current_service_plan).to eq nil
+      end
+      travel_to Time.zone.local(2018, 9, 4) do
+        expect(cluster.current_service_plan).to eq nil
+      end
+      travel_to Time.zone.local(2018, 9, 5) do
+        expect(cluster.current_service_plan).to eq plan_2
+      end
+      travel_to Time.zone.local(2019, 4, 30) do
+        expect(cluster.current_service_plan).to eq plan_2
+      end
+      travel_to Time.zone.local(2019, 5, 1) do
+        expect(cluster.current_service_plan).to eq nil
+      end
+    end
+
+    it 'locates previous plan' do
+      travel_to Time.zone.local(2017, 12, 30) do
+        expect(cluster.previous_service_plan).to eq nil
+      end
+      travel_to Time.zone.local(2018, 1, 1) do
+        expect(cluster.previous_service_plan).to eq nil
+      end
+      travel_to Time.zone.local(2018, 8, 31) do
+        expect(cluster.previous_service_plan).to eq nil
+      end
+      travel_to Time.zone.local(2018, 9, 1) do
+        expect(cluster.previous_service_plan).to eq plan_1
+      end
+      travel_to Time.zone.local(2018, 9, 4) do
+        expect(cluster.previous_service_plan).to eq plan_1
+      end
+      travel_to Time.zone.local(2018, 9, 5) do
+        expect(cluster.previous_service_plan).to eq plan_1
+      end
+      travel_to Time.zone.local(2019, 4, 30) do
+        expect(cluster.previous_service_plan).to eq plan_1
+      end
+      travel_to Time.zone.local(2019, 5, 1) do
+        expect(cluster.previous_service_plan).to eq plan_2
+      end
+    end
+
+    it 'identifies service plans covering a date range' do
+      expect(cluster.service_plans_covering('2018-01-01', '2019-05-01'))
+        .to eq [plan_1, plan_2]
+
+      expect(cluster.service_plans_covering('2018-02-01', '2018-02-28'))
+        .to eq [plan_1]
+
+      expect(cluster.service_plans_covering('2018-06-01', '2018-09-30'))
+        .to eq [plan_1, plan_2]
+    end
+  end
 end

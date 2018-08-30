@@ -151,4 +151,10 @@ FactoryBot.define do
     meta { { author: 'Alces Flight' } }
     association :topic, factory: :global_topic
   end
+
+  factory :service_plan do
+    association :cluster
+    start_date { '2018-01-01' }
+    end_date { '2020-12-30' }
+  end
 end

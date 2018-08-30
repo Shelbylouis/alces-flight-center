@@ -23,6 +23,8 @@ class Cluster < ApplicationRecord
   has_many :checks, through: :cluster_checks
   has_many :check_results, through: :cluster_checks
 
+  has_many :service_plans
+
   validates_associated :site
   validates :name, presence: true
   validates :support_type, inclusion: { in: SUPPORT_TYPES }, presence: true
@@ -98,6 +100,32 @@ class Cluster < ApplicationRecord
 
   def resolved_cases_count
     self.cases.where(state: 'resolved').count
+  end
+
+  def current_service_plan
+    service_plans.where(
+      'start_date <= ? AND end_date >= ?',
+      Date.current,
+      Date.current
+    ).first
+  end
+
+  def previous_service_plan
+    service_plans.where('end_date < ?', Date.current)
+                 .order(:start_date)
+                 .last
+  end
+
+  def service_plans_covering(from, to)
+    service_plans.where(start_date: from..to)
+      .or(service_plans.where(end_date: from..to))
+      .or(
+        service_plans.where(
+          'start_date <= ? AND end_date >= ?',
+          from,
+          to
+        )
+      ).order(:start_date)
   end
 
   private
