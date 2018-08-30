@@ -82,12 +82,12 @@ class CaseMailer < ApplicationMailer
 
   def change_request(my_case, text, user, recipients)
     @case = my_case
-    @text = text
+    @text = text.gsub(/ customer /, ' your ')
     mail(
       cc: recipients,
       subject: @case.email_reply_subject
     )
-    SlackNotifier.change_request_notification(@case, @text, user)
+    SlackNotifier.change_request_notification(@case, text, user)
   end
 
   def change_association(my_case, user)
