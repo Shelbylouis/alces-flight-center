@@ -8,6 +8,11 @@ class CaseMailerPreview < ApplicationMailerPreview
     CaseMailer.change_assignee_id(my_case, nil, User.admins.first.id)
   end
 
+  def change_contact_id
+    my_case = get_case
+    CaseMailer.change_contact_id(my_case, nil, User.admins.first.id)
+  end
+
   def comment
     my_comment = CaseComment.first || FactoryBot.build_stubbed(:case_comment)
     CaseMailer.comment(my_comment)
