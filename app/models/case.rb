@@ -263,7 +263,7 @@ class Case < ApplicationRecord
   def comments_could_be_enabled?
     # If this condition is met then comments by contacts are enabled iff
     # comments_enabled is true.
-    open? && !consultancy?
+    open? && !consultancy? && !issue.administrative?
   end
 
   def can_create_change_request?
