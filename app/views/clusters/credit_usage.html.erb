@@ -23,9 +23,9 @@
                 <% service_plans.each do |sp| %>
                   <div class="badge badge-info">
                     Service plan:
-                    <%= sp.start_date.to_formatted_s(:friendly_date) %>
+                    <%= sp.start_date.to_formatted_s(ClusterDecorator::SERVICE_PLAN_DATE_FORMAT) %>
                     to
-                    <%= sp.end_date.to_formatted_s(:friendly_date) %>
+                    <%= sp.end_date.to_formatted_s(ClusterDecorator::SERVICE_PLAN_DATE_FORMAT) %>
                   </div>
                 <% end %>
               </div>
