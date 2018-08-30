@@ -3,6 +3,7 @@ class AddAdministrativeIssue < ActiveRecord::Migration[5.2]
   ADMIN_ISSUE_NAME = 'Administrative'.freeze
 
   def up
+    Issue.reset_column_information
     issue = Issue.create!(
       name: ADMIN_ISSUE_NAME,
       administrative: true,
