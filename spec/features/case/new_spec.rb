@@ -54,6 +54,7 @@ RSpec.describe 'Case form', type: :feature, js: true do
       expect(new_case.fields).to eq([
         tier.fields[0].merge('value' => field_value)
       ])
+      expect(new_case.contact).to eq(user)
     end
   end
 
@@ -89,6 +90,22 @@ RSpec.describe 'Case form', type: :feature, js: true do
       new_case = cluster.cases.first
       expect(new_case.fields).to be_nil
       expect(new_case.change_motd_request.motd).to eq(motd)
+    end
+  end
+
+  describe 'default case assignment as an admin' do
+    let(:admin) { create(:admin) }
+    let!(:contact) { create(:primary_contact, site: site, name: 'Mary Pri') }
+    let(:site) { create(:site, default_assignee: admin) }
+    let(:cluster) { create(:cluster, site: site) }
+    let(:assigned_case) { create(:open_case, cluster: cluster) }
+
+    it 'has an assigned engineer' do
+      expect(assigned_case.assignee).to eq(admin)
+    end
+
+    it 'has an assigned contact' do
+      expect(assigned_case.contact.name).to eq('Mary Pri')
     end
   end
 end
