@@ -491,7 +491,8 @@ RSpec.describe 'Case page', type: :feature do
 
         expect(open_case.assignee).to be nil
         expect(emails.count).to eq 1
-        expect(emails[0].parts.first.body.raw_source).to have_text 'This case is no longer assigned.'
+        expect(emails[0].parts.first.body.raw_source)
+          .to have_text 'This case is no longer assigned to an engineer.'
 
       end
     end
