@@ -67,9 +67,9 @@
         <th>Created</th>
         <td>
           By
-          <%= @case.user.name %>
+          <em><%= @case.user.name %></em>
           on
-          <%= @case.created_at.to_formatted_s(:short) %>
+          <em><%= @case.created_at.to_formatted_s(:short) %></em>
         </td>
         <th>Assigned to</th>
         <td id="case-assignment">
