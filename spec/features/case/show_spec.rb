@@ -500,6 +500,63 @@ RSpec.describe 'Case page', type: :feature do
 
   describe 'Commenting' do
 
+    RSpec.shared_examples 'only assigned can comment' do
+      context 'when assigned' do
+        let(:assigned_case) {
+          create(
+            :open_case,
+            cluster: cluster,
+            assignee: admin,
+            contact: contact
+          )
+        }
+
+        it 'allows a comment to be added' do
+          visit cluster_case_path(cluster, assigned_case, as: user)
+
+          fill_in 'case_comment_text', with: 'This is a test comment'
+          click_button 'Add new comment'
+
+          assigned_case.reload
+
+          expect(assigned_case.case_comments.count).to be 1
+          expect(find('.event-card').find('.card-body').text).to eq('This is a test comment')
+          expect(find('.alert-success')).to have_text('New comment added')
+        end
+
+        it 'does not allow empty comments' do
+          visit cluster_case_path(cluster, assigned_case, as: user)
+
+          fill_in 'case_comment_text', with: ''
+          click_button 'Add new comment'
+
+          assigned_case.reload
+
+          expect(assigned_case.case_comments.count).to be 0
+          expect(find('.alert-danger')).to have_text('Empty comments are not permitted')
+        end
+
+      end
+
+      context 'when not assigned' do
+        let(:unassigned_case) {
+          create(
+            :open_case,
+            cluster: cluster,
+            assignee: nil,
+            contact: nil
+          )
+        }
+
+        it 'does not allow comments to be added' do
+          visit cluster_case_path(cluster, unassigned_case, as: user)
+          expect do
+            find('textarea')
+          end.to raise_error(Capybara::ElementNotFound)
+        end
+      end
+    end
+
     context 'for open non-consultancy Case' do
       subject { create(:open_case, cluster: cluster, tier_level: 2, contact: contact) }
 
@@ -552,30 +609,16 @@ RSpec.describe 'Case page', type: :feature do
       end
     end
 
-    it 'allows a comment to be added' do
-      visit cluster_case_path(cluster,open_case, as: admin)
-
-      fill_in 'case_comment_text', with: 'This is a test comment'
-      click_button 'Add new comment'
-
-      open_case.reload
-
-      expect(open_case.case_comments.count).to be 1
-      expect(find('.event-card').find('.card-body').text).to eq('This is a test comment')
-      expect(find('.alert-success')).to have_text('New comment added')
+    context 'as an admin' do
+      let(:user) { admin }
+      include_examples 'only assigned can comment'
     end
 
-    it 'does not allow empty comments' do
-      visit cluster_case_path(cluster,open_case, as: admin)
-
-      fill_in 'case_comment_text', with: ''
-      click_button 'Add new comment'
-
-      open_case.reload
-
-      expect(open_case.case_comments.count).to be 0
-      expect(find('.alert-danger')).to have_text('Empty comments are not permitted')
+    context 'as a contact' do
+      let(:user) { contact }
+      include_examples 'only assigned can comment'
     end
+
 
     %w(resolved closed).each do |state|
       context "for a #{state} case" do
@@ -594,10 +637,8 @@ RSpec.describe 'Case page', type: :feature do
             find('textarea')
           end.to raise_error(Capybara::ElementNotFound)
         end
-
       end
     end
-
   end
 
   describe 'time logging' do
