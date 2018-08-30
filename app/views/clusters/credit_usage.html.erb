@@ -18,28 +18,16 @@
                 <i class="fa fa-warning fa-2x fa-pull-left"></i>
                 No service plans cover this period.
               </div>
-            <% elsif service_plans.count == 1 %>
-              <div class="mt-2 alert alert-info">
-                <i class="fa fa-info fa-2x fa-pull-left"></i>
-                This period includes the service plan running from
-                <%= service_plans.first.start_date.to_formatted_s(:friendly_date) %>
-                to
-                <%= service_plans.first.end_date.to_formatted_s(:friendly_date) %>.
-              </div>
             <% else %>
-              <div class="mt-2 alert alert-info">
-                <i class="fa fa-info fa-2x fa-pull-left"></i>
-                This period includes the service plans running from:
-
-                <ul>
-                  <% service_plans.each do |sp| %>
-                    <li>
-                      <%= sp.start_date.to_formatted_s(:friendly_date) %>
-                      to
-                      <%= sp.end_date.to_formatted_s(:friendly_date) %>
-                    </li>
-                  <% end %>
-                </ul>
+              <div class="text-center mb-2">
+                <% service_plans.each do |sp| %>
+                  <div class="badge badge-info">
+                    Service plan:
+                    <%= sp.start_date.to_formatted_s(:friendly_date) %>
+                    to
+                    <%= sp.end_date.to_formatted_s(:friendly_date) %>
+                  </div>
+                <% end %>
               </div>
             <% end %>
             <table class="table table-sm">
