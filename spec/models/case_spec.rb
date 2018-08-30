@@ -385,6 +385,17 @@ RSpec.describe Case, type: :model do
     end
   end
 
+  describe '#potential_contacts' do
+    subject { kase.potential_contacts.map(&:name) }
+    let(:kase) { create(:case) }
+
+    it 'includes any contact' do
+      create(:contact, site: kase.site, name: 'some_contact')
+
+      expect(subject).to include('some_contact')
+    end
+  end
+
   describe '#commenting_enabled_for?' do
     it 'returns inverse of what CaseCommenting#disabled? would give' do
       user = build_stubbed(:user)
