@@ -83,7 +83,7 @@
       <tr style="width: 100%;">
         <td colspan="2"></td>
         <th>Assigned contact</th>
-        <td>
+        <td id="case-contact-assignment">
           <%= render 'cases/case_assignment_controls',
             column: :contact_id,
             users: @case.potential_contacts,
