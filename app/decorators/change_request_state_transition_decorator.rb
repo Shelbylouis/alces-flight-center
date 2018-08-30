@@ -28,6 +28,15 @@ class ChangeRequestStateTransitionDecorator < ApplicationDecorator
     end
   end
 
+  def article_for_event
+    case object.event
+    when 'propose'
+      'A'
+    else
+      'The'
+    end
+  end
+
   private
 
   def cr_link
