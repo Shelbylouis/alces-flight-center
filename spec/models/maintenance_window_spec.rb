@@ -541,4 +541,17 @@ RSpec.describe MaintenanceWindow, type: :model do
       end
     end
   end
+
+  it 'cannot be created for an administrative case' do
+    cluster = create(:cluster)
+    issue = create(:administrative_issue)
+    kase = create(:open_case, issue: issue, clusters: [cluster])
+    mw = build(:maintenance_window, case: kase)
+
+    expect do
+      mw.save!
+    end.to raise_exception ActiveRecord::RecordInvalid
+
+    expect(mw.errors[:case]).to include 'must not be an administrative case'
+  end
 end

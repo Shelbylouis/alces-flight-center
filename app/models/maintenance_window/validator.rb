@@ -7,6 +7,7 @@ class MaintenanceWindow < ApplicationRecord
       validate_at_least_one_associated_model
       validate_homogenous_cluster
       validate_requested_period
+      validate_case_not_administrative
     end
 
     private
@@ -75,6 +76,14 @@ class MaintenanceWindow < ApplicationRecord
       unless clusters.length == 1
         record.errors.add(
           :base, 'All associated components must belong to the same cluster'
+        )
+      end
+    end
+
+    def validate_case_not_administrative
+      if !record.finished? && record.case&.issue&.administrative?
+        record.errors.add(
+          :case, 'must not be an administrative case'
         )
       end
     end
