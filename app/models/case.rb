@@ -482,12 +482,14 @@ class Case < ApplicationRecord
                   current_user
                 end
 
-      transaction do
-        self.contact = contact
-        save!
-        la = audits.last
-        la.user = nil
-        la.save!
+      unless contact.nil?
+        transaction do
+          self.contact = contact
+          save!
+          la = audits.last
+          la.user = nil
+          la.save!
+        end
       end
     end
   end
