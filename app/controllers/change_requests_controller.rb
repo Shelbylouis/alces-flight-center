@@ -149,10 +149,12 @@ class ChangeRequestsController < ApplicationController
       # the record to the database (or raised an exception). Hence we can be
       # certain that, if we reach this point, the model is saved and valid, so
       # it's safe to send the email.
+
+      last_transition = cr.transitions.last.decorate
       email(
         [
           cr.case,
-          "The change request for this case #{cr.transitions.last.decorate.text_for_event}",
+          "#{last_transition.article_for_event} change request for this case #{last_transition.text_for_event}",
           current_user,
           @recipients ||= @case.email_recipients
         ]
