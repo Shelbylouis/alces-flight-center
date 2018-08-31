@@ -46,10 +46,10 @@ module Audited
           "Changed the assigned engineer of this case from #{User.find(from).name}"\
           " to #{User.find(to).name}."
         else
-          "Unassigned this case from #{User.find(from).name}."
+          "#{User.find(from).name} is no longer the assigned engineer for this case."
         end
       else
-        "Assigned this case to #{User.find(to).name}."
+        "#{User.find(to).name} is now the assigned engineer for this case."
       end
     end
 
@@ -67,10 +67,10 @@ module Audited
           "Changed the assigned contact of this case from #{User.find(from).name}"\
           " to #{User.find(to).name}."
         else
-          "Unassigned this case from #{User.find(from).name}."
+          "#{User.find(from).name} is no longer the assigned contact for this case."
         end
       else
-        "Assigned this case to #{User.find(to).name}."
+        "#{User.find(to).name} is now the assigned contact for this case."
       end
     end
 
