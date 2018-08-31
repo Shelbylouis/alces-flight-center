@@ -4,7 +4,6 @@ class CasePolicy < ApplicationPolicy
 
   alias_method :close?, :admin?
   alias_method :assign_engineer?, :admin?
-  alias_method :assign_contact?, :contact?
 
   alias_method :resolve?, :admin?
   alias_method :set_time?, :admin?
@@ -18,6 +17,10 @@ class CasePolicy < ApplicationPolicy
 
   def update?
     user.admin? || record.site.users.include?(user)
+  end
+
+  def assign_contact?
+    user.admin? | user.contact?
   end
 
   class Scope < Scope
