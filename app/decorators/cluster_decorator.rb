@@ -141,7 +141,7 @@ class ClusterDecorator < ApplicationDecorator
       .case_form_json
       .merge(IssuesJsonBuilder.build_for(
         self,
-        !current_user || current_user.admin?
+        current_user
       ))
   end
 
@@ -165,7 +165,7 @@ class ClusterDecorator < ApplicationDecorator
 
     def applicable_issues
       self.class.other_service_issues.reject { |i|
-        !@admin && i.administrative?
+        i.administrative? && @user && !@user.admin?
       }
     end
   end

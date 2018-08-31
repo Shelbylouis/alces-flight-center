@@ -28,7 +28,7 @@ class ServiceDecorator < ClusterPartDecorator
     # @see ApplicationRecord#permissions_check_unneeded?
     issues_json = IssuesJsonBuilder.build_for(
       self,
-      !current_user || current_user.admin?
+      current_user
     )
     super.merge(issues_json)
   end
@@ -44,8 +44,8 @@ class ServiceDecorator < ClusterPartDecorator
   private
 
   class IssuesJsonBuilder
-    def self.build_for(service, admin=false)
-      new(service, admin).build
+    def self.build_for(service, user)
+      new(service, user).build
     end
 
     def build
@@ -61,9 +61,9 @@ class ServiceDecorator < ClusterPartDecorator
     attr_reader :service
     delegate :service_type, to: :service
 
-    def initialize(service, admin=false)
+    def initialize(service, user)
       @service = service
-      @admin = admin
+      @user = user
     end
 
     def any_categorised_issues?
@@ -82,7 +82,7 @@ class ServiceDecorator < ClusterPartDecorator
         (service_type.issues + issues_requiring_any_service)
           .reject(&:special?)
           .reject { |i|
-            !@admin && i.administrative?
+            i.administrative? && @user && !@user.admin?
           }
     end
 
