@@ -147,4 +147,36 @@ RSpec.describe User, type: :model do
       expect(User.from_jwt_token(invalid_token)).to eq nil
     end
   end
+
+  describe '#validates_case_assignments' do
+    let(:site) { create(:site) }
+    let(:cluster) { create(:cluster, site: site) }
+    let(:primary) { create(:primary_contact, site: site) }
+    let!(:user) { create(:secondary_contact, site: site) }
+    let!(:kase) { create(:open_case, cluster: cluster, contact: user) }
+
+    def demote_contact
+      user.role = 'viewer'
+      user.save!
+    end
+
+    it 'unassigns cases from user when demoted to viewer' do
+      expect(user.assigned_cases.count).to eq 1
+
+      demote_contact
+      user.reload
+
+      expect(user.assigned_cases.count).to eq 0
+    end
+
+    it 'reassigns cases to primary contact when user is demoted to viewer' do
+      expect(primary.assigned_cases.count).to eq 0
+
+      demote_contact
+      kase.reload
+      primary.reload
+
+      expect(primary.assigned_cases.count).to eq 1
+    end
+  end
 end
