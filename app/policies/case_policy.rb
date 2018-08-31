@@ -3,7 +3,9 @@ class CasePolicy < ApplicationPolicy
   alias_method :escalate?, :editor?
 
   alias_method :close?, :admin?
-  alias_method :assign?, :admin?
+  alias_method :assign_engineer?, :admin?
+  alias_method :assign_contact?, :contact?
+
   alias_method :resolve?, :admin?
   alias_method :set_time?, :admin?
   alias_method :set_commenting?, :admin?
