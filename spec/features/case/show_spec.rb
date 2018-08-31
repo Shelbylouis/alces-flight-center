@@ -459,7 +459,7 @@ RSpec.describe 'Case page', type: :feature do
 
       end
 
-      it_behaves_like 'contact assignment controls'
+      include_examples 'contact assignment controls'
     end
 
     context 'as a contact' do
@@ -472,7 +472,7 @@ RSpec.describe 'Case page', type: :feature do
         expect(assignment_td.text).to eq('A Scientist')
       end
 
-      it_behaves_like 'contact assignment controls'
+      include_examples 'contact assignment controls'
     end
 
     context 'when a case has an assigned engineer' do
