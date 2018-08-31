@@ -7,6 +7,13 @@ FactoryBot.define do
     fields [{name: 'Details', value: 'some_details'}]
     tier_level 3
 
+    after :build do |kase|
+      unless kase.user.admin?
+        kase.user.site = kase.site
+        kase.user.save!
+      end
+    end
+
     factory :open_case do
       state 'open'
     end
