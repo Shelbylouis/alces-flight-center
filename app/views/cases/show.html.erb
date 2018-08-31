@@ -88,7 +88,7 @@
                           role: 'button'
               %>
             <% end %>
-            <% if policy(MaintenanceWindow).create? %>
+            <% if policy(MaintenanceWindow).create? && !@case.issue.administrative? %>
               <%= link_to 'Request maintenance',
                           @case.request_maintenance_path,
                           class: 'btn btn-secondary ml-2 btn-sm',

@@ -14,6 +14,8 @@ class CaseCommenting
       viewer_cannot_comment_message
     elsif !kase.open?
       not_open_message
+    elsif kase.issue.administrative? && !user.admin?
+      administrative_message
     elsif user.contact? && kase.comments_could_be_enabled? && !kase.comments_enabled
       non_consultancy_message
     else
@@ -39,5 +41,9 @@ class CaseCommenting
       request additional support please either escalate this case, or open a
       new support case.
     MESSAGE
+  end
+
+  def administrative_message
+    'Commenting is disabled as this is an administrative case.'
   end
 end

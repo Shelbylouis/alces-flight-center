@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_28_100631) do
+ActiveRecord::Schema.define(version: 2018_08_29_145124) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -293,6 +293,7 @@ ActiveRecord::Schema.define(version: 2018_08_28_100631) do
     t.boolean "requires_service", default: false, null: false
     t.bigint "service_type_id"
     t.bigint "category_id"
+    t.boolean "administrative", default: false, null: false
     t.index ["category_id"], name: "index_issues_on_category_id"
     t.index ["service_type_id"], name: "index_issues_on_service_type_id"
   end

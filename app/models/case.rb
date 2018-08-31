@@ -50,7 +50,6 @@ class Case < ApplicationRecord
   has_one :credit_charge, required: false
 
   delegate :category, to: :issue
-  delegate :email_recipients, to: :site
   delegate :site, to: :cluster, allow_nil: true
 
   state_machine initial: :open do
@@ -116,6 +115,8 @@ class Case < ApplicationRecord
   validates_with AvailableSupportValidator, on: :create
 
   validates_with AssociatedModelValidator
+
+  validates_with IssueValidator
 
   validate :validates_user_assignment
 
@@ -214,6 +215,14 @@ class Case < ApplicationRecord
     end
   end
 
+  def email_recipients
+    if issue.administrative?
+      []
+    else
+      site.email_recipients
+    end
+  end
+
   def ticket_subject
     # NOTE: If the format used here ever changes then this may cause new emails
     # sent in relation to an existing Cases to not be threaded with previous
@@ -254,7 +263,7 @@ class Case < ApplicationRecord
   def comments_could_be_enabled?
     # If this condition is met then comments by contacts are enabled iff
     # comments_enabled is true.
-    open? && !consultancy?
+    open? && !consultancy? && !issue.administrative?
   end
 
   def can_create_change_request?

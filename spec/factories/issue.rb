@@ -3,6 +3,7 @@ FactoryBot.define do
   factory :issue do
     name 'New user/group'
     requires_component false
+    administrative false
 
     factory :issue_with_category do
       name 'Motd change request'
@@ -39,6 +40,10 @@ FactoryBot.define do
 
     factory :special_issue do
       identifier Issue::IDENTIFIER_NAMES.first
+    end
+
+    factory :administrative_issue do
+      administrative true
     end
   end
 end

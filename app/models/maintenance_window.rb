@@ -91,6 +91,10 @@ class MaintenanceWindow < ApplicationRecord
     end
   end
 
+  def finished?
+    self.class.finished_states.include? state
+  end
+
   def associated_models
     component_groups + components + services + clusters
   end
