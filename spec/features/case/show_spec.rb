@@ -72,6 +72,8 @@ RSpec.describe 'Case page', type: :feature do
   end
 
   describe 'events list' do
+    let(:engineer) { create(:admin, name: 'Jerry') }
+
     it 'shows events in reverse chronological order' do
       create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
       create(
@@ -83,7 +85,7 @@ RSpec.describe 'Case page', type: :feature do
       create(:case_comment, case: open_case, user: admin, created_at: 4.hours.ago, text: 'First')
 
       # Generate an assignee-change audit entry
-      open_case.assignee = admin
+      open_case.assignee = engineer
       # ...and a time-worked one
       open_case.time_worked = 123
       # And an escalation entry
@@ -100,14 +102,18 @@ RSpec.describe 'Case page', type: :feature do
       visit cluster_case_path(cluster, open_case, as: admin)
 
       event_cards = all('.event-card')
-      expect(event_cards.size).to eq(7)
+      expect(event_cards.size).to eq(8)
 
-      expect(event_cards[6].find('.card-body').text).to eq('First')
-      expect(event_cards[5].find('.card-body').text).to eq('Second')
-      expect(event_cards[4].find('.card-body').text).to match(
+      expect(event_cards[7].find('.card-body').text).to eq('First')
+      expect(event_cards[6].find('.card-body').text).to eq('Second')
+      expect(event_cards[5].find('.card-body').text).to match(
         /Maintenance requested for .* from .* until .* by A Scientist; to proceed this maintenance must be confirmed on the cluster dashboard/
       )
-      expect(event_cards[3].find('.card-body').text).to eq 'Changed time worked from 42m to 2h 3m.'
+      expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked from 42m to 2h 3m.'
+
+      expect(event_cards[3].find('.card-body').text).to eq(
+        'Changed the assigned engineer of this case from A Scientist to Jerry.'
+      )
 
       expect(event_cards[2].find('.card-body').text).to eq(
           'Escalated this case to tier 3 (General Support).'
