@@ -80,17 +80,6 @@
           %>
         </td>
       </tr>
-      <tr style="width: 100%;">
-        <td colspan="2"></td>
-        <th>Assigned contact</th>
-        <td id="case-contact-assignment">
-          <%= render 'cases/case_assignment_controls',
-            column: :contact_id,
-            users: @case.potential_contacts,
-            assignee: @case.contact
-          %>
-        </td>
-      </tr>
       <tr>
         <th rowspan="<%= @case.credit_charge ? 4 : 3 %>">Affected components</th>
         <td rowspan="<%= @case.credit_charge ? 4 : 3 %>">
@@ -112,6 +101,16 @@
             <% end %>
           <% end %>
         </td>
+        <th>Assigned contact</th>
+        <td id="case-contact-assignment">
+          <%= render 'cases/case_assignment_controls',
+            column: :contact_id,
+            users: @case.potential_contacts,
+            assignee: @case.contact
+          %>
+        </td>
+      </tr>
+      <tr>
         <th>State</th>
         <td id="case-state-controls">
           <%= @case.user_facing_state %>
