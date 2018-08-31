@@ -163,6 +163,7 @@ RSpec.describe User, type: :model do
     it 'unassigns cases from user when demoted to viewer' do
       expect(user.assigned_cases.count).to eq 1
 
+      primary
       demote_contact
       user.reload
 
