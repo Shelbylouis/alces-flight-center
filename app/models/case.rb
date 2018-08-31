@@ -126,7 +126,8 @@ class Case < ApplicationRecord
 
   validates_with IssueValidator
 
-  validate :validates_user_assignment
+  validate :validates_engineer_assignment
+  validate :validates_contact_assignment
 
   validate :validate_not_resolved_with_open_cr
   validates :change_request,
@@ -494,9 +495,14 @@ class Case < ApplicationRecord
     end
   end
 
-  def validates_user_assignment
+  def validates_engineer_assignment
     return if assignee.nil?
-    errors.add(:assignee, 'must belong to this site, or be an admin') unless (assignee.site == site) || assignee.admin?
+    errors.add(:assignee, 'must be an admin') unless assignee.admin?
+  end
+
+  def validates_contact_assignment
+    return if contact.nil?
+    errors.add(:contact, 'must belong to this site') unless (contact.site == site)
   end
 
   def set_display_id
