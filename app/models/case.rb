@@ -477,10 +477,10 @@ class Case < ApplicationRecord
 
   def set_assigned_contact
     if open?
-      contact = if current_user.nil? || current_user.admin?
+      contact = if user.admin?
                   site.primary_contact
                 else
-                  current_user
+                  user
                 end
 
       unless contact.nil?
