@@ -388,11 +388,18 @@ RSpec.describe Case, type: :model do
   describe '#potential_contacts' do
     subject { kase.potential_contacts.map(&:name) }
     let(:kase) { create(:case) }
+    let(:another_site) { create(:site, name: 'Another Site') }
 
-    it 'includes any contact' do
+    it 'includes all contacts for a site' do
       create(:contact, site: kase.site, name: 'some_contact')
+      create(:contact, site: kase.site, name: 'another_contact')
 
-      expect(subject).to include('some_contact')
+      # Viewers and contacts from other sites should not be included
+      # in the list of potential contacts
+      create(:viewer, site: kase.site, name: 'just_a_viewer')
+      create(:contact, site: another_site)
+
+      expect(subject).to eq(['another_contact', 'some_contact'])
     end
   end
 
