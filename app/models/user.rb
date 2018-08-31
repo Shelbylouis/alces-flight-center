@@ -123,6 +123,7 @@ class User < ApplicationRecord
       assigned_cases.each do |kase|
         kase.contact = site_primary_contact
         kase.save!
+        CaseMailer.reassigned_case(kase, self, site_primary_contact)
       end
     end
   end
