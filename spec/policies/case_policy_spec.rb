@@ -9,7 +9,7 @@ RSpec.describe CasePolicy do
     it_behaves_like 'it is available only to editors'
   end
 
-  permissions :close?, :assign?, :resolve?, :set_time? do
+  permissions :close?, :assign_engineer?, :resolve?, :set_time? do
     it_behaves_like 'it is available only to admins'
   end
 end
