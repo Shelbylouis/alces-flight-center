@@ -381,7 +381,7 @@ RSpec.describe Case, type: :model do
       create(:viewer, name: 'some_viewer', site: kase.site)
       create(:contact, name: 'that_contact', site: kase.site)
 
-      expect(subject).not_to include('some_viewer' || 'that_contact')
+      expect(subject).not_to include('some_viewer', 'that_contact')
     end
   end
 
