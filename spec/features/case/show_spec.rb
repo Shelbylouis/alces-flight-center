@@ -429,7 +429,7 @@ RSpec.describe 'Case page', type: :feature do
         assignment_select = find('#case-engineer-assignment').find('select')
 
         options = assignment_select.all('option').map(&:text)
-        expect(options).to eq(['Nobody', '* A Scientist'])
+        expect(options).to eq(['Nobody', 'A Scientist'])
       end
 
       it 'changes assigned engineer when assignee is selected' do

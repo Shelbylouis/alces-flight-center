@@ -6,7 +6,7 @@
             column,
             users,
             :id,
-            Proc.new { |a| "#{a.admin? ? '* ' : ''}#{a.name}"},
+            Proc.new { |a| "#{a.name}"},
             {
               include_blank: 'Nobody'
             },
