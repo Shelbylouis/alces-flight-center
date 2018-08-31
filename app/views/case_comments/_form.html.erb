@@ -1,4 +1,4 @@
-<% if policy(@comment).create? && @case.allowed_to_comment %>
+<% if policy(@comment).create? && @case.allowed_to_comment? %>
   <%= form_for @comment.decorate.form_path do |f| %>
       <%= render 'partials/markdown_editor_layout',
           activate: 'write',

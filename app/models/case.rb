@@ -389,7 +389,7 @@ class Case < ApplicationRecord
     days.days + hours.hours + minutes.minutes + raw.seconds
   end
 
-  def allowed_to_comment
+  def allowed_to_comment?
     [self.assignee, self.contact].include?(current_user)
   end
 
