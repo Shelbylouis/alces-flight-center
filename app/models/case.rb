@@ -67,11 +67,11 @@ class Case < ApplicationRecord
 
   audited only: [
     :assignee_id,
+    :contact_id,
     :issue_id,
     :subject,
     :time_worked,
-    :tier_level,
-    :contact_id
+    :tier_level
   ], on: [ :update ]
   has_associated_audits
 
