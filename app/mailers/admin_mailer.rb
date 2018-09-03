@@ -3,7 +3,10 @@ class AdminMailer < ApplicationMailer
 
   def daily_open_cases_list(admin, cases)
     @admin = admin
-    @cases = cases.decorate
+    # Because we Resque serialise this job, cases here will be a plain array
+    # rather than an ActiveRecord association, so we can't just call `decorate`
+    # on the whole.
+    @cases = cases.map(&:decorate)
 
     mail(
       to: admin.email,
