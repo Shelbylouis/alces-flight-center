@@ -98,7 +98,7 @@ RSpec.describe 'Case form', type: :feature, js: true do
     let!(:contact) { create(:primary_contact, site: site, name: 'Mary Pri') }
     let(:site) { create(:site, default_assignee: admin) }
     let(:cluster) { create(:cluster, site: site) }
-    let(:assigned_case) { create(:open_case, cluster: cluster) }
+    let(:assigned_case) { create(:open_case, cluster: cluster, user: contact) }
 
     it 'has an assigned engineer' do
       expect(assigned_case.assignee).to eq(admin)
