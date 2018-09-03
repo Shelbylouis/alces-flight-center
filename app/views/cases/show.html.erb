@@ -74,6 +74,7 @@
         <th nowrap>Assigned engineer</th>
         <td id="case-engineer-assignment">
           <%= render 'cases/case_assignment_controls',
+            assignment_policy: policy(@case).assign_engineer?,
             column: :assignee_id,
             users: @case.potential_assignees,
             assignee: @case.assignee
@@ -104,6 +105,7 @@
         <th>Assigned contact</th>
         <td id="case-contact-assignment">
           <%= render 'cases/case_assignment_controls',
+            assignment_policy: policy(@case).assign_contact?,
             column: :contact_id,
             users: @case.potential_contacts,
             assignee: @case.contact

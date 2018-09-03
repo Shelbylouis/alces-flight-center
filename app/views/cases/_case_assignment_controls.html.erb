@@ -1,4 +1,4 @@
-<% if policy(@case).assign_engineer? || ( policy(@case).assign_contact? && column == :contact_id ) %>
+<% if assignment_policy %>
   <%= form_for @case do |f| %>
     <div class="form-group">
       <div class="input-group">
