@@ -13,7 +13,7 @@ RSpec.describe Case, type: :model do
           build(
             "case_requiring_#{part_name}",
             part_key => part_value,
-            tier_level: tier_level,
+            tier_level: tier_level
           )
         end
 
