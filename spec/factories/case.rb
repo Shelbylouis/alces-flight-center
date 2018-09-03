@@ -51,6 +51,11 @@ FactoryBot.define do
       after :build do |instance|
         unless instance.components.empty?
           instance.cluster = instance.components.first.cluster
+
+          unless instance.user.admin?
+            instance.user.site = instance.site
+            instance.user.save!
+          end
         end
       end
 
@@ -68,6 +73,11 @@ FactoryBot.define do
       after :build do |instance|
         unless instance.services.empty?
           instance.cluster = instance.services.first.cluster
+
+          unless instance.user.admin?
+            instance.user.site = instance.site
+            instance.user.save!
+          end
         end
       end
 
@@ -76,6 +86,11 @@ FactoryBot.define do
 
         after :build do |instance|
           instance.cluster = instance.services[0].cluster
+
+          unless instance.user.admin?
+            instance.user.site = instance.site
+            instance.user.save!
+          end
         end
       end
     end

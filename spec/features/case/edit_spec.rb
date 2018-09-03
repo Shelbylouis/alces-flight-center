@@ -56,8 +56,11 @@ RSpec.describe 'Case editing', type: :feature do
 
         expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
 
-        expect(find('.event-card')).to \
-          have_text 'Changed the subject of this case from \'Original subject\' to \'New subject\''
+        event_cards = all('.event-card')
+
+        expect(event_cards[0].find('.card-body').text).to eq(
+          'Changed the subject of this case from \'Original subject\' to \'New subject\'.'
+        )
 
         kase.reload
 
@@ -84,8 +87,12 @@ RSpec.describe 'Case editing', type: :feature do
         subject
         expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
 
-        expect(find('.event-card')).to \
-          have_text 'Changed this case\'s associated issue from \'New user/group\' to \'Some other issue\''
+        event_cards = all('.event-card')
+
+        expect(event_cards[0].find('.card-body').text)
+          .to eq(
+        'Changed this case\'s associated issue from \'New user/group\' to \'Some other issue\'.'
+        )
 
         kase.reload
         expect(kase.issue).to eq issue

@@ -399,7 +399,7 @@ RSpec.describe Case, type: :model do
       create(:viewer, site: kase.site, name: 'just_a_viewer')
       create(:contact, site: another_site)
 
-      expect(subject).to eq(['another_contact', 'some_contact'])
+      expect(subject).to eq(['another_contact', 'A Scientist', 'some_contact'])
     end
   end
 

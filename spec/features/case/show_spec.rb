@@ -15,7 +15,8 @@ RSpec.describe 'Case page', type: :feature do
       subject: 'Open case',
       assignee: admin,
       tier_level: 2,
-      time_worked: time_worked
+      time_worked: time_worked,
+      user: admin
     )
   end
 
@@ -525,8 +526,10 @@ RSpec.describe 'Case page', type: :feature do
 
           assigned_case.reload
 
+          event_cards = all('.event-card')
+
           expect(assigned_case.case_comments.count).to be 1
-          expect(find('.event-card').find('.card-body').text).to eq('This is a test comment')
+          expect(event_cards[0].find('.card-body').text).to eq('This is a test comment')
           expect(find('.alert-success')).to have_text('New comment added')
         end
 
