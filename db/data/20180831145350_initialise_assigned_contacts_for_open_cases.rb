@@ -1,8 +1,18 @@
 class InitialiseAssignedContactsForOpenCases < ActiveRecord::Migration[5.2]
   def change
+
     Case.active.each do |kase|
-      kase.send(:set_assigned_contact)
-      kase.save!
+      user = kase.user
+
+      kase.without_auditing do
+        if user.admin?
+          kase.contact = kase.site.primary_contact
+        else
+          kase.contact = user
+        end
+
+        kase.save!
+      end
     end
   end
 end
