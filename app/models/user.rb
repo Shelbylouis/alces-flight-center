@@ -94,8 +94,7 @@ class User < ApplicationRecord
   end
 
   def assigned_cases
-    cases = engineer_cases | contact_cases
-    Case.where(id: cases.map(&:id))
+    engineer_cases || contact_cases
   end
 
   private
