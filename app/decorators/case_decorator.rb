@@ -30,7 +30,11 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def tier_description
-    h.tier_description(tier_level)
+    if issue&.administrative?
+      'N/A (Administrative)'
+    else
+      h.tier_description(tier_level)
+    end
   end
 
   def commenting_disabled_text
