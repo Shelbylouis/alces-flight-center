@@ -119,10 +119,12 @@ class CaseMailer < ApplicationMailer
     @old = old_contact
     @new = new_contact
 
-    mail(
-      cc: @new&.email,
-      subject: @case.email_reply_subject
-    )
+    unless @new.nil?
+      mail(
+        to: @new&.email,
+        subject: @case.email_reply_subject
+      )
+    end
     SlackNotifier.reassigned_case_notification(kase, @old, @new)
   end
 
