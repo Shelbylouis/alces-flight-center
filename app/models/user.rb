@@ -29,7 +29,7 @@ class User < ApplicationRecord
   }
   validate :validates_primary_contact_assignment
 
-  after_validation :validates_case_assignments
+  before_validation :reassign_cases_if_necessary
 
   delegate :admin?,
     :primary_contact?,
@@ -94,7 +94,7 @@ class User < ApplicationRecord
   end
 
   def assigned_cases
-    engineer_cases || contact_cases
+    engineer_cases.empty? ? contact_cases : engineer_cases
   end
 
   private
@@ -111,7 +111,7 @@ class User < ApplicationRecord
     true  # since we use SSO for passwords
   end
 
-  def validates_case_assignments
+  def reassign_cases_if_necessary
     if viewer?
       reassign_cases
     end
