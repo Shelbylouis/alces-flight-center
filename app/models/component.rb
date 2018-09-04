@@ -10,5 +10,5 @@ class Component < ApplicationRecord
   validates_associated :component_group,
                        :cluster
 
-  validates :info, presence: true
+  validates :info, exclusion: { in: [nil], message: 'can\'t be nil' }
 end
