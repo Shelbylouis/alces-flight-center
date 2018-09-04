@@ -395,7 +395,7 @@ class Case < ApplicationRecord
   end
 
   def administrative?
-    subject == 'Administrative'
+    issue.administrative
   end
 
   private
