@@ -480,7 +480,7 @@ class Case < ApplicationRecord
   end
 
   def set_assigned_contact
-    if open? && contact.nil?
+    if open? && !administrative? && contact.nil?
       new_contact = if user.admin?
                   site.primary_contact
                 else
