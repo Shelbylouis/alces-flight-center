@@ -595,4 +595,19 @@ RSpec.describe Case, type: :model do
       end
     end
   end
+
+  describe '#administrative?' do
+    let(:issue) { create(:administrative_issue) }
+    let(:admin_case) { create(:open_case, issue: issue) }
+    let(:open_case) { create(:open_case) }
+
+    it 'returns true when case issue is administrative' do
+      expect(admin_case.administrative?).to eq true
+    end
+
+
+    it 'returns false when case issue is not administrative' do
+      expect(open_case.administrative?).to eq false
+    end
+  end
 end
