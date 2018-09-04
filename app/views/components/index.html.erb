@@ -17,7 +17,7 @@
           </thead>
 
           <tbody>
-            <% group.decorate.components.each do |component| %>
+            <% group.components.order(:name).decorate.each do |component| %>
               <tr>
                 <td width='40%'>
                   <%= link_to component.name, component_path(component) %>
