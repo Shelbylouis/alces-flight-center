@@ -803,6 +803,16 @@ RSpec.describe 'Case page', type: :feature do
 
       it_behaves_like 'for inapplicable cases'
     end
+
+    context 'for administrative case' do
+      let(:issue) { create(:administrative_issue) }
+
+      subject do
+        create(:open_case, cluster: cluster, issue: issue)
+      end
+
+      it_behaves_like 'for inapplicable cases'
+    end
   end
 
   describe 'maintenance window request' do
