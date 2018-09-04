@@ -1,6 +1,8 @@
 class TopicsController < ApplicationController
   def index
-    if current_user.nil?
+    # Check for `signed_in_without_account?` here as Flight Platform users
+    # without a Flight Center account have access to topics.  
+    if current_user.nil? && !signed_in_without_account?
       render status: :unauthorized,
         json: { error: 'Authentication required' }
       return
