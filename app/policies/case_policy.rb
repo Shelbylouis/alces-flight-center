@@ -1,6 +1,9 @@
 class CasePolicy < ApplicationPolicy
   alias_method :create?, :editor?
-  alias_method :escalate?, :editor?
+
+  def escalate?
+    editor? && !@record.issue&.administrative?
+  end
 
   alias_method :close?, :admin?
   alias_method :assign_engineer?, :admin?
