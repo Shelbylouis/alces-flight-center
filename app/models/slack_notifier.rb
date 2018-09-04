@@ -172,7 +172,13 @@ class SlackNotifier
     end
 
     def reassigned_case_notification(kase, old_contact, new_contact)
-      text = "This case has been reassigned from #{old_contact.name} to #{new_contact.name}"
+      if new_contact.nil?
+        text = "This case has been reassigned from #{old_contact.name} to"\
+          " nobody as there is no primary contact for this site."
+      else
+        text = "This case has been reassigned from #{old_contact.name} to #{new_contact.name}"
+      end
+
       reassigned_case_note = {
         fallback: text,
         title: subject_and_id_title(kase),
