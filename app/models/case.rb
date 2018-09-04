@@ -506,7 +506,11 @@ class Case < ApplicationRecord
 
   def validates_contact_assignment
     return if contact.nil?
-    errors.add(:contact, 'must belong to this site') unless (contact.site == site)
+    if administrative?
+      errors.add(:contact, "can't be assigned to an administrative case")
+    else
+      errors.add(:contact, 'must belong to this site') unless (contact.site == site)
+    end
   end
 
   def set_display_id
