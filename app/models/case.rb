@@ -394,6 +394,10 @@ class Case < ApplicationRecord
     [self.assignee, self.contact].include?(current_user)
   end
 
+  def administrative?
+    issue.administrative
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
@@ -476,7 +480,7 @@ class Case < ApplicationRecord
   end
 
   def set_assigned_contact
-    if open? && contact.nil?
+    if open? && !administrative? && contact.nil?
       new_contact = if user.admin?
                   site.primary_contact
                 else
@@ -502,7 +506,11 @@ class Case < ApplicationRecord
 
   def validates_contact_assignment
     return if contact.nil?
-    errors.add(:contact, 'must belong to this site') unless (contact.site == site)
+    if administrative?
+      errors.add(:contact, "can't be assigned to an administrative case")
+    else
+      errors.add(:contact, 'must belong to this site') unless (contact.site == site)
+    end
   end
 
   def set_display_id

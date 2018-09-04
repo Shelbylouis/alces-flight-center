@@ -426,6 +426,19 @@ RSpec.describe 'Case page', type: :feature do
             .to have_text 'This case is no longer assigned to a contact.'
         end
       end
+
+      context 'when viewing an administrative case' do
+        let(:issue) { create(:administrative_issue) }
+        let(:admin_case) { create(:open_case, issue: issue, cluster: cluster) }
+
+        it 'hides contact assignment controls' do
+          visit cluster_case_path(cluster, admin_case, as: user)
+
+          assignment_td = find('#case-contact-assignment')
+          expect { assignment_td.find('input') }.to raise_error(Capybara::ElementNotFound)
+          expect(assignment_td.text).to eq('Nobody')
+        end
+      end
     end
 
     context 'as an admin' do

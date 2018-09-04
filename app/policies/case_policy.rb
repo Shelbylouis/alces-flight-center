@@ -20,7 +20,9 @@ class CasePolicy < ApplicationPolicy
   end
 
   def assign_contact?
-    user.admin? | user.contact?
+    unless record.administrative?
+      user.admin? | user.contact?
+    end
   end
 
   class Scope < Scope
