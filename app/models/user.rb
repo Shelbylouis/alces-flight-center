@@ -30,6 +30,7 @@ class User < ApplicationRecord
   validate :validates_primary_contact_assignment
 
   before_validation :reassign_cases_if_necessary
+  validate :validates_viewer_case_assignment
 
   delegate :admin?,
     :primary_contact?,
@@ -63,6 +64,11 @@ class User < ApplicationRecord
     if primary_contact? && site_primary_contact != self
       errors.add(:role, 'primary contact is already set for this site')
     end
+  end
+
+  def validates_viewer_case_assignment
+    return if assigned_cases.empty?
+    errors.add(:cases, 'must be empty for a viewer')
   end
 
   def self.globally_available?
@@ -124,6 +130,10 @@ class User < ApplicationRecord
         kase.save!
         CaseMailer.reassigned_case(kase, self, site_primary_contact)
       end
+
+      # This ensures the reassigned cases are no longer within the cached
+      # contact_cases.
+      reload
     end
   end
 end
