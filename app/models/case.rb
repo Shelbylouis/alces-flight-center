@@ -394,6 +394,10 @@ class Case < ApplicationRecord
     [self.assignee, self.contact].include?(current_user)
   end
 
+  def administrative?
+    subject == 'Administrative'
+  end
+
   private
 
   # Picked up by state_machines-audit_trail due to `context` setting above, and
