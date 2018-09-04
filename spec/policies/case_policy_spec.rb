@@ -5,11 +5,11 @@ RSpec.describe CasePolicy do
 
   let(:record) { create(:case, cluster: create(:cluster, site: site)) }
 
-  permissions :create?, :new?, :escalate? do
+  permissions :create?, :new?, :escalate?, :assign_contact? do
     it_behaves_like 'it is available only to editors'
   end
 
-  permissions :close?, :assign?, :resolve?, :set_time? do
+  permissions :close?, :assign_engineer?, :resolve?, :set_time? do
     it_behaves_like 'it is available only to admins'
   end
 end

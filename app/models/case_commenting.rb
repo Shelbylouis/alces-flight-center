@@ -18,6 +18,8 @@ class CaseCommenting
       administrative_message
     elsif user.contact? && kase.comments_could_be_enabled? && !kase.comments_enabled
       non_consultancy_message
+    elsif !kase.allowed_to_comment?
+      not_assigned_message
     else
       ''
     end
@@ -45,5 +47,9 @@ class CaseCommenting
 
   def administrative_message
     'Commenting is disabled as this is an administrative case.'
+  end
+
+  def not_assigned_message
+    "You must be assigned to this case to comment on it."
   end
 end

@@ -71,9 +71,14 @@
           on
           <em><%= @case.created_at.to_formatted_s(:short) %></em>
         </td>
-        <th>Assigned to</th>
-        <td id="case-assignment">
-          <%= render 'cases/case_assignment_controls' %>
+        <th nowrap>Assigned engineer</th>
+        <td id="case-engineer-assignment">
+          <%= render 'cases/case_assignment_controls',
+            assignment_policy: policy(@case).assign_engineer?,
+            column: :assignee_id,
+            users: @case.potential_assignees,
+            assignee: @case.assignee
+          %>
         </td>
       </tr>
       <tr>
@@ -97,6 +102,17 @@
             <% end %>
           <% end %>
         </td>
+        <th>Assigned contact</th>
+        <td id="case-contact-assignment">
+          <%= render 'cases/case_assignment_controls',
+            assignment_policy: policy(@case).assign_contact?,
+            column: :contact_id,
+            users: @case.potential_contacts,
+            assignee: @case.contact
+          %>
+        </td>
+      </tr>
+      <tr>
         <th>State</th>
         <td id="case-state-controls">
           <%= @case.user_facing_state %>

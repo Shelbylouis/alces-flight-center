@@ -37,6 +37,7 @@ class Case < ApplicationRecord
 
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
+  belongs_to :contact, class_name: 'User', required: false
 
   has_many :maintenance_windows
   has_and_belongs_to_many :logs
@@ -64,7 +65,14 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: [:assignee_id, :issue_id, :subject, :time_worked, :tier_level], on: [ :update ]
+  audited only: [
+    :assignee_id,
+    :contact_id,
+    :issue_id,
+    :subject,
+    :time_worked,
+    :tier_level
+  ], on: [ :update ]
   has_associated_audits
 
   validates :display_id, uniqueness: true
@@ -118,7 +126,8 @@ class Case < ApplicationRecord
 
   validates_with IssueValidator
 
-  validate :validates_user_assignment
+  validate :validates_engineer_assignment
+  validate :validates_contact_assignment
 
   validate :validate_not_resolved_with_open_cr
   validates :change_request,
@@ -131,7 +140,7 @@ class Case < ApplicationRecord
   before_validation :assign_default_subject_if_unset
 
   before_create :set_display_id
-  after_create :send_new_case_email, :maybe_set_default_assignee
+  after_create :send_new_case_email, :maybe_set_default_assignee, :set_assigned_contact
 
   scope :state, ->(state) { where(state: state) }
   scope :active, -> { state('open') }
@@ -294,9 +303,11 @@ class Case < ApplicationRecord
   end
 
   def potential_assignees
-    site.users.where.not(role: :viewer)
-      .or(User.where(role: :admin))
-      .order(:name)
+    User.where(role: :admin)
+  end
+
+  def potential_contacts
+    site.users.where.not(role: :viewer).order(:name)
   end
 
   def time_worked=(new_time)
@@ -377,6 +388,10 @@ class Case < ApplicationRecord
     raw -= minutes.minutes.seconds
 
     days.days + hours.hours + minutes.minutes + raw.seconds
+  end
+
+  def allowed_to_comment?
+    [self.assignee, self.contact].include?(current_user)
   end
 
   private
@@ -460,9 +475,34 @@ class Case < ApplicationRecord
     end
   end
 
-  def validates_user_assignment
+  def set_assigned_contact
+    if open? && contact.nil?
+      new_contact = if user.admin?
+                  site.primary_contact
+                else
+                  user
+                end
+
+      return if new_contact.nil?
+      transaction do
+        self.contact = new_contact
+        save!
+
+        la = audits.last
+        la.user = nil
+        la.save!
+      end
+    end
+  end
+
+  def validates_engineer_assignment
     return if assignee.nil?
-    errors.add(:assignee, 'must belong to this site, or be an admin') unless (assignee.site == site) || assignee.admin?
+    errors.add(:assignee, 'must be an admin') unless assignee.admin?
+  end
+
+  def validates_contact_assignment
+    return if contact.nil?
+    errors.add(:contact, 'must belong to this site') unless (contact.site == site)
   end
 
   def set_display_id

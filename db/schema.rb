@@ -111,8 +111,10 @@ ActiveRecord::Schema.define(version: 2018_08_29_145124) do
     t.integer "time_worked"
     t.boolean "comments_enabled", default: false
     t.datetime "last_update"
+    t.bigint "contact_id"
     t.index ["assignee_id"], name: "index_cases_on_assignee_id"
     t.index ["cluster_id"], name: "index_cases_on_cluster_id"
+    t.index ["contact_id"], name: "index_cases_on_contact_id"
     t.index ["display_id"], name: "index_cases_on_display_id", unique: true
     t.index ["issue_id"], name: "index_cases_on_issue_id"
     t.index ["rt_ticket_id"], name: "index_cases_on_rt_ticket_id", unique: true
@@ -435,6 +437,7 @@ ActiveRecord::Schema.define(version: 2018_08_29_145124) do
   add_foreign_key "cases", "issues"
   add_foreign_key "cases", "users"
   add_foreign_key "cases", "users", column: "assignee_id"
+  add_foreign_key "cases", "users", column: "contact_id"
   add_foreign_key "change_motd_request_state_transitions", "change_motd_requests"
   add_foreign_key "change_motd_request_state_transitions", "users"
   add_foreign_key "change_request_state_transitions", "change_requests"

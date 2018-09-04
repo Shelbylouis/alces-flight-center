@@ -13,9 +13,10 @@ RSpec.describe 'Case page', type: :feature do
       :open_case,
       cluster: cluster,
       subject: 'Open case',
-      assignee: assignee,
+      assignee: admin,
       tier_level: 2,
-      time_worked: time_worked
+      time_worked: time_worked,
+      user: admin
     )
   end
 
@@ -28,7 +29,8 @@ RSpec.describe 'Case page', type: :feature do
   end
 
   let :consultancy_case do
-    create(:open_case, cluster: cluster, subject: 'Open case', assignee: assignee, tier_level: 3)
+    create(:open_case, cluster: cluster, subject: 'Open case',
+           assignee: admin, contact: contact, tier_level: 3)
   end
 
   let(:mw) { create(:maintenance_window, case: open_case, clusters: [cluster]) }
@@ -71,6 +73,8 @@ RSpec.describe 'Case page', type: :feature do
   end
 
   describe 'events list' do
+    let(:engineer) { create(:admin, name: 'Jerry') }
+
     it 'shows events in reverse chronological order' do
       create(:case_comment, case: open_case, user: admin, created_at: 2.hours.ago, text: 'Second')
       create(
@@ -82,7 +86,7 @@ RSpec.describe 'Case page', type: :feature do
       create(:case_comment, case: open_case, user: admin, created_at: 4.hours.ago, text: 'First')
 
       # Generate an assignee-change audit entry
-      open_case.assignee = admin
+      open_case.assignee = engineer
       # ...and a time-worked one
       open_case.time_worked = 123
       # And an escalation entry
@@ -109,8 +113,9 @@ RSpec.describe 'Case page', type: :feature do
       expect(event_cards[4].find('.card-body').text).to eq 'Changed time worked from 42m to 2h 3m.'
 
       expect(event_cards[3].find('.card-body').text).to eq(
-          'Assigned this case to A Scientist.'
+        'Changed the assigned engineer of this case from A Scientist to Jerry.'
       )
+
       expect(event_cards[2].find('.card-body').text).to eq(
           'Escalated this case to tier 3 (General Support).'
       )
@@ -360,48 +365,123 @@ RSpec.describe 'Case page', type: :feature do
 
     let(:emails) { ActionMailer::Base.deliveries }
 
-    it 'hides assignment controls for contacts' do
-      visit cluster_case_path(cluster, open_case, as: contact)
-      assignment_td = find('#case-assignment')
-      expect { assignment_td.find('input') }.to raise_error(Capybara::ElementNotFound)
-      expect(assignment_td.text).to eq('Nobody')
+    RSpec.shared_examples 'contact assignment controls' do
+      it 'displays contact assignment controls' do
+        visit cluster_case_path(cluster, open_case, as: user)
+        assignment_select = find('#case-contact-assignment').find('select')
+
+        options = assignment_select.all('option').map(&:text)
+        expect(options).to eq(['Nobody', 'A Scientist'])
+      end
+
+      it 'changes assigned contact when assignee is selected' do
+        open_case.reload
+        emails.clear
+
+        new_user = create(:contact, site: site, name: 'Walter White')
+
+        visit cluster_case_path(cluster, open_case, as: user)
+        find('#case-contact-assignment').select(new_user.name)
+        within('#case-contact-assignment') do
+          click_on('Change assignment')
+        end
+
+        expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
+
+        open_case.reload
+
+        expect(open_case.contact).to eq(new_user)
+        expect(emails.count).to eq 1
+        expect(emails[0].parts.first.body.raw_source)
+          .to have_text 'Walter White has been set as the assigned contact for this case'
+      end
+
+      context 'when a case has an assigned contact' do
+        it 'preselects the currently assigned contact' do
+          visit cluster_case_path(cluster, consultancy_case, as: user)
+          assignment_select = find('#case-contact-assignment').find('select')
+
+          expect(assignment_select.value).to eq(contact.id.to_s)
+        end
+
+        it 'can remove assignee' do
+
+          consultancy_case.reload
+          emails.clear
+
+          visit cluster_case_path(cluster, consultancy_case, as: user)
+          find('#case-contact-assignment').select('Nobody')
+          within('#case-contact-assignment') do
+            click_on('Change assignment')
+          end
+
+          expect(find('.alert-success'))
+            .to have_text "Support case #{consultancy_case.display_id} updated."
+
+          consultancy_case.reload
+
+          expect(consultancy_case.contact).to be nil
+          expect(emails.count).to eq 1
+          expect(emails[0].parts.first.body.raw_source)
+            .to have_text 'This case is no longer assigned to a contact.'
+        end
+      end
     end
 
-    it 'displays assignment controls for admins' do
-      visit cluster_case_path(cluster, open_case, as: admin)
-      assignment_select = find('#case-assignment').find('select')
+    context 'as an admin' do
+      let(:user) { admin }
 
-      options = assignment_select.all('option').map(&:text)
-      expect(options).to eq(['Nobody', 'A Scientist', '* A Scientist'])
+      it 'displays engineer assignment controls' do
+        visit cluster_case_path(cluster, open_case, as: admin)
+        assignment_select = find('#case-engineer-assignment').find('select')
+
+        options = assignment_select.all('option').map(&:text)
+        expect(options).to eq(['Nobody', 'A Scientist'])
+      end
+
+      it 'changes assigned engineer when assignee is selected' do
+        open_case.reload  # generates case-creation email which we can then ignore
+        emails.clear
+
+        user = create(:admin, name: 'Jerry')
+
+        visit cluster_case_path(cluster, open_case, as: admin)
+        find('#case-engineer-assignment').select(user.name)
+        click_button('Change assignment', match: :first)
+
+        expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
+
+        open_case.reload
+
+        expect(open_case.assignee).to eq(user)
+        expect(emails.count).to eq 1
+        expect(emails[0].parts.first.body.raw_source)
+          .to have_text 'Jerry has been set as the assigned engineer for this case'
+
+      end
+
+      include_examples 'contact assignment controls'
     end
 
-    it 'changes assigned user when assignee is selected' do
-      open_case.reload  # generates case-creation email which we can then ignore
-      emails.clear
+    context 'as a contact' do
+      let(:user) { contact }
 
-      user = create(:admin, name: 'Jerry')
+      it 'hides engineer assignment controls' do
+        visit cluster_case_path(cluster, open_case, as: contact)
+        assignment_td = find('#case-engineer-assignment')
+        expect { assignment_td.find('input') }.to raise_error(Capybara::ElementNotFound)
+        expect(assignment_td.text).to eq('A Scientist')
+      end
 
-      visit cluster_case_path(cluster, open_case, as: admin)
-      find('#case-assignment').select(user.name)
-      click_button('Change assignment')
-
-      expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
-
-      open_case.reload
-
-      expect(open_case.assignee).to eq(user)
-      expect(emails.count).to eq 1
-      expect(emails[0].parts.first.body.raw_source).to have_text 'This case has now been assigned to Jerry'
-
+      include_examples 'contact assignment controls'
     end
 
-    context 'when a case has an assignee' do
-      let(:assignee) { contact }
+    context 'when a case has an assigned engineer' do
       it 'preselects the current assignee' do
         visit cluster_case_path(cluster,open_case, as: admin)
-        assignment_select = find('#case-assignment').find('select')
+        assignment_select = find('#case-engineer-assignment').find('select')
 
-        expect(assignment_select.value).to eq(contact.id.to_s)
+        expect(assignment_select.value).to eq(admin.id.to_s)
       end
 
       it 'can remove assignee' do
@@ -409,8 +489,8 @@ RSpec.describe 'Case page', type: :feature do
         emails.clear
 
         visit cluster_case_path(cluster, open_case, as: admin)
-        find('#case-assignment').select('Nobody')
-        click_button('Change assignment')
+        find('#case-engineer-assignment').select('Nobody')
+        click_button('Change assignment', match: :first)
 
         expect(find('.alert-success')).to have_text "Support case #{open_case.display_id} updated."
 
@@ -418,7 +498,8 @@ RSpec.describe 'Case page', type: :feature do
 
         expect(open_case.assignee).to be nil
         expect(emails.count).to eq 1
-        expect(emails[0].parts.first.body.raw_source).to have_text 'This case is no longer assigned.'
+        expect(emails[0].parts.first.body.raw_source)
+          .to have_text 'This case is no longer assigned to an engineer.'
 
       end
     end
@@ -426,8 +507,67 @@ RSpec.describe 'Case page', type: :feature do
 
   describe 'Commenting' do
 
+    RSpec.shared_examples 'only assigned can comment' do
+      context 'when assigned' do
+        let(:assigned_case) {
+          create(
+            :open_case,
+            cluster: cluster,
+            assignee: admin,
+            contact: contact
+          )
+        }
+
+        it 'allows a comment to be added' do
+          visit cluster_case_path(cluster, assigned_case, as: user)
+
+          fill_in 'case_comment_text', with: 'This is a test comment'
+          click_button 'Add new comment'
+
+          assigned_case.reload
+
+          event_cards = all('.event-card')
+
+          expect(assigned_case.case_comments.count).to be 1
+          expect(event_cards[0].find('.card-body').text).to eq('This is a test comment')
+          expect(find('.alert-success')).to have_text('New comment added')
+        end
+
+        it 'does not allow empty comments' do
+          visit cluster_case_path(cluster, assigned_case, as: user)
+
+          fill_in 'case_comment_text', with: ''
+          click_button 'Add new comment'
+
+          assigned_case.reload
+
+          expect(assigned_case.case_comments.count).to be 0
+          expect(find('.alert-danger')).to have_text('Empty comments are not permitted')
+        end
+
+      end
+
+      context 'when not assigned' do
+        let(:unassigned_case) {
+          create(
+            :open_case,
+            cluster: cluster,
+            assignee: nil,
+            contact: nil
+          )
+        }
+
+        it 'does not allow comments to be added' do
+          visit cluster_case_path(cluster, unassigned_case, as: user)
+          expect do
+            find('textarea')
+          end.to raise_error(Capybara::ElementNotFound)
+        end
+      end
+    end
+
     context 'for open non-consultancy Case' do
-      subject { create(:open_case, cluster: cluster, tier_level: 2) }
+      subject { create(:open_case, cluster: cluster, tier_level: 2, contact: contact) }
 
       it 'disables commenting for site contact' do
         visit cluster_case_path(cluster,subject, as: contact)
@@ -478,30 +618,16 @@ RSpec.describe 'Case page', type: :feature do
       end
     end
 
-    it 'allows a comment to be added' do
-      visit cluster_case_path(cluster,open_case, as: admin)
-
-      fill_in 'case_comment_text', with: 'This is a test comment'
-      click_button 'Add new comment'
-
-      open_case.reload
-
-      expect(open_case.case_comments.count).to be 1
-      expect(find('.event-card').find('.card-body').text).to eq('This is a test comment')
-      expect(find('.alert-success')).to have_text('New comment added')
+    context 'as an admin' do
+      let(:user) { admin }
+      include_examples 'only assigned can comment'
     end
 
-    it 'does not allow empty comments' do
-      visit cluster_case_path(cluster,open_case, as: admin)
-
-      fill_in 'case_comment_text', with: ''
-      click_button 'Add new comment'
-
-      open_case.reload
-
-      expect(open_case.case_comments.count).to be 0
-      expect(find('.alert-danger')).to have_text('Empty comments are not permitted')
+    context 'as a contact' do
+      let(:user) { contact }
+      include_examples 'only assigned can comment'
     end
+
 
     %w(resolved closed).each do |state|
       context "for a #{state} case" do
@@ -520,10 +646,8 @@ RSpec.describe 'Case page', type: :feature do
             find('textarea')
           end.to raise_error(Capybara::ElementNotFound)
         end
-
       end
     end
-
   end
 
   describe 'time logging' do

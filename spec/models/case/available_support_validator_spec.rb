@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Case, type: :model do
   describe '#valid?' do
+
     [:component, :service, :cluster].each do |part_name|
       context "with #{part_name}" do
         subject do

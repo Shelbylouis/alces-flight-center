@@ -84,7 +84,7 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: [] do
-      cases.call(only: [:update]) do
+      cases.call do
         # Admin-only pages relating to cases belong here.
         resource :change_request, only: [:new, :edit], path: 'change-request'
         resource :case_associations, only: [:edit], as: 'associations', path: 'associations'
@@ -154,7 +154,7 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: :show do
-      cases.call(only: [:show, :create, :index, :new]) do
+      cases.call(only: [:show, :create, :index, :new, :update]) do
         # Pages relating to cases, for both admins and site users, belong here.
          resource :change_request, only: [:show], path: 'change-request'
       end

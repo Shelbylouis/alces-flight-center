@@ -152,31 +152,54 @@ RSpec.describe 'Case mailer', :type => :mailer do
   end
 
   describe 'Case assignment email' do
-    subject { CaseMailer.change_assignee_id(kase, nil, another_user.id) }
-
     let(:notification_method) { :assignee_notification }
-    let(:slack_args) { [kase, another_user] }
 
-    it 'sends an email on initial case assignment' do
-      expect(subject.to).to eq nil
-      expect(subject.cc).to match_array %w(another.user@somecluster.com)
-      expect(subject.bcc).to match_array(['tickets@alces-software.com'])
+    RSpec.shared_examples 'assignment notifications' do
+      it 'sends an email on initial case assignment' do
+        expect(subject.to).to eq nil
+        expect(subject.cc).to match_array %w(another.user@somecluster.com)
+        expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
-      expect(subject.body.encoded).to match('This case has now been assigned to A Scientist.')
+        expect(subject.body.encoded).to match(
+          "A Scientist has been set as the assigned #{role} for this case."
+        )
+      end
+
+      it 'sends an email on case assignment change' do
+        kase.assignee = another_user
+        mail = CaseMailer.send(mailer_method, kase, another_user.id, requestor.id)
+
+        expect(mail.to).to eq nil
+        expect(mail.cc).to match_array %w(someuser@somecluster.com)
+        expect(mail.bcc).to match_array(['tickets@alces-software.com'])
+
+        expect(mail.body.encoded).to match(
+          /Some User has been set as the assigned #{role} for this case\./
+        )
+      end
     end
 
-    it 'sends an email on case assignment change' do
-      kase.assignee = another_user
-      mail = CaseMailer.change_assignee_id(kase, another_user.id, requestor.id)
+    context 'engineer assignment' do
+      subject { CaseMailer.change_assignee_id(kase, nil, another_user.id) }
 
-      expect(mail.to).to eq nil
-      expect(mail.cc).to match_array %w(someuser@somecluster.com)
-      expect(mail.bcc).to match_array(['tickets@alces-software.com'])
+      let(:role) { 'engineer' }
+      let(:mailer_method) { :change_assignee_id }
+      let(:slack_args) { [kase, another_user, role] }
 
-      expect(mail.body.encoded).to match(/This case has now been assigned to Some User\./)
+      include_examples 'assignment notifications'
+      include_examples 'Slack'
     end
 
-    include_examples 'Slack'
+    context 'contact assignment' do
+      subject { CaseMailer.change_contact_id(kase, nil, another_user.id) }
+
+      let(:role) { 'contact' }
+      let(:mailer_method) { :change_contact_id }
+      let(:slack_args) { [kase, another_user, 'contact'] }
+
+      include_examples 'assignment notifications'
+      include_examples 'Slack'
+    end
   end
 
   describe 'Maintenance emails' do

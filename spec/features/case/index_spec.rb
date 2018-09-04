@@ -133,9 +133,12 @@ RSpec.describe 'Cases table', type: :feature do
     let(:cluster2) { create(:cluster) }
     let!(:cluster2_contact) { create(:contact, site: cluster2.site )}
 
-    let(:kase1) { create(:open_case, cluster: cluster2, subject: 'Kase1') }
-    let(:kase2) { create(:open_case, cluster: cluster2, subject: 'Kase2') }
-    let(:kase3) { create(:open_case, cluster: cluster2, subject: 'Kase3', tier_level: 3) }
+    let(:kase1) { create(:open_case, cluster: cluster2, subject: 'Kase1', assignee: admin) }
+    let(:kase2) { create(:open_case, cluster: cluster2, subject: 'Kase2', assignee: admin) }
+    let(:kase3) { create(
+      :open_case, cluster: cluster2, subject: 'Kase3',
+      tier_level: 3, contact: cluster2_contact)
+    }
 
     it 'sorts cases by last update' do
       travel_to Time.zone.local(2018, 8, 13, 9, 0, 0) do
