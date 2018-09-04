@@ -210,6 +210,8 @@ Rails.application.routes.draw do
 
   constraints Clearance::Constraints::SignedOut.new do
     root 'sso_sessions#new', as: 'sign_in'
+    # We add :topics here as Platform users without a Flight Center account
+    # still have access to topics.
     resources :topics, only: [:index]
   end
 
