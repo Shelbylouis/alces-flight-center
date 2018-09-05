@@ -20,12 +20,19 @@ RSpec.feature 'Navigation Bar', type: :feature do
       expect(site_nav_items[0]).to have_link(href: '/')
     end
 
-    it 'only the last link is active' do
+    it 'only the last (non-picker) link is active' do
       active_css = '.nav-link--active'
-      site_nav_items[0..-2].each do |item|
-        expect(item).not_to have_css active_css
+
+      if site_nav_items.last&.text == 'Choose site'
+        expect(site_nav_items.length).to eq 2
+        expect(site_nav_items.first).to have_css active_css
+        expect(site_nav_items.last).not_to have_css active_css
+      else
+        site_nav_items[0..-2].each do |item|
+          expect(item).not_to have_css active_css
+        end
+        expect(site_nav_items.last).to have_css active_css
       end
-      expect(site_nav_items.last).to have_css active_css
     end
   end
 
@@ -61,8 +68,8 @@ RSpec.feature 'Navigation Bar', type: :feature do
 
       it_behaves_like 'a common navigation bar'
 
-      it 'only has the root navigation link' do
-        expect(site_nav_items.length).to eq(1)
+      it 'only has the root navigation link (and site picker for admins)' do
+        expect(site_nav_items.length).to eq(user&.admin? ? 2 : 1)
       end
     end
 

@@ -23,23 +23,28 @@ class ScopeNavLinksBuilder
 
   def global_link
     if h.current_user&.admin?
-      nav_link_proc(text: 'Global',
-                    path: h.root_path,
-                    nav_icon: 'fa-globe')
+      nav_link_proc(
+        active: model_from_scope(:site).nil?,
+        text: 'Global',
+        path: h.root_path,
+        nav_icon: 'fa-globe'
+      )
     end
   end
 
   def site_link
     site = model_from_scope :site
-    return nil unless site
-    path_for_site = if h.current_user.admin?
-                      site
-                    else
-                      h.root_path
-                    end
-    nav_link_proc(model: site,
-                  path: path_for_site,
-                  nav_icon: 'fa-institution')
+
+    if h.current_user&.admin?
+      site_picker_proc(site)
+    else
+      return nil unless site
+      nav_link_proc(model: site,
+                    path: h.root_path,
+                    nav_icon: 'fa-institution')
+    end
+
+
   end
 
   def cluster_link
@@ -90,6 +95,12 @@ class ScopeNavLinksBuilder
   def nav_link_proc(**inputs_to_partial)
     Proc.new do |**additional_inputs|
       h.render 'partials/nav_link', **additional_inputs, **inputs_to_partial
+    end
+  end
+
+  def site_picker_proc(active_site)
+    Proc.new do |**additional_inputs|
+      h.render 'partials/site_picker', active_site: active_site, **additional_inputs
     end
   end
 end

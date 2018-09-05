@@ -1,0 +1,14 @@
+<%=
+  render 'partials/nav_link',
+         active: active && active_site,
+         model: active_site,
+         text: active_site.nil? ? 'Choose site' : nil,
+         path: active_site || root_path,
+         nav_icon: 'fa-institution',
+         dropdown: Site.all.map { |site|
+           {
+               text: site.name,
+               path: site
+           }
+         }
+%>
