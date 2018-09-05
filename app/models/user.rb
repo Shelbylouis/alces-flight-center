@@ -60,22 +60,6 @@ class User < ApplicationRecord
     !admin?
   end
 
-  def validates_primary_contact_assignment
-    return unless site_primary_contact
-    if primary_contact? && site_primary_contact != self
-      errors.add(:role, 'primary contact is already set for this site')
-    end
-  end
-
-  def validates_viewer_case_assignment
-    # If we have just been changed to be a viewer, then don't run this validation
-    # as we've yet to reassign the cases elsewhere.
-    # We should only be doing that before_save (not before validation) since it
-    # should only happen if the user's role is actually changed (and saved).
-    return if @role_changed && viewer?
-    errors.add(:cases, 'must be empty for a viewer') if viewer? && assigned_cases.any?
-  end
-
   def self.globally_available?
     true
   end
@@ -141,5 +125,21 @@ class User < ApplicationRecord
 
   def forget_changed_role
     @role_changed = false
+  end
+
+  def validates_primary_contact_assignment
+    return unless site_primary_contact
+    if primary_contact? && site_primary_contact != self
+      errors.add(:role, 'primary contact is already set for this site')
+    end
+  end
+
+  def validates_viewer_case_assignment
+    # If we have just been changed to be a viewer, then don't run this validation
+    # as we've yet to reassign the cases elsewhere.
+    # We should only be doing that before_save (not before validation) since it
+    # should only happen if the user's role is actually changed (and saved).
+    return if @role_changed && viewer?
+    errors.add(:cases, 'must be empty for a viewer') if viewer? && assigned_cases.any?
   end
 end
