@@ -25,7 +25,7 @@ FactoryBot.define do
 
   factory :site do
     name 'Liverpool University'
-    identifier 'Something'
+    identifier 'Liverpool University'
   end
 
   factory :additional_contact do
