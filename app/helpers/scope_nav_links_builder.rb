@@ -8,7 +8,7 @@ class ScopeNavLinksBuilder
 
   def build
     [
-      all_sites_link,
+      global_link,
       site_link,
       cluster_link,
       component_group_link,
@@ -21,7 +21,7 @@ class ScopeNavLinksBuilder
 
   attr_reader :scope
 
-  def all_sites_link
+  def global_link
     if h.current_user&.admin?
       nav_link_proc(text: 'Global',
                     path: h.root_path,
