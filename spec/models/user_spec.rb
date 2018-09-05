@@ -162,6 +162,10 @@ RSpec.describe User, type: :model do
 
     it 'unassigns cases from user when demoted to viewer' do
       expect(user.assigned_cases.count).to eq 1
+      expect(CaseMailer).to \
+        receive(:reassigned_case).with(
+        kase, user, primary
+      )
 
       primary
       demote_contact
@@ -174,10 +178,21 @@ RSpec.describe User, type: :model do
       expect(primary.assigned_cases.count).to eq 0
 
       demote_contact
-      kase.reload
       primary.reload
 
       expect(primary.assigned_cases.count).to eq 1
+    end
+
+    it 'unassigns case entirely if no primary contact set' do
+
+      expect(CaseMailer).to \
+        receive(:reassigned_case).with(
+          kase, user, nil
+        )
+
+      demote_contact
+      kase.reload
+      expect(kase.contact).to be nil
     end
   end
 
