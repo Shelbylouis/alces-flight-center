@@ -1,0 +1,20 @@
+<li class="nav-item dropdown">
+  <% if active_site %>
+  <a href="<%= site_path(active_site) %>" class="nav-link <%= active ? 'nav-link--active' : '' %>">
+    <span class="fa fa-institution"></span> <%= active_site.name %>
+    <span class="dropdown-toggle ml-2" data-toggle="dropdown" data-target="#site-chooser"></span>
+  </a>
+  <% else %>
+    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" data-target="#site-chooser">
+      <span class="fa fa-institution"></span> Choose site
+    </a>
+  <% end %>
+    <div class="dropdown-menu" id="site-chooser">
+    <% Site.all.map {|site| %>
+      <a class="dropdown-item" href="<%= site_path(site) %>">
+        <span class="fa fa-institution"></span> <%= site.name %>
+      </a>
+    <% }
+    %>
+  </div>
+</li>

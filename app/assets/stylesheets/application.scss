@@ -173,3 +173,14 @@ a.filter {
   display: block;
   width: 100%;
 }
+
+.product-bar {
+  .dropdown-item {
+    color: white;
+  }
+
+  .nav-item .dropdown-toggle {
+    padding: 0.5rem;
+    margin-right: -1rem;
+  }
+}
