@@ -10,7 +10,8 @@
     </a>
   <% end %>
     <div class="dropdown-menu" id="site-chooser">
-    <% Site.all.map {|site| %>
+    <%# TODO remove order call when it's redundant (see Site#default_scope) %>
+    <% Site.all.order(:identifier).map {|site| %>
       <a class="dropdown-item" href="<%= site_path(site) %>">
         <span class="fa fa-institution"></span> <%= site.name %>
       </a>
