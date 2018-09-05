@@ -1,14 +1,14 @@
-<%=
-  render 'partials/nav_link',
-         active: active && active_site,
-         model: active_site,
-         text: active_site.nil? ? 'Choose site' : nil,
-         path: active_site || root_path,
-         nav_icon: 'fa-institution',
-         dropdown: Site.all.map { |site|
-           {
-               text: raw("<i class='fa fa-institution mr-2'></i> #{site.name}"),
-               path: site
-           }
-         }
-%>
+<li class="nav-item dropdown">
+  <a href="<%= active_site ? site_path(active_site) : root_path %>" class="nav-link <%= active && active_site ? 'nav-link--active' : '' %>">
+    <span class="fa fa-institution"></span> <%= active_site&.name || 'Choose site' %>
+    <span class="dropdown-toggle ml-2" data-toggle="dropdown" data-target="#site-chooser"></span>
+  </a>
+  <div class="dropdown-menu" id="site-chooser">
+    <% Site.all.map {|site| %>
+      <a class="dropdown-item" href="<%= site_path(site) %>">
+        <span class="fa fa-institution"></span> <%= site.name %>
+      </a>
+    <% }
+    %>
+  </div>
+</li>
