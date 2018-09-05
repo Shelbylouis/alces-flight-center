@@ -125,7 +125,11 @@ class CaseMailer < ApplicationMailer
     # In practice checking for '@alces-' is enough since all admins are @alces
     # and even if we had non-alces admins, emailing them probably counts as
     # an email update to the customer.
-    has_non_admin = !all_recipients.reject { |a| a.include? '@alces-' }.empty?
+    # On staging, we give everyone an '@alces-' email address but non-admins are
+    # always prefixed with 'center+' so we can still detect them.
+    has_non_admin = all_recipients.reject { |a|
+      a.include?('@alces-') && !a.start_with?('center+')
+    }.any?
     if has_non_admin && @case
       @case.update_columns(last_update: Time.now)
     end
