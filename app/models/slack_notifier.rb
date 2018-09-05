@@ -171,6 +171,23 @@ class SlackNotifier
       send_notification(cluster_check_submission_note)
     end
 
+    def reassigned_case_notification(kase, old_contact, new_contact)
+      if new_contact.nil?
+        text = "This case has been reassigned from #{old_contact.name} to"\
+          " nobody as there is no primary contact for this site."
+      else
+        text = "This case has been reassigned from #{old_contact.name} to #{new_contact.name}"
+      end
+
+      reassigned_case_note = {
+        fallback: text,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+      send_notification(reassigned_case_note)
+    end
+
     private
 
     def maintenance_notification(kase, text, colour)

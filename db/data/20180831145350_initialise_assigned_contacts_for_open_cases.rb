@@ -5,11 +5,11 @@ class InitialiseAssignedContactsForOpenCases < ActiveRecord::Migration[5.2]
       user = kase.user
 
       kase.without_auditing do
-        if user.admin?
-          kase.contact = kase.site.primary_contact
-        else
-          kase.contact = user
-        end
+        kase.contact = if user.contact?
+                         user
+                       else
+                         kase.site.primary_contact
+                       end
 
         kase.save!
       end

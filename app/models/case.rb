@@ -481,11 +481,11 @@ class Case < ApplicationRecord
 
   def set_assigned_contact
     if open? && !administrative? && contact.nil?
-      new_contact = if user.admin?
-                  site.primary_contact
-                else
-                  user
-                end
+      new_contact = if user.contact?
+                      user
+                    else
+                      site.primary_contact
+                    end
 
       return if new_contact.nil?
       transaction do

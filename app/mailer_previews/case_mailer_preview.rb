@@ -42,6 +42,10 @@ class CaseMailerPreview < ApplicationMailerPreview
     CaseMailer.resolve_case(get_case, user)
   end
 
+  def reassign_case
+    CaseMailer.reassigned_case(get_case, user, get_case.site.primary_contact)
+  end
+
   private
 
   def get_case

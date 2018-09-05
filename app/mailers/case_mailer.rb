@@ -114,6 +114,20 @@ class CaseMailer < ApplicationMailer
     SlackNotifier.resolved_case_notification(@case, @user, @text)
   end
 
+  def reassigned_case(kase, old_contact, new_contact)
+    @case = kase
+    @old = old_contact
+    @new = new_contact
+
+    unless @new.nil?
+      mail(
+        cc: @case.email_recipients,
+        subject: @case.email_reply_subject
+      )
+    end
+    SlackNotifier.reassigned_case_notification(kase, @old, @new)
+  end
+
   private
 
   def mail(**options)
