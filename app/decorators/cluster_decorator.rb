@@ -172,7 +172,7 @@ class ClusterDecorator < ApplicationDecorator
 
   def badge(colour, text)
     h.raw(
-      "<span class=\"badge badge-pill badge-#{colour} pull-right\">#{text}</span>"
+      "<span class=\"badge badge-pill badge-#{colour}\">#{text}</span>"
     )
   end
 
