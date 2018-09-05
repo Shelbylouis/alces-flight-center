@@ -121,7 +121,7 @@ class CaseMailer < ApplicationMailer
 
     unless @new.nil?
       mail(
-        to: @new&.email,
+        to: @new.email,
         subject: @case.email_reply_subject
       )
     end
