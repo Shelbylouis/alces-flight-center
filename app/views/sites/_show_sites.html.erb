@@ -13,7 +13,7 @@
     </thead>
     <tbody>
       <% sites.each do |s| %>
-        <%= render 'partials/site_table_row', site: s, scope: @scope %>
+        <%= render 'site_table_row', site: s, scope: @scope %>
       <% end %>
     </tbody>
   <% end %>
