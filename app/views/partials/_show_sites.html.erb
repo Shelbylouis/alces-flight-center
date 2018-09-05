@@ -12,7 +12,6 @@
         </tr>
     </thead>
     <tbody>
-      <% sites = sites.sort_by {|site| site.identifier} %>
       <% sites.each do |s| %>
         <%= render 'partials/site_table_row', site: s, scope: @scope %>
       <% end %>
