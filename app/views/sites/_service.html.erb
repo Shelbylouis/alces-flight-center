@@ -1,0 +1,12 @@
+<h5><%= service.center_ui['title'] %></h5>
+<span>
+<%= link_to service.center_ui['linkText'],
+            site.terminal_service_url(service),
+            PolicyDependentOptions.wrap(
+              {class: ['btn', 'btn-primary']},
+              policy: policy(service).show?,
+              action_description: service.center_ui['description'],
+              user: current_user
+            )
+%>
+</span>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_05_115743) do
+ActiveRecord::Schema.define(version: 2018_09_05_165332) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -392,6 +392,8 @@ ActiveRecord::Schema.define(version: 2018_09_05_115743) do
     t.datetime "updated_at", null: false
     t.string "encrypted_ssh_key", limit: 4096, null: false
     t.string "service_type", null: false
+    t.jsonb "center_ui", null: false
+    t.jsonb "console_ui", null: false
     t.index ["site_id"], name: "index_terminal_services_on_site_id"
   end
 
