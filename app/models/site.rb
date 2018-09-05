@@ -2,7 +2,8 @@ class Site < ApplicationRecord
   include AdminConfig::Site
   include MarkdownDescription
 
-  default_scope { order(:identifier) }
+  # TODO uncomment this when identifier migration has happened & been deployed
+  # default_scope { order(:identifier) }
 
   has_many :users, dependent: :destroy
   has_many :additional_contacts, dependent: :destroy
