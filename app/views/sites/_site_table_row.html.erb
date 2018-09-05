@@ -1,0 +1,6 @@
+<tr class=''>
+  <td><%= link_to site.identifier, site_path(site) %></td>
+  <td><%= link_to site.name, site_path(site) %></td>
+  <td><%= link_to "Manage Support Cases (#{site.cases.active.size})",
+      site_cases_path(site, state: 'open') %></td>
+</tr>
