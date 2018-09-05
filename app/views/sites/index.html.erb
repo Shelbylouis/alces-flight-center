@@ -1,6 +1,7 @@
 <% content_for(:subtitle) { 'All Sites' } %>
 <%= render 'partials/tabs', activate: :all_sites do %>
   <ul class="list-group list-group-flush">
+    <% @sites = @sites.sort_by {|site| site.identifier} %>
     <% @sites.each do |site| %>
       <li class="list-group-item">
         <b><%= link_to site.identifier, site_path(site) %></b>
