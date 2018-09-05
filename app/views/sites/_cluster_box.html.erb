@@ -1,9 +1,9 @@
 <div class="list-group-item">
   <h4>
     <%= cluster.name %>
-    <%= cluster.service_plan_badge %>
   </h4>
-  <div>
+  <%= cluster.service_plan_badge %>
+  <div class="cluster-links">
     <%= link_to "Manage this cluster",
                 cluster_path(cluster),
                 class: [
