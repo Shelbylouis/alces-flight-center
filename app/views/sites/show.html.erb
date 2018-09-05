@@ -27,7 +27,7 @@
       <% end %>
       <div class="site-services">
         <h4>Site services</h4>
-        <% if site.flight_directory_config.present? %>
+        <% if site.terminal_service.present? %>
           <ul>
             <li>
               <h5>User and group directory</h5>
@@ -36,7 +36,7 @@
                             site.directory_service_url,
                             PolicyDependentOptions.wrap(
                               {class: ['btn', 'btn-primary']},
-                              policy: policy(site.flight_directory_config).show?,
+                              policy: policy(site.terminal_service).show?,
                               action_description: 'manage user and group directory',
                               user: current_user
                             )

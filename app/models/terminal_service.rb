@@ -1,5 +1,5 @@
-class FlightDirectoryConfig < ApplicationRecord
-  include AdminConfig::FlightDirectoryConfig
+class TerminalService < ApplicationRecord
+  include AdminConfig::TerminalService
 
   belongs_to :site
 

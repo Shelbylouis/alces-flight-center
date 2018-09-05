@@ -1,4 +1,4 @@
-class FlightDirectoryConfigPolicy < ApplicationPolicy
+class TerminalServicePolicy < ApplicationPolicy
   class Scope < Scope
     def resolve
       if user.admin?

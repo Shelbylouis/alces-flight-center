@@ -1,4 +1,4 @@
-module AdminConfig::FlightDirectoryConfig
+module AdminConfig::TerminalService
   extend ActiveSupport::Concern
 
   included do
@@ -28,7 +28,7 @@ module AdminConfig::FlightDirectoryConfig
     end
   end
 
-  # Creating new FlightDirectoryConfigs with rails admin breaks without this
+  # Creating new TerminalService with rails admin breaks without this
   # method being added.
   def ssh_key
     nil
