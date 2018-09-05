@@ -7,7 +7,7 @@
          nav_icon: 'fa-institution',
          dropdown: Site.all.map { |site|
            {
-               text: site.name,
+               text: raw("<i class='fa fa-institution mr-2'></i> #{site.name}"),
                path: site
            }
          }

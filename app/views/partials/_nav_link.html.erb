@@ -23,7 +23,7 @@
 <li class='nav-item<%= ' dropdown' if dropdown %>'>
   <%= link_to icon_span(text, nav_icon), path, link_options %>
   <% if dropdown %>
-    <div class='dropdown-menu dropdown-menu-right'>
+    <div class='dropdown-menu'>
       <% dropdown.each do |dropitem| %>
         <% if dropitem[:heading] %>
           <h6 class="dropdown-header"><%= dropitem[:text] %></h6>
