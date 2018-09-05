@@ -1,6 +1,6 @@
 class TerminalServicesController < ApplicationController
   def show
-    config = @site.terminal_service
+    config = @site.terminal_services.find_by(service_type: params[:service_type])
     if config.nil?
       render json: {}, status: 404
       return
