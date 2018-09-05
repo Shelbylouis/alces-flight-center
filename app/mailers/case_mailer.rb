@@ -8,7 +8,7 @@ class CaseMailer < ApplicationMailer
   def new_case(my_case)
     @case = my_case
     mail(
-      cc: @case.email_recipients.reject { |contact| contact == @case.user.email }, # Exclude the user raising the case
+      cc: @case.email_recipients,
       subject: @case.email_subject,
       bypass_timestamp_update: true
     )
@@ -16,11 +16,23 @@ class CaseMailer < ApplicationMailer
   end
 
   def change_assignee_id(my_case, old_id, new_id)
-    send_assignee_change_notifications(my_case, old_id, new_id, 'engineer')
+    send_assignee_change_notifications(
+      my_case,
+      old_id,
+      new_id,
+      'engineer',
+      []
+    )
   end
 
   def change_contact_id(my_case, old_id, new_id)
-    send_assignee_change_notifications(my_case, old_id, new_id, 'contact')
+    send_assignee_change_notifications(
+      my_case,
+      old_id,
+      new_id,
+      'contact',
+      my_case.email_recipients
+    )
   end
 
   def change_subject(my_case, old_val, new_val)
@@ -48,7 +60,7 @@ class CaseMailer < ApplicationMailer
     @comment = comment
     @case = @comment.case
     mail(
-      cc: @case.email_recipients.reject { |contact| contact == @comment.user.email }, # Exclude the user making the comment
+      cc: @case.email_recipients,
       subject: @case.email_reply_subject,
       bypass_timestamp_update: !comment.user.admin?  # Only count admin comments towards update time
     )
@@ -145,11 +157,11 @@ class CaseMailer < ApplicationMailer
     end
   end
 
-  def send_assignee_change_notifications(my_case, old_id, new_id, role)
+  def send_assignee_change_notifications(my_case, old_id, new_id, role, recipients)
     @case = my_case
     @assignee = new_id.nil? ? nil : User.find(new_id)
     mail(
-      cc: @assignee&.email, # Send to new assignee only
+      cc: recipients,
       subject: @case.email_reply_subject
     )
     SlackNotifier.assignee_notification(@case, @assignee, role)
