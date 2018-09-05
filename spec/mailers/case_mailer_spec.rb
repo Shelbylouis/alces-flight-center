@@ -55,6 +55,10 @@ RSpec.describe 'Case mailer', :type => :mailer do
     )
   }
 
+  let(:all_recipient_emails) {
+    %w(someuser@somecluster.com another.user@somecluster.com mailing-list@somecluster.com)
+  }
+
   before(:each) do
     site.users = [requestor, another_user]
     site.additional_contacts = [additional_contact]
@@ -74,7 +78,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
     it 'has correct addressees' do
       expect(subject.to).to eq nil
-      expect(subject.cc).to match_array %w(another.user@somecluster.com mailing-list@somecluster.com)
+      expect(subject.cc).to match_array all_recipient_emails
       expect(subject.bcc).to match_array(['tickets@alces-software.com'])
     end
 
@@ -131,7 +135,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
     it 'sends an email on case comment being added' do
       expect(subject.to).to eq nil
-      expect(subject.cc).to match_array %w(someuser@somecluster.com mailing-list@somecluster.com)
+      expect(subject.cc).to match_array all_recipient_emails
       expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
       expect(subject.body.encoded).to match('I can haz comment')
@@ -157,7 +161,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
     RSpec.shared_examples 'assignment notifications' do
       it 'sends an email on initial case assignment' do
         expect(subject.to).to eq nil
-        expect(subject.cc).to match_array %w(another.user@somecluster.com)
+        expect(subject.cc).to match_array all_recipient_emails
         expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
         expect(subject.body.encoded).to match(
@@ -170,7 +174,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
         mail = CaseMailer.send(mailer_method, kase, another_user.id, requestor.id)
 
         expect(mail.to).to eq nil
-        expect(mail.cc).to match_array %w(someuser@somecluster.com)
+        expect(mail.cc).to match_array all_recipient_emails
         expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
         expect(mail.body.encoded).to match(
