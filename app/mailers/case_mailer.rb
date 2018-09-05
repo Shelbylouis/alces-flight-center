@@ -16,11 +16,23 @@ class CaseMailer < ApplicationMailer
   end
 
   def change_assignee_id(my_case, old_id, new_id)
-    send_assignee_change_notifications(my_case, old_id, new_id, 'engineer')
+    send_assignee_change_notifications(
+      my_case,
+      old_id,
+      new_id,
+      'engineer',
+      []
+    )
   end
 
   def change_contact_id(my_case, old_id, new_id)
-    send_assignee_change_notifications(my_case, old_id, new_id, 'contact')
+    send_assignee_change_notifications(
+      my_case,
+      old_id,
+      new_id,
+      'contact',
+      my_case.email_recipients
+    )
   end
 
   def change_subject(my_case, old_val, new_val)
@@ -131,11 +143,11 @@ class CaseMailer < ApplicationMailer
     end
   end
 
-  def send_assignee_change_notifications(my_case, old_id, new_id, role)
+  def send_assignee_change_notifications(my_case, old_id, new_id, role, recipients)
     @case = my_case
     @assignee = new_id.nil? ? nil : User.find(new_id)
     mail(
-      cc: @case.email_recipients,
+      cc: recipients,
       subject: @case.email_reply_subject
     )
     SlackNotifier.assignee_notification(@case, @assignee, role)

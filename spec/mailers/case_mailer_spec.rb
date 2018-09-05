@@ -161,7 +161,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
     RSpec.shared_examples 'assignment notifications' do
       it 'sends an email on initial case assignment' do
         expect(subject.to).to eq nil
-        expect(subject.cc).to match_array all_recipient_emails
+        expect(subject.cc).to match_array recipients
         expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
         expect(subject.body.encoded).to match(
@@ -174,7 +174,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
         mail = CaseMailer.send(mailer_method, kase, another_user.id, requestor.id)
 
         expect(mail.to).to eq nil
-        expect(mail.cc).to match_array all_recipient_emails
+        expect(mail.cc).to match_array recipients
         expect(mail.bcc).to match_array(['tickets@alces-software.com'])
 
         expect(mail.body.encoded).to match(
@@ -189,6 +189,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
       let(:role) { 'engineer' }
       let(:mailer_method) { :change_assignee_id }
       let(:slack_args) { [kase, another_user, role] }
+      let(:recipients) { [] }
 
       include_examples 'assignment notifications'
       include_examples 'Slack'
@@ -200,6 +201,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
       let(:role) { 'contact' }
       let(:mailer_method) { :change_contact_id }
       let(:slack_args) { [kase, another_user, 'contact'] }
+      let(:recipients) { all_recipient_emails }
 
       include_examples 'assignment notifications'
       include_examples 'Slack'
