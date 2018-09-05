@@ -29,8 +29,9 @@ class User < ApplicationRecord
   }
   validate :validates_primary_contact_assignment
 
-  before_validation :reassign_cases_if_necessary
   validate :validates_viewer_case_assignment
+  before_save :reassign_cases_if_necessary
+  after_save :forget_changed_role
 
   delegate :admin?,
     :primary_contact?,
@@ -67,8 +68,12 @@ class User < ApplicationRecord
   end
 
   def validates_viewer_case_assignment
-    return if assigned_cases.empty?
-    errors.add(:cases, 'must be empty for a viewer')
+    # If we have just been changed to be a viewer, then don't run this validation
+    # as we've yet to reassign the cases elsewhere.
+    # We should only be doing that before_save (not before validation) since it
+    # should only happen if the user's role is actually changed (and saved).
+    return if @role_changed && viewer?
+    errors.add(:cases, 'must be empty for a viewer') if viewer? && assigned_cases.any?
   end
 
   def self.globally_available?
@@ -103,6 +108,13 @@ class User < ApplicationRecord
     engineer_cases.empty? ? contact_cases : engineer_cases
   end
 
+  def role=(new_role)
+    if role != new_role
+      @role_changed = true
+    end
+    super(new_role)
+  end
+
   private
 
   def role_inquiry
@@ -118,22 +130,16 @@ class User < ApplicationRecord
   end
 
   def reassign_cases_if_necessary
-    if viewer?
-      reassign_cases
-    end
-  end
-
-  def reassign_cases
-    if assigned_cases
+    if @role_changed && viewer? && assigned_cases.any?
       assigned_cases.each do |kase|
         kase.contact = site_primary_contact
         kase.save!
         CaseMailer.reassigned_case(kase, self, site_primary_contact)
       end
-
-      # This ensures the reassigned cases are no longer within the cached
-      # contact_cases.
-      reload
     end
+  end
+
+  def forget_changed_role
+    @role_changed = false
   end
 end

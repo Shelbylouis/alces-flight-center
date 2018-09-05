@@ -148,7 +148,7 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe '#validates_case_assignments' do
+  describe '#reassign_cases_if_necessary' do
     let(:site) { create(:site) }
     let(:cluster) { create(:cluster, site: site) }
     let(:primary) { create(:primary_contact, site: site) }
@@ -178,6 +178,64 @@ RSpec.describe User, type: :model do
       primary.reload
 
       expect(primary.assigned_cases.count).to eq 1
+    end
+  end
+
+  describe '#validates_viewer_case_assignment' do
+
+    RSpec.shared_examples 'validation passes' do
+      it 'passes validation' do
+        expect(user).to be_valid
+      end
+    end
+
+    context 'when user is admin' do
+      let(:user) { create(:admin) }
+
+      context 'with no cases assigned' do
+        include_examples 'validation passes'
+      end
+
+      context 'with cases assigned' do
+        let!(:kase) { create(:open_case, assignee: user) }
+
+        include_examples 'validation passes'
+      end
+    end
+
+    context 'when user is contact' do
+      let(:user) { create(:contact) }
+      let(:cluster) { create(:cluster, site: user.site) }
+
+      context 'with no cases assigned' do
+        include_examples 'validation passes'
+      end
+
+      context 'with cases assigned' do
+        let!(:kase) { create(:open_case, contact: user, cluster: cluster) }
+
+        include_examples 'validation passes'
+      end
+    end
+
+    context 'when user is viewer' do
+      let(:user) { create(:viewer) }
+      let(:cluster) { create(:cluster, site: user.site) }
+
+      context 'with no cases assigned' do
+        include_examples 'validation passes'
+      end
+
+      context 'with cases assigned' do
+        let!(:kase) { create(:open_case, contact: user, cluster: cluster) }
+
+        it 'fails validation' do
+          expect(user).not_to be_valid
+          expect(user.errors.messages).to include(
+                                            cases: ['must be empty for a viewer']
+                                          )
+        end
+      end
     end
   end
 end
