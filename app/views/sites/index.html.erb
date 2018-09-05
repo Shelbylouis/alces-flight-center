@@ -1,16 +1,4 @@
 <% content_for(:subtitle) { 'All Sites' } %>
 <%= render 'partials/tabs', activate: :all_sites do %>
-  <ul class="list-group list-group-flush">
-    <% @sites = @sites.sort_by {|site| site.identifier} %>
-    <% @sites.each do |site| %>
-      <li class="list-group-item">
-        <b><%= link_to site.identifier, site_path(site) %></b>
-        &mdash;
-        <%= link_to site.name, site_path(site) %>
-        &mdash;
-        <%= link_to "Manage Support Cases (#{site.cases.active.size})",
-            site_cases_path(site, state: 'open') %>
-      </li>
-    <% end %>
-  </ul>
+  <%= render 'partials/show_sites', sites: @sites %>
 <% end %>

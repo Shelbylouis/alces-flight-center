@@ -1,0 +1,21 @@
+<% empty_message = 'No sites found.' %>
+<form class="form" id="filter-form">
+  <%= render 'partials/table',
+    collection: sites,
+    message: empty_message,
+    responsive: false do %>
+    <thead>
+        <tr class="nowrap">
+          <th>Identifier</th>
+          <th>Name</th>
+          <th>Cases</th>
+        </tr>
+    </thead>
+    <tbody>
+      <% sites = sites.sort_by {|site| site.identifier} %>
+      <% sites.each do |s| %>
+        <%= render 'partials/site_table_row', site: s, scope: @scope %>
+      <% end %>
+    </tbody>
+  <% end %>
+</form>
