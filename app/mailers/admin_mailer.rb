@@ -1,12 +1,9 @@
 class AdminMailer < ApplicationMailer
   default to: Rails.application.config.email_bcc_address
 
-  def daily_open_cases_list(admin, cases)
+  def daily_open_cases_list(admin, case_ids)
     @admin = admin
-    # Because we Resque serialise this job, cases here will be a plain array
-    # rather than an ActiveRecord association, so we can't just call `decorate`
-    # on the whole.
-    @cases = cases.map(&:decorate)
+    @cases = case_ids.map { |id| Case.find(id).decorate }
 
     mail(
       to: admin.email,
