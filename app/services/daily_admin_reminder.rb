@@ -6,7 +6,7 @@ class DailyAdminReminder
         cases = admin.assigned_cases.active.prioritised
 
         unless cases.empty?
-          AdminMailer.daily_open_cases_list(admin, cases).deliver_later
+          AdminMailer.daily_open_cases_list(admin, cases.map(&:id)).deliver_later
         end
       end
     end

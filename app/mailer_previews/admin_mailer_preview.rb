@@ -4,7 +4,7 @@ class AdminMailerPreview < ApplicationMailerPreview
 
     AdminMailer.daily_open_cases_list(
        admin,
-       admin.assigned_cases.active.prioritised
+       admin.assigned_cases.active.prioritised.map(&:id)
     )
   end
 
