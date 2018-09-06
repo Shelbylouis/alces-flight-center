@@ -1,6 +1,8 @@
 <% if @case.open? %>
-  <% if @case.issue&.administrative? && current_user.admin? %>
-    <p class="small">Set a non-adminstrative issue type to allow contact interaction.</p>
+  <% if @case.issue&.administrative? %>
+    <% if current_user.admin? %>
+      <p class="small">Set a non-adminstrative issue type to allow contact interaction.</p>
+    <% end %>
   <% else %>
     <% if @case.tier_level < 3 %>
       <%
