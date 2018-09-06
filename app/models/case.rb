@@ -463,9 +463,15 @@ class Case < ApplicationRecord
   end
 
   def maybe_set_default_assignee
-    if assignee.nil? && !site.default_assignee.nil?
+    new_assignee = if user.admin?
+                     user
+                   elsif site.default_assignee
+                     site.default_assignee
+                   end
+
+    if assignee.nil? && !new_assignee.nil?
       transaction do # to make sure audits.last is our assignee change
-        self.assignee = site.default_assignee
+        self.assignee = new_assignee
         save!
         la = audits.last
         # This will show as 'Flight Center' rather than the customer's name
