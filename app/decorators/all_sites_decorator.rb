@@ -3,8 +3,8 @@ class AllSitesDecorator < ApplicationDecorator
 
   def tabs
     [
-      { id: :all_sites, path: h.sites_path },
-      cases_tab
+      cases_tab,
+      { id: :all_sites, path: h.sites_path }
     ]
   end
 
