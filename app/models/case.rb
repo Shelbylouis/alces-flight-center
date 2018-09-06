@@ -303,7 +303,7 @@ class Case < ApplicationRecord
   end
 
   def potential_assignees
-    User.where(role: :admin)
+    User.where(role: :admin).order(:name)
   end
 
   def potential_contacts
