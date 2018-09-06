@@ -1,7 +1,8 @@
 # Flight Center<%= remote == :staging ? ' staging' : '' %> tasks.
 * * * *  *  dokku enter <%= app_name %> cron rake alces:cron:every_minute
 @hourly     dokku enter <%= app_name %> cron rake alces:cron:hourly
-0 9 * * 1-5 dokku enter <%= app_name %> cron rake alces:cron:daily
+0 8 * * 1-5 [ `TZ=Europe/London date +\%Z` = 'BST' ] && dokku enter flight-center-staging cron rake alces:cron:daily
+0 9 * * 1-5 [ `TZ=Europe/London date +\%Z` = 'GMT' ] && dokku enter flight-center-staging cron rake alces:cron:daily
 <% if remote == :production -%>
 0 */3 * * * /home/ubuntu/flight-center-backup-database
 <% end -%>
