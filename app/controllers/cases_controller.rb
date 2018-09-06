@@ -3,12 +3,22 @@ class CasesController < ApplicationController
 
   after_action :verify_authorized, except: NO_AUTH_ACTIONS + [
     :redirect_to_canonical_path,
+    :assigned
   ]
 
   def index
     @filters = filters_spec
-    @cases = filtered_cases(@filters[:active])
+    @cases = filtered_cases(@scope.cases, @filters[:active])
     render :index
+  end
+
+  def assigned
+    @filters = filters_spec
+    @cases = filtered_cases(
+      Case.assigned_to(current_user).where(state: 'open').prioritised,
+      @filters[:active]
+    )
+    render :assigned
   end
 
   def show
@@ -83,36 +93,13 @@ class CasesController < ApplicationController
     end
   end
 
-  UPDATABLE_FIELDS = [:subject, :issue_id].freeze
+  ADMIN_UPDATABLE_FIELDS = [:assignee_id, :contact_id, :subject, :issue_id].freeze
+  CONTACT_UPDATABLE_FIELDS = [:contact_id].freeze
 
   def update
-
-    fields_changing = params.require(:case).permit(UPDATABLE_FIELDS)
-
-    change_action 'Support case %s updated.' do |kase|
-      old_fields = {}.tap do |fields|
-        fields_changing.to_h.keys.each { |f| fields[f.to_sym] = kase.send(f) }
-      end
-
-      kase.update(  # update! doesn't work here FSR :(
-        fields_changing
-      )
-      kase.save!
-
-      old_fields.each do |field, old_value|
-        mailer_method = "change_#{field}".to_sym
-
-        next unless CaseMailer.respond_to?(mailer_method)
-
-        CaseMailer.send(
-          mailer_method,
-          kase,
-          old_value,
-          kase.send(field)
-        ).deliver_later
-      end
-
-    end
+    fields_changing = params.require(:case)
+      .permit(current_user.admin? ? ADMIN_UPDATABLE_FIELDS : CONTACT_UPDATABLE_FIELDS)
+    update_fields(fields_changing)
   end
 
   def close
@@ -129,21 +116,10 @@ class CasesController < ApplicationController
     redirect_to @scope.dashboard_case_path(case_from_params)
   end
 
-  def assign
-    new_assignee_id = params[:case][:assignee_id]
-    new_assignee = new_assignee_id.empty? ? nil : User.find(new_assignee_id)
-    success_flash = new_assignee ?
-                        "Support case %s assigned to #{new_assignee.name}."
-                        : 'Support case %s unassigned.'
-
-    change_action success_flash do |kase|
-      kase.assignee = new_assignee
-    end
-  end
-
   def resolve
     change_action "Support case %s resolved." do |kase|
       kase.resolve!(current_user)
+      CaseMailer.resolve_case(kase, current_user).deliver_later
     end
   end
 
@@ -227,19 +203,18 @@ class CasesController < ApplicationController
     end
   end
 
-  def filtered_cases(filters)
+  def filtered_cases(initial, filters)
     my_filters = filters.dup
     association_filter = my_filters.delete(:associations).dup || []
-    scope_results = @scope.cases
 
-    results = scope_results
+    results = initial
     first_assoc = association_filter.shift
     if first_assoc
-      results = scope_results.associated_with(*first_assoc.split('-'))
+      results = initial.associated_with(*first_assoc.split('-'))
     end
 
     association_filter.each do |assoc|
-      results = results.or(scope_results.associated_with(*assoc.split('-')))
+      results = results.or(initial.associated_with(*assoc.split('-')))
     end
 
     results.filter(
@@ -252,6 +227,7 @@ class CasesController < ApplicationController
       :state,
       :assigned_to,
       :associations,
+      :prioritised,
       {
         state: [],
         assigned_to: [],
@@ -270,5 +246,31 @@ class CasesController < ApplicationController
         assigned_to: @scope.cases.map(&:assignee).uniq.compact.sort_by { |u| u.name }
       },
     }
+  end
+
+  def update_fields(fields_changing)
+    change_action 'Support case %s updated.' do |kase|
+      old_fields = {}.tap do |fields|
+        fields_changing.to_h.keys.each { |f| fields[f.to_sym] = kase.send(f) }
+      end
+
+      kase.update(  # update! doesn't work here FSR :(
+        fields_changing
+      )
+      kase.save!
+
+      old_fields.each do |field, old_value|
+        mailer_method = "change_#{field}".to_sym
+
+        next unless CaseMailer.respond_to?(mailer_method)
+
+        CaseMailer.send(
+          mailer_method,
+          kase,
+          old_value,
+          kase.send(field)
+        ).deliver_later
+      end
+    end
   end
 end

@@ -32,8 +32,13 @@ class SlackNotifier
       send_notification(case_note)
     end
 
-    def assignee_notification(kase, assignee)
-      notification_text = "#{assignee.name} has been assigned to #{kase.display_id}"
+    def assignee_notification(kase, assignee, role)
+      notification_text = if assignee
+                            "#{assignee.name} has been set as the assigned #{role}"\
+                              " for #{kase.display_id}"
+                          else
+                            "#{kase.display_id} is no longer assigned"
+                          end
       assignee_note = {
         fallback: notification_text,
         color: "#6e5494",
@@ -41,8 +46,8 @@ class SlackNotifier
         title_link: cluster_case_url(kase.cluster, kase),
         fields: [
           {
-            title: "Assigned to",
-            value: assignee.name,
+            title: "Assigned #{role}",
+            value: assignee&.name || 'Nobody',
             short: true
           }
         ]
@@ -79,16 +84,13 @@ class SlackNotifier
       maintenance_notification(kase, text, 'warning')
     end
 
-    def log_notification(log)
-      notification_text = "New log created on #{log.cluster.name}" \
-        " #{log&.component ? 'for ' + log.component.name : nil }"
-
+    def log_notification(log, text)
       logs_url = cluster_logs_url(log.cluster)
 
       log_note = {
-        fallback: notification_text,
+        fallback: text,
         color: "#8daec2",
-        pretext: notification_text,
+        pretext: text,
         author_name: log.engineer.name,
         title: "Details",
         title_link: logs_url,
@@ -100,7 +102,6 @@ class SlackNotifier
     end
 
     def change_request_notification(kase, text, user)
-      text = "The change request for this case #{text}"
       change_request_note = {
         fallback: text,
         color: '#f44192',
@@ -113,22 +114,78 @@ class SlackNotifier
       send_notification(change_request_note)
     end
 
-    def case_association_notification(kase, user)
-
-      reference_texts = kase.associations
-                            .map { |a| a.decorate.reference_text }
-
-      text = %{Changed the affected components on this case to:
-
-• #{reference_texts.join("\n • ")}
-}
-
+    def case_association_notification(kase, user, text)
       send_notification(
         author_name: user.name,
         title: subject_and_id_title(kase),
         title_link: cluster_case_url(kase.cluster, kase),
         text: text
       )
+    end
+
+    def subject_notification(kase, old, new)
+      text = "The subject for #{kase.display_id} has been changed from '#{old}' to '#{new}'"
+
+      subject_note = {
+        fallback: text,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+
+      send_notification(subject_note)
+    end
+
+    def issue_notification(kase, old, new)
+      text = "The issue for #{kase.display_id} has been changed from '#{old}' to '#{new}'"
+
+      issue_note = {
+        fallback: text,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+
+      send_notification(issue_note)
+    end
+
+    def resolved_case_notification(kase, user, text)
+      resolved_note = {
+        fallback: text,
+        author_name: user.name,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+      send_notification(resolved_note)
+    end
+
+    def cluster_check_submission_notification(cluster, user, text)
+      cluster_check_submission_note = {
+        fallback: text,
+        author_name: user.name,
+        title: "[#{cluster.name}] Cluster Check Results",
+        title_link: cluster_checks_url(cluster),
+        text: text
+      }
+      send_notification(cluster_check_submission_note)
+    end
+
+    def reassigned_case_notification(kase, old_contact, new_contact)
+      if new_contact.nil?
+        text = "This case has been reassigned from #{old_contact.name} to"\
+          " nobody as there is no primary contact for this site."
+      else
+        text = "This case has been reassigned from #{old_contact.name} to #{new_contact.name}"
+      end
+
+      reassigned_case_note = {
+        fallback: text,
+        title: subject_and_id_title(kase),
+        title_link: cluster_case_url(kase.cluster, kase),
+        text: text
+      }
+      send_notification(reassigned_case_note)
     end
 
     private

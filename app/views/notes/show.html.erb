@@ -1,10 +1,20 @@
-<% content_for(:subtitle) { note.subtitle } %>
+<% content_for(:subtitle) { note.title } %>
 
-<%= render 'partials/tabs', activate: :notes do %>
+<%= render 'partials/tabs', activate: :documents do %>
   <div class="card-body">
-    <%= note.rendered_description %>
+    <h2>
+      <% if note.visibility == 'engineering' %>
+        <i class="fa fa-lock" title="This document is only visible to engineers"></i>
+      <% end %>
+      <%= note.title %>
+    </h2>
+    <div class="card">
+      <div class="card-body">
+        <%= note.rendered_description %>
+      </div>
+    </div>
   </div>
-  <%= link_to 'Edit notes',
+  <%= link_to 'Edit document',
     note.edit_path,
     PolicyDependentOptions.wrap(
       {
@@ -12,7 +22,7 @@
         role: 'button',
       },
       policy: policy(note).edit?,
-      action_description: 'edit cluster notes',
+      action_description: 'edit cluster documents',
       user: current_user
     )
   %>

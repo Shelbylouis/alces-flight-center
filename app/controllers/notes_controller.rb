@@ -3,6 +3,7 @@ class NotesController < ApplicationController
 
   def show
     @note = note_from_params
+    # Authorisation happens in Note#check_read_permissions
     render :new unless @note.persisted?
   end
 
@@ -11,16 +12,25 @@ class NotesController < ApplicationController
     authorize @note
   end
 
+  def new
+    @note = cluster_from_params.notes.build(
+      title: 'New document',
+      visibility: 'customer'
+    ).decorate
+    authorize @note
+  end
+
   def create
     @note = note_from_params
     authorize @note
 
-    if @note.update_attributes(note_params)
-      flash[:success] = 'Notes created'
+    if @note.update_attributes(enforce_visibility(note_params))
+      flash[:success] = 'Document created.'
+      redirect_to cluster_documents_path(@note.cluster)
     else
-      flash[:error] = "Your notes were not created: #{format_errors(@note)}"
+      flash[:error] = "Your document was not created: #{format_errors(@note)}"
+      redirect_back fallback_location: @note.cluster
     end
-    redirect_back fallback_location: @note.cluster
   end
 
   def update
@@ -29,13 +39,13 @@ class NotesController < ApplicationController
 
     if note_params[:description].blank?
       @note.destroy
-      flash[:success] = 'Notes removed'
-      redirect_to cluster_path(@note.cluster)
-    elsif @note.update_attributes(note_params)
-      flash[:success] = 'Notes updated'
+      flash[:success] = 'Document deleted.'
+      redirect_to cluster_documents_path(@note.cluster)
+    elsif @note.update_attributes(enforce_visibility(note_params))
+      flash[:success] = 'Document updated.'
       redirect_to @note.decorate.path
     else
-      flash[:error] = "Your notes were not updated: #{format_errors(@note)}"
+      flash[:error] = "Your document was not updated: #{format_errors(@note)}"
       render :edit
     end
   end
@@ -59,11 +69,26 @@ class NotesController < ApplicationController
   private
 
   def note_from_params
-    flavour = params.require(:flavour)
-    @cluster.notes.send(flavour).first || @cluster.notes.new(flavour: flavour)
+    if params[:id]
+      Note.find(params[:id])
+    else
+      cluster_from_params.notes.build
+    end
   end
 
   def note_params
-    params.require(:note).permit(:description)
+    params.require(:note).permit(:description, :title, :visibility)
+  end
+
+  def cluster_from_params
+    Cluster.find_from_id!(params.require(:cluster_id))
+  end
+
+  def enforce_visibility(params)
+    params.tap do |p|
+      unless policy(@note).set_visibility?
+        p[:visibility] = 'customer'
+      end
+    end
   end
 end

@@ -7,18 +7,8 @@ class Cluster < ApplicationRecord
   PART_NAMES = [:component, :service].freeze
 
   belongs_to :site
-  has_many :component_groups,
-    # Associated ComponentGroups should be ordered by the `ordering` defined
-    # for their types (we always want VMs to appear first etc.).
-    -> {  joins(:component_type).order('ordering')  },
-    dependent: :destroy
-  has_many :components,
-    # Need to remove order scope defined for ComponentGroups above, as makes no
-    # sense and blows things up when just getting Components through the
-    # groups.
-    -> { unscope(:order) },
-    through: :component_groups,
-    dependent: :destroy
+  has_many :component_groups, dependent: :destroy
+  has_many :components, through: :component_groups, dependent: :destroy
   has_many :services, dependent: :destroy
   has_many :cases
 
@@ -32,6 +22,8 @@ class Cluster < ApplicationRecord
   has_many :cluster_checks
   has_many :checks, through: :cluster_checks
   has_many :check_results, through: :cluster_checks
+
+  has_many :service_plans
 
   validates_associated :site
   validates :name, presence: true
@@ -60,10 +52,6 @@ class Cluster < ApplicationRecord
 
   def documents
     @documents ||= DocumentsRetriever.retrieve(documents_path)
-  end
-
-  def available_component_group_types
-    component_groups.pluck("component_types.name").uniq
   end
 
   def unfinished_related_maintenance_windows
@@ -108,6 +96,36 @@ class Cluster < ApplicationRecord
 
   def cluster_check_count
     cluster_checks.length
+  end
+
+  def resolved_cases_count
+    self.cases.where(state: 'resolved').count
+  end
+
+  def current_service_plan
+    service_plans.where(
+      'start_date <= ? AND end_date >= ?',
+      Date.current,
+      Date.current
+    ).first
+  end
+
+  def previous_service_plan
+    service_plans.where('end_date < ?', Date.current)
+                 .order(:start_date)
+                 .last
+  end
+
+  def service_plans_covering(from, to)
+    service_plans.where(start_date: from..to)
+      .or(service_plans.where(end_date: from..to))
+      .or(
+        service_plans.where(
+          'start_date <= ? AND end_date >= ?',
+          from,
+          to
+        )
+      ).order(:start_date)
   end
 
   private

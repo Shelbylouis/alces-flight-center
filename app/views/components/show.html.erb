@@ -6,4 +6,12 @@
       <%= component.cluster_part_icons %>
     </li>
   </ul>
+  <div class="card-body">
+    <h3>Component information</h3>
+    <div class="card">
+      <div class="card-body">
+        <%= component.info.empty? ? 'No information stored' : component.rendered_info %>
+      </div>
+    </div>
+  </div>
 <% end %>

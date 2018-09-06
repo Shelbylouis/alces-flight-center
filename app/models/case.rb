@@ -37,6 +37,7 @@ class Case < ApplicationRecord
 
   belongs_to :user
   belongs_to :assignee, class_name: 'User', required: false
+  belongs_to :contact, class_name: 'User', required: false
 
   has_many :maintenance_windows
   has_and_belongs_to_many :logs
@@ -50,7 +51,6 @@ class Case < ApplicationRecord
   has_one :credit_charge, required: false
 
   delegate :category, to: :issue
-  delegate :email_recipients, to: :site
   delegate :site, to: :cluster, allow_nil: true
 
   state_machine initial: :open do
@@ -65,7 +65,14 @@ class Case < ApplicationRecord
 
   end
 
-  audited only: [:assignee_id, :issue_id, :subject, :time_worked, :tier_level], on: [ :update ]
+  audited only: [
+    :assignee_id,
+    :contact_id,
+    :issue_id,
+    :subject,
+    :time_worked,
+    :tier_level
+  ], on: [ :update ]
   has_associated_audits
 
   validates :display_id, uniqueness: true
@@ -117,7 +124,10 @@ class Case < ApplicationRecord
 
   validates_with AssociatedModelValidator
 
-  validate :validates_user_assignment
+  validates_with IssueValidator
+
+  validate :validates_engineer_assignment
+  validate :validates_contact_assignment
 
   validate :validate_not_resolved_with_open_cr
   validates :change_request,
@@ -130,8 +140,7 @@ class Case < ApplicationRecord
   before_validation :assign_default_subject_if_unset
 
   before_create :set_display_id
-  after_create :send_new_case_email
-  after_update :maybe_send_new_assignee_email
+  after_create :send_new_case_email, :maybe_set_default_assignee, :set_assigned_contact
 
   scope :state, ->(state) { where(state: state) }
   scope :active, -> { state('open') }
@@ -149,6 +158,11 @@ class Case < ApplicationRecord
         }
       )
   }
+
+  # _ parameter to work with URL filtering system
+  # Defaults to nil so we can just say `.prioritised`
+  # Uses reorder rather than order to overwrite the sorting of default_scope
+  scope :prioritised, ->(_=nil) { reorder('last_update ASC NULLS FIRST') }
 
   def to_param
     display_id.parameterize.upcase
@@ -210,6 +224,14 @@ class Case < ApplicationRecord
     end
   end
 
+  def email_recipients
+    if issue.administrative?
+      []
+    else
+      site.email_recipients
+    end
+  end
+
   def ticket_subject
     # NOTE: If the format used here ever changes then this may cause new emails
     # sent in relation to an existing Cases to not be threaded with previous
@@ -250,7 +272,7 @@ class Case < ApplicationRecord
   def comments_could_be_enabled?
     # If this condition is met then comments by contacts are enabled iff
     # comments_enabled is true.
-    open? && !consultancy?
+    open? && !consultancy? && !issue.administrative?
   end
 
   def can_create_change_request?
@@ -281,14 +303,11 @@ class Case < ApplicationRecord
   end
 
   def potential_assignees
-    site.users.where.not(role: :viewer)
-      .or(User.where(role: :admin))
-      .order(:name)
+    User.where(role: :admin)
   end
 
-  def assignee=(new_assignee)
-    @assignee_changed = true
-    super(new_assignee)
+  def potential_contacts
+    site.users.where.not(role: :viewer).order(:name)
   end
 
   def time_worked=(new_time)
@@ -307,7 +326,6 @@ class Case < ApplicationRecord
     # So that the validation on these setters works properly, we need to reset the "changed" state
     # of them all before continuing.
     super
-    @assignee_changed = false
     @time_worked_changed = false
     @tier_level_changed = false
   end
@@ -353,6 +371,31 @@ class Case < ApplicationRecord
     created_at.business_time_until(
       first_admin_comment.created_at
     )
+  end
+
+  def time_since_last_update
+    return unless last_update
+    # In which we redefine a "day" to be 8 hours long.
+    raw = last_update.business_time_until(Time.current)
+
+    days = (raw / 8.hours).floor
+    raw -= (8 * days.hours).seconds
+
+    hours = (raw / 1.hour).floor
+    raw -= hours.hours.seconds
+
+    minutes = (raw / 1.minutes).floor
+    raw -= minutes.minutes.seconds
+
+    days.days + hours.hours + minutes.minutes + raw.seconds
+  end
+
+  def allowed_to_comment?
+    [self.assignee, self.contact].include?(current_user)
+  end
+
+  def administrative?
+    issue.administrative
   end
 
   private
@@ -419,15 +462,55 @@ class Case < ApplicationRecord
     CaseMailer.new_case(self).deliver_later
   end
 
-  def maybe_send_new_assignee_email
-    return unless @assignee_changed
-    return if assignee.nil?
-    CaseMailer.change_assignee(self, assignee).deliver_later
+  def maybe_set_default_assignee
+    if assignee.nil? && !site.default_assignee.nil?
+      transaction do # to make sure audits.last is our assignee change
+        self.assignee = site.default_assignee
+        save!
+        la = audits.last
+        # This will show as 'Flight Center' rather than the customer's name
+        # - the latter would be misleading here since customers can't assign
+        # cases to people!
+        # NB Audited.audit_class.as_user(nil) does not work since it then gets
+        # the user from current_user anyway :(
+        la.user = nil
+        la.save!
+      end
+    end
   end
 
-  def validates_user_assignment
+  def set_assigned_contact
+    if open? && !administrative? && contact.nil?
+      new_contact = if user.contact?
+                      user
+                    else
+                      site.primary_contact
+                    end
+
+      return if new_contact.nil?
+      transaction do
+        self.contact = new_contact
+        save!
+
+        la = audits.last
+        la.user = nil
+        la.save!
+      end
+    end
+  end
+
+  def validates_engineer_assignment
     return if assignee.nil?
-    errors.add(:assignee, 'must belong to this site, or be an admin') unless (assignee.site == site) || assignee.admin?
+    errors.add(:assignee, 'must be an admin') unless assignee.admin?
+  end
+
+  def validates_contact_assignment
+    return if contact.nil?
+    if administrative?
+      errors.add(:contact, "can't be assigned to an administrative case")
+    else
+      errors.add(:contact, 'must belong to this site') unless (contact.site == site)
+    end
   end
 
   def set_display_id

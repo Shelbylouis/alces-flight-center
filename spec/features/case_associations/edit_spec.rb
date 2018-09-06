@@ -137,7 +137,7 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
 
         expect(cluster_tree_summary.text).to eq 'Group A Component a1 Component a2 Component a3'
 
-        expect(SlackNotifier).to receive(:case_association_notification).with(kase, admin)
+        expect(SlackNotifier).to receive(:case_association_notification).with(kase, admin, anything)
 
         click_button 'Save'
 
@@ -192,6 +192,8 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
       }
 
       it 'does not allow removing the association' do
+        initial_number_of_audits = kase.associated_audits.where(auditable_type: 'CaseAssociation').count
+
         expect(checkbox_for[service]).to be_checked
         checkbox_for[service].click
         click_button 'Save'
@@ -201,6 +203,37 @@ RSpec.describe 'Case association edit form', type: :feature, js: true do
         expect(find('.alert-danger')).to have_text \
           "for issue '#{issue.name}' must be associated with " \
                 "#{service_type.name} service but not given one"
+
+        expect(kase.associated_audits.where(auditable_type: 'CaseAssociation').length)
+          .to eq initial_number_of_audits  # No new audits added
+      end
+    end
+
+    context 'for a case whose issue does not require an association' do
+      let(:issue) {
+        create(:issue, requires_service: false, service_type: nil, name: 'Other')
+      }
+      let!(:service) do
+        create(:service, cluster: cluster)
+      end
+      let(:kase) {
+        create(
+          :open_case,
+          cluster: cluster,
+          services: [service],
+          issue: issue
+        )
+      }
+
+      it 'allows removal of all associations' do
+
+        expect(checkbox_for[service]).to be_checked
+        checkbox_for[service].click
+        click_button 'Save'
+
+        kase.reload
+        expect(kase.associations).to be_empty
+
       end
     end
   end

@@ -3,23 +3,36 @@ class Note < ApplicationRecord
   include BelongsToCluster
   include AdminConfig::Note
 
-  FLAVOURS = ['customer', 'engineering'].freeze
+  VISIBILITIES = %w(customer engineering).freeze
 
   belongs_to :cluster
   has_one :site, through: :cluster
 
   validates :description, presence: true
-  validates :flavour, inclusion: { in: FLAVOURS }, presence: true
+  validates :visibility, inclusion: { in: VISIBILITIES }, presence: true
 
-  FLAVOURS.each do |flavour|
-    scope flavour, ->{ where(flavour: flavour) }
+  VISIBILITIES.each do |v|
+    scope v, ->{ where(visibility: v) }
   end
 
-  def flavour_enum
-    FLAVOURS
+  def visibilities_enum
+    VISIBILITIES
   end
 
-  def to_param
-    flavour
+  private
+
+  def check_read_permissions
+    super
+    return if permissions_check_unneeded?
+
+    allowed = visibility == 'customer' || current_user.admin?
+
+    unless allowed
+      raise ReadPermissionsError,
+            <<-EOF.squish
+          User #{current_user.name} (site_id: #{current_user.site_id}) forbidden
+          from accessing #{model_identifier} (site_id: #{site.id})
+      EOF
+    end
   end
 end

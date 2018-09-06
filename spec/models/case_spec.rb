@@ -144,63 +144,6 @@ RSpec.describe Case, type: :model do
     end
   end
 
-  describe 'Email creation on assignee change' do
-
-    let(:initial_assignee) { nil }
-    let(:site) { create(:site) }
-    let(:cluster) { create(:cluster, site: site) }
-
-    subject do
-      create(:case, assignee: initial_assignee, cluster: cluster)
-    end
-
-    let :stub_mail do
-      obj = double
-      expect(obj).to receive(:deliver_later)
-      obj
-    end
-
-    context 'with no previous assignee' do
-      it 'sends an email' do
-        assignee = create(:admin)
-        subject.assignee = assignee
-
-        expect(CaseMailer).to receive(:change_assignee).with(
-          subject,
-          assignee
-        ).and_return(stub_mail)
-
-        subject.save!
-      end
-    end
-
-    context 'with a previous assignee' do
-      let(:initial_assignee) { create(:user, site: site) }
-      it 'sends an email' do
-        assignee = create(:admin)
-        subject.assignee = assignee
-
-        expect(CaseMailer).to receive(:change_assignee).with(
-          subject,
-          assignee
-        ).and_return(stub_mail)
-
-        subject.save!
-      end
-    end
-
-    context 'when being de-assigned' do
-      let(:initial_assignee) { create(:user, site: site) }
-      it 'does not send an email' do
-        subject.assignee = nil
-
-        expect(CaseMailer).not_to receive(:change_assignee)
-
-        subject.save!
-      end
-    end
-  end
-
   describe '#active' do
     it 'returns all open Cases' do
       create(:open_case, subject: 'one')
@@ -434,22 +377,29 @@ RSpec.describe Case, type: :model do
       expect(subject).to include('some_admin')
     end
 
-    it 'includes any contact for site of Case' do
-      create(:contact, name: 'some_contact', site: kase.site)
-
-      expect(subject).to include('some_contact')
-    end
-
-    it 'does not include unrelated contact' do
-      create(:contact, name: 'some_contact')
-
-      expect(subject).not_to include('some_contact')
-    end
-
-    it 'does not include viewer for site of Case' do
+    it 'does not include any user that is not an admin' do
       create(:viewer, name: 'some_viewer', site: kase.site)
+      create(:contact, name: 'that_contact', site: kase.site)
 
-      expect(subject).not_to include('some_viewer')
+      expect(subject).not_to include('some_viewer', 'that_contact')
+    end
+  end
+
+  describe '#potential_contacts' do
+    subject { kase.potential_contacts.map(&:name) }
+    let(:kase) { create(:case) }
+    let(:another_site) { create(:site, name: 'Another Site') }
+
+    it 'includes all contacts for a site' do
+      create(:contact, site: kase.site, name: 'some_contact')
+      create(:contact, site: kase.site, name: 'another_contact')
+
+      # Viewers and contacts from other sites should not be included
+      # in the list of potential contacts
+      create(:viewer, site: kase.site, name: 'just_a_viewer')
+      create(:contact, site: another_site)
+
+      expect(subject).to eq(['another_contact', 'A Scientist', 'some_contact'])
     end
   end
 
@@ -602,6 +552,62 @@ RSpec.describe Case, type: :model do
 
       expect(kase.time_to_first_response).to eq 2.hours + 15.minutes
 
+    end
+  end
+
+  describe '#time_since_last_update' do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:cluster) { create(:cluster) }
+    let(:admin) { create(:admin) }
+    let!(:kase) { create(:open_case, cluster: cluster) }
+
+    it 'handles business time in the expected way' do
+      # Where "expected" means "treats a day as eight hours long".
+
+      kase.last_update = Time.zone.local(2018, 8, 13, 9, 00)
+      kase.save!
+
+      travel_to Time.zone.local(2018, 8, 14, 10, 0) do
+        expect(kase.time_since_last_update).to eq 1.days + 1.hours
+      end
+
+    end
+
+  end
+
+  describe '#maybe_set_default_assignee' do
+    let(:site) { create(:site, default_assignee: default_assignee) }
+    let(:cluster) { create(:cluster, site: site) }
+    let(:new_case) { create(:open_case, cluster: cluster) }
+
+    context 'where site has no default assignee' do
+      let(:default_assignee) { nil }
+      it 'remains unassigned' do
+        expect(new_case.assignee).to be nil
+      end
+    end
+
+    context 'where site has a default assignee' do
+      let(:default_assignee) { create(:admin) }
+      it 'assigns case after creation' do
+        expect(new_case.assignee).to eq(default_assignee)
+      end
+    end
+  end
+
+  describe '#administrative?' do
+    let(:issue) { create(:administrative_issue) }
+    let(:admin_case) { create(:open_case, issue: issue) }
+    let(:open_case) { create(:open_case) }
+
+    it 'returns true when case issue is administrative' do
+      expect(admin_case.administrative?).to eq true
+    end
+
+
+    it 'returns false when case issue is not administrative' do
+      expect(open_case.administrative?).to eq false
     end
   end
 end

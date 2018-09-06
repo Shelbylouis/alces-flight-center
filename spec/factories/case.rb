@@ -7,6 +7,13 @@ FactoryBot.define do
     fields [{name: 'Details', value: 'some_details'}]
     tier_level 3
 
+    after :build do |kase|
+      unless kase.user.admin?
+        kase.user.site = kase.site
+        kase.user.save!
+      end
+    end
+
     factory :open_case do
       state 'open'
     end
@@ -44,6 +51,11 @@ FactoryBot.define do
       after :build do |instance|
         unless instance.components.empty?
           instance.cluster = instance.components.first.cluster
+
+          unless instance.user.admin?
+            instance.user.site = instance.site
+            instance.user.save!
+          end
         end
       end
 
@@ -61,6 +73,11 @@ FactoryBot.define do
       after :build do |instance|
         unless instance.services.empty?
           instance.cluster = instance.services.first.cluster
+
+          unless instance.user.admin?
+            instance.user.site = instance.site
+            instance.user.save!
+          end
         end
       end
 
@@ -69,6 +86,11 @@ FactoryBot.define do
 
         after :build do |instance|
           instance.cluster = instance.services[0].cluster
+
+          unless instance.user.admin?
+            instance.user.site = instance.site
+            instance.user.save!
+          end
         end
       end
     end

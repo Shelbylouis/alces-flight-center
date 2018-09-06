@@ -2,14 +2,14 @@ FactoryBot.define do
   factory :note do
     cluster
     description "# Description title\n\nDescription body\n"
-    flavour { Note::FLAVOURS[rand(Note::FLAVOURS.length)] }
+    visibility { Note::VISIBILITIES.sample }
 
     factory :customer_note do
-      flavour :customer
+      visibility :customer
     end
 
     factory :engineering_note do
-      flavour :engineering
+      visibility :engineering
     end
   end
 end

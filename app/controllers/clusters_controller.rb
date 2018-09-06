@@ -63,13 +63,18 @@ class ClustersController < ApplicationController
 
       if result.save
         if new_log
-          SlackNotifier.log_notification(new_log) if new_log.save
+          AdminMailer.new_log(new_log).deliver_later if new_log.save
         end
 
         flash[:success] = 'Cluster check results successfully saved.'
       else
         flash[:error] = 'Error while trying to save the cluster check results.'
       end
+    end
+
+    if @cluster.check_results.where(date: Date.today)
+      .size.equal?(@cluster.cluster_checks.count)
+      AdminMailer.cluster_check_submission(@cluster, current_user).deliver_later
     end
 
     redirect_to cluster_checks_path(@cluster)
@@ -87,6 +92,10 @@ class ClustersController < ApplicationController
     rescue
       not_found
     end
+  end
+
+  def import_components
+    authorize @cluster
   end
 
   private

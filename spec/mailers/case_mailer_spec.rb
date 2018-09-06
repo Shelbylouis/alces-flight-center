@@ -55,24 +55,20 @@ RSpec.describe 'Case mailer', :type => :mailer do
     )
   }
 
+  let(:all_recipient_emails) {
+    %w(someuser@somecluster.com another.user@somecluster.com mailing-list@somecluster.com)
+  }
+
   before(:each) do
     site.users = [requestor, another_user]
     site.additional_contacts = [additional_contact]
-  end
-
-  RSpec.shared_examples 'Slack' do
-    it 'sends a notification to Slack' do
-      expect(SlackNotifier).to receive(notification_method)
-        .with(*args)
-      subject
-    end
   end
 
   describe 'Case creation email' do
     subject { CaseMailer.new_case(kase) }
 
     let (:notification_method) { :case_notification }
-    let (:args) { kase }
+    let (:slack_args) { kase }
 
     it 'has correct subject' do
       expect(
@@ -82,7 +78,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
     it 'has correct addressees' do
       expect(subject.to).to eq nil
-      expect(subject.cc).to match_array %w(another.user@somecluster.com mailing-list@somecluster.com)
+      expect(subject.cc).to match_array all_recipient_emails
       expect(subject.bcc).to match_array(['tickets@alces-software.com'])
     end
 
@@ -112,6 +108,16 @@ RSpec.describe 'Case mailer', :type => :mailer do
     end
 
     include_examples 'Slack'
+
+    context 'where case is for an administrative issue' do
+      let(:issue) { create(:administrative_issue) }
+
+      it 'excludes all site email addresses' do
+        expect(subject.to).to eq nil
+        expect(subject.cc).to match_array []
+        expect(subject.bcc).to match_array(['tickets@alces-software.com'])
+      end
+    end
   end
 
   describe 'Comment email' do
@@ -125,45 +131,81 @@ RSpec.describe 'Case mailer', :type => :mailer do
             )
     }
     let (:notification_method) { :comment_notification }
-    let (:args) { [kase, comment] }
+    let (:slack_args) { [kase, comment] }
 
     it 'sends an email on case comment being added' do
       expect(subject.to).to eq nil
-      expect(subject.cc).to match_array %w(someuser@somecluster.com mailing-list@somecluster.com)
+      expect(subject.cc).to match_array all_recipient_emails
       expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
       expect(subject.body.encoded).to match('I can haz comment')
+    end
+
+
+    context 'where case is for an administrative issue' do
+      let(:issue) { create(:administrative_issue) }
+
+      it 'excludes all site email addresses' do
+        expect(subject.to).to eq nil
+        expect(subject.cc).to match_array []
+        expect(subject.bcc).to match_array(['tickets@alces-software.com'])
+      end
     end
 
     include_examples 'Slack'
   end
 
   describe 'Case assignment email' do
-    subject { CaseMailer.change_assignee(kase, another_user) }
+    let(:notification_method) { :assignee_notification }
 
-    let (:notification_method) { :assignee_notification }
-    let (:args) { [kase, another_user] }
+    RSpec.shared_examples 'assignment notifications' do
+      it 'sends an email on initial case assignment' do
+        expect(subject.to).to eq nil
+        expect(subject.cc).to match_array recipients
+        expect(subject.bcc).to match_array(['tickets@alces-software.com'])
 
-    it 'sends an email on initial case assignment' do
-      expect(subject.to).to eq nil
-      expect(subject.cc).to match_array %w(another.user@somecluster.com)
-      expect(subject.bcc).to match_array(['tickets@alces-software.com'])
+        expect(subject.body.encoded).to match(
+          "A Scientist has been set as the assigned #{role} for this case."
+        )
+      end
 
-      expect(subject.body.encoded).to match('This case has now been assigned to A Scientist.')
+      it 'sends an email on case assignment change' do
+        kase.assignee = another_user
+        mail = CaseMailer.send(mailer_method, kase, another_user.id, requestor.id)
+
+        expect(mail.to).to eq nil
+        expect(mail.cc).to match_array recipients
+        expect(mail.bcc).to match_array(['tickets@alces-software.com'])
+
+        expect(mail.body.encoded).to match(
+          /Some User has been set as the assigned #{role} for this case\./
+        )
+      end
     end
 
-    it 'sends an email on case assignment change' do
-      kase.assignee = another_user
-      mail = CaseMailer.change_assignee(kase, requestor)
+    context 'engineer assignment' do
+      subject { CaseMailer.change_assignee_id(kase, nil, another_user.id) }
 
-      expect(mail.to).to eq nil
-      expect(mail.cc).to match_array %w(someuser@somecluster.com)
-      expect(mail.bcc).to match_array(['tickets@alces-software.com'])
+      let(:role) { 'engineer' }
+      let(:mailer_method) { :change_assignee_id }
+      let(:slack_args) { [kase, another_user, role] }
+      let(:recipients) { [] }
 
-      expect(mail.body.encoded).to match(/This case has now been assigned to Some User\./)
+      include_examples 'assignment notifications'
+      include_examples 'Slack'
     end
 
-    include_examples 'Slack'
+    context 'contact assignment' do
+      subject { CaseMailer.change_contact_id(kase, nil, another_user.id) }
+
+      let(:role) { 'contact' }
+      let(:mailer_method) { :change_contact_id }
+      let(:slack_args) { [kase, another_user, 'contact'] }
+      let(:recipients) { all_recipient_emails }
+
+      include_examples 'assignment notifications'
+      include_examples 'Slack'
+    end
   end
 
   describe 'Maintenance emails' do
@@ -174,7 +216,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
       subject { CaseMailer.maintenance_state_transition(kase, text) }
 
       let (:notification_method) { :maintenance_state_transition_notification }
-      let (:args) { [kase, text] }
+      let (:slack_args) { [kase, text] }
 
       include_examples 'Slack'
     end
@@ -183,7 +225,7 @@ RSpec.describe 'Case mailer', :type => :mailer do
       subject { CaseMailer.maintenance_ending_soon(window, text) }
 
       let (:notification_method) { :maintenance_ending_soon_notification }
-      let (:args) { [window.case, text] }
+      let (:slack_args) { [window.case, text] }
 
       it 'sets the maintenance_ending_soon_email_sent flag' do
         subject
@@ -196,13 +238,53 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
   describe 'Change Request emails' do
     context 'change request event' do
-      subject { CaseMailer.change_request(kase, text, requestor) }
+      subject { CaseMailer.change_request(kase, text, requestor, kase.email_recipients) }
 
       let (:text) { "Request to change please" }
       let (:notification_method) { :change_request_notification }
-      let (:args) { [kase, text, requestor] }
+      let (:slack_args) { [kase, text, requestor] }
 
       include_examples 'Slack'
+
+
+      context 'where case is for an administrative issue' do
+        let(:issue) { create(:administrative_issue) }
+
+        it 'excludes all site email addresses' do
+          expect(subject.to).to eq nil
+          expect(subject.cc).to match_array []
+          expect(subject.bcc).to match_array(['tickets@alces-software.com'])
+        end
+      end
     end
+  end
+
+  describe 'Case association emails' do
+    subject { CaseMailer.change_association(kase, another_user) }
+
+    let(:text) {
+      reference_texts = kase.associations
+        .map { |a| a.decorate.reference_text }
+     %{Changed the affected components on this case to:
+
+• #{reference_texts.join("\n • ")}
+    }
+    }
+    let(:notification_method) { :case_association_notification }
+    let(:slack_args) { [kase, another_user, text] }
+
+    include_examples 'Slack'
+  end
+
+  describe 'Resolved case emails' do
+    subject { CaseMailer.resolve_case(kase, another_user) }
+
+    let(:text) {
+      "#{kase.display_id} has been resolved by #{another_user.name} and is awaiting closure"
+    }
+    let(:notification_method) { :resolved_case_notification }
+    let(:slack_args) { [kase, another_user, text] }
+
+    include_examples 'Slack'
   end
 end

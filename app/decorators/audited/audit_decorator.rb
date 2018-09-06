@@ -43,12 +43,13 @@ module Audited
     def assignee_id_text(from, to)
       if from
         if to
-          "Changed the assignee of this case from #{User.find(from).name} to #{User.find(to).name}."
+          "Changed the assigned engineer of this case from #{User.find(from).name}"\
+          " to #{User.find(to).name}."
         else
-          "Unassigned this case from #{User.find(from).name}."
+          "#{User.find(from).name} is no longer the assigned engineer for this case."
         end
       else
-        "Assigned this case to #{User.find(to).name}."
+        "#{User.find(to).name} is now the assigned engineer for this case."
       end
     end
 
@@ -57,7 +58,28 @@ module Audited
     end
 
     def assignee_id_details
-      'Assignee Change'
+      'Engineer Assignee Change'
+    end
+
+    def contact_id_text(from, to)
+      if from
+        if to
+          "Changed the assigned contact of this case from #{User.find(from).name}"\
+          " to #{User.find(to).name}."
+        else
+          "#{User.find(from).name} is no longer the assigned contact for this case."
+        end
+      else
+        "#{User.find(to).name} is now the assigned contact for this case."
+      end
+    end
+
+    def contact_id_type
+      'user'
+    end
+
+    def contact_id_details
+      'Contact Assignee Change'
     end
 
     def time_worked_text(from, to)

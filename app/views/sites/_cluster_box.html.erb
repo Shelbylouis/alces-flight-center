@@ -1,0 +1,32 @@
+<div class="list-group-item">
+  <h4>
+    <%= cluster.name %>
+  </h4>
+  <%= cluster.service_plan_badge %>
+  <div class="cluster-links">
+    <%= link_to "Manage this cluster",
+                cluster_path(cluster),
+                class: [
+                    'btn',
+                    'btn-primary'
+                ]
+    %>
+    <%= link_to "View cases",
+                cluster_cases_path(cluster, state: 'open'),
+                class: [
+                    'btn',
+                    'btn-primary'
+                ]
+    %>
+
+    <%= link_to "Create case",
+                new_cluster_case_path(cluster),
+                PolicyDependentOptions.wrap(
+                    {class: ['btn', 'btn-danger']},
+                    policy: policy(Case).create?,
+                    action_description: 'create a case',
+                    user: current_user
+                )
+    %>
+  </div>
+</div>

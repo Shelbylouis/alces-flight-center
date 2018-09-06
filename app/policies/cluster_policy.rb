@@ -7,6 +7,7 @@ class ClusterPolicy < ApplicationPolicy
   alias_method :preview?, :admin?
   alias_method :write?, :admin?
   alias_method :create?, :admin?
+  alias_method :import_components?, :admin?
 
   class Scope < Scope
     def resolve

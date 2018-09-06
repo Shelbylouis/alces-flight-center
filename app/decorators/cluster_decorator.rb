@@ -18,34 +18,13 @@ class ClusterDecorator < ApplicationDecorator
   def tabs
     [
       tabs_builder.overview,
-      documents.empty? ? nil : { id: :documents, path: h.cluster_documents_path(self) },
+      { id: :documents, path: h.cluster_documents_path(self) },
       { id: :credit_usage, path: h.cluster_credit_usage_path(self) },
       ({ id: :checks, path: h.cluster_checks_path(self) } unless self.cluster_check_count.zero? ),
       tabs_builder.logs,
       tabs_builder.cases,
       tabs_builder.maintenance,
-      {
-        id: :cluster,
-        dropdown: [
-          {
-            text: 'Services',
-            path: h.cluster_services_path(self)
-          },
-          {
-            text: 'Components:',
-            heading: true,
-          }
-        ].tap do |comps|
-          comps.push(text: 'All', path: h.cluster_components_path(self))
-          available_component_group_types.each do |t|
-            comps.push(
-              text: t.pluralize,
-              path: h.cluster_components_path(self, type: t)
-            )
-          end
-        end
-      },
-      notes_tab,
+      tabs_builder.cluster_composition(h)
     ].compact
   end
 
@@ -130,30 +109,29 @@ class ClusterDecorator < ApplicationDecorator
     end
   end
 
-  private
+  SERVICE_PLAN_WARNING_THRESHOLD ||= 60.days.freeze
 
-  def notes_tab
-    if current_user.admin?
-      {
-        id: :notes,
-        dropdown: [
-          {
-            text: 'Engineering',
-            path: h.cluster_note_path(self, flavour: :engineering),
-          },
-          {
-            text: 'Customer',
-            path: h.cluster_note_path(self, flavour: :customer),
-          },
-        ]
-      }
+  SERVICE_PLAN_DATE_FORMAT ||= :friendly_date
+
+  def service_plan_badge
+    current = current_service_plan
+    if current
+      if current.end_date > SERVICE_PLAN_WARNING_THRESHOLD.from_now
+        badge('success', "Service plan expires on #{current.end_date.to_formatted_s(SERVICE_PLAN_DATE_FORMAT)}")
+      else
+        badge('warning', "Service plan expires on #{current.end_date.to_formatted_s(SERVICE_PLAN_DATE_FORMAT)}")
+      end
     else
-      {
-        id: :notes,
-        path: h.cluster_note_path(self, flavour: :customer),
-      }
+      prev = previous_service_plan
+      if prev
+        badge('danger', "Service plan expired on #{prev.end_date.to_formatted_s(SERVICE_PLAN_DATE_FORMAT)}")
+      else
+        badge('danger', 'No service plan')
+      end
     end
   end
+
+  private
 
   def other_service_json
     return unless IssuesJsonBuilder.other_service_issues.present?
@@ -161,7 +139,10 @@ class ClusterDecorator < ApplicationDecorator
       other_service
       .decorate
       .case_form_json
-      .merge(IssuesJsonBuilder.build_for(self))
+      .merge(IssuesJsonBuilder.build_for(
+        self,
+        current_user
+      ))
   end
 
   def other_service
@@ -177,12 +158,22 @@ class ClusterDecorator < ApplicationDecorator
     private
 
     def self.other_service_issues
-      Issue.where(requires_component: false, requires_service: false).decorate.reject(&:special?)
+      Issue.where(requires_component: false, requires_service: false)
+           .decorate
+           .reject(&:special?)
     end
 
     def applicable_issues
-      self.class.other_service_issues
+      self.class.other_service_issues.reject { |i|
+        i.administrative? && @user && !@user.admin?
+      }
     end
+  end
+
+  def badge(colour, text)
+    h.raw(
+      "<span class=\"badge badge-pill badge-#{colour}\">#{text}</span>"
+    )
   end
 
 end

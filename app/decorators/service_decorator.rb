@@ -13,11 +13,23 @@ class ServiceDecorator < ClusterPartDecorator
   end
 
   def tabs
-    [tabs_builder.overview, tabs_builder.read_only_cases, tabs_builder.maintenance]
+    [
+      tabs_builder.overview,
+      tabs_builder.read_only_cases,
+      tabs_builder.maintenance,
+      tabs_builder.cluster_composition(h),
+    ]
   end
 
   def case_form_json
-    issues_json = IssuesJsonBuilder.build_for(self)
+    # Side note: here, and elsewhere, we take the absence of current_user to
+    # determine that we're being run outside the web-request environment (e.g.
+    # via rails console) and so treat things as if current_user is an admin.
+    # @see ApplicationRecord#permissions_check_unneeded?
+    issues_json = IssuesJsonBuilder.build_for(
+      self,
+      current_user
+    )
     super.merge(issues_json)
   end
 
@@ -32,8 +44,8 @@ class ServiceDecorator < ClusterPartDecorator
   private
 
   class IssuesJsonBuilder
-    def self.build_for(service)
-      new(service).build
+    def self.build_for(service, user)
+      new(service, user).build
     end
 
     def build
@@ -49,8 +61,9 @@ class ServiceDecorator < ClusterPartDecorator
     attr_reader :service
     delegate :service_type, to: :service
 
-    def initialize(service)
+    def initialize(service, user)
       @service = service
+      @user = user
     end
 
     def any_categorised_issues?
@@ -66,7 +79,11 @@ class ServiceDecorator < ClusterPartDecorator
 
     def applicable_issues
       @applicable_issues ||=
-        (service_type.issues + issues_requiring_any_service).reject(&:special?)
+        (service_type.issues + issues_requiring_any_service)
+          .reject(&:special?)
+          .reject { |i|
+            i.administrative? && @user && !@user.admin?
+          }
     end
 
     def issues_requiring_any_service

@@ -290,7 +290,7 @@ RSpec.describe CasesController, type: :controller do
 
           expect(flash[:error]).to eq "Error updating support case: tier_level cannot be changed when a case is #{state}"
           kase.reload
-          expect(open_case.tier_level).to eq 2
+          expect(kase.tier_level).to eq 2
         end
       end
     end

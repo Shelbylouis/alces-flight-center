@@ -3,7 +3,7 @@ class AllSitesDecorator < ApplicationDecorator
 
   def tabs
     [
-      { id: :all_sites, path: h.root_path },
+      { id: :all_sites, path: h.sites_path },
       cases_tab
     ]
   end
@@ -15,6 +15,13 @@ class AllSitesDecorator < ApplicationDecorator
       tab[:dropdown] = tab[:dropdown].reject do |item|
         item[:text] == 'Create'
       end
+
+      tab[:dropdown].unshift(
+        {
+          text: "My Cases (#{Case.assigned_to(h.current_user).where(state: 'open').size})",
+          path: h.root_path
+        }
+      )
     end
   end
 

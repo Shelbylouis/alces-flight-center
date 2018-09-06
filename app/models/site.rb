@@ -2,6 +2,9 @@ class Site < ApplicationRecord
   include AdminConfig::Site
   include MarkdownDescription
 
+  # TODO uncomment this when identifier migration has happened & been deployed
+  # default_scope { order(:identifier) }
+
   has_many :users, dependent: :destroy
   has_many :additional_contacts, dependent: :destroy
   has_many :clusters, dependent: :destroy
@@ -9,6 +12,10 @@ class Site < ApplicationRecord
   has_many :components, through: :clusters
   has_many :services, through: :clusters
   has_one :flight_directory_config
+
+  belongs_to :default_assignee,
+             class_name: 'User',
+             required: false
 
   validates :name, presence: true
   validates :canonical_name, presence: true

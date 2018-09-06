@@ -1,27 +1,10 @@
 require 'resque/server'
 
-class NoteFlavourConstraint
-  def initialize(admin:)
-    @admin = admin
-  end
-
-  def matches?(request)
-    flavour = request.env['action_dispatch.request.path_parameters'][:flavour]
-    if @admin
-      Note::FLAVOURS.include?(flavour)
-    else
-      flavour == 'customer'
-    end
-  end
-end
-
 Rails.application.routes.draw do
 
   match '/404', to: 'errors#not_found', via: :all
   match '/500', to: 'errors#internal_server_error', via: :all
 
-  asset_record_alias = 'asset-record'
-  component_expansions_alias = 'expansions'
   component_groups_alias = 'component-groups'
 
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
@@ -50,20 +33,6 @@ Rails.application.routes.draw do
       end
     end
   end
-  notes = Proc.new do |admin|
-    constraints NoteFlavourConstraint.new(admin: admin) do
-      prefix = admin ? '' : 'prevent_named_route_clash_'
-      resources :notes, param: :flavour, except: [:new, :create, :index] do
-        collection do
-          post ':flavour' => 'notes#create', as: prefix
-        end
-        member do
-          post 'preview' => 'notes#preview'
-          post 'write' => 'notes#write'
-        end
-      end
-    end
-  end
 
   maintenance_windows = Proc.new do
     resources :maintenance_windows, path: :maintenance, only: :index
@@ -80,7 +49,7 @@ Rails.application.routes.draw do
 
     mount Resque::Server, at: '/resque'
 
-    root 'sites#index'
+    root 'cases#assigned'
     resources :sites, only: [:show, :index] do
       cases.call(only: [:index, :new])
       resource :terminal_services, only: [:show]
@@ -92,7 +61,6 @@ Rails.application.routes.draw do
       member do
         post :resolve  # Only admins may resolve a case
         post :close  # Only admins may close a case
-        post :assign  # Only admins may (re)assign a case
         post :set_time
         post :set_commenting
       end
@@ -116,33 +84,29 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: [] do
-      cases.call(only: [:update]) do
+      cases.call do
         # Admin-only pages relating to cases belong here.
         resource :change_request, only: [:new, :edit], path: 'change-request'
         resource :case_associations, only: [:edit], as: 'associations', path: 'associations'
         resource :maintenance_windows, only: [:new, :create], as: 'maintenance', path: 'maintenance'
       end
       admin_logs.call
-      notes.call(true)
       post :deposit
       get '/checks/submit', to: 'clusters#enter_check_results', as: :check_submission
       post '/checks/submit', to: 'clusters#save_check_results', as: :set_check_results
       post '/checks/submit/preview', to: 'cluster_checks#preview'
       post '/checks/submit/write', to: 'cluster_checks#write'
+
+      resources :components, only: [] do
+        collection do
+          get :import, to: 'clusters#import_components'
+          post :import
+        end
+      end
     end
 
     resources :components, only: []  do
-      resource :component_expansion,
-               path: component_expansions_alias,
-               only: [:edit, :update, :create]
-      asset_record_form.call
       admin_logs.call
-    end
-
-    resources :component_expansions, only: [:destroy]
-
-    resources :component_groups, path: component_groups_alias, only: [] do
-      asset_record_form.call
     end
 
     resources :maintenance_windows, path: :maintenance, only: [] do
@@ -190,7 +154,7 @@ Rails.application.routes.draw do
     end
 
     resources :clusters, only: :show do
-      cases.call(only: [:show, :create, :index, :new]) do
+      cases.call(only: [:show, :create, :index, :new, :update]) do
         # Pages relating to cases, for both admins and site users, belong here.
          resource :change_request, only: [:show], path: 'change-request'
       end
@@ -199,24 +163,26 @@ Rails.application.routes.draw do
       resources :components, only: :index
       logs.call
       get :documents
-      notes.call(false)
+
+      resources :notes, except: [:index] do
+        collection do
+          post 'preview' => 'notes#preview'
+          post 'write' => 'notes#write'
+        end
+      end
+
       get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
       get '/checks(/:date)', to: 'clusters#view_checks', as: :checks
     end
 
     resources :components, only: :show do
       maintenance_windows.call
-      resources :component_expansions,
-                path: component_expansions_alias,
-                only: :index
-      asset_record_view.call
       logs.call
     end
 
     resources :component_groups, path: component_groups_alias, only: [] do
       get '/', controller: :components, action: :index
       resources :components, only: :index
-      asset_record_view.call
       maintenance_windows.call
     end
 
@@ -234,6 +200,7 @@ Rails.application.routes.draw do
 
     resource :terminal_services, only: [:show]
     resource :users, only: [:show]
+    resources :topics, only: [:index]
 
     # Support legacy case URLs
     get '/cases/:id', to: 'cases#redirect_to_canonical_path'
@@ -243,6 +210,9 @@ Rails.application.routes.draw do
 
   constraints Clearance::Constraints::SignedOut.new do
     root 'sso_sessions#new', as: 'sign_in'
+    # We add :topics here as Platform users without a Flight Center account
+    # still have access to topics.
+    resources :topics, only: [:index]
   end
 
   # Routes defined here are only defined/used in certain tests which need

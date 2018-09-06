@@ -1,7 +1,7 @@
 class NotePolicy < ApplicationPolicy
 
   def permitted?
-    case @record.flavour
+    case @record.visibility
     when 'engineering'
       admin?
     else
@@ -9,7 +9,9 @@ class NotePolicy < ApplicationPolicy
     end
   end
 
-  alias_method :create?, :permitted?
+  alias_method :create?, :editor?
+  alias_method :new?, :editor?
+  alias_method :set_visibility?, :admin?
   alias_method :edit?, :permitted?
   alias_method :update?, :permitted?
 

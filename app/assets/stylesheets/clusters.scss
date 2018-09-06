@@ -15,6 +15,7 @@ p.credit-balance {
 .card.credit-balance .card-body {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 li.credit-charge-entry {

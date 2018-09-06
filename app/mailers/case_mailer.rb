@@ -8,20 +8,31 @@ class CaseMailer < ApplicationMailer
   def new_case(my_case)
     @case = my_case
     mail(
-      cc: @case.email_recipients.reject { |contact| contact == @case.user.email }, # Exclude the user raising the case
-      subject: @case.email_subject
+      cc: @case.email_recipients,
+      subject: @case.email_subject,
+      bypass_timestamp_update: true
     )
     SlackNotifier.case_notification(@case)
   end
 
-  def change_assignee(my_case, new_assignee)
-    @case = my_case
-    @assignee = new_assignee
-    mail(
-      cc: new_assignee&.email, # Send to new assignee only
-      subject: @case.email_reply_subject
+  def change_assignee_id(my_case, old_id, new_id)
+    send_assignee_change_notifications(
+      my_case,
+      old_id,
+      new_id,
+      'engineer',
+      []
     )
-    SlackNotifier.assignee_notification(@case, @assignee)
+  end
+
+  def change_contact_id(my_case, old_id, new_id)
+    send_assignee_change_notifications(
+      my_case,
+      old_id,
+      new_id,
+      'contact',
+      my_case.email_recipients
+    )
   end
 
   def change_subject(my_case, old_val, new_val)
@@ -32,6 +43,7 @@ class CaseMailer < ApplicationMailer
       cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
+    SlackNotifier.subject_notification(@case, @old, @new)
   end
 
   def change_issue_id(my_case, old_val, new_val)
@@ -39,17 +51,18 @@ class CaseMailer < ApplicationMailer
     @old = Issue.find(old_val).decorate.label_text
     @new = Issue.find(new_val).decorate.label_text
     mail(
-      cc: @case.email_recipients,
       subject: @case.email_reply_subject
     )
+    SlackNotifier.issue_notification(@case, @old, @new)
   end
 
   def comment(comment)
     @comment = comment
     @case = @comment.case
     mail(
-      cc: @case.email_recipients.reject { |contact| contact == @comment.user.email }, # Exclude the user making the comment
+      cc: @case.email_recipients,
       subject: @case.email_reply_subject,
+      bypass_timestamp_update: !comment.user.admin?  # Only count admin comments towards update time
     )
     SlackNotifier.comment_notification(@case, @comment)
   end
@@ -77,13 +90,84 @@ class CaseMailer < ApplicationMailer
     window.set_maintenance_ending_soon_email_flag
   end
 
-  def change_request(my_case, text, user)
+  def change_request(my_case, text, user, recipients)
     @case = my_case
-    @text = text
+    @text = text.gsub(/ customer /, ' your ')
     mail(
-      cc: @case.email_recipients,
+      cc: recipients,
       subject: @case.email_reply_subject
     )
-    SlackNotifier.change_request_notification(@case, @text, user)
+    SlackNotifier.change_request_notification(@case, text, user)
+  end
+
+  def change_association(my_case, user)
+    @case = my_case
+    reference_texts = @case.associations
+      .map { |a| a.decorate.reference_text }
+    if reference_texts.empty?
+      @text = 'This case no longer has any associated components.'
+    else
+    @text = %{Changed the affected components on this case to:
+
+• #{reference_texts.join("\n • ")}
+    }
+    end
+
+    mail( subject: @case.email_reply_subject )
+    SlackNotifier.case_association_notification(@case, user, @text)
+  end
+
+  def resolve_case(kase, user)
+    @case = kase
+    @user = user
+    @text = "#{@case.display_id} has been resolved by #{@user.name} and is awaiting closure"
+
+    mail( subject: @case.email_reply_subject )
+    SlackNotifier.resolved_case_notification(@case, @user, @text)
+  end
+
+  def reassigned_case(kase, old_contact, new_contact)
+    @case = kase
+    @old = old_contact
+    @new = new_contact
+
+    unless @new.nil?
+      mail(
+        cc: @case.email_recipients,
+        subject: @case.email_reply_subject
+      )
+    end
+    SlackNotifier.reassigned_case_notification(kase, @old, @new)
+  end
+
+  private
+
+  def mail(**options)
+    super(options)
+    return if options[:bypass_timestamp_update]
+    all_recipients = [options[:cc], options[:to]].flatten.compact
+    # This is a bit of a hack - since we'd need to check each User model for
+    # admin-ness to be fully correct - but that would be quite costly!
+    # In practice checking for '@alces-' is enough since all admins are @alces
+    # and even if we had non-alces admins, emailing them probably counts as
+    # an email update to the customer.
+    # On staging, we give everyone an '@alces-' email address but non-admins are
+    # always prefixed with 'center+' so we can still detect them.
+    has_non_admin = all_recipients.reject { |a|
+      a.include?('@alces-') && !a.start_with?('center+')
+    }.any?
+    if has_non_admin && @case
+      @case.update_columns(last_update: Time.now)
+    end
+  end
+
+  def send_assignee_change_notifications(my_case, old_id, new_id, role, recipients)
+    @case = my_case
+    @assignee = new_id.nil? ? nil : User.find(new_id)
+    mail(
+      cc: recipients,
+      subject: @case.email_reply_subject
+    )
+    SlackNotifier.assignee_notification(@case, @assignee, role)
   end
 end

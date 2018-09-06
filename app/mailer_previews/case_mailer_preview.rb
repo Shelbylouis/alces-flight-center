@@ -3,9 +3,14 @@ class CaseMailerPreview < ApplicationMailerPreview
     CaseMailer.new_case(get_case)
   end
 
-  def change_assignee
+  def change_assignee_id
     my_case = get_case
-    CaseMailer.change_assignee(my_case, user)
+    CaseMailer.change_assignee_id(my_case, nil, User.admins.first.id)
+  end
+
+  def change_contact_id
+    my_case = get_case
+    CaseMailer.change_contact_id(my_case, nil, User.admins.first.id)
   end
 
   def comment
@@ -24,8 +29,21 @@ class CaseMailerPreview < ApplicationMailerPreview
     CaseMailer.change_request(
       get_case,
       'has text to be replaced with the text from ChangeRequestStateTransitionDecorator.',
-      user
+      user,
+      get_case.email_recipients
     )
+  end
+
+  def change_association
+    CaseMailer.change_association(get_case, user)
+  end
+
+  def resolve_case
+    CaseMailer.resolve_case(get_case, user)
+  end
+
+  def reassign_case
+    CaseMailer.reassigned_case(get_case, user, get_case.site.primary_contact)
   end
 
   private

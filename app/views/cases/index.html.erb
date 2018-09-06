@@ -1,48 +1,7 @@
-<%
-  empty_message = 'No cases match the criteria you have specified.'
-
-  mine, others = @cases.decorate.partition { |c| c.assignee == current_user && c.open? }
-%>
-
 <%= content_for(:subtitle) do
   "Showing #{@cases.length} #{'case'.pluralize(@cases.length)}"
 end %>
 <%= render 'partials/tabs', activate: :cases do %>
-  <form class="form" id="filter-form">
-    <%= render 'partials/table',
-        collection: @cases,
-        message: empty_message,
-        responsive: false do %>
-      <thead>
-        <tr class="nowrap">
-          <th>ID</th>
-          <th>Created</th>
-          <th>
-            <%= render 'cases/filters/filter_for', caption: 'State', name: 'state', filters: @filters, title: 'Filter by case state' %>
-          </th>
-          <th>Subject</th>
-          <th>
-            <%= render 'cases/filters/filter_for', caption: 'Assigned to', name: 'assigned_to', filters: @filters, title: 'Filter by assignee' %>
-          </th>
-          <th>
-            <%= render 'cases/filters/filter_for', caption: 'Affected components', name: 'associations', filters: @filters, title: 'Filter by component' %>
-          </th>
-          <th>Credit usage</th>
-        </tr>
-      </thead>
-
-      <tbody class="assigned-cases">
-        <% mine.each do |c| %>
-          <%= render 'partials/case_table_row', kase: c, scope: @scope %>
-        <% end %>
-      </tbody>
-
-      <tbody>
-        <% others.each do |c| %>
-          <%= render 'partials/case_table_row', kase: c, scope: @scope %>
-        <% end %>
-      </tbody>
-    <% end %>
-  </form>
+  <%= render 'partials/show_cases', cases: @cases %>
 <% end %>
 

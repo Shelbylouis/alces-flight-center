@@ -1,24 +1,32 @@
 <% url = scope.dashboard_case_path(kase) %>
-<tr class='case-highlight'>
+<% my_case = (current_user == kase.assignee) %>
+<tr class='case-highlight <%= 'assigned-cases' if my_case %>'>
   <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.display_id %></td>
   <%= timestamp_td(
     description:  'Support case created',
     timestamp: kase.created_at
   ) do |content|
-      render 'partials/table_cell_link', url: url, cell_content: "By #{kase.user.name} on #{content}"
+      render 'partials/table_cell_link', url: url, cell_content: raw("By <em>#{kase.user.name}</em> on <em>#{content}</em>")
   end %>
   <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.user_facing_state %></td>
   <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.subject %></td>
-  <td<%= current_user == kase.assignee ? " class=current-user" : '' %>><%= render 'partials/table_cell_link',
-    url: url,
-    cell_content: if current_user == kase.assignee
-                    'Me'
-                  else
-                    kase.assignee&.name || 'Nobody'
-                  end
+  <td<%= current_user == kase.assignee ? " class=current-user" : '' %>>
+    <%= render 'partials/table_cell_link',
+      url: url,
+      cell_content: my_case ? 'Me' : kase.assignee&.name || 'Nobody'
     %></td>
   <td>
       <%= render 'partials/association_summary', associations: kase.associations %>
   </td>
   <td><%= render 'partials/table_cell_link', url: url, cell_content: kase.credit_charge&.amount %></td>
+  <% if current_user.admin? %>
+    <% if kase.last_update.nil?  %>
+      <td class="text-danger">None</td>
+    <% else %>
+      <%= timestamp_td(description: 'Last update', timestamp: kase.last_update) do
+          render 'partials/table_cell_link', url: url, cell_content: kase.formatted_time_since_last_update
+        end
+      %>
+    <% end %>
+  <% end %>
 </tr>

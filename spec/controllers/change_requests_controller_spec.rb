@@ -11,7 +11,7 @@ RSpec.describe ChangeRequestsController, type: :controller do
   let(:cluster) { create(:cluster, site: site) }
   let(:admin) { create(:admin) }
   let(:contact) { create(:contact, site: site) }
-  let(:kase) { build(:open_case, tier_level: 4, cluster: cluster)}
+  let(:kase) { build(:open_case, tier_level: 4, cluster: cluster, user: contact)}
 
   EXPECTED_BEHAVIOURS = [ # initial_state, action, user, message, next_state
     [:draft, :propose, :admin, 'has been proposed and is awaiting customer authorisation.', :awaiting_authorisation],
@@ -28,10 +28,13 @@ RSpec.describe ChangeRequestsController, type: :controller do
 
         cr = create(:change_request, case: kase, state: initial_state)
 
+        article = action == :propose ? 'A' : 'The'
+
         expect(CaseMailer).to receive(:change_request).with(
           kase,
-          message,
-          send(user)
+          "#{article} change request for this case #{message}",
+          send(user),
+          [contact.email]
         ).and_return(stub_mail)
 
         sign_in_as(send(user))

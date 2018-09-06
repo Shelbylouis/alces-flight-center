@@ -26,10 +26,6 @@ class TabsBuilder
     }
   end
 
-  def asset_record
-    { id: :asset_record, path: scope.scope_asset_record_path }
-  end
-
   def logs
     { id: :logs, path: scope.scope_logs_path }
   end
@@ -38,6 +34,36 @@ class TabsBuilder
     {
       id: :maintenance,
       path: scope.scope_maintenance_windows_path,
+    }
+  end
+
+  def cluster_composition(h)
+    cluster = cluster_from_scope
+    return unless cluster
+    {
+      id: :cluster,
+      dropdown: [
+        {
+          text: 'Services',
+          path: h.cluster_services_path(cluster)
+        },
+        {
+          text: 'Components:',
+          heading: true,
+        }
+      ].tap do |comps|
+        comps.push(text: 'All', path: h.cluster_components_path(cluster))
+        cluster.component_groups.each do |g|
+          comps.push(
+            text: g.name,
+            path: h.component_group_path(g)
+          )
+        end
+        if h.policy(cluster).import_components?
+          comps.push(divider: true)
+          comps.push(text: 'Import from Benchware', path: h.import_cluster_components_path(cluster))
+        end
+      end
     }
   end
 
@@ -66,5 +92,13 @@ class TabsBuilder
       text: 'Resolved',
       path: scope.scope_cases_path(state: %w(resolved closed)),
     }
+  end
+
+  def cluster_from_scope
+    if scope.is_a? Cluster
+      scope
+    elsif scope.respond_to?(:cluster)
+      scope.cluster
+    end
   end
 end

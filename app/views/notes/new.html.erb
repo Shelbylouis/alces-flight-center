@@ -1,7 +1,8 @@
-<%= render 'partials/tabs', activate: :notes do %>
+<%= render 'partials/tabs', activate: :documents do %>
     <%= render 'form',
-        intro_text: note.new_form_intro,
-        button_text: 'Create notes',
-        policy: policy(note).create?
+               button_text: 'Create document',
+               note: @note,
+               policy: policy(Note).create?,
+               can_set_visibility: policy(Note).set_visibility?
     %>
 <% end %>

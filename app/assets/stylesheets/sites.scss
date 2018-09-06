@@ -4,17 +4,37 @@
 
 .cluster-list {
   .list-group-item {
-    display: flex;
-    justify-content: space-between;
-    justify-items: center;
 
-    h4 {
-      margin: 0.75rem 0;
+    display: grid;
+
+    grid-template-areas: "name badge" "buttons buttons";
+    grid-gap: 0.5rem;
+
+    @media(max-width: 1024px) {
+      grid-template-areas: "name" "badge" "buttons";
     }
 
-    & > span {
-      line-height: 3rem;
-      text-align: right;
+    h4 {
+      grid-area: name;
+      margin-bottom: 0;
+    }
+
+    .badge {
+      grid-area: badge;
+      align-self: center;
+      font-size: small;
+      white-space: normal;
+    }
+
+    .cluster-links {
+      grid-area: buttons;
+      display: flex;
+      flex-wrap: wrap;
+
+      .btn {
+        flex-grow: 1;
+        margin: 0.25rem;
+      }
     }
   }
 }

@@ -42,43 +42,67 @@ RSpec.describe 'Case editing', type: :feature do
       emails.clear
     end
 
-    it 'allows editing case subject' do
-      find('#case-subject-edit').click
-      fill_in 'case[subject]', with: 'New subject'
-      click_button 'Change subject'
+    context 'when editing case subject' do
+      subject {
+        find('#case-subject-edit').click
+        fill_in 'case[subject]', with: 'New subject'
+        click_button 'Change subject'
+      }
+      let(:notification_method) { :subject_notification }
+      let(:slack_args) { [kase, 'Original subject', 'New subject'] }
 
-      expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
+      it 'can be edited successfully' do
+        subject
 
-      expect(find('.event-card')).to \
-        have_text 'Changed the subject of this case from \'Original subject\' to \'New subject\''
+        expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
 
-      kase.reload
+        event_cards = all('.event-card')
 
-      expect(kase.subject).to eq 'New subject'
+        expect(event_cards[0].find('.card-body').text).to eq(
+          'Changed the subject of this case from \'Original subject\' to \'New subject\'.'
+        )
 
-      expect(emails.count).to eq 1
-      expect(emails[0].subject).to have_text 'New subject'
+        kase.reload
+
+        expect(kase.subject).to eq 'New subject'
+
+        expect(emails.count).to eq 1
+        expect(emails[0].subject).to have_text 'New subject'
+      end
+
+      include_examples 'Slack'
     end
 
-    it 'allows editing case issue' do
-      expect(kase.issue).not_to eq issue
+    context 'when editing case issue' do
+      subject {
+        select 'Some other issue'
+        click_button 'Change issue'
+       }
+      let(:notification_method) { :issue_notification }
+      let(:slack_args) { [kase, 'New user/group', 'Some other issue'] }
 
-      select 'Some other issue'
-      click_button 'Change issue'
-      expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
+      it 'allows editing case issue' do
+        expect(kase.issue).not_to eq issue
 
-      expect(find('.event-card')).to \
-        have_text 'Changed this case\'s associated issue from \'New user/group\' to \'Some other issue\''
+        subject
+        expect(find('.alert-success')).to have_text "Support case #{kase.display_id} updated."
 
-      kase.reload
-      expect(kase.issue).to eq issue
+        event_cards = all('.event-card')
 
-      expect(emails.count).to eq 1
-      expect(emails[0].parts.first.body.raw_source).to \
-        have_text 'This case\'s associated issue has been changed from \'New user/group\' to \'Some other issue\''
+        expect(event_cards[0].find('.card-body').text)
+          .to eq(
+        'Changed this case\'s associated issue from \'New user/group\' to \'Some other issue\'.'
+        )
+
+        kase.reload
+        expect(kase.issue).to eq issue
+
+        expect(emails.count).to eq 1
+        expect(emails[0].parts.first.body.raw_source).to \
+          have_text 'This case\'s associated issue has been changed from \'New user/group\' to \'Some other issue\''
+      end
+
+      include_examples 'Slack'
     end
   end
-
-
-
 end

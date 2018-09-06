@@ -46,16 +46,16 @@
   <div class="col-sm-12 col-md-6">
     <%= render 'clusters/credit_balance', cluster: cluster do %>
       <%= link_to 'See detailed usage', cluster_credit_usage_path(cluster),
-                  class: 'btn btn-primary'
+                  class: 'btn btn-primary btn-block'
       %>
     <% end %>
     <%= render 'clusters/cluster_checks', cluster: cluster do %>
       <%= link_to 'See check history', cluster_checks_path(cluster),
-                  class: 'btn btn-primary'
+                  class: 'btn btn-primary btn-block'
       %>
       <% if policy(cluster).enter_check_results? && cluster.last_checked != Date.today %>
         <%= link_to 'Set check results for today', cluster_check_submission_path(cluster),
-                    class: 'btn btn-danger'
+                    class: 'btn btn-danger btn-block'
         %>
       <% end %>
     <% end %>

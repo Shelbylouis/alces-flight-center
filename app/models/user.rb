@@ -13,6 +13,9 @@ class User < ApplicationRecord
 
   belongs_to :site, required: false
 
+  has_many :engineer_cases, class_name: 'Case', foreign_key: :assignee
+  has_many :contact_cases, class_name: 'Case', foreign_key: :contact
+
   validates_associated :site
   validates :name, presence: true
   validates :email,
@@ -25,6 +28,10 @@ class User < ApplicationRecord
     absence: {if: :admin?}
   }
   validate :validates_primary_contact_assignment
+
+  validate :validates_viewer_case_assignment
+  before_save :reassign_cases_if_necessary
+  after_save :forget_changed_role
 
   delegate :admin?,
     :primary_contact?,
@@ -51,13 +58,6 @@ class User < ApplicationRecord
 
   def site_user?
     !admin?
-  end
-
-  def validates_primary_contact_assignment
-    return unless site_primary_contact
-    if primary_contact? && site_primary_contact != self
-      errors.add(:role, 'primary contact is already set for this site')
-    end
   end
 
   def self.globally_available?
@@ -88,6 +88,17 @@ class User < ApplicationRecord
     )
   end
 
+  def assigned_cases
+    engineer_cases.empty? ? contact_cases : engineer_cases
+  end
+
+  def role=(new_role)
+    if role != new_role
+      @role_changed = true
+    end
+    super(new_role)
+  end
+
   private
 
   def role_inquiry
@@ -100,5 +111,35 @@ class User < ApplicationRecord
 
   def password_optional?
     true  # since we use SSO for passwords
+  end
+
+  def reassign_cases_if_necessary
+    if @role_changed && viewer? && assigned_cases.any?
+      assigned_cases.each do |kase|
+        kase.contact = site_primary_contact
+        kase.save!
+        CaseMailer.reassigned_case(kase, self, site_primary_contact)
+      end
+    end
+  end
+
+  def forget_changed_role
+    @role_changed = false
+  end
+
+  def validates_primary_contact_assignment
+    return unless site_primary_contact
+    if primary_contact? && site_primary_contact != self
+      errors.add(:role, 'primary contact is already set for this site')
+    end
+  end
+
+  def validates_viewer_case_assignment
+    # If we have just been changed to be a viewer, then don't run this validation
+    # as we've yet to reassign the cases elsewhere.
+    # We should only be doing that before_save (not before validation) since it
+    # should only happen if the user's role is actually changed (and saved).
+    return if @role_changed && viewer?
+    errors.add(:cases, 'must be empty for a viewer') if viewer? && assigned_cases.any?
   end
 end

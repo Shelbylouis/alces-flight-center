@@ -30,7 +30,11 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def tier_description
-    h.tier_description(tier_level)
+    if issue&.administrative?
+      'N/A (Administrative)'
+    else
+      h.tier_description(tier_level)
+    end
   end
 
   def commenting_disabled_text
@@ -38,14 +42,33 @@ class CaseDecorator < ApplicationDecorator
   end
 
   def available_issues
-    services.map { |s| s.service_type.issues }
-            .flatten
-            .uniq
-            .map(&:decorate)
-            .sort_by { |i| i.category&.name || '' } +
+    if services.empty?
       Issue.where(requires_component: false, requires_service: false)
-        .decorate
-        .reject(&:special?)
+           .decorate
+           .reject(&:special?)
+    else
+      services.map { |s| s.service_type.issues }
+        .flatten
+        .uniq
+        .map(&:decorate)
+        .sort_by { |i| i.category&.name || '' } +
+        Issue.where(requires_component: false, service_type: nil)
+          .decorate
+          .reject(&:special?)
+    end
+  end
+
+  def formatted_time_since_last_update
+    return 'None' unless time_since_last_update
+    tslu = time_since_last_update.parts
+    [].tap do |result|
+      # Exclude seconds (we don't need to be that precise)
+      ActiveSupport::Duration::PARTS[0..-2].each do |part|
+        if tslu.include?(part)
+          result << "#{tslu[part]}#{part.to_s[0]}"
+        end
+      end
+    end.join(' ')
   end
 
   private

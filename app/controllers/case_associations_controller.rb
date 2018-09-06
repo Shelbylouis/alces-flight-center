@@ -26,7 +26,7 @@ class CaseAssociationsController < ApplicationController
       @case.associations = new_assocs
 
       flash[:success] = "Updated affected components for support case #{@case.display_id}."
-      SlackNotifier.case_association_notification(@case, current_user)
+      CaseMailer.change_association(@case, current_user).deliver_later
 
     rescue ActiveRecord::RecordInvalid => e
       flash[:error] = "Unable to update associations, an error occurred: #{format_errors(e.record)}"
@@ -42,7 +42,7 @@ class CaseAssociationsController < ApplicationController
   end
 
   def map_association_params
-    params[:associations].map do |assoc|
+    assoc_param.map do |assoc|
       assoc_data = ASSOCIATION_PARAM_REGEX.match(assoc)
       if assoc_data
         Kernel.const_get(assoc_data[:type]).find(assoc_data[:id])
@@ -58,11 +58,19 @@ class CaseAssociationsController < ApplicationController
   end
 
   def validate_as_if_set(new_assocs)
-    old_assocs = @case.associations
-    @case.associations = new_assocs
-    @case.validate!
-  ensure
-    @case.associations = old_assocs
+    @case.without_auditing do
+      CaseAssociation.without_auditing do
+        old_assocs = @case.associations
+        @case.associations = new_assocs
+        @case.validate!
+      ensure
+        @case.associations = old_assocs
+      end
+    end
+  end
+
+  def assoc_param
+    params[:associations] || []
   end
 
 end

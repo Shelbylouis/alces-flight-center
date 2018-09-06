@@ -1,0 +1,263 @@
+node01:
+  name: node01
+  type: NOT IMPLEMENTED
+  primary_group: nodes1
+  secondary_group: physical,compute,nodes,all
+  info: |
+    # System
+
+    I'm node01!
+node02:
+  name: node02
+  type: NOT IMPLEMENTED
+  primary_group: nodes1
+  secondary_group: physical,compute,nodes,all
+  info: |
+    # System
+
+    I'm node02!
+node03:
+  name: node03
+  type: NOT IMPLEMENTED
+  primary_group: nodes1
+  secondary_group: physical,compute,nodes,all
+  info: |
+    # System
+
+    I'm node03!
+node04:
+  name: node04
+  type: NOT IMPLEMENTED
+  primary_group: nodes2
+  secondary_group: physical,compute,nodes,all
+  info: |
+    # System
+
+    I'm node04!
+node05:
+  name: node05
+  type: NOT IMPLEMENTED
+  primary_group: nodes2
+  secondary_group: physical,compute,nodes,all
+  info: |
+    # System
+
+    I'm node05!
+viz01:
+  name: viz01
+  type: NOT IMPLEMENTED
+  primary_group: viz
+  secondary_group: physical,compute,nodes,all
+  info: |
+    # System
+
+    Viz01
+phi01:
+  name: phi01
+  type: NOT IMPLEMENTED
+  primary_group: phi
+  secondary_group: physical,compute,nodes,all
+  info: |
+    # System
+
+    Phi01
+gpu01:
+  name: gpu01
+  type: NOT IMPLEMENTED
+  primary_group: gpu
+  secondary_group: physical,compute,nodes,all
+  info: |
+    # System
+
+    GPU 01
+himem01:
+  name: himem01
+  type: NOT IMPLEMENTED
+  primary_group: himem
+  secondary_group: physical,compute,nodes,all
+  info: |
+    # System
+
+    Himem 01
+login1:
+  name: login1
+  type: NOT IMPLEMENTED
+  primary_group: login
+  secondary_group: physical,compute,all
+  info: |
+    # System
+
+    The name's login node, login1 login node.
+login2:
+  name: login2
+  type: NOT IMPLEMENTED
+  primary_group: login
+  secondary_group: physical,compute,all
+  info: |
+    # System
+
+    The name's login node, login2 login node.
+vlogin01:
+  name: vlogin01
+  type: NOT IMPLEMENTED
+  primary_group: vlogin
+  secondary_group: virtual,compute,all
+  info: |
+    # System
+
+    The name's virtual login node, vlogin01 virtual login node.
+infra01:
+  name: infra01
+  type: NOT IMPLEMENTED
+  primary_group: infra
+  secondary_group: virtual,service,all
+  info: |
+    # System
+
+    Infra node 01
+infra02:
+  name: infra02
+  type: NOT IMPLEMENTED
+  primary_group: infra
+  secondary_group: virtual,service,all
+  info: |
+    # System
+
+    Infra node 02
+mds1:
+  name: mds1
+  type: NOT IMPLEMENTED
+  primary_group: mds
+  secondary_group: physical,service,storage,all
+  info: |
+    # System
+
+    MDS1
+oss1:
+  name: oss1
+  type: NOT IMPLEMENTED
+  primary_group: oss
+  secondary_group: physical,service,storage,all
+  info: |
+    # System
+
+    OSS1
+oss2:
+  name: oss2
+  type: NOT IMPLEMENTED
+  primary_group: oss
+  secondary_group: physical,service,storage,all
+  info: |
+    # System
+
+    OSS2
+master1:
+  name: master1
+  type: NOT IMPLEMENTED
+  primary_group: masters
+  secondary_group: physical,service,all
+  info: |
+    # System
+
+    Master1
+master2:
+  name: master2
+  type: NOT IMPLEMENTED
+  primary_group: masters
+  secondary_group: physical,service,all
+  info: |
+    # System
+
+    Master2
+nfs1:
+  name: nfs1
+  type: NOT IMPLEMENTED
+  primary_group: nfs
+  secondary_group: physical,service,storage,all
+  info: |
+    # System
+
+    NFS1
+admin01:
+  name: admin01
+  type: NOT IMPLEMENTED
+  primary_group: admin
+  secondary_group: virtual,service,all
+  info: |
+    # System
+
+    Admin01
+admin02:
+  name: admin02
+  type: NOT IMPLEMENTED
+  primary_group: admin
+  secondary_group: virtual,service,all
+  info: |
+    # System
+
+    Admin02
+thing01:
+  name: thing01
+  type: NOT IMPLEMENTED
+  primary_group: thing
+  secondary_group: physical,service,all
+  info: |
+    # System
+
+    A thing from benchware/metalware that doesn't fit into any group known by FC.
+local:
+  name: local
+  type: NOT IMPLEMENTED
+  primary_group: orphan
+  secondary_group:
+  info: |
+    # System
+
+    This is the `controller`.  Let's ignore things that are 'orphans'
+    (I think the controller should be the only one and we don't want
+    it in Flight Center.
+accsw1:
+  name: accsw1
+  type: NOT IMPLEMENTED
+  primary_group: sw
+  secondary_group: all
+  info: |
+    # System
+
+    Access switch 1 (manually added cos benchware doesn't know about switches).
+mgtsw1:
+  name: mgtsw1
+  type: NOT IMPLEMENTED
+  primary_group: sw
+  secondary_group: all
+  info: |
+    # System
+
+    Management switch 1 (manually added cos benchware doesn't know about switches).
+ibsw1:
+  name: ibsw1
+  type: NOT IMPLEMENTED
+  primary_group: ibsw
+  secondary_group: all
+  info: |
+    # System
+
+    Infiniband switch 1 (manually added cos benchware doesn't know about switches).
+array01:
+  name: array01
+  type: NOT IMPLEMENTED
+  primary_group: array
+  secondary_group: storage,all
+  info: |
+    # System
+
+    A lovely disk array (manually added cos benchware doesn't know about arrays).
+array02:
+  name: array02
+  type: NOT IMPLEMENTED
+  primary_group: array
+  secondary_group: storage,all
+  info: |
+    # System
+
+    Another lovely disk array (manually added cos benchware doesn't know about arrays).
