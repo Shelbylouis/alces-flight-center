@@ -13,7 +13,6 @@ class InitialiseAssignedContactsForOpenCases < ActiveRecord::Migration[5.2]
                        end
 
         kase.save!
-        kase.reload
       end
     end
   end
