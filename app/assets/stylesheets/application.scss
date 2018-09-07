@@ -184,3 +184,18 @@ a.filter {
     margin-right: -1rem;
   }
 }
+
+.markdown-modal {
+  text-align: center;
+
+  tr {
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-collapse: collapse;
+
+    ul {
+      float: left;
+      width: 85%;
+    }
+  }
+}
