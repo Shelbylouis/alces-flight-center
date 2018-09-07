@@ -1,0 +1,78 @@
+<a href="#markdown-modal" data-toggle="modal"><%=label%></a>
+<div class="modal fade markdown-modal" id="markdown-modal" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        This input has Markdown enabled styling<br/>
+        <table>
+          <tr>
+            <td><i>Italics</i></td>
+            <td>*text* or _text_</td>
+          </tr>
+          <tr>
+            <td><b>Bold</b></td>
+            <td>**text** or __text__</td>
+          <tr>
+          <tr>
+            <td><i><b>Both</b></i></td>
+            <td>***text*** or ___text___</td>
+          </tr>
+          <tr>
+            <td><s>Strikethrough</s></td>
+            <td>~text~</td>
+          </tr>
+          <tr>
+            <td><code>Code</code></td>
+            <td>`text`</td>
+          </tr>
+          <tr>
+            <td><a href>Link</a></td>
+            <td>[text](www.website.com)</td>
+          </tr>
+          <tr>
+            <td>Image</td>
+            <td>![text](www.imagelocation.com)</td>
+          </tr>
+          <tr>
+            <td><h1>Heading 1</h1></td>
+            <td># text</td>
+          </tr>
+          <tr>
+            <td><h2>Heading 2</h2></td>
+            <td>## text</td>
+          </tr>
+          <tr>
+            <td><h3>Heading 3</h3></td>
+            <td>### text</td>
+          </tr>
+          <tr>
+            <td><code>blocks<br/>of<br/>code</code></td>
+            <td>```<br/>text<br/>```<br/></td>
+          </tr>
+          <tr>
+            <td>
+              <ul>
+                <li>
+                  List
+                </li>
+                <li>
+                  List
+                </li>
+                <li>
+                  List
+                </li>
+              </ul>
+            </td>
+            <td>
+              * text<br/>
+              * text<br/>
+              * text<br/>
+            </td>
+          </tr>
+        </table>
+        Any character can be escaped with \
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
