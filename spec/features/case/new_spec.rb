@@ -107,5 +107,15 @@ RSpec.describe 'Case form', type: :feature, js: true do
     it 'has an assigned contact' do
       expect(assigned_case.contact.name).to eq('Mary Pri')
     end
+
+    context "when the admin isn't the default assignee" do
+      let(:new_admin) { create(:admin, name: 'Adam Min') }
+      let(:new_case) { create(:open_case, cluster: cluster, user: new_admin) }
+
+      it 'assigns the case to the admin creating the case' do
+        expect(site.default_assignee).not_to eq(new_admin)
+        expect(new_case.assignee).to eq(new_admin)
+      end
+    end
   end
 end
