@@ -93,28 +93,45 @@ RSpec.describe 'Case form', type: :feature, js: true do
     end
   end
 
-  describe 'default case assignment as an admin' do
+  describe 'default case assignment' do
     let(:admin) { create(:admin) }
     let!(:contact) { create(:primary_contact, site: site, name: 'Mary Pri') }
     let(:site) { create(:site, default_assignee: admin) }
     let(:cluster) { create(:cluster, site: site) }
     let(:assigned_case) { create(:open_case, cluster: cluster, user: contact) }
 
-    it 'has an assigned engineer' do
-      expect(assigned_case.assignee).to eq(admin)
+    context 'when the primary contact creates a case' do
+      it 'assigns the engineer to the default assignee' do
+        expect(assigned_case.assignee).to eq(admin)
+        expect(assigned_case.assignee).to eq(site.default_assignee)
+      end
+
+      it 'assigns the case to the primary contact' do
+        expect(assigned_case.contact.name).to eq('Mary Pri')
+      end
     end
 
-    it 'has an assigned contact' do
-      expect(assigned_case.contact.name).to eq('Mary Pri')
+    context 'when a regular contact creates a case' do
+      let(:new_contact) { create(:contact, site: site) }
+      let(:new_case) { create(:open_case, cluster: cluster, user: new_contact ) }
+
+      it 'assigns the case to the contact' do
+        expect(new_case.contact).to eq(new_contact)
+        expect(site.primary_contact).not_to eq(new_contact)
+      end
     end
 
-    context "when the admin isn't the default assignee" do
+    context "when an admin who isn't the default assignee creates a case" do
       let(:new_admin) { create(:admin, name: 'Adam Min') }
       let(:new_case) { create(:open_case, cluster: cluster, user: new_admin) }
 
       it 'assigns the case to the admin creating the case' do
         expect(site.default_assignee).not_to eq(new_admin)
         expect(new_case.assignee).to eq(new_admin)
+      end
+
+      it 'assigns the case to the primary contact' do
+        expect(new_case.contact).to eq(contact)
       end
     end
   end
