@@ -25,27 +25,18 @@
           <% end %>
         </ul>
       <% end %>
-      <div class="site-services">
-        <h4>Site services</h4>
-        <% if site.flight_directory_config.present? %>
+      <div class="site-console-services">
+        <h4>Console services</h4>
+        <% if !site.terminal_services.empty? %>
           <ul>
-            <li>
-              <h5>User and group directory</h5>
-              <span>
-                <%= link_to "Manage",
-                            site.directory_service_url,
-                            PolicyDependentOptions.wrap(
-                              {class: ['btn', 'btn-primary']},
-                              policy: policy(site.flight_directory_config).show?,
-                              action_description: 'manage user and group directory',
-                              user: current_user
-                            )
-                %>
-              </span>
-            </li>
+            <% site.terminal_services.each do |service| %>
+              <li>
+                <%= render 'sites/service', service: service %>
+              </li>
+            <% end %>
           </ul>
         <% else %>
-          No site services are currently available for this site.
+          No console services are currently available for this site.
         <% end %>
       </div>
     </div>

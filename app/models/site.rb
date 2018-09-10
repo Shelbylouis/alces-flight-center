@@ -11,7 +11,7 @@ class Site < ApplicationRecord
   has_many :cases, through: :clusters
   has_many :components, through: :clusters
   has_many :services, through: :clusters
-  has_one :flight_directory_config
+  has_many :terminal_services, class_name: 'SiteTerminalService'
 
   belongs_to :default_assignee,
              class_name: 'User',

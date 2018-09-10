@@ -45,6 +45,11 @@ Rails.application.routes.draw do
     end
   end
 
+  terminal_services = Proc.new do
+    resource :terminal_services,
+      only: [:show]
+  end
+
   constraints Clearance::Constraints::SignedIn.new { |user| user.admin? } do
 
     mount Resque::Server, at: '/resque'
@@ -52,7 +57,7 @@ Rails.application.routes.draw do
     root 'cases#assigned'
     resources :sites, only: [:show, :index] do
       cases.call(only: [:index, :new])
-      resource :terminal_services, only: [:show]
+      terminal_services.call
     end
 
     cases.call(only: []) do
@@ -103,6 +108,7 @@ Rails.application.routes.draw do
           post :import
         end
       end
+      terminal_services.call
     end
 
     resources :components, only: []  do
@@ -173,6 +179,7 @@ Rails.application.routes.draw do
 
       get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
       get '/checks(/:date)', to: 'clusters#view_checks', as: :checks
+      terminal_services.call
     end
 
     resources :components, only: :show do
@@ -198,7 +205,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resource :terminal_services, only: [:show]
+    terminal_services.call
     resource :users, only: [:show]
     resources :topics, only: [:index]
 

@@ -1,7 +1,4 @@
-class FlightDirectoryConfig < ApplicationRecord
-  include AdminConfig::FlightDirectoryConfig
-
-  belongs_to :site
+class TerminalService < ApplicationRecord
 
   validates :hostname, presence: true
   validates :username, presence: true

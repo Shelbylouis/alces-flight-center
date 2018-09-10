@@ -60,6 +60,19 @@ class ClusterDecorator < ApplicationDecorator
     end
   end
 
+  def terminal_service_url(service)
+    base_url = ENV.fetch('TERMINAL_SERVICE_BASE_URL')
+    "#{base_url}#{terminal_service_path(service)}"
+  end
+
+  def terminal_service_path(service)
+    "/clusters/#{to_param}/#{service.service_type}"
+  end
+
+  def terminal_services
+    super.sort_by {|s| s.center_ui['title']}
+  end
+
   # List the first day of each quarter since this cluster was created, including
   # the current quarter (as defined by `Date.today`).
   def all_quarter_start_dates

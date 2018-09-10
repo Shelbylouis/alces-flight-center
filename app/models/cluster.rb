@@ -24,6 +24,7 @@ class Cluster < ApplicationRecord
   has_many :check_results, through: :cluster_checks
 
   has_many :service_plans
+  has_many :terminal_services, class_name: 'ClusterTerminalService'
 
   validates_associated :site
   validates :name, presence: true
