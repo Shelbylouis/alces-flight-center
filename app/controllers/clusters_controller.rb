@@ -98,6 +98,28 @@ class ClustersController < ApplicationController
     authorize @cluster
   end
 
+  def upload_document
+    authorize @cluster
+
+    doc = params[:cluster_document]
+
+    result = @cluster.upload_document(
+      doc.original_filename,
+      doc.path
+    )
+
+    if result
+      flash[:success] = 'Document uploaded.'
+    else
+      flash[:error] = 'Could not upload document.'
+    end
+
+  rescue Aws::S3::Errors::ServiceError => e
+    flash[:error] = "Could not upload document: #{e.message}"
+  ensure
+    redirect_to cluster_documents_path(@cluster)
+  end
+
   private
 
   def start_date

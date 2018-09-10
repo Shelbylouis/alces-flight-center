@@ -1,5 +1,5 @@
 
-module Cluster::DocumentsRetriever
+module Cluster::DocumentsHandler
   Document = Struct.new(:name, :url)
 
   class << self
@@ -29,14 +29,17 @@ module Cluster::DocumentsRetriever
       []
     end
 
+    def store(name, file, documents_path)
+      obj_path = File.join(documents_path, name)
+      bucket = s3.bucket(BUCKET)
+
+      obj = bucket.object(obj_path)
+      obj.upload_file(file)
+    end
+
     private
 
     def objects_under_path(path)
-      s3 = Aws::S3::Resource.new(
-        access_key_id: ACCESS_KEY_ID,
-        secret_access_key: SECRET_ACCESS_KEY,
-        region: REGION
-      )
       response = s3.client.list_objects(
         bucket: BUCKET,
         prefix: path
@@ -51,6 +54,14 @@ module Cluster::DocumentsRetriever
         bucket: BUCKET,
         key: object.key,
         expires_in: 60.minutes.to_i
+      )
+    end
+
+    def s3
+      @s3 ||= Aws::S3::Resource.new(
+        access_key_id: ACCESS_KEY_ID,
+        secret_access_key: SECRET_ACCESS_KEY,
+        region: REGION
       )
     end
   end
