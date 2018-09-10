@@ -31,7 +31,7 @@ RSpec.describe 'Autoresize', type: :feature, js: true do
                           $('case_comment_text').on('load', function()
                           {
                             textarea_loaded = true;
-                          };)
+                          });
                         }
                        );
 
