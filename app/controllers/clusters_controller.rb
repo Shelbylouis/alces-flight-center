@@ -114,6 +114,9 @@ class ClustersController < ApplicationController
       flash[:error] = 'Could not upload document.'
     end
 
+  rescue Aws::S3::Errors::ServiceError => e
+    flash[:error] = "Could not upload document: #{e.message}"
+  ensure
     redirect_to cluster_documents_path(@cluster)
   end
 
