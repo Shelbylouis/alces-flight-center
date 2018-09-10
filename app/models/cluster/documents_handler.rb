@@ -1,5 +1,5 @@
 
-module Cluster::DocumentsRetriever
+module Cluster::DocumentsHandler
   Document = Struct.new(:name, :url)
 
   class << self

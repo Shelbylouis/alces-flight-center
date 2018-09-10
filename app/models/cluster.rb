@@ -51,7 +51,7 @@ class Cluster < ApplicationRecord
   end
 
   def documents
-    @documents ||= DocumentsRetriever.retrieve(documents_path)
+    @documents ||= DocumentsHandler.retrieve(documents_path)
   end
 
   def unfinished_related_maintenance_windows

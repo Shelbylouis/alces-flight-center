@@ -50,7 +50,7 @@ RSpec.describe 'cluster tabs', type: :feature do
       subject do
         cluster.tap do |c|
           allow_any_instance_of(Cluster).to receive(:documents).and_return([
-             Cluster::DocumentsRetriever::Document.new(
+             Cluster::DocumentsHandler::Document.new(
                  'Fake Document',
                  'http://www.example.com')
           ])
