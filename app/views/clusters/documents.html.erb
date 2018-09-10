@@ -29,13 +29,13 @@
       <% end %>
     <% end %>
   </ul>
-  <div class="d-flex">
+  <div class="d-flex my-2 mx-2">
     <% if policy(Note).create? %>
       <%=
         link_to 'Create new document',
                 new_cluster_note_path(cluster),
                 class: 'btn btn-primary',
-                style: 'flex-grow: 1;'
+                style: 'align-self: center; flex-grow: 1;'
       %>
     <% end %>
     <% if policy(cluster).upload_document? %>
