@@ -1,0 +1,24 @@
+<% if policy(@case).set_tier? %>
+  <%= form_for @case do |f| %>
+    <div class="form-group">
+      <div class="input-group">
+        <%= f.collection_select(
+              :tier_level,
+              [2, 3, 4],
+              :to_s,
+              :to_i,
+              {},
+              {
+                class: 'form-control'
+              }
+            )
+        %>
+        <div class="input-group-append">
+          <%= f.submit "Change tier",
+              class: 'btn btn-primary btn-sm'
+          %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>
