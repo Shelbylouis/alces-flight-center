@@ -97,6 +97,8 @@ Rails.application.routes.draw do
       post '/checks/submit/preview', to: 'cluster_checks#preview'
       post '/checks/submit/write', to: 'cluster_checks#write'
 
+      post :documents, to: 'clusters#upload_document', as: :upload_document
+
       resources :components, only: [] do
         collection do
           get :import, to: 'clusters#import_components'

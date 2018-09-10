@@ -98,6 +98,10 @@ class ClustersController < ApplicationController
     authorize @cluster
   end
 
+  def upload_document
+    authorize @cluster
+  end
+
   private
 
   def start_date
