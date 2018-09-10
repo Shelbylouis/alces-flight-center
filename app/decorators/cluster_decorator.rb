@@ -41,6 +41,7 @@ class ClusterDecorator < ApplicationDecorator
       },
       supportType: support_type,
       chargingInfo: charging_info,
+      showChargingInfo: show_charging_info?,
       # Encode MOTD in two forms: the raw form, to be used as the initial value
       # to be edited in the MOTD tool, and as sanitized, formatted HTML so the
       # current value can be displayed as it will be on the Cluster and in the
