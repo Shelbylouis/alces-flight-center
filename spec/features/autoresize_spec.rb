@@ -20,7 +20,7 @@ RSpec.describe 'Autoresize', type: :feature, js: true do
   }
 
   def textarea_height
-    page.evaluate_script("$('case_comment_text').height()")
+    page.evaluate_script("$('textarea').height()")
   end
 
   it 'resizes the textarea to match the height of the content' do
