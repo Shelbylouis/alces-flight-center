@@ -108,6 +108,7 @@ Rails.application.routes.draw do
           post :import
         end
       end
+      terminal_services.call
     end
 
     resources :components, only: []  do
@@ -178,6 +179,7 @@ Rails.application.routes.draw do
 
       get '/credit-usage(/:start_date)', to: 'clusters#credit_usage', as: :credit_usage
       get '/checks(/:date)', to: 'clusters#view_checks', as: :checks
+      terminal_services.call
     end
 
     resources :components, only: :show do

@@ -25,8 +25,8 @@
           <% end %>
         </ul>
       <% end %>
-      <div class="site-services">
-        <h4>Site services</h4>
+      <div class="site-console-services">
+        <h4>Console services</h4>
         <% if !site.terminal_services.empty? %>
           <ul>
             <% site.terminal_services.each do |service| %>
@@ -36,7 +36,7 @@
             <% end %>
           </ul>
         <% else %>
-          No site services are currently available for this site.
+          No console services are currently available for this site.
         <% end %>
       </div>
     </div>

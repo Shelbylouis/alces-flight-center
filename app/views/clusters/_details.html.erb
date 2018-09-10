@@ -42,6 +42,20 @@
         %>
       </li>
     </ul>
+    <div class="cluster-console-services">
+      <h4>Console services</h4>
+      <% if !cluster.terminal_services.empty? %>
+        <ul>
+          <% cluster.terminal_services.each do |service| %>
+            <li>
+              <%= render 'clusters/service', service: service %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        No console services are currently available for this cluster.
+      <% end %>
+    </div>
   </div>
   <div class="col-sm-12 col-md-6">
     <%= render 'clusters/credit_balance', cluster: cluster do %>

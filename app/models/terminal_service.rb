@@ -1,7 +1,4 @@
 class TerminalService < ApplicationRecord
-  include AdminConfig::TerminalService
-
-  belongs_to :site
 
   validates :hostname, presence: true
   validates :username, presence: true

@@ -1,6 +1,6 @@
 class TerminalServicesController < ApplicationController
   def show
-    config = @site.terminal_services.find_by(service_type: params[:service_type])
+    config = @scope.terminal_services.find_by(service_type: params[:service_type])
     if config.nil?
       render json: {}, status: 404
       return
@@ -17,8 +17,10 @@ class TerminalServicesController < ApplicationController
       },
       ui: config.console_ui,
       site: {
+        id: site.id,
         name: site.name,
       },
+      cluster: cluster_json,
       # Deprecated structure.  Remove once flight console and flight console
       # api have been deployed to not use it.
       flight_directory_config: {
@@ -26,6 +28,16 @@ class TerminalServicesController < ApplicationController
         username: config.username,
         ssh_key: config.encrypted_ssh_key,
       },
+    }
+  end
+
+  private
+
+  def cluster_json
+    return nil unless @scope.is_a?(Cluster)
+    {
+      id: @scope.id,
+      name: @scope.name,
     }
   end
 end

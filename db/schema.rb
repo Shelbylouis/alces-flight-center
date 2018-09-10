@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_05_165332) do
+ActiveRecord::Schema.define(version: 2018_09_10_010015) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -387,13 +387,16 @@ ActiveRecord::Schema.define(version: 2018_09_05_165332) do
   create_table "terminal_services", force: :cascade do |t|
     t.string "hostname", limit: 255, null: false
     t.string "username", limit: 255, null: false
-    t.bigint "site_id", null: false
+    t.bigint "site_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "encrypted_ssh_key", limit: 4096, null: false
     t.string "service_type", null: false
     t.jsonb "center_ui", null: false
     t.jsonb "console_ui", null: false
+    t.string "type", null: false
+    t.bigint "cluster_id"
+    t.index ["cluster_id"], name: "index_terminal_services_on_cluster_id"
     t.index ["site_id"], name: "index_terminal_services_on_site_id"
   end
 
@@ -472,6 +475,7 @@ ActiveRecord::Schema.define(version: 2018_09_05_165332) do
   add_foreign_key "services", "clusters"
   add_foreign_key "services", "service_types"
   add_foreign_key "sites", "users", column: "default_assignee_id"
+  add_foreign_key "terminal_services", "clusters"
   add_foreign_key "terminal_services", "sites"
   add_foreign_key "topics", "sites"
   add_foreign_key "users", "sites"
