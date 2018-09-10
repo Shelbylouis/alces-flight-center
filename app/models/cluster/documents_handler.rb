@@ -30,8 +30,6 @@ module Cluster::DocumentsHandler
     end
 
     def store(name, file, documents_path)
-      p "Going to upload #{name} from #{file} to #{documents_path}"
-
       obj_path = File.join(documents_path, name)
       bucket = s3.bucket(BUCKET)
 
