@@ -28,9 +28,9 @@ RSpec.describe 'Autoresize', type: :feature, js: true do
 
     page.execute_script(%{
                           textarea_loaded = false;
-                          $('case_comment_text').load(function() {
+                          $('case_comment_text').on('load', (function() {
                             textarea_loaded = true;
-                            });
+                            });)
                         });
 
     initial_height = textarea_height
