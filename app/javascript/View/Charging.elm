@@ -74,20 +74,21 @@ infoModal state =
             -- if we regularly need to change this we should move it from being
             -- embedded within the app.
             String.Extra.unindent """
-                _Credit allocation to issues is based on total time spent on
-                the issue by our engineers:_
+                *Credit allocation to cases is based on the total time worked by our engineers:*
 
-                0 to 30m - 0 Credits
+                * 0 to 30 minutes ➝ **0** credits
 
-                30m to 3h - 1 Credits
+                * 30 minutes to 3 hours ➝ **1** credit
 
-                3h to 6h - 2 Credits
+                * 3 to 6 hours ➝ **2** credits
 
-                6h to 9h - 3 Credits
+                * 6 to 9 hours ➝ **3** credits
 
-                9h to 12h - 4 Credits
+                * 9 to 12 hours ➝ **4** credits
 
-                &gt; 12h - 5 Credits
+                * Over 12 hours ➝ **5** credits
+
+                *Note that time worked is measured in business (not elapsed) hours.*
             """
     in
     Modal.config (ClusterChargingInfoModal Modal.hidden)
