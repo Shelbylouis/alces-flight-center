@@ -88,7 +88,7 @@ infoModal state =
 
                 * Over 12 hours ➝ **5** credits
 
-                * Note that time worked is measured in business (not elapsed) hours.*
+                *Note that time worked is measured in business (not elapsed) hours.*
             """
     in
     Modal.config (ClusterChargingInfoModal Modal.hidden)
