@@ -135,6 +135,9 @@
           <%= @case.tier_description %>
           <%= render 'cases/escalation_controls' %>
         </td>
+        <td/><td>
+          <%= render 'cases/tier_controls' %>
+        </td>
       </tr>
       <% unless @case.maintenance_windows.unfinished.empty? %>
         <tr>
