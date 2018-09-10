@@ -29,6 +29,10 @@ class SiteDecorator < ApplicationDecorator
     end
   end
 
+  def terminal_services
+    super.sort_by {|s| s.center_ui['title']}
+  end
+
   private
 
   # When a Site user is signed in we don't want/need the `/sites/:site_id`

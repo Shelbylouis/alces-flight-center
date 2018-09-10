@@ -65,6 +65,10 @@ class ClusterDecorator < ApplicationDecorator
     "#{base_url}/clusters/#{id}/#{service.service_type}"
   end
 
+  def terminal_services
+    super.sort_by {|s| s.center_ui['title']}
+  end
+
   # List the first day of each quarter since this cluster was created, including
   # the current quarter (as defined by `Date.today`).
   def all_quarter_start_dates
