@@ -28,10 +28,12 @@ RSpec.describe 'Autoresize', type: :feature, js: true do
 
     page.execute_script(%{
                           textarea_loaded = false;
-                          $('case_comment_text').on('load', (function() {
+                          $('case_comment_text').on('load', function()
+                          {
                             textarea_loaded = true;
-                            });)
-                        });
+                          };)
+                        }
+                       );
 
     initial_height = textarea_height
     fill_in 'case_comment_text', with: content
