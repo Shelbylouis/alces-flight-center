@@ -24,6 +24,9 @@ module AdminConfig::TerminalService
         configure :encrypted_ssh_key do
           hide
         end
+        configure :type do
+          hide
+        end
       end
     end
   end

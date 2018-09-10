@@ -1,5 +1,5 @@
 class SiteTerminalService < TerminalService
-  include AdminConfig::TerminalService
+  include AdminConfig::SiteTerminalService
 
   belongs_to :site
 end
