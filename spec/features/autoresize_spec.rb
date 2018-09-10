@@ -26,21 +26,8 @@ RSpec.describe 'Autoresize', type: :feature, js: true do
   it 'resizes the textarea to match the height of the content' do
     visit cluster_case_path(cluster, kase, as: admin)
 
-    page.execute_script(%{
-                          textarea_loaded = false;
-                          $('case_comment_text').on('load', function()
-                          {
-                            textarea_loaded = true;
-                          });
-                        }
-                       );
-
     initial_height = textarea_height
     fill_in 'case_comment_text', with: content
-
-    Timeout.timeout(Capybara.default_wait_time) do
-      loop until page.evaluate_script('textarea_loaded')
-    end
 
     expect(textarea_height).to be > initial_height
   end
