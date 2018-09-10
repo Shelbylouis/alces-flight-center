@@ -189,10 +189,8 @@ a.filter {
   text-align: center;
 
   .modal-dialog {
-    position: relative;
     display: table;
     overflow-x: auto;
-    width: auto;
 
     table {
       text-align:left;
@@ -201,7 +199,6 @@ a.filter {
       tr {
         border-top: 1px solid;
         border-bottom: 1px solid;
-        border-collapse: collapse;
 
         td {
           padding: 3px;
