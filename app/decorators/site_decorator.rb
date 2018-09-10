@@ -22,10 +22,14 @@ class SiteDecorator < ApplicationDecorator
 
   def terminal_service_url(service)
     base_url = ENV.fetch('TERMINAL_SERVICE_BASE_URL')
+    "#{base_url}#{terminal_service_path(service)}"
+  end
+
+  def terminal_service_path(service)
     if current_user.admin?
-      "#{base_url}/sites/#{id}/#{service.service_type}"
+      "/sites/#{to_param}/#{service.service_type}"
     else
-      "#{base_url}/#{service.service_type}"
+      "/#{service.service_type}"
     end
   end
 

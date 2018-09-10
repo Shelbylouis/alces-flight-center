@@ -15,12 +15,16 @@ class TerminalServicesController < ApplicationController
         username: config.username,
         key: config.encrypted_ssh_key,
       },
-      ui: config.console_ui,
+      ui: config.console_ui.merge({
+        breadcrumbs: breadcrumbs(config)
+      }),
       site: {
         id: site.id,
-        name: site.name,
+        link: {
+          site: 'Center',
+          path: user_aware_site_path(site),
+        },
       },
-      cluster: cluster_json,
       # Deprecated structure.  Remove once flight console and flight console
       # api have been deployed to not use it.
       flight_directory_config: {
@@ -33,11 +37,45 @@ class TerminalServicesController < ApplicationController
 
   private
 
-  def cluster_json
-    return nil unless @scope.is_a?(Cluster)
-    {
-      id: @scope.id,
-      name: @scope.name,
-    }
+  def breadcrumbs(service)
+    site = service.site
+    cluster = @scope.is_a?(Cluster) ? @scope : nil
+    [
+      current_user.admin? ? {
+        text: 'All sites',
+        icon: 'globe',
+        link: {
+          site: 'Center',
+          path: sites_path,
+        },
+      } : nil,
+      {
+        text: site.name,
+        icon: 'institution',
+        link: {
+          site: 'Center',
+          path: user_aware_site_path(site),
+        }
+      },
+      cluster.nil? ? nil : {
+        text: cluster.name,
+        icon: 'server',
+        link: {
+          site: 'Center',
+          path: cluster_path(cluster),
+        },
+      },
+      {
+        text: service.console_ui['title'],
+        icon: service.console_ui['icon'],
+        link: {
+          path: @scope.decorate.terminal_service_path(service),
+        },
+      },
+    ].compact
+  end
+
+  def user_aware_site_path(site)
+    current_user.admin? ? site_path(site) : root_path
   end
 end

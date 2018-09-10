@@ -62,7 +62,11 @@ class ClusterDecorator < ApplicationDecorator
 
   def terminal_service_url(service)
     base_url = ENV.fetch('TERMINAL_SERVICE_BASE_URL')
-    "#{base_url}/clusters/#{id}/#{service.service_type}"
+    "#{base_url}#{terminal_service_path(service)}"
+  end
+
+  def terminal_service_path(service)
+    "/clusters/#{to_param}/#{service.service_type}"
   end
 
   def terminal_services
