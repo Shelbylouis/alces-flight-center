@@ -187,23 +187,30 @@ a.filter {
 
 .markdown-modal {
   text-align: center;
-  
-  table {
-    align: center;
 
-    tr {
-      border-top: 1px solid;
-      border-bottom: 1px solid;
-      border-collapse: collapse;
+  .modal-dialog {
+    position: relative;
+    display: table;
+    overflow-x: auto;
+    width: auto;
 
-      ul {
-        float: left;
-        width: 85%;
-      }
+    table {
+      text-align:left;
+      width: 100%;
 
-      ol {
-        float: left;
-        width: 85%;
+      tr {
+        border-top: 1px solid;
+        border-bottom: 1px solid;
+        border-collapse: collapse;
+
+        td {
+          padding: 3px;
+          padding-left: 10px;
+
+          ul {
+            padding-left: 10px;
+          }
+        }
       }
     }
   }
