@@ -41,10 +41,10 @@
     <% if policy(cluster).upload_document? %>
       <%= form_tag cluster_upload_document_path(@cluster), multipart: true, class: 'form-inline' do %>
         <div class="form-group">
-          <label class="mx-2" for="cluster-document">Or upload a document:</label>
+          <label class="mx-2" for="cluster_document">Or upload a document:</label>
           <div class="input-group">
             <%=
-              file_field_tag 'cluster-document', class: 'form-control'
+              file_field_tag 'cluster_document', class: 'form-control'
             %>
             <div class="input-group-append">
               <%= submit_tag 'Upload', class: 'btn btn-primary' %>

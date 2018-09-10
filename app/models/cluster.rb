@@ -54,6 +54,10 @@ class Cluster < ApplicationRecord
     @documents ||= DocumentsHandler.retrieve(documents_path)
   end
 
+  def upload_document(name, file)
+    DocumentsHandler.store(name, file, documents_path)
+  end
+
   def unfinished_related_maintenance_windows
     parts = [self, *components, *component_groups, *services]
     parts
