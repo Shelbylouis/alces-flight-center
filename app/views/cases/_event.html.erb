@@ -1,9 +1,12 @@
 <% if !local_assigns.fetch(:admin_only, false) || current_user.admin? %>
-  <div class="card event-card">
+  <div class="<%=local_assigns.fetch(:admin_only, false) ? 'card event-card admin-card' : 'card event-card'%>">
     <div class="card-header d-inline-flex justify-content-between align-items-center">
+      <% if local_assigns.fetch(:admin_only, false) %>
+        <%= icon('lock', {:title=>'Only visible to engineers'}) =%>
+      <% end %>
       <span><%= date.to_formatted_s(:long) %> - <b><%= name %></b></span>
       <div title="<%= details %>">
-          <%= icon(type) %>
+        <%= icon(type) %>
       </div>
     </div>
     <div class="card-body">
