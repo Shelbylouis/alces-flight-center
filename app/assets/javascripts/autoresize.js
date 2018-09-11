@@ -1,5 +1,5 @@
 function enableAutoResize() {
-  $('textarea').autoresize();
+  autosize(document.querySelector('textarea'))
 }
 
 document.addEventListener('turbolinks:load', enableAutoResize);
