@@ -20,6 +20,7 @@ RSpec.describe ClusterDecorator do
         id: 1,
         name: 'Some Cluster',
         support_type: :managed,
+        show_charging_info: true,
         charging_info: '£1000',
         motd: 'Some MOTD',
       ).tap do |cluster|
@@ -39,6 +40,7 @@ RSpec.describe ClusterDecorator do
         components: subject.components.map(&:case_form_json),
         services: array_including(standard_expected_services_json),
         supportType: 'managed',
+        showChargingInfo: true,
         chargingInfo: '£1000',
         motd: 'Some MOTD',
         motdHtml: h.simple_format('Some MOTD')
