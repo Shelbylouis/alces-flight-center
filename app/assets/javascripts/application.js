@@ -19,6 +19,7 @@
 //= require bootstrap-datepicker
 //= require jquery.scrollTo.min.js
 //= require jquery.validate.min.js
+//= require textarea-autosize.js
 //
 
 function enableTooltips() {
