@@ -93,7 +93,7 @@ class CasesController < ApplicationController
     end
   end
 
-  ADMIN_UPDATABLE_FIELDS = [:assignee_id, :contact_id, :subject, :issue_id].freeze
+  ADMIN_UPDATABLE_FIELDS = [:assignee_id, :contact_id, :subject, :issue_id, :tier_level].freeze
   CONTACT_UPDATABLE_FIELDS = [:contact_id].freeze
 
   def update
