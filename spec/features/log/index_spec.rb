@@ -69,7 +69,7 @@ RSpec.feature Log, type: :feature do
       log_details = fill_details_input
       submit_log
       visit current_path
-      log_row_html = page.find(logs_selector).native.inner_html
+      log_row_html = page.first(logs_selector).native.inner_html
 
       expect(log_row_html).to include(MarkdownRenderer.render(log_details))
     end
