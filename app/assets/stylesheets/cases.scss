@@ -37,6 +37,20 @@
   }
 }
 
+.admin-card {
+  .card-header {
+    background-color: LemonChiffon;
+
+    span {
+      margin-left: 1rem;
+    }
+  }
+
+  .card-body {
+    background-color: LemonChiffon;
+  }
+}
+
 .case-table th {
   text-align: right;
 }
