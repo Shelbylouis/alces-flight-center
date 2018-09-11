@@ -35,8 +35,13 @@ import View.Utils
 view : State -> Html Msg
 view state =
     let
+        isChargeable =
+            Cluster.isTierChargeable
+                (State.selectedCluster state)
+                (State.selectedTier state)
+
         submitMsg =
-            if State.selectedTier state |> Tier.isChargeable then
+            if isChargeable then
                 ChargeablePreSubmissionModal Modal.shown
             else
                 StartSubmit

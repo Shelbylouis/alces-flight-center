@@ -5,6 +5,7 @@ module Cluster
         , asServicesIn
         , decoder
         , extractId
+        , isTierChargeable
         , setSelectedCategory
         , setSelectedComponent
         , setSelectedIssue
@@ -25,6 +26,7 @@ import Maybe.Extra
 import Service exposing (Service)
 import SupportType exposing (SupportType)
 import Tier
+import Tier.Level
 import Utils
 
 
@@ -34,6 +36,7 @@ type alias Cluster =
     , components : DrillDownSelectList Component
     , services : DrillDownSelectList Service
     , supportType : SupportType
+    , showChargingInfo : Bool
     , chargingInfo : Maybe String
     , motd : String
     , motdHtml : String
@@ -67,6 +70,7 @@ decodeWithMotd maybeMotd =
         |> P.required "services"
             (DrillDownSelectList.nameOrderedDecoder serviceDecoder)
         |> P.required "supportType" SupportType.decoder
+        |> P.required "showChargingInfo" D.bool
         |> P.required "chargingInfo"
             (D.nullable D.string
                 |> D.map
@@ -200,3 +204,13 @@ setServices services cluster =
 asServicesIn : Cluster -> DrillDownSelectList Service -> Cluster
 asServicesIn =
     flip setServices
+
+
+isTierChargeable : Cluster -> Tier.Tier -> Bool
+isTierChargeable cluster tier =
+    case tier.level of
+        Tier.Level.Three ->
+            cluster.showChargingInfo
+
+        _ ->
+            False

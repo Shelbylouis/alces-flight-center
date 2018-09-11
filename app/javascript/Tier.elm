@@ -7,7 +7,6 @@ module Tier
         , encodeContentPair
         , extractId
         , fields
-        , isChargeable
         , setFieldValue
         )
 
@@ -182,13 +181,3 @@ setFieldValue tier index value =
                     MotdTool <| updateFields fields
     in
     { tier | content = newContent }
-
-
-isChargeable : Tier -> Bool
-isChargeable tier =
-    case tier.level of
-        Level.Three ->
-            True
-
-        _ ->
-            False

@@ -9,6 +9,7 @@ import Bootstrap.Alert as Alert
 import Bootstrap.Button as Button
 import Bootstrap.Modal as Modal
 import Bootstrap.Utilities.Spacing as Spacing
+import Cluster exposing (isTierChargeable)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -16,14 +17,15 @@ import Markdown
 import Msg exposing (..)
 import State exposing (State)
 import String.Extra
-import Tier
 
 
 chargeableAlert : State -> Maybe (Html Msg)
 chargeableAlert state =
     let
         isChargeable =
-            Tier.isChargeable <| State.selectedTier state
+            isTierChargeable
+                (State.selectedCluster state)
+                (State.selectedTier state)
 
         alertChildren =
             List.intersperse (text " ")
