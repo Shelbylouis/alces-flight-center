@@ -1032,6 +1032,74 @@ RSpec.describe 'Case page', type: :feature do
           expect { assignment_td.find('select') }.to raise_error(Capybara::ElementNotFound)
         end
       end
+
+      context 'for a T4 case' do
+        context 'with an active change request' do
+          let!(:cr) { create(:change_request, case: open_case, state: 'draft') }
+
+          it 'hides assignment controls' do
+            visit cluster_case_path(cluster, open_case, as: admin)
+            assignment_td = find('#case-tier-assignment')
+
+            expect { assignment_td.find('select') }.to raise_error(Capybara::ElementNotFound)
+          end
+        end
+
+        context 'with a finalised change request' do
+          let(:cr) { create(:change_request, case: open_case, state: 'cancelled') }
+          let(:cr_case) {
+            create(:open_case, tier_level: 4, change_request: cr, cluster: cluster)
+          }
+
+          it 'displays assignment controls' do
+            visit cluster_case_path(cluster, cr_case, as: admin)
+            assignment_select = find('#case-tier-assignment').find('select')
+
+            options = assignment_select.all('option').map(&:text)
+            expect(options).to eq(['2 (Routine Maintenance)', '3 (General Support)'])
+          end
+
+          it 'transitions from T4 -> T3' do
+            visit cluster_case_path(cluster, cr_case, as: admin)
+
+            find('#case-tier-assignment').select('2 (Routine Maintenance)')
+            within('#case-tier-assignment') do
+              click_on('Change tier')
+            end
+
+            expect(find('.alert-success'))
+              .to have_text "Support case #{cr_case.display_id} updated."
+
+            cr_case.reload
+            expect(cr_case.tier_level).to eq(2)
+
+            event_cards = all('.event-card')
+            expect(event_cards[0].find('.card-body').text).to eq(
+              'Set this case to tier 2 (Routine Maintenance).'
+            )
+          end
+
+          it 'transitions from T4 -> T2' do
+            visit cluster_case_path(cluster, cr_case, as: admin)
+
+            find('#case-tier-assignment').select('2 (Routine Maintenance)')
+            within('#case-tier-assignment') do
+              click_on('Change tier')
+            end
+
+            expect(find('.alert-success'))
+              .to have_text "Support case #{cr_case.display_id} updated."
+
+            cr_case.reload
+            expect(cr_case.tier_level).to eq(2)
+
+            event_cards = all('.event-card')
+            expect(event_cards[0].find('.card-body').text).to eq(
+              'Set this case to tier 2 (Routine Maintenance).'
+            )
+          end
+        end
+      end
     end
 
     context 'as a contact' do
