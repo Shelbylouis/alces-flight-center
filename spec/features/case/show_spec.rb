@@ -994,6 +994,11 @@ RSpec.describe 'Case page', type: :feature do
 
         open_case.reload
         expect(open_case.tier_level).to eq(3)
+
+        event_cards = all('.event-card')
+        expect(event_cards[0].find('.card-body').text).to eq(
+          'Escalated this case to tier 3 (General Support).'
+        )
       end
 
       it 'transitions from T3 -> T2' do
@@ -1009,6 +1014,11 @@ RSpec.describe 'Case page', type: :feature do
 
         open_case.reload
         expect(open_case.tier_level).to eq(2)
+
+        event_cards = all('.event-card')
+        expect(event_cards[0].find('.card-body').text).to eq(
+          'Set this case to tier 2 (Routine Maintenance).'
+        )
       end
     end
 
