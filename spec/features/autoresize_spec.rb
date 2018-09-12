@@ -54,11 +54,30 @@ EOF
     fill_in 'case_comment_text', with: content
 
     expect(textarea_height).to be > initial_height
+  end
 
-    # Also check height is maintained after toggling to preview and back
-    click_on 'Preview'
-    click_on 'Write'
-    wait_for_ajax
-    expect(textarea_height).to be > initial_height
+  unless ENV.fetch('TRAVIS', false)
+
+    it 'preserves height when preview is toggled' do
+      visit cluster_case_path(cluster, kase, as: admin)
+
+      initial_height = textarea_height
+
+      Capybara.current_session.driver.execute_script(
+        'arguments[0].scrollIntoView();',
+        find('#case_comment_text').native
+      )
+
+      fill_in 'case_comment_text', with: content
+
+      click_on 'Preview'
+      click_on 'Write'
+      wait_for_ajax
+
+      # Note - height will not be the same as before the preview since the
+      # browser viewport will have shifted, but it should still be resizing to
+      # larger than it was originally.
+      expect(textarea_height).to be > initial_height
+    end
   end
 end
