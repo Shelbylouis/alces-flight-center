@@ -113,7 +113,11 @@ module Audited
 
     def tier_level_text(from, to)
       if to >= 2 && from <= 3
-        "Set this case to tier #{h.tier_description(to)}."
+        if to > from
+          "Escalated this case to tier #{h.tier_description(to)}."
+        else
+          "Set this case to tier #{h.tier_description(to)}."
+        end
       elsif from.nil?  # Hide initial transitions caused by data migration
         nil
       else
