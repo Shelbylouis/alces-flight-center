@@ -123,6 +123,13 @@ class CasesController < ApplicationController
     end
   end
 
+  def reopen
+    change_action "Support case %s reopened." do |kase|
+      kase.reopen!(current_user)
+      CaseMailer.reopen_case(kase, current_user).deliver_later
+    end
+  end
+
   def set_time
     times = params.require(:time).permit(:hours, :minutes)
 

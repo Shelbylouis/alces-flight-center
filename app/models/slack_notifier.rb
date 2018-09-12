@@ -149,15 +149,15 @@ class SlackNotifier
       send_notification(issue_note)
     end
 
-    def resolved_case_notification(kase, user, text)
-      resolved_note = {
+    def case_state_notification(kase, user, text)
+      note = {
         fallback: text,
         author_name: user.name,
         title: subject_and_id_title(kase),
         title_link: cluster_case_url(kase.cluster, kase),
         text: text
       }
-      send_notification(resolved_note)
+      send_notification(note)
     end
 
     def cluster_check_submission_notification(cluster, user, text)

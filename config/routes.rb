@@ -142,6 +142,7 @@ Rails.application.routes.draw do
       # Actions for cases, for admins and site users, belong here.
       member do
         post :escalate
+        post :reopen
       end
 
       resource :change_request, only: [:show], path: 'change-request' do

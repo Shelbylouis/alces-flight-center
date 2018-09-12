@@ -123,7 +123,16 @@ class CaseMailer < ApplicationMailer
     @text = "#{@case.display_id} has been resolved by #{@user.name} and is awaiting closure"
 
     mail( subject: @case.email_reply_subject )
-    SlackNotifier.resolved_case_notification(@case, @user, @text)
+    SlackNotifier.case_state_notification(@case, @user, @text)
+  end
+
+  def reopen_case(kase, user)
+    @case = kase
+    @user = user
+    @text = "#{@case.display_id} has been reopened by #{@user.name}."
+
+    mail( subject: @case.email_reply_subject )
+    SlackNotifier.case_state_notification(@case, @user, @text)
   end
 
   def reassigned_case(kase, old_contact, new_contact)

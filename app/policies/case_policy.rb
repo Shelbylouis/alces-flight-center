@@ -5,14 +5,16 @@ class CasePolicy < ApplicationPolicy
     editor? && !@record.issue&.administrative?
   end
 
-  alias_method :close?, :admin?
-  alias_method :assign_engineer?, :admin?
-
+  alias_method :reopen?, :editor?
   alias_method :resolve?, :admin?
+  alias_method :close?, :admin?
+
+  alias_method :assign_engineer?, :admin?
   alias_method :set_time?, :admin?
   alias_method :set_commenting?, :admin?
   alias_method :edit_associations?, :admin?
   alias_method :edit?, :admin?
+
 
   def redirect_to_canonical_path?
     true
