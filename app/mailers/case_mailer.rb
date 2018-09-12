@@ -55,15 +55,6 @@ class CaseMailer < ApplicationMailer
     SlackNotifier.issue_notification(@case, @old, @new)
   end
 
-  def change_tier_level(my_case, old_tier_level, new_tier_level)
-    @case = my_case
-    @text = "Set this case to tier #{view_context.tier_description(@case.tier_level)}."
-    mail(
-      subject: @case.email_reply_subject
-    )
-    SlackNotifier.tier_level_notification(@case, @text)
-  end
-
   def comment(comment)
     @comment = comment
     @case = @comment.case

@@ -287,14 +287,4 @@ RSpec.describe 'Case mailer', :type => :mailer do
 
     include_examples 'Slack'
   end
-
-  describe 'Tier level change emails' do
-    subject { CaseMailer.change_tier_level(kase, kase.tier_level, 3) }
-
-    let(:text) { "Set this case to tier 3 (General Support)." }
-    let(:notification_method) { :tier_level_notification }
-    let(:slack_args) { [kase, text] }
-
-    include_examples 'Slack'
-  end
 end

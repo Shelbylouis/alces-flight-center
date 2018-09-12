@@ -188,16 +188,6 @@ class SlackNotifier
       send_notification(reassigned_case_note)
     end
 
-    def tier_level_notification(kase, text)
-      tier_level_note = {
-        fallback: text,
-        title: subject_and_id_title(kase),
-        title_link: cluster_case_url(kase.cluster, kase),
-        text: text
-      }
-      send_notification(tier_level_note)
-    end
-
     private
 
     def maintenance_notification(kase, text, colour)
