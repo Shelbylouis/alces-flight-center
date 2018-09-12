@@ -58,6 +58,7 @@ EOF
     # Also check height is maintained after toggling to preview and back
     click_on 'Preview'
     click_on 'Write'
+    sleep(1)  # Give scripts a chance to happen
     expect(textarea_height).to be > initial_height
   end
 end
