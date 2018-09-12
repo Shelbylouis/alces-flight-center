@@ -1012,8 +1012,8 @@ RSpec.describe 'Case page', type: :feature do
         expect(find('.alert-success'))
           .to have_text "Support case #{consultancy_case.display_id} updated."
 
-        open_case.reload
-        expect(open_case.tier_level).to eq(2)
+        consultancy_case.reload
+        expect(consultancy_case.tier_level).to eq(2)
 
         event_cards = all('.event-card')
         expect(event_cards[0].find('.card-body').text).to eq(
