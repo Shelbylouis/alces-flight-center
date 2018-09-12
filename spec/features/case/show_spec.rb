@@ -1020,10 +1020,22 @@ RSpec.describe 'Case page', type: :feature do
           'Set this case to tier 2 (Routine Maintenance).'
         )
       end
+
+      context 'for an administrative case' do
+        let(:issue) { create(:administrative_issue) }
+        let(:admin_case) { create(:open_case, issue: issue, cluster: cluster) }
+
+        it 'hides assignment controls' do
+          visit cluster_case_path(cluster, admin_case, as: admin)
+          assignment_td = find('#case-tier-assignment')
+
+          expect { assignment_td.find('select') }.to raise_error(Capybara::ElementNotFound)
+        end
+      end
     end
 
     context 'as a contact' do
-      it 'does not display assignment controls' do
+      it 'hides assignment controls' do
         visit cluster_case_path(cluster, open_case, as: contact)
         assignment_td = find('#case-tier-assignment')
 
