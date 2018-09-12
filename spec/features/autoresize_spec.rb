@@ -54,5 +54,10 @@ EOF
     fill_in 'case_comment_text', with: content
 
     expect(textarea_height).to be > initial_height
+
+    # Also check height is maintained after toggling to preview and back
+    click_on 'Preview'
+    click_on 'Write'
+    expect(textarea_height).to be > initial_height
   end
 end
