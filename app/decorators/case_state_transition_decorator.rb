@@ -15,8 +15,10 @@ class CaseStateTransitionDecorator < ApplicationDecorator
     case event
     when 'resolve'
       return 'This case was marked as resolved.', 'check-circle-o'
+    when 'reopen'
+      return 'This case was reopened.', 'times-circle-o'
     when 'close'
-      return 'This case was closed.', 'times-circle-o'
+      return 'This case was closed.', 'lock'
     end
   end
 end
