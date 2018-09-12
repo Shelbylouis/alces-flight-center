@@ -1,7 +1,5 @@
 require 'slack-notifier'
 class CaseMailer < ApplicationMailer
-  include ApplicationHelper
-
   layout 'case_mailer'
 
   default bcc: Rails.application.config.email_bcc_address
@@ -59,7 +57,7 @@ class CaseMailer < ApplicationMailer
 
   def change_tier_level(my_case, old_tier_level, new_tier_level)
     @case = my_case
-    @text = "Set this case to tier #{tier_description(@case.tier_level)}."
+    @text = "Set this case to tier #{view_context.tier_description(@case.tier_level)}."
     mail(
       subject: @case.email_reply_subject
     )
