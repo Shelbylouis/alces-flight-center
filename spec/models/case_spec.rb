@@ -459,17 +459,6 @@ RSpec.describe Case, type: :model do
   end
 
   describe '#change_request' do
-    it 'cannot be present if tier_level is less than 4' do
-      kase = build(:open_case, tier_level: 3)
-      build(:change_request, case: kase)
-
-      expect do
-        kase.save!
-      end.to raise_error ActiveRecord::RecordInvalid
-      expect(kase.errors.messages).to include(
-        change_request: ['must be blank']
-      )
-    end
     it 'must be present if tier_level is 4' do
       kase = build(:open_case, tier_level: 4)
 
