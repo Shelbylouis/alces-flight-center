@@ -13,6 +13,11 @@ class CaseMailerPreview < ApplicationMailerPreview
     CaseMailer.change_contact_id(my_case, nil, User.admins.first.id)
   end
 
+  def change_tier_level
+    my_case = get_case
+    CaseMailer.change_tier_level(my_case, my_case.tier_level, 3)
+  end
+
   def comment
     my_comment = CaseComment.first || FactoryBot.build_stubbed(:case_comment)
     CaseMailer.comment(my_comment)
@@ -45,6 +50,7 @@ class CaseMailerPreview < ApplicationMailerPreview
   def reassign_case
     CaseMailer.reassigned_case(get_case, user, get_case.site.primary_contact)
   end
+
 
   private
 
