@@ -980,6 +980,36 @@ RSpec.describe 'Case page', type: :feature do
         options = assignment_select.all('option').map(&:text)
         expect(options).to eq(['2 (Routine Maintenance)', '3 (General Support)'])
       end
+
+      it 'transitions from T2 -> T3' do
+        visit cluster_case_path(cluster, open_case, as: admin)
+
+        find('#case-tier-assignment').select('3 (General Support)')
+        within('#case-tier-assignment') do
+          click_on('Change tier')
+        end
+
+        expect(find('.alert-success'))
+          .to have_text "Support case #{open_case.display_id} updated."
+
+        open_case.reload
+        expect(open_case.tier_level).to eq(3)
+      end
+
+      it 'transitions from T3 -> T2' do
+        visit cluster_case_path(cluster, consultancy_case, as: admin)
+
+        find('#case-tier-assignment').select('2 (Routine Maintenance)')
+        within('#case-tier-assignment') do
+          click_on('Change tier')
+        end
+
+        expect(find('.alert-success'))
+          .to have_text "Support case #{consultancy_case.display_id} updated."
+
+        open_case.reload
+        expect(open_case.tier_level).to eq(2)
+      end
     end
 
     context 'as a contact' do
