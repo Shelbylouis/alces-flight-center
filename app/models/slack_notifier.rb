@@ -188,8 +188,7 @@ class SlackNotifier
       send_notification(reassigned_case_note)
     end
 
-    def tier_level_notification(kase)
-      text = "Set this case to tier #{kase.tier_description}"
+    def tier_level_notification(kase, text)
       tier_level_note = {
         fallback: text,
         title: subject_and_id_title(kase),
