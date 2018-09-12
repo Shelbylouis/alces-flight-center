@@ -5,62 +5,20 @@
     <% end %>
   <% else %>
     <% if @case.tier_level < 3 %>
-      <%
-          modal_id = 'escalateModal'
-          modal_label = 'escalateModalLabel'
+      <%= link_to 'Open for comments',
+                   escalate_case_path(@case.id),
+                   PolicyDependentOptions.wrap(
+                       {
+                           class: "btn btn-warning btn-sm ml-2",
+                           id: 'confirm-escalate-button',
+                           method: :post,
+                           role: 'button'
+                       },
+                       policy: policy(@case).escalate?,
+                       action_description: 'open a case for comments',
+                       user: current_user
+                   )
       %>
-
-      <%= button_tag 'Escalate',
-        PolicyDependentOptions.wrap(
-          {
-            class: "btn btn-warning btn-sm ml-2",
-            data: {
-              toggle: 'modal',
-              target: "##{modal_id}",
-            },
-          },
-          policy: policy(@case).escalate?,
-          action_description: 'escalate a case',
-          user: current_user
-      )
-      %>
-
-      <div
-        class="modal fade"
-        id="<%= modal_id %>"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="<%= modal_label %>"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="<%= modal_label %>">
-                Escalating a case, please note:
-              </h5>
-              <button class="close" data-dismiss="modal">×</button>
-            </div>
-            <div class="modal-body">
-              <p>Escalating a support case means that you authorise potential use
-              of available account credit to help resolve your issue.</p>
-              <p>Do you wish to continue?</p>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-outline-primary" data-dismiss="modal">
-                Cancel
-              </button>
-              <%= link_to 'Escalate',
-                          escalate_case_path(@case.id),
-                          class: 'btn btn-outline-warning',
-                          id: 'confirm-escalate-button',
-                          method: :post,
-                          role: 'button'
-              %>
-            </div>
-          </div>
-        </div>
-      </div>
     <% elsif @case.can_create_change_request? && policy(ChangeRequest).create? %>
       <%= link_to 'Create change request',
                   new_cluster_case_change_request_path(@case.cluster.id, @case.display_id),

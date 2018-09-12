@@ -751,7 +751,7 @@ RSpec.describe 'Case page', type: :feature do
   end
 
   describe 'escalation' do
-    let(:escalate_button_text) { 'Escalate' }
+    let(:escalate_button_text) { 'Open for comments' }
 
     context 'for open tier 2 case' do
       subject do
@@ -762,23 +762,20 @@ RSpec.describe 'Case page', type: :feature do
         visit cluster_case_path(cluster,subject, as: admin)
 
         expect do
-          find_button escalate_button_text
+          find_link escalate_button_text
         end.not_to raise_error
 
-        click_button escalate_button_text
-
-        # Using find(...).click instead of click_button waits for modal to appear
-        find('#confirm-escalate-button').click
+        click_link escalate_button_text
 
         subject.reload
         expect(subject.tier_level).to eq 3
       end
 
-      it_behaves_like 'button is disabled for viewers' do
+      it_behaves_like 'button is disabled for viewers', button_link: true do
         let(:path) { cluster_case_path(subject.cluster, subject, as: user) }
         let(:button_text) { escalate_button_text }
         let(:disabled_button_title) do
-          'As a viewer you cannot escalate a case'
+          'As a viewer you cannot open a case for comments'
         end
       end
     end
@@ -788,7 +785,7 @@ RSpec.describe 'Case page', type: :feature do
         visit cluster_case_path(cluster, subject, as: admin)
 
         expect do
-          find_button escalate_button_text
+          find_link escalate_button_text
         end.to raise_error(Capybara::ElementNotFound)
       end
     end
