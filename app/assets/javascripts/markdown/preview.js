@@ -42,9 +42,7 @@ function configureMarkdownPreview() {
 function configureEditor(editor) {
   editor.find('[data-markdown-preview-button]').click((e) => showPreview(e, editor));
   editor.find('[data-markdown-write-button]').click((e) => showWrite(e, editor));
-  document.querySelectorAll('textarea').forEach(function(ta){
-    autosize(ta)
-  });
+  autosize(editor.find('textarea').get())
 };
 
 document.addEventListener('turbolinks:load', configureMarkdownPreview);
