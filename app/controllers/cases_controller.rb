@@ -126,6 +126,7 @@ class CasesController < ApplicationController
   def reopen
     change_action "Support case %s reopened." do |kase|
       kase.reopen!(current_user)
+      kase.tier_level = 3 unless kase.tier_level > 3
       CaseMailer.reopen_case(kase, current_user).deliver_later
     end
   end
