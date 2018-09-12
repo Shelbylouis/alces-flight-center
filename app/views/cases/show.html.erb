@@ -131,13 +131,13 @@
       </tr>
       <tr>
         <th>Tier</th>
-        <td>
-          <%= @case.tier_description %>
-          <%= render 'cases/escalation_controls' %>
-        </td>
-        <td/>
         <td id="case-tier-assignment">
-          <%= render 'cases/tier_controls' %>
+          <% if current_user.admin? %>
+            <%= render 'cases/tier_controls' %>
+          <% else %>
+            <%= @case.tier_description %>
+            <%= render 'cases/escalation_controls' %>
+          <% end %>
         </td>
       </tr>
       <% unless @case.maintenance_windows.unfinished.empty? %>

@@ -759,7 +759,7 @@ RSpec.describe 'Case page', type: :feature do
       end
 
       it 'can be escalated using button' do
-        visit cluster_case_path(cluster,subject, as: admin)
+        visit cluster_case_path(cluster,subject, as: contact)
 
         expect do
           find_link escalate_button_text
