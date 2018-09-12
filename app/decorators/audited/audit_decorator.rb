@@ -112,7 +112,7 @@ module Audited
     end
 
     def tier_level_text(from, to)
-      if to >= 2 && from <= 3
+      if to >= 2 && from <= 4
         if to > from
           "Escalated this case to tier #{h.tier_description(to)}."
         else

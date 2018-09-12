@@ -1,4 +1,4 @@
-<% if policy(@case).set_tier? && !@case.issue&.administrative? %>
+<% if policy(@case).set_tier? && @case.tier_can_be_changed? %>
   <%= form_for @case do |f| %>
     <div class="form-group">
       <div class="input-group">

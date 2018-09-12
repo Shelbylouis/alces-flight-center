@@ -131,8 +131,7 @@ class Case < ApplicationRecord
 
   validate :validate_not_resolved_with_open_cr
   validates :change_request,
-            presence: { if: proc { |k| k.tier_level == 4 } },
-            absence: { unless: proc { |k| k.tier_level == 4 } }
+            presence: { if: proc { |k| k.tier_level == 4 } }
 
   after_initialize :assign_cluster_if_necessary
   after_initialize :generate_token, on: :create
@@ -396,6 +395,16 @@ class Case < ApplicationRecord
 
   def administrative?
     issue.administrative
+  end
+
+  def tier_can_be_changed?
+    if administrative?
+      false
+    elsif change_request
+      change_request.finalised?
+    else
+      true
+    end
   end
 
   private
