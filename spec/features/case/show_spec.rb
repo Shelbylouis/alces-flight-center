@@ -975,7 +975,7 @@ RSpec.describe 'Case page', type: :feature do
     context 'as an admin' do
       it 'displays assignment controls' do
         visit cluster_case_path(cluster, open_case, as: admin)
-        assignment_select = find('#case_tier_level')
+        assignment_select = find('#case-tier-assignment').find('select')
 
         options = assignment_select.all('option').map(&:text)
         expect(options).to eq(['2 (Routine Maintenance)', '3 (General Support)'])
@@ -985,8 +985,9 @@ RSpec.describe 'Case page', type: :feature do
     context 'as a contact' do
       it 'does not display assignment controls' do
         visit cluster_case_path(cluster, open_case, as: contact)
+        assignment_td = find('#case-tier-assignment')
 
-        expect { find('#case_tier_level') }.to raise_error(Capybara::ElementNotFound)
+        expect { assignment_td.find('select') }.to raise_error(Capybara::ElementNotFound)
       end
     end
   end
