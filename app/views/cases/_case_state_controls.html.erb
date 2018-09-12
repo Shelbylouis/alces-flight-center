@@ -16,10 +16,23 @@
   <% end %>
 <% end %>
 
+<% if policy(@case).reopen? && @case.can_reopen? %>
+  <%= link_to 'Reopen this case',
+              reopen_case_path(@case),
+              class: 'btn btn-danger ml-2 btn-sm',
+              method: :post,
+              role: 'button',
+              title: 'Reopen this support case if the original issue has not been resolved.',
+              data: {
+                  confirm: 'Are you sure you want to reopen this support case?'
+              }
+  %>
+<% end %>
+
 <% if policy(@case).close? && @case.can_close? %>
   <%= form_tag({controller: 'cases', action: 'close'},
                method: :post,
-               class: 'form-inline',
+               class: 'form-inline mt-2',
                id: 'case-close-form'
       ) do %>
       <% if @case.cr_charge_applies? %>
@@ -38,7 +51,7 @@
         %>
         <div class="input-group-append">
           <%= submit_tag 'Set charge and close case',
-                         class: 'form-control btn btn-primary',
+                         class: 'form-control btn btn-primary btn-sm',
                          data: {
                              confirm: 'Are you sure you want to close this support case?'
                          }
