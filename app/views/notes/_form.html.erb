@@ -33,9 +33,11 @@
           <label for="note_visibility">Visibility</label>
           <%=
             f.select :visibility,
-                     [['Customer and engineer', 'customer'], ['Engineers only', 'engineering']],
-                     {},
-                     class: 'form-control'
+                    options_for_select([['Customer and engineer', 'customer'],
+                            ['Engineers only', 'engineering']],
+                            'engineering'),
+                    {},
+                    class: 'form-control'
           %>
         </div>
       <% else %>
