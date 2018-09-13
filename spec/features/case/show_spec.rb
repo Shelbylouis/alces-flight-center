@@ -361,6 +361,60 @@ RSpec.describe 'Case page', type: :feature do
     end
   end
 
+  describe 'case reopening' do
+
+    let(:button_text) { 'Reopen this case' }
+
+    before(:each) do
+      visit cluster_case_path(cluster, resolved_case, as: user)
+    end
+
+    context 'for viewers' do
+      let(:user) { create(:viewer, site: site) }
+      it 'does not show reopen button' do
+        expect do
+          find_button button_text
+        end.to raise_error Capybara::ElementNotFound
+      end
+    end
+
+    RSpec.shared_examples 'reopening allowed' do
+      it 'allows reopening a case with a comment' do
+        click_button button_text
+
+        fill_in 'comment', with: 'Reopen ALL the things!'
+        click_button 'Reopen'
+
+        resolved_case.reload
+        expect(resolved_case).to be_open
+        expect(resolved_case.tier_level).to be 3
+        expect(find('.alert-success')).to have_text("Support case #{resolved_case.display_id} reopened.")
+        expect(resolved_case.case_comments.last.text).to have_text 'Reopen ALL the things!'
+        expect(resolved_case.case_comments.last.user).to eq user
+      end
+      it 'requires a comment to reopen a case' do
+        click_button button_text
+
+        click_button 'Reopen' # without adding a comment
+
+        resolved_case.reload
+        expect(resolved_case).to be_resolved
+        expect(resolved_case.tier_level).to be 2
+        expect(find('.alert-danger')).to have_text('You must provide a comment to reopen this case.')
+      end
+    end
+
+    context 'for admins' do
+      let(:user) { admin }
+      include_examples 'reopening allowed'
+    end
+
+    context 'for contacts' do
+      let(:user) { contact }
+      include_examples 'reopening allowed'
+    end
+  end
+
   describe 'case assignment' do
 
     let(:emails) { ActionMailer::Base.deliveries }

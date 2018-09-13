@@ -124,10 +124,21 @@ class CasesController < ApplicationController
   end
 
   def reopen
-    change_action "Support case %s reopened." do |kase|
-      kase.reopen!(current_user)
-      kase.tier_level = 3 unless kase.tier_level > 3
-      CaseMailer.reopen_case(kase, current_user).deliver_later
+    comment = params[:comment]
+
+    if comment.empty?
+      flash[:error] = 'You must provide a comment to reopen this case.'
+      redirect_to @scope.dashboard_case_path(case_from_params)
+    else
+      change_action "Support case %s reopened." do |kase|
+        kase.reopen!(current_user)
+        kase.tier_level = 3 unless kase.tier_level > 3
+        kase.case_comments.create(
+          text: comment,
+          user: current_user
+        )
+        CaseMailer.reopen_case(kase, current_user).deliver_later
+      end
     end
   end
 
