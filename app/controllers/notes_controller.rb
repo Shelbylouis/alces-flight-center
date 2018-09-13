@@ -15,7 +15,7 @@ class NotesController < ApplicationController
   def new
     @note = cluster_from_params.notes.build(
       title: 'New document',
-      visibility: 'customer'
+      visibility: 'engineering'
     ).decorate
     authorize @note
   end
@@ -87,7 +87,7 @@ class NotesController < ApplicationController
   def enforce_visibility(params)
     params.tap do |p|
       unless policy(@note).set_visibility?
-        p[:visibility] = 'customer'
+        p[:visibility] = 'engineering'
       end
     end
   end
